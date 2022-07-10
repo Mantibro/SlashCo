@@ -656,7 +656,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 
 		if SlashCo.LobbyData.LOBBYSTATE > 0 then
 
-			if ply.Team() == TEAM_SURVIVOR then
+			if ply:Team() == TEAM_SURVIVOR then
 
 				ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
