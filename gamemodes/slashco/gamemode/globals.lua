@@ -1280,7 +1280,7 @@ SlashCo.OfferingVoteSuccess = function(id)
 
     SlashCo.LobbyData.VotedOffering = 0
 
-    if fail = true then return end
+    if fail == true then return end
 
     SlashCo.LobbyData.Offering = id
 
