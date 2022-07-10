@@ -20,8 +20,11 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
         if SlashCo.CurRound.SlasherData[slasherid].CanChase == false then SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99 end
 
-        --Handle The Chase Functions \/ \/ \/
 
+        if
+        --Handle The Chase Functions \/ \/ \/
+        if SlashCo.CurRound.SlasherData[slasherid].SlashID == 3 then goto no_chase end
+do
         local slasher = team.GetPlayers(TEAM_SLASHER)[i]
         SlashCo.CurRound.SlasherData[slasherid].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
 
@@ -49,8 +52,10 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
             slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
             slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
         end
-
+end
         ::CONTINUE::
+
+        ::no_chase::
 
         --Handle The Chase Functions /\ /\ /\
 
