@@ -658,17 +658,17 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 
 			if ply:Team() == TEAM_SURVIVOR then
 
-				ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
+				ply:ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
 
-				for i, ply in ipairs( player.GetAll() ) do
+				for i, ply in ipairs( player.GetAll() ) do.
 					ply:SetTeam(TEAM_SPECTATOR)
 					ply:Spawn()
 				end
 
 			end
 
-			if ply.SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or ply.SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid then
+			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or ply.SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid then
 
 				ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
