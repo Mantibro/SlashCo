@@ -117,31 +117,36 @@ SCInfo.Offering = {
     {
         Name = "Exposure",
         Rarity = 1,
-        Description = "Will make Gas Cans easier to find,\nBut\nYou will not find more than you need."
+        Description = "Will make Gas Cans easier to find,\nBut\nYou will not find more than you need.",
+        GasCanMod = 0
     },
         
     {
         Name = "Satiation",
         Rarity = 1,
-        Description = "The Slasher will be a Demon, and its items will be scarce,\nBut\nThe items will have greater effect."
+        Description = "The Slasher will be a Demon, and its items will be scarce,\nBut\nThe items will have greater effect.",
+        GasCanMod = 0
     },
 
     {
         Name = "Drainage",
         Rarity = 2,
-        Description = "Gas cans will be plentiful,\nBut\nGenerators will leak fuel over time."
+        Description = "Gas cans will be plentiful,\nBut\nGenerators will leak fuel over time.",
+        GasCanMod = 6
     },
 
     {
         Name = "Duality",
         Rarity = 3,
-        Description = "Only one generator will need to be powered,\nBut\nYou will face two Slashers."
+        Description = "Only one generator will need to be powered,\nBut\nYou will face two Slashers.",
+        GasCanMod = 0
     },
 
     {
         Name = "Singularity",
         Rarity = 3,
-        Description = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful."
+        Description = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful.",
+        GasCanMod = 6
     }
 
 }

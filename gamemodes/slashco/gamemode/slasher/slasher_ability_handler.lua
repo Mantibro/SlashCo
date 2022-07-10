@@ -4,6 +4,8 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 
     if #ents.FindByClass("sc_generator") < 1 then return end
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     --Calculate the Game Progress Value
     --The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (1 - 10)
     local gpg = SlashCo.GasCansPerGenerator
@@ -16,16 +18,13 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
         local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
-        local dist = SlashCo.CurRound.SlasherData[slasherid].ChaseRange
-
-        if SlashCo.CurRound.SlasherData[slasherid].CanChase == false then SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99 end
-
-
-        if
-        --Handle The Chase Functions \/ \/ \/
+        local dist = SlashCo.CurRound.SlasherData[slasherid].ChaseRange + (SO * 250)
 
         local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+
+        --Handle The Chase Functions \/ \/ \/
         SlashCo.CurRound.SlasherData[slasherid].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
+        if SlashCo.CurRound.SlasherData[slasherid].CanChase == false then SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99 end
 
         if not slasher:GetNWBool("InSlasherChaseMode") or  SlashCo.CurRound.SlasherData[slasherid].SlashID == 3 then goto CONTINUE end
 
@@ -52,7 +51,7 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
             slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
         end
         ::CONTINUE::
-        
+
         --Handle The Chase Functions /\ /\ /\
 
         --Other Shared Functionality:
@@ -68,7 +67,7 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
         v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Cooldown for spook animation
 
         if v1 > 0 then 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 - 0.01 
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 - (0.01 + (SO * 0.04)) 
         end
 
         if v2 > 0 then 
@@ -83,8 +82,8 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
         if v3 < 0.01 then slasher:SetNWBool("BababooeySpooking", false) end
 
-        if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - 0.01 end
-        if v3 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 - 0.01 end
+        if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - (0.01 + (SO * 0.04)) end
+        if v3 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 - (0.01 + (SO * 0.04)) end
 
     end
         ::SID::
@@ -99,7 +98,7 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
         if v2 > 0 then 
 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - 0.01 
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - (0.01 + (SO * 0.04))  
             SlashCo.CurRound.SlasherData[slasherid].CanKill = false 
             SlashCo.CurRound.SlasherData[slasherid].CanChase = false 
 
@@ -117,11 +116,11 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
         end
 
-        if v3 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 - 0.01 end
-        if v4 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = v4 - 0.02 end
+        if v3 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 - (0.01 + (SO * 0.04))  end
+        if v4 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = v4 - (0.02 + (SO * 0.08))  end
 
         if v5 < 160 and slasher:GetNWBool("InSlasherChaseMode") then 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = v5 + 0.01
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = v5 + (0.01 + (SO * 0.02))
             slasher:SetRunSpeed(SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed + (v5/3.5))
             slasher:SetWalkSpeed(SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed + (v5/3.5))
         else
@@ -139,13 +138,13 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
                 if not slasher:GetNWBool("SidGunRage") then
 
-                    SlashCo.CurRound.SlasherData[slasherid].Eyesight = SlashCo.SlasherData[2].Eyesight + 2
-                    SlashCo.CurRound.SlasherData[slasherid].Perception = SlashCo.SlasherData[2].Perception + 1.5
+                    SlashCo.CurRound.SlasherData[slasherid].Eyesight = SlashCo.SlasherData[2].Eyesight + (2 + (SO * 2))
+                    SlashCo.CurRound.SlasherData[slasherid].Perception = SlashCo.SlasherData[2].Perception + (1.5 + (SO * 1))
 
                 else
 
-                    SlashCo.CurRound.SlasherData[slasherid].Eyesight = SlashCo.SlasherData[2].Eyesight + 5
-                    SlashCo.CurRound.SlasherData[slasherid].Perception = SlashCo.SlasherData[2].Perception + 1
+                    SlashCo.CurRound.SlasherData[slasherid].Eyesight = SlashCo.SlasherData[2].Eyesight + (5 + (SO * 2))
+                    SlashCo.CurRound.SlasherData[slasherid].Perception = SlashCo.SlasherData[2].Perception + (1 + (SO * 3))
 
                 end
 

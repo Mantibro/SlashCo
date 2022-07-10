@@ -324,11 +324,52 @@ local Think = function()
 			local allRunning = true
 			local gens = table.GetKeys(SlashCo.CurRound.Generators)
 			for I=1, #gens do
+
 				if not SlashCo.CurRound.Generators[gens[I]].Running then
 					allRunning = false
 					break
 				end
+
 			end
+
+			for I=1, #gens do
+
+				if SlashCo.CurRound.OfferingData.DO then
+
+					if SlashCo.CurRound.Generators[gens[I]].Running then
+						allRunning = true
+						break
+					end
+
+				end
+
+			end
+
+			--DRAINAGE \/ \/ \/
+
+			if SlashCo.CurRound.OfferingData.CurrentOffering == 3 then
+
+				local gn1 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[1]:EntIndex()].Remaining
+    			local gn2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].Remaining
+
+				local needed = gn1 + gn2
+
+				if #SlashCo.CurRound.GasCans < (needed + 1) then return end --Prevent draining if there is too few gas cans
+
+				SlashCo.CurRound.OfferingData.DrainageTick = SlashCo.CurRound.OfferingData.DrainageTick + FrameTime()
+
+				if SlashCo.CurRound.OfferingData.DrainageTick > 50 then --Drain the gas
+					SlashCo.CurRound.OfferingData.DrainageTick = 0
+					local r = math.random(1,2)
+
+					if SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[r]:EntIndex()].Remaining < 4 then
+						SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[r]:EntIndex()].Remaining = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[r]:EntIndex()].Remaining + 1
+					end
+				end
+
+			end
+
+			--DRAINAGE /\ /\ /\
 
 			--Open the trailer door here when it's ready. For now it instantly ends the round.
 			if allRunning and SlashCo.CurRound.SummonHelicopter == false then

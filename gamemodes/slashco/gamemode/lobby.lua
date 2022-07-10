@@ -505,7 +505,8 @@ function lobbyRoundSetup()
 	end
 
 	--Assign the map randomly
-	SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
+	--SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
+	SlashCo.LobbyData.SelectedMapNum = 2
 
 	for i, ply in ipairs( player.GetAll() ) do
 		ply:ChatPrint("(Debug) Lobby Setup complete. Difficulty: "..SlashCo.LobbyData.SelectedDifficulty)
@@ -611,8 +612,6 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
 	if SlashCo.LobbyData.LOBBYSTATE == 1 then
 
-		Check = P1Check + P2Check + P3Check + P4Check
-
 		if #SlashCo.LobbyData.AssignedSurvivors == Check and Check > 0 and SERVER then 
 			RunConsoleCommand("lobby_debug_transition") 
 		end
@@ -649,6 +648,8 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		P4Check = 0
 	end
 
+	Check = P1Check + P2Check + P3Check + P4Check
+
 end)
 
 hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disconnects after the Lobby stage is underway, reset the lobby.
@@ -661,9 +662,9 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 				ply:ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
 
-				for i, ply in ipairs( player.GetAll() ) do.
-					ply:SetTeam(TEAM_SPECTATOR)
-					ply:Spawn()
+				for i, play in ipairs( player:GetAll() ) do
+					play:SetTeam(TEAM_SPECTATOR)
+					play:Spawn()
 				end
 
 			end
@@ -673,9 +674,9 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 				ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
 
-				for i, ply in ipairs( player.GetAll() ) do
-					ply:SetTeam(TEAM_SPECTATOR)
-					ply:Spawn()
+				for i, play in ipairs( player.GetAll() ) do
+					play:SetTeam(TEAM_SPECTATOR)
+					play:Spawn()
 				end
 
 			end

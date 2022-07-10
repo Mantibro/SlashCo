@@ -15,6 +15,11 @@ SlashCo.Maps = {
     {
         ID = "sc_summercamp",
         NAME = "Black Lake Summer Camp"
+    },
+
+    {
+        ID = "rp_deadcity",
+        NAME = "Dead City"
     }
 
 }
@@ -152,8 +157,13 @@ SlashCo.ResetCurRoundData = function()
         ConnectedPlayers = {},
         AntiLoopSpawn = false,
         OfferingData = {
-            CurrentOffering = "",
-            GasCanMod = 0
+            CurrentOffering = 0,
+            GasCanMod = 0,
+            SO = 0,
+            DO = false,
+            SatO = 0,
+            DrainageTick = 0,
+            ItemMod = 0
         },
         SlasherData = {
             AllSurvivors = {}, --This table holds all survivors loaded for this round, dead or alive, as well as their contribution value to the round. (TODO: game contribution)
@@ -189,6 +199,7 @@ SlashCo.ResetCurRoundData = function()
         roundOverToggle = false,
         SlasherSpawned = false,
         SummonHelicopter = false,
+        HelicopterSpawnPosition = Vector(0,0,0),
         HelicopterTargetPosition = Vector(0,0,0),
         AllowRoundEndSequence = false,
         EscapeHelicopterSummoned = false,
@@ -226,6 +237,7 @@ if SERVER then
         --Transfer loaded data into the main table
         SlashCo.CurRound.Difficulty = diff
         SlashCo.CurRound.SurvivorData.GasCanMod = survivorgasmod
+        SlashCo.CurRound.OfferingData.CurrentOffering = offering
 
         --First we insert the Slasher. If the Slasher does not join in time the game cannot begin.
 
@@ -579,12 +591,16 @@ SlashCo.ValidateMap = function(map)
         return false
     end
 
+    if SlashCo.CurRound.OfferingData.CurrentOffering > 0 then 
+        SlashCo.CurRound.OfferingData.GasCanMod = SCInfo.Offering[SlashCo.CurRound.OfferingData.CurrentOffering].GasCanMod
+    end
+
     local slashergasmod = 0 --FIX LATER
 
     --Amount of Spawned Gas Cans: 7 + (4 - Difficulty Value) + Map Modifier + Offering Modifier + Slasher-Specific Modifier + (4 - Player Count)
     local gasCount = json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + slashergasmod + (4 - SlashCo.CurRound.SurvivorCount) - SlashCo.CurRound.SurvivorData.GasCanMod
 
-    if SlashCo.CurRound.OfferingData.CurrentOffering == "offering_exposure" then
+    if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --The Exposure Offering caps gas cans at 8.
         gasCount = 8 + slashergasmod
     end
 
@@ -599,6 +615,8 @@ SlashCo.ValidateMap = function(map)
     local batCount = math.max(json.Generators.Count, #(json.Batteries.Spawnpoints))
     local itemCount = #(json.Items.Spawnpoints)
     local HeliCount = #(json.Helicopter.Spawnpoints)
+
+    SlashCo.CurRound.HelicopterSpawnPosition = json.Helicopter.StartLocation.pos
 
     --Add gas can spawns to the number of item spawns if allowed by the config
     local usesGasSpawns = ""
@@ -795,6 +813,11 @@ SlashCo.CreateGasCans = function(spawnpoints)
         local pos = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].pos
         local ang = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].ang
 
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --Exposure Offering Spawnpoints
+            pos = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[spawnpoints[I]].pos
+            ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[spawnpoints[I]].ang
+        end
+
         local entID = SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
@@ -971,12 +994,10 @@ SlashCo.EndRound = function()
     if SlashCo.CurRound.SurvivorCount == 0 then
         print("[SlashCo] The slasher won the round.")
         survivorsWon = false
-        if SlashCo.CurRound.AllowRoundEndSequence == true then
-            if SlashCo.CurRound.SlasherData.GameProgress < 10 then 
-                SlashCo.RoundOverScreen(3)
-            else
-                SlashCo.RoundOverScreen(2)
-            end
+        if SlashCo.CurRound.SlasherData.GameProgress < 10 then 
+            SlashCo.RoundOverScreen(3)
+        else
+            SlashCo.RoundOverScreen(2)
         end
     else
         print("[SlashCo] The survivors won the round. "..tostring(SlashCo.CurRound.SurvivorCount).." survivors made it out.")
@@ -1045,6 +1066,22 @@ SlashCo.SpawnCurConfig = function()
         --local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
         local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
 
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
+            gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.Offerings.Exposure.Spawnpoints))
+        end
+
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
+            SlashCo.CurRound.OfferingData.ItemMod = -2
+        end
+
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then SlashCo.CurRound.OfferingData.SatO = 1 end
+
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 4 then SlashCo.CurRound.OfferingData.DO = true end 
+
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 5 then SlashCo.CurRound.OfferingData.SO = 1 end
+
+        SlashCo.CurRound.ItemCount = SlashCo.CurRound.ItemCount + SlashCo.CurRound.OfferingData.ItemMod
+
         local possibleItemSpawnpoints = SlashCo.CurConfig.Items.Spawnpoints
         if SlashCo.CurConfig.Items.IncludeGasCanSpawns then
             for i=1, #(SlashCo.CurConfig.GasCans.Spawnpoints) do
@@ -1084,7 +1121,6 @@ SlashCo.SpawnCurConfig = function()
         SlashCo.CurRound.roundOverToggle = true
 
         SlashCo.BroadcastItemData()
-
         
 		timer.Simple(0.5, function()
 
@@ -1184,7 +1220,7 @@ SlashCo.CreateEscapeHelicopter = function()
 
     if SlashCo.CurRound.EscapeHelicopterSpawned == true then return end
 
-    local entID = SlashCo.CreateHelicopter( Vector(7675, -3046, 1700), Angle( 0,0,0 ) ) --TODO: set up a unique spawn position for each map.
+    local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) ) --TODO: set up a unique spawn position for each map.
 
     SlashCo.CurRound.EscapeHelicopterSpawned = true
 
@@ -1275,6 +1311,12 @@ SlashCo.OfferingVoteSuccess = function(id)
             end
 
         end
+
+    end
+
+    if id == 2 then --Satiation
+
+        --SlashCo.LobbyData.SelectedSlasherInfo.CLS = 2
 
     end
 

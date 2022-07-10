@@ -249,6 +249,20 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		
 		hook.Add( "Think", "Slasher_Chasing_Light", function()
 
+			if slasher:GetNWBool("TrollgeStage2") then
+
+				local tlight = DynamicLight( slasher:EntIndex() + 999 )
+	       		if ( tlight ) then
+		        	tlight.pos = slasher:LocalToWorld( Vector(0,0,20) )
+		        	tlight.r = 255
+		        	tlight.g = 0
+		        	tlight.b = 0
+		        	tlight.brightness = 5
+		        	tlight.Decay = 1000
+		        	tlight.Size = 2500
+		        	tlight.DieTime = CurTime() + 1
+            	end
+
 			if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") then return end
             
             local dlight = DynamicLight( slasher:EntIndex() + 1 )
@@ -261,20 +275,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		        dlight.Decay = 1000
 		        dlight.Size = 250
 		        dlight.DieTime = CurTime() + 1
-            end
-
-			if slasher:GetNWBool("TrollgeStage2") then
-
-				local tlight = DynamicLight( slasher:EntIndex() + 999 )
-	       		if ( tlight ) then
-		        tlight.pos = slasher:LocalToWorld( Vector(0,0,20) )
-		        tlight.r = 255
-		        tlight.g = 0
-		        tlight.b = 0
-		        tlight.brightness = 5
-		        tlight.Decay = 1000
-		        tlight.Size = 2500
-		        tlight.DieTime = CurTime() + 1
             end
 
 			end

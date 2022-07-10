@@ -28,7 +28,7 @@ SlashCo.UseItem = function(ply)
 
 	if SERVER then
 
-	--if game.GetMap() == "sc_lobby" then return end
+	if game.GetMap() == "sc_lobby" then return end
 
 	if ply:Team() != TEAM_SURVIVOR then return end
 

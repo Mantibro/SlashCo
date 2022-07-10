@@ -58,7 +58,7 @@ util.AddNetworkString("mantislashcoOfferingVoteFinished")
 
 function PlayGlobalSound(sound, level, ent)
 
-	--ent:EmitSound(sound, 1, 1, 0)
+	ent:EmitSound(sound, 1, 1, 0)
 	--"Sounds must be precached serverside manually before they can be played. util.PrecacheSound does not work for this purpose, Entity:EmitSound does the trick"
 
 	if SERVER then

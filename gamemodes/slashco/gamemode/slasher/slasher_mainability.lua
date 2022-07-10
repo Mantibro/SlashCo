@@ -4,6 +4,9 @@ SlashCo.SlasherMainAbility = function(slasher)
 
     local slasherid = slasher:SteamID64()
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+    local SatO = SlashCo.CurRound.OfferingData.SatO
+
     --Bababooey's Invisibility ability \/ \/ \/
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 1 then goto SID end
@@ -63,7 +66,7 @@ do --To Prevent local value jump error
         ::SKIP::
 
         --Quiet appear
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(3,13)
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(3,(13 - (SO * 6)))
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 8
 
         ::SPOOKAPPEAR::
@@ -105,7 +108,7 @@ end --ends here
                 slasher:Freeze(false) 
                 slasher:SetNWBool("SidEating", false) 
                 slasher:SetNWBool("DemonPacified", true)
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1 + SatO
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(15,25)
                 target:Remove()
             end)

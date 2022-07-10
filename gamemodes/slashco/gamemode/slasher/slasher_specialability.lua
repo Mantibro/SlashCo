@@ -4,10 +4,12 @@ SlashCo.SlasherSpecialAbility = function(slasher)
 
     local slasherid = slasher:SteamID64()
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     --Bababooey's Clone ability
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 1 then goto SID end
 do
-    if #ents.FindByClass( "sc_babaclone") > 0 then return end
+    if #ents.FindByClass( "sc_babaclone") > SO then return end
     local clone = SlashCo.CreateItem("sc_babaclone",slasher:GetPos(), slasher:GetAngles())
 end
 
@@ -20,8 +22,8 @@ end
         slasher:SetNWBool("SidGun", true)
         slasher:SetNWBool("SidGunEquipping", true)
         slasher:Freeze(true)
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 4
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 4
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 4 - (SO * 2)
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 4 - (SO * 2)
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 - 1 --Deplete the uses
 

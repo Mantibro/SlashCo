@@ -4,6 +4,8 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     local slasherid = slasher:SteamID64()
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 3 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 < 1 then goto trollclaw end
     if slasher:GetNWBool("SidGun") then goto sidgun end
 do
@@ -131,16 +133,16 @@ do
 
                 if slasher:GetPos():Distance(target:GetPos()) < 200 then
 
-                local vPoint = target:GetPos() + Vector(0,0,50)
-                local bloodfx = EffectData()
-                bloodfx:SetOrigin( vPoint )
-                util.Effect( "BloodImpact", bloodfx )
+                    local vPoint = target:GetPos() + Vector(0,0,50)
+                    local bloodfx = EffectData()
+                    bloodfx:SetOrigin( vPoint )
+                    util.Effect( "BloodImpact", bloodfx )
 
-                slasher:EmitSound("slashco/slasher/trollge_hit.wav")
+                    slasher:EmitSound("slashco/slasher/trollge_hit.wav")
 
-                if SERVER then target:TakeDamage( 10, slasher, slasher ) end
+                    if SERVER then target:TakeDamage( (10 + (SO * 10)), slasher, slasher ) end
 
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1 + SO
 
                 end
 

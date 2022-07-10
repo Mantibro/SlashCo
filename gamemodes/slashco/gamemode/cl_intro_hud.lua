@@ -17,9 +17,27 @@ net.Receive( "mantislashcoGameIntro", function( len, ply )
 		intro_diff = "HARD"
 	end
 
+	if introtable.s_class == 0 then
+		intro_class = "Unknown"
+	elseif introtable.s_class == 1 then
+		intro_class = "Cryptid"
+	elseif introtable.s_class == 2 then
+		intro_class = "Demon"
+	elseif introtable.s_class == 3 then
+		intro_class = "Umbra"
+	end
+
+	if introtable.s_danger == 0 then
+		intro_danger = "Unknown"
+	elseif introtable.s_danger == 1 then
+		intro_danger = "Moderate"
+	elseif introtable.s_danger == 2 then
+		intro_danger = "Considerable"
+	elseif introtable.s_danger == 3 then
+		intro_danger = "Devastating"
+	end
+
 	intro_name = introtable.s_name
-	intro_class = introtable.s_class
-	intro_danger = introtable.s_danger
 	intro_offer = introtable.offer
 
 	if intromusic_antispam == nil or intromusic_antispam != true then 
