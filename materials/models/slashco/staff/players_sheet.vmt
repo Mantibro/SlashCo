@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$baseTexture" "models/slashco/staff/staffsheet2"
+	"$bumpmap" "models/kleiner/kleiner_sheet_normal"
+
+}

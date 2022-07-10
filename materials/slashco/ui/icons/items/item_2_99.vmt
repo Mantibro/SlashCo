@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/icons/items/item_2_99"
+	"$translucent" 1
+	"$halflambert" 1
+}

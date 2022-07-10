@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_slashco/items/cookie/dough"
+	"$bumpmap" "models/props_slashco/items/cookie/dough_nm"
+	"$halflambert" 1
+}

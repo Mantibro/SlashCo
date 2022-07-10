@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/lobby_ready"
+	"$alphatest" 1
+	"$halflambert" 1
+}

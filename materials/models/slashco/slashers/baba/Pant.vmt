@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\baba\Pant"
+	"$bumpmap" "models\slashco\slashers\baba\PantNM"
+	"$halflambert" 1
+}

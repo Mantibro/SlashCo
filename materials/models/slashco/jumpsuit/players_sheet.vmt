@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/slashco/jumpsuit/jumpsuitsheet2"
+	"$bumpmap" "models/slashco/jumpsuit/jumpsuit_n"
+}

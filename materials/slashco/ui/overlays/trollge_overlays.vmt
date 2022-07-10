@@ -1,0 +1,17 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/overlays/trollge_overlays"
+	"$alpha" "0.5"
+	
+
+	"Proxies"
+	{
+		"AnimatedTexture"
+		{
+			"animatedTextureVar"		"$basetexture"
+			"animatedTextureFrameNumVar"	"$frame"
+			"animatedTextureFrameRate"		"5"
+		}
+	}
+}
+

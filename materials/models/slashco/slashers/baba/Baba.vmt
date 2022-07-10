@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\baba\Baba"
+	"$halflambert" 1
+}

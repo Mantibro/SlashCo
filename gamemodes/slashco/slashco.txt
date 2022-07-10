@@ -1,0 +1,22 @@
+"slashco"
+{
+	"base"		"base"
+	"title"		"SlashCo"
+	"maps"		"^sc_"
+	"category"	"pvp"
+	"menusystem"	"1"
+	"workshopid"	""
+
+	"settings"
+	{
+		1
+		{
+			"name"		"slashco_player_cycle"
+			"text"		"Cycle Players"
+			"help"		"If enabled, having more than 5 players will automatically cycle players through sets of 5."
+			"type"		"CheckBox"
+			"default"	"1"
+		}
+
+	}
+}

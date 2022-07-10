@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_slashco/helicopter/seats"
+	"$surfaceprop" "Dirt"
+	"$halflambert" 1
+}

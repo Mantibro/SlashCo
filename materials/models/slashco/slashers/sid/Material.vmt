@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/sid/Material"
+	"$bumpmap" "models/slashco/slashers/sid/Material-bump"
+	"$halflambert" 1
+}
