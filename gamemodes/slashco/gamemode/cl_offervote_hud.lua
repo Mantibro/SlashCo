@@ -33,7 +33,7 @@ net.Receive( "mantislashcoOfferingVoteFinished", function( len, ply )
 
 end)
 
-hook.Add("HUDPaint", "RoundIntroHUD", function()
+hook.Add("HUDPaint", "OfferingVoteHUD", function()
 
 	local ply = LocalPlayer()
 
