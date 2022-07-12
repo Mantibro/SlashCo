@@ -160,6 +160,7 @@ SlashCo.UseItem = function(ply)
 
 		else
 			ply:ChatPrint("You can activate the beacon once one generator has been turned on.")
+			return
 		end
 
 	end

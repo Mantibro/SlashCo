@@ -121,5 +121,51 @@ end --ends here
 
     ::AMOGUS::
 
+    --Amogus Human Transform \/ \/ \/
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
+
+    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 then
+
+        slasher:SetNWBool("AmogusDisguising", true)
+        slasher:Freeze(true)
+
+        timer.Simple(2, function() 
+            slasher:Freeze(false) 
+            slasher:SetNWBool("AmogusDisguising", false)
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2
+
+            slasher:SetNWBool("AmogusSurvivorDisguise", true)
+            slasher:SetNWBool("AmogusDisguised", true)
+
+            local rand = math.random( 1, 5 )
+	        local id = 1
+	        if rand < 3 then id = rand elseif rand == 3 then id = 5 elseif rand == 4 then id = 7 end
+	        local modelname = "models/slashco/survivor/male_0"..id..".mdl"
+	        util.PrecacheModel( modelname )
+	        slasher:SetModel( modelname )
+
+        end)
+
+    elseif slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 then
+
+        --sound
+        slasher:Freeze(true)
+        slasher:SetNWBool("AmogusSurvivorDisguise", false)
+        slasher:SetNWBool("AmogusDisguised", false)
+
+        util.PrecacheModel( "models/slashco/slashers/amogus/amogus.mdl" )
+	    slasher:SetModel( "models/slashco/slashers/amogus/amogus.mdl" )
+
+        timer.Simple(2 - (SO * 1.95), function() 
+            slasher:Freeze(false) 
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 3 - (SO * 2.8)
+        end)
+
+    end
+
+    --Amogus Human Transform /\ /\ /\
+
+    ::THIRSTY::
+
 
 end

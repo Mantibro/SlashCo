@@ -270,6 +270,31 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
     ::AMOGUS::
 
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
+    --Amogus' Abilities
+do
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Transformation type
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Transform cooldown
+    --v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --blood
+
+    if v2 > 0 then 
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() 
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = false
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+    else
+        if not slasher:GetNWBool("AmogusDisguised") then
+            SlashCo.CurRound.SlasherData[slasherid].CanKill = true
+            SlashCo.CurRound.SlasherData[slasherid].CanChase = true
+        else
+            SlashCo.CurRound.SlasherData[slasherid].CanKill = false
+            SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+        end
+    end   
+    
+    
+end
+    ::THIRSTY::
+
 end
 
 end)

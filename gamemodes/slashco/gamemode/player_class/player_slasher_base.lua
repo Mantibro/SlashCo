@@ -34,6 +34,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 		return
 	end
 
+	if ply:GetNWBool("AmogusDisguised") then return end
+
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	local spook = ply:GetNWBool("BababooeySpooking")
@@ -180,6 +182,26 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	end
 
 	::amogus::
+
+	if ply:GetModel() != "models/slashco/slashers/amogus/amogus.mdl" then goto thirsty end --Amogus' Animator
+
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_HL2MP_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN 
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	::thirsty::
 	
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
@@ -187,6 +209,7 @@ end)
 
 hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, volume, rf )
 
+	if ply:GetNWBool("AmogusSurvivorDisguise") then return false end
 
 	if ply:Team() == TEAM_SLASHER then 
 
@@ -198,6 +221,11 @@ hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, 
 			ply:EmitSound( "slashco/slasher/sid_step"..math.random(1,2)..".mp3") 
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/trollge/trollge.mdl" then --Trollge (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/amogus/amogus.mdl" then --Amogus Footsteps
+			if ply:GetNWBool("AmogusFuelDisguise") then return true end
+
+			ply:EmitSound( "slashco/slasher/amogus_step"..math.random(1,3)..".wav") 
 			return true 
 		end
 		

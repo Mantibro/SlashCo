@@ -24,6 +24,30 @@ SCInfo.Slasher = {
         Danger = "Devastating",
         Description = "Troll.",
         ProTip = "-This Slasher grows stronger with human blood.\n-Its eyesight seems to be limited to moving objects."
+    },
+
+    {
+        Name = "Amogus",
+        Class = "Cryptid",
+        Danger = "Moderate",
+        Description = "The Imposter Slasher who is the master of deception and hiding in plain sight.\n\n-Amogus can assume the form of one of a Survivor.\n-He can assume the form of a Fuel Can.\n-Amogus is really loud while running.",
+        ProTip = "-This Slasher can disguise itself as a human.\n-Fuel Cans are also presumed to be another disguise."
+    },
+
+    {
+        Name = "Thirsty",
+        Class = "Demon",
+        Danger = "Considerable",
+        Description = "The Milk Slasher whose abilities depend on his level of Thirst.\n\n-Thirsty must drink Jugs of Milk to reset his thirst.\n-The Thirstier he is, the slower he is, but can sense the position of players.\n-Thirsty is really quiet.",
+        ProTip = "-This Slasher is heavily linked with Milk Jugs.\n-2."
+    },
+
+    {
+        Name = "Male_07",
+        Class = "Umbra",
+        Danger = "Devastating",
+        Description = "TThe Omniscient Slasher which can possess one of his many clones.\n\n-Male_07 will turn into a monstrous entity after a long enough chase.\n-He can keep his deadlier human form for longer as the game progresses.",
+        ProTip = "-1.\n-2."
     }
 
 }

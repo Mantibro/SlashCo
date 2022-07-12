@@ -583,7 +583,7 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
 			local seek = seek
 
-			if num < 3 then return end
+			if num < 2 then return end
 
 			if seek == nil then seek = 0 end
 
@@ -619,7 +619,7 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		local minx = -1520
 		local maxx = -1360
 		local miny = -270
-		local maxy = 140
+		local maxy = -140
 
 		for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
 
@@ -647,6 +647,11 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		P3Check = 0
 		P4Check = 0
 	end
+
+	if P1Check == nil then P1Check = 0 end
+	if P2Check == nil then P2Check = 0 end
+	if P3Check == nil then P3Check = 0 end
+	if P4Check == nil then P4Check = 0 end
 
 	Check = P1Check + P2Check + P3Check + P4Check
 

@@ -111,6 +111,26 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "",
         KillSound = "slashco/slasher/trollge_kill.wav"
+    },
+
+    {
+        NAME = "Amogus",
+        ID = 4,
+        CLS = 1,
+        DNG = 1,
+        Model = "models/slashco/slashers/amogus/amogus.mdl",
+        KillDelay = 2,
+        GasCanMod = 0,
+        ProwlSpeed = 150,
+        ChaseSpeed = 275,
+        Perception = 4.5,
+        Eyesight = 6,
+        KillDistance = 130,
+        ChaseRange = 400,
+        ChaseDuration = 15.0,
+        JumpscareDuration = 2,
+        ChaseMusic = "",
+        KillSound = "slashco/slasher/amogus_kill.wav"
     }
 
 }
@@ -185,7 +205,7 @@ SlashCo.ResetCurRoundData = function()
         ExposureSpawns = {}, --This is only used in TestConfig()
         Batteries = {},
         Items = {},
-        Helicopter = {},
+        Helicopter = 0,
         AlivePlayers = {},
         DeadPlayers = {},
         SkipSlasherSpawnTimer = false,
@@ -237,7 +257,7 @@ if SERVER then
         --Transfer loaded data into the main table
         SlashCo.CurRound.Difficulty = diff
         SlashCo.CurRound.SurvivorData.GasCanMod = survivorgasmod
-        SlashCo.CurRound.OfferingData.CurrentOffering = offering
+        SlashCo.CurRound.OfferingData.CurrentOffering = tonumber(offering)
 
         --First we insert the Slasher. If the Slasher does not join in time the game cannot begin.
 
@@ -277,6 +297,7 @@ if SERVER then
 
                 print("[SlashCo] Selecting Slasher for player with id: "..id)        
                 if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
+                --if s == 1 then SlashCo.SelectSlasher(4, id) end
                 if s == 2 then SlashCo.SelectSlasher(tonumber(slasher2id), id) end
 
             end)
@@ -616,7 +637,7 @@ SlashCo.ValidateMap = function(map)
     local itemCount = #(json.Items.Spawnpoints)
     local HeliCount = #(json.Helicopter.Spawnpoints)
 
-    SlashCo.CurRound.HelicopterSpawnPosition = json.Helicopter.StartLocation.pos
+    SlashCo.CurRound.HelicopterSpawnPosition = Vector(json.Helicopter.StartLocation.pos[1],json.Helicopter.StartLocation.pos[2],json.Helicopter.StartLocation.pos[3])
 
     --Add gas can spawns to the number of item spawns if allowed by the config
     local usesGasSpawns = ""
@@ -915,6 +936,8 @@ SlashCo.CreateHelicopter = function(pos, ang)
 
     local id = Ent:EntIndex()
 
+    SlashCo.CurRound.Helicopter = id
+
     return id
 end
 
@@ -1011,16 +1034,19 @@ SlashCo.EndRound = function()
     end
     print("[SlashCo] Round over, returning to lobby in "..tostring(delay).." seconds.")
 
-    timer.Simple(delay, function()
+    timer.Simple(1, function()
+
+        SlashCo.RemoveHelicopter()
+
         local survivors = team.GetPlayers(TEAM_SURVIVOR)
         for i=1, #survivors do
-            survivors[i]:SetTeam(TEAM_LOBBY)
+            survivors[i]:SetTeam(TEAM_SPECTATOR)
             survivors[i]:Spawn()
         end
 
         local slashers = team.GetPlayers(TEAM_SLASHER)
         for i=1, #slashers do
-            slashers[i]:SetTeam(TEAM_LOBBY)
+            slashers[i]:SetTeam(TEAM_SPECTATOR)
             slashers[i]:Spawn()
         end
 
@@ -1224,6 +1250,8 @@ SlashCo.CreateEscapeHelicopter = function()
 
     SlashCo.CurRound.EscapeHelicopterSpawned = true
 
+    SlashCo.CurRound.Helicopter = entID
+
     timer.Simple(0.1, function()
 
         SlashCo.HelicopterGoAboveLand(entID)
@@ -1280,6 +1308,14 @@ end
 SlashCo.UpdateHelicopterSeek = function(pos)
 
 	SlashCo.CurRound.HelicopterTargetPosition = pos
+
+end
+
+SlashCo.RemoveHelicopter = function()
+
+local ent = ents.GetByIndex(SlashCo.CurRound.Helicopter)
+
+ent:Remove()
 
 end
 
