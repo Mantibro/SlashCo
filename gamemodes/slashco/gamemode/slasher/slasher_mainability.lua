@@ -124,7 +124,7 @@ end --ends here
     --Amogus Human Transform \/ \/ \/
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
 
-    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 then
+    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") then
 
         slasher:SetNWBool("AmogusDisguising", true)
         slasher:Freeze(true)
@@ -144,9 +144,12 @@ end --ends here
 	        util.PrecacheModel( modelname )
 	        slasher:SetModel( modelname )
 
+            slasher:SetRunSpeed( 300 )
+            slasher:SetWalkSpeed( 200 )
+
         end)
 
-    elseif slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 then
+    elseif not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and slasher:GetNWBool("AmogusSurvivorDisguise") then
 
         --sound
         slasher:Freeze(true)

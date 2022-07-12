@@ -674,7 +674,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 
 			end
 
-			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or ply.SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid then
+			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid then
 
 				ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
