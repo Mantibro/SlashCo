@@ -209,9 +209,9 @@ SlashCo.UseItem = function(ply)
 
 			elseif rand == 4 then
 
-				if #team.getPlayers(TEAM_SLASHER) < 1 then return end
+				if #team.GetPlayers(TEAM_SLASHER) < 1 then return end
 
-				local slasher = team.getPlayers(TEAM_SLASHER)[1]
+				local slasher = team.GetPlayers(TEAM_SLASHER)[1]
 
 				ply:SetPos(slasher:LocalToWorld( Vector(100 , 0, 10) ) )
 				ply:SetRunSpeed( 200 )

@@ -129,9 +129,29 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 400,
         ChaseDuration = 15.0,
         JumpscareDuration = 2,
-        ChaseMusic = "",
-        KillSound = "slashco/slasher/amogus_kill.wav"
-    }
+        ChaseMusic = "slashco/slasher/amogus_chase.wav",
+        KillSound = "slashco/slasher/amogus_kill.mp3"
+    },
+
+    {
+        NAME = "Thirsty",
+        ID = 5,
+        CLS = 2,
+        DNG = 2,
+        Model = "models/slashco/slashers/thirsty/thirsty.mdl",
+        KillDelay = 2,
+        GasCanMod = 0,
+        ProwlSpeed = 150,
+        ChaseSpeed = 250,
+        Perception = 1.0,
+        Eyesight = 2,
+        KillDistance = 150,
+        ChaseRange = 900,
+        ChaseDuration = 8.0,
+        JumpscareDuration = 2,
+        ChaseMusic = "slashco/slasher/thirsty_chase.wav",
+        KillSound = "slashco/slasher/thirsty_kill.mp3"
+    },
 
 }
 
@@ -296,8 +316,8 @@ if SERVER then
             timer.Simple(1, function() 
 
                 print("[SlashCo] Selecting Slasher for player with id: "..id)        
-                if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
-                --if s == 1 then SlashCo.SelectSlasher(4, id) end
+                --if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
+                if s == 1 then SlashCo.SelectSlasher(3, id) end
                 if s == 2 then SlashCo.SelectSlasher(tonumber(slasher2id), id) end
 
             end)

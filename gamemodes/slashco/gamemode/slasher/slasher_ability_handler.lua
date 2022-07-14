@@ -13,7 +13,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
     local gen2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].Remaining
     local bg1 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[1]:EntIndex()].HasBattery
     local bg2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].HasBattery
-    if SlashCo.CurRound.SlasherData.GameProgress > -1 then SlashCo.CurRound.SlasherData.GameProgress = (gpg - gen1) + (gpg - gen2) + BoolToNumber(bg1) + BoolToNumber(bg2) end
+    --if SlashCo.CurRound.SlasherData.GameProgress > -1 then SlashCo.CurRound.SlasherData.GameProgress = (gpg - gen1) + (gpg - gen2) + BoolToNumber(bg1) + BoolToNumber(bg2) end
 
 for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
@@ -216,7 +216,7 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
                 slasher:SetRunSpeed( 280 )
                 slasher:SetWalkSpeed( 150  )
-                SlashCo.CurRound.SlasherData[slasherid].Eyesight = 4
+                --SlashCo.CurRound.SlasherData[slasherid].Eyesight = 4
 
                 for i = 1, #player.GetAll() do
                     local ply = player.GetAll()[i]
@@ -259,7 +259,7 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
         end
 
-        if v3 == 1 then
+        if v1 == 1 then
 
             SlashCo.CurRound.SlasherData[slasherid].Eyesight = 10 - (   slasher:GetVelocity():Length() / 35 )
             SlashCo.CurRound.SlasherData[slasherid].Perception = 5 - (   slasher:GetVelocity():Length() / 60 )
@@ -282,7 +282,7 @@ do
         SlashCo.CurRound.SlasherData[slasherid].CanKill = false
         SlashCo.CurRound.SlasherData[slasherid].CanChase = false
     else
-        if not slasher:GetNWBool("AmogusDisguised") then
+        if not slasher:GetNWBool("AmogusDisguised") or slasher:GetNWBool("AmogusDisguising") then
             SlashCo.CurRound.SlasherData[slasherid].CanKill = true
             SlashCo.CurRound.SlasherData[slasherid].CanChase = true
         else

@@ -124,10 +124,12 @@ end --ends here
     --Amogus Human Transform \/ \/ \/
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
 
-    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") then
+    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 
         slasher:SetNWBool("AmogusDisguising", true)
         slasher:Freeze(true)
+
+        slasher:EmitSound("slashco/slasher/amogus_transform"..math.random(1,2)..".mp3")
 
         timer.Simple(2, function() 
             slasher:Freeze(false) 
@@ -136,6 +138,8 @@ end --ends here
 
             slasher:SetNWBool("AmogusSurvivorDisguise", true)
             slasher:SetNWBool("AmogusDisguised", true)
+
+            slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
             local rand = math.random( 1, 5 )
 	        local id = 1
@@ -149,15 +153,19 @@ end --ends here
 
         end)
 
-    elseif not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and slasher:GetNWBool("AmogusSurvivorDisguise") then
+    elseif not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and slasher:GetNWBool("AmogusDisguised") then
 
-        --sound
         slasher:Freeze(true)
         slasher:SetNWBool("AmogusSurvivorDisguise", false)
+        slasher:SetNWBool("AmogusFuelDisguise", false)
         slasher:SetNWBool("AmogusDisguised", false)
+        slasher:EmitSound("slashco/slasher/amogus_reveal.mp3")
 
         util.PrecacheModel( "models/slashco/slashers/amogus/amogus.mdl" )
 	    slasher:SetModel( "models/slashco/slashers/amogus/amogus.mdl" )
+
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
 
         timer.Simple(2 - (SO * 1.95), function() 
             slasher:Freeze(false) 

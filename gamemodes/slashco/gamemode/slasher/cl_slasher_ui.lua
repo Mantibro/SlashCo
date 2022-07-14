@@ -253,6 +253,47 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		--Trollge /\ /\ /\
 
 		::amogus::
+		--Amogus \/ \/ \/
+
+		if SlashID != 4 then goto thirsty end
+		do
+			local AmogusSurvivor = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1")
+			local AmogusFuel = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a2")
+			
+			local is_survivor = LocalPlayer():GetNWBool("AmogusSurvivorDisguise")
+			local is_fuel = LocalPlayer():GetNWBool("AmogusFuelDisguise")
+			local is_disguised = LocalPlayer():GetNWBool("AmogusDisguised")
+
+			willdrawmain = true
+
+			if is_survivor then 
+				surface.SetMaterial(AmogusSurvivor)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+				willdrawmain = false
+			end
+
+			if is_fuel then 
+				surface.SetMaterial(AmogusFuel)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+				willdrawmain = false
+			end
+
+			if not is_disguised then
+				draw.SimpleText( "R - Disguise as Survivor", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+				surface.SetMaterial(AmogusFuel)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+				draw.SimpleText( "F - Disguise as Fuel", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+			else
+				draw.SimpleText( "R - Reveal yourself", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+			end
+
+		end
+
+		--Amogus /\ /\ /\
+
+		::thirsty::
 
 		--Slasher-Shared function \/ \/ \/ 
 

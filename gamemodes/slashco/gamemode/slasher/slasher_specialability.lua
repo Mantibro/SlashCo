@@ -68,6 +68,39 @@ end
 
     ::AMOGUS::
 
+    --Amogus Fuel Transform \/ \/ \/
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
 
+    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
+
+        slasher:SetNWBool("AmogusDisguising", true)
+        slasher:Freeze(true)
+
+        slasher:EmitSound("slashco/slasher/amogus_transform"..math.random(1,2)..".mp3")
+
+        timer.Simple(2, function() 
+            slasher:Freeze(false) 
+            slasher:SetNWBool("AmogusDisguising", false)
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2
+
+            slasher:SetNWBool("AmogusFuelDisguise", true)
+            slasher:SetNWBool("AmogusDisguised", true)
+
+            slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
+
+	        local modelname = SlashCo.GasCanModel
+	        util.PrecacheModel( modelname )
+	        slasher:SetModel( modelname )
+
+            slasher:SetRunSpeed( 200 )
+            slasher:SetWalkSpeed( 200 )
+
+        end)
+
+    end
+
+    --Amogus Fuel Transform /\ /\ /\
+
+    ::THIRSTY::
     
 end

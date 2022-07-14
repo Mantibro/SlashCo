@@ -202,7 +202,27 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	end
 
 	::thirsty::
+
+	if ply:GetModel() != "models/slashco/slashers/thirsty/thirsty.mdl" then goto male07 end --Thristy's Animator
 	
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_HL2MP_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN 
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	::male07::
+
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
@@ -226,6 +246,8 @@ hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, 
 			if ply:GetNWBool("AmogusFuelDisguise") then return true end
 
 			ply:EmitSound( "slashco/slasher/amogus_step"..math.random(1,3)..".wav") 
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/thirsty/thirsty.mdl" then --Thirsty (no) Footsteps
 			return true 
 		end
 		

@@ -126,23 +126,28 @@ do
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 + 0.5
 
-            if slasher:GetEyeTrace().Entity:IsPlayer() then
-                local target = slasher:GetEyeTrace().Entity
+            if SERVER then
 
-                if target:Team() != TEAM_SURVIVOR then return end
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(60,0,0)), Vector(-60,-60,-60), Vector(60,60,60), 10, DMG_SLASH, 50, false )
 
-                if slasher:GetPos():Distance(target:GetPos()) < 200 then
+                if target:IsPlayer() then
 
-                    local vPoint = target:GetPos() + Vector(0,0,50)
-                    local bloodfx = EffectData()
-                    bloodfx:SetOrigin( vPoint )
-                    util.Effect( "BloodImpact", bloodfx )
+                    if target:Team() != TEAM_SURVIVOR then return end
 
-                    slasher:EmitSound("slashco/slasher/trollge_hit.wav")
+                    if slasher:GetPos():Distance(target:GetPos()) < 200 then
 
-                    if SERVER then target:TakeDamage( (10 + (SO * 10)), slasher, slasher ) end
+                        local vPoint = target:GetPos() + Vector(0,0,50)
+                        local bloodfx = EffectData()
+                        bloodfx:SetOrigin( vPoint )
+                        util.Effect( "BloodImpact", bloodfx )
 
-                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1 + SO
+                        slasher:EmitSound("slashco/slasher/trollge_hit.wav")
+
+                        target:TakeDamage( (10 + (SO * 10)), slasher, slasher )
+
+                        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1 + SO
+
+                    end
 
                 end
 
