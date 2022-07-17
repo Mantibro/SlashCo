@@ -37,6 +37,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	if ply:GetNWBool("AmogusDisguised") then return end
 
 	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local pac = ply:GetNWBool("DemonPacified")
 
 	local spook = ply:GetNWBool("BababooeySpooking")
 
@@ -204,12 +205,34 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	::thirsty::
 
 	if ply:GetModel() != "models/slashco/slashers/thirsty/thirsty.mdl" then goto male07 end --Thristy's Animator
+
+	if not ply:GetNWBool("ThirstyDrinking") then anim_antispam = false end
 	
 	if ply:IsOnGround() then
 
 		if not chase then 
-			ply.CalcIdeal = ACT_HL2MP_WALK 
-			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+
+			if not ply:GetNWBool("ThirstyBigMlik") then
+
+				ply.CalcIdeal = ACT_HL2MP_WALK 
+				ply.CalcSeqOverride = ply:LookupSequence("prowl")
+
+			else
+
+				if not pac then
+
+					ply.CalcIdeal = ACT_HL2MP_RUN 
+					ply.CalcSeqOverride = ply:LookupSequence("chase2")
+
+				else
+
+					ply.CalcIdeal = ACT_HL2MP_WALK 
+					ply.CalcSeqOverride = ply:LookupSequence("prowl")
+
+				end
+
+			end
+
 		else
 			ply.CalcIdeal = ACT_HL2MP_RUN 
 			ply.CalcSeqOverride = ply:LookupSequence("chase")
@@ -219,6 +242,14 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 		ply.CalcSeqOverride = ply:LookupSequence("float")
 
+	end
+
+	if ply:GetNWBool("ThirstyDrinking") then 
+		
+		ply.CalcSeqOverride = ply:LookupSequence("drink") 
+
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+	
 	end
 
 	::male07::

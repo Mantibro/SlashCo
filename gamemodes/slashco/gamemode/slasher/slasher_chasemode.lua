@@ -4,9 +4,6 @@ SlashCo.SlasherCallForChaseMode = function(slasher)
 
     local slasherid = slasher:SteamID64()
 
-    local chase_music = CreateSound(slasher, SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
-    chase_music:SetSoundLevel( 95  )
-
     if slasher:GetNWBool("SidGunEquipped") then goto sidaim end
 do
     if SlashCo.CurRound.SlasherData[slasherid].CanChase == false then return end
@@ -19,8 +16,7 @@ do
 
         slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
         slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-        --slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
-        chase_music:Stop()
+        slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
 
         return 
     end
@@ -45,14 +41,12 @@ do
 
         slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed )
         slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed  )
-        --PlayGlobalSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic,95,slasher)
-        chase_music:Play()
+        PlayGlobalSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic,95,slasher)
 
     else
         slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
         slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-        --slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
-        chase_music:Stop()
+        slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
     end
 end
     ::sidaim::

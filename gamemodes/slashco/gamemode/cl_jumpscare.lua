@@ -50,5 +50,14 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		surface.SetMaterial(Overlay)
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
+	elseif ply:GetNWBool("SurvivorJumpscare_5") == true then
+
+		local Overlay = Material("slashco/ui/overlays/jumpscare_5")
+		Overlay:SetInt( "$frame", 0 )
+
+		surface.SetDrawColor(255,255,255,255)	
+		surface.SetMaterial(Overlay)
+		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
 	end
 end)

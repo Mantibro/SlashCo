@@ -69,7 +69,7 @@ end
     ::AMOGUS::
 
     --Amogus Fuel Transform \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto MALE07 end
 
     if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 
@@ -101,6 +101,8 @@ end
 
     --Amogus Fuel Transform /\ /\ /\
 
-    ::THIRSTY::
+    --Thirsty has no special ability.
+
+    ::MALE07::
     
 end

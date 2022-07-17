@@ -178,5 +178,39 @@ end --ends here
 
     ::THIRSTY::
 
+    --Thirsty's Milk Drinking \/ \/ \/
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then goto MALE07 end
+
+    if slasher:GetEyeTrace().Entity:GetClass() == "sc_milkjug" then
+
+        target = slasher:GetEyeTrace().Entity	
+
+        if slasher:GetPos():Distance(target:GetPos()) < 150 and not slasher:GetNWBool("ThirstyDrinking") then
+
+            slasher:SetNWBool("ThirstyDrinking", true)
+            slasher:SetNWBool("InSlasherChaseMode", false) 
+            slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 99
+            slasher:Freeze(true)
+
+            timer.Simple(4, function() slasher:EmitSound("slashco/slasher/thirsty_drink.mp3") end)
+
+            timer.Simple(12, function() 
+                slasher:Freeze(false) 
+                slasher:SetNWBool("ThirstyDrinking", false) 
+                slasher:SetNWBool("DemonPacified", true)
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1 + SatO
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(20,35)
+                target:Remove()
+
+                if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 2 then
+                    slasher:SetNWBool("ThirstyBigMlik", true)
+                end
+            end)
+        end
+    end
+    --Thirsty's Milk Drinking /\ /\ /\
+
+    ::MALE07::
 
 end

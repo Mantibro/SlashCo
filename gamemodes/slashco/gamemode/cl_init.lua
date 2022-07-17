@@ -109,6 +109,10 @@ net.Receive("mantislashcoGiveSlasherData", function()
 		ChaseDur = SlasherTable[lid].ChaseDuration
 		ChaseTick = SlasherTable[lid].CurrentChaseTick
 		V1 = SlasherTable[lid].SlasherValue1
+        V2 = SlasherTable[lid].SlasherValue2
+        V3 = SlasherTable[lid].SlasherValue3
+        V4 = SlasherTable[lid].SlasherValue4
+        V5 = SlasherTable[lid].SlasherValue5
         SlasherSteamID = SlasherTable[lid].SteamID
 	end
 

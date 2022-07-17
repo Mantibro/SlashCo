@@ -4,11 +4,22 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     local plyid = ply:SteamID64()
 
+    ply:SetRunSpeed(SlashCo.CurRound.SlasherData[plyid].ProwlSpeed)
+    ply:SetWalkSpeed(SlashCo.CurRound.SlasherData[plyid].ProwlSpeed)
+
     local slid = SlashCo.CurRound.SlasherData[plyid].SlasherID
 
     if slid == 3 then
 
         PlayGlobalSound("slashco/slasher/trollge_breathing.wav",50,ply)
+
+    end
+
+    if slid == 5 then
+
+        ply:SetViewOffset( Vector(0,0,20) )
+
+        ply:SetCurrentViewOffset( Vector(0,0,20) )
 
     end
 

@@ -282,7 +282,7 @@ do
         SlashCo.CurRound.SlasherData[slasherid].CanKill = false
         SlashCo.CurRound.SlasherData[slasherid].CanChase = false
     else
-        if not slasher:GetNWBool("AmogusDisguised") or slasher:GetNWBool("AmogusDisguising") then
+        if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
             SlashCo.CurRound.SlasherData[slasherid].CanKill = true
             SlashCo.CurRound.SlasherData[slasherid].CanChase = true
         else
@@ -294,7 +294,61 @@ do
     
 end
     ::THIRSTY::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then goto MALE07 end
+    --Thirsty's Abilities
+do
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Milk drank
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Pacification
+    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Thirst
 
+    if v1 > 4 then v1 = 4 end
+
+    if v2 > 0 then --Thirsty is pacified
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
+
+        SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed = 100
+        SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed = 100
+        SlashCo.CurRound.SlasherData[slasherid].Eyesight = 0
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 0
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - (0.01 + (SO * 0.04))  
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = false 
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = false 
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
+        slasher:SetNWBool("DemonPacified", true)
+
+    else --Thirsty is not pacified
+
+        if v3 < 100 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 + (FrameTime()/(2 - (SO/2))) end
+        --Deplete thirst
+
+        SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed = 285 - ( v1 * 10)
+        SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed = 100 + ( (    ( v3 / (6 - v1)   )   ) + ( v1 * 12.5 )   )*(1+SO)
+        SlashCo.CurRound.SlasherData[slasherid].Eyesight = 2 + (    ( v3 / (28.5 - (v1*4))   )   )  
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 1.0 + (    ( v3 / (44.5 - (v1*8))   )   )  
+        --Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
+        --His chase speed is greatest at low milk drank, and the more he drinks, it is converted to prowl speed.
+
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = true 
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = true 
+        slasher:SetNWBool("DemonPacified", false)
+
+        if slasher:GetNWBool("InSlasherChaseMode") then 
+
+            slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed )
+            slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed )
+        else
+
+            slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+            slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+
+        end
+
+    end
+
+end
+    ::MALE07::
 end
 
 end)

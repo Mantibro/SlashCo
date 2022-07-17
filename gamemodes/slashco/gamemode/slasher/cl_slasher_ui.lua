@@ -29,6 +29,11 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		local mainiconposx = cx/20
 		local mainiconposy = cy + (cy/2)
 
+		local GasBack = Material("slashco/ui/gas_back")
+		local MilkBase = Material("slashco/ui/milk_base")
+		local BloodBase = Material("slashco/ui/blood_base")
+		local GasTop = Material("slashco/ui/gas_top")
+
 		local ProgressBarBack = Material("slashco/ui/icons/slasher/progbar_back")
 		local ProgressBarBase = Material("slashco/ui/icons/slasher/progbar_base")
 		local ProgressBarIcon = Material("slashco/ui/icons/slasher/progbar_icon")
@@ -294,6 +299,27 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		--Amogus /\ /\ /\
 
 		::thirsty::
+
+		--Thirsty \/ \/ \/
+		if SlashID != 5 then goto male07 end
+do
+
+		local milk = 1 - (V3/100)
+
+		surface.SetMaterial(GasBack)
+		surface.DrawTexturedRect((ScrW()/2) - ScrW()/16, (ScrH()/1.25)  - ScrW()/16, ScrW()/8, ScrW()/8)
+
+		surface.SetMaterial(MilkBase)
+		surface.DrawTexturedRectUV((ScrW()/2) - ScrW()/16	,		(ScrH()/1.25) - (		(ScrW()/8) * (1-milk) 	)	+	ScrW()/16, 	ScrW()/8	, (ScrW()/8 ) * (1-milk)		,0, milk, 1, 1 )
+
+		surface.SetMaterial(GasTop)
+		surface.DrawTexturedRect((ScrW()/2) - ScrW()/16, (ScrH()/1.25)  - ScrW()/16, ScrW()/8, ScrW()/8)
+
+		draw.SimpleText( "R - Drink Milk (Drank: "..V1..")", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+end
+		--Thirsty /\ /\ /\
+
+		::male07::
 
 		--Slasher-Shared function \/ \/ \/ 
 

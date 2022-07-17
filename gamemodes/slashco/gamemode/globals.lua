@@ -20,6 +20,11 @@ SlashCo.Maps = {
     {
         ID = "rp_deadcity",
         NAME = "Dead City"
+    },
+
+    {
+        ID = "rp_redforest",
+        NAME = "Red Forest"
     }
 
 }
@@ -141,7 +146,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Model = "models/slashco/slashers/thirsty/thirsty.mdl",
         KillDelay = 2,
         GasCanMod = 0,
-        ProwlSpeed = 150,
+        ProwlSpeed = 100,
         ChaseSpeed = 250,
         Perception = 1.0,
         Eyesight = 2,
@@ -317,7 +322,7 @@ if SERVER then
 
                 print("[SlashCo] Selecting Slasher for player with id: "..id)        
                 --if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
-                if s == 1 then SlashCo.SelectSlasher(3, id) end
+                if s == 1 then SlashCo.SelectSlasher(5, id) end
                 if s == 2 then SlashCo.SelectSlasher(tonumber(slasher2id), id) end
 
             end)
@@ -1126,7 +1131,7 @@ SlashCo.SpawnCurConfig = function()
 
         if SlashCo.CurRound.OfferingData.CurrentOffering == 5 then SlashCo.CurRound.OfferingData.SO = 1 end
 
-        SlashCo.CurRound.ItemCount = SlashCo.CurRound.ItemCount + SlashCo.CurRound.OfferingData.ItemMod
+        SlashCo.CurRound.ItemCount = SlashCo.CurRound.ItemCount + SlashCo.CurRound.OfferingData.ItemMod + SlashCo.CurRound.Difficulty
 
         local possibleItemSpawnpoints = SlashCo.CurConfig.Items.Spawnpoints
         if SlashCo.CurConfig.Items.IncludeGasCanSpawns then
@@ -1159,6 +1164,7 @@ SlashCo.SpawnCurConfig = function()
             local slashid = SlashCo.CurRound.SlasherData[plyid].SlasherID
 
             if slashid == 2 then item_class = "sc_cookie" end
+            if slashid == 5 then item_class = "sc_milkjug" end
 
             if item_class != "" then SlashCo.CreateItems(itemSpawns, item_class) print("[SlashCo] Spawning Items.") end
 
