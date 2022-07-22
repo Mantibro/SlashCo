@@ -7,6 +7,9 @@ SlashCo.SlasherPrimaryFire = function(slasher)
     local SO = SlashCo.CurRound.OfferingData.SO
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 3 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 < 1 then goto trollclaw end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 2 then goto maleclaw end
+
     if slasher:GetNWBool("SidGun") then goto sidgun end
 do
 
@@ -114,8 +117,31 @@ do
         slasher:SetNWBool("TrollgeSlashing",false)
         timer.Remove("TrollgeSlashDecay")
 
-        timer.Simple(0.2, function() 
+        timer.Simple(0.3, function() 
+
             slasher:EmitSound("slashco/slasher/trollge_swing.wav")
+
+            if SERVER then
+
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 10, DMG_SLASH, 50, false )
+
+                if target:IsPlayer() then
+
+                    if target:Team() != TEAM_SURVIVOR then return end
+
+                    local vPoint = target:GetPos() + Vector(0,0,50)
+                    local bloodfx = EffectData()
+                    bloodfx:SetOrigin( vPoint )
+                    util.Effect( "BloodImpact", bloodfx )
+
+                    slasher:EmitSound("slashco/slasher/trollge_hit.wav")
+
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1 + SO
+
+                end
+
+            end
+
         end)
 
         timer.Simple(0.1, function() 
@@ -126,32 +152,53 @@ do
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 + 0.5
 
+        end)
+
+    end
+
+end
+
+    ::maleclaw::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 6 then return end
+
+do
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 < 0.01 then
+
+        slasher:SetNWBool("Male07Slashing",false)
+        timer.Remove("Male07SlashDecay")
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 2
+
+        timer.Simple(0.5, function() 
+
+            slasher:EmitSound("slashco/slasher/trollge_swing.wav")
+
             if SERVER then
 
-                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 10, DMG_SLASH, 50, false )
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 50 + (SO*50), DMG_SLASH, 50, false )
 
                 if target:IsPlayer() then
 
                     if target:Team() != TEAM_SURVIVOR then return end
 
-                    if slasher:GetPos():Distance(target:GetPos()) < 200 then
+                    local vPoint = target:GetPos() + Vector(0,0,50)
+                    local bloodfx = EffectData()
+                    bloodfx:SetOrigin( vPoint )
+                    util.Effect( "BloodImpact", bloodfx )
 
-                        local vPoint = target:GetPos() + Vector(0,0,50)
-                        local bloodfx = EffectData()
-                        bloodfx:SetOrigin( vPoint )
-                        util.Effect( "BloodImpact", bloodfx )
-
-                        slasher:EmitSound("slashco/slasher/trollge_hit.wav")
-
-                        target:TakeDamage( (10 + (SO * 10)), slasher, slasher )
-
-                        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1 + SO
-
-                    end
+                    slasher:EmitSound("slashco/slasher/trollge_hit.wav") 
 
                 end
 
             end
+
+        end)
+
+        timer.Simple(0.1, function() 
+
+            slasher:SetNWBool("Male07Slashing",true)
+
+            timer.Create( "Male07SlashDecay", 1.5, 1, function() slasher:SetNWBool("Male07Slashing",false) end)
 
         end)
 

@@ -158,6 +158,26 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillSound = "slashco/slasher/thirsty_kill.mp3"
     },
 
+    {
+        NAME = "Male_07",
+        ID = 6,
+        CLS = 3,
+        DNG = 3,
+        Model = "models/Humans/Group01/male_07.mdl",
+        KillDelay = 4,
+        GasCanMod = 0,
+        ProwlSpeed = 100,
+        ChaseSpeed = 302,
+        Perception = 1.0,
+        Eyesight = 5,
+        KillDistance = 130,
+        ChaseRange = 400,
+        ChaseDuration = 3.0,
+        JumpscareDuration = 2,
+        ChaseMusic = "slashco/slasher/thirsty_chase.wav",
+        KillSound = "slashco/slasher/male07_kill.mp3"
+    }
+
 }
 
 SlashCo.LobbyData = {
@@ -321,8 +341,9 @@ if SERVER then
             timer.Simple(1, function() 
 
                 print("[SlashCo] Selecting Slasher for player with id: "..id)        
-                --if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
-                if s == 1 then SlashCo.SelectSlasher(5, id) end
+                if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
+                --if s == 1 then SlashCo.SelectSlasher(6, id) end
+                if slasher1id == 6 then SlashCo.SelectSlasher(math.random(1,5), id) end
                 if s == 2 then SlashCo.SelectSlasher(tonumber(slasher2id), id) end
 
             end)
@@ -883,6 +904,8 @@ SlashCo.CreateItems = function(spawnpoints, item)
         local pos = SlashCo.CurConfig.Items.Spawnpoints[spawnpoints[I]].pos
         local ang = SlashCo.CurConfig.Items.Spawnpoints[spawnpoints[I]].ang
 
+        --table.remove( SlashCo.CurConfig.Items.Spawnpoints, spawnpoints[I] ) --Occupied spawn
+
         local entID = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
     end
 end
@@ -1170,8 +1193,6 @@ SlashCo.SpawnCurConfig = function()
 
         end
 
-        SlashCo.CurRound.roundOverToggle = true
-
         SlashCo.BroadcastItemData()
         
 		timer.Simple(0.5, function()
@@ -1180,6 +1201,7 @@ SlashCo.SpawnCurConfig = function()
 
         end)
 
+        SlashCo.CurRound.roundOverToggle = true
         GAMEMODE.State = GAMEMODE.States.IN_GAME
         SlashCo.CurRound.SlasherData.GameProgress = 0
 

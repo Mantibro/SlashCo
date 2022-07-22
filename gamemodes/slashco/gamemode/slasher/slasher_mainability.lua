@@ -193,15 +193,53 @@ end --ends here
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 99
             slasher:Freeze(true)
 
-            timer.Simple(4, function() slasher:EmitSound("slashco/slasher/thirsty_drink.mp3") end)
+            target:Remove()
 
-            timer.Simple(12, function() 
+            local matrix = slasher:GetBoneMatrix(slasher:LookupBone( "HandR" ))
+            local pos = matrix:GetTranslation()
+            local ang = matrix:GetAngles()
+
+            local chugjug = ents.Create( "prop_physics" )
+
+		    chugjug:SetMoveType( MOVETYPE_NONE )
+            chugjug:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
+		    chugjug:SetModel( SlashCo.Items.MILK.Model )
+    	    chugjug:SetPos( pos )
+    	    chugjug:SetAngles( ang )
+
+            chugjug:FollowBone( slasher, slasher:LookupBone( "HandR" ) )
+
+            timer.Simple(1, function() slasher:EmitSound("slashco/slasher/thirsty_drink.mp3") end)
+
+            timer.Simple(4.5, function() 
+                chugjug:Remove() 
+            
+                local emptyjug = ents.Create( "prop_physics" )
+		        emptyjug:SetSolid( SOLID_VPHYSICS )
+		        emptyjug:PhysicsInit( SOLID_VPHYSICS )
+		        emptyjug:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
+		        emptyjug:SetMoveType( MOVETYPE_VPHYSICS)
+		        emptyjug:SetModel( SlashCo.Items.MILK.Model )
+    	        emptyjug:SetPos( pos )
+    	        emptyjug:SetAngles( ang )
+                emptyjug:Spawn()
+                emptyjug:Activate()
+                local phys = emptyjug:GetPhysicsObject()
+	            if phys:IsValid() then phys:Wake() end
+                phys:ApplyForceCenter( slasher:GetAimVector() * 450 )
+
+                timer.Simple(4.5, function() 
+                    emptyjug:Remove() 
+                end)
+
+            end)
+
+            timer.Simple(8, function() 
                 slasher:Freeze(false) 
                 slasher:SetNWBool("ThirstyDrinking", false) 
                 slasher:SetNWBool("DemonPacified", true)
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1 + SatO
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(20,35)
-                target:Remove()
 
                 if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 2 then
                     slasher:SetNWBool("ThirstyBigMlik", true)
@@ -212,5 +250,58 @@ end --ends here
     --Thirsty's Milk Drinking /\ /\ /\
 
     ::MALE07::
+    --Male07's State Switch \/ \/ \/
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 6 then goto TYLER end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then return end
+
+    if v1 == 0 and slasher:GetEyeTrace().Entity:GetClass() == "sc_maleclone" then
+
+        target = slasher:GetEyeTrace().Entity	
+
+        if slasher:GetPos():Distance(target:GetPos()) < 150 then
+
+            slasher:EmitSound("slashco/slasher/male07_possess.mp3")
+
+            slasher:SetPos(target:GetPos())
+            slasher:SetAngles(target:GetAngles())
+
+            target:Remove()
+
+            local modelname = "models/Humans/Group01/male_07.mdl"
+	        util.PrecacheModel( modelname )
+	        slasher:SetModel( modelname )
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
+
+            SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
+
+            slasher:SetWalkSpeed(100)
+            slasher:SetRunSpeed(100)
+
+        end
+
+    end
+
+    if v1 > 0 then
+
+        local modelname = "models/hunter/plates/plate.mdl"
+	    util.PrecacheModel( modelname )
+	    slasher:SetModel( modelname )
+
+        SlashCo.CreateItem("sc_maleclone",slasher:GetPos(),slasher:GetAngles())
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+
+        slasher:EmitSound("slashco/slasher/male07_unpossess"..math.random(1,2)..".mp3")
+
+        slasher:SetWalkSpeed(300)
+        slasher:SetRunSpeed(300)
+
+    end
+
+    --Male07's State Switch /\ /\ /\
+
+    ::TYLER::
 
 end

@@ -321,6 +321,40 @@ end
 
 		::male07::
 
+		--Male07 \/ \/ \/
+		if SlashID != 6 then goto tyler end
+do
+
+		local MaleSpecter = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s0")
+		local MaleMonster = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s2")
+					
+		if V1 != 0 then
+			draw.SimpleText( "R - Unpossess Vessel", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		else
+			draw.SimpleText( "R - Possess Vessel", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		end
+
+		if V1 != 1 then
+			willdrawmain = false
+
+			if V1 == 0 then
+				surface.SetMaterial(MaleSpecter)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+			end
+
+			if V1 == 2 then
+				surface.SetMaterial(MaleMonster)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+			end
+		else
+			willdrawmain = true
+		end
+
+end
+		--Male07 /\ /\ /\
+
+		::tyler::
+
 		--Slasher-Shared function \/ \/ \/ 
 
 		--Slasher Main Icon

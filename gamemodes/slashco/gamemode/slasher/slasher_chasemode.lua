@@ -31,6 +31,8 @@ do
             slasher:SetNWBool("InSlasherChaseMode", true)
             SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
 
+            if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0 end
+
         end
 
     end

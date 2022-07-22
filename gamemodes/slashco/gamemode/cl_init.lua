@@ -29,6 +29,7 @@ hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
     if LocalPlayer():Team() == TEAM_SLASHER then
         halo.Add(ents.FindByClass("sc_generator"), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
         halo.Add(ents.FindByClass("sc_babaclone"), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
+        halo.Add(ents.FindByClass("sc_maleclone"), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
     end
 end)
 

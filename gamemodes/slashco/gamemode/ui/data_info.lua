@@ -7,7 +7,7 @@ SCInfo.Slasher = {
         Class = "Cryptid",
         Danger = "Moderate",
         Description = "The Phantom Slasher which specialises in illusion abilities to catch survivors off-guard.\n\n-Bababooey can turn himself invisible.\n-He can create a phantom clone of himself to scare and locate Survivors.",
-        ProTip = "-This Slasher has the ability to vanish into thin air.\n-Phantom illusions of this Slasher have been observed."
+        ProTip = "-This Slasher has the ability to vanish into thin air."
     },
 
     {
@@ -15,7 +15,7 @@ SCInfo.Slasher = {
         Class = "Demon",
         Danger = "Considerable",
         Description = "The Psychotic Slasher which keeps his rage in check with Cookies.\n\n-Sid gains speed while chasing over time, but starts out slow.\n-Cookies will pacify him for a while.\n-Sid's special ability allows him to devastate Survivors at long range.",
-        ProTip = "-This Slasher is obsessed with cookies.\n-Loud gunshots have been heard in zones where this Slasher was present."
+        ProTip = "-Loud gunshots have been heard in zones where this Slasher was present."
     },
 
     {
@@ -23,7 +23,7 @@ SCInfo.Slasher = {
         Class = "Umbra",
         Danger = "Devastating",
         Description = "Troll.",
-        ProTip = "-This Slasher grows stronger with human blood.\n-Its eyesight seems to be limited to moving objects."
+        ProTip = "-Its eyesight seems to be limited to moving objects."
     },
 
     {
@@ -31,7 +31,7 @@ SCInfo.Slasher = {
         Class = "Cryptid",
         Danger = "Moderate",
         Description = "The Imposter Slasher who is the master of deception and hiding in plain sight.\n\n-Amogus can assume the form of one of a Survivor.\n-He can assume the form of a Fuel Can.\n-Amogus is really loud while running.",
-        ProTip = "-This Slasher can disguise itself as a human.\n-Fuel Cans are also presumed to be another disguise."
+        ProTip = "-This Slasher can disguise itself as a human."
     },
 
     {
@@ -39,15 +39,39 @@ SCInfo.Slasher = {
         Class = "Demon",
         Danger = "Considerable",
         Description = "The Milk Slasher whose abilities depend on his level of Thirst.\n\n-Thirsty must drink Jugs of Milk to reset his thirst.\n-The Thirstier he is, the slower he is, but can sense the position of players.\n-Thirsty is really quiet.",
-        ProTip = "-This Slasher is heavily linked with Milk Jugs.\n-2."
+        ProTip = "-This Slasher is heavily linked with Milk Jugs."
     },
 
     {
         Name = "Male_07",
         Class = "Umbra",
         Danger = "Devastating",
-        Description = "TThe Omniscient Slasher which can possess one of his many clones.\n\n-Male_07 will turn into a monstrous entity after a long enough chase.\n-He can keep his deadlier human form for longer as the game progresses.",
+        Description = "The Omniscient Slasher which can possess one of his many clones.\n\n-Male_07 will turn into a monstrous entity after a long enough chase.\n-He can keep his deadlier human form for longer as the game progresses.",
         ProTip = "-1.\n-2."
+    },
+
+    {
+        Name = "Tyler",
+        Class = "Demon",
+        Danger = "Devastating",
+        Description = "The Balance Slasher who controls the progress of the round.\n\n-Tyler has two forms. Creator, and Destroyer.\n-Tyler, the Creator will create gas cans for survivors upon being found.\nTyler, the Destroyer will destroy anything in its path.",
+        ProTip = "-Noticeably fewer Fuel Cans were spotted in this Slasher's Zone."
+    },
+
+    {
+        Name = "Borgmire",
+        Class = "Cryptid",
+        Danger = "Considerable",
+        Description = "The Brute Slasher who can overpower survivors with overwhelming strength.\n\n-Borgmire is most effective in short chases.\n-He can pick up and throw nearby Survivors for heavy damage.",
+        ProTip = "-This Slasher seems to suffer from exhaustion during long chases."
+    },
+
+    {
+        Name = "The King",
+        Class = "Demon",
+        Danger = "Considerable",
+        Description = "The Glutton Slasher who must eat burgers to grow his power.\n\n-T.\n-T.\nT.",
+        ProTip = "-."
     }
 
 }

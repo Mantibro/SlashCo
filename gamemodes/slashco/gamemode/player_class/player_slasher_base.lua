@@ -52,6 +52,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	local trollge_stage1 = ply:GetNWBool("TrollgeStage1")
 	local trollge_stage2 = ply:GetNWBool("TrollgeStage2")
 	local trollge_slashing = ply:GetNWBool("TrollgeSlashing")
+	local male_slashing = ply:GetNWBool("Male07Slashing")
+	local male_transforming = ply:GetNWBool("Male07Transforming")
 
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
@@ -253,6 +255,78 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	end
 
 	::male07::
+	--Male_07's animator
+
+	if not male_slashing and not male_transforming then anim_antispam = false end
+
+	if ply:GetModel() == "models/humans/group01/male_07.mdl" then 
+	
+		if ply:IsOnGround() then
+
+			if not chase then 
+				ply.CalcIdeal = ACT_WALK 
+				ply.CalcSeqOverride = ply:LookupSequence("walk_all")
+			else
+				ply.CalcIdeal = ACT_RUN_PANICKED 
+				ply.CalcSeqOverride = ply:LookupSequence("run_all_panicked")
+			end
+	
+		else
+	
+			ply.CalcIdeal = ACT_JUMP
+			ply.CalcSeqOverride = ply:LookupSequence("jump_holding_jump")
+	
+		end
+
+		ply:SetPoseParameter( "move_x", ply:GetVelocity():Length()/100 )
+
+		local a1 = -ply:GetVelocity()[2]
+		local a2 = -ply:GetVelocity()[1]
+
+		ply:SetPoseParameter( "move_yaw",-((( math.atan2( a1, a2 )*2/(-2*math.pi) ) 	* 180	) + ply:GetAngles()[2] - 180))
+
+		if ply:GetVelocity():Length() < 30 then 
+
+			ply.CalcIdeal = ACT_IDLE
+			ply.CalcSeqOverride = ply:LookupSequence("idle_all")
+
+		end
+
+	elseif ply:GetModel() == "models/slashco/slashers/male_07/male_07_monster.mdl" then
+		
+		if ply:IsOnGround() then
+
+			if not chase then 
+				ply.CalcIdeal = ACT_HL2MP_WALK 
+				ply.CalcSeqOverride = ply:LookupSequence("prowl")
+			else
+				ply.CalcIdeal = ACT_HL2MP_RUN 
+				ply.CalcSeqOverride = ply:LookupSequence("chase")
+			end
+	
+		else
+	
+			ply.CalcSeqOverride = ply:LookupSequence("float")
+	
+		end
+
+		if male_slashing and anim_antispam == nil or anim_antispam == false then
+			ply:AddVCDSequenceToGestureSlot( 1, ply:LookupSequence("slash"), 0, true )
+			anim_antispam = true 
+		end
+
+		if male_transforming then 
+		
+			ply.CalcSeqOverride = ply:LookupSequence("transform") 
+	
+			if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+		
+		end
+	
+	
+	end
+
+	--TYLER
 
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
@@ -279,6 +353,8 @@ hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, 
 			ply:EmitSound( "slashco/slasher/amogus_step"..math.random(1,3)..".wav") 
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/thirsty/thirsty.mdl" then --Thirsty (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/hunter/plates/plate.mdl" then --Male07Specter (no) Footsteps
 			return true 
 		end
 		

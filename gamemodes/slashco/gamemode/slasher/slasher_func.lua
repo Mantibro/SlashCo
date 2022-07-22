@@ -23,6 +23,12 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     end
 
+    if slid == 6 then
+
+        SlashCo.CurRound.SlasherData[plyid].SlasherValue1 = 1
+
+    end
+
 end
 
 SlashCo.InsertSlasherToTable = function(id)
