@@ -14,20 +14,47 @@ SlashCo.Maps = {
 
     {
         ID = "sc_summercamp",
-        NAME = "Black Lake Summer Camp"
+        NAME = "Black Lake Summer Camp",
+        SIZE = 2,
+        LEVELS = {
+            500
+        }
     },
 
     {
         ID = "rp_deadcity",
-        NAME = "Dead City"
+        NAME = "Dead City",
+        SIZE = 3,
+        LEVELS = {
+            350
+        }
     },
 
     {
         ID = "rp_redforest",
-        NAME = "Red Forest"
+        NAME = "Red Forest",
+        SIZE = 4,
+        LEVELS = {
+            350,
+            -600
+        }
     }
 
 }
+
+SlashCo.ReturnMapIndex = function()
+
+    local cur_map = game.GetMap()
+
+    for i = 1, #SlashCo.Maps do
+
+        if SlashCo.Maps[i].ID == cur_map then
+            return i
+        end
+
+    end
+
+end
 
 SlashCo.MAXPLAYERS = 5
 
@@ -72,6 +99,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 5,
         KillDistance = 135,
         ChaseRange = 700,
+        ChaseRadius = 0.94,
         ChaseDuration = 10.0,
         JumpscareDuration = 1.5,
         ChaseMusic = "slashco/slasher/baba_chase.wav",
@@ -92,6 +120,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 3,
         KillDistance = 120,
         ChaseRange = 1500,
+        ChaseRadius = 0.96,
         ChaseDuration = 6.0,
         JumpscareDuration = 1,
         ChaseMusic = "slashco/slasher/sid_chase.wav",
@@ -112,6 +141,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 2,
         KillDistance = 100,
         ChaseRange = 0,
+        ChaseRadius = 0.0,
         ChaseDuration = 0.0,
         JumpscareDuration = 2,
         ChaseMusic = "",
@@ -132,6 +162,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 6,
         KillDistance = 130,
         ChaseRange = 400,
+        ChaseRadius = 0.90,
         ChaseDuration = 15.0,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/amogus_chase.wav",
@@ -152,6 +183,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 2,
         KillDistance = 150,
         ChaseRange = 900,
+        ChaseRadius = 0.94,
         ChaseDuration = 8.0,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/thirsty_chase.wav",
@@ -172,9 +204,10 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 5,
         KillDistance = 130,
         ChaseRange = 400,
-        ChaseDuration = 3.0,
+        ChaseRadius = 0.94,
+        ChaseDuration = 5.0,
         JumpscareDuration = 2,
-        ChaseMusic = "slashco/slasher/thirsty_chase.wav",
+        ChaseMusic = "slashco/slasher/male07_chase.wav",
         KillSound = "slashco/slasher/male07_kill.mp3"
     }
 
@@ -343,7 +376,6 @@ if SERVER then
                 print("[SlashCo] Selecting Slasher for player with id: "..id)        
                 if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
                 --if s == 1 then SlashCo.SelectSlasher(6, id) end
-                if slasher1id == 6 then SlashCo.SelectSlasher(math.random(1,5), id) end
                 if s == 2 then SlashCo.SelectSlasher(tonumber(slasher2id), id) end
 
             end)
@@ -1082,7 +1114,7 @@ SlashCo.EndRound = function()
     end
     print("[SlashCo] Round over, returning to lobby in "..tostring(delay).." seconds.")
 
-    timer.Simple(1, function()
+    timer.Simple(delay, function()
 
         SlashCo.RemoveHelicopter()
 
@@ -1190,6 +1222,18 @@ SlashCo.SpawnCurConfig = function()
             if slashid == 5 then item_class = "sc_milkjug" end
 
             if item_class != "" then SlashCo.CreateItems(itemSpawns, item_class) print("[SlashCo] Spawning Items.") end
+
+            if slashid == 6 then
+
+                local diff = SlashCo.CurRound.Difficulty
+
+                for i = 1, (  math.random(0, 6) + (6 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
+
+                    SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0,0,0))
+
+                end
+    
+            end
 
         end
 
@@ -1400,7 +1444,7 @@ SlashCo.OfferingVoteSuccess = function(id)
 
     if id == 2 then --Satiation
 
-        --SlashCo.LobbyData.SelectedSlasherInfo.CLS = 2
+        SlashCo.LobbyData.SelectedSlasherInfo.CLS = 2
 
     end
 
@@ -1418,6 +1462,36 @@ SlashCo.OfferingVoteSuccess = function(id)
     end
 
     SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
+
+end
+
+SlashCo.TraceHullLocator = function()
+
+    --Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player.
+
+    local height_offset = 5
+
+    --local h = SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
+    local h = 500
+
+    local range = 5000
+
+    local pos = Vector(0,0,h)
+
+    ::RELOCATE::
+
+    pos = Vector(math.random(-range,range),math.random(-range,range),h)
+
+    local tr = util.TraceHull( {
+		start = pos,
+		endpos = pos - Vector(0,0,-1000),
+		maxs = Vector(-16,-16,0 + height_offset),
+		mins = Vector(16,16,72 + height_offset),
+	} )
+
+    if tr.Hit then goto RELOCATE end
+
+    return pos
 
 end
 

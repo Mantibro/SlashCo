@@ -505,8 +505,8 @@ function lobbyRoundSetup()
 	end
 
 	--Assign the map randomly
-	--SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
-	SlashCo.LobbyData.SelectedMapNum = 2
+	SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
+	--SlashCo.LobbyData.SelectedMapNum = 2
 
 	for i, ply in ipairs( player.GetAll() ) do
 		ply:ChatPrint("(Debug) Lobby Setup complete. Difficulty: "..SlashCo.LobbyData.SelectedDifficulty)

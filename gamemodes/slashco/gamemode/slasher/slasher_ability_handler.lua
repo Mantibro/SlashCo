@@ -26,20 +26,31 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
         SlashCo.CurRound.SlasherData[slasherid].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
         if SlashCo.CurRound.SlasherData[slasherid].CanChase == false then SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99 end
 
-        if not slasher:GetNWBool("InSlasherChaseMode") or  SlashCo.CurRound.SlasherData[slasherid].SlashID == 3 then goto CONTINUE end
+        if SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown > 0 then 
 
+            SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown - FrameTime() 
+
+        end
+
+        if not slasher:GetNWBool("InSlasherChaseMode") or  SlashCo.CurRound.SlasherData[slasherid].SlashID == 3 then goto CONTINUE end
+do
         a = SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick
         SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = a + FrameTime()
 
-        if slasher:GetEyeTrace().Entity:IsPlayer() then
-            target = slasher:GetEyeTrace().Entity	
-    
-            if target:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(target:GetPos()) < (dist * 1.3) then
-    
+        local inv = (1 - SlashCo.CurRound.SlasherData[slasherid].ChaseRadius) / 2
+
+        local find = ents.FindInCone( slasher:EyePos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius + inv )
+
+        for i = 1, #find do
+
+            if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
+
+                --TODO trace so it doesn't count through walls
+
                 SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
-    
+                break 
             end
-    
+
         end
 
         if a > SlashCo.CurRound.SlasherData[slasherid].ChaseDuration then 
@@ -49,7 +60,10 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
             slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
             slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
             slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
+
+            timer.Simple(0.25, function() slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic) end)
         end
+end
         ::CONTINUE::
 
         --Handle The Chase Functions /\ /\ /\
@@ -376,6 +390,7 @@ do
         SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed = 302
         SlashCo.CurRound.SlasherData[slasherid].Perception = 1.0
         SlashCo.CurRound.SlasherData[slasherid].Eyesight = 2
+        SlashCo.CurRound.SlasherData[slasherid].ChaseRange = 400
 
         SlashCo.CurRound.SlasherData[slasherid].CanKill = true 
         SlashCo.CurRound.SlasherData[slasherid].CanChase = true
@@ -388,6 +403,7 @@ do
         SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed = 285
         SlashCo.CurRound.SlasherData[slasherid].Perception = 1.5
         SlashCo.CurRound.SlasherData[slasherid].Eyesight = 5
+        SlashCo.CurRound.SlasherData[slasherid].ChaseRange = 700
 
         SlashCo.CurRound.SlasherData[slasherid].CanKill = false 
 
@@ -410,12 +426,29 @@ do
 	            slasher:SetModel( modelname )
 
                 slasher:SetNWBool("Male07Transforming", true)
+                slasher:SetNWBool("Male07Slashing", false)
                 slasher:Freeze(true)
+
+                local vPoint = slasher:GetPos() + Vector(0,0,50)
+                local bloodfx = EffectData()
+                bloodfx:SetOrigin( vPoint )
+                util.Effect( "BloodImpact", bloodfx )
+
+                slasher:EmitSound("vo/npc/male01/no02.wav") 
+
+                slasher:EmitSound("NPC_Manhack.Slice") 
                
                 timer.Simple(3, function() 
 
                     slasher:SetNWBool("Male07Transforming", false)
                     slasher:Freeze(false)
+
+                    if slasher:GetNWBool("InSlasherChaseMode") then
+
+                        slasher:SetRunSpeed(285)
+                        slasher:SetWalkSpeed(285)
+
+                    end
 
                 end)
 

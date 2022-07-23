@@ -272,6 +272,9 @@ end --ends here
 	        util.PrecacheModel( modelname )
 	        slasher:SetModel( modelname )
 
+            slasher:SetMaterial("")
+		    slasher:SetColor(Color(255,255,255,255))
+
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
 
             SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
@@ -288,6 +291,9 @@ end --ends here
         local modelname = "models/hunter/plates/plate.mdl"
 	    util.PrecacheModel( modelname )
 	    slasher:SetModel( modelname )
+
+        slasher:SetMaterial("Models/effects/vol_light001")
+		slasher:SetColor(Color(0,0,0,0))
 
         SlashCo.CreateItem("sc_maleclone",slasher:GetPos(),slasher:GetAngles())
 

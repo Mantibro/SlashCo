@@ -107,11 +107,7 @@ SlashCo.UseItem = function(ply)
 
 			end
 
-			--TODO TraceHull to find a good position and teleport there. For now will just respawn
-
-			local player = ply
-
-			SlashCo.RespawnPlayer(player,hpafter)
+			ply:SetPos( SlashCo.TraceHullLocator() )
 
         end)
 

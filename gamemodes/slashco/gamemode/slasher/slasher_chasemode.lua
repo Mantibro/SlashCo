@@ -8,7 +8,9 @@ SlashCo.SlasherCallForChaseMode = function(slasher)
 do
     if SlashCo.CurRound.SlasherData[slasherid].CanChase == false then return end
 
-    local dist = SlashCo.CurRound.SlasherData[slasherid].ChaseRange
+    if SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown > 0 then return end
+
+    SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = 2
 
     if slasher:GetNWBool("InSlasherChaseMode") then 
 
@@ -18,22 +20,37 @@ do
         slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
         slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
 
+        timer.Simple(0.25, function() slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic) end)
+
         return 
     end
 
-    if slasher:GetEyeTrace().Entity:IsPlayer() then
-        local target = slasher:GetEyeTrace().Entity
+    local dist = SlashCo.CurRound.SlasherData[slasherid].ChaseRange
 
-        if target:Team() != TEAM_SURVIVOR then return end
+    local find = ents.FindInCone( slasher:EyePos(), slasher:GetEyeTrace().Normal, dist, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius )
 
-        if slasher:GetPos():Distance(target:GetPos()) < dist then
+    local target = NULL
 
-            slasher:SetNWBool("InSlasherChaseMode", true)
-            SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
+    for i = 1, #find do
 
-            if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0 end
+        if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
 
+            --TODO trace so it doesn't count through walls
+
+            target = find[i]
+            break 
         end
+
+    end
+
+    if not target:IsValid() then return end
+
+    if slasher:GetPos():Distance(target:GetPos()) < dist then
+
+        slasher:SetNWBool("InSlasherChaseMode", true)
+        SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
+
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0 end
 
     end
 
@@ -49,7 +66,9 @@ do
         slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
         slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
         slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
+        timer.Simple(0.25, function() slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic) end)
     end
+
 end
     ::sidaim::
     if not slasher:GetNWBool("SidGunEquipped") then return end
