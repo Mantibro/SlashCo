@@ -4,6 +4,7 @@ AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 include( "player.lua" )
 include( "globals.lua" )
+include( "master_database.lua" )
 include( "lobby.lua" )
 include( "ui/data_info.lua" )
 include( "items.lua" )
@@ -429,6 +430,8 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 	ply:SetTeam(TEAM_SPECTATOR)
 	ply:Spawn()
 	hook.Run("LobbyInfoText")
+
+	SlashCoDatabase.OnPlayerJoined(pid)
 
 	SlashCo.AwaitExpectedPlayers()
 

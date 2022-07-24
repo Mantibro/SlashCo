@@ -1485,8 +1485,8 @@ SlashCo.TraceHullLocator = function()
     local tr = util.TraceHull( {
 		start = pos,
 		endpos = pos - Vector(0,0,-1000),
-		maxs = Vector(-16,-16,0 + height_offset),
-		mins = Vector(16,16,72 + height_offset),
+		maxs = Vector(-24,-24,0 + height_offset),
+		mins = Vector(24,24,72 + height_offset),
 	} )
 
     if tr.Hit then goto RELOCATE end

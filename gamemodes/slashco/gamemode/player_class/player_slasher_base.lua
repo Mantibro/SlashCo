@@ -267,7 +267,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 				ply.CalcIdeal = ACT_WALK 
 				ply.CalcSeqOverride = ply:LookupSequence("walk_all")
 			else
-				ply.CalcIdeal = ACT_RUN_PANICKED 
+				ply.CalcIdeal = ACT_RUN_SCARED
 				ply.CalcSeqOverride = ply:LookupSequence("run_all_panicked")
 			end
 	
@@ -283,7 +283,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 		local a1 = -ply:GetVelocity()[2]
 		local a2 = -ply:GetVelocity()[1]
 
-		ply:SetPoseParameter( "move_yaw",-((( math.atan2( a1, a2 )*2/(-2*math.pi) ) 	* 180	) + ply:GetAngles()[2] - 180))
+		--ply:SetPoseParameter( "move_yaw",-((( math.atan2( a1, a2 )*2/(-2*math.pi) ) 	* 180	) + ply:GetAngles()[2] - 180))
 
 		if ply:GetVelocity():Length() < 30 then 
 

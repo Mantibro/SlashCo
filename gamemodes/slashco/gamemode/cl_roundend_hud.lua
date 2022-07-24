@@ -42,7 +42,7 @@ hook.Add("HUDPaint", "RoundOutroHUD", function()
 
 	--local tick = tick
 	if re_tick == nil then re_tick = 0 end
-	re_tick = re_tick + 1
+	re_tick = re_tick + 1.5
 
 
 	local black = Material("models/slashco/slashers/trollge/body")

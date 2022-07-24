@@ -27,7 +27,7 @@ end
 
 function PLAYER:SetModel()
 
-	local rand = math.random( 1, 5 )
+	local rand = math.random( 1, 4 )
 
 	local id = 1
 
