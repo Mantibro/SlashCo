@@ -13,8 +13,6 @@ ENT.Purpose			= "Transport of SlashCo workers."
 ENT.Instructions	= ""
 ENT.AutomaticFrameAdvance = true 
 
-local SatPlayers = {}
-
 local plyCount = 0
 
 
@@ -52,6 +50,8 @@ function ENT:Use( activator, caller, useType, value )
 
 		local userEnteredAlready = false
 
+		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
+
 		if SatPlayers[4] == nil then availabilityHeli = true end
 
 		if activator:Team() == TEAM_SURVIVOR and availabilityHeli then --The Player is sat down in the helicopter
@@ -68,21 +68,21 @@ function ENT:Use( activator, caller, useType, value )
 			end
 		end
 
-		if userEnteredAlready == false then table.insert(SatPlayers, {steamid = activator:SteamID64()}) end
+		if userEnteredAlready == false then 
+			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, {steamid = activator:SteamID64()}) 
+		end
 
 		local vehicle = ents.Create("prop_vehicle_prisoner_pod")
-		local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
+		--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
 
-		if t == false then
-			SafeRemoveEntity(vehicle)
-			return false
-		end
+		--if t == false then
+		--	SafeRemoveEntity(vehicle)
+		--	return false
+		--end
 
 
 		local ang = Angle(0,0,0)
 		local pos = Vector(0,0,0)
-
-		--if SatPlayers[1] != nil and SatPlayers[1].steamid == activator:SteamID64() then pos = self:GetPos() + ( vehicle:GetUp() * 40 ) + ( vehicle:GetForward() * -30 )  + ( vehicle:GetRight() * -17 ) angoffset = -90
 
 		if SatPlayers[1] != nil and SatPlayers[1].steamid == activator:SteamID64() then 
 			pos = self:LocalToWorld( Vector(-30 , -17, 40) ) 

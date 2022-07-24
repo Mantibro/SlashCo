@@ -149,7 +149,9 @@ SCInfo.RoundEnd = {
         AlivePlayers = " were reported present on the rescue helicopter.",
         DeadPlayers = " were confirmed dead.",
         LeftBehindPlayers = " had to be left behind.",
-        Fail = "The dispatched SlashCo Workers could not be rescued."
+        Fail = "The dispatched SlashCo Workers could not be rescued.",
+        OnlyOneAlive = " was the only one to survive.",
+        OnlyOneDead = " was confirmed dead."
     },
 
     {

@@ -463,7 +463,9 @@ function lobbyRoundSetup()
 
 		if team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then goto reroll end
 
-		SlashCo.LobbyData.AssignedSlashers[2].steamid = team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64()
+		table.insert(SlashCo.LobbyData.AssignedSlashers, {	steamid = team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64()	})
+
+		--SlashCo.LobbyData.AssignedSlashers[2].steamid = team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64()
 
 		local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
 		p:ChatPrint("You will become the second Slasher.")
@@ -790,6 +792,12 @@ function lobbySaveCurData()
 
 	end
 
+	if SlashCo.LobbyData.AssignedSlashers[2] != nil then
+
+		table.insert(slashers, {steamid = SlashCo.LobbyData.AssignedSlashers[2].steamid})
+
+	end
+
 	--Major data dump SOON: Duality
 	sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( "..diff..", "..offer..", "..slasher1id..", "..slasher2id..", "..survivorgasmod.." );")
 
@@ -879,12 +887,24 @@ end )
 
 function lobbyFinish() 
 
+	if SlashCo.LobbyData.LOBBYSTATE == 4 then return end
+
 	SlashCo.LobbyData.LOBBYSTATE = 4
 
 	print("Helicopter now ready to depart!")
 
-	SlashCo.StartGameIntro()
+	timer.Simple(1.5, function()
 
-	lobbyLeaveTimer()
+		SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1]+1500,SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+400)
+
+	end)
+
+	timer.Simple(4, function()
+
+		SlashCo.StartGameIntro()
+
+		lobbyLeaveTimer()
+
+	end)
 
 end

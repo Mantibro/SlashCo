@@ -18,8 +18,10 @@ function ENT:Initialize()
 		self:SetModel( "models/slashco/slashers/baba/baba.mdl")
 		self:SetMoveType( MOVETYPE_NONE )
 		self:SetUseType( SIMPLE_USE )
-		self:SetColor(Color(0,0,0,0)) 
-		self:SetRenderMode( RENDERMODE_TRANSCOLOR ) 
+		self:DrawShadow(false)
+		self:SetColor(Color(0,0,0,0))
+		self:SetRenderMode(RENDERMODE_TRANSALPHA)
+		vehicle:SetNoDraw(true)
 
 		self:SetNWBool("CloneTripped", false)
 
@@ -61,7 +63,10 @@ function ENT:Think()
 
 			self:SetNWBool("CloneTripped", true)
 
-			self:SetColor(Color(255,255,255,255)) 
+			self:DrawShadow(true)
+			self:SetColor(Color(255,255,255,255))
+			self:SetRenderMode(RENDERMODE_TRANSCOLOR)
+			self:SetNoDraw(false) 
 
 			self:SetPos( self:GetPos() + self:GetForward() * 2 )
 			self:SetPos( Vector(self:GetPos()[1],self:GetPos()[2],ground.HitPos[3]))
@@ -86,7 +91,10 @@ function ENT:Think()
 			self:EmitSound("slashco/slasher/baba_reveal.mp3")
 
 			self:EmitSound("slashco/slasher/baba_scare.mp3")
-			self:SetColor(Color(255,255,255,255)) 
+			self:DrawShadow(true)
+			self:SetColor(Color(255,255,255,255))
+			self:SetRenderMode(RENDERMODE_TRANSCOLOR)
+			self:SetNoDraw(false) 
 			self:ResetSequence( "spook" )
 			self:SetPlaybackRate( 2 )
 

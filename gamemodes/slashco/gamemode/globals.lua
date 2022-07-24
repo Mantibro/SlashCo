@@ -161,7 +161,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Perception = 4.5,
         Eyesight = 6,
         KillDistance = 130,
-        ChaseRange = 400,
+        ChaseRange = 600,
         ChaseRadius = 0.90,
         ChaseDuration = 15.0,
         JumpscareDuration = 2,
@@ -203,7 +203,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Perception = 1.0,
         Eyesight = 5,
         KillDistance = 130,
-        ChaseRange = 400,
+        ChaseRange = 600,
         ChaseRadius = 0.94,
         ChaseDuration = 5.0,
         JumpscareDuration = 2,
@@ -299,6 +299,7 @@ SlashCo.ResetCurRoundData = function()
         SummonHelicopter = false,
         HelicopterSpawnPosition = Vector(0,0,0),
         HelicopterTargetPosition = Vector(0,0,0),
+        HelicopterRescuedPlayers = {},
         AllowRoundEndSequence = false,
         EscapeHelicopterSummoned = false,
         EscapeHelicopterSpawned = false,
@@ -1108,7 +1109,11 @@ SlashCo.EndRound = function()
         if #SlashCo.CurRound.SlasherData.AllSurvivors == #team.GetPlayers(TEAM_SURVIVOR) then 
             SlashCo.RoundOverScreen(0) 
         else
-            SlashCo.RoundOverScreen(1) 
+            if SlashCo.CurRound.DistressBeaconUsed and #SlashCo.CurRound.HelicopterRescuedPlayers == #team.GetPlayers(TEAM_SURVIVOR) then
+                SlashCo.RoundOverScreen(4) 
+            else
+                SlashCo.RoundOverScreen(1) 
+            end
         end
 
     end

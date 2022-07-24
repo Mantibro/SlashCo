@@ -150,7 +150,10 @@ SlashCo.UseItem = function(ply)
 
 				SlashCo.SummonEscapeHelicopter()
 
-				SlashCo.CurRound.DistressBeaconUsed = true 
+				SlashCo.CurRound.DistressBeaconUsed = true
+				
+				SlashCo.CreateItem("sc_activebeacon",ply:GetPos(),Angle(0,0,0))
+
 
 			end
 
@@ -176,9 +179,11 @@ SlashCo.UseItem = function(ply)
 
 		]]
 
-		--emitsound
+		ply:EmitSound("slashco/survivor/devildie_roll.mp3")
 
 		timer.Simple(2, function()
+
+			ply:EmitSound("slashco/survivor/devildie_break.mp3")
 
 			local rand = math.random(1,6)
 
@@ -187,9 +192,13 @@ SlashCo.UseItem = function(ply)
 				SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , 20, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
 				SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , -20, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
 
+				ply:EmitSound("slashco/survivor/devildie_fuel.mp3")
+
 			elseif rand == 2 then
 
 				ply:SetRunSpeed( 450 )
+
+				ply:EmitSound("slashco/survivor/devildie_speed.mp3")
 
 				timer.Simple(45, function()
 
@@ -201,7 +210,29 @@ SlashCo.UseItem = function(ply)
 
 			elseif rand == 3 then
 
-				ply:SetHealth( ply:Health() + math.random(-100,100) )
+				local hpd = math.random(-100,100)
+
+				if hpd <= ply:Health() then hpd = ply:Health() + 1 end
+
+				ply:SetHealth( ply:Health() + hpd )
+
+				if hpd <= 0 then 
+					ply:EmitSound("slashco/survivor/devildie_hurt.mp3") 
+
+					local vPoint = ply:GetPos() + Vector(0,0,50)
+                    local bloodfx = EffectData()
+                    bloodfx:SetOrigin( vPoint )
+                    util.Effect( "BloodImpact", bloodfx )
+				end
+
+				if hpd > 0 then 
+					ply:EmitSound("slashco/survivor/devildie_heal.mp3") 
+
+					local vPoint = ply:GetPos() + Vector(0,0,50)
+                    local healfx = EffectData()
+                    healfx:SetOrigin( vPoint )
+                    util.Effect( "TeslaZap", healfx )
+				end
 
 			elseif rand == 4 then
 
@@ -219,11 +250,20 @@ SlashCo.UseItem = function(ply)
 
 			elseif rand == 5 then
 
-				--louddsound
+				PlayGlobalSound("slashco/survivor/devildie_siren.mp3", 96, ply)
 
 			elseif rand == 6 then
 
-				ply:Kill()
+				ply:EmitSound("slashco/survivor/devildie_kill.mp3")
+
+				timer.Simple(0.5, function()
+					local vPoint = ply:GetPos() + Vector(0,0,50)
+                    local killfx = EffectData()
+                    killfx:SetOrigin( vPoint )
+                    util.Effect( "HelicopterImpact", killfx )
+
+					ply:Kill()
+        		end)
 
 			end
 

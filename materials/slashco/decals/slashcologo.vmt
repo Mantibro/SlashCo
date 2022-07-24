@@ -1,5 +1,6 @@
 "LightmappedGeneric"
 {
 	"$basetexture" "slashco/decals/slashcologo"
-
+                 $alphatest 1
+                 $decal 1
 }

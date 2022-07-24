@@ -203,36 +203,39 @@ SlashCo.RoundOverScreen = function(state)
 	local l4 = ""
 	local l5 = ""
 
+	local rescued_players = SlashCo.CurRound.HelicopterRescuedPlayers
 	local alive_survivors = ""
 
-	if #team.GetPlayers(TEAM_SURVIVOR) == 1 then 
+	if #rescued_players == 1 then 
 
-		alive_survivors = team.GetPlayers(TEAM_SURVIVOR)[1]:GetName()
+		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()
 
-	elseif #team.GetPlayers(TEAM_SURVIVOR) == 2 then 
+	elseif #rescued_players == 2 then 
 
-		alive_survivors = team.GetPlayers(TEAM_SURVIVOR)[1]:GetName().." and "..team.GetPlayers(TEAM_SURVIVOR)[2]:GetName()
+		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[2].steamid):GetName()
 
-	elseif #team.GetPlayers(TEAM_SURVIVOR) == 3 then 
+	elseif #rescued_players == 3 then 
 
-		alive_survivors = team.GetPlayers(TEAM_SURVIVOR)[1]:GetName()..", "..team.GetPlayers(TEAM_SURVIVOR)[2]:GetName().." and "..team.GetPlayers(TEAM_SURVIVOR)[3]:GetName()
+		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[2].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[3].steamid):GetName()
 
-	elseif #team.GetPlayers(TEAM_SURVIVOR) == 4 then 
+	elseif #rescued_players == 4 then 
 
-		alive_survivors = team.GetPlayers(TEAM_SURVIVOR)[1]:GetName()..", "..team.GetPlayers(TEAM_SURVIVOR)[2]:GetName()..", "..team.GetPlayers(TEAM_SURVIVOR)[3]:GetName().." and "..team.GetPlayers(TEAM_SURVIVOR)[4]:GetName()
+		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[2].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[3].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[4].steamid):GetName()
 
 	end
 
-	local deadsurv_table = SlashCo.CurRound.SlasherData.AllSurvivors
+	local deadsurv_table = {}
 	local dead_survivors = ""
 
-	for i = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
+	for i = 1, #team.GetPlayers(TEAM_SPECTATOR) do
 
-		local dataply = SlashCo.CurRound.SlasherData.AllSurvivors[i].id
+		local spec = team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64()
 
-		for s = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for s = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
 
-			if dataply == team.GetPlayers(TEAM_SURVIVOR)[s]:SteamID64() then table.RemoveByValue( deadsurv_table, dataply ) end
+			if spec == SlashCo.CurRound.SlasherData.AllSurvivors[s]:SteamID64() then 
+				table.insert(deadsurv_table, {id = spec}) 
+			end
 
 		end
 
@@ -256,6 +259,45 @@ SlashCo.RoundOverScreen = function(state)
 
 	end
 
+	local absurv_table = {}
+	local abandoned_survivors = ""
+
+	for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+		local a_ply = team.GetPlayers(TEAM_SURVIVOR)[i]:SteamID64()
+
+		for r = 1, #rescued_players do
+
+			local r_ply = rescued_players[r].steamid
+			
+			if r_ply == a_ply then goto RESCUED end
+
+		end
+
+		table.insert(absurv_table, a_ply)
+
+		::RESCUED::
+
+	end
+
+	if #absurv_table == 1 then 
+
+		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()
+
+	elseif #absurv_table == 2 then 
+
+		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName().." and "..player.GetBySteamID64(absurv_table[2].id):GetName()
+
+	elseif #absurv_table == 3 then 
+
+		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()..", "..player.GetBySteamID64(absurv_table[2].id):GetName().." and "..player.GetBySteamID64(absurv_table[3].id):GetName()
+
+	elseif #absurv_table == 4 then 
+
+		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()..", "..player.GetBySteamID64(absurv_table[2].id):GetName()..", "..player.GetBySteamID64(absurv_table[3].id):GetName().." and "..player.GetBySteamID64(absurv_table[4].id):GetName()
+
+	end
+
 	if state == 0 then
 
 		l1 = SCInfo.RoundEnd[1].On
@@ -268,15 +310,30 @@ SlashCo.RoundOverScreen = function(state)
 
 		l1 = SCInfo.RoundEnd[1].On
 		l2 = SCInfo.RoundEnd[2].NonFullTeam
-		l3 = alive_survivors..SCInfo.RoundEnd[2].AlivePlayers
-		l4 = dead_survivors..SCInfo.RoundEnd[2].DeadPlayers
-		l5 = ""
+
+		if #team.GetPlayers(TEAM_SURVIVOR) > 1 then 
+			l3 = alive_survivors..SCInfo.RoundEnd[2].AlivePlayers
+		else
+			l3 = alive_survivors..SCInfo.RoundEnd[2].OnlyOneAlive
+		end
+
+		if #dead_survivors > 1 then 
+			l4 = dead_survivors..SCInfo.RoundEnd[2].DeadPlayers
+		else
+			l4 = dead_survivors..SCInfo.RoundEnd[2].OnlyOneDead
+		end
+
+		if #absurv_table > 0 then
+			l5 = abandoned_survivors..SCInfo.RoundEnd[2].LeftBehindPlayers
+		else
+			l5 = ""
+		end
 
 	elseif state == 2 then
 
 		l1 = SCInfo.RoundEnd[1].On
 		l2 = SCInfo.RoundEnd[2].Fail
-		l3 = "" --TODO
+		l3 = "" 
 		l4 = ""
 		l5 = ""
 
@@ -291,8 +348,8 @@ SlashCo.RoundOverScreen = function(state)
 	elseif state == 4 then
 		
 		l1 = SCInfo.RoundEnd[1].DB
-		l2 = SCInfo.RoundEnd[3].LossComplete
-		l3 = ""
+		l2 = dead_survivors..SCInfo.RoundEnd[3].Loss
+		l3 = alive_survivors..SCInfo.RoundEnd[2].DBWin
 		l4 = ""
 		l5 = ""
 

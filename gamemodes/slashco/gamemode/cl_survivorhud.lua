@@ -263,6 +263,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		        	tlight.DieTime = CurTime() + 1
             	end
 
+			end
+
 			if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") then return end
             
             local dlight = DynamicLight( slasher:EntIndex() + 1 )
@@ -276,8 +278,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		        dlight.Size = 250
 		        dlight.DieTime = CurTime() + 1
             end
-
-			end
 
         end )
 

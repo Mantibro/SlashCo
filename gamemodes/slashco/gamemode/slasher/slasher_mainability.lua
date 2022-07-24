@@ -272,8 +272,10 @@ end --ends here
 	        util.PrecacheModel( modelname )
 	        slasher:SetModel( modelname )
 
-            slasher:SetMaterial("")
 		    slasher:SetColor(Color(255,255,255,255))
+            slasher:DrawShadow(true)
+		    slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
+		    slasher:SetNoDraw(false)
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
 
@@ -292,8 +294,10 @@ end --ends here
 	    util.PrecacheModel( modelname )
 	    slasher:SetModel( modelname )
 
-        slasher:SetMaterial("Models/effects/vol_light001")
-		slasher:SetColor(Color(0,0,0,0))
+        slasher:SetColor(Color(0,0,0,0))
+        slasher:DrawShadow(false)
+		slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+		slasher:SetNoDraw(true)
 
         SlashCo.CreateItem("sc_maleclone",slasher:GetPos(),slasher:GetAngles())
 
