@@ -1,0 +1,16 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/overlays/thirsty_fuck"
+	"$alpha" "0.85"
+
+	"Proxies"
+	{
+		"AnimatedTexture"
+		{
+			"animatedTextureVar"		"$basetexture"
+			"animatedTextureFrameNumVar"	"$frame"
+			"animatedTextureFrameRate"		"20"
+		}
+	}
+}
+

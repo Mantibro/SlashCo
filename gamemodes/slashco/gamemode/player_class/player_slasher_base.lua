@@ -43,6 +43,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	local eating = ply:GetNWBool("SidEating")
 	local equipping_gun = ply:GetNWBool("SidGunEquipping")
+	local sid_executing = ply:GetNWBool("SidExecuting")
 
 	local gun_state = ply:GetNWBool("SidGunEquipped")
 	local aiming_gun = ply:GetNWBool("SidGunAiming")
@@ -85,7 +86,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	if ply:GetModel() != "models/slashco/slashers/sid/sid.mdl" then goto trollge end --Sid's Animator
 
-	if not eating and not equipping_gun and not aiming_gun and not gun_shooting then anim_antispam = false end
+	if not eating and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then anim_antispam = false end
 
 	if not equipping_gun then
 
@@ -257,8 +258,6 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	::male07::
 	--Male_07's animator
 
-	if not male_slashing and not male_transforming then anim_antispam = false end
-
 	if ply:GetModel() == "models/humans/group01/male_07.mdl" then 
 	
 		if ply:IsOnGround() then
@@ -293,6 +292,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 		end
 
 	elseif ply:GetModel() == "models/slashco/slashers/male_07/male_07_monster.mdl" then
+
+		if not male_slashing and not male_transforming then anim_antispam = false end
 		
 		if ply:IsOnGround() then
 

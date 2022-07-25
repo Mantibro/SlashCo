@@ -14,6 +14,21 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 	end
 
+	if ply:GetNWBool("ThirstyFuck") == true  then
+		local Overlay = Material("slashco/ui/overlays/thirsty_fuck")
+		Overlay:SetInt( "$frame", 0 )
+
+		surface.SetDrawColor(255,255,255,60)	
+		surface.SetMaterial(Overlay)
+		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
+		if c == nil then
+			surface.PlaySound("slashco/slasher/thirsty_rage1.mp3")
+			surface.PlaySound("slashco/slasher/thirsty_rage2.mp3")
+			c = true
+		end
+	end
+
 	if ply:GetNWBool("SurvivorJumpscare_1") == true  then
 
 		local Overlay = Material("slashco/ui/overlays/jumpscare_1")

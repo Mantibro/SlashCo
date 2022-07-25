@@ -339,6 +339,11 @@ function lobbyRoundSetup()
 
 	SlashCo.CurRound.ConnectedPlayers = SlashCo.LobbyData.Players
 
+	for i, play in ipairs( player.GetAll() ) do
+		local pid = play:SteamID64()
+		SlashCo.BroadcastMasterDatabaseForClient(pid)
+	end
+
 
 	SlashCo.LobbyData.SelectedDifficulty = math.random( 0, 3 ) --Randomizing the Difficulty
 
@@ -929,17 +934,15 @@ function lobbyFinish()
 
 	SlashCo.LobbyData.LOBBYSTATE = 4
 
-	print("Helicopter now ready to depart!")
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+500)
 
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+1000)
+	timer.Simple(8, function()
 
-	timer.Simple(3, function()
-
-		SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1]+5000,SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+400)
+		SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1]+5000,SlashCo.CurRound.HelicopterTargetPosition[2]+4000,SlashCo.CurRound.HelicopterTargetPosition[3]+1000)
 
 	end)
 
-	timer.Simple(10, function()
+	timer.Simple(15, function()
 
 		SlashCo.StartGameIntro()
 

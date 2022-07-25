@@ -88,9 +88,23 @@ end
 
             slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
-	        local modelname = SlashCo.GasCanModel
-	        util.PrecacheModel( modelname )
-	        slasher:SetModel( modelname )
+            slasher:SetColor(Color(0,0,0,0))
+            slasher:DrawShadow(false)
+		    slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+		    slasher:SetNoDraw(true)
+
+            local g = ents.Create( "prop_physics" )
+
+            g:SetPos( slasher:GetPos() + Vector(0,0,15) )
+            g:SetAngles( slasher:GetAngles() +Angles(0,90,0) )
+            g:SetModel( SlashCo.GasCanModel )
+            g:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
+            g:Spawn()
+
+            g:FollowBone( slasher, slasher:LookupBone( "Hips" ) )
+
+            local id = g:EntIndex()
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = id
 
             slasher:SetRunSpeed( 200 )
             slasher:SetWalkSpeed( 200 )

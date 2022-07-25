@@ -54,6 +54,8 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		local willdrawchase = true
 		local willdrawmain = true
 
+		local pacified = LocalPlayer():GetNWBool("DemonPacified")
+
 		surface.SetDrawColor(255,255,255,255)	
 
 		local g = (GameProgress/10)
@@ -100,6 +102,9 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 		end
 
+		if pacified then
+			draw.SimpleText( "(DEMON) You have been Pacified by consuming an item. You cannot Chase or Kill and your senses are dulled.", "ItemFontTip", ScrW()/2, ScrH()/4, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+		end
 		--Bababooey \/ \/ \/
 
 		if SlashID != 1 then goto sid end

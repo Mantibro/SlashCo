@@ -39,10 +39,10 @@ SlashCo.Maps = {
         SIZE = 4,
         MIN_PLAYERS = 3,
         LEVELS = {
+            250,
             350,
-            450,
-            -600,
-            -620
+            -630,
+            -650
         }
     }
 
@@ -208,7 +208,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseSpeed = 302,
         Perception = 1.0,
         Eyesight = 5,
-        KillDistance = 130,
+        KillDistance = 160,
         ChaseRange = 600,
         ChaseRadius = 0.94,
         ChaseDuration = 5.0,
@@ -1169,7 +1169,10 @@ SlashCo.EndRound = function()
         if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
             --Add to stats of the remaining survivors' wins.
             for i = 1, #SlashCo.CurRound.HelicopterRescuedPlayers do
+
                 SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "SurvivorRoundsWon", 1)
+                SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "Points", 15)
+
             end
         end
 
@@ -1528,27 +1531,36 @@ SlashCo.TraceHullLocator = function()
 
     --Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player or npc.
 
-    local height_offset = 5
-
-    local h = SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
+    local height_offset = 10
     local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
-    local range = 2500*size
+    local range = 3500*size
 
     local pos = Vector(0,0,h)
 
     ::RELOCATE::
 
+    local h = SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
+
     pos = Vector(math.random(-range,range),math.random(-range,range),h)
+
+    local tr_l = util.TraceLine( {
+		start = pos,
+		endpos = pos - Vector(0,0,1000),
+	} )
+
+    if not tr_l.Hit then goto RELOCATE end
 
     local tr = util.TraceHull( {
 		start = pos,
-		endpos = pos - Vector(0,0,-1000),
-		maxs = Vector(-24,-24,0 + height_offset),
-		mins = Vector(24,24,72 + height_offset),
+		endpos = pos + Vector(0,0,tr_l.HitPos[3] - height_offset),
+		maxs = Vector(18,18,72),
+		mins = Vector(-18,-18,0),
 	} )
 
     if tr.Hit then goto RELOCATE end
+
+    pos = tr_l.HitPos
 
     return pos
 

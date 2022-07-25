@@ -289,7 +289,11 @@ end
 do
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Transformation type
     v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Transform cooldown
-    --v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --blood
+    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Fuel Can EntIndex
+
+    if IsValid(ents.GetByIndex(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3)) then
+        ents.GetByIndex(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3):SetAngles(Angle(0,slasher:EyeAngles()[2],0))
+    end
 
     if v2 > 0 then 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() 
@@ -299,6 +303,7 @@ do
         if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
             SlashCo.CurRound.SlasherData[slasherid].CanKill = true
             SlashCo.CurRound.SlasherData[slasherid].CanChase = true
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
         else
             SlashCo.CurRound.SlasherData[slasherid].CanKill = false
             SlashCo.CurRound.SlasherData[slasherid].CanChase = false
@@ -314,8 +319,6 @@ do
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Milk drank
     v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Pacification
     v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Thirst
-
-    if v1 > 4 then v1 = 4 end
 
     if v2 > 0 then --Thirsty is pacified
 
@@ -338,7 +341,7 @@ do
         --Deplete thirst
 
         SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed = 285 - ( v1 * 10)
-        SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed = 100 + ( (    ( v3 / (5 - v1)   )   ) + ( v1 * 15 )   )*(1+SO)
+        SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed = 100 + ( (    ( v3 / (7 - v1)   )   ) + ( v1 * 20 )   )*(0.8+(SO*0.5))
         SlashCo.CurRound.SlasherData[slasherid].Eyesight = 2 + (    ( v3 / (28.5 - (v1*4))   )   )  
         SlashCo.CurRound.SlasherData[slasherid].Perception = 1.0 + (    ( v3 / (44.5 - (v1*8))   )   )  
         --Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
@@ -417,7 +420,7 @@ do
 
             --Timer - 10 seconds + Game Progress (1-10) ^ 3 (SO - x2)
 
-            if v2 > 1 + math.pow( SlashCo.CurRound.SlasherData.GameProgress, 3 ) * (1 + SO) then 
+            if v2 > 1 + (SlashCo.CurRound.SlasherData.GameProgress*2) +  math.pow( SlashCo.CurRound.SlasherData.GameProgress, 2 ) * (1 + SO) then 
 
                 --Become Monster
 
@@ -465,3 +468,37 @@ end
 end
 
 end)
+
+SlashCo.ThirstyRage = function(ply)
+
+    local pos = ply:GetPos()
+
+    for i = 1, #team.GetPlayers(TEAM_SLASHER) do
+
+        local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
+        local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then return end
+
+        if slasher:GetPos():Distance( pos ) > 900 then return end
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 6
+        slasher:SetNWBool("ThirstyBigMlik", true)
+
+        for i = 1, #player.GetAll() do
+            local ply = player.GetAll()[i]
+            ply:SetNWBool("ThirstyFuck",true)
+        end
+
+        timer.Simple(3, function() 
+        
+            for i = 1, #player.GetAll() do
+                local ply = player.GetAll()[i]
+                ply:SetNWBool("ThirstyFuck",false)
+            end
+        
+        end)
+
+    end
+
+end

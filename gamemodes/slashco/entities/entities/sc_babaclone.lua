@@ -21,7 +21,7 @@ function ENT:Initialize()
 		self:DrawShadow(false)
 		self:SetColor(Color(0,0,0,0))
 		self:SetRenderMode(RENDERMODE_TRANSALPHA)
-		vehicle:SetNoDraw(true)
+		--self:SetNoDraw(true)
 
 		self:SetNWBool("CloneTripped", false)
 

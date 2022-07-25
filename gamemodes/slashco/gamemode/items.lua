@@ -53,6 +53,8 @@ SlashCo.UseItem = function(ply)
 
         end)
 
+		SlashCo.ThirstyRage(ply)
+
 	end
 
 	if itid == 4 then

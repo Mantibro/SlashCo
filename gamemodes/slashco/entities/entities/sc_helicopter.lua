@@ -200,7 +200,7 @@ function ENT:Think()
 			local vPoint = self:GetPos()
         	local fx = EffectData()
         	fx:SetOrigin( vPoint )
-			fx:SetScale( math.random(50,200) )
+			fx:SetScale( math.random(20,150) )
 			fx:SetEntity( self )
         	util.Effect( "ThumperDust", fx )
 

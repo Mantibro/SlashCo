@@ -6,6 +6,8 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
+    local dist = SlashCo.CurRound.SlasherData[slasherid].KillDistance
+
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 3 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 < 1 then goto trollclaw end
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 2 then goto maleclaw end
@@ -16,8 +18,6 @@ do
     if SlashCo.CurRound.SlasherData[slasherid].CanKill == false then return end
 
     if SlashCo.CurRound.SlasherData[slasherid].KillDelayTick > 0 then return end
-
-    local dist = SlashCo.CurRound.SlasherData[slasherid].KillDistance
     
     if slasher:GetEyeTrace().Entity:IsPlayer() then
         local target = slasher:GetEyeTrace().Entity	
@@ -102,6 +102,59 @@ do
 
             timer.Create( "SidGunDecay", 1.5, 1, function() slasher:SetNWBool("SidGunShoot",false) end)
         end)
+
+    else
+
+        --Executing a Survivor
+
+        if slasher:GetEyeTrace().Entity:IsPlayer() then
+            local target = slasher:GetEyeTrace().Entity	
+    
+            if target:Team() != TEAM_SURVIVOR then return end
+    
+            if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+    
+                target:SetNWBool("SurvivorBeingJumpscared",true)
+    
+                SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+                SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99
+
+                slasher:SetNWBool("SidExecuting",true)
+
+                target:SetPos(slasher:GetPos())
+                target:SetAngles(   Angle(0,slasher:EyeAngles()[2],0)   )  
+                    
+                target:Freeze(true)
+                target:SetNotSolid(true)
+                slasher:Freeze(true)
+    
+                SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+    
+                timer.Simple(3, function()
+    
+                    target:SetNWBool("SurvivorBeingJumpscared",false)
+
+                    PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
+
+                    slasher:EmitSound("slashco/slasher/sid_shot.mp3",95,100,1,6)
+
+                    slasher:SetNWBool("SidExecuting",false)
+
+                    target:SetPos(slasher:GetPos() + (slasher:GetForward() * 30))
+
+                    target:Freeze(false)
+                    target:SetVelocity( slasher:GetForward() * 20000 )
+                    target:SetNotSolid(false)
+                    target:Kill()
+            
+                end)
+
+                timer.Simple(5, function()
+                    slasher:Freeze(false)
+                end)
+            end
+    
+        end
 
     end
 

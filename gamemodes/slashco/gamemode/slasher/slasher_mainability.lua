@@ -141,6 +141,7 @@ end --ends here
 
             slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
+
             local rand = math.random( 1, 5 )
 	        local id = 1
 	        if rand < 3 then id = rand elseif rand == 3 then id = 5 elseif rand == 4 then id = 7 end
@@ -164,12 +165,23 @@ end --ends here
         util.PrecacheModel( "models/slashco/slashers/amogus/amogus.mdl" )
 	    slasher:SetModel( "models/slashco/slashers/amogus/amogus.mdl" )
 
+        slasher:SetColor(Color(255,255,255,255))
+        slasher:DrawShadow(true)
+		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
+		slasher:SetNoDraw(false)
+
         slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
         slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
 
+        if IsValid(ents.GetByIndex(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3)) then
+
+            ents.GetByIndex(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3):Remove()
+
+        end
+
         timer.Simple(2 - (SO * 1.95), function() 
             slasher:Freeze(false) 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 3 - (SO * 2.8)
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2.5 - (SO * 2.4)
         end)
 
     end
@@ -238,7 +250,11 @@ end --ends here
                 slasher:Freeze(false) 
                 slasher:SetNWBool("ThirstyDrinking", false) 
                 slasher:SetNWBool("DemonPacified", true)
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1 + SatO
+
+                if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 < ( 4 + SatO) then
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1 + SatO
+                end
+
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(20,35)
 
                 if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 2 then
@@ -281,8 +297,12 @@ end --ends here
 
             SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
 
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 3
+
             slasher:SetWalkSpeed(100)
             slasher:SetRunSpeed(100)
+
+            return
 
         end
 
@@ -305,8 +325,12 @@ end --ends here
 
         slasher:EmitSound("slashco/slasher/male07_unpossess"..math.random(1,2)..".mp3")
 
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 3
+
         slasher:SetWalkSpeed(300)
         slasher:SetRunSpeed(300)
+
+        return
 
     end
 
