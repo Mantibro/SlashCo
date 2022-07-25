@@ -255,7 +255,7 @@ end --ends here
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then return end
 
-    if v1 == 0 and slasher:GetEyeTrace().Entity:GetClass() == "sc_maleclone" then
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 0 and slasher:GetEyeTrace().Entity:GetClass() == "sc_maleclone" then
 
         target = slasher:GetEyeTrace().Entity	
 
@@ -288,7 +288,7 @@ end --ends here
 
     end
 
-    if v1 > 0 then
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then
 
         local modelname = "models/hunter/plates/plate.mdl"
 	    util.PrecacheModel( modelname )

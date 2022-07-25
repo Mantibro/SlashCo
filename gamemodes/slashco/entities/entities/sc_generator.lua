@@ -85,6 +85,16 @@ if SERVER then
 			SlashCo.CurRound.Generators[self:EntIndex()].Pouring = true 
 			SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer = activator:SteamID64()
 			AntiSpam = false
+
+			if SlashCo.CurRound.Generators[self:EntIndex()].Remaining > 3 then
+				SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer = activator:SteamID64()
+			else
+				if SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer != SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer then
+
+					SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer = 0
+
+				end
+			end
 		end
 		if usetype == USE_OFF then 
 			SlashCo.CurRound.Generators[self:EntIndex()].Pouring = false 
@@ -147,6 +157,8 @@ function ENT:Think()
 
 			SlashCo.AddGas( self )
 
+			SlashCoDatabase.UpdateStats(SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer, "Points", 5)
+
 			AntiSpam = false
 			self:StopSound("slashco/generator_fill.wav")
 
@@ -163,6 +175,12 @@ function ENT:Think()
 
 				local delay = 6
 				self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
+
+				if SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer == SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer then
+
+					SlashCoDatabase.UpdateStats(SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer, "Points", 25)
+
+				end
 
 				timer.Simple(delay, function()
 

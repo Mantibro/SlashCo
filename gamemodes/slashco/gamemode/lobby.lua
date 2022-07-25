@@ -369,6 +369,10 @@ function lobbyRoundSetup()
 
 	end
 
+	SlashCo.LobbyData.DeathwardsLeft = 2 - SlashCo.LobbyData.SelectedDifficulty
+
+	if SlashCo.LobbyData.DeathwardsLeft < 0 then SlashCo.LobbyData.DeathwardsLeft = 0 end
+
 	for i = 1, #SlashCo.LobbyData.Players do --Setup for assigning that players' in-game teams
 
 		if SlashCo.LobbyData.Players[i].readyState == 1	then
@@ -507,8 +511,11 @@ function lobbyRoundSetup()
 	end
 
 	--Assign the map randomly
+	::Map_reroll::
 	SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
-	--SlashCo.LobbyData.SelectedMapNum = 2
+	
+	if #SlashCo.LobbyData.AssignedSurvivors < SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then goto Map_reroll end
+	
 
 	for i, ply in ipairs( player.GetAll() ) do
 		ply:ChatPrint("(Debug) Lobby Setup complete. Difficulty: "..SlashCo.LobbyData.SelectedDifficulty)
@@ -551,8 +558,39 @@ end
 net.Receive("mantislashcoPickItem", function()
 
     t = net.ReadTable()
+
+	local balance = tonumber(SlashCoDatabase.GetStat(t.ply, "Points"))
+
+	local ply = player.GetBySteamID64(t.ply)
+
+	if t.id == 2 then
+
+		if SlashCo.LobbyData.DeathwardsLeft < 1 then
+			ply:ChatPrint("There are no more Deathwards left.")
+			return
+		end
+
+		SlashCo.LobbyData.DeathwardsLeft = SlashCo.LobbyData.DeathwardsLeft - 1
+	end
+
+	if SCInfo.Item[t.id].Price > balance then
+
+		ply:ChatPrint("You cannot afford this item.")
+		return
+		
+	end
+
+	if SlashCo.LobbyData.DeathwardsLeft < 0 then SlashCo.LobbyData.DeathwardsLeft = 0 end
+
+	SlashCoDatabase.UpdateStats(t.ply, "Points", -tonumber(SCInfo.Item[t.id].Price))
     
 	lobbyChooseItem(t.ply, t.id)
+
+	timer.Simple(0.5, function() 
+	
+		SlashCo.BroadcastMasterDatabaseForClient(t.ply)
+
+	end)
 
 end)
 
@@ -893,17 +931,26 @@ function lobbyFinish()
 
 	print("Helicopter now ready to depart!")
 
-	timer.Simple(1.5, function()
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+1000)
 
-		SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1]+1500,SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+400)
+	timer.Simple(3, function()
+
+		SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1]+5000,SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+400)
 
 	end)
 
-	timer.Simple(4, function()
+	timer.Simple(10, function()
 
 		SlashCo.StartGameIntro()
 
 		lobbyLeaveTimer()
+
+		local heli = table.Random(ents.FindByClass("sc_helicopter"))
+
+		heli:StopSound("slashco/helicopter_engine_distant.wav")
+		heli:StopSound("slashco/helicopter_rotors_distant.wav")
+		heli:StopSound("slashco/helicopter_engine_close.wav")
+		heli:StopSound("slashco/helicopter_rotors_close.wav")
 
 	end)
 

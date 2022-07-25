@@ -80,56 +80,67 @@ SCInfo.Item = {
 
     {
         Name = "Fuel Can",
+        Price = 0,
         Description = "A jerry can full of high-octane gas. Useful for refuelling Cars and Generators. \nTaking it with you will reduce how much gas you will find within the Zone. \nOnce you drop this item, you will not be able to store it again."
     },
 
     {
         Name = "The Deathward",
+        Price = 95,
         Description = "A ceramic, skull-shaped charm. Will save you from certain death, but only once. \nYour team can only have a limited amount of them.\nThis item will take up your Item Slot, even if spent."
     },
 
     {
         Name = "Milk Jug",
+        Price = 35,
         Description = "A jug of fresh milk. Consuming it will grant you a large speed boost for a short while. \nEspecially useful when encountering a certain Slasher."
     },
 
     {
         Name = "Cookie",
+        Price = 30,
         Description = "A large chocolate chip cookie. Consuming it will grant you a speed boost for a limited time. \nEspecially useful when encountering a certain Slasher."
     },
 
     {
         Name = "Mayonnaise",
+        Price = 15,
         Description = "A large jar full of highly caloric mayonnaise. Consuming it will grant you a massive boost \nto your health. \nEspecially useful when encountering a certain Slasher."
     },
 
     {
         Name = "Step Decoy",
+        Price = 5,
         Description = "A worn, metallic boot. \nIf placed on a solid surface, it will imitate footsteps sounds which can distract Slashers."
     },
 
     {
         Name = "The Baby",
+        Price = 65,
         Description = "A decrepit-looking doll of a baby. Upon use, this item will halve your health and teleport \nyou away from the slasher. \nThe lower your health, the more likely you are to suffer a premature death upon use."
     },
 
     {
         Name = "B-Gone Soda",
+        Price = 35,
         Description = "A can of strange soda. It has a sweet smell. \nConsuming it will turn you invisible for a short while."
     },
 
     {
         Name = "Distress Beacon",
+        Price = 85,
         Description = "A personal emergency terminal. \nIf at least one Generator has been activated and you are the last one alive, upon use \nthis item will alert the Slashco headquarters to send emergency rescue. \nOnly one can be taken."
     },
 
     {
         Name = "Devil's Gamble",
+        Price = 45,
         Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
     },
 
     {
         Name = "Personal Radio Set",
+        Price = 0,
         Description = "A full set of short-wave radio transmitters which will allow your team to communicate remotely. \nOnly one can be taken."
     }
 
@@ -156,6 +167,7 @@ SCInfo.RoundEnd = {
 
     {
         Loss =  " are now presumed either dead or missing in action.",
+        LossOnlyOne =  " is now presumed either dead or missing in action.",
         LossComplete =  "The Dispatched SlashCo Workers are now presumed either dead or missing in action.",
         DBWin = " had to be rescued before the assignment could be completed."
     }

@@ -212,9 +212,10 @@ SlashCo.UseItem = function(ply)
 
 				local hpd = math.random(-100,100)
 
-				if hpd <= ply:Health() then hpd = ply:Health() + 1 end
+				if hpd <= ply:Health() then hpd = (-ply:Health()) + 1 end
+				if hpd + ply:Health() > 200 then hpd = 200-ply:Health() end
 
-				ply:SetHealth( ply:Health() + hpd )
+				ply:SetHealth( ply:Health() + hpd ) 
 
 				if hpd <= 0 then 
 					ply:EmitSound("slashco/survivor/devildie_hurt.mp3") 

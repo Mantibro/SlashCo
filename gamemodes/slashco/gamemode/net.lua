@@ -56,6 +56,8 @@ util.AddNetworkString("mantislashcoOfferingEndVote")
 
 util.AddNetworkString("mantislashcoOfferingVoteFinished")
 
+util.AddNetworkString("mantislashcoGiveMasterDatabase")
+
 function PlayGlobalSound(sound, level, ent)
 
 	ent:EmitSound(sound, 1, 1, 0)
@@ -157,13 +159,13 @@ end
 
 SlashCo.PlayerItemStashRequest = function(id)
 
-    if IsPlayerHoldingItem(id) then 
+    if SlashCo.GetHeldItem(player.GetBySteamID64(id)) != 0 then 
         player.GetBySteamID64(id):ChatPrint("You have already chosen an item.")
         return 
     end
 
     net.Start("mantislashcoStartItemPicking")
-	net.WriteTable({ply = id})
+	net.WriteTable({ply = id, wardsleft = SlashCo.LobbyData.DeathwardsLeft})
 	net.Broadcast()
 
 end
@@ -182,6 +184,17 @@ SlashCo.PlayerOfferingTableRequest = function(id)
 end
 
 SlashCo.RoundOverScreen = function(state)
+
+	local heli = table.Random(ents.FindByClass("sc_helicopter"))
+
+	if !IsValid(heli) then goto skipsound end
+
+	heli:StopSound("slashco/helicopter_engine_distant.wav")
+	heli:StopSound("slashco/helicopter_rotors_distant.wav")
+	heli:StopSound("slashco/helicopter_engine_close.wav")
+	heli:StopSound("slashco/helicopter_rotors_close.wav")
+
+	::skipsound::
 
     net.Start("mantislashcoRoundEnd")
 
@@ -202,6 +215,8 @@ SlashCo.RoundOverScreen = function(state)
 	local l3 = ""
 	local l4 = ""
 	local l5 = ""
+
+	local all_survivors = SlashCo.CurRound.SlasherData.AllSurvivors
 
 	local rescued_players = SlashCo.CurRound.HelicopterRescuedPlayers
 	local alive_survivors = ""
@@ -233,7 +248,7 @@ SlashCo.RoundOverScreen = function(state)
 
 		for s = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
 
-			if spec == SlashCo.CurRound.SlasherData.AllSurvivors[s]:SteamID64() then 
+			if spec == SlashCo.CurRound.SlasherData.AllSurvivors[s].id then 
 				table.insert(deadsurv_table, {id = spec}) 
 			end
 
@@ -346,12 +361,25 @@ SlashCo.RoundOverScreen = function(state)
 		l5 = ""
 
 	elseif state == 4 then
-		
-		l1 = SCInfo.RoundEnd[1].DB
-		l2 = dead_survivors..SCInfo.RoundEnd[3].Loss
-		l3 = alive_survivors..SCInfo.RoundEnd[2].DBWin
-		l4 = ""
-		l5 = ""
+		if #all_survivors > 1 then	
+			l1 = SCInfo.RoundEnd[1].DB
+
+			if #dead_survivors > 1 then
+				l2 = dead_survivors..SCInfo.RoundEnd[3].Loss
+			else
+				l2 = dead_survivors..SCInfo.RoundEnd[3].LossOnlyOne
+			end
+
+			l3 = alive_survivors..SCInfo.RoundEnd[3].DBWin
+			l4 = ""
+			l5 = ""
+		else
+			l1 = SCInfo.RoundEnd[1].DB
+			l2 = alive_survivors..SCInfo.RoundEnd[3].DBWin
+			l3 = ""
+			l4 = ""
+			l5 = ""
+		end
 
 	end
 
@@ -389,6 +417,18 @@ SlashCo.BroadcastGlobalData = function()
 	net.Start("mantislashcoSendGlobalInfoTable")
 	net.WriteTable(SCInfo)
 	net.Broadcast()
+
+	end
+
+end
+
+SlashCo.BroadcastMasterDatabaseForClient = function(ply_id)
+
+	if SERVER then
+
+		net.Start("mantislashcoGiveMasterDatabase")
+		net.WriteTable(sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='"..ply_id.."'; "))
+		net.Broadcast()
 
 	end
 

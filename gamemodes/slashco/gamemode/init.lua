@@ -437,6 +437,8 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 
 	SlashCo.BroadcastGlobalData()
 
+	timer.Simple(5, function() SlashCo.BroadcastMasterDatabaseForClient(pid) end)
+
 end
 
 end)

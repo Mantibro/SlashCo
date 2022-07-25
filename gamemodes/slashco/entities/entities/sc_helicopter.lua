@@ -14,7 +14,7 @@ ENT.Instructions	= ""
 ENT.AutomaticFrameAdvance = true 
 
 local plyCount = 0
-
+local switch = false
 
 function ENT:Initialize()
 	if SERVER then
@@ -153,14 +153,6 @@ function ENT:Use( activator, caller, useType, value )
 			lobbyFinish()
 
 		end
-
-		if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME then 
-
-			SlashCo.SurvivorWinFinish()
-
-			SlashCo.HelicopterTakeOff()
-
-		end
 		
 	end
 
@@ -176,9 +168,13 @@ function ENT:Think()
 
 	if SERVER then
 
+	local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
+
 	TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
 
 	if EnableMovement and TargetPosition != nil then
+
+		if acceleration == nil then acceleration = 0 end
 
 		targsmoothx = math.sqrt( math.abs(TargetPosition[1] - self:GetPos()[1]) ) * sign(TargetPosition[1] - self:GetPos()[1])
 
@@ -186,22 +182,104 @@ function ENT:Think()
 
 		targsmoothz = math.sqrt( math.abs(TargetPosition[3] - self:GetPos()[3]) ) * sign(TargetPosition[3] - self:GetPos()[3])
 
-
-		self:SetPos( self:GetPos() +   ((Vector(targsmoothx,targsmoothy,targsmoothz)) / 8 )  )
-
 		local vel = Vector(targsmoothx,targsmoothy,targsmoothz):Length()
 
-		local pitchgo = vel / 8
+		local pitchgo = acceleration*vel / 16
+		local IsAirborne = 1
 
-		if math.abs(targsmoothx) > 2 and math.abs(targsmoothy) > 2 then 
+		local ground = util.TraceLine( {
+			start = self:LocalToWorld(Vector(0,0,40)),
+			endpos = self:LocalToWorld(Vector(0,0,40)) + self:GetUp() * -43,
+			filter = self
+		} )
 
-			directional = Vector(targsmoothx,targsmoothy,targsmoothz):Angle()[2] * sign(Vector(targsmoothx,targsmoothy,targsmoothz):Length())
+		if ground.Hit then
+
+			IsAirborne = 0
+
+			local vPoint = self:GetPos()
+        	local fx = EffectData()
+        	fx:SetOrigin( vPoint )
+			fx:SetScale( math.random(50,200) )
+			fx:SetEntity( self )
+        	util.Effect( "ThumperDust", fx )
 
 		end
 
+		sway_x = IsAirborne*math.sin(CurTime()*0.6)*(2+(pitchgo*2))
+		sway_y = IsAirborne*math.sin(CurTime()*1)*(1.5+(pitchgo*2))
+		sway_z = IsAirborne*math.sin(CurTime()*0.8)*(2+(pitchgo*2))
+
+		local dir_length = Vector(targsmoothx-sway_x,targsmoothy-sway_y,targsmoothz-sway_z):Length()
+
+		local dir_length_sqr = Vector(targsmoothx-sway_x,targsmoothy-sway_y,0):Length()
+
+		if final_dir == nil then final_dir = 0 end
+
+		if dir_length > 2 then 
+
+			directional = Vector(targsmoothx,targsmoothy,targsmoothz):Angle()[2] * sign(Vector(targsmoothx,targsmoothy,targsmoothz):Length())
+
+			final_dir = final_dir + (	sign(-final_dir+directional)	*math.sqrt(acceleration*dir_length_sqr/25)*acceleration*	(math.abs(-final_dir+directional)	/	130)	)
+
+			if acceleration == 1.1 then acceleration = 0 end
+
+			if acceleration < 1 then acceleration = acceleration + (FrameTime()/3) end
+		else
+
+			acceleration = 1.1
+
+		end
+
+
+		self:SetPos( self:GetPos() +   ((Vector(targsmoothx*acceleration-sway_x,targsmoothy*acceleration-sway_y,targsmoothz*acceleration-sway_z)) / 8 )  )
 		--Entity(1):ChatPrint(tostring(vel))
 
-		self:SetAngles(	 Angle(pitchgo,directional,0)	)
+		self:SetAngles(	 Angle(pitchgo+sway_x,final_dir+sway_y,sway_z)	)
+
+	end
+
+	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
+
+		SlashCo.SurvivorWinFinish()
+
+		SlashCo.HelicopterTakeOff()
+
+		switch = true 
+
+	end
+
+	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers >= (#team.GetPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
+
+		if SlashCo.CurRound.Difficulty != 1 then return end
+
+		local abandon = math.random(50, 120)
+
+    	timer.Simple(abandon, function() 
+    
+        	SlashCo.HelicopterTakeOff()
+        	SlashCo.SurvivorWinFinish()
+
+			switch = true 
+
+    	end)
+
+	end
+
+	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
+
+		if SlashCo.CurRound.Difficulty != 2 then return end
+
+		local abandon = math.random(50, 120)
+
+    	timer.Simple(abandon, function() 
+    
+        	SlashCo.HelicopterTakeOff()
+        	SlashCo.SurvivorWinFinish()
+
+			switch = true 
+
+    	end)
 
 	end
 

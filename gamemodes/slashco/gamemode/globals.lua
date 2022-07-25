@@ -16,6 +16,7 @@ SlashCo.Maps = {
         ID = "sc_summercamp",
         NAME = "Black Lake Summer Camp",
         SIZE = 2,
+        MIN_PLAYERS = 1,
         LEVELS = {
             500
         }
@@ -25,7 +26,9 @@ SlashCo.Maps = {
         ID = "rp_deadcity",
         NAME = "Dead City",
         SIZE = 3,
+        MIN_PLAYERS = 2,
         LEVELS = {
+            150,
             350
         }
     },
@@ -34,9 +37,12 @@ SlashCo.Maps = {
         ID = "rp_redforest",
         NAME = "Red Forest",
         SIZE = 4,
+        MIN_PLAYERS = 3,
         LEVELS = {
             350,
-            -600
+            450,
+            -600,
+            -620
         }
     }
 
@@ -243,6 +249,7 @@ SlashCo.LobbyData = {
     },
     SelectedMapNum = 0,
     FinalSlasherID = 0,
+    DeathwardsLeft = 0
 
 }
 
@@ -297,6 +304,7 @@ SlashCo.ResetCurRoundData = function()
         roundOverToggle = false,
         SlasherSpawned = false,
         SummonHelicopter = false,
+        EscapeHelicopterLanded = false,
         HelicopterSpawnPosition = Vector(0,0,0),
         HelicopterTargetPosition = Vector(0,0,0),
         HelicopterRescuedPlayers = {},
@@ -698,7 +706,7 @@ SlashCo.ValidateMap = function(map)
     local slashergasmod = 0 --FIX LATER
 
     --Amount of Spawned Gas Cans: 7 + (4 - Difficulty Value) + Map Modifier + Offering Modifier + Slasher-Specific Modifier + (4 - Player Count)
-    local gasCount = json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + slashergasmod + (4 - SlashCo.CurRound.SurvivorCount) - SlashCo.CurRound.SurvivorData.GasCanMod
+    local gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + slashergasmod + (4 - SlashCo.CurRound.SurvivorCount) - SlashCo.CurRound.SurvivorData.GasCanMod
 
     if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --The Exposure Offering caps gas cans at 8.
         gasCount = 8 + slashergasmod
@@ -797,6 +805,7 @@ SlashCo.CreateGenerator = function(pos, ang)
         Progress = 0.0,
         PouredCanID = 0,
         CorrentPourer = 0,
+        ConsistentPourer = 0,
         HasBattery = false
     }
 
@@ -1092,28 +1101,50 @@ SlashCo.RemoveAllCurRoundEnts = function()
 end
 
 SlashCo.EndRound = function()
-    local delay = 15
+    local delay = 20
 
     local survivorsWon = true
-    if SlashCo.CurRound.SurvivorCount == 0 then
-        print("[SlashCo] The slasher won the round.")
-        survivorsWon = false
-        if SlashCo.CurRound.SlasherData.GameProgress < 10 then 
-            SlashCo.RoundOverScreen(3)
-        else
-            SlashCo.RoundOverScreen(2)
-        end
-    else
-        print("[SlashCo] The survivors won the round. "..tostring(SlashCo.CurRound.SurvivorCount).." survivors made it out.")
+    if SlashCo.CurRound.SurvivorCount == 0 then --All Survivors are Dead
 
-        if #SlashCo.CurRound.SlasherData.AllSurvivors == #team.GetPlayers(TEAM_SURVIVOR) then 
-            SlashCo.RoundOverScreen(0) 
-        else
-            if SlashCo.CurRound.DistressBeaconUsed and #SlashCo.CurRound.HelicopterRescuedPlayers == #team.GetPlayers(TEAM_SURVIVOR) then
+        survivorsWon = false
+
+        if SlashCo.CurRound.SlasherData.GameProgress < 10 then --Assignment Failed
+
+            SlashCo.RoundOverScreen(3)
+
+        else --Assignment Success
+
+            SlashCo.RoundOverScreen(2)
+
+        end
+
+    else --There are living Survivors
+
+        if SlashCo.CurRound.DistressBeaconUsed then --Premature Win Distress Beacon
+
+            if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then --The Last survivor got to the helicopter
+
                 SlashCo.RoundOverScreen(4) 
-            else
-                SlashCo.RoundOverScreen(1) 
+
+            else --Emergency rescue came and went, normal loss
+
+                SlashCo.RoundOverScreen(3)
+
             end
+
+
+        else --Normal Win
+
+            if #SlashCo.CurRound.SlasherData.AllSurvivors == #team.GetPlayers(TEAM_SURVIVOR) then --Everyone lived
+
+                SlashCo.RoundOverScreen(0) 
+
+            else --Not Everyone lived
+
+                SlashCo.RoundOverScreen(1) 
+
+            end
+
         end
 
     end
@@ -1135,10 +1166,20 @@ SlashCo.EndRound = function()
             slashers[i]:Spawn()
         end
 
-        if #survivors > 0 then
-            --TODO: Add to stats of the remaining survivors' wins.
-        else
-            --TODO: Add to stats of the slasher's wins
+        if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
+            --Add to stats of the remaining survivors' wins.
+            for i = 1, #SlashCo.CurRound.HelicopterRescuedPlayers do
+                SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "SurvivorRoundsWon", 1)
+            end
+        end
+
+        if #survivors < 1 then
+
+            --Add to stats of the slasher's wins
+            for i = 1, #slashers do
+                SlashCoDatabase.UpdateStats(slashers[i]:SteamID64(), "SlasherRoundsWon", 1)
+            end
+
         end
 
         SlashCo.RemoveAllCurRoundEnts()
@@ -1148,7 +1189,7 @@ SlashCo.EndRound = function()
 end
 
 SlashCo.SurvivorWinFinish = function()
-    local delay = 6
+    local delay = 16
 
     for i, play in ipairs( player.GetAll() ) do
         play:ChatPrint("[SlashCo] All Living survivors are in the Helicopter.") 
@@ -1232,7 +1273,7 @@ SlashCo.SpawnCurConfig = function()
 
                 local diff = SlashCo.CurRound.Difficulty
 
-                for i = 1, (  math.random(0, 6) + (6 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
+                for i = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
 
                     SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0,0,0))
 
@@ -1382,13 +1423,26 @@ SlashCo.HelicopterLand = function(pos)
 
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3])
 
+    --Will the Helicopter Abandom players?
+
+    if SlashCo.CurRound.Difficulty != 3 then return end
+
+    local abandon = math.random(50, 120)
+
+    timer.Simple(abandon, function() 
+    
+        SlashCo.HelicopterTakeOff()
+        SlashCo.SurvivorWinFinish()
+
+    end)
+
 end
 
 SlashCo.HelicopterTakeOff = function()
 
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+1500)
 
-    timer.Simple(5, function()
+    timer.Simple(12, function()
 
         SlashCo.HelicopterFinalLeave()
 
@@ -1472,14 +1526,14 @@ end
 
 SlashCo.TraceHullLocator = function()
 
-    --Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player.
+    --Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player or npc.
 
     local height_offset = 5
 
-    --local h = SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
-    local h = 500
+    local h = SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
+    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
-    local range = 5000
+    local range = 2500*size
 
     local pos = Vector(0,0,h)
 

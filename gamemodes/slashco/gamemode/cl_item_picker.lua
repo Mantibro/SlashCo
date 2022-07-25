@@ -1,8 +1,10 @@
 include( "ui/fonts.lua" )
 
+local ReceivedLocalPlayerID = ""
+
 function SelectThisItem(itemID)
 
-	if LocalPlayer():SteamID64() != readtable.ply then return end
+	if LocalPlayer():SteamID64() != ReceivedLocalPlayerID then return end
 
 	if ( IsValid(ItemSelectFrame) ) then
 		ItemSelectFrame:Remove()
@@ -21,6 +23,8 @@ net.Receive("mantislashcoStartItemPicking", function()
 
 	if LocalPlayer():SteamID64() != readtable.ply then return end
 
+	ReceivedLocalPlayerID = readtable.ply 
+
 	DrawTheSelectorBox()
 
 end)
@@ -29,7 +33,7 @@ function DrawTheSelectorBox()
 
 	if ( IsValid( ItemSelectFrame ) ) then return end
 
-	if LocalPlayer():SteamID64() != readtable.ply then return end
+	if LocalPlayer():SteamID64() != ReceivedLocalPlayerID then return end
 	
 	-- Slasher selectionBox
 	ItemSelectFrame = vgui.Create( "DFrame" )
@@ -64,6 +68,10 @@ function DrawTheSelectorBox()
 		confirmselect:SetDisabled( true )
 	end
 
+	if SelectedItem == 2 and readtable.wardsleft < 1 then
+		confirmselect:SetDisabled( true )
+	end
+
 
 	-- Model panel
 	local mdl = vgui.Create("DModelPanel", ItemSelectFrame)
@@ -91,7 +99,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_junk/metalgascan.mdl")
 		mdl:SetCamPos(Vector(80, 0, 0))
 
-		ILabel:SetText( SCInfo.Item[1].Name )
+		ILabel:SetText( SCInfo.Item[1].Name.."( "..SCInfo.Item[1].Price.." Points )" )
 		IDesc:SetText( SCInfo.Item[1].Description )
 
 	elseif SelectedItem == 2 then
@@ -99,15 +107,15 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/slashco/items/deathward.mdl")
 		mdl:SetCamPos(Vector(40, 0, 15))
 
-		ILabel:SetText( SCInfo.Item[2].Name )
-		IDesc:SetText( SCInfo.Item[2].Description )
+		ILabel:SetText( SCInfo.Item[2].Name.."( "..SCInfo.Item[2].Price.." Points )" )
+		IDesc:SetText( SCInfo.Item[2].Description.."\nWards left: "..tostring(readtable.wardsleft) )
 
 	elseif SelectedItem == 3 then
 
 		mdl:SetModel("models/props_junk/garbage_milkcarton001a.mdl")
 		mdl:SetCamPos(Vector(60, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[3].Name )
+		ILabel:SetText( SCInfo.Item[3].Name.."( "..SCInfo.Item[3].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[3].Description )
 
 	elseif SelectedItem == 4 then
@@ -115,7 +123,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/slashco/items/cookie.mdl")
 		mdl:SetCamPos(Vector(50, 0, 20))
 
-		ILabel:SetText( SCInfo.Item[4].Name )
+		ILabel:SetText( SCInfo.Item[4].Name.."( "..SCInfo.Item[4].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[4].Description )
 
 	elseif SelectedItem == 5 then
@@ -123,7 +131,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_lab/jar01a.mdl")
 		mdl:SetCamPos(Vector(60, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[5].Name )
+		ILabel:SetText( SCInfo.Item[5].Name.."( "..SCInfo.Item[5].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[5].Description )
 
 	elseif SelectedItem == 6 then
@@ -131,7 +139,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_junk/Shoe001a.mdl")
 		mdl:SetCamPos(Vector(50, 0, 20))
 
-		ILabel:SetText( SCInfo.Item[6].Name )
+		ILabel:SetText( SCInfo.Item[6].Name.."( "..SCInfo.Item[6].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[6].Description )
 
 	elseif SelectedItem == 7 then
@@ -139,7 +147,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_c17/doll01.mdl")
 		mdl:SetCamPos(Vector(50, 0, 0))
 
-		ILabel:SetText( SCInfo.Item[7].Name )
+		ILabel:SetText( SCInfo.Item[7].Name.."( "..SCInfo.Item[7].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[7].Description )
 
 	elseif SelectedItem == 8 then
@@ -147,7 +155,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_junk/PopCan01a.mdl")
 		mdl:SetCamPos(Vector(30, 0, 0))
 
-		ILabel:SetText( SCInfo.Item[8].Name )
+		ILabel:SetText( SCInfo.Item[8].Name.."( "..SCInfo.Item[8].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[8].Description )
 
 	elseif SelectedItem == 9 then
@@ -155,7 +163,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_c17/light_cagelight01_on.mdl")
 		mdl:SetCamPos(Vector(50, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[9].Name )
+		ILabel:SetText( SCInfo.Item[9].Name.."( "..SCInfo.Item[9].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[9].Description )
 
 	elseif SelectedItem == 10 then
@@ -163,7 +171,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/slashco/items/devildie.mdl")
 		mdl:SetCamPos(Vector(30, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[10].Name )
+		ILabel:SetText( SCInfo.Item[10].Name.."( "..SCInfo.Item[10].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[10].Description )
 
 	elseif SelectedItem == 11 then
@@ -171,7 +179,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_phx/gibs/flakgib1.mdl")
 		mdl:SetCamPos(Vector(30, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[11].Name )
+		ILabel:SetText( SCInfo.Item[11].Name.."( "..SCInfo.Item[11].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[11].Description )
 
 	end
@@ -189,6 +197,7 @@ function HideItemSelection()
 		ItemSelectFrame:Remove()
 		ItemSelectFrame = nil
 		SelectedItem = 0
+		ReceivedLocalPlayerID = ""
 	end
 
 end

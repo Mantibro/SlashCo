@@ -14,6 +14,16 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 		LobbyInfoTable = net.ReadTable()
 	end)
 
+	net.Receive( "mantislashcoGiveMasterDatabase", function( len, ply )
+
+		local t = net.ReadTable()
+
+		if t[1].PlayerID != LocalPlayer():SteamID64() then return end
+
+		data_load = t
+
+	end)
+
 	if game.GetMap() != "sc_lobby" then return end
 
 	if stop_lobbymusic != true and (lobbymusic_antispam == nil or lobbymusic_antispam != true) then  
@@ -23,7 +33,23 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	end
 
 	if stop_lobbymusic then lobby_music:Stop() end
-	
+
+	local point_count = 0
+	local srvwin_count = 0
+	local slswin_count = 0
+
+	if data_load != nil and data_load != false then
+
+		point_count = data_load[1].Points
+		srvwin_count = data_load[1].SurvivorRoundsWon
+		slswin_count = data_load[1].SlasherRoundsWon
+
+	end
+
+	draw.SimpleText( "You have "..point_count.." Points.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.05), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	draw.SimpleText( "You have won "..srvwin_count.." Rounds as SURVIVOR.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.08), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	draw.SimpleText( "You have won "..slswin_count.." Rounds as SLASHER.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.11), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+
 if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
 	
 	local scrW, scrH = ScrW(), ScrH()
