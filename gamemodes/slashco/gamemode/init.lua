@@ -582,7 +582,7 @@ end)
 if SERVER then
     hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, state)
 
-        if ply:Team() != TEAM_SURVIVOR then return false end
+        if ply:Team() != TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then return false end
 
 		if state == false then return false end
 

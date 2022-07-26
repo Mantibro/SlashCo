@@ -97,10 +97,10 @@ SlashCo.SlasherData = {     --Information about Slashers.
         CLS = 1,
         DNG = 1,
         Model = "models/slashco/slashers/baba/baba.mdl",
-        KillDelay = 1.5,
+        KillDelay = 3,
         GasCanMod = 0,
         ProwlSpeed = 150,
-        ChaseSpeed = 290,
+        ChaseSpeed = 293,
         Perception = 1.0,
         Eyesight = 5,
         KillDistance = 135,
@@ -118,7 +118,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         CLS = 2,
         DNG = 2,
         Model = "models/slashco/slashers/sid/sid.mdl",
-        KillDelay = 3,
+        KillDelay = 7,
         GasCanMod = 0,
         ProwlSpeed = 150,
         ChaseSpeed = 270,
@@ -160,10 +160,10 @@ SlashCo.SlasherData = {     --Information about Slashers.
         CLS = 1,
         DNG = 1,
         Model = "models/slashco/slashers/amogus/amogus.mdl",
-        KillDelay = 2,
+        KillDelay = 8,
         GasCanMod = 0,
         ProwlSpeed = 150,
-        ChaseSpeed = 275,
+        ChaseSpeed = 285,
         Perception = 4.5,
         Eyesight = 6,
         KillDistance = 130,
@@ -215,6 +215,27 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/male07_chase.wav",
         KillSound = "slashco/slasher/male07_kill.mp3"
+    },
+
+    {
+        NAME = "Tyler",
+        ID = 7,
+        CLS = 2,
+        DNG = 3,
+        Model = "models/slashco/slashers/tyler/tyler.mdl",
+        KillDelay = 6,
+        GasCanMod = -5,
+        ProwlSpeed = 300,
+        ChaseSpeed = 580,
+        Perception = 0.0,
+        Eyesight = 5,
+        KillDistance = 200,
+        ChaseRange = 0,
+        ChaseRadius = 1,
+        ChaseDuration = 0.0,
+        JumpscareDuration = 2,
+        ChaseMusic = "",
+        KillSound = "slashco/slasher/tyler_kill.mp3"
     }
 
 }
@@ -306,6 +327,7 @@ SlashCo.ResetCurRoundData = function()
         SummonHelicopter = false,
         EscapeHelicopterLanded = false,
         HelicopterSpawnPosition = Vector(0,0,0),
+        HelicopterInitialSpawnPosition = Vector(0,0,0),
         HelicopterTargetPosition = Vector(0,0,0),
         HelicopterRescuedPlayers = {},
         AllowRoundEndSequence = false,
@@ -946,7 +968,8 @@ SlashCo.CreateItems = function(spawnpoints, item)
         local pos = SlashCo.CurConfig.Items.Spawnpoints[spawnpoints[I]].pos
         local ang = SlashCo.CurConfig.Items.Spawnpoints[spawnpoints[I]].ang
 
-        --table.remove( SlashCo.CurConfig.Items.Spawnpoints, spawnpoints[I] ) --Occupied spawn
+        --Occupied spawn
+        --table.RemoveByValue( SlashCo.CurConfig.Items.Spawnpoints, spawnpoints[I] )
 
         local entID = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
     end
@@ -1108,7 +1131,7 @@ SlashCo.EndRound = function()
 
         survivorsWon = false
 
-        if SlashCo.CurRound.SlasherData.GameProgress < 10 then --Assignment Failed
+        if not SlashCo.CurRound.SummonHelicopter then --Assignment Failed
 
             SlashCo.RoundOverScreen(3)
 
@@ -1286,6 +1309,12 @@ SlashCo.SpawnCurConfig = function()
 
         end
 
+        local beacon_spawn = SlashCo.GetSpawnpoints(1, #possibleItemSpawnpoints)
+        local r = math.random(1, #possibleItemSpawnpoints)
+        local pickedpoint = possibleItemSpawnpoints[r]
+
+        SlashCo.CreateItem("sc_beacon", Vector(pickedpoint.pos[1],pickedpoint.pos[2],pickedpoint.pos[3]), Angle(pickedpoint.ang[1],pickedpoint.ang[2],pickedpoint.ang[3])) --Spawn one distress beacon
+
         SlashCo.BroadcastItemData()
         
 		timer.Simple(0.5, function()
@@ -1387,7 +1416,7 @@ SlashCo.CreateEscapeHelicopter = function()
 
     if SlashCo.CurRound.EscapeHelicopterSpawned == true then return end
 
-    local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) ) --TODO: set up a unique spawn position for each map.
+    local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
 
     SlashCo.CurRound.EscapeHelicopterSpawned = true
 
@@ -1455,7 +1484,7 @@ end
 
 SlashCo.HelicopterFinalLeave = function()
 
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(7675, -3046, 1700)
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition.pos[1],SlashCo.CurRound.HelicopterSpawnPosition.pos[2],SlashCo.CurRound.HelicopterSpawnPosition.pos[3])
 
 end
 

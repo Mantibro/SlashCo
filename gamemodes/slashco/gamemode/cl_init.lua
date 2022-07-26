@@ -130,7 +130,7 @@ net.Receive("mantislashcoGlobalSound", function()
 
     local t = net.ReadTable()
   
-    EmitSound( t.SoundPath, LocalPlayer():GetPos(), t.Entity:EntIndex(), CHAN_AUTO, 1, t.SndLevel )
+    EmitSound( t.SoundPath, LocalPlayer():GetPos(), t.Entity:EntIndex(), CHAN_AUTO, t.Volume, t.SndLevel )
 
     --local sound = CreateSound(t.Entity, t.SoundPath)
     --sound:SetSoundLevel( t.SndLevel  )

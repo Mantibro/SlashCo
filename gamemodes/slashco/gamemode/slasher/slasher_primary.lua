@@ -12,6 +12,8 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 2 then goto maleclaw end
 
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 7 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 3 then goto tylerdestroy end
+
     if slasher:GetNWBool("SidGun") then goto sidgun end
 do
 
@@ -258,5 +260,81 @@ do
     end
 
 end
+
+    ::tylerdestroy::
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then return end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != 3 then return end
+
+    do
+
+        if SlashCo.CurRound.SlasherData[slasherid].CanKill == false then return end
+    
+        if SlashCo.CurRound.SlasherData[slasherid].KillDelayTick > 0 then return end
+        
+        if slasher:GetEyeTrace().Entity then
+
+            local target = slasher:GetEyeTrace().Entity	
+
+            local c = target:GetClass()
+    
+            if not target:IsPlayer() and c != "prop_physics" and c != "sc_milkjug" and c != "sc_cookie" and c != "sc_stepdecoy" and c != "sc_baby" and c != "sc_devildie" and c != "sc_mayo" and c != "sc_soda" then return end
+    
+            if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+    
+                target:SetNWBool("SurvivorBeingJumpscared",true)
+                target:SetNWBool("SurvivorJumpscare_"..SlashCo.CurRound.SlasherData[slasherid].SlasherID, true)
+    
+                slasher:EmitSound(SlashCo.CurRound.SlasherData[slasherid].KillSound)
+                    
+                if target:IsPlayer() then target:Freeze(true) end
+                slasher:Freeze(true)
+    
+                SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+    
+                timer.Simple(SlashCo.CurRound.SlasherData[slasherid].JumpscareDuration, function()
+    
+                    target:SetNWBool("SurvivorBeingJumpscared",false)
+                    target:SetNWBool("SurvivorJumpscare_"..SlashCo.CurRound.SlasherData[slasherid].SlasherID, false)
+    
+                    slasher:Freeze(false)
+
+                    if target:IsPlayer() then 
+
+                        target:Freeze(false) 
+                        target:Kill() 
+
+                    else
+                        target:Remove()
+                        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 + 0.5
+                    end
+
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 + 1
+
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+
+                    slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
+                    timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav") end)
+
+                    slasher:SetColor(Color(0,0,0,0))
+                    slasher:DrawShadow(false)
+		            slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+		            slasher:SetNoDraw(true)
+                    slasher:SetNWBool("TylerFlash", false)
+
+                    for i = 1, #player.GetAll() do
+                        local ply = player.GetAll()[i]
+                        ply:SetNWBool("DisplayTylerTheDestroyerEffects",false)
+                    end
+            
+                end)
+            end
+    
+        end
+    
+    end
 
 end

@@ -50,11 +50,17 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	local aimed_gun = ply:GetNWBool("SidGunAimed")
 	local gun_shooting = ply:GetNWBool("SidGunShoot")
 	local gun_rage = ply:GetNWBool("SidGunRage")
+
 	local trollge_stage1 = ply:GetNWBool("TrollgeStage1")
 	local trollge_stage2 = ply:GetNWBool("TrollgeStage2")
 	local trollge_slashing = ply:GetNWBool("TrollgeSlashing")
+
 	local male_slashing = ply:GetNWBool("Male07Slashing")
 	local male_transforming = ply:GetNWBool("Male07Transforming")
+
+	local tyler_creator = ply:GetNWBool("TylerTheCreator")
+	local tyler_destroyer = ply:GetNWBool("TylerTheDestroyer")
+	local tyler_creating = ply:GetNWBool("TylerCreating")
 
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
@@ -110,8 +116,10 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 				end
 			else
+
 				ply.CalcSeqOverride = ply:LookupSequence("eat")
 				if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
 			end
 
 		end
@@ -140,6 +148,13 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 			if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
 
 		end
+
+	end
+
+	if sid_executing then
+
+		ply.CalcSeqOverride = ply:LookupSequence("execution")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) ply:ChatPrint("NIGGA CHUNGUS!") anim_antispam = true end
 
 	end
 
@@ -329,6 +344,42 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	--TYLER
 
+	if ply:GetModel() != "models/slashco/slashers/tyler/tyler.mdl" then goto borgmire end --Tyler's Animator
+
+	if tyler_creator then
+
+		if not tyler_creating then
+
+			--ply.CalcIdeal = ACT_HL2MP_IDLE 
+			ply.CalcSeqOverride = ply:LookupSequence("creator idle")
+
+			anim_antispam = false
+
+		else
+
+			ply.CalcSeqOverride = ply:LookupSequence("create") 
+			if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+		end
+
+	else
+
+		if ply:GetVelocity():LengthSqr() > 5 then
+
+			--ply.CalcIdeal = ACT_HL2MP_IDLE 
+			ply.CalcSeqOverride = ply:LookupSequence("destroyer walk")
+
+		else
+
+			--ply.CalcIdeal = ACT_HL2MP_IDLE 
+			ply.CalcSeqOverride = ply:LookupSequence("destroyer activated")
+
+		end
+
+	end
+
+	::borgmire::
+
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
@@ -356,6 +407,8 @@ hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, 
 		elseif ply:GetModel() == "models/slashco/slashers/thirsty/thirsty.mdl" then --Thirsty (no) Footsteps
 			return true 
 		elseif ply:GetModel() == "models/hunter/plates/plate.mdl" then --Male07Specter (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/tyler/tyler.mdl" then --Tyler (no) Footsteps
 			return true 
 		end
 		

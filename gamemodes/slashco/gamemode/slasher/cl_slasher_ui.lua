@@ -41,6 +41,8 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 		local MainIcon = Material("slashco/ui/icons/slasher/s_"..SlashID)
 
+		local GenericSlashIcon = Material("slashco/ui/icons/slasher/s_slash")
+
 		local KillIcon = Material("slashco/ui/icons/slasher/s_0")
 		local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
 
@@ -350,6 +352,13 @@ do
 			if V1 == 2 then
 				surface.SetMaterial(MaleMonster)
 				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+
+				willdrawkill = false
+
+				surface.SetMaterial(GenericSlashIcon)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+				draw.SimpleText( "M1 - Slash", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
 			end
 		else
 			willdrawmain = true
@@ -359,6 +368,46 @@ end
 		--Male07 /\ /\ /\
 
 		::tyler::
+		if SlashID != 7 then goto borgmire end
+do
+
+	local DestroyerIcon = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s1")
+	local name = ", The Creator"
+
+	if V1 < 1 then
+		draw.SimpleText( "R - Manifest", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	elseif V1 == 1 then
+		draw.SimpleText( "(Wait until you're found or you become Destroyer)", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	end
+
+	if V1 > 1 then
+
+		name = ", The Destroyer"
+
+		willdrawmain = false
+
+		surface.SetMaterial(DestroyerIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+
+	end
+
+	if V1 > 2 then
+
+		surface.SetMaterial(DestroyerIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "M1 - Destroy", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+		willdrawkill = false
+
+	end
+
+	SlashName = "Tyler"..name
+
+	willdrawchase = false
+
+end
+
+		::borgmire::
 
 		--Slasher-Shared function \/ \/ \/ 
 

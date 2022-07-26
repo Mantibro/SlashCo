@@ -189,7 +189,7 @@ end
 
             slasher:SetNWBool("SidGunLetterC", true)
 
-            PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.wav",95,slasher)
+            PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.wav",95,slasher, 0.7)
 
         end
     end
@@ -298,7 +298,7 @@ do
     if v2 > 0 then 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() 
         SlashCo.CurRound.SlasherData[slasherid].CanKill = false
-        SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+        --SlashCo.CurRound.SlasherData[slasherid].CanChase = false
     else
         if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
             SlashCo.CurRound.SlasherData[slasherid].CanKill = true
@@ -465,6 +465,207 @@ do
 
 end
     ::TYLER::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto BORGMIRE end
+    --Tyler's Abilities
+do
+
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --State
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Time Spent as Creator or destroyer
+    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Times Found
+    v4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 --Destruction power
+    v5 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 --Destoyer Blink
+
+    local ms = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+
+    SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+
+    if v1 == 0 then --Specter
+
+        slasher:SetNWBool("TylerFlash", false)
+
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed ) 
+        slasher:SetRunSpeed(SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed)
+        slasher:SetWalkSpeed(SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed)
+        slasher:SetNWBool("TylerTheCreator", false)
+        slasher:SetBodygroup( 0, 0 )
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = false
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 6.0
+
+    elseif v1 == 1 then --Creator
+
+        slasher:SetNWBool("TylerFlash", false)
+
+        slasher:SetSlowWalkSpeed( 1 ) 
+        slasher:SetRunSpeed(1)
+        slasher:SetWalkSpeed(1)
+        slasher:Freeze(true)
+        slasher:SetNWBool("TylerTheCreator", true)
+        slasher:SetBodygroup( 0, 0 )
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 + FrameTime()
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = false
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 0.0
+
+        if v2 > ( ms * 60) - (v4 * 8) then --Time ran out
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 2
+
+        end
+
+        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do --Survivor found tyler
+
+            local surv = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+            if surv:GetPos():Distance( slasher:GetPos() ) < 500 and surv:GetEyeTrace().Entity == slasher then
+
+                slasher.tyler_found = true
+
+            end
+
+        end
+
+        if slasher.tyler_found != nil and slasher.tyler_found == true then
+
+            slasher.tyler_found = false
+
+            slasher:SetNWBool("TylerCreating", true)
+
+            timer.Simple(3, function() 
+            
+                SlashCo.CreateGasCan(slasher:GetPos() + (slasher:GetForward() * 30) + Vector(0,0,18))
+            
+            end)
+
+            timer.Simple(4, function() 
+            
+                slasher:SetNWBool("TylerCreating", false)
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1
+
+                slasher:SetColor(Color(0,0,0,0))
+                slasher:DrawShadow(false)
+		        slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+		        slasher:SetNoDraw(true)
+            
+            end)
+
+        end
+
+        slasher.tyler_destroyer_entrance_antispam = nil
+
+    elseif v1 == 2 then --Pre-Destroyer
+
+        slasher:Freeze(true)
+
+        if slasher.tyler_destroyer_entrance_antispam == nil then
+
+            PlayGlobalSound("slashco/slasher/tyler_alarm.wav", 110, slasher, 1)
+
+            for i = 1, 6 do
+                slasher:StopSound("slashco/slasher/tyler_song_"..i..".mp3")
+            end
+
+            timer.Simple(0.1, function() 
+                for i = 1, 6 do
+                slasher:StopSound("slashco/slasher/tyler_song_"..i..".mp3")
+                end 
+            end)
+
+            slasher.tyler_destroyer_entrance_antispam = 0
+        end
+
+        local decay = v4 / 2
+
+        if v4 > 14 then decay = 7 end 
+
+        if slasher.tyler_destroyer_entrance_antispam < (12 - decay) then
+            slasher.tyler_destroyer_entrance_antispam = slasher.tyler_destroyer_entrance_antispam + FrameTime()
+        else
+
+            slasher:StopSound("slashco/slasher/tyler_alarm.wav")
+            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_alarm.wav") end) --idk man only works if i stop it twice shut up
+
+            PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 98, slasher, 1)
+
+            slasher:Freeze(false)
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 3
+
+            for i = 1, #player.GetAll() do
+                local ply = player.GetAll()[i]
+                ply:SetNWBool("DisplayTylerTheDestroyerEffects",true)
+            end
+
+        end
+
+        slasher:SetSlowWalkSpeed( 1 ) 
+        slasher:SetRunSpeed(1)
+        slasher:SetWalkSpeed(1)
+        slasher:SetNWBool("TylerTheCreator", false)
+        slasher:SetBodygroup( 0, 1 )
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = false
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 0.0
+
+    elseif v1 == 3 then --Destroyer
+
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed ) 
+        slasher:SetRunSpeed(SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed)
+        slasher:SetWalkSpeed(SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed)
+        slasher:SetNWBool("TylerTheCreator", false)
+        slasher:SetBodygroup( 0, 1 )
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 + FrameTime()
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = true
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 2.0
+
+        if v2 > ((ms * 15) + 60 + (v4 * 10)) then
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+
+            slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
+            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav") end)
+
+            slasher:SetColor(Color(0,0,0,0))
+            slasher:DrawShadow(false)
+            slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+            slasher:SetNoDraw(true)
+            slasher:SetNWBool("TylerFlash", false)
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 - 1
+
+            for i = 1, #player.GetAll() do
+                local ply = player.GetAll()[i]
+                ply:SetNWBool("DisplayTylerTheDestroyerEffects",false)
+            end
+
+        end
+
+    end
+
+    if v1 > 1 then
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = v5 + FrameTime()
+
+        if v5 > 0.85 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = 0 end
+
+        if v5 <= 0.5 then 
+            slasher:SetColor(Color(0,0,0,0))
+            slasher:DrawShadow(false)
+		    slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+		    slasher:SetNoDraw(true)
+            slasher:SetNWBool("TylerFlash", false)
+        else
+            slasher:SetColor(Color(255,255,255,255))
+            slasher:DrawShadow(true)
+		    slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
+		    slasher:SetNoDraw(false)
+            slasher:SetNWBool("TylerFlash", true)
+        end
+
+    end
+
+end
+    ::BORGMIRE::
 end
 
 end)
@@ -480,7 +681,7 @@ SlashCo.ThirstyRage = function(ply)
 
         if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then return end
 
-        if slasher:GetPos():Distance( pos ) > 900 then return end
+        if slasher:GetPos():Distance( pos ) > 1400 then return end
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 6
         slasher:SetNWBool("ThirstyBigMlik", true)

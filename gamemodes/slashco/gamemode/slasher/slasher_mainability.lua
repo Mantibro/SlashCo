@@ -161,6 +161,7 @@ end --ends here
         slasher:SetNWBool("AmogusFuelDisguise", false)
         slasher:SetNWBool("AmogusDisguised", false)
         slasher:EmitSound("slashco/slasher/amogus_reveal.mp3")
+        slasher:SetNWBool("DynamicFlashlight", false)
 
         util.PrecacheModel( "models/slashco/slashers/amogus/amogus.mdl" )
 	    slasher:SetModel( "models/slashco/slashers/amogus/amogus.mdl" )
@@ -337,5 +338,28 @@ end --ends here
     --Male07's State Switch /\ /\ /\
 
     ::TYLER::
+    --Tyler's State Switch \/ \/ \/
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto THEKING end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 0 then
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
+
+        local song = math.random(1,6)
+
+        slasher:SetColor(Color(255,255,255,255))
+        slasher:DrawShadow(true)
+		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
+		slasher:SetNoDraw(false)
+
+        PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 97, slasher, 1)
+
+    end
+
+    --Tyler's State Switch /\ /\ /\
+
+    --Borgmire has no main ability
+
+    ::THEKING::
 
 end

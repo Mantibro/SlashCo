@@ -58,14 +58,16 @@ util.AddNetworkString("mantislashcoOfferingVoteFinished")
 
 util.AddNetworkString("mantislashcoGiveMasterDatabase")
 
-function PlayGlobalSound(sound, level, ent)
+function PlayGlobalSound(sound, level, ent, vol)
+
+	if vol == nil then vol = 1 end
 
 	ent:EmitSound(sound, 1, 1, 0)
 	--"Sounds must be precached serverside manually before they can be played. util.PrecacheSound does not work for this purpose, Entity:EmitSound does the trick"
 
 	if SERVER then
 		net.Start("mantislashcoGlobalSound")
-		net.WriteTable({SoundPath = sound, SndLevel = level, Entity = ent})
+		net.WriteTable({SoundPath = sound, SndLevel = level, Entity = ent, Volume = vol})
 		net.Broadcast()
 	end
 
@@ -425,6 +427,8 @@ end
 SlashCo.BroadcastMasterDatabaseForClient = function(ply_id)
 
 	if SERVER then
+
+		if sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='"..ply_id.."'; ") == nil or sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='"..ply_id.."'; ") == false then return end
 
 		net.Start("mantislashcoGiveMasterDatabase")
 		net.WriteTable(sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='"..ply_id.."'; "))

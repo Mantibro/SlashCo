@@ -29,6 +29,23 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     end
 
+    if slid == 6 then
+
+        SlashCo.CurRound.SlasherData[plyid].SlasherValue1 = 1
+
+    end
+
+    if slid == 7 then
+
+        SlashCo.CurRound.SlasherData[plyid].SlasherValue1 = 0
+
+        ply:SetColor(Color(0,0,0,0))
+        ply:DrawShadow(false)
+		ply:SetRenderMode(RENDERMODE_TRANSALPHA)
+		ply:SetNoDraw(true)
+
+    end
+
 end
 
 SlashCo.InsertSlasherToTable = function(id)
