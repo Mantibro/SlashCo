@@ -107,6 +107,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 700,
         ChaseRadius = 0.94,
         ChaseDuration = 10.0,
+        ChaseCooldown = 3,
         JumpscareDuration = 1.5,
         ChaseMusic = "slashco/slasher/baba_chase.wav",
         KillSound = "slashco/slasher/baba_kill.mp3"
@@ -128,6 +129,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 1500,
         ChaseRadius = 0.96,
         ChaseDuration = 6.0,
+        ChaseCooldown = 3,
         JumpscareDuration = 1,
         ChaseMusic = "slashco/slasher/sid_chase.wav",
         KillSound = "slashco/slasher/sid_kill.mp3"
@@ -149,6 +151,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 0,
         ChaseRadius = 0.0,
         ChaseDuration = 0.0,
+        ChaseCooldown = 3,
         JumpscareDuration = 2,
         ChaseMusic = "",
         KillSound = "slashco/slasher/trollge_kill.wav"
@@ -170,6 +173,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 600,
         ChaseRadius = 0.90,
         ChaseDuration = 15.0,
+        ChaseCooldown = 3,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/amogus_chase.wav",
         KillSound = "slashco/slasher/amogus_kill.mp3"
@@ -191,6 +195,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 900,
         ChaseRadius = 0.94,
         ChaseDuration = 8.0,
+        ChaseCooldown = 3,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/thirsty_chase.wav",
         KillSound = "slashco/slasher/thirsty_kill.mp3"
@@ -212,6 +217,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 600,
         ChaseRadius = 0.94,
         ChaseDuration = 5.0,
+        ChaseCooldown = 3,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/male07_chase.wav",
         KillSound = "slashco/slasher/male07_kill.mp3"
@@ -233,6 +239,29 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseRange = 0,
         ChaseRadius = 1,
         ChaseDuration = 0.0,
+        ChaseCooldown = 3,
+        JumpscareDuration = 2,
+        ChaseMusic = "",
+        KillSound = "slashco/slasher/tyler_kill.mp3"
+    },
+
+    {
+        NAME = "Borgmire",
+        ID = 8,
+        CLS = 1,
+        DNG = 2,
+        Model = "models/slashco/slashers/borgire/borgire.mdl",
+        KillDelay = 6,
+        GasCanMod = 0,
+        ProwlSpeed = 300,
+        ChaseSpeed = 320,
+        Perception = 1.0,
+        Eyesight = 5,
+        KillDistance = 0,
+        ChaseRange = 1500,
+        ChaseRadius = 0.91,
+        ChaseDuration = 12.0,
+        ChaseCooldown = 8,
         JumpscareDuration = 2,
         ChaseMusic = "",
         KillSound = "slashco/slasher/tyler_kill.mp3"
@@ -435,47 +464,25 @@ if game.GetMap() != "sc_lobby" then
     print("[SlashCo] Now running player expectation...")
 
     local ExpectTrue = false
-    local P1 = false
-    local P2 = false
-    local P3 = false
-    local P4 = false
-    local P5 = false
+    local expected_count = 0
 
-    if SlashCo.CurRound.ExpectedPlayersLoaded == true and ExpectTrue == false then
+    for i = 1, #SlashCo.CurRound.ExpectedPlayers do
+        local ex_p = player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[i].steamid)
 
-        print("[SlashCo] Now expecting players..!")
+        for p = 1, #player.GetAll() do
+            local s_p = player.GetAll()[p]
 
-        if table.HasValue(player.GetAll(), player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[1].steamid)) then
-            P1 = true
-            print("[SlashCo] Expected player 1 in!".."("..player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[1].steamid):Name()..")")
+            if ex_p == s_p then
+                expected_count = expected_count + 1
+                print("[SlashCo] Expected player "..expected_count.." in!".."("..ex_p:Name()..")")
+                break
+            end
+
         end
-
-        if table.HasValue(player.GetAll(), player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[2].steamid)) then
-            P2 = true
-            print("[SlashCo] Expected player 2 in!".."("..player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[2].steamid):Name()..")")
-        end
-
-        if SlashCo.CurRound.ExpectedPlayers[3] != nil and table.HasValue(player.GetAll(), player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[3].steamid)) then
-            P3 = true
-            print("[SlashCo] Expected player 3 in!".."("..player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[3].steamid):Name()..")")
-        end
-
-        if SlashCo.CurRound.ExpectedPlayers[4] != nil and table.HasValue(player.GetAll(), player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[4].steamid)) then
-            P4 = true
-            print("[SlashCo] Expected player 4 in!".."("..player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[4].steamid):Name()..")")
-        end
-
-        if SlashCo.CurRound.ExpectedPlayers[5] != nil and table.HasValue(player.GetAll(), player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[5].steamid)) then
-            P5 = true
-            print("[SlashCo] Expected player 5 in!".."("..player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[5].steamid):Name()..")")
-        end
-
-        if #SlashCo.CurRound.ExpectedPlayers == 2 and P1 == true and P2 == true then ExpectTrue = true print("[SlashCo] Expectation successful with 2 players!") end
-        if #SlashCo.CurRound.ExpectedPlayers == 3 and P1 == true and P2 == true and P3 == true then ExpectTrue = true end
-        if #SlashCo.CurRound.ExpectedPlayers == 4 and P1 == true and P2 == true and P3 == true and P4 == true then ExpectTrue = true end
-        if #SlashCo.CurRound.ExpectedPlayers == 5 and P1 == true and P2 == true and P3 == true and P4 == true and P5 == true then ExpectTrue = true end
 
     end
+
+    if expected_count == #SlashCo.CurRound.ExpectedPlayers then ExpectTrue = true end
 
     if SlashCo.CurRound.AntiLoopSpawn == false and ExpectTrue == true then
 
@@ -728,13 +735,7 @@ SlashCo.ValidateMap = function(map)
     local slashergasmod = 0 --FIX LATER
 
     --Amount of Spawned Gas Cans: 7 + (4 - Difficulty Value) + Map Modifier + Offering Modifier + Slasher-Specific Modifier + (4 - Player Count)
-    local gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + slashergasmod + (4 - SlashCo.CurRound.SurvivorCount) - SlashCo.CurRound.SurvivorData.GasCanMod
-
-    if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --The Exposure Offering caps gas cans at 8.
-        gasCount = 8 + slashergasmod
-    end
-
-    SlashCo.CurRound.GasCanCount = gasCount
+    local gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - SlashCo.CurRound.SurvivorCount) - SlashCo.CurRound.SurvivorData.GasCanMod
 
     --Transfer json to a global
     SlashCo.CurConfig = json
@@ -777,6 +778,14 @@ SlashCo.ValidateMap = function(map)
             valid = false
         end
     end
+
+
+    if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --The Exposure Offering caps gas cans at 8.
+        SlashCo.CurRound.GasCanCount = 8
+    end
+
+    SlashCo.CurRound.GasCanCount = gasCount
+
     /* ============================ GENERATORS ============================ */
     
     /* ============================ OFFERINGS ============================ */ 
@@ -1239,14 +1248,7 @@ SlashCo.SpawnCurConfig = function()
             return
         end
 
-        --Spawn all generators
-        local genSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GeneratorCount, #(SlashCo.CurConfig.Generators.Spawnpoints))
-        --local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
-        local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
-
-        if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
-            gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.Offerings.Exposure.Spawnpoints))
-        end
+        local slashergasmod = 0
 
         if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
             SlashCo.CurRound.OfferingData.ItemMod = -2
@@ -1275,13 +1277,10 @@ SlashCo.SpawnCurConfig = function()
                 end
             end
         end
+
         local itemSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.ItemCount, #possibleItemSpawnpoints)
 
         local item_class = ""
-
-        SlashCo.CreateGenerators(genSpawns)
-        SlashCo.CreateBatteries(genSpawns)
-        SlashCo.CreateGasCans(gasSpawns)
 
         --Decide if what and if items should be spawned according to the selected slasher
         for s = 1, #SlashCo.CurRound.SlashersToBeSpawned do
@@ -1290,8 +1289,13 @@ SlashCo.SpawnCurConfig = function()
 
             local slashid = SlashCo.CurRound.SlasherData[plyid].SlasherID
 
-            if slashid == 2 then item_class = "sc_cookie" end
-            if slashid == 5 then item_class = "sc_milkjug" end
+            if slashid == 2 then 
+                item_class = "sc_cookie" 
+            elseif slashid == 5 then 
+                item_class = "sc_milkjug" 
+            else
+                item_class = "" 
+            end
 
             if item_class != "" then SlashCo.CreateItems(itemSpawns, item_class) print("[SlashCo] Spawning Items.") end
 
@@ -1307,7 +1311,26 @@ SlashCo.SpawnCurConfig = function()
     
             end
 
+            slashergasmod = slashergasmod + SlashCo.CurRound.SlasherData[plyid].GasCanMod
+
         end
+
+        SlashCo.CurRound.GasCanCount = SlashCo.CurRound.GasCanCount + slashergasmod
+
+        if SlashCo.CurRound.GasCanCount < 2 then SlashCo.CurRound.GasCanCount = 2 end
+
+        --Spawn all generators
+        local genSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GeneratorCount, #(SlashCo.CurConfig.Generators.Spawnpoints))
+        --local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
+        local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
+
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
+            gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.Offerings.Exposure.Spawnpoints))
+        end
+
+        SlashCo.CreateGenerators(genSpawns)
+        SlashCo.CreateBatteries(genSpawns)
+        SlashCo.CreateGasCans(gasSpawns)
 
         local beacon_spawn = SlashCo.GetSpawnpoints(1, #possibleItemSpawnpoints)
         local r = math.random(1, #possibleItemSpawnpoints)
@@ -1484,7 +1507,7 @@ end
 
 SlashCo.HelicopterFinalLeave = function()
 
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition.pos[1],SlashCo.CurRound.HelicopterSpawnPosition.pos[2],SlashCo.CurRound.HelicopterSpawnPosition.pos[3])
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],SlashCo.CurRound.HelicopterSpawnPosition[2],SlashCo.CurRound.HelicopterSpawnPosition[3])
 
 end
 

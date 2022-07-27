@@ -10,7 +10,7 @@ do
 
     if SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown > 0 then return end
 
-    SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = 2
+    SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown
 
     if slasher:GetNWBool("InSlasherChaseMode") then 
 

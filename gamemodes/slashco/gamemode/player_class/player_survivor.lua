@@ -33,7 +33,9 @@ function PLAYER:SetModel()
 
 	if rand < 3 then id = rand elseif rand == 3 then id = 5 elseif rand == 4 then id = 7 end
 
-	local modelname = "models/slashco/survivor/male_0"..id..".mdl"
+	--local modelname = "models/slashco/survivor/male_0"..id..".mdl"
+
+	local modelname = "models/slashco/survivor/test/male_01.mdl"
 	util.PrecacheModel( modelname )
 	self.Player:SetModel( modelname )
 

@@ -345,14 +345,18 @@ end --ends here
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
 
-        local song = math.random(1,6)
+        --local song = math.random(1,6)
 
         slasher:SetColor(Color(255,255,255,255))
         slasher:DrawShadow(true)
 		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		slasher:SetNoDraw(false)
 
-        PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 97, slasher, 1)
+        --PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)), slasher, 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
+
+        --slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..song..".mp3")
+        --slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
+        --slasher.TylerSong:ChangeVolume( 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
 
     end
 

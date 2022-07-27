@@ -25,6 +25,8 @@ function ENT:Initialize()
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetMoveType( MOVETYPE_NONE )
 		self:SetUseType( ONOFF_USE )
+
+		self.PlaySound = false
 	end
 end
 
@@ -184,8 +186,7 @@ function ENT:Think()
 
 				timer.Simple(delay, function()
 
-					--self:EmitSound("slashco/generator_loop.wav", 85, 100, 1)
-					PlayGlobalSound("slashco/generator_loop.wav", 85, self)
+					self.PlaySound = true
 
 				end)
 
@@ -200,6 +201,17 @@ function ENT:Think()
 			SlashCo.CurRound.Generators[self:EntIndex()].Interaction = false
 		
 		end
+
+	end
+
+	if self.PlaySound then
+
+		if self.RunningSound == nil then 
+            self.RunningSound = CreateSound( slasher, "slashco/slasher/generator_loop.wav")
+        else
+            self.RunningSound:SetSoundLevel( 85 )
+            self.RunningSound:Play() 
+        end
 
 	end
 

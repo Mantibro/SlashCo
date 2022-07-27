@@ -46,9 +46,9 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
 	end
 
-	draw.SimpleText( "You have "..point_count.." Points.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.05), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-	draw.SimpleText( "You have won "..srvwin_count.." Rounds as SURVIVOR.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.08), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-	draw.SimpleText( "You have won "..slswin_count.." Rounds as SLASHER.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.11), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	draw.SimpleText( "You have "..point_count.." Points.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.05), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( "You have won "..srvwin_count.." Rounds as SURVIVOR.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.08), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+	draw.SimpleText( "You have won "..slswin_count.." Rounds as SLASHER.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.11), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 
 if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
 	
@@ -183,9 +183,9 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 		surface.SetMaterial(Tablet)
 		surface.DrawTexturedRect(-ScrW()/15, ScrH()/50, ScrW()/2.5, ScrW()/2.5)
 	
-		draw.SimpleText( "Press F1 to ready as Survivor.", "LobbyFont1", scrW * 0.5, (scrH * 0.5)+250, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+		draw.SimpleText( "Press F1 to ready as Survivor.", "LobbyFont1", scrW * 0.975, (scrH * 0.5)+300, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 	
-		draw.SimpleText( "Press F2 to ready as Slasher.", "LobbyFont1", scrW * 0.5, (scrH * 0.5)+350, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+		draw.SimpleText( "Press F2 to ready as Slasher.", "LobbyFont1", scrW * 0.975, (scrH * 0.5)+350, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 	
 		if TimeLeft != nil and TimeLeft > 0 then
 			draw.SimpleText( "Starting in: "..tostring( TimeLeft ).." seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.25), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
@@ -234,23 +234,23 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 	
 	
 	
-	draw.SimpleText( " \" , \" to switch teams.", "LobbyFont2", scrW * 0.5, (scrH * 0.5)+450, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	draw.SimpleText( " \" , \" to switch teams.", "LobbyFont2", scrW * 0.975, (scrH * 0.5)+425, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 	
 	if clientReadiness != nil then
 		
 		if clientReadiness < 1 then
 	
-			draw.SimpleText( "You are not Ready.", "LobbyFont1", scrW * 0.5, (scrH * 0.5)+150, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+			draw.SimpleText( "You are not Ready.", "LobbyFont1", scrW * 0.025, scrH * 0.225, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
 		end
 		if clientReadiness == 1 then
 	
-			draw.SimpleText( "You are Ready as SURVIVOR.", "LobbyFont1", scrW * 0.5, (scrH * 0.5)+150, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+			draw.SimpleText( "You are Ready as SURVIVOR.", "LobbyFont1", scrW * 0.025, scrH * 0.225, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
 		end
 		if clientReadiness == 2 then
 	
-			draw.SimpleText( "You are Ready as SLASHER.", "LobbyFont1", scrW * 0.5, (scrH * 0.5)+150, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+			draw.SimpleText( "You are Ready as SLASHER.", "LobbyFont1", scrW * 0.025, scrH * 0.225, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	
 		end
 	

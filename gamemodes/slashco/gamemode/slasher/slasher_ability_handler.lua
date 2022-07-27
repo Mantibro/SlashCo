@@ -481,6 +481,8 @@ do
 
     if v1 == 0 then --Specter
 
+        slasher.TylerSongPickedID = nil
+
         slasher:SetNWBool("TylerFlash", false)
 
         slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed ) 
@@ -506,7 +508,19 @@ do
         SlashCo.CurRound.SlasherData[slasherid].CanKill = false
         SlashCo.CurRound.SlasherData[slasherid].Perception = 0.0
 
-        if v2 > ( ms * 60) - (v4 * 8) then --Time ran out
+        if slasher.TylerSongPickedID == nil then
+            slasher.TylerSongPickedID = math.random(1,6)
+        end
+
+        if slasher.TylerSong == nil then 
+            slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
+        else
+            slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3*1.5) * (30 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
+            slasher.TylerSong:Play() 
+            slasher.TylerSong:ChangeVolume( 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
+        end
+
+        if v2 > ( ms * 40) - (v4 * 4) then --Time ran out
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 2
 
@@ -516,23 +530,23 @@ do
 
             local surv = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-            if surv:GetPos():Distance( slasher:GetPos() ) < 500 and surv:GetEyeTrace().Entity == slasher then
+            if surv:GetPos():Distance( slasher:GetPos() ) < 400 and surv:GetEyeTrace().Entity == slasher then
 
-                slasher.tyler_found = true
+                slasher:SetNWBool("TylerCreating", true)
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
 
             end
 
         end
 
-        if slasher.tyler_found != nil and slasher.tyler_found == true then
+        if slasher:GetNWBool("TylerCreating") and SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 != 1.8 then
 
-            slasher.tyler_found = false
-
-            slasher:SetNWBool("TylerCreating", true)
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = 1.8
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
 
             timer.Simple(3, function() 
             
-                SlashCo.CreateGasCan(slasher:GetPos() + (slasher:GetForward() * 30) + Vector(0,0,18))
+                SlashCo.CreateGasCan(slasher:GetPos() + (slasher:GetForward() * 60) + Vector(0,0,18), Angle(0,0,0))
             
             end)
 
@@ -540,12 +554,19 @@ do
             
                 slasher:SetNWBool("TylerCreating", false)
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = 0
+
+                slasher:Freeze(false)
 
                 slasher:SetColor(Color(0,0,0,0))
                 slasher:DrawShadow(false)
 		        slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 		        slasher:SetNoDraw(true)
+
+                slasher.TylerSong:Stop() 
+                slasher.TylerSong = nil
             
             end)
 
@@ -555,21 +576,16 @@ do
 
     elseif v1 == 2 then --Pre-Destroyer
 
+        slasher.TylerSongPickedID = nil
+
         slasher:Freeze(true)
 
         if slasher.tyler_destroyer_entrance_antispam == nil then
 
             PlayGlobalSound("slashco/slasher/tyler_alarm.wav", 110, slasher, 1)
 
-            for i = 1, 6 do
-                slasher:StopSound("slashco/slasher/tyler_song_"..i..".mp3")
-            end
-
-            timer.Simple(0.1, function() 
-                for i = 1, 6 do
-                slasher:StopSound("slashco/slasher/tyler_song_"..i..".mp3")
-                end 
-            end)
+            slasher.TylerSong:Stop() 
+            slasher.TylerSong = nil
 
             slasher.tyler_destroyer_entrance_antispam = 0
         end

@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/borgmire/borg_face"
+	"$bumpmap" "models/slashco/slashers/borgmire/borg_facenm"
+	"$halflambert" 1
+}
