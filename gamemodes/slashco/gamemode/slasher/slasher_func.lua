@@ -46,6 +46,16 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     end
 
+    if slid == 8 then
+
+        ply:SetViewOffset( Vector(0,0,85) )
+
+        ply:SetCurrentViewOffset( Vector(0,0,85) )
+
+        PlayGlobalSound("slashco/slasher/borgmire_heartbeat.wav",50,ply)
+
+    end
+
 end
 
 SlashCo.InsertSlasherToTable = function(id)

@@ -80,7 +80,7 @@ SCInfo.Item = {
 
     {
         Name = "Fuel Can",
-        Price = 0,
+        Price = 15,
         Description = "A jerry can full of high-octane gas. Useful for refuelling Cars and Generators. \nTaking it with you will reduce how much gas you will find within the Zone. \nOnce you drop this item, you will not be able to store it again."
     },
 

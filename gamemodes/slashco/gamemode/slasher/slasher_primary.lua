@@ -14,6 +14,8 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 7 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 3 then goto tylerdestroy end
 
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 8 then goto borgpunch end
+
     if slasher:GetNWBool("SidGun") then goto sidgun end
 do
 
@@ -134,7 +136,7 @@ do
     
                 SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
     
-                timer.Simple(4.5, function()
+                timer.Simple(4.1, function()
     
                     target:SetNWBool("SurvivorBeingJumpscared",false)
 
@@ -339,5 +341,52 @@ end
         end
     
     end
+
+    ::borgpunch::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then return end
+do
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 < 0.01 then
+
+        slasher:SetNWBool("BorgmirePunch",false)
+        timer.Remove("BorgmirePunchDecay")
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2
+
+        timer.Simple(0.3, function() 
+
+            slasher:EmitSound("slashco/slasher/trollge_swing.wav")
+
+            if SERVER then
+
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 35 + (SO*20), DMG_SLASH, 50, false )
+
+                if target:IsPlayer() then
+
+                    if target:Team() != TEAM_SURVIVOR then return end
+
+                    local vPoint = target:GetPos() + Vector(0,0,50)
+                    local bloodfx = EffectData()
+                    bloodfx:SetOrigin( vPoint )
+                    util.Effect( "BloodImpact", bloodfx )
+
+                    slasher:EmitSound("slashco/slasher/trollge_hit.wav") 
+
+                end
+
+            end
+
+        end)
+
+        timer.Simple(0.05, function() 
+
+            slasher:SetNWBool("BorgmirePunch",true)
+
+            timer.Create( "BorgmirePunchDecay", 1.5, 1, function() slasher:SetNWBool("BorgmirePunch",false) end)
+
+        end)
+
+    end
+
+end
 
 end

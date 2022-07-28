@@ -80,6 +80,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	local tyler_creator = ply:GetNWBool("TylerTheCreator")
 	local tyler_creating = ply:GetNWBool("TylerCreating")
 
+	local borg_punch = ply:GetNWBool("BorgmirePunch")
+
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
 	if ply:GetModel() != "models/slashco/slashers/baba/baba.mdl" then goto sid end --Bababooey's Animator
@@ -398,6 +400,35 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	end
 
 	::borgmire::
+
+	if ply:GetModel() != "models/slashco/slashers/borgmire/borgmire.mdl" then goto theking end --Borgmire's Animator
+do
+
+	if not borg_punch then anim_antispam = false end
+
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_HL2MP_WALK
+			ply.CalcSeqOverride = ply:LookupSequence("walk_all")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN 
+			ply.CalcSeqOverride = ply:LookupSequence("run_all")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("jump")
+
+	end
+
+
+	if borg_punch and (anim_antispam == nil or anim_antispam == false) then
+		ply:AddVCDSequenceToGestureSlot( 1, ply:LookupSequence("Attack_MELEE"), 0, true )
+		anim_antispam = true 
+	end
+end
+	::theking::
 
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)

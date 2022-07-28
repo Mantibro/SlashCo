@@ -186,7 +186,7 @@ function ENT:Think()
 
 				timer.Simple(delay, function()
 
-					self.PlaySound = true
+					PlayGlobalSound("slashco/generator_loop.wav", 85, self, 1)
 
 				end)
 
@@ -201,17 +201,6 @@ function ENT:Think()
 			SlashCo.CurRound.Generators[self:EntIndex()].Interaction = false
 		
 		end
-
-	end
-
-	if self.PlaySound then
-
-		if self.RunningSound == nil then 
-            self.RunningSound = CreateSound( slasher, "slashco/slasher/generator_loop.wav")
-        else
-            self.RunningSound:SetSoundLevel( 85 )
-            self.RunningSound:Play() 
-        end
 
 	end
 

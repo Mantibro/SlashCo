@@ -20,9 +20,9 @@ SlashCo.Maps = {
         LEVELS = {
             500
         }
-    },
+    }
 
-    {
+    --[[{
         ID = "rp_deadcity",
         NAME = "Dead City",
         SIZE = 3,
@@ -44,7 +44,7 @@ SlashCo.Maps = {
             -630,
             -650
         }
-    }
+    }]]
 
 }
 
@@ -243,29 +243,29 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "",
         KillSound = "slashco/slasher/tyler_kill.mp3"
-    }
+    },
 
-    --[[{
+    {
         NAME = "Borgmire",
         ID = 8,
         CLS = 1,
         DNG = 2,
-        Model = "models/slashco/slashers/borgire/borgire.mdl",
-        KillDelay = 6,
+        Model = "models/slashco/slashers/borgmire/borgmire.mdl",
+        KillDelay = 0,
         GasCanMod = 0,
-        ProwlSpeed = 300,
-        ChaseSpeed = 320,
+        ProwlSpeed = 150,
+        ChaseSpeed = 325,
         Perception = 1.0,
-        Eyesight = 5,
+        Eyesight = 2,
         KillDistance = 0,
         ChaseRange = 1500,
         ChaseRadius = 0.91,
         ChaseDuration = 12.0,
         ChaseCooldown = 8,
         JumpscareDuration = 2,
-        ChaseMusic = "",
-        KillSound = "slashco/slasher/tyler_kill.mp3"
-    }]]
+        ChaseMusic = "slashco/slasher/borgmire_chase.wav",
+        KillSound = ""
+    }
 
 }
 
@@ -732,10 +732,8 @@ SlashCo.ValidateMap = function(map)
         SlashCo.CurRound.OfferingData.GasCanMod = SCInfo.Offering[SlashCo.CurRound.OfferingData.CurrentOffering].GasCanMod
     end
 
-    local slashergasmod = 0 --FIX LATER
-
     --Amount of Spawned Gas Cans: 7 + (4 - Difficulty Value) + Map Modifier + Offering Modifier + Slasher-Specific Modifier + (4 - Player Count)
-    local gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - SlashCo.CurRound.SurvivorCount) - SlashCo.CurRound.SurvivorData.GasCanMod
+    local gasCount = 9
 
     --Transfer json to a global
     SlashCo.CurConfig = json
@@ -779,12 +777,13 @@ SlashCo.ValidateMap = function(map)
         end
     end
 
+    gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) - SlashCo.CurRound.SurvivorData.GasCanMod
 
     if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --The Exposure Offering caps gas cans at 8.
-        SlashCo.CurRound.GasCanCount = 8
+        SlashCo.CurRound.GasCanCount = 8 - SlashCo.CurRound.SurvivorData.GasCanMod
+    else
+        SlashCo.CurRound.GasCanCount = gasCount
     end
-
-    SlashCo.CurRound.GasCanCount = gasCount
 
     /* ============================ GENERATORS ============================ */
     

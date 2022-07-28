@@ -407,7 +407,26 @@ do
 
 end
 
-		::borgmire::
+	::borgmire::
+	if SlashID != 8 then goto theking end
+do
+
+	local PunchIcon = Material("slashco/ui/icons/slasher/s_punch")
+	local ThrowIcon = Material("slashco/ui/icons/slasher/s_punch")
+
+	willdrawkill = false
+
+	surface.SetMaterial(PunchIcon)
+	surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+	draw.SimpleText( "M1 - Punch", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+	surface.SetMaterial(ThrowIcon)
+	surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+	draw.SimpleText( "F - Throw", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+end
+
+	::theking::
 
 		--Slasher-Shared function \/ \/ \/ 
 

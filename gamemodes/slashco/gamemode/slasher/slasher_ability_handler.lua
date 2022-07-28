@@ -61,6 +61,8 @@ do
             slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
             slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
 
+            SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown
+
             timer.Simple(0.25, function() slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic) end)
         end
 end
@@ -134,7 +136,7 @@ end
         if v4 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = v4 - (0.02 + (SO * 0.08))  end
 
         if v5 < 160 and slasher:GetNWBool("InSlasherChaseMode") then 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = v5 + (FrameTime() + (SO * 0.02))
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = v5 + (FrameTime() + (SO * 0.02)) + (v1*FrameTime()*0.5)
             slasher:SetRunSpeed(SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed + (v5/3.5))
             slasher:SetWalkSpeed(SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed + (v5/3.5))
         else
@@ -512,13 +514,16 @@ do
             slasher.TylerSongPickedID = math.random(1,6)
         end
 
-        if slasher.TylerSong == nil then 
-            slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
-        else
-            slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3*1.5) * (30 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
-            slasher.TylerSong:Play() 
-            slasher.TylerSong:ChangeVolume( 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
+        if CLIENT then
+            if slasher.TylerSong == nil then 
+                slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
+            else
+                slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3*1.5) * (30 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
+                slasher.TylerSong:Play() 
+                slasher.TylerSong:ChangeVolume( 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
+            end
         end
+
 
         if v2 > ( ms * 40) - (v4 * 4) then --Time ran out
 
@@ -564,9 +569,10 @@ do
                 slasher:DrawShadow(false)
 		        slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 		        slasher:SetNoDraw(true)
-
-                slasher.TylerSong:Stop() 
-                slasher.TylerSong = nil
+                if CLIENT then
+                    slasher.TylerSong:Stop() 
+                    slasher.TylerSong = nil
+                end
             
             end)
 
@@ -583,9 +589,10 @@ do
         if slasher.tyler_destroyer_entrance_antispam == nil then
 
             PlayGlobalSound("slashco/slasher/tyler_alarm.wav", 110, slasher, 1)
-
-            slasher.TylerSong:Stop() 
-            slasher.TylerSong = nil
+            if CLIENT then
+                slasher.TylerSong:Stop() 
+                slasher.TylerSong = nil
+            end
 
             slasher.tyler_destroyer_entrance_antispam = 0
         end
@@ -682,6 +689,64 @@ do
 
 end
     ::BORGMIRE::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto THEKING end
+do
+
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Time Spent chasing
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Punch Cooldown
+    --v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Times Found
+    --v4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 --Destruction power
+    --v5 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 --Destoyer Blink
+
+    if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() end
+
+    if not slasher:GetNWBool("InSlasherChaseMode") then
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+
+        slasher.ChaseSound = nil 
+
+        if slasher.IdleSound == nil then
+
+            PlayGlobalSound("slashco/slasher/borgmire_breath_base.wav", 60, slasher, 1)
+
+            slasher:StopSound("slashco/slasher/borgmire_breath_chase.wav")
+            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/borgmire_breath_chase.wav") end)
+
+            slasher.IdleSound = true
+        end
+
+    else
+
+        slasher.IdleSound = nil 
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + FrameTime()
+
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 10 ) )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 10 )  )
+
+        if slasher.ChaseSound == nil then
+
+            PlayGlobalSound("slashco/slasher/borgmire_breath_chase.wav", 70, slasher, 1)
+
+            PlayGlobalSound("slashco/slasher/borgmire_anger.mp3", 75, slasher, 1)
+
+            PlayGlobalSound("slashco/slasher/borgmire_anger_far.mp3", 102, slasher, 1)
+
+            slasher:StopSound("slashco/slasher/borgmire_breath_base.wav")
+            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/borgmire_breath_base.wav") end)
+
+            slasher.ChaseSound = true
+        end
+
+    end
+
+end
+    ::THEKING::
+
 end
 
 end)

@@ -609,3 +609,7 @@ hook.Add( "PlayerUse", "STOP", function( ply, ent )
 	end
 
 end )
+
+function GM:HUDShouldDraw(element)
+	return (element != "CHudDeathNotice");
+end

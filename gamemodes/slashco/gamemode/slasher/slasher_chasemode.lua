@@ -33,13 +33,13 @@ do
 
     for i = 1, #find do
 
-        if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
+        --if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
 
             --TODO trace so it doesn't count through walls
 
             target = find[i]
             break 
-        end
+        --end
 
     end
 

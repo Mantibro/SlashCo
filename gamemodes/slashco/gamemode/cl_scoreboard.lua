@@ -16,8 +16,6 @@ net.Receive("mantislashcoSendRoundData", function()
 
 	PlayerData = net.ReadTable()
 
-	g_Scoreboard = nil
-
 end)
 
 --
@@ -167,8 +165,6 @@ local PLAYER_LINE = {
 		if team_status == TEAM_SLASHER then
 			teamorder = 0
 		end
-
-		
 
 		--
 		-- This is what sorts the list. The panels are docked in the z order,
