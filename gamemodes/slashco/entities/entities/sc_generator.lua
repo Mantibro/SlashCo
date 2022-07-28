@@ -175,7 +175,7 @@ function ENT:Think()
 				self:StopSound("slashco/generator_fill.wav")
 				AntiSpam = false
 
-				local delay = 6
+				local delay = 6.4
 				self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
 
 				if SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer == SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer then

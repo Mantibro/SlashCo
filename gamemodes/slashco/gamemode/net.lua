@@ -58,6 +58,8 @@ util.AddNetworkString("mantislashcoOfferingVoteFinished")
 
 util.AddNetworkString("mantislashcoGiveMasterDatabase")
 
+util.AddNetworkString("mantislashcoSendRoundData")
+
 function PlayGlobalSound(sound, level, ent, vol)
 
 	if vol == nil then vol = 1 end
@@ -77,6 +79,14 @@ SlashCo.BroadcastSlasherData = function()
 
     net.Start("mantislashcoGiveSlasherData")
 	net.WriteTable(SlashCo.CurRound.SlasherData)
+	net.Broadcast()
+
+end
+
+SlashCo.BroadcastCurrentRoundData = function()
+
+    net.Start("mantislashcoSendRoundData")
+	net.WriteTable({survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData})
 	net.Broadcast()
 
 end

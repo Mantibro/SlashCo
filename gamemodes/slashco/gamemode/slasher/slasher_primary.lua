@@ -123,8 +123,10 @@ do
 
                 slasher:SetNWBool("SidExecuting",true)
 
+                target:SetNWBool("SurvivorSidExecution", true)
+
                 target:SetPos(slasher:GetPos())
-                target:SetAngles(   Angle(0,slasher:EyeAngles()[2],0)   )  
+                target:SetEyeAngles(   Angle(0,slasher:GetAngles()[2],0)   )  
                     
                 target:Freeze(true)
                 target:SetNotSolid(true)
@@ -132,7 +134,7 @@ do
     
                 SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
     
-                timer.Simple(3, function()
+                timer.Simple(4.5, function()
     
                     target:SetNWBool("SurvivorBeingJumpscared",false)
 
@@ -140,19 +142,20 @@ do
 
                     slasher:EmitSound("slashco/slasher/sid_shot.mp3",95,100,1,6)
 
-                    slasher:SetNWBool("SidExecuting",false)
+                    target:SetNWBool("SurvivorSidExecution", false)
 
-                    target:SetPos(slasher:GetPos() + (slasher:GetForward() * 30))
+                    target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
 
                     target:Freeze(false)
-                    target:SetVelocity( slasher:GetForward() * 20000 )
+                    target:SetVelocity( slasher:GetForward() * 500 )
                     target:SetNotSolid(false)
-                    target:Kill()
+                    timer.Simple(0.05, function() target:Kill() end)
             
                 end)
 
-                timer.Simple(5, function()
+                timer.Simple(8, function()
                     slasher:Freeze(false)
+                    slasher:SetNWBool("SidExecuting",false)
                 end)
             end
     

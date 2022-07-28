@@ -243,9 +243,9 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "",
         KillSound = "slashco/slasher/tyler_kill.mp3"
-    },
+    }
 
-    {
+    --[[{
         NAME = "Borgmire",
         ID = 8,
         CLS = 1,
@@ -265,7 +265,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "",
         KillSound = "slashco/slasher/tyler_kill.mp3"
-    }
+    }]]
 
 }
 

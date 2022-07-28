@@ -30,6 +30,25 @@ player_manager.RegisterClass("player_slasher_base", PLAYER, "player_default")
 --Slasher Animation Controller
 hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
+	if ply:Team() == TEAM_SURVIVOR then
+
+		if not ply:GetNWBool("SurvivorSidExecution") then surv_anim_antispam = false end
+
+		if ply:GetNWBool("SurvivorSidExecution") then
+
+			ply.CalcIdeal = ACT_DIESIMPLE
+			ply.CalcSeqOverride = ply:LookupSequence("taunt_cali")
+			--ply:SetPlaybackRate( 0.1 )
+			if surv_anim_antispam == nil or surv_anim_antispam == false then ply:SetCycle( 0 ) surv_anim_antispam = true end
+
+			return ply.CalcIdeal, ply.CalcSeqOverride
+
+		else
+			return
+		end
+
+	end
+
 	if ply:Team() != TEAM_SLASHER then
 		return
 	end
@@ -59,7 +78,6 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	local male_transforming = ply:GetNWBool("Male07Transforming")
 
 	local tyler_creator = ply:GetNWBool("TylerTheCreator")
-	local tyler_destroyer = ply:GetNWBool("TylerTheDestroyer")
 	local tyler_creating = ply:GetNWBool("TylerCreating")
 
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
@@ -154,7 +172,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	if sid_executing then
 
 		ply.CalcSeqOverride = ply:LookupSequence("execution")
-		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) ply:ChatPrint("NIGGA CHUNGUS!") anim_antispam = true end
+		ply:SetPlaybackRate( 1 )
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
 
 	end
 

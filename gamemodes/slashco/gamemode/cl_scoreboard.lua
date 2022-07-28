@@ -7,9 +7,18 @@ surface.CreateFont( "ScoreboardDefault", {
 
 surface.CreateFont( "ScoreboardDefaultTitle", {
 	font	= "Helvetica",
-	size	= 32,
+	size	= 15,
 	weight	= 800
 } )
+
+
+net.Receive("mantislashcoSendRoundData", function()
+
+	PlayerData = net.ReadTable()
+
+	g_Scoreboard = nil
+
+end)
 
 --
 -- This defines a new panel type for the player row. The player row is given a player
@@ -31,33 +40,12 @@ local PLAYER_LINE = {
 		self.Name = self:Add( "DLabel" )
 		self.Name:Dock( FILL )
 		self.Name:SetFont( "ScoreboardDefault" )
-		self.Name:SetTextColor( Color( 93, 93, 93 ) )
+		self.Name:SetTextColor( Color( 0, 0, 0 ) )
 		self.Name:DockMargin( 8, 0, 0, 0 )
 
 		self.Mute = self:Add( "DImageButton" )
 		self.Mute:SetSize( 32, 32 )
 		self.Mute:Dock( RIGHT )
-
-		self.Ping = self:Add( "DLabel" )
-		self.Ping:Dock( RIGHT )
-		self.Ping:SetWidth( 50 )
-		self.Ping:SetFont( "ScoreboardDefault" )
-		self.Ping:SetTextColor( Color( 93, 93, 93 ) )
-		self.Ping:SetContentAlignment( 5 )
-
-		self.Deaths = self:Add( "DLabel" )
-		self.Deaths:Dock( RIGHT )
-		self.Deaths:SetWidth( 50 )
-		self.Deaths:SetFont( "ScoreboardDefault" )
-		self.Deaths:SetTextColor( Color( 93, 93, 93 ) )
-		self.Deaths:SetContentAlignment( 5 )
-
-		self.Kills = self:Add( "DLabel" )
-		self.Kills:Dock( RIGHT )
-		self.Kills:SetWidth( 50 )
-		self.Kills:SetFont( "ScoreboardDefault" )
-		self.Kills:SetTextColor( Color( 93, 93, 93 ) )
-		self.Kills:SetContentAlignment( 5 )
 
 		self:Dock( TOP )
 		self:DockPadding( 3, 3, 3, 3 )
@@ -90,21 +78,6 @@ local PLAYER_LINE = {
 		if ( self.PName == nil || self.PName != self.Player:Nick() ) then
 			self.PName = self.Player:Nick()
 			self.Name:SetText( self.PName )
-		end
-
-		if ( self.NumKills == nil || self.NumKills != self.Player:Frags() ) then
-			self.NumKills = self.Player:Frags()
-			self.Kills:SetText( self.NumKills )
-		end
-
-		if ( self.NumDeaths == nil || self.NumDeaths != self.Player:Deaths() ) then
-			self.NumDeaths = self.Player:Deaths()
-			self.Deaths:SetText( self.NumDeaths )
-		end
-
-		if ( self.NumPing == nil || self.NumPing != self.Player:Ping() ) then
-			self.NumPing = self.Player:Ping()
-			self.Ping:SetText( self.NumPing )
 		end
 
 		--
@@ -145,12 +118,64 @@ local PLAYER_LINE = {
 			return
 		end
 
+		local team_status = TEAM_SPECTATOR
+
+		if PlayerData == nil then goto SKIP end
+
+		for p = 1, #player.GetAll() do
+			local pl = player.GetAll()[p]
+			local found = false
+
+			for i = 1, #PlayerData.survivors do
+				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].steamid)
+
+				if pot_s == pl then
+					team_status = TEAM_SURVIVOR
+					found = true
+					break 
+				end
+
+			end
+
+			for i = 1, #PlayerData.slashers do
+				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].steamid)
+
+				if pot_s == pl then
+					team_status = TEAM_SURVIVOR
+					found = true
+					break 
+				end
+
+			end
+
+			if found then break end
+
+		end
+
+		::SKIP::
+
+		local teamorder = 0
+
+		if team_status== TEAM_SPECTATOR then
+			teamorder = 500
+		end
+
+		if team_status == TEAM_SURVIVOR then
+			teamorder = 50
+		end
+
+		if team_status == TEAM_SLASHER then
+			teamorder = 0
+		end
+
+		
+
 		--
 		-- This is what sorts the list. The panels are docked in the z order,
 		-- so if we set the z order according to kills they'll be ordered that way!
 		-- Careful though, it's a signed short internally, so needs to range between -32,768k and +32,767
 		--
-		self:SetZPos( ( self.NumKills * -50 ) + self.NumDeaths + self.Player:EntIndex() )
+		self:SetZPos( ( -50 ) + self.Player:EntIndex() + teamorder )
 
 	end,
 
@@ -164,12 +189,62 @@ local PLAYER_LINE = {
 		-- We draw our background a different colour based on the status of the player
 		--
 
-		if ( self.Player:Team() == TEAM_CONNECTING ) then
-			draw.RoundedBox( 4, 0, 0, w, h, Color( 200, 200, 200, 200 ) )
-			return
+		--if ( self.Player:Team() == TEAM_CONNECTING ) then
+		--	draw.RoundedBox( 4, 0, 0, w, h, Color( 200, 200, 200, 200 ) )
+		--	return
+		--end
+
+		local team_status = TEAM_SPECTATOR
+
+		if PlayerData == nil then goto SKIP end
+
+		for p = 1, #player.GetAll() do
+			local pl = player.GetAll()[p]
+			local found = false
+
+			for i = 1, #PlayerData.survivors do
+				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].id)
+
+				if pot_s == pl then
+					team_status = TEAM_SURVIVOR
+					found = true
+					break 
+				end
+
+			end
+
+			for i = 1, #PlayerData.slashers do
+				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].s_id)
+
+				if pot_s == pl then
+					team_status = TEAM_SLASHER
+					found = true
+					break 
+				end
+
+			end
+
+			if found then break end
+
 		end
 
-		draw.RoundedBox( 4, 0, 0, w, h, team.GetColor(self.Player:Team()) )
+		::SKIP::
+
+		local teamcolor = Color(0,0,0,255)
+
+		if team_status == TEAM_SPECTATOR then
+			teamcolor = Color(220,220,220,255)
+		end
+
+		if team_status == TEAM_SURVIVOR then
+			teamcolor = Color(255,255,255,255)
+		end
+
+		if team_status == TEAM_SLASHER then
+			teamcolor = Color(255,0,0,255)
+		end
+
+		draw.RoundedBox( 4, 0, 0, w, h,teamcolor )
 	end
 }
 
@@ -211,8 +286,8 @@ local SCORE_BOARD = {
 
 	PerformLayout = function( self )
 
-		self:SetSize( 700, ScrH() - 200 )
-		self:SetPos( ScrW() / 2 - 350, 100 )
+		self:SetSize( 400, ScrH() - 200 )
+		self:SetPos( ScrW() / 2 - 200, 100 )
 
 	end,
 
@@ -225,6 +300,11 @@ local SCORE_BOARD = {
 	Think = function( self, w, h )
 
 		self.Name:SetText( GetHostName() )
+
+		local mat = vgui.Create("Material", self)
+		mat:SetPos(0, -80)
+		mat:SetSize(20, 20)
+		mat:SetMaterial("slashco/ui/slashco_score")
 
 		--
 		-- Loop through each player, and if one doesn't have a score entry - create it.
@@ -281,4 +361,7 @@ end
 	Desc: If you prefer to draw your scoreboard the stupid way (without vgui)
 -----------------------------------------------------------]]
 function GM:HUDDrawScoreBoard()
+
+	--draw.SimpleText( "nutd!!!!.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.5), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
+
 end

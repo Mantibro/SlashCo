@@ -446,6 +446,8 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 
 	SlashCo.BroadcastGlobalData()
 
+	SlashCo.BroadcastCurrentRoundData()
+
 	timer.Simple(5, function() SlashCo.BroadcastMasterDatabaseForClient(pid) end)
 
 end
@@ -597,3 +599,13 @@ end
 hook.Add("ShowTeam", "DoNotAllowTeamSwitch", function()
 	return false
 end)
+
+hook.Add( "PlayerUse", "STOP", function( ply, ent )
+
+	if ply:Team() == TEAM_SPECTATOR then
+		return false
+	else
+		return
+	end
+
+end )
