@@ -116,8 +116,8 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Perception = 1.0,
         Eyesight = 5,
         KillDistance = 135,
-        ChaseRange = 700,
-        ChaseRadius = 0.94,
+        ChaseRange = 600,
+        ChaseRadius = 0.91,
         ChaseDuration = 10.0,
         ChaseCooldown = 3,
         JumpscareDuration = 1.5,
@@ -205,7 +205,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 2,
         KillDistance = 150,
         ChaseRange = 900,
-        ChaseRadius = 0.94,
+        ChaseRadius = 0.92,
         ChaseDuration = 8.0,
         ChaseCooldown = 3,
         JumpscareDuration = 2,
@@ -227,7 +227,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 5,
         KillDistance = 160,
         ChaseRange = 600,
-        ChaseRadius = 0.94,
+        ChaseRadius = 0.9,
         ChaseDuration = 5.0,
         ChaseCooldown = 3,
         JumpscareDuration = 2,
@@ -261,7 +261,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         NAME = "Borgmire",
         ID = 8,
         CLS = 1,
-        DNG = 2,
+        DNG = 3,
         Model = "models/slashco/slashers/borgmire/borgmire.mdl",
         KillDelay = 0,
         GasCanMod = 0,
@@ -271,13 +271,35 @@ SlashCo.SlasherData = {     --Information about Slashers.
         Eyesight = 2,
         KillDistance = 0,
         ChaseRange = 1500,
-        ChaseRadius = 0.91,
+        ChaseRadius = 0.88,
         ChaseDuration = 12.0,
         ChaseCooldown = 8,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/borgmire_chase.wav",
         KillSound = ""
     }
+
+    --[[{
+        NAME = "The Free Smiley Dealer",
+        ID = 9,
+        CLS = 3,
+        DNG = 2,
+        Model = "models/slashco/slashers/freesmiley/freesmiley.mdl",
+        KillDelay = 0,
+        GasCanMod = 0,
+        ProwlSpeed = 100,
+        ChaseSpeed = 250,
+        Perception = 2.0,
+        Eyesight = 5,
+        KillDistance = 125,
+        ChaseRange = 1000,
+        ChaseRadius = 0.93,
+        ChaseDuration = 12.0,
+        ChaseCooldown = 8,
+        JumpscareDuration = 2,
+        ChaseMusic = "slashco/slasher/borgmire_chase.wav",
+        KillSound = ""
+    }]]
 
 }
 
@@ -1562,7 +1584,7 @@ SlashCo.HelicopterLeaveForIntro = function()
 		heli:StopSound("slashco/helicopter_rotors_distant.wav")
 		heli:StopSound("slashco/helicopter_engine_close.wav")
 		heli:StopSound("slashco/helicopter_rotors_close.wav")
-        
+
         timer.Simple(0.05, function()
 
 		    heli:StopSound("slashco/helicopter_engine_distant.wav")

@@ -4,25 +4,29 @@ net.Receive( "mantislashcoLobbyTimerTime", function( len, ply )
 	TimeLeft = net.ReadUInt(6)
 end)
 
-hook.Add("HUDPaint", "LobbyInfoText", function()
-		
-	net.Receive( "mantislashcoGiveLobbyStatus", function( len, ply )
-		StateOfLobby = net.ReadUInt(3)	
-	end)
+net.Receive( "mantislashcoGiveLobbyStatus", function( len, ply )
+	StateOfLobby = net.ReadUInt(3)	
+end)
 
-	net.Receive( "mantislashcoGiveLobbyInfo", function( len, ply )
-		LobbyInfoTable = net.ReadTable()
-	end)
+net.Receive( "mantislashcoGiveLobbyInfo", function( len, ply )
+	LobbyInfoTable = net.ReadTable()
+end)
 
-	net.Receive( "mantislashcoGiveMasterDatabase", function( len, ply )
+net.Receive( "mantislashcoGiveMasterDatabase", function( len, ply )
 
-		local t = net.ReadTable()
+local t = net.ReadTable()
+
+	timer.Simple(1, function()
 
 		if t[1].PlayerID != LocalPlayer():SteamID64() then return end
 
 		data_load = t
 
 	end)
+
+end)
+
+hook.Add("HUDPaint", "LobbyInfoText", function()
 
 	if game.GetMap() != "sc_lobby" then return end
 
@@ -49,6 +53,10 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	draw.SimpleText( "You have "..point_count.." Points.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.05), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	draw.SimpleText( "You have won "..srvwin_count.." Rounds as SURVIVOR.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.08), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	draw.SimpleText( "You have won "..slswin_count.." Rounds as SLASHER.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.11), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+
+	if StateOfLobby == nil or StateOfLobby < 1 then 
+		draw.SimpleText( " \" , \" to switch teams.", "LobbyFont2", scrW * 0.975, (scrH * 0.5)+425, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) 
+	end
 
 if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
 	
@@ -231,10 +239,6 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 		surface.DrawTexturedRect(ScrW()/4.55, ScrH()/1.945, ScrW()/45, Player5Yes*(1-Player5Readiness)*ScrW()/45)
 	
 	end
-	
-	
-	
-	draw.SimpleText( " \" , \" to switch teams.", "LobbyFont2", scrW * 0.975, (scrH * 0.5)+425, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 	
 	if clientReadiness != nil then
 		

@@ -66,7 +66,7 @@ do
 
     local spread = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4
 
-    if slasher:GetNWBool("SidGunAimed") and spread < 1.8 then
+    if slasher:GetNWBool("SidGunAimed") and spread < 2.4 then
 
         slasher:SetNWBool("SidGunShoot",false)
         timer.Remove("SidGunDecay")
@@ -76,7 +76,9 @@ do
 
             PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
 
-            slasher:EmitSound("slashco/slasher/sid_shot.mp3",95,100,1,6)
+            PlayGlobalSound("slashco/slasher/sid_shot.mp3", 95, slasher)
+
+            PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 85, slasher)
 
             slasher:FireBullets( 
                 {
@@ -86,23 +88,26 @@ do
                     Dir = slasher:GetAimVector(), 
                     Src = slasher:GetPos() + Vector(0,0,60), 
                     IgnoreEntity = slasher, 
-                    Spread = Vector(math.random(-5-(spread*25),5+(spread*25))*0.001,math.random(-5-(spread*25),5+(spread*25))*0.001,0)
+                    Spread = Vector(math.random(-2-(spread*25),2+(spread*25))*0.001,math.random(-2-(spread*25),2+(spread*25))*0.001,0)
 
                 }, false )
 
             local vec, ang = slasher:GetBonePosition(slasher:LookupBone( "HandL" ))
             local vPoint = vec
-            local muzzle = EffectData()
-            muzzle:SetOrigin( vPoint )
-            muzzle:SetAttachment( 1 )
-            util.Effect( "GunshipMuzzleFlash", muzzle )
+            --local muzzle = EffectData()
+            --muzzle:SetOrigin( vPoint )
+            --muzzle:SetAngles( ang )
+            --muzzle:SetScale( 500 )
+            --muzzle:SetFlags( 7 )
+            --muzzle:SetAttachment( 0 )
+            --util.Effect( "MuzzleEffect", muzzle )
 
             local shell = EffectData()
             shell:SetOrigin( vPoint )
             shell:SetAngles( ang ) 
             util.Effect( "ShellEject", shell )
 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 2
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 3
 
             timer.Create( "SidGunDecay", 1.5, 1, function() slasher:SetNWBool("SidGunShoot",false) end)
         end)
@@ -123,6 +128,8 @@ do
                 SlashCo.CurRound.SlasherData[slasherid].CanChase = false
                 SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99
 
+                PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 85, slasher, 1)
+
                 slasher:SetNWBool("SidExecuting",true)
 
                 target:SetNWBool("SurvivorSidExecution", true)
@@ -142,7 +149,9 @@ do
 
                     PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
 
-                    slasher:EmitSound("slashco/slasher/sid_shot.mp3",95,100,1,6)
+                    PlayGlobalSound("slashco/slasher/sid_shot.mp3", 95, slasher)
+
+                    PlayGlobalSound("slashco/slasher/sid_shot_2.mp3", 85, slasher)
 
                     target:SetNWBool("SurvivorSidExecution", false)
 
@@ -235,7 +244,9 @@ do
 
             if SERVER then
 
-                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 50 + (SO*50), DMG_SLASH, 50, false )
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 50 + (SO*50), DMG_SLASH, 2, false )
+
+                if not target:IsValid() then return end
 
                 if target:IsPlayer() then
 
@@ -247,6 +258,49 @@ do
                     util.Effect( "BloodImpact", bloodfx )
 
                     target:EmitSound("slashco/slasher/trollge_hit.wav") 
+
+                end
+
+                if target:GetClass() == "prop_door_rotating" then
+
+                    if SERVER then target:Fire("Open") end
+
+                    timer.Simple(0.05, function() 
+
+                        local tr = util.TraceLine( {
+                            start = slasher:EyePos(),
+                            endpos = slasher:EyePos() + slasher:GetForward() * 10000,
+                            filter = slasher
+                        } )
+
+                        local trace = util.GetSurfaceData( tr.SurfaceProps ).name
+
+
+                        local prop = ents.Create( "prop_physics" )
+                        local model = target:GetModel()
+                        prop:SetModel(model)
+                        prop:SetMoveType( MOVETYPE_NONE )
+                        --prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
+    	                prop:SetPos( target:GetPos() + slasher:GetForward()*6 + Vector(0,0,1) )
+    	                prop:SetAngles( target:GetAngles() )
+                        prop:Spawn()
+                        prop:Activate()
+                        prop:SetSkin (target:GetSkin() )
+                        local phys = prop:GetPhysicsObject()
+	                    if phys:IsValid() then phys:Wake() end
+                        phys:ApplyForceCenter( slasher:GetForward() * 30000 )
+
+                        if trace == "wood" then
+                            target:EmitSound("physics/wood/wood_crate_break"..math.random(1,5)..".wav")
+                        end
+
+                        if trace == "metal" then
+                            target:EmitSound("physics/metal/metal_box_break"..math.random(1,2)..".wav")
+                        end
+
+                        target:Remove()
+
+                    end)
 
                 end
 
@@ -343,7 +397,7 @@ end
     end
 
     ::borgpunch::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 or slasher:GetNWBool("BorgmireThrow") then return end
 do
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 < 0.01 then
@@ -358,7 +412,7 @@ do
 
             if SERVER then
 
-                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 35 + (SO*20), DMG_SLASH, 50, false )
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(50,0,50)), Vector(-35,-35,-60), Vector(35,35,60), 35 + (SO*20), DMG_SLASH, 5, false )
 
                 if not target:IsValid() then return end
 
@@ -374,6 +428,49 @@ do
                     util.Effect( "BloodImpact", bloodfx )
 
                     target:EmitSound("slashco/slasher/borgmire_hit"..math.random(1,2)..".mp3")
+
+                end
+
+                if target:GetClass() == "prop_door_rotating" then
+
+                    if SERVER then target:Fire("Open") end
+
+                    timer.Simple(0.05, function() 
+
+                        local tr = util.TraceLine( {
+                            start = slasher:EyePos(),
+                            endpos = slasher:EyePos() + slasher:GetForward() * 10000,
+                            filter = slasher
+                        } )
+
+                        local trace = util.GetSurfaceData( tr.SurfaceProps ).name
+
+
+                        local prop = ents.Create( "prop_physics" )
+                        local model = target:GetModel()
+                        prop:SetModel(model)
+                        prop:SetMoveType( MOVETYPE_NONE )
+                        --prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
+    	                prop:SetPos( target:GetPos() + slasher:GetForward()*6 + Vector(0,0,1) )
+    	                prop:SetAngles( target:GetAngles() )
+                        prop:Spawn()
+                        prop:Activate()
+                        prop:SetSkin (target:GetSkin() )
+                        local phys = prop:GetPhysicsObject()
+	                    if phys:IsValid() then phys:Wake() end
+                        phys:ApplyForceCenter( slasher:GetForward() * 60000 )
+
+                        if trace == "wood" then
+                            target:EmitSound("physics/wood/wood_crate_break"..math.random(1,5)..".wav")
+                        end
+
+                        if trace == "metal" then
+                            target:EmitSound("physics/metal/metal_box_break"..math.random(1,2)..".wav")
+                        end
+
+                        target:Remove()
+
+                    end)
 
                 end
 

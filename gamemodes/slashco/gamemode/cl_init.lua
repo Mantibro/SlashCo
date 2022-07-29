@@ -13,6 +13,7 @@ include( "cl_item_picker.lua" )
 include( "cl_offering_picker.lua" )
 include( "cl_jumpscare.lua" )
 include( "cl_offervote_hud.lua" )
+include( "cl_spectator_hud.lua" )
 
 function GM:HUDDrawTargetID()
 	return false

@@ -36,6 +36,7 @@ function ENT:RunBehaviour()
 			SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0,0,0))
 
 		end
+
 	end
 
 end
@@ -49,6 +50,20 @@ function ENT:Think()
 			self.CollideSwitch = self.CollideSwitch - FrameTime()
 		else
 			self:SetNotSolid(false)
+		end
+
+		local tr = util.TraceLine( {
+			start = self:GetPos() + Vector(0,0,50),
+			endpos = self:GetPos() + self:GetForward() * 10000,
+			filter = self
+		} )
+
+		if tr.Entity:GetClass() == "prop_door_rotating" then
+
+			if self:GetPos():Distance( tr.Entity:GetPos() ) > 150 then return end
+
+			tr.Entity:Fire("Open")
+
 		end
 
 	end

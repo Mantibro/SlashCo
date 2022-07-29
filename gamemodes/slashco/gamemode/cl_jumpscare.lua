@@ -28,7 +28,23 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 			c = true
 		end
 
-	elseif ply:GetNWBool("SurvivorJumpscare_1") == true  then
+	end
+
+	if ply:GetNWBool("SidFuck") == true  then
+		local Overlay = Material("slashco/ui/overlays/sid_fuck")
+
+		surface.SetDrawColor(255,255,255,60)	
+		surface.SetMaterial(Overlay)
+		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
+		if c == nil then
+			surface.PlaySound("slashco/slasher/sid_rage_drone.mp3")
+			c = true
+		end
+
+	end
+
+	if ply:GetNWBool("SurvivorJumpscare_1") == true  then
 
 		if f == nil then f = 0 end
 		f = f+(FrameTime()*20)

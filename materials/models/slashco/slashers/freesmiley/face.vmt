@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/freesmiley/face"
+	"$bumpmap" "models/slashco/slashers/freesmiley/face_nm"
+	"$halflambert" 1
+}

@@ -30,6 +30,8 @@ function ENT:Use( activator )
 
 if SERVER then
 
+	if self:GetNWBool("BeingEaten") then return end
+
 	if activator:Team() == TEAM_SURVIVOR then 
 
 		SlashCo.ItemPickUp(activator:SteamID64(), self:EntIndex(), 4)

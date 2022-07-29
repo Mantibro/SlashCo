@@ -27,16 +27,13 @@ do
 
     local dist = SlashCo.CurRound.SlasherData[slasherid].ChaseRange
 
-    local find = ents.FindInCone( slasher:EyePos(), slasher:GetEyeTrace().Normal, dist, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius )
+    local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius )
 
     local target = NULL
 
     for i = 1, #find do
 
         if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
-
-            --TODO trace so it doesn't count through walls
-
             target = find[i]
             break 
         end

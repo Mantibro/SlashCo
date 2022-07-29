@@ -480,7 +480,7 @@ end
 
 		local StepNotice = Material("slashco/ui/particle/step_notice")
 		if timeSinceLast == nil then timeSinceLast = 0 end
-		timeSinceLast = timeSinceLast + 0.01
+		timeSinceLast = timeSinceLast + FrameTime()
 		if timeSinceLast > 0.2 then timeSinceLast = 0 end 
 		--Survivor Step Notice
 		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
@@ -561,7 +561,7 @@ hook.Add( "Think", "Slasher_Vision_Light", function()
 		dlight.DieTime = CurTime() + 1
 	end
 end )
-hook.Add("RenderScreenspaceEffects", "PostProcessingExample", function()
+hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
 
 	if LocalPlayer():Team() != TEAM_SLASHER then return end
 

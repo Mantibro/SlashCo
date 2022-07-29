@@ -360,6 +360,8 @@ function lobbyRoundSetup()
 		SlashCo.LobbyData.SelectedSlasherInfo.NAME = SlashCo.SlasherData[rand].NAME
 		SlashCo.LobbyData.SelectedSlasherInfo.TIP = SCInfo.Slasher[rand].ProTip
 
+		SlashCo.LobbyData.FinalSlasherID = rand
+
 	elseif SlashCo.LobbyData.SelectedDifficulty == 1 then
 
 		local rand = math.random( 1, #SlashCo.SlasherData)
@@ -624,81 +626,74 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
 	if SlashCo.LobbyData.LOBBYSTATE < 1 then
 
-		if SlashCo.LobbyData.ReadyTimerStarted == false then
 
-			local seek = seek
+		local seek = seek
 
-			if num < 2 then return end
+		if num < 2 then return end
 
-			if seek == nil then seek = 0 end
+		if seek == nil then seek = 0 end
 
-			for p = 1, num do
+		for p = 1, num do
 
-				local rdy = getReadyState(player.GetBySteamID64(SlashCo.LobbyData.Players[p].steamid))
-				if rdy > 0 then seek = seek + 1 end
-
-			end
-
-			if seek >= (num / 2) then 
-				SlashCo.LobbyData.ReadyTimerStarted = true
-				lobbyReadyTimer(30)
-			end
-
-			seek = 0
+			local rdy = getReadyState(player.GetBySteamID64(SlashCo.LobbyData.Players[p].steamid))
+			if rdy > 0 then seek = seek + 1 end
 
 		end
 
-		if num < 2 and SlashCo.LobbyData.ReadyTimerStarted then 
+		if seek > (num / 2) and SlashCo.LobbyData.ReadyTimerStarted == false then 
+
+			SlashCo.LobbyData.ReadyTimerStarted = true
+
+			lobbyReadyTimer(30)
+
+		end
+
+		if seek >= num then
+
+			timer.Destroy( "AllReadyLobby")
+
+			RunConsoleCommand("lobby_debug_proceed")
+
+		end
+
+		if (	num < 2 or seek <= (num / 2)		) and SlashCo.LobbyData.ReadyTimerStarted then 
 			timer.Destroy( "AllReadyLobby" )
 			SlashCo.LobbyData.ReadyTimerStarted = false
 		end
 
+		seek = 0
+
 	end
 
 	if SlashCo.LobbyData.LOBBYSTATE == 1 then
-
-		if #SlashCo.LobbyData.AssignedSurvivors == Check and Check > 0 and SERVER then 
-			RunConsoleCommand("lobby_debug_transition") 
-		end
 
 		local minx = -1520
 		local maxx = -1360
 		local miny = -270
 		local maxy = -140
 
+		local all_players_in = true
+
 		for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
 
 			local x = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid):GetPos()[1]
 			local y = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid):GetPos()[2]
 
-				if i == 1 then 
-					if (x > minx and x < maxx) and (y > miny and y < maxy) then P1Check = 1 else P1Check = 0 end
-				end
-				if i == 2 then 
-					if (x > minx and x < maxx) and (y > miny and y < maxy) then P2Check = 1 else P2Check = 0 end
-				end
-				if i == 3 then 
-					if (x > minx and x < maxx) and (y > miny and y < maxy) then P3Check = 1 else P3Check = 0 end
-				end
-				if i == 4 then 
-					if (x > minx and x < maxx) and (y > miny and y < maxy) then P4Check = 1 else P4Check = 0 end
-				end
+			if (x > minx and x < maxx) and (y > miny and y < maxy) then 
+				--good
+				return
+			else 
+				all_players_in = false
+				break
+			end
 
 		end
 
-	else
-		P1Check = 0
-		P2Check = 0
-		P3Check = 0
-		P4Check = 0
+		if all_players_in and SERVER then 
+			RunConsoleCommand("lobby_debug_transition") 
+		end
+
 	end
-
-	if P1Check == nil then P1Check = 0 end
-	if P2Check == nil then P2Check = 0 end
-	if P3Check == nil then P3Check = 0 end
-	if P4Check == nil then P4Check = 0 end
-
-	Check = P1Check + P2Check + P3Check + P4Check
 
 end)
 

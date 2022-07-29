@@ -383,7 +383,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	::borgmire::
 
-	if ply:GetModel() != "models/slashco/slashers/borgmire/borgmire.mdl" then goto theking end --Borgmire's Animator
+	if ply:GetModel() != "models/slashco/slashers/borgmire/borgmire.mdl" then goto freesmiley end --Borgmire's Animator
 do
 
 	if not borg_punch and not borg_throw then anim_antispam = false end
@@ -420,14 +420,35 @@ do
 		anim_antispam = true 
 	end
 end
-	::theking::
+	::freesmiley::
+	if ply:GetModel() != "models/slashco/slashers/freesmiley/freesmiley.mdl" then goto next end --Free Smiley's Animator
+do
 
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_WALK
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+end
+	::next::
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
 
 hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, volume, rf )
 
+if SERVER then
 	if ply:GetNWBool("AmogusSurvivorDisguise") then return false end
 
 	if ply:Team() == TEAM_SLASHER then 
@@ -461,8 +482,58 @@ hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, 
 			ply.BorgStepTick = ply.BorgStepTick + 1
 
 			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Free Smiley Footsteps
+
+			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then ply.SmileyStepTick = 0 end
+
+			local b = true
+
+			if ply.SmileyStepTick == 0 then 
+
+				ply:EmitSound( "slashco/slasher/borgmire_step"..math.random(1,4)..".mp3")
+
+				b = false 
+			end
+
+			ply.SmileyStepTick = ply.SmileyStepTick + 1
+
+			return b
 		end
 		
 	end
+
+end
+
+if CLIENT then
+
+	if ply:GetNWBool("AmogusSurvivorDisguise") then return false end
+
+	if ply:Team() == TEAM_SLASHER then 
+
+		if ply:GetModel() == "models/slashco/slashers/baba/baba.mdl" then --Bababooey Footsteps
+			if ply:GetNWBool("BababooeyInvisibility") then return true end
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/sid/sid.mdl" then --Sid Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/trollge/trollge.mdl" then --Trollge (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/amogus/amogus.mdl" then --Amogus Footsteps
+			if ply:GetNWBool("AmogusFuelDisguise") then return true end
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/thirsty/thirsty.mdl" then --Thirsty (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/hunter/plates/plate.mdl" then --Male07Specter (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/tyler/tyler.mdl" then --Tyler (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/borgmire/borgmire.mdl" then --Borgmire Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Free Smiley Footsteps
+			return true 
+		end
+		
+	end
+
+end
 
 end )

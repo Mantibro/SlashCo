@@ -13,7 +13,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
     local gen2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].Remaining
     local bg1 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[1]:EntIndex()].HasBattery
     local bg2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].HasBattery
-    if SlashCo.CurRound.SlasherData.GameProgress > -1 then SlashCo.CurRound.SlasherData.GameProgress = (gpg - gen1) + (gpg - gen2) + BoolToNumber(bg1) + BoolToNumber(bg2) end
+    --if SlashCo.CurRound.SlasherData.GameProgress > -1 then SlashCo.CurRound.SlasherData.GameProgress = (gpg - gen1) + (gpg - gen2) + BoolToNumber(bg1) + BoolToNumber(bg2) end
 
 for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
@@ -37,18 +37,17 @@ do
         a = SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick
         SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = a + FrameTime()
 
-        local inv = (1 - SlashCo.CurRound.SlasherData[slasherid].ChaseRadius) / 2
+        --local inv = (1 - SlashCo.CurRound.SlasherData[slasherid].ChaseRadius) / 2
+        local inv = -0.2
 
-        local find = ents.FindInCone( slasher:EyePos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius + inv )
+        local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius + inv )
 
         for i = 1, #find do
 
             if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
 
-                --TODO trace so it doesn't count through walls
-
                 SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
-                break 
+
             end
 
         end
@@ -689,7 +688,7 @@ do
 
 end
     ::BORGMIRE::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto THEKING end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto FREESMILEY end
 do
 
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Time Spent chasing
@@ -745,7 +744,7 @@ do
     end
 
 end
-    ::THEKING::
+    ::FREESMILEY::
 
 end
 
@@ -762,7 +761,7 @@ SlashCo.ThirstyRage = function(ply)
 
         if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then return end
 
-        if slasher:GetPos():Distance( pos ) > 1400 then return end
+        if slasher:GetPos():Distance( pos ) > 1600 then return end
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 6
         slasher:SetNWBool("ThirstyBigMlik", true)
@@ -778,6 +777,43 @@ SlashCo.ThirstyRage = function(ply)
                 local ply = player.GetAll()[i]
                 ply:SetNWBool("ThirstyFuck",false)
             end
+        
+        end)
+
+    end
+
+end
+
+SlashCo.SidRage = function(ply)
+
+    local pos = ply:GetPos()
+
+    for i = 1, #team.GetPlayers(TEAM_SLASHER) do
+
+        local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
+        local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2 then return end
+
+        if slasher:GetPos():Distance( pos ) > 1800 then return end
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 2
+
+        PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 95, slasher, 1)
+
+        for i = 1, #player.GetAll() do
+            local ply = player.GetAll()[i]
+            ply:SetNWBool("SidFuck",true)
+        end
+
+        timer.Simple(3, function() 
+        
+            for i = 1, #player.GetAll() do
+                local ply = player.GetAll()[i]
+                ply:SetNWBool("SidFuck",false)
+            end
+
+            PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85, slasher, 1)
         
         end)
 

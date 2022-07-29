@@ -67,8 +67,6 @@ function GM:Initialize()
 
 	end
 
-	RunConsoleCommand('hud_deathnotice_time', '0')
-
 end
 
 hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, ent )
@@ -76,6 +74,10 @@ hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, ent )
 	if ply:Team() == TEAM_SLASHER then
 
 		if SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherID == 6 and SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherValue1 == 0 then
+			return false
+		end
+
+		if SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherID == 7 and SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherValue1 == 0 then
 			return false
 		end
 
@@ -413,6 +415,9 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 
 	if SERVER then
 
+	ply:SetTeam(TEAM_SPECTATOR)
+	ply:Spawn()
+
 	local pid = ply:SteamID64()
 	local data = {}
 
@@ -438,8 +443,6 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 	SlashCo.PlayerData[pid].RoundsWonSurvivor = data.Stats.RoundsWon.Survivor or 0
 	SlashCo.PlayerData[pid].RoundsWonSlasher = data.Stats.RoundsWon.Slasher or 0
 
-	ply:SetTeam(TEAM_SPECTATOR)
-	ply:Spawn()
 	hook.Run("LobbyInfoText")
 
 	SlashCoDatabase.OnPlayerJoined(pid)
@@ -451,6 +454,8 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 	SlashCo.BroadcastCurrentRoundData()
 
 	timer.Simple(5, function() SlashCo.BroadcastMasterDatabaseForClient(pid) end)
+
+	RunConsoleCommand('hud_deathnotice_time', '0')
 
 end
 

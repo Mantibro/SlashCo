@@ -121,14 +121,14 @@ end
 
     ::BORGMIRE::
     --Borgmire's Throw \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto THEKING end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto FREESMILEY end
 
     if slasher:GetEyeTrace().Entity:IsPlayer() and not slasher:GetNWBool("BorgmireThrow") then
         local target = slasher:GetEyeTrace().Entity	
 
         if target:Team() != TEAM_SURVIVOR then return end
 
-        if slasher:GetPos():Distance(target:GetPos()) < 150 and not target:GetNWBool("SurvivorBeingJumpscared") then
+        if slasher:GetPos():Distance(target:GetPos()) < 200 and not target:GetNWBool("SurvivorBeingJumpscared") then
 
             slasher:SetNWBool("BorgmireThrow",true)
 
@@ -141,12 +141,17 @@ end
 
             target:SetPos(slasher:GetPos() + Vector(0,0,100))
 
+            for i = 1, 13 do
+            
+                timer.Simple(0.1 + (i/10), function() target:SetPos(slasher:GetPos() + Vector(0,0,100)) end)
+
+            end
 
             timer.Simple(1.5, function()
 
-                target:SetPos(slasher:GetPos() + Vector(40,0,110))
+                target:SetPos(slasher:GetPos() + Vector(45,0,50))
 
-                target:SetVelocity( (slasher:GetForward() * 2000) + Vector(0,0,500) )
+                target:SetVelocity( (slasher:GetForward() * 1500) + Vector(0,0,800) )
 
                 target:Freeze(false)
                 if target:Health() > 1 then target:SetHealth( target:Health() - (target:Health() / 4) ) end
@@ -165,6 +170,6 @@ end
 
     --Borgmire's Throw /\ /\ \/
 
-    ::THEKING::
+    ::FREESMILEY::
     
 end

@@ -61,16 +61,16 @@ SCInfo.Slasher = {
     {
         Name = "Borgmire",
         Class = "Cryptid",
-        Danger = "Considerable",
+        Danger = "Devastating",
         Description = "The Brute Slasher who can overpower survivors with overwhelming strength.\n\n-Borgmire is most effective in short chases.\n-He can pick up and throw nearby Survivors for heavy damage.",
         ProTip = "-This Slasher seems to suffer from exhaustion during long chases."
     },
 
     {
-        Name = "The King",
-        Class = "Demon",
+        Name = "The Free Smiley Dealer",
+        Class = "Umbra",
         Danger = "Considerable",
-        Description = "The Glutton Slasher who must eat burgers to grow his power.\n\n-T.\n-T.\nT.",
+        Description = "The Summoner Slasher who can raise minions to help with the Hunt.\n\n-T.\n-T.\nT.",
         ProTip = "-."
     }
 

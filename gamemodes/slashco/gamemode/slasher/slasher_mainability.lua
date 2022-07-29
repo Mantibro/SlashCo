@@ -98,6 +98,8 @@ end --ends here
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 99
             slasher:EmitSound("slashco/slasher/sid_cookie"..math.random(1,2)..".mp3")
 
+            target:SetNWBool("BeingEaten", true)
+
             timer.Simple(1.3, function() 
                 slasher:EmitSound("slashco/slasher/sid_eating.mp3")
             end)
@@ -339,7 +341,7 @@ end --ends here
 
     ::TYLER::
     --Tyler's State Switch \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto THEKING end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto FREESMILEY end
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 0 then
 
@@ -364,6 +366,6 @@ end --ends here
 
     --Borgmire has no main ability
 
-    ::THEKING::
+    ::FREESMILEY::
 
 end

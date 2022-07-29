@@ -27,6 +27,7 @@ AddCSLuaFile( "cl_intro_hud.lua" )
 AddCSLuaFile( "cl_roundend_hud.lua" )
 AddCSLuaFile( "cl_jumpscare.lua" )
 AddCSLuaFile( "cl_offervote_hud.lua" )
+AddCSLuaFile( "cl_spectator_hud.lua" )
 
 local cycle_players = CreateConVar( "slashco_player_cycle", "0", FCVAR_REPLICATED )
 
