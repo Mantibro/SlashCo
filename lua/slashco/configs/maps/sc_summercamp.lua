@@ -84,9 +84,9 @@
 	},
 	"Helicopter": {
 
-		"StartInitialLocation": {
-			"pos":  [8082, -1932, 53.076942443848],
-			"ang":  [-1, -136, 0]		   
+		"IntroLocation": {
+			"pos":  [8123, -1898, 50.715209960938],
+			"ang":  [0, -136, 0]				  
 		},
 
 		"StartLocation": {

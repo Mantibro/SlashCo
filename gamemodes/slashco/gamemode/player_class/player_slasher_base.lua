@@ -30,25 +30,6 @@ player_manager.RegisterClass("player_slasher_base", PLAYER, "player_default")
 --Slasher Animation Controller
 hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
-	if ply:Team() == TEAM_SURVIVOR then
-
-		if not ply:GetNWBool("SurvivorSidExecution") then surv_anim_antispam = false end
-
-		if ply:GetNWBool("SurvivorSidExecution") then
-
-			ply.CalcIdeal = ACT_DIESIMPLE
-			ply.CalcSeqOverride = ply:LookupSequence("taunt_cali")
-			--ply:SetPlaybackRate( 0.1 )
-			if surv_anim_antispam == nil or surv_anim_antispam == false then ply:SetCycle( 0 ) surv_anim_antispam = true end
-
-			return ply.CalcIdeal, ply.CalcSeqOverride
-
-		else
-			return
-		end
-
-	end
-
 	if ply:Team() != TEAM_SLASHER then
 		return
 	end
@@ -81,6 +62,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	local tyler_creating = ply:GetNWBool("TylerCreating")
 
 	local borg_punch = ply:GetNWBool("BorgmirePunch")
+	local borg_throw = ply:GetNWBool("BorgmireThrow")
 
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
@@ -404,7 +386,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	if ply:GetModel() != "models/slashco/slashers/borgmire/borgmire.mdl" then goto theking end --Borgmire's Animator
 do
 
-	if not borg_punch then anim_antispam = false end
+	if not borg_punch and not borg_throw then anim_antispam = false end
 
 	if ply:IsOnGround() then
 
@@ -424,7 +406,17 @@ do
 
 
 	if borg_punch and (anim_antispam == nil or anim_antispam == false) then
-		ply:AddVCDSequenceToGestureSlot( 1, ply:LookupSequence("Attack_MELEE"), 0, true )
+
+		local r = math.random(1,2)
+		local PunchAnim = ""
+		if r == 1 then PunchAnim = "Attack_FIST" else PunchAnim = "Attack_MELEE" end
+
+		ply:AddVCDSequenceToGestureSlot( 1, ply:LookupSequence(PunchAnim), 0, true )
+		anim_antispam = true 
+	end
+
+	if borg_throw and (anim_antispam == nil or anim_antispam == false) then
+		ply:AddVCDSequenceToGestureSlot( 1, ply:LookupSequence("attack_throw"), 0, true )
 		anim_antispam = true 
 	end
 end
@@ -459,6 +451,15 @@ hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, 
 		elseif ply:GetModel() == "models/hunter/plates/plate.mdl" then --Male07Specter (no) Footsteps
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/tyler/tyler.mdl" then --Tyler (no) Footsteps
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/borgmire/borgmire.mdl" then --Borgmire Footsteps
+
+			if ply.BorgStepTick == nil or ply.BorgStepTick > 1 then ply.BorgStepTick = 0 end
+
+			if ply.BorgStepTick == 0 then ply:EmitSound( "slashco/slasher/borgmire_step"..math.random(1,4)..".mp3") end
+
+			ply.BorgStepTick = ply.BorgStepTick + 1
+
 			return true 
 		end
 		

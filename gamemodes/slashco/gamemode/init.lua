@@ -67,6 +67,8 @@ function GM:Initialize()
 
 	end
 
+	RunConsoleCommand('hud_deathnotice_time', '0')
+
 end
 
 hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, ent )
@@ -613,3 +615,7 @@ end )
 function GM:HUDShouldDraw(element)
 	return (element != "CHudDeathNotice");
 end
+
+hook.Add( "GetFallDamage", "RealisticDamage", function( ply, speed )
+    return ( speed / 12 )
+end )

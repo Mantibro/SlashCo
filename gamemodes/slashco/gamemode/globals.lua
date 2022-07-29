@@ -20,6 +20,18 @@ SlashCo.Maps = {
         LEVELS = {
             500
         }
+    },
+
+    {
+        ID = "sc_highschool",
+        NAME = "Black Lake High School",
+        SIZE = 2,
+        MIN_PLAYERS = 2,
+        LEVELS = {
+            -160,
+            100,
+            600
+        }
     }
 
     --[[{
@@ -747,6 +759,10 @@ SlashCo.ValidateMap = function(map)
 
     SlashCo.CurRound.HelicopterSpawnPosition = Vector(json.Helicopter.StartLocation.pos[1],json.Helicopter.StartLocation.pos[2],json.Helicopter.StartLocation.pos[3])
 
+    SlashCo.CurRound.HelicopterIntroPosition = Vector(json.Helicopter.IntroLocation.pos[1],json.Helicopter.IntroLocation.pos[2],json.Helicopter.IntroLocation.pos[3])
+
+    SlashCo.CurRound.HelicopterIntroAngle = Angle(json.Helicopter.IntroLocation.ang[1],json.Helicopter.IntroLocation.ang[2],json.Helicopter.IntroLocation.ang[3])
+
     --Add gas can spawns to the number of item spawns if allowed by the config
     local usesGasSpawns = ""
     if json.Items.IncludeGasCanSpawns then
@@ -1349,6 +1365,16 @@ SlashCo.SpawnCurConfig = function()
         GAMEMODE.State = GAMEMODE.States.IN_GAME
         SlashCo.CurRound.SlasherData.GameProgress = 0
 
+        SlashCo.UpdateHelicopterSeek( SlashCo.CurRound.HelicopterIntroPosition )
+
+        SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterIntroPosition, SlashCo.CurRound.HelicopterIntroAngle )
+
+        timer.Simple(8, function()
+
+            SlashCo.HelicopterTakeOffIntro()
+    
+        end)
+
     else
 
     end
@@ -1410,6 +1436,8 @@ end
 
 SlashCo.SummonEscapeHelicopter = function()
 
+    if SlashCo.CurRound.EscapeHelicopterSummoned then return end
+
     SlashCo.CurRound.EscapeHelicopterSummoned = true
 
 	--[[
@@ -1459,11 +1487,9 @@ SlashCo.HelicopterGoAboveLand = function(id)
     local pos = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].pos
     local ang = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].ang 
 
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3]+1500)
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3]+1000)
 
-    local delay = math.sqrt( ents.GetByIndex(id):GetPos():Distance(Vector(pos[1],pos[2],pos[3]+1500)) ) / 5
-
-    print(delay)
+    local delay = math.sqrt( ents.GetByIndex(id):GetPos():Distance(Vector(pos[1],pos[2],pos[3]+1000)) ) / 5
 
     timer.Simple(delay, function()
 
@@ -1494,11 +1520,23 @@ end
 
 SlashCo.HelicopterTakeOff = function()
 
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+1500)
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+1000)
 
-    timer.Simple(12, function()
+    timer.Simple(9, function()
 
         SlashCo.HelicopterFinalLeave()
+
+    end)
+
+end
+
+SlashCo.HelicopterTakeOffIntro = function()
+
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],SlashCo.CurRound.HelicopterTargetPosition[2],SlashCo.CurRound.HelicopterTargetPosition[3]+1000)
+
+    timer.Simple(9, function()
+
+        SlashCo.HelicopterLeaveForIntro()
 
     end)
 
@@ -1507,6 +1545,36 @@ end
 SlashCo.HelicopterFinalLeave = function()
 
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],SlashCo.CurRound.HelicopterSpawnPosition[2],SlashCo.CurRound.HelicopterSpawnPosition[3])
+
+end
+
+SlashCo.HelicopterLeaveForIntro = function()
+
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],SlashCo.CurRound.HelicopterSpawnPosition[2],SlashCo.CurRound.HelicopterSpawnPosition[3])
+
+    local delay = math.sqrt( ents.GetByIndex(SlashCo.CurRound.Helicopter):GetPos():Distance(Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],SlashCo.CurRound.HelicopterSpawnPosition[2],SlashCo.CurRound.HelicopterSpawnPosition[3])) ) / 5
+
+    timer.Simple(delay, function()
+
+        local heli = ents.GetByIndex(SlashCo.CurRound.Helicopter)
+
+        heli:StopSound("slashco/helicopter_engine_distant.wav")
+		heli:StopSound("slashco/helicopter_rotors_distant.wav")
+		heli:StopSound("slashco/helicopter_engine_close.wav")
+		heli:StopSound("slashco/helicopter_rotors_close.wav")
+        
+        timer.Simple(0.05, function()
+
+		    heli:StopSound("slashco/helicopter_engine_distant.wav")
+		    heli:StopSound("slashco/helicopter_rotors_distant.wav")
+		    heli:StopSound("slashco/helicopter_engine_close.wav")
+		    heli:StopSound("slashco/helicopter_rotors_close.wav")
+
+            SlashCo.RemoveHelicopter()
+
+        end)
+
+    end)
 
 end
 

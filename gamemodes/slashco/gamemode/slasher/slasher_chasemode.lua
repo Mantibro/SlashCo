@@ -33,17 +33,25 @@ do
 
     for i = 1, #find do
 
-        --if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
+        if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
 
             --TODO trace so it doesn't count through walls
 
             target = find[i]
             break 
-        --end
+        end
 
     end
 
     if not target:IsValid() then return end
+
+    local tr = util.TraceLine( {
+        start = slasher:EyePos(),
+        endpos = target:GetPos()+Vector(0,0,50),
+        filter = slasher
+    } )
+
+    if tr.Entity != target then return end
 
     if slasher:GetPos():Distance(target:GetPos()) < dist then
 

@@ -194,7 +194,7 @@ do
                     bloodfx:SetOrigin( vPoint )
                     util.Effect( "BloodImpact", bloodfx )
 
-                    slasher:EmitSound("slashco/slasher/trollge_hit.wav")
+                    target:EmitSound("slashco/slasher/trollge_hit.wav")
 
                     SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1 + SO
 
@@ -246,7 +246,7 @@ do
                     bloodfx:SetOrigin( vPoint )
                     util.Effect( "BloodImpact", bloodfx )
 
-                    slasher:EmitSound("slashco/slasher/trollge_hit.wav") 
+                    target:EmitSound("slashco/slasher/trollge_hit.wav") 
 
                 end
 
@@ -354,22 +354,26 @@ do
 
         timer.Simple(0.3, function() 
 
-            slasher:EmitSound("slashco/slasher/trollge_swing.wav")
+            slasher:EmitSound("slashco/slasher/borgmire_swing"..math.random(1,2)..".mp3")
 
             if SERVER then
 
                 local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 35 + (SO*20), DMG_SLASH, 50, false )
 
-                if target:IsPlayer() then
+                if not target:IsValid() then return end
 
-                    if target:Team() != TEAM_SURVIVOR then return end
+                if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) or target:GetClass() == "prop_ragdoll" then
 
-                    local vPoint = target:GetPos() + Vector(0,0,50)
+                    local o = Vector(0,0,0)
+
+                    if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) then o = Vector(0,0,50) end
+
+                    local vPoint = target:GetPos() + o
                     local bloodfx = EffectData()
                     bloodfx:SetOrigin( vPoint )
                     util.Effect( "BloodImpact", bloodfx )
 
-                    slasher:EmitSound("slashco/slasher/trollge_hit.wav") 
+                    target:EmitSound("slashco/slasher/borgmire_hit"..math.random(1,2)..".mp3")
 
                 end
 

@@ -23,13 +23,17 @@ function ENT:Initialize()
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetMoveType( MOVETYPE_NONE )
 
+		self.EnableMovement = false
+
+		self.final_dir = self:GetAngles()[2]
+
 		timer.Simple(0.1, function()
 
 			self:ResetSequence( 1 )
 
 			SlashCo.UpdateHelicopterSeek(self:GetPos())
 
-			EnableMovement = true
+			self.EnableMovement = true
 	
 		end)
 	end
@@ -51,6 +55,8 @@ function ENT:Use( activator, caller, useType, value )
 		local userEnteredAlready = false
 
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
+
+		if game.GetMap() != "sc_lobby" and SlashCo.CurRound.EscapeHelicopterSummoned == false then return end
 
 		if SatPlayers[4] == nil then availabilityHeli = true end
 
@@ -172,19 +178,24 @@ function ENT:Think()
 
 	TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
 
-	if EnableMovement and TargetPosition != nil then
+	if self.EnableMovement and TargetPosition != nil then
+
+		if pitchgo == nil then pitchgo = 0 end
+
+		if sway_x == nil then sway_x = 0 end
+		if sway_y == nil then sway_y = 0 end
+		if sway_z == nil then sway_z = 0 end
+
+		if self.final_dir == nil then self.final_dir = 0 end
 
 		if acceleration == nil then acceleration = 0 end
 
-		targsmoothx = math.sqrt( math.abs(TargetPosition[1] - self:GetPos()[1]) ) * sign(TargetPosition[1] - self:GetPos()[1])
+		if targsmoothx == nil then targsmoothx = 0 end
+		if targsmoothy == nil then targsmoothy = 0 end
+		if targsmoothz == nil then targsmoothz = 0 end
 
-		targsmoothy = math.sqrt( math.abs(TargetPosition[2] - self:GetPos()[2]) ) * sign(TargetPosition[2] - self:GetPos()[2])
+		if vel == nil then vel = 0 end
 
-		targsmoothz = math.sqrt( math.abs(TargetPosition[3] - self:GetPos()[3]) ) * sign(TargetPosition[3] - self:GetPos()[3])
-
-		local vel = Vector(targsmoothx,targsmoothy,targsmoothz):Length()
-
-		local pitchgo = acceleration*vel / 16
 		local IsAirborne = 1
 
 		local ground = util.TraceLine( {
@@ -206,6 +217,19 @@ function ENT:Think()
 
 		end
 
+		self:SetAngles(	 Angle(pitchgo+sway_x,self.final_dir+sway_y,sway_z)	)
+		self:SetPos( self:GetPos() +   ((Vector(targsmoothx*acceleration-sway_x,targsmoothy*acceleration-sway_y,targsmoothz*acceleration-sway_z)) / 8 )  )
+
+		--Calculate it all afterwards
+
+		targsmoothx = math.sqrt( math.abs(TargetPosition[1] - self:GetPos()[1]) ) * sign(TargetPosition[1] - self:GetPos()[1])
+
+		targsmoothy = math.sqrt( math.abs(TargetPosition[2] - self:GetPos()[2]) ) * sign(TargetPosition[2] - self:GetPos()[2])
+
+		targsmoothz = math.sqrt( math.abs(TargetPosition[3] - self:GetPos()[3]) ) * sign(TargetPosition[3] - self:GetPos()[3])
+
+		vel = Vector(targsmoothx,targsmoothy,targsmoothz):Length()
+
 		sway_x = IsAirborne*math.sin(CurTime()*0.6)*(2+(pitchgo*2))
 		sway_y = IsAirborne*math.sin(CurTime()*1)*(1.5+(pitchgo*2))
 		sway_z = IsAirborne*math.sin(CurTime()*0.8)*(2+(pitchgo*2))
@@ -214,13 +238,11 @@ function ENT:Think()
 
 		local dir_length_sqr = Vector(targsmoothx-sway_x,targsmoothy-sway_y,0):Length()
 
-		if final_dir == nil then final_dir = 0 end
-
 		if dir_length > 2 then 
 
 			directional = Vector(targsmoothx,targsmoothy,targsmoothz):Angle()[2] * sign(Vector(targsmoothx,targsmoothy,targsmoothz):Length())
 
-			final_dir = final_dir + (	sign(-final_dir+directional)	*math.sqrt(acceleration*dir_length_sqr/25)*acceleration*	(math.abs(-final_dir+directional)	/	130)	)
+			self.final_dir = self.final_dir + (	sign(-self.final_dir+directional)	*math.sqrt(acceleration*dir_length_sqr/25)*acceleration*	(math.abs(-self.final_dir+directional)	/	130)	)
 
 			if acceleration == 1.1 then acceleration = 0 end
 
@@ -231,11 +253,7 @@ function ENT:Think()
 
 		end
 
-
-		self:SetPos( self:GetPos() +   ((Vector(targsmoothx*acceleration-sway_x,targsmoothy*acceleration-sway_y,targsmoothz*acceleration-sway_z)) / 8 )  )
-		--Entity(1):ChatPrint(tostring(vel))
-
-		self:SetAngles(	 Angle(pitchgo+sway_x,final_dir+sway_y,sway_z)	)
+		pitchgo = acceleration*vel / 16
 
 	end
 
