@@ -119,7 +119,7 @@ do
     
             if target:Team() != TEAM_SURVIVOR then return end
     
-            if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+            if slasher:GetPos():Distance(target:GetPos()) < dist*1.4 and not target:GetNWBool("SurvivorBeingJumpscared") then
     
                 target:SetNWBool("SurvivorBeingJumpscared",true)
     
@@ -145,10 +145,14 @@ do
 
                 timer.Simple(1, function() 
                     target:EmitSound("ambient/voices/citizen_beaten4.wav") 
+                    target:SetEyeAngles(   Angle(0,slasher:GetAngles()[2],0)   )  
+                    target:SetPos(slasher:GetPos())
                 end)
 
                 timer.Simple(3, function()               
-                    target:EmitSound("ambient/voices/citizen_beaten3.wav")              
+                    target:EmitSound("ambient/voices/citizen_beaten3.wav")  
+                    target:SetEyeAngles(   Angle(0,slasher:GetAngles()[2],0)   )  
+                    target:SetPos(slasher:GetPos())            
                 end)
 
                 timer.Simple(3.95, function() 
@@ -272,7 +276,7 @@ do
 
             if SERVER then
 
-                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,0)), Vector(-30,-30,-60), Vector(30,30,60), 50 + (SO*50), DMG_SLASH, 2, false )
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,60)), Vector(-30,-40,-60), Vector(30,40,60), 50 + (SO*50), DMG_SLASH, 2, false )
 
                 if not target:IsValid() then return end
 
@@ -440,7 +444,7 @@ do
 
             if SERVER then
 
-                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(50,0,50)), Vector(-35,-35,-60), Vector(35,35,60), 35 + (SO*20), DMG_SLASH, 5, false )
+                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(50,0,50)), Vector(-35,-45,-60), Vector(35,45,60), 35 + (SO*20), DMG_SLASH, 5, false )
 
                 if not target:IsValid() then return end
 

@@ -120,7 +120,7 @@ concommand.Add( "lobby_reset", function( ply, cmd, args )
 	
 	SlashCo.LobbyData.LOBBYSTATE = 0
 
-	table.Empty(SlashCo.LobbyData.ChosenItems)
+	table.Empty(SlashCo.LobbyData.Players)
 
 	SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_lobby_primary"))
     SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Close")
@@ -532,7 +532,7 @@ function lobbyRoundSetup()
 	net.WriteTable(SlashCo.SlasherData)
 	net.Broadcast()
 
-	BeginSlasherSelection()
+	if SlashCo.LobbyData.SelectedDifficulty > 0 then BeginSlasherSelection() end
 
 	end
 
@@ -549,16 +549,20 @@ function BeginSlasherSelection()
 end
 
 net.Receive("mantiSlashCoSelectSlasher", function()
-    
-	id = net.ReadUInt(3)
 
-	ChooseTheSlasher(id)
+	if SERVER then
+		rec_id = net.ReadTable()
+		print("[SlashCo] Received. ("..rec_id.pick..")")
+		SlashCo.ChooseTheSlasherLobby(rec_id.pick)
+	end
 
 end)
+SlashCo.ChooseTheSlasherLobby = function(id)
 
-function ChooseTheSlasher(id)
-
-	SlashCo.LobbyData.FinalSlasherID = id
+	if SERVER then
+		SlashCo.LobbyData.FinalSlasherID = id
+		print("[SlashCo] Slasher Picked. ("..id..")")
+	end
 
 end
 
@@ -681,7 +685,6 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
 			if (x > minx and x < maxx) and (y > miny and y < maxy) then 
 				--good
-				return
 			else 
 				all_players_in = false
 				break
@@ -716,7 +719,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 
 			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid then
 
-				ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
+				ply:ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
 
 				for i, play in ipairs( player.GetAll() ) do

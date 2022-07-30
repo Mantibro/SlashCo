@@ -159,7 +159,7 @@ function ENT:Think()
 
 			SlashCo.AddGas( self )
 
-			SlashCoDatabase.UpdateStats(SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer, "Points", 5)
+			SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer].PointsTotal + 5
 
 			AntiSpam = false
 			self:StopSound("slashco/generator_fill.wav")
@@ -180,7 +180,8 @@ function ENT:Think()
 
 				if SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer == SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer then
 
-					SlashCoDatabase.UpdateStats(SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer, "Points", 25)
+					--SlashCoDatabase.UpdateStats(SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer, "Points", 25)
+					SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer].PointsTotal + 25
 
 				end
 

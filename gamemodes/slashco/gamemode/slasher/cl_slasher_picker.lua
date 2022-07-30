@@ -41,13 +41,13 @@ function HideSelection()
 
 end
 
-function SlasherChosen(slashID)
+function SlasherChosen(My_Pick)
 
 	net.Start("mantiSlashCoSelectSlasher")
-	net.WriteUInt(slashID,3)
+	net.WriteTable({pick = My_Pick})
 	net.SendToServer()
 
-	print("Slasher chosen with the ID of "..slashID)
+	print("Slasher chosen with the ID of "..My_Pick)
 
 end
 
@@ -66,7 +66,7 @@ function DrawTheSlasherSelectorBox()
 
 	if ( IsValid( SlasherSelectFrame ) ) then print("not valid!") return end
 
-	if  SlasherPickingID != 0 then SlasherChosen(SlasherPickingID) return end
+	--if  SlasherPickingID != 0 then SlasherChosen(SlasherPickingID) return end
 	
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create( "DFrame" )

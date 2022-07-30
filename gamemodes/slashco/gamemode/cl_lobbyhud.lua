@@ -16,7 +16,7 @@ net.Receive( "mantislashcoGiveMasterDatabase", function( len, ply )
 
 local t = net.ReadTable()
 
-	timer.Simple(1, function()
+	timer.Simple(4, function()
 
 		if t[1].PlayerID != LocalPlayer():SteamID64() then return end
 
@@ -50,6 +50,8 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
 	end
 
+	local scrW, scrH = ScrW(), ScrH()
+
 	draw.SimpleText( "You have "..point_count.." Points.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.05), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	draw.SimpleText( "You have won "..srvwin_count.." Rounds as SURVIVOR.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.08), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 	draw.SimpleText( "You have won "..slswin_count.." Rounds as SLASHER.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.11), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
@@ -59,8 +61,6 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	end
 
 if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
-	
-	local scrW, scrH = ScrW(), ScrH()
 
 	local Tablet = Material("slashco/ui/lobby_backdrop")
 	local ReadyCheck = Material("slashco/ui/lobby_ready")

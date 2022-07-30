@@ -58,6 +58,8 @@ function ENT:Think()
 			filter = self
 		} )
 
+		if not IsValid(tr.Entity) then return end
+
 		if tr.Entity:GetClass() == "prop_door_rotating" then
 
 			if self:GetPos():Distance( tr.Entity:GetPos() ) > 150 then return end

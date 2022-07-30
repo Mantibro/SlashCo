@@ -1,6 +1,6 @@
 include( "ui/fonts.lua" )
 
-hook.Add("HUDPaint", "RoundOutroHUD", function()
+hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	local ply = LocalPlayer()
 

@@ -149,9 +149,9 @@ end
 
             timer.Simple(1.5, function()
 
-                target:SetPos(slasher:GetPos() + Vector(45,0,50))
+                target:SetPos(slasher:GetPos() + Vector(47,0,53))
 
-                target:SetVelocity( (slasher:GetForward() * 1500) + Vector(0,0,800) )
+                target:SetVelocity( (slasher:GetForward() * 1600) + Vector(0,0,800) )
 
                 target:Freeze(false)
                 if target:Health() > 1 then target:SetHealth( target:Health() - (target:Health() / 4) ) end

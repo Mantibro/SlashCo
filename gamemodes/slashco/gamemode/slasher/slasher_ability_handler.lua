@@ -13,7 +13,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
     local gen2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].Remaining
     local bg1 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[1]:EntIndex()].HasBattery
     local bg2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].HasBattery
-    --if SlashCo.CurRound.SlasherData.GameProgress > -1 then SlashCo.CurRound.SlasherData.GameProgress = (gpg - gen1) + (gpg - gen2) + BoolToNumber(bg1) + BoolToNumber(bg2) end
+    if SlashCo.CurRound.SlasherData.GameProgress > -1 then SlashCo.CurRound.SlasherData.GameProgress = (gpg - gen1) + (gpg - gen2) + BoolToNumber(bg1) + BoolToNumber(bg2) end
 
 for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
@@ -421,7 +421,7 @@ do
 
             --Timer - 10 seconds + Game Progress (1-10) ^ 3 (SO - x2)
 
-            if v2 > 1 + (SlashCo.CurRound.SlasherData.GameProgress*2) +  math.pow( SlashCo.CurRound.SlasherData.GameProgress, 2 ) * (1 + SO) then 
+            if v2 > 1 + (SlashCo.CurRound.SlasherData.GameProgress*1.5) +  (0.75 * math.pow( SlashCo.CurRound.SlasherData.GameProgress, 2 ) ) * (1 + SO) then 
 
                 --Become Monster
 
@@ -724,8 +724,8 @@ do
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + FrameTime()
 
-        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 10 ) )
-        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 10 )  )
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 12 ) )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 12 )  )
 
         if slasher.ChaseSound == nil then
 

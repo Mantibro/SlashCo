@@ -443,6 +443,8 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 	SlashCo.PlayerData[pid].RoundsWonSurvivor = data.Stats.RoundsWon.Survivor or 0
 	SlashCo.PlayerData[pid].RoundsWonSlasher = data.Stats.RoundsWon.Slasher or 0
 
+	SlashCo.PlayerData[pid].PointsTotal = 0
+
 	hook.Run("LobbyInfoText")
 
 	SlashCoDatabase.OnPlayerJoined(pid)

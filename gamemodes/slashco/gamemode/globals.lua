@@ -1223,26 +1223,38 @@ SlashCo.EndRound = function()
 
         SlashCo.RemoveHelicopter()
 
+        if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
+            --Add to stats of the remaining survivors' wins.
+            for i = 1, #SlashCo.CurRound.HelicopterRescuedPlayers do
+
+                SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "SurvivorRoundsWon", 1)
+
+                SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal + 15
+
+            end
+        end
+
         local survivors = team.GetPlayers(TEAM_SURVIVOR)
         for i=1, #survivors do
+
             survivors[i]:SetTeam(TEAM_SPECTATOR)
             survivors[i]:Spawn()
+
+        end
+
+        for i = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
+            local man = SlashCo.CurRound.SlasherData.AllSurvivors[i].id
+
+            if IsValid(player.GetBySteamID64( man )) then 
+                SlashCoDatabase.UpdateStats(man, "Points", SlashCo.PlayerData[man].PointsTotal)
+            end
+
         end
 
         local slashers = team.GetPlayers(TEAM_SLASHER)
         for i=1, #slashers do
             slashers[i]:SetTeam(TEAM_SPECTATOR)
             slashers[i]:Spawn()
-        end
-
-        if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
-            --Add to stats of the remaining survivors' wins.
-            for i = 1, #SlashCo.CurRound.HelicopterRescuedPlayers do
-
-                SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "SurvivorRoundsWon", 1)
-                SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "Points", 15)
-
-            end
         end
 
         if #survivors < 1 then
