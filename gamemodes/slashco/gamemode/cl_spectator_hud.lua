@@ -15,10 +15,9 @@ end)
 
 hook.Add("KeyPress", "ToggleLight", function(ply, key) 
 
-	if vision == nil then vision = false end
-	if game.GetMap() == "sc_lobby" then return end
+	if ply != LocalPlayer() then return end
 
-	if input.IsKeyDown( 28 ) then 
+	if key == 28  then 
 		vision = not vision
 	end
 

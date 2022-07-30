@@ -515,9 +515,33 @@ function GM:PlayerDeath(victim, inflictor, attacker)
 				local ragdoll = ents.Create("prop_ragdoll")
 				ragdoll:SetModel(victim:GetModel())
 				ragdoll:SetPos(victim:GetPos())
-				ragdoll:SetAngles(victim:GetAngles())
 				ragdoll:SetNoDraw(false)
 				ragdoll:Spawn()
+
+				local ang_offset = 0
+
+				if victim:GetNWBool("SurvivorDecapitate") then
+
+					ragdoll:ManipulateBoneScale( ragdoll:LookupBone( "ValveBiped.Bip01_Head1" ), Vector(0,0,0) )
+
+					local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone( "ValveBiped.Bip01_Head1" ))
+
+                	local bloodfx = EffectData()
+                	bloodfx:SetOrigin( vPoint )
+                	util.Effect( "BloodImpact", bloodfx )
+
+					local dripfx = EffectData()
+                	dripfx:SetOrigin( vPoint )
+					dripfx:SetFlags( 3 )
+					dripfx:SetColor( 0 )
+					dripfx:SetScale( 6 )
+                	util.Effect( "bloodspray", dripfx )
+
+					ang_offset = 180
+
+				end
+
+				ragdoll:SetAngles(Angle(0,victim:EyeAngles()[2] + ang_offset,0))
 
 				local physCount = ragdoll:GetPhysicsObjectCount()
 	
@@ -533,7 +557,7 @@ function GM:PlayerDeath(victim, inflictor, attacker)
 							local plybone = victim:TranslateBoneToPhysBone( b )
 
 							if plybone == PhysBone then
-								PhysBone:AlignAngles( PhysBone:GetAngles(), plybone:GetAngles())
+								PhysBone:SetAngles( PhysBone:GetAngles(), plybone:GetAngles())
 							end
 
 						end

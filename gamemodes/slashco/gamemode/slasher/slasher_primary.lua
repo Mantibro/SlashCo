@@ -76,9 +76,9 @@ do
 
             PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
 
-            PlayGlobalSound("slashco/slasher/sid_shot.mp3", 95, slasher)
+            PlayGlobalSound("slashco/slasher/sid_shot.mp3", 85, slasher)
 
-            PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 85, slasher)
+            PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 78, slasher)
 
             slasher:FireBullets( 
                 {
@@ -88,19 +88,17 @@ do
                     Dir = slasher:GetAimVector(), 
                     Src = slasher:GetPos() + Vector(0,0,60), 
                     IgnoreEntity = slasher, 
-                    Spread = Vector(math.random(-2-(spread*25),2+(spread*25))*0.001,math.random(-2-(spread*25),2+(spread*25))*0.001,0)
+                    Spread = Vector(math.Rand(-1-(spread*25),1+(spread*25))*0.001,math.Rand(-1-(spread*25),1+(spread*25))*0.001,0)
 
                 }, false )
 
             local vec, ang = slasher:GetBonePosition(slasher:LookupBone( "HandL" ))
             local vPoint = vec
-            --local muzzle = EffectData()
-            --muzzle:SetOrigin( vPoint )
-            --muzzle:SetAngles( ang )
-            --muzzle:SetScale( 500 )
-            --muzzle:SetFlags( 7 )
-            --muzzle:SetAttachment( 0 )
-            --util.Effect( "MuzzleEffect", muzzle )
+            local muzzle = EffectData()
+            muzzle:SetOrigin( vPoint + slasher:GetForward()*8 + Vector(0,0,2) )
+            muzzle:SetStart( Vector(255,0,0) )
+            muzzle:SetAttachment( 0 )
+            util.Effect( "sid_muzzle", muzzle )
 
             local shell = EffectData()
             shell:SetOrigin( vPoint )
@@ -132,6 +130,8 @@ do
 
                 slasher:SetNWBool("SidExecuting",true)
 
+                target:SetNWBool("SurvivorDecapitate",true)
+
                 target:SetNWBool("SurvivorSidExecution", true)
 
                 target:SetPos(slasher:GetPos())
@@ -142,6 +142,20 @@ do
                 slasher:Freeze(true)
     
                 SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+
+                timer.Simple(1, function() 
+                    target:EmitSound("ambient/voices/citizen_beaten4.wav") 
+                end)
+
+                timer.Simple(3, function()               
+                    target:EmitSound("ambient/voices/citizen_beaten3.wav")              
+                end)
+
+                timer.Simple(3.95, function() 
+                
+                    target:SetEyeAngles(   Angle(0,180+slasher:GetAngles()[2],0)   ) 
+                
+                end)
     
                 timer.Simple(4.1, function()
     
@@ -149,16 +163,29 @@ do
 
                     PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
 
-                    PlayGlobalSound("slashco/slasher/sid_shot.mp3", 95, slasher)
+                    slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
 
-                    PlayGlobalSound("slashco/slasher/sid_shot_2.mp3", 85, slasher)
+                    slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
+
+                    local vec, ang = slasher:GetBonePosition(slasher:LookupBone( "HandL" ))
+                    local vPoint = vec
+                    local muzzle = EffectData()
+                    muzzle:SetOrigin( vPoint + slasher:GetForward()*8 + Vector(0,0,2) )
+                    muzzle:SetStart( Vector(255,0,0) )
+                    muzzle:SetAttachment( 0 )
+                    util.Effect( "sid_muzzle", muzzle )
+
+                    local shell = EffectData()
+                    shell:SetOrigin( vPoint )
+                    shell:SetAngles( ang ) 
+                    util.Effect( "ShellEject", shell )
 
                     target:SetNWBool("SurvivorSidExecution", false)
 
                     target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
 
                     target:Freeze(false)
-                    target:SetVelocity( slasher:GetForward() * 500 )
+                    target:SetVelocity( slasher:GetForward() * 300 )
                     target:SetNotSolid(false)
                     timer.Simple(0.05, function() target:Kill() end)
             
@@ -167,6 +194,7 @@ do
                 timer.Simple(8, function()
                     slasher:Freeze(false)
                     slasher:SetNWBool("SidExecuting",false)
+                    target:SetNWBool("SurvivorDecapitate",false)
                 end)
             end
     

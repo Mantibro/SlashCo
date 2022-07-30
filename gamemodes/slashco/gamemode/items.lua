@@ -32,6 +32,8 @@ SlashCo.UseItem = function(ply)
 
 	if ply:Team() != TEAM_SURVIVOR then return end
 
+	if ply:IsFrozen() then return end
+
 	local itid = SlashCo.GetHeldItem(ply)
 
 	--Skip the non-usable items
@@ -72,6 +74,8 @@ SlashCo.UseItem = function(ply)
 			ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 
         end)
+
+		SlashCo.SidRage(ply)
 
 	end
 
@@ -284,9 +288,11 @@ SlashCo.DropItem = function(ply)
 
 	if SERVER then
 
-	--if game.GetMap() == "sc_lobby" then return end
+	if game.GetMap() == "sc_lobby" then return end
 
 	if ply:Team() != TEAM_SURVIVOR then return end
+
+	if ply:IsFrozen() then return end
 
 	local itid = SlashCo.GetHeldItem(ply)
 
