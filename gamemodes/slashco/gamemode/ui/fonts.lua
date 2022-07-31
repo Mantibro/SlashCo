@@ -1,7 +1,26 @@
 surface.CreateFont( "LobbyFont1", {
-	font = "Arial", --  Use the font-name which is shown to you by your operating system Font Viewer, not the file name
+	font = "CA Alternative Three", --  Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	extended = false,
-	size = 25,
+	size = 30,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+	color = black,
+} )
+
+surface.CreateFont( "PlayersFont", {
+	font = "CA Alternative Three", --  Use the font-name which is shown to you by your operating system Font Viewer, not the file name
+	extended = false,
+	size = 20,
 	weight = 500,
 	blursize = 0,
 	scanlines = 0,
@@ -18,7 +37,7 @@ surface.CreateFont( "LobbyFont1", {
 } )
 
 surface.CreateFont( "LobbyFont2", {
-	font = "Arial", 
+	font = "Anklepants", 
 	extended = false,
 	size = 50,
 	weight = 500,
@@ -35,10 +54,65 @@ surface.CreateFont( "LobbyFont2", {
 	outline = false,
 } )
 
-surface.CreateFont( "BriefingFont", {
-	font = "Arial", 
+surface.CreateFont( "MenuFont1", {
+	font = "CA Alternative Three", --  Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	extended = false,
-	size = 100,
+	size = 15,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+	color = black,
+} )
+
+surface.CreateFont( "MenuFont2", {
+	font = "Anklepants", 
+	extended = false,
+	size = 20,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+} )
+
+surface.CreateFont( "MenuFont3", {
+	font = "Anklepants", 
+	extended = false,
+	size = 35,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+} )
+
+surface.CreateFont( "BriefingFont", {
+	font = "Anklepants", 
+	extended = false,
+	size = 60,
 	weight = 500,
 	blursize = 0,
 	scanlines = 0,
@@ -54,7 +128,43 @@ surface.CreateFont( "BriefingFont", {
 } )
 
 surface.CreateFont( "BriefingNoteFont", {
-	font = "Arial", 
+	font = "Forcible BRK", 
+	extended = false,
+	size = 20,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+} )
+
+surface.CreateFont( "IntroFont", {
+	font = "CA Alternative Three",
+	extended = false,
+	size = 50,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false,
+} )
+
+surface.CreateFont( "ItemFont", {
+	font = "CA Alternative Three", 
 	extended = false,
 	size = 30,
 	weight = 500,
@@ -71,46 +181,10 @@ surface.CreateFont( "BriefingNoteFont", {
 	outline = false,
 } )
 
-surface.CreateFont( "IntroFont", {
-	font = "Arial",
-	extended = false,
-	size = 75,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-} )
-
-surface.CreateFont( "ItemFont", {
-	font = "Arial", 
-	extended = false,
-	size = 50,
-	weight = 500,
-	blursize = 0,
-	scanlines = 0,
-	antialias = true,
-	underline = false,
-	italic = false,
-	strikeout = false,
-	symbol = false,
-	rotary = false,
-	shadow = false,
-	additive = false,
-	outline = false,
-} )
-
 surface.CreateFont( "ItemFontTip", {
-	font = "Arial", 
+	font = "CA Alternative Three", 
 	extended = false,
-	size = 40,
+	size = 25,
 	weight = 500,
 	blursize = 0,
 	scanlines = 0,
@@ -126,9 +200,9 @@ surface.CreateFont( "ItemFontTip", {
 } )
 
 surface.CreateFont( "OutroFont", {
-	font = "Arial",
+	font = "CA Alternative Three",
 	extended = false,
-	size = 50,
+	size = 40,
 	weight = 500,
 	blursize = 0,
 	scanlines = 0,

@@ -432,7 +432,7 @@ end
 
 		--Slasher Main Icon
 
-		draw.SimpleText( SlashName, "IntroFont", mainiconposx+(cx/4), mainiconposy+(mainiconposy/5), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		draw.SimpleText( SlashName, "LobbyFont2", mainiconposx+(cx/4), mainiconposy+(mainiconposy/4.25), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 
 		if not willdrawmain then goto skipmain end
 
@@ -480,7 +480,7 @@ end
 
 		local StepNotice = Material("slashco/ui/particle/step_notice")
 		if timeSinceLast == nil then timeSinceLast = 0 end
-		timeSinceLast = timeSinceLast + FrameTime()
+		timeSinceLast = timeSinceLast + FrameTime()/3
 		if timeSinceLast > 0.2 then timeSinceLast = 0 end 
 		--Survivor Step Notice
 		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do

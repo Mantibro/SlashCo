@@ -63,6 +63,42 @@ local PLAYER_LINE = {
 		--local friend = self.Player:GetFriendStatus()
 		--MsgN( pl, " Friend: ", friend )
 
+		self.team_status = TEAM_SPECTATOR
+
+		if PlayerData == nil then goto SKIP end
+
+		for p = 1, #player.GetAll() do
+			local pl = player.GetAll()[p]
+			local found = false
+
+			for i = 1, #PlayerData.survivors do
+				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].steamid)
+
+				if pot_s == pl then
+					self.team_status = TEAM_SURVIVOR
+					found = true
+					break 
+				end
+
+			end
+
+			for i = 1, #PlayerData.slashers do
+				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].steamid)
+
+				if pot_s == pl then
+					self.team_status = TEAM_SLASHER
+					found = true
+					break 
+				end
+
+			end
+
+			if found then break end
+
+		end
+
+		::SKIP::
+
 	end,
 
 	Think = function( self )
@@ -116,54 +152,18 @@ local PLAYER_LINE = {
 			return
 		end
 
-		local team_status = TEAM_SPECTATOR
+		self.teamorder = 0
 
-		if PlayerData == nil then goto SKIP end
-
-		for p = 1, #player.GetAll() do
-			local pl = player.GetAll()[p]
-			local found = false
-
-			for i = 1, #PlayerData.survivors do
-				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].steamid)
-
-				if pot_s == pl then
-					team_status = TEAM_SURVIVOR
-					found = true
-					break 
-				end
-
-			end
-
-			for i = 1, #PlayerData.slashers do
-				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].steamid)
-
-				if pot_s == pl then
-					team_status = TEAM_SURVIVOR
-					found = true
-					break 
-				end
-
-			end
-
-			if found then break end
-
+		if self.team_status== TEAM_SPECTATOR then
+			self.teamorder = 500
 		end
 
-		::SKIP::
-
-		local teamorder = 0
-
-		if team_status== TEAM_SPECTATOR then
-			teamorder = 500
+		if self.team_status == TEAM_SURVIVOR then
+			self.teamorder = 50
 		end
 
-		if team_status == TEAM_SURVIVOR then
-			teamorder = 50
-		end
-
-		if team_status == TEAM_SLASHER then
-			teamorder = 0
+		if self.team_status == TEAM_SLASHER then
+			self.teamorder = 0
 		end
 
 		--
@@ -171,7 +171,7 @@ local PLAYER_LINE = {
 		-- so if we set the z order according to kills they'll be ordered that way!
 		-- Careful though, it's a signed short internally, so needs to range between -32,768k and +32,767
 		--
-		self:SetZPos( ( -50 ) + self.Player:EntIndex() + teamorder )
+		self:SetZPos( ( -50 ) + self.Player:EntIndex() + self.teamorder )
 
 	end,
 
@@ -190,57 +190,21 @@ local PLAYER_LINE = {
 		--	return
 		--end
 
-		local team_status = TEAM_SPECTATOR
+		self.teamcolor = Color(0,0,0,255)
 
-		if PlayerData == nil then goto SKIP end
-
-		for p = 1, #player.GetAll() do
-			local pl = player.GetAll()[p]
-			local found = false
-
-			for i = 1, #PlayerData.survivors do
-				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].id)
-
-				if pot_s == pl then
-					team_status = TEAM_SURVIVOR
-					found = true
-					break 
-				end
-
-			end
-
-			for i = 1, #PlayerData.slashers do
-				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].s_id)
-
-				if pot_s == pl then
-					team_status = TEAM_SLASHER
-					found = true
-					break 
-				end
-
-			end
-
-			if found then break end
-
+		if self.team_status == TEAM_SPECTATOR then
+			self.teamcolor = Color(220,220,220,255)
 		end
 
-		::SKIP::
-
-		local teamcolor = Color(0,0,0,255)
-
-		if team_status == TEAM_SPECTATOR then
-			teamcolor = Color(220,220,220,255)
+		if self.team_status == TEAM_SURVIVOR then
+			self.teamcolor = Color(255,255,255,255)
 		end
 
-		if team_status == TEAM_SURVIVOR then
-			teamcolor = Color(255,255,255,255)
+		if self.team_status == TEAM_SLASHER then
+			self.teamcolor = Color(255,0,0,255)
 		end
 
-		if team_status == TEAM_SLASHER then
-			teamcolor = Color(255,0,0,255)
-		end
-
-		draw.RoundedBox( 4, 0, 0, w, h,teamcolor )
+		draw.RoundedBox( 4, 0, 0, w, h,self.teamcolor )
 	end
 }
 

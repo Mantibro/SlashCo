@@ -40,7 +40,13 @@ do
 
     end
 
-    if not target:IsValid() then return end
+    if not target:IsValid() then 
+        if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist then
+            target = slasher:GetEyeTrace().Entity
+        else
+            return 
+        end
+    end
 
     local tr = util.TraceLine( {
         start = slasher:EyePos(),

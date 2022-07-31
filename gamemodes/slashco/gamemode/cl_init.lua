@@ -14,10 +14,21 @@ include( "cl_offering_picker.lua" )
 include( "cl_jumpscare.lua" )
 include( "cl_offervote_hud.lua" )
 include( "cl_spectator_hud.lua" )
+include( "cl_playermodel_picker.lua" )
 
 function GM:HUDDrawTargetID()
 	return false
 end 
+
+hook.Add("KeyPress", "PlayerSelect", function(ply, key) 
+
+	if ply != LocalPlayer() or ply:Team() != TEAM_LOBBY then return end
+
+	if key == 8192 then 
+		DrawThePlayermodelSelectorBox()
+    end
+
+end)
 
 net.Receive("octoSlashCoTestConfigHalos", function()
     hook.Add("PreDrawHalos", "octoSlashCoTestConfigPreDrawHalos", function()
@@ -248,7 +259,7 @@ do
 
         if  offering_name != nil then text = offering_name.." Offering" end
 
-		surface.SetFont( "LobbyFont2" )
+		surface.SetFont( "LobbyFont1" )
 		local tW, tH = surface.GetTextSize( text )
 
 		local pad = 5
@@ -257,7 +268,7 @@ do
 		surface.DrawRect( -tW / 2 - pad, -pad, tW + pad * 2, tH + pad * 2 )
 
 		-- Draw some text
-		draw.SimpleText( text, "LobbyFont2", -tW / 2, 0, color_white )
+		draw.SimpleText( text, "LobbyFont1", -tW / 2, 0, color_white )
 	cam.End3D2D()
 
 end

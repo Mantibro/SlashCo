@@ -159,3 +159,19 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		f = nil
 	end
 end)
+
+hook.Add("CalcView", "ThirdPersonSurvivorView", function(ply, pos, angles, fov)
+
+	if ply:Team() != TEAM_SURVIVOR then return end
+
+	if ply:GetNWBool("SurvivorSidExecution") then
+
+		pos = ply:LocalToWorld( Vector(120,120,60) )
+		angles = ply:LocalToWorldAngles( Angle(0,-135,0) )
+
+		return GAMEMODE:CalcView(ply, pos, angles, fov)
+	else
+		return
+	end
+
+end)

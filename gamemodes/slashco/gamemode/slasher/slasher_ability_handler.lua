@@ -52,6 +52,13 @@ do
 
         end
 
+        if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist * 2 then
+            SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
+            find = slasher:GetEyeTrace().Entity
+        end
+
+        if not find:GetNWBool("SurvivorChased") then find:SetNWBool("SurvivorChased",true) end
+
         if a > SlashCo.CurRound.SlasherData[slasherid].ChaseDuration then 
 
             slasher:SetNWBool("InSlasherChaseMode", false) 
@@ -63,6 +70,13 @@ do
             SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown
 
             timer.Simple(0.25, function() slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic) end)
+        end
+
+        if not slasher:GetNWBool("InSlasherChaseMode") then
+            for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+                local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+                if ply:GetNWBool("SurvivorChased") then ply:SetNWBool("SurvivorChased",false) end
+            end
         end
 end
         ::CONTINUE::
@@ -190,7 +204,7 @@ end
 
             slasher:SetNWBool("SidGunLetterC", true)
 
-            PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.wav",95,slasher, 0.7)
+            PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.wav",95,slasher, 0.5)
 
         end
     end

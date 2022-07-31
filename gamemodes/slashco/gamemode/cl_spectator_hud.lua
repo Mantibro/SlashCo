@@ -8,6 +8,11 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	if game.GetMap() == "sc_lobby" then return end
 
+	if SlasherSteamID != nil and SlasherSteamID == LocalPlayer():SteamID64() then
+		draw.SimpleText("You will spawn as "..SlashName.." soon. . ." , "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color( 255, 50, 50, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+		return
+	end
+
 	draw.SimpleText("You are Spectating" , "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.06), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 	draw.SimpleText("LMB to follow player. | Space to switch view. | R to toggle illumination." , "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.12), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
@@ -15,9 +20,13 @@ end)
 
 hook.Add("KeyPress", "ToggleLight", function(ply, key) 
 
-	if ply != LocalPlayer() then return end
+	if ply != LocalPlayer() or LocalPlayer():Team() != TEAM_SPECTATOR  then return end
 
-	if key == 28  then 
+	if SlasherSteamID != nil and SlasherSteamID == LocalPlayer():SteamID64() then
+		return
+	end
+
+	if key == 8192  then 
 		vision = not vision
 	end
 
@@ -29,6 +38,10 @@ hook.Add( "Think", "Spectator_Vision_Light", function()
 
 	if LocalPlayer():Team() != TEAM_SPECTATOR then return end
 	if not vision then return end
+
+	if SlasherSteamID != nil and SlasherSteamID == LocalPlayer():SteamID64() then
+		return
+	end
 
 	--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright ) 
 

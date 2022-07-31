@@ -32,18 +32,34 @@ net.Receive( "mantislashcoRoundEnd", function( len, ply )
 
 end)
 
+net.Receive( "mantislashcoHelicopterMusic", function( len, ply )
+
+	if LocalPlayer():Team() == TEAM_SLASHER then return end
+
+	if stop_helimusic != true and (helimusic_antispam == nil or helimusic_antispam != true) then  
+		heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
+		heli_music:Play()
+		helimusic_antispam = true 
+	end
+
+	if stop_helimusic then heli_music:Stop() end
+
+end)
+
 hook.Add("HUDPaint", "RoundOutroHUD", function()
 
 	local ply = LocalPlayer()
 
 	--Round Ending screen
 
+	if helimusic_antispam == true and LocalPlayer():GetNWBool("SurvivorChased") then stop_helimusic = true end
+
 	if show_roundend_screen != true then return end
 
-	--local tick = tick
 	if re_tick == nil then re_tick = 0 end
-	re_tick = re_tick + 1.5
+	re_tick = re_tick + FrameTime() * 1.5
 
+	stop_helimusic = true
 
 	local black = Material("models/slashco/slashers/trollge/body")
 

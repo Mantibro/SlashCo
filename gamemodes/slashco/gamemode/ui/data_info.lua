@@ -6,8 +6,11 @@ SCInfo.Slasher = {
         Name = "Bababaooey",
         Class = "Cryptid",
         Danger = "Moderate",
-        Description = "The Phantom Slasher which specialises in illusion abilities to catch survivors off-guard.\n\n-Bababooey can turn himself invisible.\n-He can create a phantom clone of himself to scare and locate Survivors.",
-        ProTip = "-This Slasher has the ability to vanish into thin air."
+        Description = "The Phantom Slasher which specialises in illusion abilities to catch \nsurvivors off-guard.\n\n-Bababooey can turn himself invisible.\n-He can create a phantom clone of himself to scare and locate Survivors.",
+        ProTip = "-This Slasher has the ability to vanish into thin air.",
+        SpeedRating = "★★★☆☆",
+        EyeRating = "★★★☆☆",
+        DiffRating = "★☆☆☆☆"
     },
 
     {
@@ -15,23 +18,32 @@ SCInfo.Slasher = {
         Class = "Demon",
         Danger = "Considerable",
         Description = "The Psychotic Slasher which keeps his rage in check with Cookies.\n\n-Sid gains speed while chasing over time, but starts out slow.\n-Cookies will pacify him for a while.\n-Sid's special ability allows him to devastate Survivors at long range.",
-        ProTip = "-Loud gunshots have been heard in zones where this Slasher was present."
+        ProTip = "-Loud gunshots have been heard in zones where this Slasher was present.",
+        SpeedRating = "★★☆☆☆",
+        EyeRating = "★★★☆☆",
+        DiffRating = "★★★★☆"
     },
 
     {
         Name = "Trollge",
         Class = "Umbra",
         Danger = "Devastating",
-        Description = "Troll.",
-        ProTip = "-Its eyesight seems to be limited to moving objects."
+        Description = "The Bloodthirsty Slasher whose power grows with the amount of\nblood he has collected.\n\n-Trollge cannot see Survivors who stand still.\n-He must collect enough blood to unlock his true form.\n-He can not collect blood after the round has progressed enough.",
+        ProTip = "-Its eyesight seems to be limited to moving objects.",
+        SpeedRating = "★★☆☆☆",
+        EyeRating = "★★☆☆☆",
+        DiffRating = "★★★★★"
     },
 
     {
         Name = "Amogus",
         Class = "Cryptid",
         Danger = "Moderate",
-        Description = "The Imposter Slasher who is the master of deception and hiding in plain sight.\n\n-Amogus can assume the form of one of a Survivor.\n-He can assume the form of a Fuel Can.\n-Amogus is really loud while running.",
-        ProTip = "-This Slasher can disguise itself as a human."
+        Description = "The Imposter Slasher who is the master of deception and hiding in plain sight.\n\n-Amogus can assume the form of a Survivor.\n-He can assume the form of a Fuel Can.\n-Amogus is really loud while running.",
+        ProTip = "-This Slasher can disguise itself as a human.",
+        SpeedRating = "★★☆☆☆",
+        EyeRating = "★★★☆☆",
+        DiffRating = "★★★☆☆"
     },
 
     {
@@ -39,7 +51,10 @@ SCInfo.Slasher = {
         Class = "Demon",
         Danger = "Considerable",
         Description = "The Milk Slasher whose abilities depend on his level of Thirst.\n\n-Thirsty must drink Jugs of Milk to reset his thirst.\n-The Thirstier he is, the slower he is, but can sense the position of players.\n-Thirsty is really quiet.",
-        ProTip = "-This Slasher is heavily linked with Milk Jugs."
+        ProTip = "-This Slasher is heavily linked with Milk Jugs.",
+        SpeedRating = "★☆☆☆☆",
+        EyeRating = "★★★★★",
+        DiffRating = "★★★★☆"
     },
 
     {
@@ -47,7 +62,10 @@ SCInfo.Slasher = {
         Class = "Umbra",
         Danger = "Devastating",
         Description = "The Omniscient Slasher which can possess one of his many clones.\n\n-Male_07 will turn into a monstrous entity after a long enough chase.\n-He can keep his deadlier human form for longer as the game progresses.",
-        ProTip = "-1.\n-2."
+        ProTip = "-This Slasher is incorporeal and can possess vessels.",
+        SpeedRating = "★★★★★",
+        EyeRating = "★★☆☆☆",
+        DiffRating = "★★★☆☆"
     },
 
     {
@@ -55,7 +73,10 @@ SCInfo.Slasher = {
         Class = "Demon",
         Danger = "Devastating",
         Description = "The Balance Slasher who controls the progress of the round.\n\n-Tyler has two forms. Creator, and Destroyer.\n-Tyler, the Creator will create gas cans for survivors upon being found.\nTyler, the Destroyer will destroy anything in its path.",
-        ProTip = "-Noticeably fewer Fuel Cans were spotted in this Slasher's Zone."
+        ProTip = "-Noticeably fewer Fuel Cans were spotted in this Slasher's Zone.",
+        SpeedRating = "★★★★★",
+        EyeRating = "★☆☆☆☆",
+        DiffRating = "★★★★☆"
     },
 
     {
@@ -63,7 +84,10 @@ SCInfo.Slasher = {
         Class = "Cryptid",
         Danger = "Devastating",
         Description = "The Brute Slasher who can overpower survivors with overwhelming strength.\n\n-Borgmire is most effective in short chases.\n-He can pick up and throw nearby Survivors for heavy damage.",
-        ProTip = "-This Slasher seems to suffer from exhaustion during long chases."
+        ProTip = "-This Slasher seems to suffer from exhaustion during long chases.",
+        SpeedRating = "★★★★☆",
+        EyeRating = "★☆☆☆☆",
+        DiffRating = "★☆☆☆☆"
     },
 
     {
@@ -71,7 +95,10 @@ SCInfo.Slasher = {
         Class = "Umbra",
         Danger = "Considerable",
         Description = "The Summoner Slasher who can raise minions to help with the Hunt.\n\n-T.\n-T.\nT.",
-        ProTip = "-."
+        ProTip = "-.",
+        SpeedRating = "★☆☆☆☆",
+        EyeRating = "★☆☆☆☆",
+        DiffRating = "★★★☆☆"
     }
 
 }
@@ -81,43 +108,43 @@ SCInfo.Item = {
     {
         Name = "Fuel Can",
         Price = 15,
-        Description = "A jerry can full of high-octane gas. Useful for refuelling Cars and Generators. \nTaking it with you will reduce how much gas you will find within the Zone. \nOnce you drop this item, you will not be able to store it again."
+        Description = "A jerry can full of high-octane gas. Useful for refuelling Cars and \nGenerators. Taking it with you will reduce how much gas you will find\nwithin the Zone. \nOnce you drop this item, you will not be able to store it again."
     },
 
     {
         Name = "The Deathward",
         Price = 95,
-        Description = "A ceramic, skull-shaped charm. Will save you from certain death, but only once. \nYour team can only have a limited amount of them.\nThis item will take up your Item Slot, even if spent."
+        Description = "A ceramic, skull-shaped charm. Will save you from certain death,\nbut only once. Your team can only have a limited amount of them.\nThis item will take up your Item Slot, even if spent."
     },
 
     {
         Name = "Milk Jug",
         Price = 35,
-        Description = "A jug of fresh milk. Consuming it will grant you a large speed boost for a short while. \nEspecially useful when encountering a certain Slasher."
+        Description = "A jug of fresh milk. Consuming it will grant you a large speed boost\n for a short while.\nA certain Slasher seems to really like this item."
     },
 
     {
         Name = "Cookie",
         Price = 30,
-        Description = "A large chocolate chip cookie. Consuming it will grant you a speed boost for a limited time. \nEspecially useful when encountering a certain Slasher."
+        Description = "A large chocolate chip cookie. Consuming it will grant you a speed boost\nfor a limited time. \nA certain Slasher seems to really like this item."
     },
 
     {
         Name = "Mayonnaise",
         Price = 15,
-        Description = "A large jar full of highly caloric mayonnaise. Consuming it will grant you a massive boost \nto your health. \nEspecially useful when encountering a certain Slasher."
+        Description = "A large jar full of highly caloric mayonnaise. Consuming it will grant \nyou a massive boost to your health."
     },
 
     {
         Name = "Step Decoy",
         Price = 5,
-        Description = "A worn, metallic boot. \nIf placed on a solid surface, it will imitate footsteps sounds which can distract Slashers."
+        Description = "A worn, metallic boot. \nIf placed on a solid surface, it will imitate footsteps sounds which can\ndistract Slashers."
     },
 
     {
         Name = "The Baby",
         Price = 65,
-        Description = "A decrepit-looking doll of a baby. Upon use, this item will halve your health and teleport \nyou away from the slasher. \nThe lower your health, the more likely you are to suffer a premature death upon use."
+        Description = "A decrepit-looking doll of a baby. Upon use, this item will halve your \nhealth and teleport you away from the slasher. \nThe lower your health, the more likely you are to\nsuffer a premature death upon use."
     },
 
     {
@@ -141,7 +168,7 @@ SCInfo.Item = {
     {
         Name = "Personal Radio Set",
         Price = 0,
-        Description = "A full set of short-wave radio transmitters which will allow your team to communicate remotely. \nOnly one can be taken."
+        Description = "A full set of short-wave radio transmitters which will allow your team\nto communicate remotely. Only one can be taken."
     }
 
 }
@@ -158,11 +185,10 @@ SCInfo.RoundEnd = {
         FullTeam = "All of the dispatched SlashCo Workers were rescued.",
         NonFullTeam = "Not all of the dispatched SlashCo Workers could be rescued.",
         AlivePlayers = " were reported present on the rescue helicopter.",
-        DeadPlayers = " were confirmed dead.",
+        DeadPlayers = " could not make it out alive.",
         LeftBehindPlayers = " had to be left behind.",
         Fail = "The dispatched SlashCo Workers could not be rescued.",
         OnlyOneAlive = " was the only one to survive.",
-        OnlyOneDead = " was confirmed dead."
     },
 
     {
@@ -186,7 +212,7 @@ SCInfo.Offering = {
     {
         Name = "Satiation",
         Rarity = 1,
-        Description = "The Slasher will be a Demon, and its items will be scarce,\nBut\nThe items will have greater effect.",
+        Description = "The Slasher will be a Demon,\nand its items will be scarce,\nBut\nThe items will have greater effect.",
         GasCanMod = 0
     },
 

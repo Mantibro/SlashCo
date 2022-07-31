@@ -60,6 +60,8 @@ util.AddNetworkString("mantislashcoGiveMasterDatabase")
 
 util.AddNetworkString("mantislashcoSendRoundData")
 
+util.AddNetworkString("mantislashcoHelicopterMusic")
+
 function PlayGlobalSound(sound, level, ent, vol)
 
 	if vol == nil then vol = 1 end
@@ -344,11 +346,7 @@ SlashCo.RoundOverScreen = function(state)
 			l3 = alive_survivors..SCInfo.RoundEnd[2].OnlyOneAlive
 		end
 
-		if #dead_survivors > 1 then 
-			l4 = dead_survivors..SCInfo.RoundEnd[2].DeadPlayers
-		else
-			l4 = dead_survivors..SCInfo.RoundEnd[2].OnlyOneDead
-		end
+		l4 = dead_survivors..SCInfo.RoundEnd[2].DeadPlayers
 
 		if #absurv_table > 0 then
 			l5 = abandoned_survivors..SCInfo.RoundEnd[2].LeftBehindPlayers

@@ -32,9 +32,9 @@ SlashCo.Maps = {
             100,
             600
         }
-    }
+    },
 
-    --[[{
+    {
         ID = "rp_deadcity",
         NAME = "Dead City",
         SIZE = 3,
@@ -43,9 +43,9 @@ SlashCo.Maps = {
             150,
             350
         }
-    },
+    }
 
-    {
+    --[[{
         ID = "rp_redforest",
         NAME = "Red Forest",
         SIZE = 4,
@@ -469,7 +469,6 @@ if SERVER then
 
                 print("[SlashCo] Selecting Slasher for player with id: "..id)        
                 if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
-                --if s == 1 then SlashCo.SelectSlasher(6, id) end
                 if s == 2 then SlashCo.SelectSlasher(tonumber(slasher2id), id) end
 
             end)
@@ -1272,6 +1271,20 @@ SlashCo.EndRound = function()
     end)
 end
 
+SlashCo.RoundHeadstart = function()
+
+    if #SlashCo.CurRound.SlasherData.AllSurvivors > 3 then return end
+
+    for i = 1, (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
+
+        local r = ents.FindByClass("sc_generator")[math.random(1,2)]:EntIndex()
+
+        SlashCo.CurRound.Generators[r].Remaining =  SlashCo.CurRound.Generators[r].Remaining - 1
+
+    end
+
+end
+
 SlashCo.SurvivorWinFinish = function()
     local delay = 16
 
@@ -1409,6 +1422,10 @@ SlashCo.SpawnCurConfig = function()
     
         end)
 
+        SlashCo.RoundHeadstart()
+
+        SlashCo.BroadcastSlasherData()
+
     else
 
     end
@@ -1511,6 +1528,9 @@ SlashCo.CreateEscapeHelicopter = function()
         SlashCo.HelicopterGoAboveLand(entID)
 
     end)
+
+    net.Start("mantislashcoHelicopterMusic")
+	net.Broadcast()
 
 end
 
@@ -1716,6 +1736,37 @@ SlashCo.TraceHullLocator = function()
     pos = tr_l.HitPos
 
     return pos
+
+end
+
+SlashCo.RadialTester = function(ent, dist)
+
+    local last_best_angle = 0
+    local last_greatest_distance = 0
+
+    for i = 1, 359 do
+
+        local ang = ent:GetAngles()[2] + i
+
+        local tr = util.TraceLine( {
+            start = ent:GetPos() + Vector(0,0,60),
+            endpos = (  ent:GetAngles() + Angle(0,ang,0)    ):Forward() * dist,
+            filter = ent
+        } )
+
+        if not tr.Hit then return ang end
+
+        if ( tr.HitPos - tr.StartPos ):Length() > last_greatest_distance then
+
+            last_greatest_distance = ( tr.HitPos - tr.StartPos ):Length()
+
+            last_best_angle = ang
+
+        end
+
+    end
+
+    return last_best_angle
 
 end
 

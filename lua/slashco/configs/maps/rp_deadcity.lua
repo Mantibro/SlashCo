@@ -97,9 +97,13 @@
 	},
 	"Helicopter": {
 	
+		"IntroLocation": {
+			"pos":  [5576, -2441, 37.209922790527],
+			"ang":  [0, 135, 0]							 
+		},
+
 		"StartLocation": {
             "pos":  [13202, 11283, 3325.875732]
-
         },
 		
 		"Spawnpoints": {

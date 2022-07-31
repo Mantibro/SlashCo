@@ -47,22 +47,24 @@ function DrawTheSelectorBox()
 		local Item = vgui.Create( "DButton", ItemSelectFrame )
 		function Item.DoClick() SelectThisItem(i) end
 		Item:SetPos( 10, y )
-		Item:SetSize( 130, 20 )
+		Item:SetSize( 160, 30 )
 		Item:SetText( SCInfo.Item[i].Name )
+		Item:SetFont( "MenuFont1" )
 
 		if SelectedItem == i  then
 			Item:SetDisabled( true )
 		end
 			
-		y = y + 30
+		y = y + 40
 		
 	end
 
 	local confirmselect = vgui.Create( "DButton", ItemSelectFrame )
 	function confirmselect.DoClick() ItemChosen(SelectedItem) HideItemSelection() end
-	confirmselect:SetPos( 300, y - 30 )
-	confirmselect:SetSize( 130, 20 )
+	confirmselect:SetPos( 600, y - 40 )
+	confirmselect:SetSize( 160, 30 )
 	confirmselect:SetText( "Confirm" )
+	confirmselect:SetFont( "MenuFont1" )
 
 	if SelectedItem == 0  then
 		confirmselect:SetDisabled( true )
@@ -75,7 +77,7 @@ function DrawTheSelectorBox()
 
 	-- Model panel
 	local mdl = vgui.Create("DModelPanel", ItemSelectFrame)
-	mdl:SetPos(150, 30)
+	mdl:SetPos(250, 30)
 	mdl:SetSize(350, 200)
 	--mdl:SetModel("models/props_junk/metalgascan.mdl")
 	--mdl:SetCamPos(Vector(80, 0, 0))
@@ -83,15 +85,17 @@ function DrawTheSelectorBox()
 	mdl:SetFOV(40)
 
 	local ILabel = vgui.Create( "DLabel", ItemSelectFrame )
-	ILabel:SetPos( 150, 230 )
-	ILabel:SetSize(450, 100)
+	ILabel:SetPos( 180, 230 )
+	ILabel:SetSize(600, 200)
 	ILabel:SetText( " " )
+	ILabel:SetFont( "MenuFont2" )
 	ILabel:SetAutoStretchVertical( true )
 
 	local IDesc = vgui.Create( "DLabel", ItemSelectFrame )
-	IDesc:SetPos( 150, 260 )
-	IDesc:SetSize(450, 100)
+	IDesc:SetPos( 180, 260 )
+	IDesc:SetSize(600, 200)
 	IDesc:SetText(  " " )
+	IDesc:SetFont( "MenuFont1" )
 	IDesc:SetAutoStretchVertical( true )
 
 	if SelectedItem == 1 then
@@ -99,7 +103,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_junk/metalgascan.mdl")
 		mdl:SetCamPos(Vector(80, 0, 0))
 
-		ILabel:SetText( SCInfo.Item[1].Name.."( "..SCInfo.Item[1].Price.." Points )" )
+		ILabel:SetText( SCInfo.Item[1].Name.." ( "..SCInfo.Item[1].Price.." Points )" )
 		IDesc:SetText( SCInfo.Item[1].Description )
 
 	elseif SelectedItem == 2 then
@@ -107,7 +111,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/slashco/items/deathward.mdl")
 		mdl:SetCamPos(Vector(40, 0, 15))
 
-		ILabel:SetText( SCInfo.Item[2].Name.."( "..SCInfo.Item[2].Price.." Points )" )
+		ILabel:SetText( SCInfo.Item[2].Name.." ( "..SCInfo.Item[2].Price.." Points )" )
 		IDesc:SetText( SCInfo.Item[2].Description.."\nWards left: "..tostring(readtable.wardsleft) )
 
 	elseif SelectedItem == 3 then
@@ -115,7 +119,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_junk/garbage_milkcarton001a.mdl")
 		mdl:SetCamPos(Vector(60, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[3].Name.."( "..SCInfo.Item[3].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[3].Name.." ( "..SCInfo.Item[3].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[3].Description )
 
 	elseif SelectedItem == 4 then
@@ -123,7 +127,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/slashco/items/cookie.mdl")
 		mdl:SetCamPos(Vector(50, 0, 20))
 
-		ILabel:SetText( SCInfo.Item[4].Name.."( "..SCInfo.Item[4].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[4].Name.." ( "..SCInfo.Item[4].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[4].Description )
 
 	elseif SelectedItem == 5 then
@@ -131,7 +135,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_lab/jar01a.mdl")
 		mdl:SetCamPos(Vector(60, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[5].Name.."( "..SCInfo.Item[5].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[5].Name.." ( "..SCInfo.Item[5].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[5].Description )
 
 	elseif SelectedItem == 6 then
@@ -139,7 +143,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_junk/Shoe001a.mdl")
 		mdl:SetCamPos(Vector(50, 0, 20))
 
-		ILabel:SetText( SCInfo.Item[6].Name.."( "..SCInfo.Item[6].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[6].Name.." ( "..SCInfo.Item[6].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[6].Description )
 
 	elseif SelectedItem == 7 then
@@ -147,7 +151,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_c17/doll01.mdl")
 		mdl:SetCamPos(Vector(50, 0, 0))
 
-		ILabel:SetText( SCInfo.Item[7].Name.."( "..SCInfo.Item[7].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[7].Name.." ( "..SCInfo.Item[7].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[7].Description )
 
 	elseif SelectedItem == 8 then
@@ -155,7 +159,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_junk/PopCan01a.mdl")
 		mdl:SetCamPos(Vector(30, 0, 0))
 
-		ILabel:SetText( SCInfo.Item[8].Name.."( "..SCInfo.Item[8].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[8].Name.." ( "..SCInfo.Item[8].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[8].Description )
 
 	elseif SelectedItem == 9 then
@@ -163,7 +167,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_c17/light_cagelight01_on.mdl")
 		mdl:SetCamPos(Vector(50, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[9].Name.."( "..SCInfo.Item[9].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[9].Name.." ( "..SCInfo.Item[9].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[9].Description )
 
 	elseif SelectedItem == 10 then
@@ -171,7 +175,7 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/slashco/items/devildie.mdl")
 		mdl:SetCamPos(Vector(30, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[10].Name.."( "..SCInfo.Item[10].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[10].Name.." ( "..SCInfo.Item[10].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[10].Description )
 
 	elseif SelectedItem == 11 then
@@ -179,12 +183,12 @@ function DrawTheSelectorBox()
 		mdl:SetModel("models/props_phx/gibs/flakgib1.mdl")
 		mdl:SetCamPos(Vector(30, 0, 10))
 
-		ILabel:SetText( SCInfo.Item[11].Name.."( "..SCInfo.Item[11].Price.." Points )"  )
+		ILabel:SetText( SCInfo.Item[11].Name.." ( "..SCInfo.Item[11].Price.." Points )"  )
 		IDesc:SetText( SCInfo.Item[11].Description )
 
 	end
 
-	ItemSelectFrame:SetSize( 600, y )
+	ItemSelectFrame:SetSize( 800, y )
 	ItemSelectFrame:Center()
 	ItemSelectFrame:MakePopup()
 	ItemSelectFrame:SetKeyboardInputEnabled( false )

@@ -42,6 +42,21 @@ end )
 if not SlashCo then SlashCo = {} end
 
 function GM:Initialize()
+
+	--if CLIENT then
+
+		CreateClientConVar( "cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel" )
+	
+		cvars.AddChangeCallback( "cl_slashco_playermodel", function(name, oldVal, newVal) 
+	
+			if newVal != "models/slashco/survivor/male_0*.mdl" then
+				--print("[SlashCo] Bad Playermodel. It will be randomized instead.")
+			end
+		
+		end)
+	
+	--end
+
     --If there is no data folder then make one.
     if !file.Exists("slashco", "DATA") then
         print("[SlashCo] The data folder for this gamemode doesn't appear to exist, creating it now.")
@@ -65,6 +80,16 @@ function GM:Initialize()
 
 		SlashCo.CreateOfferTable(Vector(-1435, 736, 224), Angle(0,-90,0))
 
+	end
+
+	if SERVER then
+		resource.AddFile( "resource/fonts/ANKLEPAN.tff" )
+		resource.AddFile( "resource/fonts/KILOTON1.tff" )
+		resource.AddFile( "resource/fonts/forcible.tff" )
+		resource.AddFile( "resource/fonts/terminatortwo.tff" )
+		resource.AddFile( "resource/fonts/glare.tff" )
+		resource.AddFile( "resource/fonts/Comic_Papyrus.tff" )
+		resource.AddFile( "resource/fonts/Alternative.tff" )
 	end
 
 end
@@ -127,6 +152,10 @@ function GM:PlayerButtonDown(ply, button)
 					ply:ChatPrint( "Now ready as Survivor." )
 					lobbyPlayerReadying(ply, 1)
 					broadcastLobbyInfo()
+				else
+					ply:ChatPrint( "You are no longer ready." )
+					lobbyPlayerReadying(ply, 0)
+					broadcastLobbyInfo()
 				end
 			end
 
@@ -138,6 +167,10 @@ function GM:PlayerButtonDown(ply, button)
 
 					ply:ChatPrint( "Now ready as Slasher." )
 					lobbyPlayerReadying(ply, 2)
+					broadcastLobbyInfo()
+				else
+					ply:ChatPrint( "You are no longer ready." )
+					lobbyPlayerReadying(ply, 0)
 					broadcastLobbyInfo()
 				end
 			end
@@ -196,6 +229,27 @@ function GM:PlayerButtonDown(ply, button)
 			if button == 16 then SlashCo.SlasherSpecialAbility(ply) end --Special
 
 		end
+
+	end
+
+	if ply:Team() == TEAM_SURVIVOR then --Taunts
+
+		if button == 2 then 
+
+			ply:SetNWBool("Taunt_Cali", true) --California girls
+			return
+
+		elseif button == 3 then 
+
+			ply:SetNWBool("Taunt_MNR", true) --Monday Night
+			return
+
+		elseif ply:GetNWBool("Taunt_MNR") or ply:GetNWBool("Taunt_Cali") then
+
+			ply:SetNWBool("Taunt_Cali", false)
+			ply:SetNWBool("Taunt_MNR", false)
+
+		end 
 
 	end
 
@@ -442,7 +496,6 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 	SlashCo.PlayerData[pid].Lives = 1
 	SlashCo.PlayerData[pid].RoundsWonSurvivor = data.Stats.RoundsWon.Survivor or 0
 	SlashCo.PlayerData[pid].RoundsWonSlasher = data.Stats.RoundsWon.Slasher or 0
-
 	SlashCo.PlayerData[pid].PointsTotal = 0
 
 	hook.Run("LobbyInfoText")
@@ -648,5 +701,5 @@ function GM:HUDShouldDraw(element)
 end
 
 hook.Add( "GetFallDamage", "RealisticDamage", function( ply, speed )
-    return ( speed / 12 )
+    return ( speed / 16 )
 end )

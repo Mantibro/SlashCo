@@ -27,9 +27,19 @@ end
 
 function PLAYER:SetModel()
 
-	local id = math.random( 1, 9 )
+	local cl_modelname = self.Player:GetInfo( "cl_slashco_playermodel" )
 
-	local modelname = "models/slashco/survivor/male_0"..id..".mdl"
+	local allow = false
+
+	for i = 1, 9 do
+		if cl_modelname == "models/slashco/survivor/male_0"..i..".mdl" then allow = true end
+	end
+
+	if allow then
+		modelname = cl_modelname
+	else
+		modelname = "models/slashco/survivor/male_0"..math.random( 1, 9 )..".mdl"
+	end
 
 	util.PrecacheModel( modelname )
 	self.Player:SetModel( modelname )
@@ -42,13 +52,28 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 
 	if ply:Team() == TEAM_SURVIVOR then
 
-		if not ply:GetNWBool("SurvivorSidExecution") then surv_anim_antispam = false end
+		if not ply:GetNWBool("SurvivorSidExecution") and not ply:GetNWBool("Taunt_MNR") then ply.surv_anim_antispam = false end
 
 		if ply:GetNWBool("SurvivorSidExecution") then
 
 			ply.CalcIdeal = ACT_DIESIMPLE
 			ply.CalcSeqOverride = ply:LookupSequence("sid_execution")
-			if surv_anim_antispam == nil or surv_anim_antispam == false then ply:SetCycle( 0 ) surv_anim_antispam = true end
+			if ply.surv_anim_antispam == nil or ply.surv_anim_antispam == false then ply:SetCycle( 0 ) ply.surv_anim_antispam = true end
+
+			return ply.CalcIdeal, ply.CalcSeqOverride
+
+		elseif ply:GetNWBool("Taunt_Cali") then
+
+			ply.CalcIdeal = ACT_DIESIMPLE
+			ply.CalcSeqOverride = ply:LookupSequence("taunt_cali")
+
+			return ply.CalcIdeal, ply.CalcSeqOverride
+
+		elseif ply:GetNWBool("Taunt_MNR") then
+
+			ply.CalcIdeal = ACT_DIESIMPLE
+			ply.CalcSeqOverride = ply:LookupSequence("taunt_mnr")
+			if ply.surv_anim_antispam == nil or ply.surv_anim_antispam == false then ply:SetCycle( 0 ) ply.surv_anim_antispam = true end
 
 			return ply.CalcIdeal, ply.CalcSeqOverride
 

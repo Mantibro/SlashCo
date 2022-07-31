@@ -87,9 +87,6 @@ concommand.Add( "lobby_debug_brief", function( ply, cmd, args )
 		net.Broadcast()
 	end
 
-	--ply:ChatPrint("(Debug) Lobby now entering Brief Mode...")
-
-
 	else
 
 	ply:ChatPrint("Only admins can use debug commands!")
@@ -101,8 +98,6 @@ end )
 concommand.Add( "timer_start", function( ply, cmd, args )
 
 	if ply:IsAdmin() or SERVER then
-	
-	--ply:ChatPrint("(Debug) Timer started.")
 
 	lobbyReadyTimer(30)
 
@@ -630,7 +625,6 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
 	if SlashCo.LobbyData.LOBBYSTATE < 1 then
 
-
 		local seek = seek
 
 		if num < 2 then return end
@@ -638,26 +632,23 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		if seek == nil then seek = 0 end
 
 		for p = 1, num do
-
 			local rdy = getReadyState(player.GetBySteamID64(SlashCo.LobbyData.Players[p].steamid))
 			if rdy > 0 then seek = seek + 1 end
-
 		end
 
 		if seek > (num / 2) and SlashCo.LobbyData.ReadyTimerStarted == false then 
-
 			SlashCo.LobbyData.ReadyTimerStarted = true
-
 			lobbyReadyTimer(30)
+		end
 
+		if seek <= (num / 2) and SlashCo.LobbyData.ReadyTimerStarted == true then
+			timer.Destroy( "AllReadyLobby")
+			SlashCo.LobbyData.ReadyTimerStarted = false
 		end
 
 		if seek >= num then
-
 			timer.Destroy( "AllReadyLobby")
-
 			RunConsoleCommand("lobby_debug_proceed")
-
 		end
 
 		if (	num < 2 or seek <= (num / 2)		) and SlashCo.LobbyData.ReadyTimerStarted then 
@@ -677,6 +668,8 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		local maxy = -140
 
 		local all_players_in = true
+
+		if #SlashCo.LobbyData.AssignedSurvivors < 1 then return end
 
 		for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
 
@@ -708,7 +701,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 			if ply:Team() == TEAM_SURVIVOR then
 
 				ply:ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
-				if SERVER then RunConsoleCommand("lobby_reset") end
+				if SERVER then RunConsoleCommand("lobby_reset") return end
 
 				for i, play in ipairs( player:GetAll() ) do
 					play:SetTeam(TEAM_SPECTATOR)
@@ -717,7 +710,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 
 			end
 
-			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid then
+			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or (SlashCo.LobbyData.AssignedSlashers[2] != nil and ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid) then
 
 				ply:ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end

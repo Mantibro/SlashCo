@@ -19,6 +19,10 @@ function HeadBob(pl, pos, ang, fov)
 		if pl:KeyDown(IN_FORWARD) or pl:KeyDown(IN_BACK) or pl:KeyDown(IN_MOVELEFT) or pl:KeyDown(IN_MOVERIGHT) then
 			HBPosZ = HBPosZ + (pl:GetVelocity():Length()/17) * FrameTime()
             PitchReset = false
+
+            if HBPitch == nil then HBPitch = 0 end
+            if HBRoll == nil then HBRoll = 0 end
+
             HBPitch = HBPitch + (pl:GetVelocity():Length()/17) * FrameTime()
             HBRoll = HBRoll + (pl:GetVelocity():Length()/25) * FrameTime()
             HBPitchPost = math.sin(HBPitch)*0.25*velCoef

@@ -10,6 +10,8 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 3 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 < 1 then goto trollclaw end
 
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 4 and slasher:GetNWBool("AmogusSurvivorDisguise") then goto amogusstealth end
+
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 2 then goto maleclaw end
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 7 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 3 then goto tylerdestroy end
@@ -75,9 +77,7 @@ do
             slasher:SetNWBool("SidGunShoot",true)
 
             PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
-
             PlayGlobalSound("slashco/slasher/sid_shot.mp3", 85, slasher)
-
             PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 78, slasher)
 
             slasher:FireBullets( 
@@ -120,88 +120,136 @@ do
             if target:Team() != TEAM_SURVIVOR then return end
     
             if slasher:GetPos():Distance(target:GetPos()) < dist*1.4 and not target:GetNWBool("SurvivorBeingJumpscared") then
-    
-                target:SetNWBool("SurvivorBeingJumpscared",true)
-    
-                SlashCo.CurRound.SlasherData[slasherid].CanChase = false
-                SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99
 
-                PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 85, slasher, 1)
+                local pick_ang = SlashCo.RadialTester(slasher, 600)
 
-                slasher:SetNWBool("SidExecuting",true)
-
-                target:SetNWBool("SurvivorDecapitate",true)
-
-                target:SetNWBool("SurvivorSidExecution", true)
-
-                target:SetPos(slasher:GetPos())
-                target:SetEyeAngles(   Angle(0,slasher:GetAngles()[2],0)   )  
-                    
-                target:Freeze(true)
+                slasher:SetEyeAngles( Angle(0,pick_ang,0) )
                 target:SetNotSolid(true)
                 slasher:Freeze(true)
-    
-                SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
 
-                timer.Simple(1, function() 
-                    target:EmitSound("ambient/voices/citizen_beaten4.wav") 
-                    target:SetEyeAngles(   Angle(0,slasher:GetAngles()[2],0)   )  
+                timer.Simple(0.1, function() 
+
+                    for i = 1 , 76 do --why the fuck do i have to do this?!?!?!?!!?!
+
+                        timer.Simple(0 + (i*0.05), function() 
+                            target:SetEyeAngles(   Angle(0,pick_ang,0)   )  
+                            target:SetAngles(   Angle(0,pick_ang,0)   )  
+                            target:SetPos(slasher:GetPos())
+                        end)
+
+                    end
+
+                    target:Freeze(true)
+    
+                    target:SetNWBool("SurvivorBeingJumpscared",true)
+                    SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+                    SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99
+
+                    PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 85, slasher, 1)
+
+                    slasher:SetNWBool("SidExecuting",true)
+
+                    target:SetNWBool("SurvivorDecapitate",true)
+
+                    target:SetNWBool("SurvivorSidExecution", true)
+
                     target:SetPos(slasher:GetPos())
-                end)
-
-                timer.Simple(3, function()               
-                    target:EmitSound("ambient/voices/citizen_beaten3.wav")  
-                    target:SetEyeAngles(   Angle(0,slasher:GetAngles()[2],0)   )  
-                    target:SetPos(slasher:GetPos())            
-                end)
-
-                timer.Simple(3.95, function() 
-                
-                    target:SetEyeAngles(   Angle(0,180+slasher:GetAngles()[2],0)   ) 
-                
-                end)
+                    target:SetEyeAngles(   Angle(0,pick_ang,0)   )  
     
-                timer.Simple(4.1, function()
+                    SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+
+                    timer.Simple(1, function() 
+                        target:EmitSound("ambient/voices/citizen_beaten4.wav") 
+                    end)
+
+                    timer.Simple(3, function()               
+                        target:EmitSound("ambient/voices/citizen_beaten3.wav")             
+                    end)
+
+                    timer.Simple(3.95, function() 
+                        target:SetEyeAngles(   Angle(0,180+pick_ang,0)   )        
+                    end)
     
-                    target:SetNWBool("SurvivorBeingJumpscared",false)
+                    timer.Simple(4.1, function()
+    
+                        target:SetNWBool("SurvivorBeingJumpscared",false)
 
-                    PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
+                        PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
 
-                    slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
+                        slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
 
-                    slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
+                        slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
 
-                    local vec, ang = slasher:GetBonePosition(slasher:LookupBone( "HandL" ))
-                    local vPoint = vec
-                    local muzzle = EffectData()
-                    muzzle:SetOrigin( vPoint + slasher:GetForward()*8 + Vector(0,0,2) )
-                    muzzle:SetStart( Vector(255,0,0) )
-                    muzzle:SetAttachment( 0 )
-                    util.Effect( "sid_muzzle", muzzle )
+                        local vec, ang = slasher:GetBonePosition(slasher:LookupBone( "HandL" ))
+                        local vPoint = vec
+                        local muzzle = EffectData()
+                        muzzle:SetOrigin( vPoint + slasher:GetForward()*8 + Vector(0,0,2) )
+                        muzzle:SetStart( Vector(255,0,0) )
+                        muzzle:SetAttachment( 0 )
+                        util.Effect( "sid_muzzle", muzzle )
 
-                    local shell = EffectData()
-                    shell:SetOrigin( vPoint )
-                    shell:SetAngles( ang ) 
-                    util.Effect( "ShellEject", shell )
+                        local shell = EffectData()
+                        shell:SetOrigin( vPoint )
+                        shell:SetAngles( ang ) 
+                        util.Effect( "ShellEject", shell )
 
-                    target:SetNWBool("SurvivorSidExecution", false)
+                        target:SetNWBool("SurvivorSidExecution", false)
 
-                    target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
+                        target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
 
-                    target:Freeze(false)
-                    target:SetVelocity( slasher:GetForward() * 300 )
-                    target:SetNotSolid(false)
-                    timer.Simple(0.05, function() target:Kill() end)
+                        target:Freeze(false)
+                        target:SetVelocity( slasher:GetForward() * 300 )
+                        target:SetNotSolid(false)
+                        timer.Simple(0.05, function() target:Kill() end)
             
+                    end)
+
+                    timer.Simple(8, function()
+                        slasher:Freeze(false)
+                        slasher:SetNWBool("SidExecuting",false)
+                        target:SetNWBool("SurvivorDecapitate",false)
+                    end)
+
                 end)
 
-                timer.Simple(8, function()
-                    slasher:Freeze(false)
-                    slasher:SetNWBool("SidExecuting",false)
-                    target:SetNWBool("SurvivorDecapitate",false)
-                end)
             end
     
+        end
+
+    end
+
+end
+
+    ::amogusstealth::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 or not slasher:GetNWBool("AmogusSurvivorDisguise") then return end
+do
+
+    if slasher:GetEyeTrace().Entity:IsPlayer() then
+        local target = slasher:GetEyeTrace().Entity	
+
+        if target:Team() != TEAM_SURVIVOR then return end
+
+        if SlashCo.CurRound.SlasherData[slasherid].KillDelayTick > 0 then return end
+
+        if slasher:GetVelocity():Length() > 1 then return end
+
+        if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+
+            target:SetNWBool("SurvivorBeingJumpscared",true)
+
+            slasher:EmitSound("slashco/slasher/amogus_stealthkill.mp3",60)
+
+            target:Freeze(true)
+            slasher:Freeze(true)
+
+            SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+
+            timer.Simple(1.25, function()
+                target:SetNWBool("SurvivorBeingJumpscared",false)
+                slasher:Freeze(false)
+                target:Freeze(false)
+                target:Kill()     
+            end)
         end
 
     end
