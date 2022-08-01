@@ -144,8 +144,11 @@ end --ends here
             slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
 
-            local id = math.random( 1, 9 )
-	        local modelname = "models/slashco/survivor/male_0"..id..".mdl"
+            local s = team.GetPlayers(TEAM_SURVIVOR)
+            local modelname = "models/slashco/survivor/male_01.mdl"
+            if #s > 0 then
+	            modelname = s[math.random(1,#s)]:GetModel()
+            end
 	        util.PrecacheModel( modelname )
 	        slasher:SetModel( modelname )
 
@@ -321,6 +324,7 @@ end --ends here
         slasher:DrawShadow(false)
 		slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 		slasher:SetNoDraw(true)
+        slasher:SetPos(slasher:GetPos() + Vector(0,0,60))
 
         SlashCo.CreateItem("sc_maleclone",slasher:GetPos(),slasher:GetAngles())
 

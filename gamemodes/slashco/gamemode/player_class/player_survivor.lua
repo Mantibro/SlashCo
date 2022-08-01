@@ -77,6 +77,13 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 
 			return ply.CalcIdeal, ply.CalcSeqOverride
 
+		elseif ply:GetNWBool("Taunt_Griddy") then
+
+			ply.CalcIdeal = ACT_DIESIMPLE
+			ply.CalcSeqOverride = ply:LookupSequence("taunt_griddy")
+
+			return ply.CalcIdeal, ply.CalcSeqOverride
+
 		else
 			return
 		end

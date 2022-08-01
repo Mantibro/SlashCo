@@ -50,42 +50,43 @@ local PLAYER_LINE = {
 		self:SetHeight( 32 + 3 * 2 )
 		self:DockMargin( 2, 0, 2, 2 )
 
-		self.team_status = TEAM_SPECTATOR
-
-		if PlayerData == nil then goto SKIP end
-
-		for p = 1, #player.GetAll() do
-			local pl = player.GetAll()[p]
-
-			for i = 1, #PlayerData.survivors do
-				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].id)
-
-				if pot_s == pl then
-					self.team_status = TEAM_SURVIVOR
-					break 
-				end
-
-			end
-
-			for i = 1, #PlayerData.slashers do
-				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].s_id)
-
-				if pot_s == pl then
-					self.team_status = TEAM_SLASHER
-					break 
-				end
-
-			end
-
-		end
-
-		::SKIP::
-
 	end,
 
 	Setup = function( self, pl )
 
 		self.Player = pl
+
+		self.team_status = TEAM_SPECTATOR
+		self.teamcolor = Color(150,150,150,255)
+		self.teamorder = 500
+
+		if PlayerData == nil then goto SKIP end
+
+		for i = 1, #PlayerData.survivors do
+			local pot_s = player.GetBySteamID64(PlayerData.survivors[i].id)
+
+			if pot_s == pl then
+				self.team_status = TEAM_SURVIVOR
+				self.teamcolor = Color(255,255,255,255)
+				self.teamorder = 50
+				goto SKIP
+			end
+
+		end
+
+		for i = 1, #PlayerData.slashers do
+			local pot_s = player.GetBySteamID64(PlayerData.slashers[i].s_id)
+
+			if pot_s == pl then
+				self.team_status = TEAM_SLASHER
+				self.teamcolor = Color(255,0,0,255)
+				self.teamorder = 0
+				break 
+			end
+
+		end
+
+		::SKIP::
 
 		self.Avatar:SetPlayer( pl )
 
@@ -112,6 +113,7 @@ local PLAYER_LINE = {
 		--
 		-- Change the icon of the mute button based on state
 		--
+
 		if ( self.Muted == nil || self.Muted != self.Player:IsMuted() ) then
 
 			self.Muted = self.Player:IsMuted()
@@ -147,20 +149,6 @@ local PLAYER_LINE = {
 			return
 		end
 
-		self.teamorder = 0
-
-		if self.team_status== TEAM_SPECTATOR then
-			self.teamorder = 500
-		end
-
-		if self.team_status == TEAM_SURVIVOR then
-			self.teamorder = 50
-		end
-
-		if self.team_status == TEAM_SLASHER then
-			self.teamorder = 0
-		end
-
 		--
 		-- This is what sorts the list. The panels are docked in the z order,
 		-- so if we set the z order according to kills they'll be ordered that way!
@@ -184,20 +172,6 @@ local PLAYER_LINE = {
 		--	draw.RoundedBox( 4, 0, 0, w, h, Color( 200, 200, 200, 200 ) )
 		--	return
 		--end
-
-		self.teamcolor = Color(0,0,0,255)
-
-		if self.team_status == TEAM_SPECTATOR then
-			self.teamcolor = Color(150,150,150,255)
-		end
-
-		if self.team_status == TEAM_SURVIVOR then
-			self.teamcolor = Color(255,255,255,255)
-		end
-
-		if self.team_status == TEAM_SLASHER then
-			self.teamcolor = Color(255,0,0,255)
-		end
 
 		draw.RoundedBox( 4, 0, 0, w, h,self.teamcolor )
 	end
@@ -236,25 +210,6 @@ local SCORE_BOARD = {
 		self.Scores = self:Add( "DScrollPanel" )
 		self.Scores:Dock( FILL )
 
-	end,
-
-	PerformLayout = function( self )
-
-		self:SetSize( 500, ScrH() - 200 )
-		self:SetPos( ScrW() / 2 - 250, 100 )
-
-	end,
-
-	Paint = function( self, w, h )
-
-		--draw.RoundedBox( 4, 0, 0, w, h, Color( 0, 0, 0, 200 ) )
-
-	end,
-
-	Think = function( self, w, h )
-
-		self.Name:SetText( GetHostName() )
-
 		local game_state = "In lobby."
 
 		if game.GetMap() != "sc_lobby" then
@@ -273,6 +228,25 @@ local SCORE_BOARD = {
 		mat:SetPos(0, 120)
 		mat:SetSize(20, 20)
 		mat:SetMaterial("slashco/ui/slashco_score")
+
+	end,
+
+	PerformLayout = function( self )
+
+		self:SetSize( 500, ScrH() - 200 )
+		self:SetPos( ScrW() / 2 - 250, 100 )
+
+	end,
+
+	Paint = function( self, w, h )
+
+		--draw.RoundedBox( 4, 0, 0, w, h, Color( 0, 0, 0, 200 ) )
+
+	end,
+
+	Think = function( self, w, h )
+
+		self.Name:SetText( GetHostName() )
 
 		--
 		-- Loop through each player, and if one doesn't have a score entry - create it.

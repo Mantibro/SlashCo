@@ -527,22 +527,16 @@ do
 
         if slasher.TylerSongPickedID == nil then
             slasher.TylerSongPickedID = math.random(1,6)
-        end
 
-        if CLIENT then
-            if slasher.TylerSong == nil then 
-                slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
-            else
-                slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3*1.5) * (30 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
-                slasher.TylerSong:Play() 
-                slasher.TylerSong:ChangeVolume( 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
-            end
+            PlayGlobalSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3",  85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3*1.5) * (30 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) , slasher,  0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
         end
-
 
         if v2 > ( ms * 40) - (v4 * 4) then --Time ran out
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 2
+            slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
+            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3") end)
+            slasher.TylerSongPickedID = nil
 
         end
 
@@ -554,6 +548,9 @@ do
 
                 slasher:SetNWBool("TylerCreating", true)
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+                slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
+                timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3") end)
+                slasher.TylerSongPickedID = nil
 
             end
 

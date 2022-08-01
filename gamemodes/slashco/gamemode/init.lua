@@ -244,10 +244,16 @@ function GM:PlayerButtonDown(ply, button)
 			ply:SetNWBool("Taunt_MNR", true) --Monday Night
 			return
 
-		elseif ply:GetNWBool("Taunt_MNR") or ply:GetNWBool("Taunt_Cali") then
+		elseif button == 4 then 
+
+			ply:SetNWBool("Taunt_Griddy", true) --Htiin the griddy
+			return
+
+		elseif ply:GetNWBool("Taunt_MNR") or ply:GetNWBool("Taunt_Cali") or ply:GetNWBool("Taunt_Griddy") then
 
 			ply:SetNWBool("Taunt_Cali", false)
 			ply:SetNWBool("Taunt_MNR", false)
+			if button != 33 then ply:SetNWBool("Taunt_Griddy", false) end
 
 		end 
 
@@ -441,13 +447,14 @@ local Think = function()
 
 			--DRAINAGE /\ /\ /\
 
-			--Open the trailer door here when it's ready. For now it instantly ends the round.
 			if allRunning and SlashCo.CurRound.SummonHelicopter == false then
 				SlashCo.CurRound.SummonHelicopter = true
 
 				--(SPAWN HELICOPTER)
 
-				SlashCo.SummonEscapeHelicopter()			
+				SlashCo.SummonEscapeHelicopter()	
+				
+				SlashCo.CurRound.DistressBeaconUsed = false
 
 			end
 

@@ -955,3 +955,57 @@ function lobbyFinish()
 	end)
 
 end
+
+SlashCo.OfferingVoteFail = function()
+
+    SlashCo.LobbyData.Offering = 0
+    SlashCo.LobbyData.VotedOffering = 0
+    table.Empty(SlashCo.LobbyData.Offerors)
+
+    for i, play in ipairs( player.GetAll() ) do
+        play:ChatPrint("Offering vote was unsuccessful.") 
+        SlashCo.EndOfferingVote(play)
+    end
+
+end
+
+SlashCo.OfferingVoteSuccess = function(id)
+
+    local fail = false
+
+    if id == 4 then --Duality
+
+        if #team.GetPlayers(TEAM_SPECTATOR) < 1 then
+
+            for i, play in ipairs( player.GetAll() ) do
+                play:ChatPrint("Offering vote successful, however a Spectator could not be found to assign as the second Slasher. Duality was not offered.") 
+                SlashCo.EndOfferingVote(play)
+                fail = true
+            end
+
+        end
+
+    end
+
+    if id == 2 then --Satiation
+
+        SlashCo.LobbyData.SelectedSlasherInfo.CLS = 2
+
+    end
+
+    SlashCo.LobbyData.VotedOffering = 0
+
+    if fail == true then return end
+
+    SlashCo.LobbyData.Offering = id
+
+    timer.Destroy( "OfferingVoteTimer")
+
+    for i, play in ipairs( player.GetAll() ) do
+        play:ChatPrint("Offering vote successful. "..SCInfo.Offering[id].Name.." has been offered.") 
+        SlashCo.EndOfferingVote(play)
+    end
+
+    SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
+
+end

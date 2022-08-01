@@ -61,8 +61,27 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		surface.SetDrawColor(255,255,255,255)	
 
 		local g = (GameProgress/10)
-		local gp = Lerp( SysTime(), 0, g )
+		if g_monitor == nil then g_monitor = g end
 
+		if lerper == nil then lerper = 1 end
+
+		if g_monitor < g then
+
+			if g < 10 then
+				surface.PlaySound("slashco/slashco_progress.mp3")
+			else
+				surface.PlaySound("slashco/slashco_progress_full.mp3")
+			end
+
+			lerper = 0.02
+
+		end
+
+		if lerper < 1 then lerper = lerper + ( 0.01 + ( 0.005 / lerper ) ) end
+
+		local gp = Lerp( lerper, 0, g )
+
+		g_monitor = g
 
 		local pulse = 5 * math.sin( SysTime()  * ((gp+1)*3) ) * (gp*3)
 
