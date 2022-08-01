@@ -7,7 +7,7 @@ local add = 0
 local PitchReset = false
 
 function HeadBob(pl, pos, ang, fov)
-    if pl:Team() != TEAM_SURVIVOR then return end
+    if pl:Team() != TEAM_SURVIVOR or pl:GetNWBool("SurvivorSidExecution") then return end
 
     local velCoef = (pl:GetVelocity():Length()/300)
 	local v = {}

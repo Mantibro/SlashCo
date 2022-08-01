@@ -42,8 +42,6 @@ net.Receive( "mantislashcoHelicopterMusic", function( len, ply )
 		helimusic_antispam = true 
 	end
 
-	if stop_helimusic then heli_music:Stop() end
-
 end)
 
 hook.Add("HUDPaint", "RoundOutroHUD", function()
@@ -54,10 +52,12 @@ hook.Add("HUDPaint", "RoundOutroHUD", function()
 
 	if helimusic_antispam == true and LocalPlayer():GetNWBool("SurvivorChased") then stop_helimusic = true end
 
+	if stop_helimusic and helimusic_antispam == true then heli_music:Stop() end
+
 	if show_roundend_screen != true then return end
 
 	if re_tick == nil then re_tick = 0 end
-	re_tick = re_tick + FrameTime() * 1.5
+	re_tick = re_tick + 1.5
 
 	stop_helimusic = true
 

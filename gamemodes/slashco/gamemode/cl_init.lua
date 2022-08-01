@@ -15,6 +15,7 @@ include( "cl_jumpscare.lua" )
 include( "cl_offervote_hud.lua" )
 include( "cl_spectator_hud.lua" )
 include( "cl_playermodel_picker.lua" )
+include( "cl_gameinfo.lua" )
 
 function GM:HUDDrawTargetID()
 	return false
@@ -35,6 +36,8 @@ net.Receive("octoSlashCoTestConfigHalos", function()
         halo.Add( ents.FindByClass("prop_physics"), Color( 255, 0, 0 ), 2, 2, 8, true, true )
         halo.Add( ents.FindByClass("sc_*"), Color( 0, 255, 255 ), 2, 2, 4, true, true )
     end)
+
+    RunConsoleCommand('hud_deathnotice_time', '0')
 end)
 
 hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()

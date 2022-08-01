@@ -1,10 +1,27 @@
 include( "ui/fonts.lua" )
 
+net.Receive("mantislashcoLobbySlasherInformation", function()
+
+	LobbySlasherInfo = net.ReadTable()
+
+end)
+
 hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	local ply = LocalPlayer()
 
 	if ply:Team() != TEAM_SPECTATOR then return end
+
+	if LobbySlasherInfo != nil then
+
+		if LobbySlasherInfo.player != LocalPlayer():SteamID64() then return end
+
+		if slashershow_tick == nil then slashershow_tick = 0 end
+		slashershow_tick = slashershow_tick + 0.25
+
+		draw.SimpleText("You will play as: "..LobbySlasherInfo.slasher , "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.6), Color( 255, 0, 0, slashershow_tick ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+
+	end
 
 	if game.GetMap() == "sc_lobby" then return end
 

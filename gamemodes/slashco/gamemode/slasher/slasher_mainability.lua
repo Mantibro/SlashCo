@@ -144,9 +144,7 @@ end --ends here
             slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
 
-            local rand = math.random( 1, 5 )
-	        local id = 1
-	        if rand < 3 then id = rand elseif rand == 3 then id = 5 elseif rand == 4 then id = 7 end
+            local id = math.random( 1, 9 )
 	        local modelname = "models/slashco/survivor/male_0"..id..".mdl"
 	        util.PrecacheModel( modelname )
 	        slasher:SetModel( modelname )
@@ -175,6 +173,8 @@ end --ends here
 
         slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
         slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+
+        SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = 2 - (SO * 1.95) 
 
         if IsValid(ents.GetByIndex(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3)) then
 
@@ -284,7 +284,6 @@ end --ends here
 
             slasher:SetPos(target:GetPos())
             slasher:SetAngles(target:GetAngles())
-
             target:Remove()
 
             local modelname = "models/Humans/Group01/male_07.mdl"
@@ -295,6 +294,7 @@ end --ends here
             slasher:DrawShadow(true)
 		    slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		    slasher:SetNoDraw(false)
+            slasher:SetMoveType(MOVETYPE_WALK)
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
 

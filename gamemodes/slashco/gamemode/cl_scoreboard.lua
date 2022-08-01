@@ -1,12 +1,12 @@
 
 surface.CreateFont( "ScoreboardDefault", {
-	font	= "Helvetica",
+	font	= "CA Alternative Three",
 	size	= 22,
 	weight	= 800
 } )
 
 surface.CreateFont( "ScoreboardDefaultTitle", {
-	font	= "Helvetica",
+	font	= "CA Alternative Three",
 	size	= 15,
 	weight	= 800
 } )
@@ -26,6 +26,10 @@ end)
 local PLAYER_LINE = {
 	Init = function( self )
 
+		self.Mute = self:Add( "DImageButton" )
+		self.Mute:SetSize( 32, 32 )
+		self.Mute:Dock( LEFT )
+
 		self.AvatarButton = self:Add( "DButton" )
 		self.AvatarButton:Dock( LEFT )
 		self.AvatarButton:SetSize( 32, 32 )
@@ -41,14 +45,41 @@ local PLAYER_LINE = {
 		self.Name:SetTextColor( Color( 0, 0, 0 ) )
 		self.Name:DockMargin( 8, 0, 0, 0 )
 
-		self.Mute = self:Add( "DImageButton" )
-		self.Mute:SetSize( 32, 32 )
-		self.Mute:Dock( RIGHT )
-
 		self:Dock( TOP )
 		self:DockPadding( 3, 3, 3, 3 )
 		self:SetHeight( 32 + 3 * 2 )
 		self:DockMargin( 2, 0, 2, 2 )
+
+		self.team_status = TEAM_SPECTATOR
+
+		if PlayerData == nil then goto SKIP end
+
+		for p = 1, #player.GetAll() do
+			local pl = player.GetAll()[p]
+
+			for i = 1, #PlayerData.survivors do
+				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].id)
+
+				if pot_s == pl then
+					self.team_status = TEAM_SURVIVOR
+					break 
+				end
+
+			end
+
+			for i = 1, #PlayerData.slashers do
+				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].s_id)
+
+				if pot_s == pl then
+					self.team_status = TEAM_SLASHER
+					break 
+				end
+
+			end
+
+		end
+
+		::SKIP::
 
 	end,
 
@@ -62,42 +93,6 @@ local PLAYER_LINE = {
 
 		--local friend = self.Player:GetFriendStatus()
 		--MsgN( pl, " Friend: ", friend )
-
-		self.team_status = TEAM_SPECTATOR
-
-		if PlayerData == nil then goto SKIP end
-
-		for p = 1, #player.GetAll() do
-			local pl = player.GetAll()[p]
-			local found = false
-
-			for i = 1, #PlayerData.survivors do
-				local pot_s = player.GetBySteamID64(PlayerData.survivors[i].steamid)
-
-				if pot_s == pl then
-					self.team_status = TEAM_SURVIVOR
-					found = true
-					break 
-				end
-
-			end
-
-			for i = 1, #PlayerData.slashers do
-				local pot_s = player.GetBySteamID64(PlayerData.slashers[i].steamid)
-
-				if pot_s == pl then
-					self.team_status = TEAM_SLASHER
-					found = true
-					break 
-				end
-
-			end
-
-			if found then break end
-
-		end
-
-		::SKIP::
 
 	end,
 
@@ -193,7 +188,7 @@ local PLAYER_LINE = {
 		self.teamcolor = Color(0,0,0,255)
 
 		if self.team_status == TEAM_SPECTATOR then
-			self.teamcolor = Color(220,220,220,255)
+			self.teamcolor = Color(150,150,150,255)
 		end
 
 		if self.team_status == TEAM_SURVIVOR then
@@ -222,22 +217,21 @@ local SCORE_BOARD = {
 
 		self.Header = self:Add( "Panel" )
 		self.Header:Dock( TOP )
-		self.Header:SetHeight( 100 )
+		self.Header:SetHeight( 300 )
 
 		self.Name = self.Header:Add( "DLabel" )
 		self.Name:SetFont( "ScoreboardDefaultTitle" )
 		self.Name:SetTextColor( color_white )
-		self.Name:Dock( TOP )
-		self.Name:SetHeight( 40 )
-		self.Name:SetContentAlignment( 5 )
+		self.Name:SetPos( 65, 115 )
+		self.Name:SetSize(600, 200)
 		self.Name:SetExpensiveShadow( 2, Color( 0, 0, 0, 200 ) )
 
-		--self.NumPlayers = self.Header:Add( "DLabel" )
-		--self.NumPlayers:SetFont( "ScoreboardDefault" )
-		--self.NumPlayers:SetTextColor( color_white )
-		--self.NumPlayers:SetPos( 0, 100 - 30 )
-		--self.NumPlayers:SetSize( 300, 30 )
-		--self.NumPlayers:SetContentAlignment( 4 )
+		self.StateName = self.Header:Add( "DLabel" )
+		self.StateName:SetFont( "ScoreboardDefaultTitle" )
+		self.StateName:SetTextColor( color_white )
+		self.StateName:SetPos( 65, 180 )
+		self.StateName:SetSize(600, 200)
+		self.StateName:SetExpensiveShadow( 2, Color( 0, 0, 0, 200 ) )
 
 		self.Scores = self:Add( "DScrollPanel" )
 		self.Scores:Dock( FILL )
@@ -246,8 +240,8 @@ local SCORE_BOARD = {
 
 	PerformLayout = function( self )
 
-		self:SetSize( 400, ScrH() - 200 )
-		self:SetPos( ScrW() / 2 - 200, 100 )
+		self:SetSize( 500, ScrH() - 200 )
+		self:SetPos( ScrW() / 2 - 250, 100 )
 
 	end,
 
@@ -261,8 +255,22 @@ local SCORE_BOARD = {
 
 		self.Name:SetText( GetHostName() )
 
+		local game_state = "In lobby."
+
+		if game.GetMap() != "sc_lobby" then
+
+			local offer = "Regular"
+
+			if PlayerData.offering != "" then offer = PlayerData.offering end
+
+			game_state = offer.." round in progress."
+
+		end
+
+		self.StateName:SetText( game_state )
+
 		local mat = vgui.Create("Material", self)
-		mat:SetPos(0, -80)
+		mat:SetPos(0, 120)
 		mat:SetSize(20, 20)
 		mat:SetMaterial("slashco/ui/slashco_score")
 

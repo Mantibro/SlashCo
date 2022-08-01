@@ -559,6 +559,8 @@ SlashCo.ChooseTheSlasherLobby = function(id)
 		print("[SlashCo] Slasher Picked. ("..id..")")
 	end
 
+	SlashCo.BroadcastLobbySlasherInformation()
+
 end
 
 net.Receive("mantislashcoPickItem", function()
@@ -654,6 +656,10 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		if (	num < 2 or seek <= (num / 2)		) and SlashCo.LobbyData.ReadyTimerStarted then 
 			timer.Destroy( "AllReadyLobby" )
 			SlashCo.LobbyData.ReadyTimerStarted = false
+
+			net.Start("mantislashcoLobbyTimerTime")
+			net.WriteUInt(62,6)
+			net.Broadcast()
 		end
 
 		seek = 0

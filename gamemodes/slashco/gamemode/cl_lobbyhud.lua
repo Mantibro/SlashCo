@@ -49,7 +49,13 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	draw.SimpleText( "You have won "..slswin_count.." Rounds as SLASHER.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.11), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 
 	if StateOfLobby == nil or StateOfLobby < 1 then 
-		draw.SimpleText( " \" , \" to switch teams", "LobbyFont2", scrW * 0.975, (scrH * 0.5)+425, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) 
+		draw.SimpleText( " \" , \" to switch between player / spectator", "LobbyFont1", scrW * 0.975, (scrH * 0.93), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) 
+	end
+
+	if LocalPlayer():Team() == TEAM_LOBBY then
+
+		draw.SimpleText( "R to choose Playermodel", "LobbyFont1", scrW * 0.975, (scrH * 0.9), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) 
+
 	end
 
 if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
@@ -62,6 +68,8 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 
 	local Lobby_Players = {}
 
+	local isClientinLobby = false
+
 	for i = 1, #LobbyInfoTable do
 
 		if not IsValid(player.GetBySteamID64( LobbyInfoTable[i].steamid )) then return end
@@ -70,16 +78,9 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 			table.insert(Lobby_Players, { ID = LobbyInfoTable[i].steamid, Name = player.GetBySteamID64( LobbyInfoTable[i].steamid ):GetName(), Ready = LobbyInfoTable[i].readyState })
 		end
 
-		if Lobby_Players[i].Name == clientname then
-			
+		if Lobby_Players[i].Name == clientname then			
 			clientReadiness = LobbyInfoTable[i].readyState
-
-			isClientinLobby = true break
-
-		else
-
-			isClientinLobby = false
-
+			isClientinLobby = true
 		end
 
 	end
@@ -95,8 +96,8 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 	
 		draw.SimpleText( "Press F2 to ready as Slasher.", "LobbyFont1", scrW * 0.975, (scrH * 0.5)+350, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 	
-		if TimeLeft != nil and TimeLeft > 0 then
-			draw.SimpleText( "Starting in: "..tostring( TimeLeft ).." seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.25), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+		if TimeLeft != nil and TimeLeft > 0 and TimeLeft < 61 then
+			draw.SimpleText( "Starting in: "..tostring( TimeLeft ).." seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.65), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 		end
 
 		for i = 1, #Lobby_Players do

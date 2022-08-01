@@ -282,6 +282,15 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 				surface.SetMaterial(AmogusSurvivor)
 				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
 				willdrawmain = false
+				if LocalPlayer():GetVelocity():Length() < 1 then
+					surface.SetMaterial(AmogusSurvivor)
+					surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+					draw.SimpleText( "M1 - Kill (Sneak)", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+					willdrawkill = false
+				else
+					willdrawkill = true
+				end
 			end
 
 			if is_fuel then 

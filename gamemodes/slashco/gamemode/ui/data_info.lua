@@ -113,19 +113,19 @@ SCInfo.Item = {
 
     {
         Name = "The Deathward",
-        Price = 95,
+        Price = 50,
         Description = "A ceramic, skull-shaped charm. Will save you from certain death,\nbut only once. Your team can only have a limited amount of them.\nThis item will take up your Item Slot, even if spent."
     },
 
     {
         Name = "Milk Jug",
-        Price = 35,
+        Price = 20,
         Description = "A jug of fresh milk. Consuming it will grant you a large speed boost\n for a short while.\nA certain Slasher seems to really like this item."
     },
 
     {
         Name = "Cookie",
-        Price = 30,
+        Price = 25,
         Description = "A large chocolate chip cookie. Consuming it will grant you a speed boost\nfor a limited time. \nA certain Slasher seems to really like this item."
     },
 
@@ -143,25 +143,25 @@ SCInfo.Item = {
 
     {
         Name = "The Baby",
-        Price = 65,
+        Price = 35,
         Description = "A decrepit-looking doll of a baby. Upon use, this item will halve your \nhealth and teleport you away from the slasher. \nThe lower your health, the more likely you are to\nsuffer a premature death upon use."
     },
 
     {
         Name = "B-Gone Soda",
-        Price = 35,
+        Price = 25,
         Description = "A can of strange soda. It has a sweet smell. \nConsuming it will turn you invisible for a short while."
     },
 
     {
         Name = "Distress Beacon",
-        Price = 85,
+        Price = 45,
         Description = "A personal emergency terminal. \nIf at least one Generator has been activated and you are the last one alive, upon use \nthis item will alert the Slashco headquarters to send emergency rescue. \nOnly one can be taken."
     },
 
     {
         Name = "Devil's Gamble",
-        Price = 45,
+        Price = 60,
         Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
     },
 
@@ -236,5 +236,12 @@ SCInfo.Offering = {
         Description = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful.",
         GasCanMod = 6
     }
+
+}
+
+SCInfo.Main = {
+
+    Base = "Welcome to the SlashCo Power Recovery Program.\n\nYour assignment is refuelling and activating two Generators present in an area called the Slasher Zone.\n\nYou will need to pour four cans of fuel and insert a car battery into each, however it might turn out not to be an easy task.\n\nAn evil entity known as a Slasher will be present in the zone with you. The only way you can successfully complete your \ntask is by knowing how to survive.\n\nYou will be dropped off by a helicopter, which will also pick you up after both of the generators have been activated.\n\nIf you ever find yourself left stranded without a team, the helicopter can come rescue you prematurely if you signal \nit with a Distress Beacon, one of which you will always be able to find within the Slasher Zone.\nRescue will come only if at least one generator has been activated.\n\nBefore you set off to the Slasher Zone, you can choose an Item in the lobby in exchange for Points you earn during rounds as Survivor.",
+    SlasherBase = "As a Slasher, your goal is to kill all of the Survivors before they manage to escape.\n\nYou can track the progress of the Survivors' assignment with a bar which indicates the Game Progress.\n\nEach Slasher has unique abilities which can help achieve your goal in different ways, furthermore, Slashers are divided\ninto three different Classes, each of which has a different ability kind.\n\nCryptid:\nThe abilities of Cryptids are simple and easy to understand. They consist of relatively straightforward ways of\nhelping you kill Survivors.\n\nDemon:\nA Demon's abilities depend on the Items they have consumed, which will be spawned all around the map, and at times the\nGame Progress of the round, meaning that a Demon's goals is not just killing Survivors, but also finding and consuming\nItems to grow their power.\n\nUmbra:\nThe powers of Slashers of the Umbra class grow as the Game Progress increases, meaning they are weak at first, but the\ncloser the Survivors get to completing their assignment, their abilities strengthen.",
 
 }

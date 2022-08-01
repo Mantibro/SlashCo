@@ -1,75 +1,45 @@
 local SlashCo = SlashCo
 
 util.AddNetworkString("octoSlashCoTestConfigHalos")
-
 util.AddNetworkString("mantislashcoGiveLobbyInfo")
-
 util.AddNetworkString("mantislashcoGiveLobbyStatus")
-
 util.AddNetworkString("mantislashcoRequestInfo")
-
 util.AddNetworkString("mantislashcoLobbyTimerTime")
-
 util.AddNetworkString("mantislashcoLobbyHelicopterReady")
-
 util.AddNetworkString("mantislashcoGasPourProgress")
-
 util.AddNetworkString("mantislashcoGiveSlasherData")
-
 util.AddNetworkString("mantislashcoSlasherChaseMode")
-
 util.AddNetworkString("mantislashcoSlasherKillPlayer")
-
 util.AddNetworkString("mantiSlashCoPickingSlasher")
-
 util.AddNetworkString("mantiSlashCoSelectSlasher") 
-
 util.AddNetworkString("mantislashcoStartItemPicking")
-
 util.AddNetworkString("mantislashcoPickItem")
-
 util.AddNetworkString("mantislashcoGiveItemData")
-
 util.AddNetworkString("mantislashcoSendLobbyItemGlobal") 
-
 util.AddNetworkString("mantislashcoSendGlobalInfoTable")
-
 util.AddNetworkString("mantislashcoGlobalSound")
-
 util.AddNetworkString("mantislashcoGameIntro")
-
 util.AddNetworkString("mantislashcoRoundEnd")
-
 util.AddNetworkString("mantislashcoBriefing")
-
-util.AddNetworkString("mantislashcoBriefing")
-
 util.AddNetworkString("mantislashcoStartOfferingPicking") 
-
 util.AddNetworkString("mantislashcoBeginOfferingVote")
-
 util.AddNetworkString("mantislashcoOfferingVoteOut")
-
 util.AddNetworkString("mantislashcoVoteForOffering")
-
 util.AddNetworkString("mantislashcoOfferingEndVote")
-
 util.AddNetworkString("mantislashcoOfferingVoteFinished")
-
 util.AddNetworkString("mantislashcoGiveMasterDatabase")
-
 util.AddNetworkString("mantislashcoSendRoundData")
-
 util.AddNetworkString("mantislashcoHelicopterMusic")
+util.AddNetworkString("mantislashcoLobbySlasherInformation")
 
 function PlayGlobalSound(sound, level, ent, vol)
 
 	if vol == nil then vol = 1 end
 
-	ent:EmitSound(sound, 1, 1, 0)
-	--"Sounds must be precached serverside manually before they can be played. util.PrecacheSound does not work for this purpose, Entity:EmitSound does the trick"
-
 	if SERVER then
+		ent:EmitSound(sound, 1, 1, 0)
+		--"Sounds must be precached serverside manually before they can be played. util.PrecacheSound does not work for this purpose, Entity:EmitSound does the trick"
+
 		net.Start("mantislashcoGlobalSound")
 		net.WriteTable({SoundPath = sound, SndLevel = level, Entity = ent, Volume = vol})
 		net.Broadcast()
@@ -85,10 +55,18 @@ SlashCo.BroadcastSlasherData = function()
 
 end
 
+SlashCo.BroadcastLobbySlasherInformation = function()
+
+    net.Start("mantislashcoLobbySlasherInformation")
+	net.WriteTable({ player = SlashCo.LobbyData.AssignedSlasher, slasher = SlashCo.SlasherData[SlashCo.LobbyData.FinalSlasherID].Name })
+	net.Broadcast()
+
+end
+
 SlashCo.BroadcastCurrentRoundData = function()
 
     net.Start("mantislashcoSendRoundData")
-	net.WriteTable({survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData})
+	net.WriteTable({survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData.OfferingName})
 	net.Broadcast()
 
 end

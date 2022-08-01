@@ -347,6 +347,7 @@ SlashCo.ResetCurRoundData = function()
         AntiLoopSpawn = false,
         OfferingData = {
             CurrentOffering = 0,
+            OfferingName = "",
             GasCanMod = 0,
             SO = 0,
             DO = false,
@@ -430,6 +431,9 @@ if SERVER then
         SlashCo.CurRound.Difficulty = diff
         SlashCo.CurRound.SurvivorData.GasCanMod = survivorgasmod
         SlashCo.CurRound.OfferingData.CurrentOffering = tonumber(offering)
+        if SlashCo.CurRound.OfferingData.CurrentOffering > 0 then 
+            SlashCo.CurRound.OfferingData.OfferingName = SCInfo.Offering[SlashCo.CurRound.OfferingData.CurrentOffering].Name
+        end
 
         --First we insert the Slasher. If the Slasher does not join in time the game cannot begin.
 
@@ -1228,7 +1232,7 @@ SlashCo.EndRound = function()
 
                 SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "SurvivorRoundsWon", 1)
 
-                SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal + 15
+                SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal + 25
 
             end
         end
@@ -1640,9 +1644,9 @@ end
 
 SlashCo.RemoveHelicopter = function()
 
-local ent = ents.GetByIndex(SlashCo.CurRound.Helicopter)
+    local ent = ents.GetByIndex(SlashCo.CurRound.Helicopter)
 
-ent:Remove()
+    if IsValid(ent) then ent:Remove() end
 
 end
 
@@ -1739,7 +1743,7 @@ SlashCo.TraceHullLocator = function()
 
 end
 
-SlashCo.RadialTester = function(ent, dist)
+SlashCo.RadialTester = function(ent, dist, secondary)
 
     local last_best_angle = 0
     local last_greatest_distance = 0
@@ -1751,7 +1755,7 @@ SlashCo.RadialTester = function(ent, dist)
         local tr = util.TraceLine( {
             start = ent:GetPos() + Vector(0,0,60),
             endpos = (  ent:GetAngles() + Angle(0,ang,0)    ):Forward() * dist,
-            filter = ent
+            filter = {ent, secondary}
         } )
 
         if not tr.Hit then return ang end

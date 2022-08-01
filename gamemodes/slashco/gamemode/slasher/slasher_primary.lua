@@ -63,7 +63,7 @@ do
 end
 
     ::sidgun::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2  then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2 or not slasher:GetNWBool("SidGun") then return end
 do
 
     local spread = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4
@@ -121,23 +121,15 @@ do
     
             if slasher:GetPos():Distance(target:GetPos()) < dist*1.4 and not target:GetNWBool("SurvivorBeingJumpscared") then
 
-                local pick_ang = SlashCo.RadialTester(slasher, 600)
+                local pick_ang = SlashCo.RadialTester(slasher, 600, target)
 
                 slasher:SetEyeAngles( Angle(0,pick_ang,0) )
-                target:SetNotSolid(true)
+                target:SetEyeAngles(  Angle(0,pick_ang,0)  ) 
                 slasher:Freeze(true)
 
                 timer.Simple(0.1, function() 
 
-                    for i = 1 , 76 do --why the fuck do i have to do this?!?!?!?!!?!
-
-                        timer.Simple(0 + (i*0.05), function() 
-                            target:SetEyeAngles(   Angle(0,pick_ang,0)   )  
-                            target:SetAngles(   Angle(0,pick_ang,0)   )  
-                            target:SetPos(slasher:GetPos())
-                        end)
-
-                    end
+                    target:SetPos(slasher:GetPos())
 
                     target:Freeze(true)
     

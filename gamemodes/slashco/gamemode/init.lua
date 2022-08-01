@@ -306,6 +306,8 @@ hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
 	if SERVER then
 		print("[SlashCo] InitPostEntity Started.")
 		RunConsoleCommand("sv_alltalk", "2")
+
+		if game.GetMap() == "rp_deadcity" then Entity(176):Fire("Press") end
 		
 		if game.GetMap() != "sc_lobby" then
 			GAMEMODE.State = GAMEMODE.States.IN_GAME
@@ -453,7 +455,7 @@ local Think = function()
 			--Go back to lobby if everyone dies.
 			if SlashCo.CurRound.SurvivorCount == 0 and SlashCo.CurRound.roundOverToggle then
 
-				--SlashCo.EndRound()
+				SlashCo.EndRound()
 
 				SlashCo.CurRound.roundOverToggle = false
 			end
@@ -506,11 +508,13 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 
 	SlashCo.BroadcastGlobalData()
 
-	SlashCo.BroadcastCurrentRoundData()
+	timer.Simple(2, function() 
 
-	timer.Simple(5, function() SlashCo.BroadcastMasterDatabaseForClient(pid) end)
+		SlashCo.BroadcastMasterDatabaseForClient(pid) 
+		SlashCo.BroadcastCurrentRoundData()
+		SlashCo.BroadcastGlobalData()
 
-	RunConsoleCommand('hud_deathnotice_time', '0')
+	end)
 
 end
 

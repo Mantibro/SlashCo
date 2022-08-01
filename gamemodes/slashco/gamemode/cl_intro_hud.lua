@@ -47,6 +47,8 @@ net.Receive( "mantislashcoGameIntro", function( len, ply )
 
 	show_intro_screen = true
 
+	LobbySlasherInfo = nil
+
 end)
 
 hook.Add("HUDPaint", "RoundIntroHUD", function()

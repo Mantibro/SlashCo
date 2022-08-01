@@ -237,9 +237,9 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		surface.SetMaterial(item_mat)
 		surface.DrawTexturedRect(itemx, itemy, itemsize, itemsize)
-		draw.SimpleText( item_name, "ItemFont", ScrW()/1.16, ScrH()/1.05, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-		if item_droppable then draw.SimpleText( "Q to drop", "ItemFontTip", itemx-15, itemy+(itemsize/5), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
-		if item_usable then draw.SimpleText( "R to use", "ItemFontTip", itemx-15, itemy, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
+		draw.SimpleText( item_name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+		if item_droppable then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
+		if item_usable then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
 
 	end
 	

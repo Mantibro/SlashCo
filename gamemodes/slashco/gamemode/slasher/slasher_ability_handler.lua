@@ -41,12 +41,14 @@ do
         local inv = -0.2
 
         local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius + inv )
+        local find_p = NULL
 
         for i = 1, #find do
 
             if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
 
                 SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
+                find_p = find[i]
 
             end
 
@@ -54,10 +56,10 @@ do
 
         if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist * 2 then
             SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
-            find = slasher:GetEyeTrace().Entity
+            find_p = slasher:GetEyeTrace().Entity
         end
 
-        if not find:GetNWBool("SurvivorChased") then find:SetNWBool("SurvivorChased",true) end
+        if IsValid( find_p ) and not find_p:GetNWBool("SurvivorChased") then find_p:SetNWBool("SurvivorChased",true) end
 
         if a > SlashCo.CurRound.SlasherData[slasherid].ChaseDuration then 
 
