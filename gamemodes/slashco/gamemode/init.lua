@@ -74,7 +74,7 @@ function GM:Initialize()
 
 	if game.GetMap() == "sc_lobby" then
 
-		SlashCo.CreateHelicopter( Vector(-567, 515, 176), Angle(0,45,0))
+		SlashCo.CreateHelicopter( Vector(-544 625 237), Angle(0,45,0))
 
 		SlashCo.CreateItemStash(Vector(-1168, -550, 300), Angle(0,90,90) )
 
@@ -692,25 +692,3 @@ if SERVER then
         return false
     end)
 end
-
-hook.Add("ShowTeam", "DoNotAllowTeamSwitch", function()
-	return false
-end)
-
-hook.Add( "PlayerUse", "STOP", function( ply, ent )
-
-	if ply:Team() == TEAM_SPECTATOR then
-		return false
-	else
-		return
-	end
-
-end )
-
-function GM:HUDShouldDraw(element)
-	return (element != "CHudDeathNotice");
-end
-
-hook.Add( "GetFallDamage", "RealisticDamage", function( ply, speed )
-    return ( speed / 16 )
-end )

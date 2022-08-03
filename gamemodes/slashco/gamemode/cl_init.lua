@@ -21,6 +21,16 @@ function GM:HUDDrawTargetID()
 	return false
 end 
 
+hook.Add( "HUDShouldDraw", "DisableDefaultHUD", function( name )
+	if ( name == "CHudHealth" or name == "CHudBattery") then
+	    return false
+	end
+end)
+
+function GM:DrawDeathNotice(x, y)
+	return false
+end
+
 hook.Add("KeyPress", "PlayerSelect", function(ply, key) 
 
 	if ply != LocalPlayer() or ply:Team() != TEAM_LOBBY then return end
@@ -36,18 +46,17 @@ net.Receive("octoSlashCoTestConfigHalos", function()
         halo.Add( ents.FindByClass("prop_physics"), Color( 255, 0, 0 ), 2, 2, 8, true, true )
         halo.Add( ents.FindByClass("sc_*"), Color( 0, 255, 255 ), 2, 2, 4, true, true )
     end)
-
-    RunConsoleCommand('hud_deathnotice_time', '0')
 end)
 
 hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
     if LocalPlayer():Team() == TEAM_SLASHER then
-        halo.Add(ents.FindByClass("sc_generator"), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
+        halo.Add(ents.FindByClass("sc_generator"), Color( 255, 255, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
         halo.Add(ents.FindByClass("sc_babaclone"), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
         halo.Add(ents.FindByClass("sc_maleclone"), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
     end
 
     if LocalPlayer():Team() == TEAM_SPECTATOR then
+        halo.Add(ents.FindByClass("sc_generator"), Color( 255, 255, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
         halo.Add(team.GetPlayers(TEAM_SURVIVOR), Color( 0, 0, 255 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
         halo.Add(team.GetPlayers(TEAM_SLASHER), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
     end

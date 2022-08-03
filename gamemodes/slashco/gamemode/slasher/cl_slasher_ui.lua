@@ -11,7 +11,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 			SlashID = 1
 			SlashName = "ERROR"
 			Eyesight = 5
-			Perception = 1
+			PerceptionReal = 1
 			CanChase = false
 			ChaseRange = 500
 			CanKill = false
@@ -19,7 +19,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 			ChaseTick = SlasherTable[lid].CurrentChaseTick
 		end
 
-		--Range (in units) = 2.5 * SurvivorSpeed * Perception
+		--Range (in units) = 2.5 * SurvivorSpeed * PerceptionReal
 		local slasherpos = ply:GetPos()
 		local inchase = LocalPlayer():GetNWBool("InSlasherChaseMode")
 
@@ -506,6 +506,10 @@ end
 
 		::skipchase::
 
+		local PerceptionReal = Perception
+
+		if inchase then PerceptionReal = 0 end
+
 		local StepNotice = Material("slashco/ui/particle/step_notice")
 		if timeSinceLast == nil then timeSinceLast = 0 end
 		timeSinceLast = timeSinceLast + FrameTime()/3
@@ -517,7 +521,7 @@ end
 
 			local vel = (survivor:GetVelocity()):Length()
 
-			local range = 3 * vel * Perception
+			local range = 3 * vel * PerceptionReal
 
 			local pos = survivor:GetPos()
 
@@ -545,7 +549,7 @@ end
 
 			local vel = 300
 
-			local range = 3 * vel * Perception
+			local range = 3 * vel * PerceptionReal
 
 			local offsetpos = Vector(math.random(-50, 50),math.random(-50, 50),0)
 
@@ -607,9 +611,3 @@ hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
 
 	DrawColorModify( tab ) --Draws Color Modify effect
 end )
-
-hook.Add( "HUDShouldDraw", "DisableDefaultHUD", function( name )
-	if ( name == "CHudHealth" or name == "CHudBattery" ) then
-	return false
-	end
-end)

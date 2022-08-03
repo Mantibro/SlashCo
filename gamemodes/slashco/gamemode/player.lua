@@ -70,88 +70,45 @@ end
 --Proximity voice chat
 
 hook.Add( "PlayerCanHearPlayersVoice", "Maximum Range", function( listener, talker )
+
+	if talker:Team() == TEAM_SPECTATOR or talker:Team() == TEAM_SLASHER then return false end
+
     if listener:GetPos():DistToSqr( talker:GetPos() ) > 1000000 then
 		return false
 	end
 
-	if talker:Team() == TEAM_SPECTATOR or talker:Team() == TEAM_SLASHER then return false end
 end )
 
+hook.Add( "GetFallDamage", "RealisticDamage", function( ply, speed )
+    return ( speed / 16 )
+end )
 
+hook.Add( "PlayerCanSeePlayersChat", "TeamChat", function( text, teamOnly, listener, speaker)
 
---[[
+	if listener:Team() == TEAM_SPECTATOR then return true end
+	if speaker:Team() == TEAM_SLASHER then return false end
+	if speaker:Team() == TEAM_SPECTATOR and listener:Team() != TEAM_SPECTATOR then return false end
 
-I want to put these here
-but they just don't work
-
-SlashCo.PlayerData[pid].Lives for some reason returns nil here, but not in init
-
-i am going insane
-
-
-
-function GM:PlayerDeath(victim, inflictor, attacker)
-
-if SERVER then
-
-	print(SlashCo.PlayerData[victim:SteamID64()].Lives)
-
-	if !IsValid(victim) then return end
-
-    if GAMEMODE.State == GAMEMODE.States.IN_GAME and victim:Team() == TEAM_SURVIVOR then
-        --local pid = victim:SteamID64()
-		local lives = SlashCo.PlayerData[pid].Lives
-		SlashCo.PlayerData[pid].Lives = tonumber(lives)-1
-        
-		if tonumber(lives)-1 <= 0 then
-			print("[SlashCo] '"..victim:GetName().."' is out of lives, moving them to the Spectator team.")
-
-			local ragdoll = ents.Create("prop_ragdoll")
-			ragdoll:SetModel(victim:GetModel())
-			ragdoll:SetPos(victim:GetPos())
-			ragdoll:SetAngles(victim:GetAngles())
-			ragdoll:SetNoDraw(false)
-			local phys = ragdoll:GetPhysicsObject()
-			if IsValid(phys) then phys:ApplyForceCenter( victim:GetVelocity() ) end
-			ragdoll:Spawn()
-
-			victim:SetTeam( TEAM_SPECTATOR )
-			
+	if listener:GetPos():DistToSqr( talker:GetPos() ) > 1000000 then 
+		return false 
+	else
+		if speaker:Team() == TEAM_SURVIVOR then 
+			return true 
 		end
-    end
+	end
 
-end
+end )
 
-end
+hook.Add("ShowTeam", "DoNotAllowTeamSwitch", function()
+	return false
+end)
 
-hook.Add("PlayerDeath", "SurvivorDying", function(victim, inflictor, attacker) --Deathward
+hook.Add( "PlayerUse", "STOP", function( ply, ent )
 
-if SERVER then
-
-	if victim:Team() != TEAM_SURVIVOR then return end
-
-	local pid = victim:SteamID64()
-
-	--if SlashCo.GetHeldItem(victim) != 0 or SlashCo.GetHeldItem(victim) != 2 or SlashCo.GetHeldItem(victim) != 99 then
-	--	SlashCo.DropItem(victim)
-	--end
-
-	victim:SetNWBool("DynamicFlashlight", false)
-
-	if SlashCo.PlayerData[pid] == nil then return end
-
-	if SlashCo.PlayerData[pid].Lives > 1 then
-		victim:EmitSound( "slashco/survivor/deathward.mp3")
-		victim:EmitSound( "slashco/survivor/deathward_break"..math.random(1,2)..".mp3")
-
-		SlashCo.RespawnPlayer(victim)
-
-		SlashCo.ChangeSurvivorItem(pid, 99)
-
+	if ply:Team() == TEAM_SPECTATOR then
+		return false
+	else
 		return
 	end
 
-end
-	
-end)
-]]
+end )

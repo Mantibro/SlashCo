@@ -706,11 +706,12 @@ do
 
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Time Spent chasing
     v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Punch Cooldown
-    --v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Times Found
-    --v4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 --Destruction power
-    --v5 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 --Destoyer Blink
+    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Punch Slowdown
 
     if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() end
+
+    if v3 > 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 - FrameTime() end
+    if v3 < 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 1 end
 
     if not slasher:GetNWBool("InSlasherChaseMode") then
 
@@ -737,8 +738,8 @@ do
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + FrameTime()
 
-        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 12 ) )
-        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 12 )  )
+        slasher:SetRunSpeed(  (     SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 14 )   ) / v3 )
+        slasher:SetWalkSpeed( (     SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 14 )   ) / v3 )
 
         if slasher.ChaseSound == nil then
 
@@ -746,7 +747,7 @@ do
 
             PlayGlobalSound("slashco/slasher/borgmire_anger.mp3", 75, slasher, 1)
 
-            PlayGlobalSound("slashco/slasher/borgmire_anger_far.mp3", 102, slasher, 1)
+            PlayGlobalSound("slashco/slasher/borgmire_anger_far.mp3", 110, slasher, 1)
 
             slasher:StopSound("slashco/slasher/borgmire_breath_base.wav")
             timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/borgmire_breath_base.wav") end)

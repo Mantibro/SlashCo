@@ -482,6 +482,8 @@ do
 
             slasher:EmitSound("slashco/slasher/borgmire_swing"..math.random(1,2)..".mp3")
 
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 2
+
             if SERVER then
 
                 local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(50,0,50)), Vector(-35,-45,-60), Vector(35,45,60), 35 + (SO*20), DMG_SLASH, 5, false )

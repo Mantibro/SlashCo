@@ -245,12 +245,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 	
 end)
 
-hook.Add( "HUDShouldDraw", "DisableDefaultHUD", function( name )
-	if ( name == "CHudHealth" or name == "CHudBattery" ) then
-	return false
-	end
-end)
-
 hook.Add( "Think", "Slasher_Chasing_Light", function()
 
 	for s = 1, #team.GetPlayers(TEAM_SLASHER) do

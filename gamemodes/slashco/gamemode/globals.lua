@@ -15,6 +15,7 @@ SlashCo.Maps = {
     {
         ID = "sc_summercamp",
         NAME = "Black Lake Summer Camp",
+        AUTHOR = "Steinman",
         SIZE = 2,
         MIN_PLAYERS = 1,
         LEVELS = {
@@ -25,6 +26,7 @@ SlashCo.Maps = {
     {
         ID = "sc_highschool",
         NAME = "Black Lake High School",
+        AUTHOR = "Steinman",
         SIZE = 2,
         MIN_PLAYERS = 2,
         LEVELS = {
@@ -37,6 +39,7 @@ SlashCo.Maps = {
     {
         ID = "rp_deadcity",
         NAME = "Dead City",
+        AUTHOR = "NuclearGhost",
         SIZE = 3,
         MIN_PLAYERS = 2,
         LEVELS = {
@@ -48,6 +51,7 @@ SlashCo.Maps = {
     --[[{
         ID = "rp_redforest",
         NAME = "Red Forest",
+        AUTHOR = "NuclearGhost",
         SIZE = 4,
         MIN_PLAYERS = 3,
         LEVELS = {
