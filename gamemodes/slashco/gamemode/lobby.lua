@@ -519,9 +519,9 @@ function lobbyRoundSetup()
 	if #SlashCo.LobbyData.AssignedSurvivors < SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then goto Map_reroll end
 	
 
-	for i, ply in ipairs( player.GetAll() ) do
-		ply:ChatPrint("(Debug) Lobby Setup complete. Difficulty: "..SlashCo.LobbyData.SelectedDifficulty)
-	end
+	--for i, ply in ipairs( player.GetAll() ) do
+	--	ply:ChatPrint("(Debug) Lobby Setup complete. Difficulty: "..SlashCo.LobbyData.SelectedDifficulty)
+	--end
 
 	net.Start("mantislashcoSendLobbyItemGlobal") 
 	net.WriteTable(SlashCo.SlasherData)

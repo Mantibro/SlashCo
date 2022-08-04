@@ -32,11 +32,11 @@ Extra credits: undo, Jim, DarkGrey
 local SlashCo = SlashCo
 local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
-concommand.Add( "set_team", function( ply, cmd, args )
+--[[concommand.Add( "set_team", function( ply, cmd, args )
 	local Team = args[1] or 1
 	ply:SetTeam( Team )
 	ply:Spawn()
-end )
+end )]]
 
 --Initialize global variable to hold functions.
 if not SlashCo then SlashCo = {} end
@@ -74,7 +74,7 @@ function GM:Initialize()
 
 	if game.GetMap() == "sc_lobby" then
 
-		SlashCo.CreateHelicopter( Vector(-544 625 237), Angle(0,45,0))
+		SlashCo.CreateHelicopter( Vector(-544, 625, 200), Angle(0,45,0))
 
 		SlashCo.CreateItemStash(Vector(-1168, -550, 300), Angle(0,90,90) )
 
@@ -323,8 +323,6 @@ hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
 
 		end
 	end
-
-	--if game.GetMap() == "sc_lobby" then EmitSound( "slashco/music/slashco_lobby.wav", Vector(0,0,0), 0, CHAN_STATIC, 1, 100) end
 
 end)
 

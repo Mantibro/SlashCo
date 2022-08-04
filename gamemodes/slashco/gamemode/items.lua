@@ -37,7 +37,7 @@ SlashCo.UseItem = function(ply)
 	local itid = SlashCo.GetHeldItem(ply)
 
 	--Skip the non-usable items
-	if itid < 3 or itid == 6 or itid == 11 then return end
+	if itid < 3 or itid == 11 then return end
 
 	if itid == 3 then
 
@@ -89,6 +89,16 @@ SlashCo.UseItem = function(ply)
 
 	end
 
+	if itid == 6 then
+
+		--Active Step Decoy
+
+		local decoy = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld( Vector(10 , 0, 5) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
+
+		Entity( decoy ):SetNWBool("StepDecoyActive", true) 
+
+	end
+
 	if itid == 7 then
 
 		--When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position. 
@@ -121,17 +131,19 @@ SlashCo.UseItem = function(ply)
 
 	if itid == 8 then
 
-		--When used, the survivor will become invisible for 30 seconds.
+		--When used, the survivor will become undetectable for 30 seconds.
 
 		ply:EmitSound("slashco/survivor/soda_drink"..math.random(1,2)..".mp3")
 
 		ply:SetMaterial("Models/effects/vol_light001")
 		ply:SetColor(Color(0,0,0,0))
+		ply:SetNWBool("BGoneSoda", true)
 
 		timer.Simple(30, function()
 
 			ply:SetMaterial("")
 			ply:SetColor(Color(255,255,255,255))
+			ply:SetNWBool("BGoneSoda", false)
 
 			ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 

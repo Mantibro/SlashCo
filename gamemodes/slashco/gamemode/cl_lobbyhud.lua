@@ -89,8 +89,8 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 
 		surface.SetDrawColor(255,255,255,255)	
 
-		surface.SetMaterial(Tablet)
-		surface.DrawTexturedRect(-ScrW()/15, ScrH()/50, ScrW()/2.5, ScrW()/2.5)
+		--surface.SetMaterial(Tablet)
+		--surface.DrawTexturedRect(-ScrW()/15, ScrH()/50, ScrW()/2.5, ScrW()/2.5)
 	
 		draw.SimpleText( "Press F1 to ready as Survivor.", "LobbyFont1", scrW * 0.975, (scrH * 0.5)+300, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 	
@@ -100,59 +100,59 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 			draw.SimpleText( "Starting in: "..tostring( TimeLeft ).." seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.65), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 		end
 
+		local mul_y = 1
+		if longest_name == nil then longest_name = 0 end
+		if plynum == nil or plynum != #Lobby_Players then 
+			longest_name = 0
+			plynum = #Lobby_Players 
+		end
+
+		draw.SimpleText( plynum.." / 5", "LobbyFont1", scrW * 0.018, (scrH * 0.22), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+
 		for i = 1, #Lobby_Players do
 
 			local pos_y = 0.27
-			if i == 2 then pos_y = 0.333 end
-			if i == 3 then pos_y = 0.395 end
-			if i == 4 then pos_y = 0.457 end
-			if i == 5 then pos_y = 0.52 end
-
-			draw.SimpleText( Lobby_Players[i].Name, "PlayersFont", scrW * 0.025, (scrH * pos_y), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-
-		end
-
-		surface.SetDrawColor(255,255,255,255)	
-
-		for i = 1, #Lobby_Players do
-
+			local x_pos = scrW * 0.025
 			local iconsize = ScrW()/45
-			local x_pos = ScrW()/4.55
-			local y_pos = ScrH()/3.8
 
-			if i == 2 then y_pos = ScrH()/3.068 end
-			if i == 3 then y_pos = ScrH()/2.57 end
-			if i == 4 then y_pos = ScrH()/2.21 end
-			if i == 5 then y_pos = ScrH()/1.945 end
+			surface.SetDrawColor( 0, 0, 0 )
+			surface.DrawRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18,(longest_name) + 65, 60 )
+			surface.SetDrawColor( 50, 50, 50 )
+			surface.DrawOutlinedRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18, longest_name + 65, 60, 3 )
 
-			if Lobby_Players[i].Ready > 0 then
-				surface.SetMaterial(ReadyCheck)
-				surface.DrawTexturedRect(x_pos, y_pos, iconsize, iconsize)
-			else
-				surface.SetMaterial(UnReadyCheck)
-				surface.DrawTexturedRect(x_pos, y_pos, iconsize, iconsize)
+			if string.len(Lobby_Players[i].Name)*15 > longest_name then 
+				longest_name = string.len(Lobby_Players[i].Name)*15 
 			end
 
+			draw.SimpleText( Lobby_Players[i].Name, "PlayersFont", scrW * 0.025, (scrH * (pos_y * mul_y)), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+			
+			local icon_pos_x = x_pos + longest_name
+			local icon_pos_y = (scrH * (pos_y * mul_y)) - 8
+
+			surface.SetDrawColor(255,255,255,255)
+			if Lobby_Players[i].Ready > 0 then
+				surface.SetMaterial(ReadyCheck)
+			else
+				surface.SetMaterial(UnReadyCheck)
+			end
+
+			surface.DrawTexturedRect(icon_pos_x, icon_pos_y, iconsize, iconsize)
+
+			mul_y = mul_y + 0.25
+
 		end
+
 	
 	end
 	
 	if clientReadiness != nil then
 		
-		if clientReadiness < 1 then
-	
-			draw.SimpleText( "You are not Ready.", "LobbyFont1", scrW * 0.025, scrH * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	
-		end
-		if clientReadiness == 1 then
-	
-			draw.SimpleText( "You are Ready as SURVIVOR.", "LobbyFont1", scrW * 0.025, scrH * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	
-		end
-		if clientReadiness == 2 then
-	
+		if clientReadiness < 1 then	
+			draw.SimpleText( "You are not Ready.", "LobbyFont1", scrW * 0.025, scrH * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )	
+		elseif clientReadiness == 1 then	
+			draw.SimpleText( "You are Ready as SURVIVOR.", "LobbyFont1", scrW * 0.025, scrH * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )	
+		elseif clientReadiness == 2 then	
 			draw.SimpleText( "You are Ready as SLASHER.", "LobbyFont1", scrW * 0.025, scrH * 0.8, Color( 255, 50, 50, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	
 		end
 	
 	end

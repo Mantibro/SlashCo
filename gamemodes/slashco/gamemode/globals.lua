@@ -14,7 +14,7 @@ SlashCo.Maps = {
 
     {
         ID = "sc_summercamp",
-        NAME = "Black Lake Summer Camp",
+        NAME = "Summer Camp",
         AUTHOR = "Steinman",
         SIZE = 2,
         MIN_PLAYERS = 1,
@@ -25,7 +25,7 @@ SlashCo.Maps = {
 
     {
         ID = "sc_highschool",
-        NAME = "Black Lake High School",
+        NAME = "High School",
         AUTHOR = "Steinman",
         SIZE = 2,
         MIN_PLAYERS = 2,
@@ -34,9 +34,9 @@ SlashCo.Maps = {
             100,
             600
         }
-    },
+    }
 
-    {
+    --[[{
         ID = "rp_deadcity",
         NAME = "Dead City",
         AUTHOR = "NuclearGhost",
@@ -48,7 +48,7 @@ SlashCo.Maps = {
         }
     }
 
-    --[[{
+    {
         ID = "rp_redforest",
         NAME = "Red Forest",
         AUTHOR = "NuclearGhost",
@@ -1312,7 +1312,7 @@ SlashCo.SpawnCurConfig = function()
     --SlashCo.ResetCurRoundData()
 
     local curmap = game.GetMap()
-    if curmap != "sc_lobby" then --Replace with actual map name for the lobby map
+    if curmap != "sc_lobby" then
         if not SlashCo.ValidateMap(curmap) then
             ErrorNoHalt("[SlashCo] '"..curmap.."' is not a playable map, aborting.\n")
             return
@@ -1427,6 +1427,8 @@ SlashCo.SpawnCurConfig = function()
         timer.Simple(8, function()
 
             SlashCo.HelicopterTakeOffIntro()
+
+            SlashCo.ClearDatabase() --Everything was loaded, clear the database.
     
         end)
 

@@ -67,7 +67,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 		if g_monitor < g then
 
-			if g < 10 then
+			if g < 1 then
 				surface.PlaySound("slashco/slashco_progress.mp3")
 			else
 				surface.PlaySound("slashco/slashco_progress_full.mp3")
@@ -77,9 +77,9 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 		end
 
-		if lerper < 1 then lerper = lerper + ( 0.01 + ( 0.005 / lerper ) ) end
+		if lerper < 1 then lerper = (lerper + (( 0.01 + ( 0.005 / lerper ) ))/5) * (1-g) end
 
-		local gp = Lerp( lerper, 0, g )
+		local gp = Lerp( g + lerper, 0, g )
 
 		g_monitor = g
 
@@ -436,7 +436,7 @@ do
 end
 
 	::borgmire::
-	if SlashID != 8 then goto theking end
+	if SlashID != 8 then goto freesmiley end
 do
 
 	local PunchIcon = Material("slashco/ui/icons/slasher/s_punch")
@@ -454,7 +454,7 @@ do
 
 end
 
-	::theking::
+	::freesmiley::
 
 		--Slasher-Shared function \/ \/ \/ 
 
@@ -519,6 +519,8 @@ end
 
 			local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
 
+			if survivor:GetNWBool("BGoneSoda") then goto gone end
+
 			local vel = (survivor:GetVelocity()):Length()
 
 			local range = 3 * vel * PerceptionReal
@@ -528,7 +530,7 @@ end
 			local em = ParticleEmitter(pos)
     		local part = em:Add(	StepNotice,	pos	) 
 
-    		if part and timeSinceLast < 0.01 and  (  slasherpos	):Distance(	pos	) < range and survivor:IsOnGround() then 
+    		if part and timeSinceLast == 0 and  (  slasherpos	):Distance(	pos	) < range and survivor:IsOnGround() then 
           		part:SetColor(255,255,255,math.random(255))
           		part:SetVelocity(Vector(math.random(-1,1),math.random(-1,1),math.random(-1,1)):GetNormal() * 20)
           		part:SetDieTime(1)
@@ -538,8 +540,9 @@ end
     		end
 
 			em:Finish()
-			
 
+			::gone::
+			
 		end
 
 		--Step Decoy Step Notice
@@ -551,14 +554,14 @@ end
 
 			local range = 3 * vel * PerceptionReal
 
-			local offsetpos = Vector(math.random(-50, 50),math.random(-50, 50),0)
+			local offsetpos = Vector(math.random(-2, 2),math.random(-2, 2),0)
 
 			local pos = boot:GetPos() + offsetpos
 
 			local em = ParticleEmitter(pos)
     		local part = em:Add(	StepNotice,	pos	) 
 
-    		if part and timeSinceLast < 0.01 and  (  slasherpos	):Distance(	pos	) < range then 
+    		if part and timeSinceLast == 0 and  (  slasherpos	):Distance(	pos	) < range then 
           		part:SetColor(255,255,255,math.random(255))
           		part:SetVelocity(Vector(math.random(-1,1),math.random(-1,1),math.random(-1,1)):GetNormal() * 20)
           		part:SetDieTime(1)

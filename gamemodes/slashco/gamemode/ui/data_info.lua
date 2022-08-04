@@ -119,13 +119,13 @@ SCInfo.Item = {
 
     {
         Name = "Milk Jug",
-        Price = 20,
+        Price = 10,
         Description = "A jug of fresh milk. Consuming it will grant you a large speed boost\n for a short while.\nA certain Slasher seems to really like this item."
     },
 
     {
         Name = "Cookie",
-        Price = 25,
+        Price = 15,
         Description = "A large chocolate chip cookie. Consuming it will grant you a speed boost\nfor a limited time. \nA certain Slasher seems to really like this item."
     },
 
@@ -137,7 +137,7 @@ SCInfo.Item = {
 
     {
         Name = "Step Decoy",
-        Price = 5,
+        Price = 10,
         Description = "A worn, metallic boot. \nIf placed on a solid surface, it will imitate footsteps sounds which can\ndistract Slashers."
     },
 
@@ -149,7 +149,7 @@ SCInfo.Item = {
 
     {
         Name = "B-Gone Soda",
-        Price = 25,
+        Price = 20,
         Description = "A can of strange soda. It has a sweet smell. \nConsuming it will turn you invisible for a short while."
     },
 
@@ -161,15 +161,15 @@ SCInfo.Item = {
 
     {
         Name = "Devil's Gamble",
-        Price = 60,
+        Price = 40,
         Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
-    },
+    }
 
-    {
+    --[[{
         Name = "Personal Radio Set",
         Price = 0,
         Description = "A full set of short-wave radio transmitters which will allow your team\nto communicate remotely. Only one can be taken."
-    }
+    }]]
 
 }
 

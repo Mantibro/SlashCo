@@ -710,7 +710,7 @@ do
 
     if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() end
 
-    if v3 > 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 - FrameTime() end
+    if v3 > 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 - (FrameTime()/(2-SO)) end
     if v3 < 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 1 end
 
     if not slasher:GetNWBool("InSlasherChaseMode") then
@@ -738,8 +738,8 @@ do
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + FrameTime()
 
-        slasher:SetRunSpeed(  (     SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 14 )   ) / v3 )
-        slasher:SetWalkSpeed( (     SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * 14 )   ) / v3 )
+        slasher:SetRunSpeed(  (     SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * (14-(SO*7)) )   ) / v3 )
+        slasher:SetWalkSpeed( (     SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - math.sqrt( v1 * (14-(SO*7)) )   ) / v3 )
 
         if slasher.ChaseSound == nil then
 

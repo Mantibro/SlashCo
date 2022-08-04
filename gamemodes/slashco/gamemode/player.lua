@@ -89,7 +89,7 @@ hook.Add( "PlayerCanSeePlayersChat", "TeamChat", function( text, teamOnly, liste
 	if speaker:Team() == TEAM_SLASHER then return false end
 	if speaker:Team() == TEAM_SPECTATOR and listener:Team() != TEAM_SPECTATOR then return false end
 
-	if listener:GetPos():DistToSqr( talker:GetPos() ) > 1000000 then 
+	if listener:GetPos():DistToSqr( speaker:GetPos() ) > 1000000 then 
 		return false 
 	else
 		if speaker:Team() == TEAM_SURVIVOR then 
