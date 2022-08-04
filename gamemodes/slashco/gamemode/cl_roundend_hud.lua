@@ -1,6 +1,6 @@
 include( "ui/fonts.lua" )
 
-net.Receive( "mantislashcoRoundEnd", function( len, ply )
+net.Receive( "mantislashcoRoundEnd", function( _, _ )
 	local retable = net.ReadTable()
 
 	local result = retable.result
@@ -32,7 +32,7 @@ net.Receive( "mantislashcoRoundEnd", function( len, ply )
 
 end)
 
-net.Receive( "mantislashcoHelicopterMusic", function( len, ply )
+net.Receive( "mantislashcoHelicopterMusic", function( _, _ )
 
 	if LocalPlayer():Team() == TEAM_SLASHER then return end
 
@@ -46,7 +46,7 @@ end)
 
 hook.Add("HUDPaint", "RoundOutroHUD", function()
 
-	local ply = LocalPlayer()
+	--local ply = LocalPlayer()
 
 	--Round Ending screen
 

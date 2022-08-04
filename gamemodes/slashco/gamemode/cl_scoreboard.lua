@@ -123,7 +123,7 @@ local PLAYER_LINE = {
 				self.Mute:SetImage( "icon32/unmuted.png" )
 			end
 
-			self.Mute.DoClick = function( s ) self.Player:SetMuted( not self.Muted ) end
+			self.Mute.DoClick = function( _ ) self.Player:SetMuted( not self.Muted ) end
 			self.Mute.OnMouseWheeled = function( s, delta )
 				self.Player:SetVoiceVolumeScale( self.Player:GetVoiceVolumeScale() + ( delta / 100 * 5 ) )
 				s.LastTick = CurTime()
@@ -238,13 +238,13 @@ local SCORE_BOARD = {
 
 	end,
 
-	Paint = function( self, w, h )
+	Paint = function( _, _, _ )
 
 		--draw.RoundedBox( 4, 0, 0, w, h, Color( 0, 0, 0, 200 ) )
 
 	end,
 
-	Think = function( self, w, h )
+	Think = function( self, _, _ )
 
 		self.Name:SetText( GetHostName() )
 
@@ -252,7 +252,7 @@ local SCORE_BOARD = {
 		-- Loop through each player, and if one doesn't have a score entry - create it.
 		--
 		local plyrs = player.GetAll()
-		for id, pl in pairs( plyrs ) do
+		for _, pl in pairs( plyrs ) do
 
 			if ( IsValid( pl.ScoreEntry ) ) then continue end
 

@@ -27,7 +27,7 @@ hook.Add( "HUDShouldDraw", "DisableDefaultHUD", function( name )
 	end
 end)
 
-function GM:DrawDeathNotice(x, y)
+function GM:DrawDeathNotice(_, _)
 	return false
 end
 

@@ -30,7 +30,7 @@ Extra credits: undo, Jim, DarkGrey
 ]]
 
 local SlashCo = SlashCo
-local roundOverToggle = SlashCo.CurRound.roundOverToggle
+--local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
 --[[concommand.Add( "set_team", function( ply, cmd, args )
 	local Team = args[1] or 1
@@ -47,7 +47,7 @@ function GM:Initialize()
 
 		CreateClientConVar( "cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel" )
 	
-		cvars.AddChangeCallback( "cl_slashco_playermodel", function(name, oldVal, newVal) 
+		cvars.AddChangeCallback( "cl_slashco_playermodel", function(_, _, newVal)
 	
 			if newVal ~= "models/slashco/survivor/male_0*.mdl" then
 				--print("[SlashCo] Bad Playermodel. It will be randomized instead.")
@@ -94,7 +94,7 @@ function GM:Initialize()
 
 end
 
-hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, ent )
+hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, _ )
 
 	if ply:Team() == TEAM_SLASHER then
 
@@ -374,7 +374,7 @@ local Think = function()
 		
 		--Assign everyone to the data table.
 		if not setupPlayerData then
-			local plys = player.GetAll()
+			--local plys = player.GetAll()
 			for i=1, #plys do
 				if IsValid(plys[i]) and plys[i]:Team() == TEAM_SURVIVOR then
 					table.insert(SlashCo.CurRound.AlivePlayers, plys[i])
@@ -386,7 +386,7 @@ local Think = function()
 		end
 
 		--If a survivor is dead move em over to the dead players list.
-		local plys = player.GetAll()
+		--local plys = player.GetAll()
 		for i=1, #plys do
 			if IsValid(plys[i]) and plys[i]:Team() == TEAM_SPECTATOR and table.HasValue(SlashCo.CurRound.AlivePlayers, plys[i]) then
 				table.insert(SlashCo.CurRound.DeadPlayers, plys[i])
@@ -472,7 +472,7 @@ hook.Add("PostGamemodeLoaded", "octoSlashCoPostGamemodeLoaded", function()
 	timer.Simple(1, function() hook.Add("Think", "octoSlashCoCoreThink", Think) end)
 end)
 
-hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, transition)
+hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 
 	if SERVER then
 
@@ -562,7 +562,7 @@ end
 end)
 
 
-function GM:PlayerDeath(victim, inflictor, attacker)
+function GM:PlayerDeath(victim, _, _)
 	
 		if not IsValid(victim) then return end
 	
@@ -616,7 +616,7 @@ function GM:PlayerDeath(victim, inflictor, attacker)
 						PhysBone:SetVelocity(victim:GetVelocity() * 2)
 						PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
 
-						local ragbone = ragdoll:TranslatePhysBoneToBone( i )
+						ragdoll:TranslatePhysBoneToBone( i ) --local ragbone =
 						for b = 1, victim:GetBoneCount() do
 							local plybone = victim:TranslateBoneToPhysBone( b )
 
@@ -640,7 +640,7 @@ function GM:PlayerDeath(victim, inflictor, attacker)
 	
 end
 	
-hook.Add("PlayerDeath", "SurvivorDying", function(victim, inflictor, attacker) --Deathward
+hook.Add("PlayerDeath", "SurvivorDying", function(victim, _, _) --Deathward
 	
 	if SERVER then
 	

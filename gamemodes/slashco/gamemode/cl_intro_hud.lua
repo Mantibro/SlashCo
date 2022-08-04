@@ -1,6 +1,6 @@
 include( "ui/fonts.lua" )
 
-net.Receive( "mantislashcoGameIntro", function( len, ply )
+net.Receive( "mantislashcoGameIntro", function( _, _ )
 	local introtable = net.ReadTable()
 
 	stop_lobbymusic = true
@@ -53,7 +53,7 @@ end)
 
 hook.Add("HUDPaint", "RoundIntroHUD", function()
 
-	local ply = LocalPlayer()
+	--local ply = LocalPlayer()
 
 	--Intro screen
 
@@ -64,7 +64,7 @@ hook.Add("HUDPaint", "RoundIntroHUD", function()
 	tick = tick + 0.5
 
 	local map = intro_map
-	local difficulty = intro_diff
+	--local difficulty = intro_diff
 	local name = intro_name
 	local class = intro_class
 	local danger = intro_danger

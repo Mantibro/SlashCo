@@ -1,20 +1,20 @@
 include( "ui/fonts.lua" )
 
-net.Receive( "mantislashcoLobbyTimerTime", function( len, ply )
+net.Receive( "mantislashcoLobbyTimerTime", function( _, _ )
 	TimeLeft = net.ReadUInt(6)
 end)
 
-net.Receive( "mantislashcoGiveLobbyStatus", function( len, ply )
+net.Receive( "mantislashcoGiveLobbyStatus", function( _, _ )
 	StateOfLobby = net.ReadUInt(3)	
 end)
 
-net.Receive( "mantislashcoGiveLobbyInfo", function( len, ply )
+net.Receive( "mantislashcoGiveLobbyInfo", function( _, _ )
 	LobbyInfoTable = net.ReadTable()
 end)
 
 hook.Add("HUDPaint", "LobbyInfoText", function()
 
-	net.Receive( "mantislashcoGiveMasterDatabase", function( len, ply )
+	net.Receive( "mantislashcoGiveMasterDatabase", function( _, _ )
 		local t = net.ReadTable()
 		if t[1].PlayerID ~= LocalPlayer():SteamID64() then return end
 		data_load = t
@@ -60,7 +60,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
 if StateOfLobby ~= nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
 
-	local Tablet = Material("slashco/ui/lobby_backdrop")
+	--local Tablet = Material("slashco/ui/lobby_backdrop")
 	local ReadyCheck = Material("slashco/ui/lobby_ready")
 	local UnReadyCheck = Material("slashco/ui/lobby_unready")
 	

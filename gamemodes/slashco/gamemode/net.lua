@@ -98,7 +98,7 @@ net.Receive("mantislashcoBeginOfferingVote", function()
 
 	timer.Create( "OfferingVoteTimer", 20, 1, function() SlashCo.OfferingVoteFail() end)
 
-	for i, play in ipairs( player.GetAll() ) do
+	for _, play in ipairs( player.GetAll() ) do
         play:ChatPrint(player.GetBySteamID64(t.ply):GetName().." would like to offer "..SCInfo.Offering[t.id].Name) 
     end
 

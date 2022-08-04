@@ -552,7 +552,7 @@ SlashCo.RoundBeginTimer = function()
 	timer.Create( "GameStart", 15, 1, function() if SERVER then RunConsoleCommand("slashco_curconfig_run") end end)
 end
 
-concommand.Add( "slashco_curconfig_run", function( ply, cmd, args )
+concommand.Add( "slashco_curconfig_run", function( _, _, _ )
 
     SlashCo.RemoveAllCurRoundEnts()
 	
@@ -623,7 +623,7 @@ if SERVER then
 
         SlashCo.CurRound.SurvivorCount = #survivors
 
-        local id1 = slashers[1].Slashers
+        --local id1 = slashers[1].Slashers
         local id2 = 0
         if slashers[2] ~= nil then id2 = slashers[2].Slashers end
 
@@ -784,7 +784,7 @@ SlashCo.ValidateMap = function(map)
     --local gasCount = math.max(json.GasCans.Count, #(json.GasCans.Spawnpoints))
     local batCount = math.max(json.Generators.Count, #(json.Batteries.Spawnpoints))
     local itemCount = #(json.Items.Spawnpoints)
-    local HeliCount = #(json.Helicopter.Spawnpoints)
+    --local HeliCount = #(json.Helicopter.Spawnpoints)
 
     SlashCo.CurRound.HelicopterSpawnPosition = Vector(json.Helicopter.StartLocation.pos[1],json.Helicopter.StartLocation.pos[2],json.Helicopter.StartLocation.pos[3])
 
@@ -988,7 +988,7 @@ SlashCo.CreateGenerators = function(spawnpoints)
         local pos = SlashCo.CurConfig.Generators.Spawnpoints[spawnpoints[I]].pos
         local ang = SlashCo.CurConfig.Generators.Spawnpoints[spawnpoints[I]].ang
 
-        local entID = SlashCo.CreateGenerator( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateGenerator( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) ) --local entID =
     end
 end
 
@@ -1002,7 +1002,7 @@ SlashCo.CreateGasCans = function(spawnpoints)
             ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[spawnpoints[I]].ang
         end
 
-        local entID = SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
 
@@ -1012,7 +1012,7 @@ SlashCo.CreateGasCansE = function(spawnpoints)
         local pos = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].pos
         local ang = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].ang
 
-        local entID = SlashCo.CreateGasCanE( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateGasCanE( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
 
@@ -1024,7 +1024,7 @@ SlashCo.CreateItems = function(spawnpoints, item)
         --Occupied spawn
         --table.RemoveByValue( SlashCo.CurConfig.Items.Spawnpoints, spawnpoints[I] )
 
-        local entID = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
+        SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
     end
 end
 
@@ -1034,7 +1034,7 @@ SlashCo.CreateBatteries = function(spawnpoints)
         local pos = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][rand].pos
         local ang = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][rand].ang
 
-        local entID = SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
 
@@ -1045,7 +1045,7 @@ SlashCo.CreateBatteriesE = function(spawnpoints)
             local pos = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][J].pos
             local ang = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][J].ang
 
-            local entID = SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+            SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
         end
     end
 end
@@ -1283,7 +1283,7 @@ SlashCo.RoundHeadstart = function()
 
     if #SlashCo.CurRound.SlasherData.AllSurvivors > 3 then return end
 
-    for i = 1, (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
+    for _ = 1, (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
 
         local r = ents.FindByClass("sc_generator")[math.random(1,2)]:EntIndex()
 
@@ -1296,7 +1296,7 @@ end
 SlashCo.SurvivorWinFinish = function()
     local delay = 16
 
-    for i, play in ipairs( player.GetAll() ) do
+    for _, play in ipairs( player.GetAll() ) do
         play:ChatPrint("[SlashCo] All Living survivors are in the Helicopter.") 
     end
 
@@ -1373,7 +1373,7 @@ SlashCo.SpawnCurConfig = function()
 
                 local diff = SlashCo.CurRound.Difficulty
 
-                for i = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
+                for _ = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
 
                     SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0,0,0))
 
@@ -1402,7 +1402,7 @@ SlashCo.SpawnCurConfig = function()
         SlashCo.CreateBatteries(genSpawns)
         SlashCo.CreateGasCans(gasSpawns)
 
-        local beacon_spawn = SlashCo.GetSpawnpoints(1, #possibleItemSpawnpoints)
+        SlashCo.GetSpawnpoints(1, #possibleItemSpawnpoints) --local beacon_spawn =
         local r = math.random(1, #possibleItemSpawnpoints)
         local pickedpoint = possibleItemSpawnpoints[r]
 
@@ -1444,7 +1444,7 @@ end
 --Used to test configs for conflicts.
 --Run lua_run SlashCo.TestConfig
 
-concommand.Add( "debug_config", function( ply, cmd, args )
+concommand.Add( "debug_config", function( _, _, _ )
 	SlashCo.TestConfig()
 end )
 
@@ -1548,7 +1548,7 @@ SlashCo.HelicopterGoAboveLand = function(id)
     local rand = math.random( 1, #SlashCo.CurConfig.Helicopter.Spawnpoints) --The Landing position is randomized
 
     local pos = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].pos
-    local ang = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].ang 
+    --local ang = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].ang
 
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3]+1000)
 

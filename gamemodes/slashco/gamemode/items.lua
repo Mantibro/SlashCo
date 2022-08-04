@@ -312,7 +312,7 @@ SlashCo.DropItem = function(ply)
 	if itid == 0 or itid == 2 or itid == 11 then return end
 
 	if itid == 1 then 
-		local droppeditem = SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
+		SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) --local droppeditem =
 
 	elseif itid == 3 then 
 		local droppeditem = SlashCo.CreateItem("sc_milkjug", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
@@ -354,7 +354,7 @@ end
 	
 end
 
-concommand.Add( "give_item", function( ply, cmd, args )
+concommand.Add( "give_item", function( ply, _, args )
 
 	if SERVER then
 	

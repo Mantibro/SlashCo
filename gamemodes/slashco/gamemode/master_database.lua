@@ -1,4 +1,4 @@
-local SlashCo = SlashCo
+--local SlashCo = SlashCo
 
 --The Master Player Database
 
@@ -10,11 +10,11 @@ local SlashCo = SlashCo
 
 SlashCoDatabase = {}
 
-SlashCoDatabase.EstablishDatabase = function(id)
+SlashCoDatabase.EstablishDatabase = function(_)
 
 	if not sql.TableExists( "slashco_master_database" ) then --Create the database table for basic statistics
 
-		for i, ply in ipairs( player.GetAll() ) do
+		for _, ply in ipairs( player.GetAll() ) do
 			ply:ChatPrint("[SlashCo] The Master Database does not exist. Creating it now.")
 		end
 
@@ -89,7 +89,7 @@ SlashCoDatabase.UpdateStats = function(id, s_type, increase)
 	local database = sql.Query("SELECT "..s_type.." FROM slashco_master_database WHERE PlayerID ='"..id.."'; ")
 	local name = sql.Query("SELECT PlayerName FROM slashco_master_database WHERE PlayerID ='"..id.."'; ")[1].PlayerName
 
-	local current_stat = nil
+	local current_stat
 
 	if s_type == "SurvivorRoundsWon" then
 		current_stat = database[1].SurvivorRoundsWon

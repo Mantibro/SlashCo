@@ -1,6 +1,6 @@
 local SlashCo = SlashCo
 
-concommand.Add( "lobby_debug_proceed", function( ply, cmd, args )
+concommand.Add( "lobby_debug_proceed", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 	
@@ -11,10 +11,10 @@ concommand.Add( "lobby_debug_proceed", function( ply, cmd, args )
 
 	for i = 1, #SlashCo.LobbyData.Players do --If someone is not ready, force them as ready survivor.
 
-		local ply = player.GetBySteamID64( SlashCo.LobbyData.Players[i].steamid )
+		local ply1 = player.GetBySteamID64( SlashCo.LobbyData.Players[i].steamid )
 
-		if getReadyState(ply) < 1 then
-			lobbyPlayerReadying(ply, 1)
+		if getReadyState(ply1) < 1 then
+			lobbyPlayerReadying(ply1, 1)
 		end
 	end
 	if SERVER then
@@ -46,7 +46,7 @@ concommand.Add( "lobby_debug_proceed", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "lobby_debug_transition", function( ply, cmd, args )
+concommand.Add( "lobby_debug_transition", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 	
@@ -72,7 +72,7 @@ concommand.Add( "lobby_debug_transition", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "lobby_debug_brief", function( ply, cmd, args )
+concommand.Add( "lobby_debug_brief", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 	
@@ -95,7 +95,7 @@ concommand.Add( "lobby_debug_brief", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "timer_start", function( ply, cmd, args )
+concommand.Add( "timer_start", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 
@@ -109,7 +109,7 @@ concommand.Add( "timer_start", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "lobby_reset", function( ply, cmd, args )
+concommand.Add( "lobby_reset", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 	
@@ -141,7 +141,7 @@ concommand.Add( "lobby_reset", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "lobby_openitems", function( ply, cmd, args )
+concommand.Add( "lobby_openitems", function( ply, _, _ )
 	
 	if ply:IsAdmin() or SERVER then
 
@@ -158,7 +158,7 @@ concommand.Add( "lobby_openitems", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "lobby_leave", function( ply, cmd, args )
+concommand.Add( "lobby_leave", function( ply, _, _ )
 	
 	if ply:IsAdmin() or SERVER then
 
@@ -334,7 +334,7 @@ function lobbyRoundSetup()
 
 	SlashCo.CurRound.ConnectedPlayers = SlashCo.LobbyData.Players
 
-	for i, play in ipairs( player.GetAll() ) do
+	for _, play in ipairs( player.GetAll() ) do
 		local pid = play:SteamID64()
 		SlashCo.BroadcastMasterDatabaseForClient(pid)
 	end
@@ -504,9 +504,9 @@ function lobbyRoundSetup()
 			ply:SetTeam(TEAM_SPECTATOR)
 			ply:Spawn()
 
-			for i, play in ipairs( player.GetAll() ) do
+			--[[for i, play in ipairs( player.GetAll() ) do
 				--play:ChatPrint("(Debug) Slasher selection successful, the Slasher is: "..ply:GetName()) 
-			end
+			end]]
 	
 		end
 
@@ -709,7 +709,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 				ply:ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") return end
 
-				for i, play in ipairs( player:GetAll() ) do
+				for _, play in ipairs( player:GetAll() ) do
 					play:SetTeam(TEAM_SPECTATOR)
 					play:Spawn()
 				end
@@ -721,7 +721,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 				ply:ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
 
-				for i, play in ipairs( player.GetAll() ) do
+				for _, play in ipairs( player.GetAll() ) do
 					play:SetTeam(TEAM_SPECTATOR)
 					play:Spawn()
 				end
@@ -878,7 +878,7 @@ function lobbySaveCurData()
 
 end
 
-concommand.Add( "debug_datatest_read", function( ply, cmd, args )
+concommand.Add( "debug_datatest_read", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 
@@ -897,7 +897,7 @@ concommand.Add( "debug_datatest_read", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "debug_datatest_error", function( ply, cmd, args )
+concommand.Add( "debug_datatest_error", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 
@@ -911,7 +911,7 @@ concommand.Add( "debug_datatest_error", function( ply, cmd, args )
 
 end )
 
-concommand.Add( "debug_datatest_delete", function( ply, cmd, args )
+concommand.Add( "debug_datatest_delete", function( ply, _, _ )
 
 	if ply:IsAdmin() or SERVER then
 
@@ -962,7 +962,7 @@ SlashCo.OfferingVoteFail = function()
     SlashCo.LobbyData.VotedOffering = 0
     table.Empty(SlashCo.LobbyData.Offerors)
 
-    for i, play in ipairs( player.GetAll() ) do
+    for _, play in ipairs( player.GetAll() ) do
         play:ChatPrint("Offering vote was unsuccessful.") 
         SlashCo.EndOfferingVote(play)
     end
@@ -977,7 +977,7 @@ SlashCo.OfferingVoteSuccess = function(id)
 
         if #team.GetPlayers(TEAM_SPECTATOR) < 1 then
 
-            for i, play in ipairs( player.GetAll() ) do
+            for _, play in ipairs( player.GetAll() ) do
                 play:ChatPrint("Offering vote successful, however a Spectator could not be found to assign as the second Slasher. Duality was not offered.") 
                 SlashCo.EndOfferingVote(play)
                 fail = true
@@ -1001,7 +1001,7 @@ SlashCo.OfferingVoteSuccess = function(id)
 
     timer.Destroy( "OfferingVoteTimer")
 
-    for i, play in ipairs( player.GetAll() ) do
+    for _, play in ipairs( player.GetAll() ) do
         play:ChatPrint("Offering vote successful. "..SCInfo.Offering[id].Name.." has been offered.") 
         SlashCo.EndOfferingVote(play)
     end

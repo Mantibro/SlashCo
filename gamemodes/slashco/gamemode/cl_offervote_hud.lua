@@ -1,6 +1,6 @@
 include( "ui/fonts.lua" )
 
-net.Receive( "mantislashcoOfferingVoteOut", function( len, ply )
+net.Receive( "mantislashcoOfferingVoteOut", function( _, _ )
 	local t = net.ReadTable()
 
 	offeror_name = player.GetBySteamID64(t.ply):GetName()
@@ -15,7 +15,7 @@ net.Receive( "mantislashcoOfferingVoteOut", function( len, ply )
 
 end)
 
-net.Receive( "mantislashcoOfferingEndVote", function( len, ply )
+net.Receive( "mantislashcoOfferingEndVote", function( _, _ )
 	local t = net.ReadTable()
 
 	if t.ply ~= LocalPlayer():SteamID64() then return end
@@ -24,7 +24,7 @@ net.Receive( "mantislashcoOfferingEndVote", function( len, ply )
 
 end)
 
-net.Receive( "mantislashcoOfferingVoteFinished", function( len, ply )
+net.Receive( "mantislashcoOfferingVoteFinished", function( _, _ )
 	local t = net.ReadTable()
 
 	offering_vote_result = t.r

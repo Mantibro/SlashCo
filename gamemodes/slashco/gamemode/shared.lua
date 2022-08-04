@@ -31,7 +31,7 @@ AddCSLuaFile( "cl_spectator_hud.lua" )
 AddCSLuaFile( "cl_playermodel_picker.lua" )
 AddCSLuaFile( "cl_gameinfo.lua" )
 
-local cycle_players = CreateConVar( "slashco_player_cycle", "0", FCVAR_REPLICATED )
+CreateConVar( "slashco_player_cycle", "0", FCVAR_REPLICATED ) --local cycle_players =
 
 function GM:Initialize()
 	-- Do stuff
