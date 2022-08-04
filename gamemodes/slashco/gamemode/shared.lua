@@ -39,7 +39,7 @@ end
 
 function GM:CreateTeams()
 
-	if ( !GAMEMODE.TeamBased ) then return end
+	if ( not GAMEMODE.TeamBased ) then return end
 
 	TEAM_SURVIVOR = 1
 	team.SetUp( TEAM_SURVIVOR, "Survivor", Color( 255, 255, 255 ) )

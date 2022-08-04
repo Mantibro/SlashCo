@@ -18,7 +18,7 @@ end)
 net.Receive( "mantislashcoOfferingEndVote", function( len, ply )
 	local t = net.ReadTable()
 
-	if t.ply != LocalPlayer():SteamID64() then return end
+	if t.ply ~= LocalPlayer():SteamID64() then return end
 
 	show_vote_screen = false
 
@@ -49,7 +49,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 		stop_lobbymusic = true
 
 		if o_tick == nil then o_tick = 1 end 
-		if o_tick != 0 then o_tick = o_tick + 1 end
+		if o_tick ~= 0 then o_tick = o_tick + 1 end
 
 		if o_tick > 3000 then o_tick = -255 end
 
@@ -64,9 +64,9 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 
 	end
 
-	if ply:Team() != TEAM_LOBBY then return end
+	if ply:Team() ~= TEAM_LOBBY then return end
 
-	if show_vote_screen != true then return end
+	if show_vote_screen ~= true then return end
 
 	draw.SimpleText( offeror_name.." would like to offer the "..offering_name.." Offering"..". Do you accept this Offering?", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.27), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 

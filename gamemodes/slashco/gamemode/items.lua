@@ -30,7 +30,7 @@ SlashCo.UseItem = function(ply)
 
 	if game.GetMap() == "sc_lobby" then return end
 
-	if ply:Team() != TEAM_SURVIVOR then return end
+	if ply:Team() ~= TEAM_SURVIVOR then return end
 
 	if ply:IsFrozen() then return end
 
@@ -302,7 +302,7 @@ SlashCo.DropItem = function(ply)
 
 	if game.GetMap() == "sc_lobby" then return end
 
-	if ply:Team() != TEAM_SURVIVOR then return end
+	if ply:Team() ~= TEAM_SURVIVOR then return end
 
 	if ply:IsFrozen() then return end
 
@@ -358,7 +358,7 @@ concommand.Add( "give_item", function( ply, cmd, args )
 
 	if SERVER then
 	
-	if ply:Team() != TEAM_SURVIVOR then print("Only survivors can have items") return end
+	if ply:Team() ~= TEAM_SURVIVOR then print("Only survivors can have items") return end
 
 	SlashCo.ChangeSurvivorItem(ply:SteamID64(), tonumber(args[1]))
 
@@ -379,7 +379,7 @@ if SERVER then
 		end
 	end
 
-	if id != 0 then player.GetBySteamID64(plyid):EmitSound("slashco/survivor/item_equip"..math.random(1,2)..".mp3") end
+	if id ~= 0 then player.GetBySteamID64(plyid):EmitSound("slashco/survivor/item_equip"..math.random(1,2)..".mp3") end
 
     SlashCo.BroadcastItemData()
 

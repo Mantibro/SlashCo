@@ -33,7 +33,7 @@ end
 
 hook.Add("KeyPress", "PlayerSelect", function(ply, key) 
 
-	if ply != LocalPlayer() or ply:Team() != TEAM_LOBBY then return end
+	if ply ~= LocalPlayer() or ply:Team() ~= TEAM_LOBBY then return end
 
 	if key == 8192 then 
 		DrawThePlayermodelSelectorBox()
@@ -128,7 +128,7 @@ net.Receive("mantislashcoGiveSlasherData", function()
     SlasherTeam = SlasherTable.AllSlashers
     GameReady = SlasherTable.GameReadyToBegin
 
-	if SlasherTable[lid] != nil then
+	if SlasherTable[lid] ~= nil then
 		SlashID = SlasherTable[lid].SlasherID
 		SlashName = SlasherTable[lid].NAME
 		Eyesight = SlasherTable[lid].Eyesight
@@ -166,9 +166,9 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
     if game.GetMap() == "sc_lobby" then return end
 
-    if LocalPlayer():Team() != TEAM_SPECTATOR then return end
+    if LocalPlayer():Team() ~= TEAM_SPECTATOR then return end
 
-    if GameProgress != -1 then return end
+    if GameProgress ~= -1 then return end
 
     local KillIcon = Material("slashco/ui/icons/slasher/s_0")
 	local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
@@ -254,7 +254,7 @@ end)
 
 hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
-    if game.GetMap() != "sc_lobby" then return end
+    if game.GetMap() ~= "sc_lobby" then return end
 
 do
 
@@ -269,7 +269,7 @@ do
 
 		local text = "Make an Offering"
 
-        if  offering_name != nil then text = offering_name.." Offering" end
+        if  offering_name ~= nil then text = offering_name.." Offering" end
 
 		surface.SetFont( "LobbyFont1" )
 		local tW, tH = surface.GetTextSize( text )
@@ -356,7 +356,7 @@ do
 
             draw.SimpleText( pro_tip, "BriefingNoteFont", 25-monitorsize/2, 800-monitorsize/2, color_white)
 
-            if s_id != nil and s_id != 0 then icondrawid = s_id end
+            if s_id ~= nil and s_id ~= 0 then icondrawid = s_id end
 
         else 
 

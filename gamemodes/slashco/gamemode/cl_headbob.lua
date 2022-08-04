@@ -7,7 +7,7 @@ local add = 0
 local PitchReset = false
 
 function HeadBob(pl, pos, ang, fov)
-    if pl:Team() != TEAM_SURVIVOR or pl:GetNWBool("SurvivorSidExecution") then return end
+    if pl:Team() ~= TEAM_SURVIVOR or pl:GetNWBool("SurvivorSidExecution") then return end
 
     local velCoef = (pl:GetVelocity():Length()/300)
 	local v = {}
@@ -30,7 +30,7 @@ function HeadBob(pl, pos, ang, fov)
             v.ang.pitch = v.ang.pitch + HBPitchPost
             v.ang.roll = v.ang.roll + HBRollPost
         else --Reste view pitch
-            if !PitchReset then
+            if not PitchReset then
                 HBPitch = HBPitchPost
                 HBRoll = HBRollPost
                 PitchReset = true

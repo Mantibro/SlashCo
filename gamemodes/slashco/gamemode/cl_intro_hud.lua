@@ -40,7 +40,7 @@ net.Receive( "mantislashcoGameIntro", function( len, ply )
 	intro_name = introtable.s_name
 	intro_offer = introtable.offer
 
-	if intromusic_antispam == nil or intromusic_antispam != true then 
+	if intromusic_antispam == nil or intromusic_antispam ~= true then
 		surface.PlaySound( "slashco/music/slashco_intro.mp3") 
 		intromusic_antispam = true 
 	end
@@ -57,7 +57,7 @@ hook.Add("HUDPaint", "RoundIntroHUD", function()
 
 	--Intro screen
 
-	if show_intro_screen != true then return end
+	if show_intro_screen ~= true then return end
 
 	--local tick = tick
 	if tick == nil then tick = 0 end

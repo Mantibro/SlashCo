@@ -10,11 +10,11 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	local ply = LocalPlayer()
 
-	if ply:Team() != TEAM_SPECTATOR then return end
+	if ply:Team() ~= TEAM_SPECTATOR then return end
 
-	if LobbySlasherInfo != nil then
+	if LobbySlasherInfo ~= nil then
 
-		if LobbySlasherInfo.player != LocalPlayer():SteamID64() then return end
+		if LobbySlasherInfo.player ~= LocalPlayer():SteamID64() then return end
 
 		if slashershow_tick == nil then slashershow_tick = 0 end
 		slashershow_tick = slashershow_tick + 0.25
@@ -25,7 +25,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	if game.GetMap() == "sc_lobby" then return end
 
-	if SlasherSteamID != nil and SlasherSteamID == LocalPlayer():SteamID64() then
+	if SlasherSteamID ~= nil and SlasherSteamID == LocalPlayer():SteamID64() then
 		draw.SimpleText("You will spawn as "..SlashName.." soon. . ." , "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color( 255, 50, 50, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 		return
 	end
@@ -37,9 +37,9 @@ end)
 
 hook.Add("KeyPress", "ToggleLight", function(ply, key) 
 
-	if ply != LocalPlayer() or LocalPlayer():Team() != TEAM_SPECTATOR  then return end
+	if ply ~= LocalPlayer() or LocalPlayer():Team() ~= TEAM_SPECTATOR  then return end
 
-	if SlasherSteamID != nil and SlasherSteamID == LocalPlayer():SteamID64() then
+	if SlasherSteamID ~= nil and SlasherSteamID == LocalPlayer():SteamID64() then
 		return
 	end
 
@@ -53,10 +53,10 @@ hook.Add( "Think", "Spectator_Vision_Light", function()
 
 	if vision == nil then vision = false end
 
-	if LocalPlayer():Team() != TEAM_SPECTATOR then return end
+	if LocalPlayer():Team() ~= TEAM_SPECTATOR then return end
 	if not vision then return end
 
-	if SlasherSteamID != nil and SlasherSteamID == LocalPlayer():SteamID64() then
+	if SlasherSteamID ~= nil and SlasherSteamID == LocalPlayer():SteamID64() then
 		return
 	end
 
@@ -76,7 +76,7 @@ hook.Add( "Think", "Spectator_Vision_Light", function()
 end )
 hook.Add("RenderScreenspaceEffects", "SpectatorVision", function()
 
-	if LocalPlayer():Team() != TEAM_SPECTATOR then return end
+	if LocalPlayer():Team() ~= TEAM_SPECTATOR then return end
 	if not vision then return end
 
 	local tab = {

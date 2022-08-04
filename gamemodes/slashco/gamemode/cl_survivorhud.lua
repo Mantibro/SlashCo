@@ -65,7 +65,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 			IsGassing = false
 
-			if ReceivedTable != nil then
+			if ReceivedTable ~= nil then
 
 				local man = ReceivedTable.id
 				local prog = ReceivedTable.prog
@@ -97,7 +97,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 			local ReceivedTable = net.ReadTable()
 
-			if ReceivedTable != nil then
+			if ReceivedTable ~= nil then
 				if man == LocalPlayer():SteamID64() then
 					IsGassing = false
 				end

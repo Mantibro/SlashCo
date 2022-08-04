@@ -179,7 +179,7 @@ end )
 --Only run this and the removePlayerFromLobby function using the GM:PlayerChangedTeam hook: https://wiki.facepunch.com/gmod/GM:PlayerChangedTeam
 function addPlayerToLobby(ply)
 
-	if !table.HasValue(SlashCo.LobbyData.Players, ply:SteamID64()) then table.insert(SlashCo.LobbyData.Players, {steamid = ply:SteamID64(), readyState = 0}) end
+	if not table.HasValue(SlashCo.LobbyData.Players, ply:SteamID64()) then table.insert(SlashCo.LobbyData.Players, {steamid = ply:SteamID64(), readyState = 0}) end
 
 	broadcastLobbyInfo()
 	
@@ -249,7 +249,7 @@ function broadcastLobbyInfo()
 	net.WriteTable(SlashCo.LobbyData.Players)
 	net.Broadcast()
 
-	if timer.TimeLeft( "AllReadyLobby" ) != nil then
+	if timer.TimeLeft( "AllReadyLobby" ) ~= nil then
 
 		net.Start("mantislashcoLobbyTimerTime")
 		net.WriteUInt(  math.floor(	timer.TimeLeft( "AllReadyLobby" ) )	,6)
@@ -261,11 +261,11 @@ end
 
 function GM:PlayerChangedTeam(ply, oldTeam, newTeam)
 
-	if newTeam == TEAM_LOBBY and oldTeam != TEAM_LOBBY then
+	if newTeam == TEAM_LOBBY and oldTeam ~= TEAM_LOBBY then
 		addPlayerToLobby(ply)
 	end
 
-	if newTeam == TEAM_SPECTATOR and oldTeam != TEAM_SPECTATOR then
+	if newTeam == TEAM_SPECTATOR and oldTeam ~= TEAM_SPECTATOR then
 		removePlayerFromLobby(ply)
 	end
 
@@ -391,7 +391,7 @@ function lobbyRoundSetup()
 
 	end
 
-	if SlashCo.LobbyData.PotentialSurvivors[1] != nil or SlashCo.LobbyData.PotentialSlashers[1] != nil then --Assigning that players' teams
+	if SlashCo.LobbyData.PotentialSurvivors[1] ~= nil or SlashCo.LobbyData.PotentialSlashers[1] ~= nil then --Assigning that players' teams
 
 		if SlashCo.LobbyData.PotentialSlashers[1] == nil then --If no none readied as Slasher, the slasher will be randomly picked from the survivor-ready players.
 
@@ -479,7 +479,7 @@ function lobbyRoundSetup()
 	end
 
 	--Finalize teams
-	if SlashCo.LobbyData.AssignedSurvivors[1] != nil and SlashCo.LobbyData.AssignedSlashers[1] != nil then
+	if SlashCo.LobbyData.AssignedSurvivors[1] ~= nil and SlashCo.LobbyData.AssignedSlashers[1] ~= nil then
 
 		--print(player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[1].steamid):GetName() .. player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid):GetName())
 
@@ -604,13 +604,13 @@ end)
 
 hook.Add("Tick", "LobbyTickEvent", function()
 
-	if game.GetMap() != "sc_lobby" then return end
+	if game.GetMap() ~= "sc_lobby" then return end
 
 	if lobby_tick == nil then lobby_tick = 0 end
 	lobby_tick = lobby_tick + 1
 	if lobby_tick > 33 then lobby_tick = 0 end
 
-	if lobby_tick == 33 and timer.TimeLeft( "AllReadyLobby" ) != nil then 
+	if lobby_tick == 33 and timer.TimeLeft( "AllReadyLobby" ) ~= nil then
 		broadcastLobbyInfo()
 	end
 
@@ -716,7 +716,7 @@ hook.Add( "PlayerDisconnected", "Playerleave", function(ply) --If a player disco
 
 			end
 
-			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or (SlashCo.LobbyData.AssignedSlashers[2] != nil and ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid) then
+			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or (SlashCo.LobbyData.AssignedSlashers[2] ~= nil and ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid) then
 
 				ply:ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
 				if SERVER then RunConsoleCommand("lobby_reset") end
@@ -761,7 +761,7 @@ function lobbySaveCurData()
 
 		else
 
-			if SlashCo.LobbyData.SelectedSlasherInfo.CLS != SlashCo.SlasherData[rand].CLS then goto retry end --the random slasher's class does not match.
+			if SlashCo.LobbyData.SelectedSlasherInfo.CLS ~= SlashCo.SlasherData[rand].CLS then goto retry end --the random slasher's class does not match.
 
 		end
 
@@ -771,7 +771,7 @@ function lobbySaveCurData()
 
 		else
 
-			if SlashCo.LobbyData.SelectedSlasherInfo.DNG != SlashCo.SlasherData[rand].DNG then goto retry end --the random slasher's danger level does not match.
+			if SlashCo.LobbyData.SelectedSlasherInfo.DNG ~= SlashCo.SlasherData[rand].DNG then goto retry end --the random slasher's danger level does not match.
 
 		end
 
@@ -784,7 +784,7 @@ function lobbySaveCurData()
 
 	print("Now beginning database...")
 
-	if !sql.TableExists( "slashco_table_basedata" ) then --Create the database table
+	if not sql.TableExists( "slashco_table_basedata" ) then --Create the database table
 
 		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary NUMBER , SlasherIDSecondary NUMBER , SurviorGasMod NUMBER);" )
 		sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item NUMBER);" )
@@ -793,7 +793,7 @@ function lobbySaveCurData()
 	end
 
 
-	if team.GetPlayers(TEAM_SURVIVOR) != nil and #team.GetPlayers(TEAM_SURVIVOR) > 0 then
+	if team.GetPlayers(TEAM_SURVIVOR) ~= nil and #team.GetPlayers(TEAM_SURVIVOR) > 0 then
 		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do --Save the Current Survivors to the database
 
 			table.insert(survivors, {steamid = team.GetPlayers(TEAM_SURVIVOR)[i]:SteamID64()})
@@ -806,12 +806,12 @@ function lobbySaveCurData()
 
 	end
 
-	if team.GetPlayers(TEAM_SPECTATOR) != nil and SlashCo.LobbyData.AssignedSlashers != nil then
+	if team.GetPlayers(TEAM_SPECTATOR) ~= nil and SlashCo.LobbyData.AssignedSlashers ~= nil then
 		for i = 1, #team.GetPlayers(TEAM_SPECTATOR) do --Save the Current Spectators to the database
 
-			if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() != SlashCo.LobbyData.AssignedSlashers[1].steamid then
+			if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[1].steamid then
 
-				if SlashCo.LobbyData.AssignedSlashers[2] != nil and team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() != SlashCo.LobbyData.AssignedSlashers[2].steamid then
+				if SlashCo.LobbyData.AssignedSlashers[2] ~= nil and team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[2].steamid then
 
 					--They're just a regular Spectator
 
@@ -832,7 +832,7 @@ function lobbySaveCurData()
 
 	end
 
-	if SlashCo.LobbyData.AssignedSlashers[2] != nil then
+	if SlashCo.LobbyData.AssignedSlashers[2] ~= nil then
 
 		table.insert(slashers, {steamid = SlashCo.LobbyData.AssignedSlashers[2].steamid})
 

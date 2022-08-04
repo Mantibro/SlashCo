@@ -16,13 +16,13 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
 	net.Receive( "mantislashcoGiveMasterDatabase", function( len, ply )
 		local t = net.ReadTable()
-		if t[1].PlayerID != LocalPlayer():SteamID64() then return end
+		if t[1].PlayerID ~= LocalPlayer():SteamID64() then return end
 		data_load = t
 	end)
 
-	if game.GetMap() != "sc_lobby" then return end
+	if game.GetMap() ~= "sc_lobby" then return end
 
-	if stop_lobbymusic != true and (lobbymusic_antispam == nil or lobbymusic_antispam != true) then  
+	if stop_lobbymusic ~= true and (lobbymusic_antispam == nil or lobbymusic_antispam ~= true) then
 		lobby_music = CreateSound(LocalPlayer(), "slashco/music/slashco_lobby.wav")
 		lobby_music:Play()
 		lobbymusic_antispam = true 
@@ -34,7 +34,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	local srvwin_count = 0
 	local slswin_count = 0
 
-	if data_load != nil and data_load != false then
+	if data_load ~= nil and data_load ~= false then
 
 		point_count = data_load[1].Points
 		srvwin_count = data_load[1].SurvivorRoundsWon
@@ -58,7 +58,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
 	end
 
-if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
+if StateOfLobby ~= nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
 
 	local Tablet = Material("slashco/ui/lobby_backdrop")
 	local ReadyCheck = Material("slashco/ui/lobby_ready")
@@ -96,13 +96,13 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 	
 		draw.SimpleText( "Press F2 to ready as Slasher.", "LobbyFont1", scrW * 0.975, (scrH * 0.5)+350, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 	
-		if TimeLeft != nil and TimeLeft > 0 and TimeLeft < 61 then
+		if TimeLeft ~= nil and TimeLeft > 0 and TimeLeft < 61 then
 			draw.SimpleText( "Starting in: "..tostring( TimeLeft ).." seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.65), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 		end
 
 		local mul_y = 1
 		if longest_name == nil then longest_name = 0 end
-		if plynum == nil or plynum != #Lobby_Players then 
+		if plynum == nil or plynum ~= #Lobby_Players then
 			longest_name = 0
 			plynum = #Lobby_Players 
 		end
@@ -145,7 +145,7 @@ if StateOfLobby != nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 	
 	end
 	
-	if clientReadiness != nil then
+	if clientReadiness ~= nil then
 		
 		if clientReadiness < 1 then	
 			draw.SimpleText( "You are not Ready.", "LobbyFont1", scrW * 0.025, scrH * 0.8, Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )	

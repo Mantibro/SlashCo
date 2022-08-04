@@ -30,7 +30,7 @@ player_manager.RegisterClass("player_slasher_base", PLAYER, "player_default")
 --Slasher Animation Controller
 hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
-	if ply:Team() != TEAM_SLASHER then
+	if ply:Team() ~= TEAM_SLASHER then
 		return
 	end
 
@@ -66,7 +66,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
-	if ply:GetModel() != "models/slashco/slashers/baba/baba.mdl" then goto sid end --Bababooey's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/baba/baba.mdl" then goto sid end --Bababooey's Animator
 
 	if ply:IsOnGround() then
 
@@ -92,7 +92,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	::sid::
 
-	if ply:GetModel() != "models/slashco/slashers/sid/sid.mdl" then goto trollge end --Sid's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/sid/sid.mdl" then goto trollge end --Sid's Animator
 
 	if not eating and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then anim_antispam = false end
 
@@ -163,7 +163,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	::trollge::
 
-	if ply:GetModel() != "models/slashco/slashers/trollge/trollge.mdl" then goto amogus end --Trollge's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/trollge/trollge.mdl" then goto amogus end --Trollge's Animator
 
 	if not trollge_slashing then anim_antispam = false end
 
@@ -205,7 +205,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	::amogus::
 
-	if ply:GetModel() != "models/slashco/slashers/amogus/amogus.mdl" then goto thirsty end --Amogus' Animator
+	if ply:GetModel() ~= "models/slashco/slashers/amogus/amogus.mdl" then goto thirsty end --Amogus' Animator
 
 	if ply:IsOnGround() then
 
@@ -225,7 +225,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	::thirsty::
 
-	if ply:GetModel() != "models/slashco/slashers/thirsty/thirsty.mdl" then goto male07 end --Thristy's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/thirsty/thirsty.mdl" then goto male07 end --Thristy's Animator
 
 	if not ply:GetNWBool("ThirstyDrinking") then anim_antispam = false end
 	
@@ -347,7 +347,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	--TYLER
 
-	if ply:GetModel() != "models/slashco/slashers/tyler/tyler.mdl" then goto borgmire end --Tyler's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/tyler/tyler.mdl" then goto borgmire end --Tyler's Animator
 
 	if tyler_creator then
 
@@ -383,7 +383,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	::borgmire::
 
-	if ply:GetModel() != "models/slashco/slashers/borgmire/borgmire.mdl" then goto freesmiley end --Borgmire's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/borgmire/borgmire.mdl" then goto freesmiley end --Borgmire's Animator
 do
 
 	if not borg_punch and not borg_throw then anim_antispam = false end
@@ -421,7 +421,7 @@ do
 	end
 end
 	::freesmiley::
-	if ply:GetModel() != "models/slashco/slashers/freesmiley/freesmiley.mdl" then goto next end --Free Smiley's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/freesmiley/freesmiley.mdl" then goto next end --Free Smiley's Animator
 do
 
 	if ply:IsOnGround() then

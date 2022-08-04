@@ -2,7 +2,7 @@ include( "ui/fonts.lua" )
 
 function SelectThisOffering(offerID)
 
-	if LocalPlayer():SteamID64() != readtable_offering.ply then return end
+	if LocalPlayer():SteamID64() ~= readtable_offering.ply then return end
 
 	if ( IsValid(OfferSelectFrame) ) then
 		OfferSelectFrame:Remove()
@@ -19,7 +19,7 @@ net.Receive("mantislashcoStartOfferingPicking", function()
 
 	readtable_offering = net.ReadTable()
 
-	if LocalPlayer():SteamID64() != readtable_offering.ply then return end
+	if LocalPlayer():SteamID64() ~= readtable_offering.ply then return end
 
 	DrawTheOfferSelectorBox()
 
@@ -29,7 +29,7 @@ function DrawTheOfferSelectorBox()
 
 	if ( IsValid( OfferSelectFrame ) ) then return end
 
-	if LocalPlayer():SteamID64() != readtable_offering.ply then return end
+	if LocalPlayer():SteamID64() ~= readtable_offering.ply then return end
 	
 	-- Slasher selectionBox
 	OfferSelectFrame = vgui.Create( "DFrame" )
@@ -92,7 +92,7 @@ function DrawTheOfferSelectorBox()
 	mdl:SetModel("models/slashco/other/offerings/o_"..SelectedOffering..".mdl")
 	mdl:SetCamPos(Vector(60, 0, 0))
 
-	if SelectedOffering != nil and SelectedOffering > 0 then
+	if SelectedOffering ~= nil and SelectedOffering > 0 then
 		ILabel:SetText( SCInfo.Offering[SelectedOffering].Name.." Offering" )
 		IDesc:SetText( SCInfo.Offering[SelectedOffering].Description )
 	end

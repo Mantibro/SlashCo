@@ -162,7 +162,7 @@ end)
 
 hook.Add("CalcView", "ThirdPersonSurvivorView", function(ply, pos, angles, fov)
 
-	if ply:Team() != TEAM_SURVIVOR then return end
+	if ply:Team() ~= TEAM_SURVIVOR then return end
 
 	if ply:GetNWBool("SurvivorSidExecution") then
 

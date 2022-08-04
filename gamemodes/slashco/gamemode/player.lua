@@ -10,7 +10,7 @@ function GM:PlayerInitialSpawn(ply, transition)
 end
 
 function GM:PlayerSpawn(player, transition)
-	if !IsValid(player) then return end
+	if not IsValid(player) then return end
 
 	if player:Team() == TEAM_SURVIVOR then
 		player_manager.SetPlayerClass(player, "player_survivor")
@@ -34,7 +34,7 @@ function GM:PlayerSpawn(player, transition)
 	player_manager.RunClass( player, "Spawn" )
 
 	-- If we are in transition, do not touch player's weapons
-	if ( !transiton ) then
+	if ( not transiton ) then
 		-- Call item loadout function
 		hook.Call( "PlayerLoadout", GAMEMODE, player )
 	end
@@ -87,7 +87,7 @@ hook.Add( "PlayerCanSeePlayersChat", "TeamChat", function( text, teamOnly, liste
 
 	if listener:Team() == TEAM_SPECTATOR then return true end
 	if speaker:Team() == TEAM_SLASHER then return false end
-	if speaker:Team() == TEAM_SPECTATOR and listener:Team() != TEAM_SPECTATOR then return false end
+	if speaker:Team() == TEAM_SPECTATOR and listener:Team() ~= TEAM_SPECTATOR then return false end
 
 	if listener:GetPos():DistToSqr( speaker:GetPos() ) > 1000000 then 
 		return false 

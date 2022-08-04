@@ -2,16 +2,16 @@ include( "ui/fonts.lua" )
 
 hook.Add("HUDPaint", "GameInfo_Info", function()
 
-	if LocalPlayer():Team() != TEAM_LOBBY and LocalPlayer():Team() != TEAM_SPECTATOR  then return end
+	if LocalPlayer():Team() ~= TEAM_LOBBY and LocalPlayer():Team() ~= TEAM_SPECTATOR  then return end
 
 	draw.SimpleText("Press F6 for Game Info" , "LobbyFont1", ScrW() * 0.02, (ScrH() * 0.93), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 end)
 
 hook.Add("PlayerButtonDown", "GameInfo", function(ply, key) 
 
-	if ply != LocalPlayer() then return end
+	if ply ~= LocalPlayer() then return end
 
-	if LocalPlayer():Team() != TEAM_LOBBY and LocalPlayer():Team() != TEAM_SPECTATOR  then return end
+	if LocalPlayer():Team() ~= TEAM_LOBBY and LocalPlayer():Team() ~= TEAM_SPECTATOR  then return end
 
 	if key == 97  then 
 		DrawTheGameInfoBox()
