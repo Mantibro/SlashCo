@@ -528,7 +528,7 @@ do
         if slasher.TylerSongPickedID == nil then
             slasher.TylerSongPickedID = math.random(1,6)
 
-            PlayGlobalSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3",  85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3*1.5) * (30 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) , slasher,  0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
+            PlayGlobalSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3",  98 , slasher,  0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.08))
         end
 
         if v2 > ( ms * 40) - (v4 * 4) then --Time ran out
@@ -581,10 +581,6 @@ do
                 slasher:DrawShadow(false)
 		        slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 		        slasher:SetNoDraw(true)
-                if CLIENT then
-                    slasher.TylerSong:Stop() 
-                    slasher.TylerSong = nil
-                end
             
             end)
 

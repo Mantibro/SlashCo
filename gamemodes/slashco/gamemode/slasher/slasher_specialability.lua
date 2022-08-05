@@ -134,7 +134,7 @@ end
 
             local pick_ang = SlashCo.RadialTester(slasher, 200, target)
 
-            slasher:SetEyeAngles( Angle(0,pick_ang,0) )
+            --slasher:SetEyeAngles( Angle(0,pick_ang,0) )
 
             SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = 99
 
