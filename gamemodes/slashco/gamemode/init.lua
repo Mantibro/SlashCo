@@ -234,24 +234,23 @@ function GM:PlayerButtonDown(ply, button)
 
 	if ply:Team() == TEAM_SURVIVOR then --Taunts
 
-		if button == 2 then 
+		if button == 1 then 
 
-			ply:SetNWBool("Taunt_Cali", true) --California girls
+			--ply:SetNWBool("Taunt_Cali", true) --California girls --copyright :(
 			return
 
-		elseif button == 3 then 
+		elseif button == 2 then 
 
 			ply:SetNWBool("Taunt_MNR", true) --Monday Night
 			return
 
-		elseif button == 4 then 
+		elseif button == 3 then 
 
-			ply:SetNWBool("Taunt_Griddy", true) --Htiin the griddy
+			ply:SetNWBool("Taunt_Griddy", true) --Hittin the griddy
 			return
 
-		elseif ply:GetNWBool("Taunt_MNR") or ply:GetNWBool("Taunt_Cali") or ply:GetNWBool("Taunt_Griddy") then
+		elseif ply:GetNWBool("Taunt_MNR") or ply:GetNWBool("Taunt_Griddy") then
 
-			ply:SetNWBool("Taunt_Cali", false)
 			ply:SetNWBool("Taunt_MNR", false)
 			if button ~= 33 then ply:SetNWBool("Taunt_Griddy", false) end
 
