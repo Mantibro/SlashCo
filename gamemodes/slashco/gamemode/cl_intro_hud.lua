@@ -1,6 +1,6 @@
 include( "ui/fonts.lua" )
 
-net.Receive( "mantislashcoGameIntro", function( len, ply )
+net.Receive( "mantislashcoGameIntro", function( _, _ )
 	local introtable = net.ReadTable()
 
 	stop_lobbymusic = true
@@ -40,7 +40,7 @@ net.Receive( "mantislashcoGameIntro", function( len, ply )
 	intro_name = introtable.s_name
 	intro_offer = introtable.offer
 
-	if intromusic_antispam == nil or intromusic_antispam != true then 
+	if intromusic_antispam == nil or intromusic_antispam ~= true then
 		surface.PlaySound( "slashco/music/slashco_intro.mp3") 
 		intromusic_antispam = true 
 	end
@@ -53,18 +53,18 @@ end)
 
 hook.Add("HUDPaint", "RoundIntroHUD", function()
 
-	local ply = LocalPlayer()
+	--local ply = LocalPlayer()
 
 	--Intro screen
 
-	if show_intro_screen != true then return end
+	if show_intro_screen ~= true then return end
 
 	--local tick = tick
 	if tick == nil then tick = 0 end
 	tick = tick + 0.5
 
 	local map = intro_map
-	local difficulty = intro_diff
+	--local difficulty = intro_diff
 	local name = intro_name
 	local class = intro_class
 	local danger = intro_danger

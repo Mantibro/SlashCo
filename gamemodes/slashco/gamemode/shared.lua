@@ -31,7 +31,7 @@ AddCSLuaFile( "cl_spectator_hud.lua" )
 AddCSLuaFile( "cl_playermodel_picker.lua" )
 AddCSLuaFile( "cl_gameinfo.lua" )
 
-local cycle_players = CreateConVar( "slashco_player_cycle", "0", FCVAR_REPLICATED )
+CreateConVar( "slashco_player_cycle", "0", FCVAR_REPLICATED ) --local cycle_players =
 
 function GM:Initialize()
 	-- Do stuff
@@ -39,7 +39,7 @@ end
 
 function GM:CreateTeams()
 
-	if ( !GAMEMODE.TeamBased ) then return end
+	if ( not GAMEMODE.TeamBased ) then return end
 
 	TEAM_SURVIVOR = 1
 	team.SetUp( TEAM_SURVIVOR, "Survivor", Color( 255, 255, 255 ) )

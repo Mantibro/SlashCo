@@ -98,7 +98,7 @@ net.Receive("mantislashcoBeginOfferingVote", function()
 
 	timer.Create( "OfferingVoteTimer", 20, 1, function() SlashCo.OfferingVoteFail() end)
 
-	for i, play in ipairs( player.GetAll() ) do
+	for _, play in ipairs( player.GetAll() ) do
         play:ChatPrint(player.GetBySteamID64(t.ply):GetName().." would like to offer "..SCInfo.Offering[t.id].Name) 
     end
 
@@ -106,7 +106,7 @@ end)
 
 SlashCo.OfferingVote = function(ply, agreement)
 
-	if agreement != true then return end
+	if agreement ~= true then return end
 
 	table.insert(SlashCo.LobbyData.Offerors, {steamid = ply:SteamID64()})
 
@@ -151,7 +151,7 @@ end
 
 SlashCo.PlayerItemStashRequest = function(id)
 
-    if SlashCo.GetHeldItem(player.GetBySteamID64(id)) != 0 then 
+    if SlashCo.GetHeldItem(player.GetBySteamID64(id)) ~= 0 then
         player.GetBySteamID64(id):ChatPrint("You have already chosen an item.")
         return 
     end
@@ -179,7 +179,7 @@ SlashCo.RoundOverScreen = function(state)
 
 	local heli = table.Random(ents.FindByClass("sc_helicopter"))
 
-	if !IsValid(heli) then goto skipsound end
+	if not IsValid(heli) then goto skipsound end
 
 	heli:StopSound("slashco/helicopter_engine_distant.wav")
 	heli:StopSound("slashco/helicopter_rotors_distant.wav")

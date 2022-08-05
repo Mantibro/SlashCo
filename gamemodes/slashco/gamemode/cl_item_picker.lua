@@ -4,7 +4,7 @@ local ReceivedLocalPlayerID = ""
 
 function SelectThisItem(itemID)
 
-	if LocalPlayer():SteamID64() != ReceivedLocalPlayerID then return end
+	if LocalPlayer():SteamID64() ~= ReceivedLocalPlayerID then return end
 
 	if ( IsValid(ItemSelectFrame) ) then
 		ItemSelectFrame:Remove()
@@ -21,7 +21,7 @@ net.Receive("mantislashcoStartItemPicking", function()
 
 	readtable = net.ReadTable()
 
-	if LocalPlayer():SteamID64() != readtable.ply then return end
+	if LocalPlayer():SteamID64() ~= readtable.ply then return end
 
 	ReceivedLocalPlayerID = readtable.ply 
 
@@ -33,7 +33,7 @@ function DrawTheSelectorBox()
 
 	if ( IsValid( ItemSelectFrame ) ) then return end
 
-	if LocalPlayer():SteamID64() != ReceivedLocalPlayerID then return end
+	if LocalPlayer():SteamID64() ~= ReceivedLocalPlayerID then return end
 	
 	-- Slasher selectionBox
 	ItemSelectFrame = vgui.Create( "DFrame" )

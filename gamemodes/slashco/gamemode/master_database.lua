@@ -1,4 +1,4 @@
-local SlashCo = SlashCo
+--local SlashCo = SlashCo
 
 --The Master Player Database
 
@@ -10,11 +10,11 @@ local SlashCo = SlashCo
 
 SlashCoDatabase = {}
 
-SlashCoDatabase.EstablishDatabase = function(id)
+SlashCoDatabase.EstablishDatabase = function(_)
 
-	if !sql.TableExists( "slashco_master_database" ) then --Create the database table for basic statistics
+	if not sql.TableExists( "slashco_master_database" ) then --Create the database table for basic statistics
 
-		for i, ply in ipairs( player.GetAll() ) do
+		for _, ply in ipairs( player.GetAll() ) do
 			ply:ChatPrint("[SlashCo] The Master Database does not exist. Creating it now.")
 		end
 
@@ -24,7 +24,7 @@ SlashCoDatabase.EstablishDatabase = function(id)
 
 end
 
-if !sql.TableExists( "slashco_master_database" ) then
+if not sql.TableExists( "slashco_master_database" ) then
 	SlashCoDatabase.EstablishDatabase()
 end
 
@@ -67,7 +67,7 @@ SlashCoDatabase.OnPlayerJoined = function(id)
 
 			--Check if the player has changed their name
 
-			if database[index].PlayerName != player.GetBySteamID64(id):GetName() then
+			if database[index].PlayerName ~= player.GetBySteamID64(id):GetName() then
 
 				sql.Query("UPDATE slashco_master_database SET PlayerName = "..player.GetBySteamID64(id):GetName().." WHERE PlayerID = '"..id.."';")
 
@@ -81,7 +81,7 @@ end
 
 SlashCoDatabase.UpdateStats = function(id, s_type, increase)
 
-	if s_type != "SurvivorRoundsWon" and s_type != "SlasherRoundsWon" and s_type != "Points" then
+	if s_type ~= "SurvivorRoundsWon" and s_type ~= "SlasherRoundsWon" and s_type ~= "Points" then
 		ErrorNoHalt("[SlashCo] Database Error. Invalid Type: "..s_type)
 		return
 	end
@@ -89,7 +89,7 @@ SlashCoDatabase.UpdateStats = function(id, s_type, increase)
 	local database = sql.Query("SELECT "..s_type.." FROM slashco_master_database WHERE PlayerID ='"..id.."'; ")
 	local name = sql.Query("SELECT PlayerName FROM slashco_master_database WHERE PlayerID ='"..id.."'; ")[1].PlayerName
 
-	local current_stat = nil
+	local current_stat
 
 	if s_type == "SurvivorRoundsWon" then
 		current_stat = database[1].SurvivorRoundsWon
@@ -119,7 +119,7 @@ end
 
 SlashCoDatabase.GetStat = function(id, s_type)
 
-	if s_type != "SurvivorRoundsWon" and s_type != "SlasherRoundsWon" and s_type != "Points" then
+	if s_type ~= "SurvivorRoundsWon" and s_type ~= "SlasherRoundsWon" and s_type ~= "Points" then
 		ErrorNoHalt("[SlashCo] Database Error. Invalid Type: "..s_type)
 		return 0
 	end

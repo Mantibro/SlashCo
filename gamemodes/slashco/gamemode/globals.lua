@@ -451,7 +451,7 @@ if SERVER then
 
         for i = 1, #sql.Query("SELECT * FROM slashco_table_survivordata; ") do
 
-            if sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors != nil then
+            if sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors ~= nil then
                 --Survivors due to connect
                 table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors})
                     --For the slasher's clientside view also
@@ -500,7 +500,7 @@ SlashCo.AwaitExpectedPlayers =  function()
 
 if SERVER then
 
-if game.GetMap() != "sc_lobby" then
+if game.GetMap() ~= "sc_lobby" then
 
     print("[SlashCo] Now running player expectation...")
 
@@ -552,7 +552,7 @@ SlashCo.RoundBeginTimer = function()
 	timer.Create( "GameStart", 15, 1, function() if SERVER then RunConsoleCommand("slashco_curconfig_run") end end)
 end
 
-concommand.Add( "slashco_curconfig_run", function( ply, cmd, args )
+concommand.Add( "slashco_curconfig_run", function( _, _, _ )
 
     SlashCo.RemoveAllCurRoundEnts()
 	
@@ -594,8 +594,8 @@ if SERVER then
 
                 else
 
-                    if slashers[1] != nil and id == slashers[1].Slashers then goto CONTINUE end
-                    if slashers[2] != nil and id == slashers[2].Slashers then goto CONTINUE end
+                    if slashers[1] ~= nil and id == slashers[1].Slashers then goto CONTINUE end
+                    if slashers[2] ~= nil and id == slashers[2].Slashers then goto CONTINUE end
 
                     for k = 1, #survivors do
                         if id == survivors[k].Survivors then goto CONTINUE end
@@ -623,9 +623,9 @@ if SERVER then
 
         SlashCo.CurRound.SurvivorCount = #survivors
 
-        local id1 = slashers[1].Slashers
+        --local id1 = slashers[1].Slashers
         local id2 = 0
-        if slashers[2] != nil then id2 = slashers[2].Slashers end
+        if slashers[2] ~= nil then id2 = slashers[2].Slashers end
 
         timer.Simple(0.05, function()
 
@@ -779,12 +779,12 @@ SlashCo.ValidateMap = function(map)
     --Transfer json to a global
     SlashCo.CurConfig = json
 
-    /* ============================ GENERATORS ============================ */
+    -- ============================ GENERATORS ============================
     local genCount = json.Generators.Count
     --local gasCount = math.max(json.GasCans.Count, #(json.GasCans.Spawnpoints))
     local batCount = math.max(json.Generators.Count, #(json.Batteries.Spawnpoints))
     local itemCount = #(json.Items.Spawnpoints)
-    local HeliCount = #(json.Helicopter.Spawnpoints)
+    --local HeliCount = #(json.Helicopter.Spawnpoints)
 
     SlashCo.CurRound.HelicopterSpawnPosition = Vector(json.Helicopter.StartLocation.pos[1],json.Helicopter.StartLocation.pos[2],json.Helicopter.StartLocation.pos[3])
 
@@ -830,9 +830,9 @@ SlashCo.ValidateMap = function(map)
         SlashCo.CurRound.GasCanCount = gasCount
     end
 
-    /* ============================ GENERATORS ============================ */
+    -- ============================ GENERATORS ============================
     
-    /* ============================ OFFERINGS ============================ */ 
+    -- ============================ OFFERINGS ============================
     if not json.Offerings then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] This configuration has no data for offerings, and several will not work.\n")
     end
@@ -849,7 +849,7 @@ SlashCo.ValidateMap = function(map)
     end
     offeringText = offeringText..tostring(#(json.Offerings.Exposure.Spawnpoints)).." Exposure Offering Spawnpoints"
 
-    /* ============================ OFFERINGS ============================ */
+    -- ============================ OFFERINGS ============================
 
     --Map is valid, print out to console.
     print( "[SlashCo] Map config for '"..map.."' loaded successfully.\n\t"..tostring(#(SlashCo.CurConfig.Generators.Spawnpoints)).." Generator Spawnpoints\n\t"..tostring(#(SlashCo.CurConfig.GasCans.Spawnpoints)).." Gas Can Spawnpoints\n\t"..tostring(itemCount).." Item Spawnpoints "..usesGasSpawns.."\n\t"..tostring(#(json.Spawnpoints.Slasher)).." Slasher Spawnpoints\n\t"..tostring(#(json.Spawnpoints.Survivor)).." Survivor Spawnpoints\n\t"..tostring(#(json.Helicopter.Spawnpoints)).." Helicopter Spawnpoints\n\t"..offeringText )
@@ -861,7 +861,7 @@ end
 SlashCo.CreateGenerator = function(pos, ang)
     local Ent = ents.Create( "sc_generator" )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a generator at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -891,7 +891,7 @@ end
 SlashCo.CreateGasCan = function(pos, ang)
     local Ent = ents.Create( "prop_physics" )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a gas can at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -913,7 +913,7 @@ end
 SlashCo.CreateGasCanE = function(pos, ang)
     local Ent = ents.Create( "prop_physics" )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a gas can at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -936,7 +936,7 @@ end
 SlashCo.CreateItem = function(class, pos, ang)
     local Ent = ents.Create( class )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a "..class.." at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -965,7 +965,7 @@ end
 SlashCo.CreateBattery = function(pos, ang)
     local Ent = ents.Create( "prop_physics" )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a battery at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -988,7 +988,7 @@ SlashCo.CreateGenerators = function(spawnpoints)
         local pos = SlashCo.CurConfig.Generators.Spawnpoints[spawnpoints[I]].pos
         local ang = SlashCo.CurConfig.Generators.Spawnpoints[spawnpoints[I]].ang
 
-        local entID = SlashCo.CreateGenerator( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateGenerator( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) ) --local entID =
     end
 end
 
@@ -1002,7 +1002,7 @@ SlashCo.CreateGasCans = function(spawnpoints)
             ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[spawnpoints[I]].ang
         end
 
-        local entID = SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
 
@@ -1012,7 +1012,7 @@ SlashCo.CreateGasCansE = function(spawnpoints)
         local pos = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].pos
         local ang = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].ang
 
-        local entID = SlashCo.CreateGasCanE( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateGasCanE( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
 
@@ -1024,7 +1024,7 @@ SlashCo.CreateItems = function(spawnpoints, item)
         --Occupied spawn
         --table.RemoveByValue( SlashCo.CurConfig.Items.Spawnpoints, spawnpoints[I] )
 
-        local entID = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
+        SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
     end
 end
 
@@ -1034,7 +1034,7 @@ SlashCo.CreateBatteries = function(spawnpoints)
         local pos = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][rand].pos
         local ang = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][rand].ang
 
-        local entID = SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
 
@@ -1045,7 +1045,7 @@ SlashCo.CreateBatteriesE = function(spawnpoints)
             local pos = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][J].pos
             local ang = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][J].ang
 
-            local entID = SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+            SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
         end
     end
 end
@@ -1091,7 +1091,7 @@ end
 SlashCo.CreateHelicopter = function(pos, ang)
     local Ent = ents.Create( "sc_helicopter" )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create the helicopter at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -1111,7 +1111,7 @@ end
 SlashCo.CreateItemStash = function(pos, ang)
     local Ent = ents.Create( "sc_itemstash" )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create the itemstash at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -1129,7 +1129,7 @@ end
 SlashCo.CreateOfferTable = function(pos, ang)
     local Ent = ents.Create( "sc_offertable" )
 
-    if !IsValid(Ent) then
+    if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create the offertable at ("..tostring(pos).."), entity was NULL.\n")
         return nil
     end
@@ -1283,7 +1283,7 @@ SlashCo.RoundHeadstart = function()
 
     if #SlashCo.CurRound.SlasherData.AllSurvivors > 3 then return end
 
-    for i = 1, (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
+    for _ = 1, (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
 
         local r = ents.FindByClass("sc_generator")[math.random(1,2)]:EntIndex()
 
@@ -1296,7 +1296,7 @@ end
 SlashCo.SurvivorWinFinish = function()
     local delay = 16
 
-    for i, play in ipairs( player.GetAll() ) do
+    for _, play in ipairs( player.GetAll() ) do
         play:ChatPrint("[SlashCo] All Living survivors are in the Helicopter.") 
     end
 
@@ -1312,7 +1312,7 @@ SlashCo.SpawnCurConfig = function()
     --SlashCo.ResetCurRoundData()
 
     local curmap = game.GetMap()
-    if curmap != "sc_lobby" then
+    if curmap ~= "sc_lobby" then
         if not SlashCo.ValidateMap(curmap) then
             ErrorNoHalt("[SlashCo] '"..curmap.."' is not a playable map, aborting.\n")
             return
@@ -1367,13 +1367,13 @@ SlashCo.SpawnCurConfig = function()
                 item_class = "" 
             end
 
-            if item_class != "" then SlashCo.CreateItems(itemSpawns, item_class) print("[SlashCo] Spawning Items.") end
+            if item_class ~= "" then SlashCo.CreateItems(itemSpawns, item_class) print("[SlashCo] Spawning Items.") end
 
             if slashid == 6 then
 
                 local diff = SlashCo.CurRound.Difficulty
 
-                for i = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
+                for _ = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
 
                     SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0,0,0))
 
@@ -1402,7 +1402,7 @@ SlashCo.SpawnCurConfig = function()
         SlashCo.CreateBatteries(genSpawns)
         SlashCo.CreateGasCans(gasSpawns)
 
-        local beacon_spawn = SlashCo.GetSpawnpoints(1, #possibleItemSpawnpoints)
+        SlashCo.GetSpawnpoints(1, #possibleItemSpawnpoints) --local beacon_spawn =
         local r = math.random(1, #possibleItemSpawnpoints)
         local pickedpoint = possibleItemSpawnpoints[r]
 
@@ -1444,7 +1444,7 @@ end
 --Used to test configs for conflicts.
 --Run lua_run SlashCo.TestConfig
 
-concommand.Add( "debug_config", function( ply, cmd, args )
+concommand.Add( "debug_config", function( _, _, _ )
 	SlashCo.TestConfig()
 end )
 
@@ -1548,7 +1548,7 @@ SlashCo.HelicopterGoAboveLand = function(id)
     local rand = math.random( 1, #SlashCo.CurConfig.Helicopter.Spawnpoints) --The Landing position is randomized
 
     local pos = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].pos
-    local ang = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].ang 
+    --local ang = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].ang
 
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3]+1000)
 
@@ -1568,7 +1568,7 @@ SlashCo.HelicopterLand = function(pos)
 
     --Will the Helicopter Abandom players?
 
-    if SlashCo.CurRound.Difficulty != 3 then return end
+    if SlashCo.CurRound.Difficulty ~= 3 then return end
 
     local abandon = math.random(50, 120)
 

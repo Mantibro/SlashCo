@@ -30,7 +30,7 @@ Extra credits: undo, Jim, DarkGrey
 ]]
 
 local SlashCo = SlashCo
-local roundOverToggle = SlashCo.CurRound.roundOverToggle
+--local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
 --[[concommand.Add( "set_team", function( ply, cmd, args )
 	local Team = args[1] or 1
@@ -47,9 +47,9 @@ function GM:Initialize()
 
 		CreateClientConVar( "cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel" )
 	
-		cvars.AddChangeCallback( "cl_slashco_playermodel", function(name, oldVal, newVal) 
+		cvars.AddChangeCallback( "cl_slashco_playermodel", function(_, _, newVal)
 	
-			if newVal != "models/slashco/survivor/male_0*.mdl" then
+			if newVal ~= "models/slashco/survivor/male_0*.mdl" then
 				--print("[SlashCo] Bad Playermodel. It will be randomized instead.")
 			end
 		
@@ -58,12 +58,12 @@ function GM:Initialize()
 	--end
 
     --If there is no data folder then make one.
-    if !file.Exists("slashco", "DATA") then
+    if not file.Exists("slashco", "DATA") then
         print("[SlashCo] The data folder for this gamemode doesn't appear to exist, creating it now.")
         file.CreateDir("slashco/playerdata")
 
 		--Return to the lobby if no game is in progress and we just loaded in.
-			if GAMEMODE.State != GAMEMODE.States.IN_GAME and game.GetMap() != "sc_lobby" then
+			if GAMEMODE.State ~= GAMEMODE.States.IN_GAME and game.GetMap() ~= "sc_lobby" then
 			SlashCo.GoToLobby()
 			GAMEMODE.State = GAMEMODE.States.LOBBY
 		else
@@ -94,7 +94,7 @@ function GM:Initialize()
 
 end
 
-hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, ent )
+hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, _ )
 
 	if ply:Team() == TEAM_SLASHER then
 
@@ -108,14 +108,14 @@ hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, ent )
 
 	end
 
-    return (ply:Team() != TEAM_SPECTATOR)
+    return (ply:Team() ~= TEAM_SPECTATOR)
 end )
 
 function GM:PlayerButtonDown(ply, button)
 
 	if ply:Team() == TEAM_SPECTATOR then
 		if button == 107 then --Spectator Left Clicks
-			if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() != OBS_MODE_ROAMING then --Stop spectating if already spectating a player.
+			if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then --Stop spectating if already spectating a player.
 				local pos = ply:GetPos()
 				local eyeang = ply:EyeAngles()
 
@@ -148,7 +148,7 @@ function GM:PlayerButtonDown(ply, button)
 		--Ready States
 		if SlashCo.LobbyData.LOBBYSTATE == 0 then
 			if ply:Team() == TEAM_LOBBY and button == 92 then
-				if getReadyState(ply) != 1 then
+				if getReadyState(ply) ~= 1 then
 					ply:ChatPrint( "Now ready as Survivor." )
 					lobbyPlayerReadying(ply, 1)
 					broadcastLobbyInfo()
@@ -160,7 +160,7 @@ function GM:PlayerButtonDown(ply, button)
 			end
 
 			if ply:Team() == TEAM_LOBBY and button == 93 then
-				if getReadyState(ply) != 2 then
+				if getReadyState(ply) ~= 2 then
 
 					--Check if the player has made an offering or agreed to one
 					if isPlyOfferor(ply) then ply:ChatPrint( "Cannot ready as Slasher as you have either made or agreed to an Offering." ) return end
@@ -253,7 +253,7 @@ function GM:PlayerButtonDown(ply, button)
 
 			ply:SetNWBool("Taunt_Cali", false)
 			ply:SetNWBool("Taunt_MNR", false)
-			if button != 33 then ply:SetNWBool("Taunt_Griddy", false) end
+			if button ~= 33 then ply:SetNWBool("Taunt_Griddy", false) end
 
 		end 
 
@@ -315,7 +315,7 @@ hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
 
 		if game.GetMap() == "rp_deadcity" then Entity(176):Fire("Press") end
 		
-		if game.GetMap() != "sc_lobby" then
+		if game.GetMap() ~= "sc_lobby" then
 			GAMEMODE.State = GAMEMODE.States.IN_GAME
 
 			SlashCo.LoadCurRoundData()
@@ -374,7 +374,7 @@ local Think = function()
 		
 		--Assign everyone to the data table.
 		if not setupPlayerData then
-			local plys = player.GetAll()
+			--local plys = player.GetAll()
 			for i=1, #plys do
 				if IsValid(plys[i]) and plys[i]:Team() == TEAM_SURVIVOR then
 					table.insert(SlashCo.CurRound.AlivePlayers, plys[i])
@@ -386,7 +386,7 @@ local Think = function()
 		end
 
 		--If a survivor is dead move em over to the dead players list.
-		local plys = player.GetAll()
+		--local plys = player.GetAll()
 		for i=1, #plys do
 			if IsValid(plys[i]) and plys[i]:Team() == TEAM_SPECTATOR and table.HasValue(SlashCo.CurRound.AlivePlayers, plys[i]) then
 				table.insert(SlashCo.CurRound.DeadPlayers, plys[i])
@@ -394,7 +394,7 @@ local Think = function()
 			end
 		end
 
-		if SlashCo.CurRound != nil and GAMEMODE.State == GAMEMODE.States.IN_GAME and #(table.GetKeys(SlashCo.CurRound.Generators)) > 0 then
+		if SlashCo.CurRound ~= nil and GAMEMODE.State == GAMEMODE.States.IN_GAME and #(table.GetKeys(SlashCo.CurRound.Generators)) > 0 then
 			local allRunning = true
 			local gens = table.GetKeys(SlashCo.CurRound.Generators)
 			for I=1, #gens do
@@ -472,7 +472,7 @@ hook.Add("PostGamemodeLoaded", "octoSlashCoPostGamemodeLoaded", function()
 	timer.Simple(1, function() hook.Add("Think", "octoSlashCoCoreThink", Think) end)
 end)
 
-hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, transition)
+hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 
 	if SERVER then
 
@@ -483,10 +483,10 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, tr
 	local data = {}
 
 	--Don't load playerdata if it's already loaded
-	if SlashCo.PlayerData[ply:SteamID64()] != nil then return end
+	if SlashCo.PlayerData[ply:SteamID64()] ~= nil then return end
 
 	--If the player doesn't have a save file then create one for them.
-	if !file.Exists("slashco/playerdata/"..tostring(ply:SteamID64())..".json", "DATA") then
+	if not file.Exists("slashco/playerdata/"..tostring(ply:SteamID64())..".json", "DATA") then
 		local json = '{ "Stats": { "RoundsWon": { "Survivor": 0, "Slasher": 0 }, "Achievements": [] } }'
 
 		print("[SlashCo] No playerdata file found for '"..ply:GetName().."', making one for them.")
@@ -562,9 +562,9 @@ end
 end)
 
 
-function GM:PlayerDeath(victim, inflictor, attacker)
+function GM:PlayerDeath(victim, _, _)
 	
-		if !IsValid(victim) then return end
+		if not IsValid(victim) then return end
 	
 		if GAMEMODE.State == GAMEMODE.States.IN_GAME and victim:Team() == TEAM_SURVIVOR then
 			local pid = victim:SteamID64()
@@ -616,7 +616,7 @@ function GM:PlayerDeath(victim, inflictor, attacker)
 						PhysBone:SetVelocity(victim:GetVelocity() * 2)
 						PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
 
-						local ragbone = ragdoll:TranslatePhysBoneToBone( i )
+						ragdoll:TranslatePhysBoneToBone( i ) --local ragbone =
 						for b = 1, victim:GetBoneCount() do
 							local plybone = victim:TranslateBoneToPhysBone( b )
 
@@ -640,15 +640,15 @@ function GM:PlayerDeath(victim, inflictor, attacker)
 	
 end
 	
-hook.Add("PlayerDeath", "SurvivorDying", function(victim, inflictor, attacker) --Deathward
+hook.Add("PlayerDeath", "SurvivorDying", function(victim, _, _) --Deathward
 	
 	if SERVER then
 	
-		if victim:Team() != TEAM_SURVIVOR then return end
+		if victim:Team() ~= TEAM_SURVIVOR then return end
 	
 		local pid = victim:SteamID64()
 	
-		if SlashCo.GetHeldItem(victim) != 0 or SlashCo.GetHeldItem(victim) != 2 or SlashCo.GetHeldItem(victim) != 99 then
+		if SlashCo.GetHeldItem(victim) ~= 0 or SlashCo.GetHeldItem(victim) ~= 2 or SlashCo.GetHeldItem(victim) ~= 99 then
 			SlashCo.DropItem(victim)
 		end
 	
@@ -679,7 +679,7 @@ end)
 if SERVER then
     hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, state)
 
-        if ply:Team() != TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then return false end
+        if ply:Team() ~= TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then return false end
 
 		if state == false then return false end
 

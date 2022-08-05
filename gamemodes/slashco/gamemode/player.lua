@@ -1,16 +1,16 @@
 include( "globals.lua" )
 
-local SlashCo = SlashCo
+--local SlashCo = SlashCo
 
-function GM:PlayerInitialSpawn(ply, transition)
+function GM:PlayerInitialSpawn(ply, _)
 	if game.GetMap() == "sc_lobby" then
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()
 	end
 end
 
-function GM:PlayerSpawn(player, transition)
-	if !IsValid(player) then return end
+function GM:PlayerSpawn(player, _)
+	if not IsValid(player) then return end
 
 	if player:Team() == TEAM_SURVIVOR then
 		player_manager.SetPlayerClass(player, "player_survivor")
@@ -34,7 +34,7 @@ function GM:PlayerSpawn(player, transition)
 	player_manager.RunClass( player, "Spawn" )
 
 	-- If we are in transition, do not touch player's weapons
-	if ( !transiton ) then
+	if ( not transiton ) then
 		-- Call item loadout function
 		hook.Call( "PlayerLoadout", GAMEMODE, player )
 	end
@@ -79,15 +79,15 @@ hook.Add( "PlayerCanHearPlayersVoice", "Maximum Range", function( listener, talk
 
 end )
 
-hook.Add( "GetFallDamage", "RealisticDamage", function( ply, speed )
+hook.Add( "GetFallDamage", "RealisticDamage", function( _, speed )
     return ( speed / 16 )
 end )
 
-hook.Add( "PlayerCanSeePlayersChat", "TeamChat", function( text, teamOnly, listener, speaker)
+hook.Add( "PlayerCanSeePlayersChat", "TeamChat", function( _, _, listener, speaker)
 
 	if listener:Team() == TEAM_SPECTATOR then return true end
 	if speaker:Team() == TEAM_SLASHER then return false end
-	if speaker:Team() == TEAM_SPECTATOR and listener:Team() != TEAM_SPECTATOR then return false end
+	if speaker:Team() == TEAM_SPECTATOR and listener:Team() ~= TEAM_SPECTATOR then return false end
 
 	if listener:GetPos():DistToSqr( speaker:GetPos() ) > 1000000 then 
 		return false 
@@ -103,7 +103,7 @@ hook.Add("ShowTeam", "DoNotAllowTeamSwitch", function()
 	return false
 end)
 
-hook.Add( "PlayerUse", "STOP", function( ply, ent )
+hook.Add( "PlayerUse", "STOP", function( ply, _ )
 
 	if ply:Team() == TEAM_SPECTATOR then
 		return false

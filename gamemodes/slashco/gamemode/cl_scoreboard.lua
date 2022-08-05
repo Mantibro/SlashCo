@@ -99,13 +99,13 @@ local PLAYER_LINE = {
 
 	Think = function( self )
 
-		if ( !IsValid( self.Player ) ) then
+		if ( not IsValid( self.Player ) ) then
 			self:SetZPos( 9999 ) -- Causes a rebuild
 			self:Remove()
 			return
 		end
 
-		if ( self.PName == nil || self.PName != self.Player:Nick() ) then
+		if ( self.PName == nil or self.PName ~= self.Player:Nick() ) then
 			self.PName = self.Player:Nick()
 			self.Name:SetText( self.PName )
 		end
@@ -114,7 +114,7 @@ local PLAYER_LINE = {
 		-- Change the icon of the mute button based on state
 		--
 
-		if ( self.Muted == nil || self.Muted != self.Player:IsMuted() ) then
+		if ( self.Muted == nil or self.Muted ~= self.Player:IsMuted() ) then
 
 			self.Muted = self.Player:IsMuted()
 			if ( self.Muted ) then
@@ -123,14 +123,14 @@ local PLAYER_LINE = {
 				self.Mute:SetImage( "icon32/unmuted.png" )
 			end
 
-			self.Mute.DoClick = function( s ) self.Player:SetMuted( !self.Muted ) end
+			self.Mute.DoClick = function( _ ) self.Player:SetMuted( not self.Muted ) end
 			self.Mute.OnMouseWheeled = function( s, delta )
 				self.Player:SetVoiceVolumeScale( self.Player:GetVoiceVolumeScale() + ( delta / 100 * 5 ) )
 				s.LastTick = CurTime()
 			end
 
 			self.Mute.PaintOver = function( s, w, h )
-				if ( !IsValid( self.Player ) ) then return end
+				if ( not IsValid( self.Player ) ) then return end
 			
 				local a = 255 - math.Clamp( CurTime() - ( s.LastTick or 0 ), 0, 3 ) * 255
 				if ( a <= 0 ) then return end
@@ -160,7 +160,7 @@ local PLAYER_LINE = {
 
 	Paint = function( self, w, h )
 
-		if ( !IsValid( self.Player ) ) then
+		if ( not IsValid( self.Player ) ) then
 			return
 		end
 
@@ -212,11 +212,11 @@ local SCORE_BOARD = {
 
 		local game_state = "In lobby."
 
-		if game.GetMap() != "sc_lobby" then
+		if game.GetMap() ~= "sc_lobby" then
 
 			local offer = "Regular"
 
-			if PlayerData.offering != "" then offer = PlayerData.offering end
+			if PlayerData.offering ~= "" then offer = PlayerData.offering end
 
 			game_state = offer.." round in progress."
 
@@ -238,13 +238,13 @@ local SCORE_BOARD = {
 
 	end,
 
-	Paint = function( self, w, h )
+	Paint = function( _, _, _ )
 
 		--draw.RoundedBox( 4, 0, 0, w, h, Color( 0, 0, 0, 200 ) )
 
 	end,
 
-	Think = function( self, w, h )
+	Think = function( self, _, _ )
 
 		self.Name:SetText( GetHostName() )
 
@@ -252,7 +252,7 @@ local SCORE_BOARD = {
 		-- Loop through each player, and if one doesn't have a score entry - create it.
 		--
 		local plyrs = player.GetAll()
-		for id, pl in pairs( plyrs ) do
+		for _, pl in pairs( plyrs ) do
 
 			if ( IsValid( pl.ScoreEntry ) ) then continue end
 
@@ -274,7 +274,7 @@ SCORE_BOARD = vgui.RegisterTable( SCORE_BOARD, "EditablePanel" )
 -----------------------------------------------------------]]
 function GM:ScoreboardShow()
 
-	if ( !IsValid( g_Scoreboard ) ) then
+	if ( not IsValid( g_Scoreboard ) ) then
 		g_Scoreboard = vgui.CreateFromTable( SCORE_BOARD )
 	end
 

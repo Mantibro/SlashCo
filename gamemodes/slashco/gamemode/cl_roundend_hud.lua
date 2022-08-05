@@ -1,11 +1,11 @@
 include( "ui/fonts.lua" )
 
-net.Receive( "mantislashcoRoundEnd", function( len, ply )
+net.Receive( "mantislashcoRoundEnd", function( _, _ )
 	local retable = net.ReadTable()
 
 	local result = retable.result
 
-	if outromusic_antispam == nil or outromusic_antispam != true then 
+	if outromusic_antispam == nil or outromusic_antispam ~= true then
 
 		if result == 0 then
 			surface.PlaySound( "slashco/music/slashco_win_full.mp3") 
@@ -32,11 +32,11 @@ net.Receive( "mantislashcoRoundEnd", function( len, ply )
 
 end)
 
-net.Receive( "mantislashcoHelicopterMusic", function( len, ply )
+net.Receive( "mantislashcoHelicopterMusic", function( _, _ )
 
 	if LocalPlayer():Team() == TEAM_SLASHER then return end
 
-	if stop_helimusic != true and (helimusic_antispam == nil or helimusic_antispam != true) then  
+	if stop_helimusic ~= true and (helimusic_antispam == nil or helimusic_antispam ~= true) then
 		heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
 		heli_music:Play()
 		helimusic_antispam = true 
@@ -46,7 +46,7 @@ end)
 
 hook.Add("HUDPaint", "RoundOutroHUD", function()
 
-	local ply = LocalPlayer()
+	--local ply = LocalPlayer()
 
 	--Round Ending screen
 
@@ -54,7 +54,7 @@ hook.Add("HUDPaint", "RoundOutroHUD", function()
 
 	if stop_helimusic and helimusic_antispam == true then heli_music:Stop() end
 
-	if show_roundend_screen != true then return end
+	if show_roundend_screen ~= true then return end
 
 	if re_tick == nil then re_tick = 0 end
 	re_tick = re_tick + 1.5
