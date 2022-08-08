@@ -525,7 +525,7 @@ do
         SlashCo.CurRound.SlasherData[slasherid].CanKill = false
         SlashCo.CurRound.SlasherData[slasherid].Perception = 0.0
 
-        if slasher.TylerSongPickedID == nil then
+        if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
             slasher.TylerSongPickedID = math.random(1,6)
 
             PlayGlobalSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3",  98 , slasher,  0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.08))
@@ -533,9 +533,11 @@ do
 
         if v2 > ( ms * 40) - (v4 * 4) then --Time ran out
 
+            local stop_song = slasher.TylerSongPickedID
+
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 2
-            slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
-            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3") end)
+            slasher:StopSound("slashco/slasher/tyler_song_"..stop_song..".mp3")
+            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_song_"..stop_song..".mp3") end)
             slasher.TylerSongPickedID = nil
 
         end
@@ -544,12 +546,14 @@ do
 
             local surv = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-            if surv:GetPos():Distance( slasher:GetPos() ) < 400 and surv:GetEyeTrace().Entity == slasher then
+            local stop_song = slasher.TylerSongPickedID
+
+            if not slasher:GetNWBool("TylerCreating") and surv:GetPos():Distance( slasher:GetPos() ) < 400 and surv:GetEyeTrace().Entity == slasher then
 
                 slasher:SetNWBool("TylerCreating", true)
                 SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
-                slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3")
-                timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3") end)
+                slasher:StopSound("slashco/slasher/tyler_song_"..stop_song..".mp3")
+                timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_song_"..stop_song..".mp3") end)
                 slasher.TylerSongPickedID = nil
 
             end

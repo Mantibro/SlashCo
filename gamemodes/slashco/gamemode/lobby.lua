@@ -775,7 +775,7 @@ function lobbySaveCurData()
 
 		end
 
-		ChooseTheSlasher(rand) 
+		SlashCo.ChooseTheSlasherLobby(rand) 
 		
 	end 
 
