@@ -436,7 +436,7 @@ do
 end
 
 	::borgmire::
-	if SlashID != 8 then goto freesmiley end
+	if SlashID != 8 then goto manspider end
 do
 
 	local PunchIcon = Material("slashco/ui/icons/slasher/s_punch")
@@ -454,7 +454,47 @@ do
 
 end
 
-	::freesmiley::
+	::manspider::
+	if SlashID != 9 then goto watcher end
+do
+
+	local LeapIcon = Material("slashco/ui/icons/slasher/s_punch")
+
+	local is_nested = LocalPlayer():GetNWBool("ManspiderNested")
+
+	if V1 != "" then
+
+		if IsValid( player.GetBySteamID64( V1 ) ) then
+
+			draw.SimpleText( "Your Target: "..player.GetBySteamID64( V1 ):Name(), "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/6), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+		end
+
+	end
+
+	if not is_nested then
+		if V1 == "" then draw.SimpleText( "R - Nest", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) end
+	else
+
+		if V3 < 100 then
+			draw.SimpleText( "(Wait for prey to come)", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		else
+			draw.SimpleText( "R - Abandon Nest", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		end
+
+	end
+
+	if inchase then
+
+		surface.SetMaterial(LeapIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "F - Leap", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+	end
+
+end
+
+	::watcher::
 
 		--Slasher-Shared function \/ \/ \/ 
 

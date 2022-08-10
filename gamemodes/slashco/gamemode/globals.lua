@@ -281,29 +281,29 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/borgmire_chase.wav",
         KillSound = ""
-    }
+    },
 
-    --[[{
-        NAME = "The Free Smiley Dealer",
+    {
+        NAME = "Manspider",
         ID = 9,
-        CLS = 3,
+        CLS = 1,
         DNG = 2,
-        Model = "models/slashco/slashers/freesmiley/freesmiley.mdl",
-        KillDelay = 0,
+        Model = "models/slashco/slashers/manspider/manspider.mdl",
+        KillDelay = 5,
         GasCanMod = 0,
-        ProwlSpeed = 100,
-        ChaseSpeed = 250,
-        Perception = 2.0,
+        ProwlSpeed = 150,
+        ChaseSpeed = 288,
+        Perception = 1.0,
         Eyesight = 5,
-        KillDistance = 125,
-        ChaseRange = 1000,
-        ChaseRadius = 0.93,
-        ChaseDuration = 12.0,
-        ChaseCooldown = 8,
+        KillDistance = 150,
+        ChaseRange = 700,
+        ChaseRadius = 0.9,
+        ChaseDuration = 9.0,
+        ChaseCooldown = 2,
         JumpscareDuration = 2,
-        ChaseMusic = "slashco/slasher/borgmire_chase.wav",
-        KillSound = ""
-    }]]
+        ChaseMusic = "slashco/slasher/manspider_chase.wav",
+        KillSound = "slashco/slasher/manspider_kill.mp3"
+    }
 
 }
 
@@ -1428,7 +1428,7 @@ SlashCo.SpawnCurConfig = function()
 
             SlashCo.HelicopterTakeOffIntro()
 
-            SlashCo.ClearDatabase() --Everything was loaded, clear the database.
+            --SlashCo.ClearDatabase() --Everything was loaded, clear the database.
     
         end)
 

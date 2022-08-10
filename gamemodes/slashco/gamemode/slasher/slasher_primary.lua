@@ -30,6 +30,10 @@ do
 
         if target:Team() != TEAM_SURVIVOR then return end
 
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 9 then --Manspider Condition
+            if target:SteamID64() != SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 then return end
+        end
+
         if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
 
             target:SetNWBool("SurvivorBeingJumpscared",true)

@@ -459,7 +459,7 @@ local Think = function()
 			--Go back to lobby if everyone dies.
 			if SlashCo.CurRound.SurvivorCount == 0 and SlashCo.CurRound.roundOverToggle then
 
-				SlashCo.EndRound()
+				--SlashCo.EndRound()
 
 				SlashCo.CurRound.roundOverToggle = false
 			end

@@ -56,6 +56,12 @@ do
 
     if tr.Entity != target then return end
 
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 9 then --Manspider Condition
+
+        if target:SteamID64() != SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 then return end
+
+    end
+
     if slasher:GetPos():Distance(target:GetPos()) < dist then
 
         slasher:SetNWBool("InSlasherChaseMode", true)

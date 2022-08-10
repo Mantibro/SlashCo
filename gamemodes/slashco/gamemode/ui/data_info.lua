@@ -91,14 +91,14 @@ SCInfo.Slasher = {
     },
 
     {
-        Name = "The Free Smiley Dealer",
-        Class = "Umbra",
+        Name = "Manspider",
+        Class = "Cryptid",
         Danger = "Considerable",
-        Description = "The Summoner Slasher who can raise minions to help with the Hunt.\n\n-T.\n-T.\nT.",
+        Description = "The Huntsman Slasher which is picky with its victims.\n\n-T.\n-T.\nT.",
         ProTip = "-.",
-        SpeedRating = "★☆☆☆☆",
-        EyeRating = "★☆☆☆☆",
-        DiffRating = "★★★☆☆"
+        SpeedRating = "★★★☆☆",
+        EyeRating = "★★★☆☆",
+        DiffRating = "★☆☆☆☆"
     }
 
 }

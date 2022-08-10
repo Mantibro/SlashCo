@@ -56,6 +56,16 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     end
 
+    if slid == 9 then
+
+        ply:SetViewOffset( Vector(0,0,20) )
+
+        ply:SetCurrentViewOffset( Vector(0,0,20) )
+
+        PlayGlobalSound("slashco/slasher/manspider_idle.wav",50,ply)
+
+    end
+
 end
 
 SlashCo.InsertSlasherToTable = function(id)

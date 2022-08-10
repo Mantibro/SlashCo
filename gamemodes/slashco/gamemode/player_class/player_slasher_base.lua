@@ -64,6 +64,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	local borg_punch = ply:GetNWBool("BorgmirePunch")
 	local borg_throw = ply:GetNWBool("BorgmireThrow")
 
+	local manspider_nest = ply:GetNWBool("ManspiderNested")
+
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
 	if ply:GetModel() ~= "models/slashco/slashers/baba/baba.mdl" then goto sid end --Bababooey's Animator
@@ -383,7 +385,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	::borgmire::
 
-	if ply:GetModel() ~= "models/slashco/slashers/borgmire/borgmire.mdl" then goto freesmiley end --Borgmire's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/borgmire/borgmire.mdl" then goto manspider end --Borgmire's Animator
 do
 
 	if not borg_punch and not borg_throw then anim_antispam = false end
@@ -420,8 +422,8 @@ do
 		anim_antispam = true 
 	end
 end
-	::freesmiley::
-	if ply:GetModel() ~= "models/slashco/slashers/freesmiley/freesmiley.mdl" then goto next end --Free Smiley's Animator
+	::manspider::
+	if ply:GetModel() ~= "models/slashco/slashers/manspider/manspider.mdl" then goto next end --Free Smiley's Animator
 do
 
 	if ply:IsOnGround() then
@@ -437,6 +439,12 @@ do
 	else
 
 		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	if manspider_nest then
+
+		ply.CalcSeqOverride = ply:LookupSequence("nest")
 
 	end
 
@@ -482,22 +490,9 @@ if SERVER then
 			ply.BorgStepTick = ply.BorgStepTick + 1
 
 			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Free Smiley Footsteps
-
-			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then ply.SmileyStepTick = 0 end
-
-			local b = true
-
-			if ply.SmileyStepTick == 0 then 
-
-				ply:EmitSound( "slashco/slasher/borgmire_step"..math.random(1,4)..".mp3")
-
-				b = false 
-			end
-
-			ply.SmileyStepTick = ply.SmileyStepTick + 1
-
-			return b
+		elseif ply:GetModel() == "models/slashco/slashers/manspider/manspider.mdl" then --Free Smiley Footsteps
+			ply:EmitSound( "slashco/slasher/manspider_step.mp3")
+			return true
 		end
 		
 	end
@@ -528,7 +523,7 @@ if CLIENT then
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/borgmire/borgmire.mdl" then --Borgmire Footsteps
 			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Free Smiley Footsteps
+		elseif ply:GetModel() == "models/slashco/slashers/manspider/manspider.mdl" then --Free Smiley Footsteps
 			return true 
 		end
 		

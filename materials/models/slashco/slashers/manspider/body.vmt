@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/manspider/body"
+	"$bumpmap" "models/slashco/slashers/manspider/body_nm"
+	"$halflambert" 1
+}

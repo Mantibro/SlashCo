@@ -701,7 +701,7 @@ do
 
 end
     ::BORGMIRE::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto FREESMILEY end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto MANSPIDER end
 do
 
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Time Spent chasing
@@ -758,7 +758,105 @@ do
     end
 
 end
-    ::FREESMILEY::
+    ::MANSPIDER::
+
+do
+
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Target SteamID
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Leap Cooldown
+    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Time spend nested
+    v4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 --Aggression
+
+    if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() end
+
+    if v1 == 0 then v1 = "" end
+
+    if v1 == "" then
+
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+        SlashCo.CurRound.SlasherData[slasherid].CanKil = false
+
+    else
+
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = true
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = true
+
+        if not IsValid(  player.GetBySteamID64( v1 ) ) then v1 = "" end
+
+    end
+
+    if slasher:GetNWBool("ManspiderNested") then
+
+        --Find a survivor
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 + FrameTime()
+
+        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+            local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+            if s:GetPos():Distance( slasher:GetPos() ) < (1000 + (v3 * 3)) then
+
+                local tr = util.TraceLine( {
+                    start = slasher:EyePos(),
+                    endpos = s:GetPos()+Vector(0,0,40),
+                    filter = slasher
+                } )
+
+                if tr.Entity == s then
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
+                    slasher:SetNWBool("ManspiderNested", false)
+                end
+
+            end
+
+        end
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 0
+
+    else
+
+        --Not nested
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
+
+        if v1 == "" then
+
+            for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+                local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+                local d = s:GetPos():Distance( slasher:GetPos() )
+    
+                if d < (1000) then
+    
+                    local tr = util.TraceLine( {
+                        start = slasher:EyePos(),
+                        endpos = s:GetPos()+Vector(0,0,40),
+                        filter = slasher
+                    } )
+    
+                    if tr.Entity == s then
+
+                        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = v4 + ( FrameTime() + (  (1000-d)  / 10000  )   )
+
+                        if v4 > 100 then
+                            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
+                        end
+
+                    end
+    
+                end
+    
+            end
+
+        else
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 0
+
+        end
+
+    end
+
+end
 
 end
 

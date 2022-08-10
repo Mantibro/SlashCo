@@ -121,7 +121,7 @@ end
 
     ::BORGMIRE::
     --Borgmire's Throw \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto FREESMILEY end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto MANSPIDER end
 
     if slasher:GetEyeTrace().Entity:IsPlayer() and not slasher:GetNWBool("BorgmireThrow") then
         local target = slasher:GetEyeTrace().Entity	
@@ -172,8 +172,30 @@ end
 
     end
 
-    --Borgmire's Throw /\ /\ \/
+    --Borgmire's Throw /\ /\ /\
+    ::MANSPIDER::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 9 then goto WATCHER end
+    --Manspider's Leap \/ \/ \/
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 > 0 then return end
 
-    ::FREESMILEY::
+    if not slasher:IsOnGround() then return end
+
+    if not slasher:GetNWBool("InSlasherChaseMode") then return end
+
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 4
+
+    slasher:Freeze(true)
+    slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
+
+    timer.Simple(1, function()  
+    
+        slasher:SetVelocity(  (slasher:EyeAngles():Forward() * 800) + Vector(0,0,200)  )
+        slasher:Freeze(false)
+
+    end)
+
+    --Manspider's Leap /\ /\ /\
+
+    ::WATCHER::
     
 end

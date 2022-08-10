@@ -345,7 +345,7 @@ end --ends here
 
     ::TYLER::
     --Tyler's State Switch \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto FREESMILEY end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto MANSPIDER end
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 0 then
 
@@ -370,6 +370,46 @@ end --ends here
 
     --Borgmire has no main ability
 
-    ::FREESMILEY::
+    ::MANSPIDER::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 9 then goto WATCHER end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != "" then return end
+
+    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+        local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+        if s:GetPos():Distance( slasher:GetPos() ) < 2000 then
+
+            slasher:ChatPrint("Cannot Nest here, a Survivor is too close. . .")
+            return
+
+        end
+
+    end
+
+    if not slasher:GetNWBool("ManspiderNested") then
+
+        slasher:SetNWBool("ManspiderNested", true)
+
+        slasher:SetRunSpeed( 1 )
+        slasher:SetWalkSpeed( 1 )
+        slasher:SetSlowWalkSpeed( 1 )
+
+    else
+
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 100 then
+
+            slasher:SetNWBool("ManspiderNested", false)
+
+            slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+            slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+            slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+
+        end
+
+    end
+
+    ::WATCHER::
 
 end
