@@ -769,19 +769,19 @@ do
 
     if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = v2 - FrameTime() end
 
-    if v1 == 0 then v1 = "" end
+    if not isstring(v1) then v1 = "" end
 
     if v1 == "" then
 
         SlashCo.CurRound.SlasherData[slasherid].CanChase = false
-        SlashCo.CurRound.SlasherData[slasherid].CanKil = false
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = false
 
     else
 
         SlashCo.CurRound.SlasherData[slasherid].CanChase = true
-        SlashCo.CurRound.SlasherData[slasherid].CanChase = true
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = true
 
-        if not IsValid(  player.GetBySteamID64( v1 ) ) then v1 = "" end
+        if not IsValid(  player.GetBySteamID64( v1 ) ) or player.GetBySteamID64( v1 ):Team() != TEAM_SURVIVOR then v1 = "" end
 
     end
 
@@ -803,6 +803,7 @@ do
                 } )
 
                 if tr.Entity == s then
+                    slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
                     SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
                     slasher:SetNWBool("ManspiderNested", false)
                 end
@@ -840,6 +841,7 @@ do
 
                         if v4 > 100 then
                             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
+                            slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
                         end
 
                     end
