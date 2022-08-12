@@ -19,15 +19,14 @@ local SenderTable = {
 local AntiSpam = false
 
 function ENT:Initialize()
-	if SERVER then
-		self:SetModel( SlashCo.GeneratorModel )
-		self:SetSolid( SOLID_VPHYSICS )
-		self:PhysicsInit( SOLID_VPHYSICS )
-		self:SetMoveType( MOVETYPE_NONE )
-		self:SetUseType( ONOFF_USE )
-
-		self.PlaySound = false
-	end
+    if SERVER then
+        self:SetModel( SlashCo.GeneratorModel )
+        self:SetSolid( SOLID_VPHYSICS )
+        self:PhysicsInit( SOLID_VPHYSICS )
+        self:SetMoveType( MOVETYPE_NONE )
+        self:GetPhysicsObject():EnableMotion( false )
+        self:SetUseType( ONOFF_USE )
+    end
 end
 
 function ENT:Touch(otherEnt)

@@ -470,6 +470,36 @@ do
 
 		end
 
+		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+			if ply:SteamID64() == V1 and not ply:GetNWBool("BGoneSoda") then
+				ply:SetMaterial( "models/debug/debugwhite" )
+				ply:SetColor( Color( 255, 0, 0, 255 ) )
+				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
+			end
+
+			if ply:SteamID64() != V1 then
+				ply:SetMaterial( "" )
+				ply:SetColor( Color( 255, 255, 255, 255 ) )
+				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
+			end
+
+		end
+
+	else
+		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+			if ply:GetMaterial() == "models/debug/debugwhite" then
+				ply:SetMaterial( "" )
+				ply:SetColor( Color( 255, 255, 255, 255 ) )
+				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
+			end
+
+		end
 	end
 
 	if not is_nested then

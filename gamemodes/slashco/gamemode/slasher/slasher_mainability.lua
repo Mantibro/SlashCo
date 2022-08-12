@@ -375,20 +375,20 @@ end --ends here
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != "" then return end
 
-    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-
-        local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-        if s:GetPos():Distance( slasher:GetPos() ) < 2000 then
-
-            slasher:ChatPrint("Cannot Nest here, a Survivor is too close. . .")
-            return
-
-        end
-
-    end
-
     if not slasher:GetNWBool("ManspiderNested") then
+
+        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+            local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+    
+            if s:GetPos():Distance( slasher:GetPos() ) < 1600 then
+    
+                slasher:ChatPrint("Cannot Nest here, a Survivor is too close. . .")
+                return
+    
+            end
+    
+        end
 
         slasher:SetNWBool("ManspiderNested", true)
 
