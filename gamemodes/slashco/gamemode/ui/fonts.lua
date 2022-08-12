@@ -17,6 +17,24 @@ surface.CreateFont( "LobbyFont1", {
 	color = black,
 } )
 
+surface.CreateFont( "TVCD", {
+	font = "Tvcd",
+	extended = false,
+	size = 22,
+	weight = 500,
+	blursize = 1,
+	scanlines = 4,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false
+} )
+
 surface.CreateFont( "PlayersFont", {
 	font = "CA Alternative Three", --  Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	extended = false,

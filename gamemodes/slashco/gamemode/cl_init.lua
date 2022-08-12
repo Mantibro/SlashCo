@@ -230,11 +230,11 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
     if GameReady == true then
 
-        draw.SimpleText( "The round will start soon.", "ItemFont", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+        draw.SimpleText( "The round will start soon.", "ItemFont", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
     else
 
-        draw.SimpleText( "Waiting for players. . .", "ItemFont", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+        draw.SimpleText( "Waiting for players. . .", "ItemFont", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
     end
 

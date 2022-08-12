@@ -35,7 +35,7 @@ function DrawTheOfferSelectorBox()
 	OfferSelectFrame = vgui.Create( "DFrame" )
 	OfferSelectFrame:SetTitle( "Make an Offering" )
 
-	if SelectedOffering == nil then SelectedOffering = 0 end
+	if SelectedOffering == nil then SelectedOffering = 1 end
 
 	local y = 30
 	for i = 1, #SCInfo.Offering do
@@ -110,7 +110,7 @@ function HideOfferingSelection()
 	if ( IsValid(OfferSelectFrame) ) then
 		OfferSelectFrame:Remove()
 		OfferSelectFrame = nil
-		SelectedOffering = 0
+		SelectedOffering = 1
 	end
 
 end
