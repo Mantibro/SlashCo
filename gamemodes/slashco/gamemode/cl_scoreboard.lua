@@ -274,7 +274,7 @@ SCORE_BOARD = vgui.RegisterTable( SCORE_BOARD, "EditablePanel" )
 -----------------------------------------------------------]]
 function GM:ScoreboardShow()
 
-	if ( not IsValid( g_Scoreboard ) ) then
+	if ( not IsValid( g_Scoreboard ) ) and PlayerData != nil then
 		g_Scoreboard = vgui.CreateFromTable( SCORE_BOARD )
 	end
 

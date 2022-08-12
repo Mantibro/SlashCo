@@ -1428,7 +1428,7 @@ SlashCo.SpawnCurConfig = function()
 
             SlashCo.HelicopterTakeOffIntro()
 
-            --SlashCo.ClearDatabase() --Everything was loaded, clear the database.
+            SlashCo.ClearDatabase() --Everything was loaded, clear the database.
     
         end)
 
