@@ -143,19 +143,18 @@ if StateOfLobby ~= nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 
 		end
 
-	
-	end
-	
-	if clientReadiness ~= nil then
-		
-		if clientReadiness < 1 then	
-			draw.SimpleText( "       [NOT READY]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 128, 128, 128, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-		elseif clientReadiness == 1 then	
-			draw.SimpleText( "       [READIED AS SURVIVOR]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 0, 255, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-		elseif clientReadiness == 2 then	
-			draw.SimpleText( "       [READIED AS SLASHER]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 255, 0, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+		if clientReadiness ~= nil then
+
+			if clientReadiness < 1 then
+				draw.SimpleText( "       [NOT READY]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 128, 128, 128, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+			elseif clientReadiness == 1 then
+				draw.SimpleText( "       [READIED AS SURVIVOR]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 0, 255, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+			elseif clientReadiness == 2 then
+				draw.SimpleText( "       [READIED AS SLASHER]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 255, 0, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+			end
+
 		end
-	
+
 	end
 
 end

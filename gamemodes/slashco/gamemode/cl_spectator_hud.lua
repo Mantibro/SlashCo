@@ -49,6 +49,10 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 
 	if key == 8192 then
 		vision = not vision
+		Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+		Sndd:Play()
+		Sndd:ChangeVolume(0.5, 0)
+		Sndd:ChangePitch(100, 0)
 	end
 
 end)

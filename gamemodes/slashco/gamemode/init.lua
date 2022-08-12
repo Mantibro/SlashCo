@@ -157,6 +157,10 @@ function GM:PlayerButtonDown(ply, button)
 					lobbyPlayerReadying(ply, 0)
 					broadcastLobbyInfo()
 				end
+				Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+				Sndd:Play()
+				Sndd:ChangeVolume(0.5, 0)
+				Sndd:ChangePitch(100, 0)
 			end
 
 			if ply:Team() == TEAM_LOBBY and button == 93 then
@@ -173,6 +177,10 @@ function GM:PlayerButtonDown(ply, button)
 					lobbyPlayerReadying(ply, 0)
 					broadcastLobbyInfo()
 				end
+				Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+				Sndd:Play()
+				Sndd:ChangeVolume(0.5, 0)
+				Sndd:ChangePitch(100, 0)
 			end
 
 			if ply:Team() == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferor(ply) then 
@@ -190,13 +198,29 @@ function GM:PlayerButtonDown(ply, button)
 					ply:SetTeam(TEAM_LOBBY)
 					ply:Spawn()
 					ply:ChatPrint( "Now joining the Lobby..." )
+					Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+					Sndd:Play()
+					Sndd:ChangeVolume(0.5, 0)
+					Sndd:ChangePitch(80, 0)
 
 				else 
 					ply:ChatPrint( "The Lobby is currently full." )
+					Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+					Sndd:Play()
+					Sndd:ChangeVolume(0.5, 0)
+					Sndd:ChangePitch(65, 0)
 				end
 
 			elseif ply:Team() == TEAM_LOBBY then
-				if(#team.GetPlayers(TEAM_LOBBY) > 2) then	--Joining the Spectator team.
+				ply:SetTeam(TEAM_SPECTATOR)
+				ply:Spawn()
+				ply:ChatPrint( "Now joining Spectators..." )
+				Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+				Sndd:Play()
+				Sndd:ChangeVolume(0.5, 0)
+				Sndd:ChangePitch(80, 0)
+
+--[[				if(#team.GetPlayers(TEAM_LOBBY) > 2) then	--Joining the Spectator team. --no need for this lol
 				
 					ply:SetTeam(TEAM_SPECTATOR)
 					ply:Spawn()
@@ -204,7 +228,7 @@ function GM:PlayerButtonDown(ply, button)
 
 				else 
 					ply:ChatPrint( "Cannot Spectate with less than 3 players." )
-				end
+				end]]
 			end	
 		end
 
