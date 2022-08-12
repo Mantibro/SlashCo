@@ -785,6 +785,31 @@ do
 
     end
 
+    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do --Switch Target if too close
+
+        local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+        local d = s:GetPos():Distance( slasher:GetPos() )
+
+        if d < (150) then
+
+            local tr = util.TraceLine( {
+                start = slasher:EyePos(),
+                endpos = s:GetPos()+Vector(0,0,40),
+                filter = slasher
+            } )
+
+            if tr.Entity == s then
+
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
+                slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
+
+            end
+
+        end
+
+    end
+
     if slasher:GetNWBool("ManspiderNested") then
 
         --Find a survivor

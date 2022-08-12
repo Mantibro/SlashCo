@@ -466,7 +466,7 @@ do
 
 		if IsValid( player.GetBySteamID64( V1 ) ) then
 
-			draw.SimpleText( "Your Target: "..player.GetBySteamID64( V1 ):Name(), "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/6), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+			draw.SimpleText( "Your Prey: "..player.GetBySteamID64( V1 ):Name(), "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/6), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 
 		end
 
@@ -475,7 +475,7 @@ do
 			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
 			if ply:SteamID64() == V1 and not ply:GetNWBool("BGoneSoda") then
-				ply:SetMaterial( "models/debug/debugwhite" )
+				ply:SetMaterial( "lights/white" )
 				ply:SetColor( Color( 255, 0, 0, 255 ) )
 				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
 			end
@@ -493,7 +493,7 @@ do
 
 			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-			if ply:GetMaterial() == "models/debug/debugwhite" then
+			if ply:GetMaterial() == "lights/white" then
 				ply:SetMaterial( "" )
 				ply:SetColor( Color( 255, 255, 255, 255 ) )
 				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )

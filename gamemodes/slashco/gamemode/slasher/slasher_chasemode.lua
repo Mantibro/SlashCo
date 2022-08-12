@@ -31,6 +31,17 @@ do
 
     local target = NULL
 
+    local tr = util.TraceLine( {
+        start = slasher:EyePos(),
+        endpos = target:GetPos()+Vector(0,0,50),
+        filter = slasher
+    } )
+
+    if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist then
+        target = slasher:GetEyeTrace().Entity
+        goto FOUND
+    end
+
     for i = 1, #find do
 
         if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
@@ -41,20 +52,12 @@ do
     end
 
     if not target:IsValid() then 
-        if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist then
-            target = slasher:GetEyeTrace().Entity
-        else
-            return 
-        end
+        return
     end
 
-    local tr = util.TraceLine( {
-        start = slasher:EyePos(),
-        endpos = target:GetPos()+Vector(0,0,50),
-        filter = slasher
-    } )
-
     if tr.Entity != target then return end
+
+    ::FOUND::
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 9 then --Manspider Condition
 
