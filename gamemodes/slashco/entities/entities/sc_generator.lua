@@ -24,7 +24,7 @@ function ENT:Initialize()
         self:SetSolid( SOLID_VPHYSICS )
         self:PhysicsInit( SOLID_VPHYSICS )
         self:SetMoveType( MOVETYPE_NONE )
-        self:GetPhysicsObject():EnableMotion( false )
+	self:GetPhysicsObject():EnableMotion( false )
         self:SetUseType( ONOFF_USE )
     end
 end
