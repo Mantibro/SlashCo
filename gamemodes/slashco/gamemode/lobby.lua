@@ -116,6 +116,8 @@ concommand.Add( "lobby_reset", function( ply, _, _ )
 	SlashCo.LobbyData.LOBBYSTATE = 0
 
 	table.Empty(SlashCo.LobbyData.Players)
+	table.Empty(SlashCo.LobbyData.AssignedSlashers)
+	table.Empty(SlashCo.LobbyData.AssignedSurvivors)
 
 	SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_lobby_primary"))
     SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Close")

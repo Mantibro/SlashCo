@@ -759,7 +759,7 @@ do
 
 end
     ::MANSPIDER::
-
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 9 then goto WATCHER end
 do
 
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Target SteamID
@@ -801,8 +801,12 @@ do
 
             if tr.Entity == s then
 
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
-                slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
+                if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != s:SteamID64() then 
+
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
+                    slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
+
+                end
 
             end
 
@@ -888,6 +892,8 @@ do
     end
 
 end
+
+    ::WATCHER::
 
 end
 
