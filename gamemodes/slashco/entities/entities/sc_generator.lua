@@ -76,7 +76,7 @@ function ENT:Touch(otherEnt)
 	end
 end
 
-function ENT:Use( activator, caller, usetype )
+function ENT:Use( activator, _, usetype )
 
 if SERVER then
 
@@ -90,7 +90,7 @@ if SERVER then
 			if SlashCo.CurRound.Generators[self:EntIndex()].Remaining > 3 then
 				SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer = activator:SteamID64()
 			else
-				if SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer != SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer then
+				if SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer ~= SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer then
 
 					SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer = 0
 
@@ -147,8 +147,8 @@ function ENT:Think()
 
 		local PouredGas = ents.GetByIndex(SlashCo.CurRound.Generators[self:EntIndex()].PouredCanID)
 
-		if PouredGas != nil then
-			if PouredGas != NULL then
+		if PouredGas ~= nil then
+			if PouredGas ~= NULL then
 				PouredGas:SetAngles( self:LocalToWorldAngles( Angle(0,0,45+(SlashCo.CurRound.Generators[self:EntIndex()].Progress*6)) ) )
 				PouredGas:SetPos( self:LocalToWorld( Vector(-18,30,55+(SlashCo.CurRound.Generators[self:EntIndex()].Progress*2)) ) )
 			end

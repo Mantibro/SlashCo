@@ -3,7 +3,7 @@ AddCSLuaFile()
 DEFINE_BASECLASS("player_default")
 
 local PLAYER = {}
-local SlashCo = SlashCo
+--local SlashCo = SlashCo
 
 --
 -- See gamemodes/base/player_class/player_default.lua for all overridable variables
@@ -92,7 +92,7 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 
 end)
 
-hook.Add( "PlayerFootstep", "SurvivorFootstep", function( ply, pos, foot, sound, volume, rf )
+hook.Add( "PlayerFootstep", "SurvivorFootstep", function( ply, _, _, _, _, _ ) --pos, foot, sound, volume, rf
 	if ply:Team() == TEAM_SURVIVOR and ply:GetNWBool("BGoneSoda") then 
 		return true
 	end	

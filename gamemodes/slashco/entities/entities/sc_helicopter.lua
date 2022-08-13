@@ -13,8 +13,8 @@ ENT.Purpose			= "Transport of SlashCo workers."
 ENT.Instructions	= ""
 ENT.AutomaticFrameAdvance = true 
 
-local plyCount = 0
-local switch = false
+--local plyCount = 0
+--local switch = false
 
 function ENT:Initialize()
 	if SERVER then
@@ -46,17 +46,17 @@ function ENT:Initialize()
 
 end
 
-function ENT:Use( activator, caller, useType, value )
+function ENT:Use( _,_,_,_ ) --activator, caller, useType, value
 
 	if SERVER then
 
-		local availabilityHeli = false
+		--local availabilityHeli = false
 
-		local userEnteredAlready = false
+		--local userEnteredAlready = false
 
-		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
+		--local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
-		if game.GetMap() != "sc_lobby" and SlashCo.CurRound.EscapeHelicopterSummoned == false then return end
+		if game.GetMap() ~= "sc_lobby" and SlashCo.CurRound.EscapeHelicopterSummoned == false then return end
 
 		if SatPlayers[4] == nil then availabilityHeli = true end
 
@@ -78,7 +78,7 @@ function ENT:Use( activator, caller, useType, value )
 			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, {steamid = activator:SteamID64()}) 
 		end
 
-		local vehicle = ents.Create("prop_vehicle_prisoner_pod")
+		ents.Create("prop_vehicle_prisoner_pod") --local vehicle =
 		--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
 
 		--if t == false then
@@ -87,22 +87,22 @@ function ENT:Use( activator, caller, useType, value )
 		--end
 
 
-		local ang = Angle(0,0,0)
-		local pos = Vector(0,0,0)
+		--local ang = Angle(0,0,0)
+		--local pos = Vector(0,0,0)
 
-		if SatPlayers[1] != nil and SatPlayers[1].steamid == activator:SteamID64() then 
+		if SatPlayers[1] ~= nil and SatPlayers[1].steamid == activator:SteamID64() then
 			pos = self:LocalToWorld( Vector(-30 , -17, 40) ) 
 			ang = self:LocalToWorldAngles( Angle(0,-90,0) ) 
 
-		elseif SatPlayers[2] != nil and SatPlayers[2].steamid == activator:SteamID64() then 
+		elseif SatPlayers[2] ~= nil and SatPlayers[2].steamid == activator:SteamID64() then
 			pos = self:LocalToWorld( Vector(-30 , 17, 40) ) 
 			ang = self:LocalToWorldAngles( Angle(0,-90,0) )
 
-		elseif SatPlayers[3] != nil and SatPlayers[3].steamid == activator:SteamID64() then 
+		elseif SatPlayers[3] ~= nil and SatPlayers[3].steamid == activator:SteamID64() then
 			pos = self:LocalToWorld( Vector(30 , -17, 40) ) 
 			ang = self:LocalToWorldAngles( Angle(0,90,0) )
 
-		elseif SatPlayers[4] != nil and SatPlayers[4].steamid == activator:SteamID64() then 
+		elseif SatPlayers[4] ~= nil and SatPlayers[4].steamid == activator:SteamID64() then
 			pos = self:LocalToWorld( Vector(30 , 17, 40) ) 
 			ang = self:LocalToWorldAngles( Angle(0,90,0) )	
 		end
@@ -174,11 +174,11 @@ function ENT:Think()
 
 	if SERVER then
 
-	local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
+	--local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
 	TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
 
-	if self.EnableMovement and TargetPosition != nil then
+	if self.EnableMovement and TargetPosition ~= nil then
 
 		if pitchgo == nil then pitchgo = 0 end
 
@@ -269,7 +269,7 @@ function ENT:Think()
 
 	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers >= (#team.GetPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
 
-		if SlashCo.CurRound.Difficulty != 1 then return end
+		if SlashCo.CurRound.Difficulty ~= 1 then return end
 
 		local abandon = math.random(50, 120)
 
@@ -286,7 +286,7 @@ function ENT:Think()
 
 	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
 
-		if SlashCo.CurRound.Difficulty != 2 then return end
+		if SlashCo.CurRound.Difficulty ~= 2 then return end
 
 		local abandon = math.random(50, 120)
 

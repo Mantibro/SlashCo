@@ -49,7 +49,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 	local aiming_gun = ply:GetNWBool("SidGunAiming")
 	local aimed_gun = ply:GetNWBool("SidGunAimed")
 	local gun_shooting = ply:GetNWBool("SidGunShoot")
-	local gun_rage = ply:GetNWBool("SidGunRage")
+	--local gun_rage = ply:GetNWBool("SidGunRage")
 
 	local trollge_stage1 = ply:GetNWBool("TrollgeStage1")
 	local trollge_stage2 = ply:GetNWBool("TrollgeStage2")
@@ -299,8 +299,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 		ply:SetPoseParameter( "move_x", ply:GetVelocity():Length()/100 )
 
-		local a1 = -ply:GetVelocity()[2]
-		local a2 = -ply:GetVelocity()[1]
+		--local a1 = -ply:GetVelocity()[2]
+		--local a2 = -ply:GetVelocity()[1]
 
 		--ply:SetPoseParameter( "move_yaw",-((( math.atan2( a1, a2 )*2/(-2*math.pi) ) 	* 180	) + ply:GetAngles()[2] - 180))
 
@@ -454,7 +454,7 @@ end
 end)
 
 
-hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, pos, foot, sound, volume, rf )
+hook.Add( "PlayerFootstep", "SlasherFootstep", function( ply, _, _, _, _, _ ) --pos, foot, sound, volume, rf
 
 if SERVER then
 	if ply:GetNWBool("AmogusSurvivorDisguise") then return false end
