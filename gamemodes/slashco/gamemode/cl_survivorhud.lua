@@ -120,23 +120,23 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 
 		if hp > (prevHp or 100) then --reset damage indicator upon healing
-			prevHp = hp
+			prevHp = math.Clamp(hp,0,100)
 			SetTime = 0
 		end
 
 		if (CurTime() >= (SetTime or 0)) then
 			if ShowDamage then --update prevHp once the indicator time is up
-				prevHp = hp
+				prevHp = math.Clamp(hp,0,100)
 				ShowDamage = false
 			end
 
 			if hp < (prevHp or 100) then --start the damage indicator time
-				prevHp1 = hp
+				prevHp1 = math.Clamp(hp,0,100)
 				ShowDamage = true
 				SetTime = CurTime() + 2.1
 			end
 		elseif hp < prevHp1 then --reset indicator time if more damage is taken
-			prevHp1 = hp
+			prevHp1 = math.Clamp(hp,0,100)
 			SetTime = CurTime() + 2.1
 		end
 
