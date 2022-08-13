@@ -300,58 +300,71 @@ SlashCo.DropItem = function(ply)
 
 	if SERVER then
 
-	if game.GetMap() == "sc_lobby" then return end
+		if game.GetMap() == "sc_lobby" then
+			return
+		end
 
-	if ply:Team() ~= TEAM_SURVIVOR then return end
+		if ply:Team() ~= TEAM_SURVIVOR then
+			return
+		end
 
-	if ply:IsFrozen() then return end
+		if ply:IsFrozen() then
+			return
+		end
 
-	local itid = SlashCo.GetHeldItem(ply)
+		local itid = SlashCo.GetHeldItem(ply)
 
-	--Skip the non-droppable items
-	if itid == 0 or itid == 2 or itid == 11 then return end
+		--Skip the non-droppable items
+		if itid == 0 or itid == 2 or itid == 11 then
+			return
+		end
 
-	if itid == 1 then 
-		SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) --local droppeditem =
+		local case = {
+			[1] = function()
+				SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+			end,
+			[3] = function()
+				local droppeditem = SlashCo.CreateItem("sc_milkjug", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+			end,
+			[4] = function()
+				local droppeditem = SlashCo.CreateItem("sc_cookie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+			end,
+			[5] = function()
+				local droppeditem = SlashCo.CreateItem("sc_mayo", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+			end,
+			[6] = function()
+				local droppeditem = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+			end,
+			[7] = function()
+				local droppeditem = SlashCo.CreateItem("sc_baby", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+			end,
+			[8] = function()
+				local droppeditem = SlashCo.CreateItem("sc_soda", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+			end,
+			[9] = function()
+				local droppeditem = SlashCo.CreateItem("sc_beacon", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 750)
+			end,
+			[10] = function()
+				local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+			end
+		}
+		assert(case[itid], "Tried to drop an item that doesn't exist! ID: "..(itid or "nil"))
+		case[itid]()
 
-	elseif itid == 3 then 
-		local droppeditem = SlashCo.CreateItem("sc_milkjug", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 250 )
+		SlashCo.BroadcastSelectables()
 
-	elseif itid == 4 then 
-		local droppeditem = SlashCo.CreateItem("sc_cookie", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 250 )
+		SlashCo.ChangeSurvivorItem(ply:SteamID64(), 0)
 
-	elseif itid == 5 then 
-		local droppeditem = SlashCo.CreateItem("sc_mayo", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 250 )
-
-	elseif itid == 6 then 
-		local droppeditem = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 250 )
-
-	elseif itid == 7 then 
-		local droppeditem = SlashCo.CreateItem("sc_baby", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 250 )
-
-	elseif itid == 8 then 
-		local droppeditem = SlashCo.CreateItem("sc_soda", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 250 )
-
-	elseif itid == 9 then 
-		local droppeditem = SlashCo.CreateItem("sc_beacon", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 750 )
-
-	elseif itid == 10 then 
-		local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld( Vector(30 , 0, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
-		Entity( droppeditem ):GetPhysicsObject():ApplyForceCenter( ply:GetAimVector() * 250 )
-	
 	end
 
-	SlashCo.ChangeSurvivorItem(ply:SteamID64(), 0)
-
-end
-	
 end
 
 concommand.Add( "give_item", function( ply, _, args )
@@ -396,6 +409,9 @@ SlashCo.ItemPickUp = function(plyid, item, itid)
 	if SlashCo.GetHeldItem(ply) > 0 then return end
 
 	SlashCo.ChangeSurvivorItem(ply:SteamID64(), itid)
+
+	table.RemoveByValue( SlashCo.CurRound.Selectables, item)
+	SlashCo.BroadcastSelectables()
 
 	ents.GetByIndex( item ):Remove()
 

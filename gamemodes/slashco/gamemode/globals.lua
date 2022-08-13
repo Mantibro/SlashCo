@@ -402,7 +402,8 @@ SlashCo.ResetCurRoundData = function()
         EscapeHelicopterSummoned = false,
         EscapeHelicopterSpawned = false,
         DistressBeaconUsed = false,
-        IsRadioTalkEnabled = false
+        IsRadioTalkEnabled = false,
+        Selectables = {}
     }
 end
 SlashCo.ResetCurRoundData()
@@ -905,6 +906,7 @@ SlashCo.CreateGasCan = function(pos, ang)
 
     local id = Ent:EntIndex()
     table.insert(SlashCo.CurRound.GasCans, id)
+    table.insert(SlashCo.CurRound.Selectables, id)
 
     return id
 end
@@ -928,6 +930,7 @@ SlashCo.CreateGasCanE = function(pos, ang)
 
     local id = Ent:EntIndex()
     table.insert(SlashCo.CurRound.ExposureSpawns, id)
+    table.insert(SlashCo.CurRound.Selectables, id)
 
     return id
 end
@@ -948,7 +951,7 @@ SlashCo.CreateItem = function(class, pos, ang)
 
     local id = Ent:EntIndex()
 
-    if class == "sc_babaclone" then 
+    if class == "sc_babaclone" then
         if  SERVER  then
             SlashCo.CurRound.SlasherEntities[id] = {
                 activateWalk = false,
@@ -956,6 +959,8 @@ SlashCo.CreateItem = function(class, pos, ang)
                 PostActivation = false
             }
         end
+    else
+        table.insert(SlashCo.CurRound.Selectables, id)
     end
 
     return id
@@ -979,6 +984,7 @@ SlashCo.CreateBattery = function(pos, ang)
 
     local id = Ent:EntIndex()
     table.insert(SlashCo.CurRound.Batteries, id)
+    table.insert(SlashCo.CurRound.Selectables, id)
 
     return id
 end
@@ -1004,6 +1010,7 @@ SlashCo.CreateGasCans = function(spawnpoints)
 
         SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
+
 end
 
 --Testing only function for exposure spawnpoints
@@ -1065,6 +1072,8 @@ SlashCo.InsertBattery = function(generator, battery)
     battery:SetParent( generator )
     battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
     battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+    table.RemoveByValue( SlashCo.CurRound.Selectables, bid )
+    SlashCo.BroadcastSelectables()
 end
 
 --Inserts a given gas can into a generator
@@ -1085,6 +1094,8 @@ SlashCo.RemoveGas = function(generator, gas)
   
     gas:Remove()
     table.RemoveByValue( SlashCo.CurRound.GasCans, gasid )
+    table.RemoveByValue( SlashCo.CurRound.Selectables, gasid )
+    SlashCo.BroadcastSelectables()
 end
 
 --Spawn the helicopter 
@@ -1428,7 +1439,7 @@ SlashCo.SpawnCurConfig = function()
 
             SlashCo.HelicopterTakeOffIntro()
 
-            --SlashCo.ClearDatabase() --Everything was loaded, clear the database.
+            SlashCo.ClearDatabase() --Everything was loaded, clear the database.
     
         end)
 
@@ -1436,8 +1447,7 @@ SlashCo.SpawnCurConfig = function()
 
         SlashCo.BroadcastSlasherData()
 
-    else
-
+        SlashCo.BroadcastSelectables()
     end
 end
 

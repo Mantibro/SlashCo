@@ -35,6 +35,42 @@ surface.CreateFont( "TVCD", {
 	outline = false
 } )
 
+surface.CreateFont( "Indicator", {
+	font = "Tvcd",
+	extended = false,
+	size = 34,
+	weight = 500,
+	blursize = 1,
+	scanlines = 4,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false
+} )
+
+surface.CreateFont( "TVCD-NB", {
+	font = "Tvcd",
+	extended = false,
+	size = 22,
+	weight = 500,
+	blursize = 0,
+	scanlines = 0,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false
+} )
+
 surface.CreateFont( "PlayersFont", {
 	font = "CA Alternative Three", --  Use the font-name which is shown to you by your operating system Font Viewer, not the file name
 	extended = false,

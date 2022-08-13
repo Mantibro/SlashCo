@@ -167,20 +167,31 @@ function GM:PlayerButtonDown(ply, button)
 				if getReadyState(ply) ~= 2 then
 
 					--Check if the player has made an offering or agreed to one
-					if isPlyOfferor(ply) then ply:ChatPrint( "Cannot ready as Slasher as you have either made or agreed to an Offering." ) return end
+					if isPlyOfferor(ply) then
+						ply:ChatPrint( "Cannot ready as Slasher as you have either made or agreed to an Offering." )
+						Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+						Sndd:Play()
+						Sndd:ChangeVolume(0.5, 0)
+						Sndd:ChangePitch(65, 0)
+						return
+					end
 
 					ply:ChatPrint( "Now ready as Slasher." )
 					lobbyPlayerReadying(ply, 2)
 					broadcastLobbyInfo()
+					Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+					Sndd:Play()
+					Sndd:ChangeVolume(0.5, 0)
+					Sndd:ChangePitch(100, 0)
 				else
 					ply:ChatPrint( "You are no longer ready." )
 					lobbyPlayerReadying(ply, 0)
 					broadcastLobbyInfo()
+					Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+					Sndd:Play()
+					Sndd:ChangeVolume(0.5, 0)
+					Sndd:ChangePitch(100, 0)
 				end
-				Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(100, 0)
 			end
 
 			if ply:Team() == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferor(ply) then 
@@ -631,7 +642,7 @@ function GM:PlayerDeath(victim, _, _)
 				ragdoll:SetAngles(Angle(0,victim:EyeAngles()[2] + ang_offset,0))
 
 				local physCount = ragdoll:GetPhysicsObjectCount()
-	
+
 				for i = 0, (physCount - 1) do
 					local PhysBone = ragdoll:GetPhysicsObjectNum(i)
 		

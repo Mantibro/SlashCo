@@ -2,6 +2,12 @@
 include( "ui/fonts.lua" )
 --include( "ui/data_info.lua" )
 
+net.Receive("slashcoSelectables", function(_,_)
+
+	Selectables = net.ReadTable()
+
+end)
+
 hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	local ply = LocalPlayer()
@@ -23,39 +29,17 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		local ITEM2_99 = Material("slashco/ui/icons/items/item_2_99")
 
-		local hp = ply:Health()
-
 		if Gasseous == nil then Gasseous = 0 end
 		if IsGassing == nil then IsGassing = false end
 		if HeldItem == nil then HeldItem = 0 end
-
-		local showLow = 0
-
-		local HealthBack = Material("slashco/ui/health_back")
-		local HealthBase = Material("slashco/ui/health_base")
-		local HealthOver = Material("slashco/ui/health_over")
-		local HealthTop = Material("slashco/ui/health_top")
-		local HealthTopLow = Material("slashco/ui/health_top_low")
 
 		local GasBack = Material("slashco/ui/gas_back")
 		local GasBase = Material("slashco/ui/gas_base")
 		local GasTop = Material("slashco/ui/gas_top")
 
-		local healthx = ScrW()/25
-		local healthy = ScrH() - (ScrH()/3.5)
-		local healthsize = ScrH()/4
-
 		local itemx = ScrW() - (ScrW()/7)
 		local itemy = ScrH() - (ScrH()/3.5)
 		local itemsize = ScrH()/5
-
-		local ints = 1.5 + (1 - (hp / 100) )
-
-		local a = 1 + (CurTime() * ints * 6)
-
-		local hpt = 0.86 - (hp/100)*0.74 --Deadzone: 0.12 , 0.86
-
-		local hptover = 0.86 - ((hp-100)/100)*0.74 --Deadzone: 0.12 , 0.86
 
 		local pouringas = 0
 
@@ -111,27 +95,76 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		if not input.IsButtonDown( 15 ) then IsGassing = false end
 
-		if hp > 100 then hpt = 0.12 end
-		if hp <= 100 then hptover = 0.86 end
+		--//item selection indicator//--
 
-		if hp < 40 then showLow = 1 else showLow = 0 end
+		local hitPos = ply:GetShootPos()
+		--draw.SimpleText(#Selectables, "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		for _, p in pairs(Selectables) do
+			local entity = Entity(p)
+			if not IsValid(entity) then continue end
+			local gasPos = entity:GetPos()
+			local realDistance = hitPos:Distance(gasPos)
+			if realDistance < 100 then
+				local trace = util.QuickTrace(hitPos,gasPos-hitPos,ply)
+				if trace.Hit and trace.Entity ~= entity then continue end
+				gasPos = gasPos:ToScreen()
+				local centerDistance = math.Distance(ScrW()/2,ScrH()/2,gasPos.x,gasPos.y)
+				draw.SimpleText("[", "Indicator", gasPos.x-centerDistance/2-12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+		end
 
-		surface.SetDrawColor(255,255,255,255)	
+		--//health//--
 
-		surface.SetMaterial(HealthBack)
-		surface.DrawTexturedRect(healthx, healthy, healthsize, healthsize)
+		local hp = ply:Health()
+		local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 
-		surface.SetMaterial(HealthBase)
-		surface.DrawTexturedRectUV( healthx,healthy + healthsize*hpt, healthsize, healthsize * (1-hpt),		 0, hpt, 1, 1 )
+		if hp > (prevHp or 100) then --reset damage indicator upon healing
+			prevHp = hp
+			SetTime = 0
+		end
 
-		surface.SetMaterial(HealthOver)
-		surface.DrawTexturedRectUV(healthx,healthy + healthsize*hptover, healthsize, healthsize * (1-hptover),		 0, hptover, 1, 1 )
+		if (CurTime() >= (SetTime or 0)) then
+			if ShowDamage then --update prevHp once the indicator time is up
+				prevHp = hp
+				ShowDamage = false
+			end
 
-		surface.SetMaterial(HealthTop)
-		surface.DrawTexturedRect(	healthx - math.sin(a)*ints*3	, 	healthy - math.sin(a)*ints*3	, healthsize + math.sin(a)*ints*6, healthsize + math.sin(a)*ints*6)
+			if hp < (prevHp or 100) then --start the damage indicator time
+				prevHp1 = hp
+				ShowDamage = true
+				SetTime = CurTime() + 2.1
+			end
+		elseif hp < prevHp1 then --reset indicator time if more damage is taken
+			prevHp1 = hp
+			SetTime = CurTime() + 2.1
+		end
 
-		surface.SetMaterial(HealthTopLow)
-		surface.DrawTexturedRect(	healthx - math.sin(a)*ints*3	, 	healthy - math.sin(a)*ints*3	,showLow * (healthsize + math.sin(a)*ints*6),showLow * (healthsize + math.sin(a)*ints*6))
+		if (hp > 0) then
+			aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
+			displayHp = math.Round(aHp)
+			displayHpBar = math.floor(math.Clamp(hp/maxHp,0,1)*27)
+			displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.ceil(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
+		else --instantly display everything as empty when dead
+			aHp = 0
+			displayHp = 0
+			displayHpBar = 0
+			displayPrevHpBar = 0
+		end
+
+		surface.SetDrawColor(0,0,128,255)
+		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420, 27)
+
+		local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
+		local parsed = markup.Parse("<font=TVCD>HP "..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
+
+		surface.DrawRect(ScrW() * 0.025+407, ScrH() * 0.95-24, parsedValue:GetWidth()+11, 27) --extra little bit of background, changes with value
+		parsed:Draw(ScrW() * 0.025+4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+		parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+
+		--//gas whatever//--
+
+		surface.SetDrawColor(255,255,255,255)
 
 		surface.SetMaterial(GasBack)
 		surface.DrawTexturedRect((ScrW()/2) - ScrW()/16, (ScrH()/2)  - ScrW()/16, pouringas*ScrW()/8, ScrW()/8)
@@ -152,15 +185,14 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				if t[i].steamid == LocalPlayer():SteamID64() then
 					HeldItem = t[i].itemid
 				end
-			end 
-		
-		end)
+			end
 
+		end)
 
 		net.Receive("mantislashcoSendGlobalInfoTable", function()
 
 			SCInfo = net.ReadTable()
-		
+
 		end)
 
 		local item_name = ""
