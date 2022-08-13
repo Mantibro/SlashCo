@@ -174,7 +174,7 @@ function ENT:Think()
 
 	if SERVER then
 
-	--local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
+	local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
 	TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
 
