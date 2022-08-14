@@ -13,10 +13,18 @@ ENT.Instructions = ""
 
 --local InInteraction = false
 local SenderTable = {
-    prog = 0,
-    id = 0
+    progress = 0
 }
 local AntiSpam = false
+
+local sendProgress = function(activator, progress)
+    net.Start("mantislashcoGasPourProgress")
+
+    SenderTable.progress = progress
+
+    net.WriteTable(SenderTable)
+    net.Send(activator)
+end
 
 function ENT:Initialize()
     if SERVER then
@@ -45,7 +53,9 @@ function ENT:Touch(otherEnt)
             pgas:SetPos(self:LocalToWorld(Vector(-18, 30, 55 + (SlashCo.CurRound.Generators[self:EntIndex()].Progress * 2))))
             pgas:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45 + SlashCo.CurRound.Generators[self:EntIndex()].Progress)))
             pgas:SetParent(self)
-            table.insert(SlashCo.CurRound.DiscardedCans, pgas:EntIndex())
+
+            SlashCo.MakeSelectableNow(pgas:EntIndex())
+            SenderTable.gasCan = pgas:EntIndex()
 
             SlashCo.CurRound.Generators[self:EntIndex()].PouredCanID = pgas:EntIndex()
 
@@ -133,13 +143,7 @@ function ENT:Think()
 
             SlashCo.CurRound.Generators[self:EntIndex()].Progress = SlashCo.CurRound.Generators[self:EntIndex()].Progress + 0.01
 
-            net.Start("mantislashcoGasPourProgress")
-
-            SenderTable.prog = SlashCo.CurRound.Generators[self:EntIndex()].Progress
-            SenderTable.id = activator:SteamID64()
-
-            net.WriteTable(SenderTable)
-            net.Broadcast()
+            sendProgress(activator, SlashCo.CurRound.Generators[self:EntIndex()].Progress)
 
             if AntiSpam == false then
                 self:EmitSound("slashco/generator_fill.wav")
@@ -169,13 +173,19 @@ function ENT:Think()
 
                 SlashCo.CurRound.Generators[self:EntIndex()].PouredCanID = 0
 
+                --//discard gas can//--
+
                 PouredGas:PhysicsInit(SOLID_VPHYSICS)
                 PouredGas:SetMoveType(MOVETYPE_VPHYSICS)
                 PouredGas:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
                 PouredGas:SetParent(nil)
 
+                SlashCo.RemoveSelectableNow(PouredGas:EntIndex())
+
+                table.insert(SlashCo.CurRound.DiscardedCans, PouredGas:EntIndex())
+
                 local PouredGasPhysics = PouredGas:GetPhysicsObject()
-                PouredGasPhysics:SetVelocity(Vector(math.random(-200,200),200,math.random(-200,200)))
+                PouredGasPhysics:SetVelocity(Vector(math.random(-200,200),math.random(-200,200),200))
 
                 local randomvec = Vector(0,0,0)
                 randomvec:Random( -1000, 1000 )

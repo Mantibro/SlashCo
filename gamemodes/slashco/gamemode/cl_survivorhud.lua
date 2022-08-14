@@ -2,10 +2,29 @@
 include( "ui/fonts.lua" )
 --include( "ui/data_info.lua" )
 
+local maxHp = 100 --ply:GetMaxHealth() seems to be 200
+
 net.Receive("slashcoSelectables", function(_,_)
 
 	Selectables = net.ReadTable()
 
+end)
+
+net.Receive( "mantislashcoGasPourProgress", function( )
+
+	local ReceivedTable = net.ReadTable()
+
+	if ReceivedTable then
+		--ply:ChatPrint(table.ToString(ReceivedTable))
+		gasCan = ReceivedTable.gasCan
+		local progress = ReceivedTable.progress
+		gas = 1 - (progress / 13)
+		if progress > 0 and progress <= 13 then
+			isGassing = true
+		else
+			isGassing = false
+		end
+	end
 end)
 
 hook.Add("HUDPaint", "SurvivorHUD", function()
@@ -29,73 +48,15 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		local ITEM2_99 = Material("slashco/ui/icons/items/item_2_99")
 
-		if Gasseous == nil then Gasseous = 0 end
-		if IsGassing == nil then IsGassing = false end
 		if HeldItem == nil then HeldItem = 0 end
-
-		local GasBack = Material("slashco/ui/gas_back")
-		local GasBase = Material("slashco/ui/gas_base")
-		local GasTop = Material("slashco/ui/gas_top")
 
 		local itemx = ScrW() - (ScrW()/7)
 		local itemy = ScrH() - (ScrH()/3.5)
 		local itemsize = ScrH()/5
 
-		local pouringas = 0
+		if not input.IsButtonDown( 15 ) then isGassing = false end
 
-		net.Receive( "mantislashcoGasPourProgress", function( )
-
-			local ReceivedTable = net.ReadTable()
-
-			IsGassing = false
-
-			if ReceivedTable ~= nil then
-
-				local man = ReceivedTable.id
-				local prog = ReceivedTable.prog
-
-				if man == LocalPlayer():SteamID64() then
-
-					if prog <= 0 or prog > 12.98 then 
-						IsGassing = false
-					else 
-						IsGassing = true
-					end
-
-				else
-					IsGassing = false
-				end
-
-				Gasseous = 1 - (prog / 13)
-				if Gasseous == 0 or Gasseous > 13 then IsGassing = false end
-
-			else
-
-				IsGassing = false
-
-			end
-
-		end)
-
-		net.Receive( "mantislashcoGasPourEnded", function( )
-
-			local ReceivedTable = net.ReadTable()
-
-			if ReceivedTable ~= nil then
-				if man == LocalPlayer():SteamID64() then
-					IsGassing = false
-				end
-			end
-
-		end)
-
-		local gas = Gasseous
-
-		if IsGassing == true then pouringas = 1 else pouringas = 0 end
-
-		if not input.IsButtonDown( 15 ) then IsGassing = false end
-
-		--//item selection indicator//--
+		--//item selection crosshair//--
 
 		local hitPos = ply:GetShootPos()
 		--draw.SimpleText(#Selectables, "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -104,7 +65,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			if not IsValid(entity) then continue end
 			local gasPos = entity:GetPos()
 			local realDistance = hitPos:Distance(gasPos)
-			if realDistance < 100 then
+			if realDistance < 100 and not (isGassing and gasCan == p) then
 				local trace = util.QuickTrace(hitPos,gasPos-hitPos,ply)
 				if trace.Hit and trace.Entity ~= entity then continue end
 				gasPos = gasPos:ToScreen()
@@ -117,7 +78,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		--//health//--
 
 		local hp = ply:Health()
-		local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 
 		if hp > (prevHp or 100) then --reset damage indicator upon healing
 			prevHp = math.Clamp(hp,0,100)
@@ -140,17 +100,10 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			SetTime = CurTime() + 2.1
 		end
 
-		if (hp > 0) then
-			aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
-			displayHp = math.Round(aHp)
-			displayHpBar = math.floor(math.Clamp(hp/maxHp,0,1)*27)
-			displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.ceil(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
-		else --instantly display everything as empty when dead
-			aHp = 0
-			displayHp = 0
-			displayHpBar = 0
-			displayPrevHpBar = 0
-		end
+		aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
+		local displayHp = math.Round(aHp)
+		local displayHpBar = math.floor(math.Clamp(hp/maxHp,0,1)*27)
+		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.ceil(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
 
 		local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
 		local parsed = markup.Parse("<font=TVCD>HP "..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
@@ -161,18 +114,28 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		parsed:Draw(ScrW() * 0.025+4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 		parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 
-		--//gas whatever//--
+		--//gas fuel meter//--
 
-		surface.SetDrawColor(255,255,255,255)
+		if isGassing and IsValid(Entity(gasCan)) then
+			local genPos = Entity(gasCan):GetPos()
+			local realDistance = hitPos:Distance(genPos)
+			if realDistance < 100 then
+				genPos = genPos:ToScreen()
+				local fade = math.Round((100 - realDistance) * 2.8)
+				local parsedLiters = markup.Parse("<font=TVCD>" .. math.Round(gas * 10) .. "L</font>") --this only exists to find the length lol
+				local width = 206 + parsedLiters:GetWidth()
+				local xClamp = math.Clamp(genPos.x, ScrW() * 0.025 + width / 2, ScrW() * 0.975 - width / 2)
+				local yClamp = math.Clamp(genPos.y, ScrH() * 0.05 + 24, ScrH() * 0.95 - 51)
+				local half = math.Clamp((gas * 8), 0, 8) % 1 >= 0.5
 
-		surface.SetMaterial(GasBack)
-		surface.DrawTexturedRect((ScrW()/2) - ScrW()/16, (ScrH()/2)  - ScrW()/16, pouringas*ScrW()/8, ScrW()/8)
-
-		surface.SetMaterial(GasBase)
-		surface.DrawTexturedRectUV((ScrW()/2) - ScrW()/16	,		(ScrH()/2) - (		(ScrW()/8) * (1-gas) 	)	+	ScrW()/16, 	ScrW()/8	, pouringas*(ScrW()/8 ) * (1-gas)		,0, gas, 1, 1 )
-
-		surface.SetMaterial(GasTop)
-		surface.DrawTexturedRect((ScrW()/2) - ScrW()/16, (ScrH()/2)  - ScrW()/16, ScrW()/8, pouringas*ScrW()/8)
+				surface.SetDrawColor(0, 128, 0, fade)
+				surface.DrawRect(xClamp - width / 2, yClamp - 13, width, 27)
+				draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + 205 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText("FUEL " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+			else
+				isGassing = false
+			end
+		end
 
 		--Item Display
 

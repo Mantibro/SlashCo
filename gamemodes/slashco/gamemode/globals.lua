@@ -403,8 +403,7 @@ SlashCo.ResetCurRoundData = function()
         EscapeHelicopterSpawned = false,
         DistressBeaconUsed = false,
         IsRadioTalkEnabled = false,
-        Selectables = {},
-        DiscardedCans = {}
+        DiscardedCans = {} --Used specifically to prevent used cans from being carried again
     }
 end
 SlashCo.ResetCurRoundData()
@@ -907,7 +906,7 @@ SlashCo.CreateGasCan = function(pos, ang)
 
     local id = Ent:EntIndex()
     table.insert(SlashCo.CurRound.GasCans, id)
-    table.insert(SlashCo.CurRound.Selectables, id)
+    SlashCo.MakeSelectable(id)
 
     return id
 end
@@ -931,7 +930,7 @@ SlashCo.CreateGasCanE = function(pos, ang)
 
     local id = Ent:EntIndex()
     table.insert(SlashCo.CurRound.ExposureSpawns, id)
-    table.insert(SlashCo.CurRound.Selectables, id)
+    SlashCo.MakeSelectable(id)
 
     return id
 end
@@ -961,7 +960,7 @@ SlashCo.CreateItem = function(class, pos, ang)
             }
         end
     else
-        table.insert(SlashCo.CurRound.Selectables, id)
+        SlashCo.MakeSelectable(id)
     end
 
     return id
@@ -985,7 +984,7 @@ SlashCo.CreateBattery = function(pos, ang)
 
     local id = Ent:EntIndex()
     table.insert(SlashCo.CurRound.Batteries, id)
-    table.insert(SlashCo.CurRound.Selectables, id)
+    SlashCo.MakeSelectable(id)
 
     return id
 end
@@ -1073,8 +1072,7 @@ SlashCo.InsertBattery = function(generator, battery)
     battery:SetParent( generator )
     battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
     battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
-    table.RemoveByValue( SlashCo.CurRound.Selectables, bid )
-    SlashCo.BroadcastSelectables()
+    SlashCo.RemoveSelectableNow(bid)
 end
 
 --Inserts a given gas can into a generator
@@ -1095,8 +1093,7 @@ SlashCo.RemoveGas = function(generator, gas)
 
     gas:Remove()
     table.RemoveByValue( SlashCo.CurRound.GasCans, gasid )
-    table.RemoveByValue( SlashCo.CurRound.Selectables, gasid )
-    SlashCo.BroadcastSelectables()
+    SlashCo.RemoveSelectableNow(gasid)
 end
 
 --Spawn the helicopter 
@@ -1186,6 +1183,8 @@ SlashCo.RemoveAllCurRoundEnts = function()
             Entity(SlashCo.CurRound.ExposureSpawns[I]):Remove()
         end
     end
+
+    SlashCo.ClearSelectables()
 end
 
 SlashCo.EndRound = function()

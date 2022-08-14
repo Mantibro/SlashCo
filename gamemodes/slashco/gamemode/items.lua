@@ -6,7 +6,7 @@ SlashCo.GetHeldItem = function(ply)
 	for _, v in ipairs(SlashCo.CurRound.SurvivorData.Items) do
         if v.steamid == id then
 			return v.itemid
-		end	      
+		end
 	end
 end
 
@@ -93,24 +93,24 @@ SlashCo.UseItem = function(ply)
 
 		--Active Step Decoy
 
-		local decoy = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld( Vector(10 , 0, 5) ) , ply:LocalToWorldAngles( Angle(0,0,0) )) 
+		local decoy = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld( Vector(10 , 0, 5) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
 
-		Entity( decoy ):SetNWBool("StepDecoyActive", true) 
+		Entity( decoy ):SetNWBool("StepDecoyActive", true)
 
 	end
 
 	if itid == 7 then
 
-		--When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position. 
-		--Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health. 
-		--(50 - 10%, 25 - 60% ,1 - 100%). 
+		--When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
+		--Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
+		--(50 - 10%, 25 - 60% ,1 - 100%).
 		--Using it will spawn a spent baby in the position the survivor used it.
 
 		ply:EmitSound("slashco/survivor/baby_use.mp3")
 
 		local deathchance = math.random(0, math.floor( ply:Health() / 5 ) )
 
-		local hpafter = ply:Health() / 2 
+		local hpafter = ply:Health() / 2
 
 		ply:SetHealth( hpafter )
 
@@ -162,14 +162,14 @@ SlashCo.UseItem = function(ply)
 		local r1 = ents.FindByClass( "sc_generator")[1]:EntIndex()
 		local r2 = ents.FindByClass( "sc_generator")[2]:EntIndex()
 
-		if SlashCo.CurRound.Generators[r1].Running or SlashCo.CurRound.Generators[r2].Running then 
+		if SlashCo.CurRound.Generators[r1].Running or SlashCo.CurRound.Generators[r2].Running then
 
-			if SlashCo.CurRound.DistressBeaconUsed == false then 
+			if SlashCo.CurRound.DistressBeaconUsed == false then
 
 				SlashCo.SummonEscapeHelicopter()
 
 				SlashCo.CurRound.DistressBeaconUsed = true
-				
+
 				SlashCo.CreateItem("sc_activebeacon",ply:GetPos(),Angle(0,0,0))
 
 
@@ -205,7 +205,7 @@ SlashCo.UseItem = function(ply)
 
 			local rand = math.random(1,6)
 
-			if rand == 1 then 
+			if rand == 1 then
 
 				SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , 20, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
 				SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , -20, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
@@ -233,10 +233,10 @@ SlashCo.UseItem = function(ply)
 				if hpd <= ply:Health() then hpd = (-ply:Health()) + 1 end
 				if hpd + ply:Health() > 200 then hpd = 200-ply:Health() end
 
-				ply:SetHealth( ply:Health() + hpd ) 
+				ply:SetHealth( ply:Health() + hpd )
 
-				if hpd <= 0 then 
-					ply:EmitSound("slashco/survivor/devildie_hurt.mp3") 
+				if hpd <= 0 then
+					ply:EmitSound("slashco/survivor/devildie_hurt.mp3")
 
 					local vPoint = ply:GetPos() + Vector(0,0,50)
                     local bloodfx = EffectData()
@@ -244,8 +244,8 @@ SlashCo.UseItem = function(ply)
                     util.Effect( "BloodImpact", bloodfx )
 				end
 
-				if hpd > 0 then 
-					ply:EmitSound("slashco/survivor/devildie_heal.mp3") 
+				if hpd > 0 then
+					ply:EmitSound("slashco/survivor/devildie_heal.mp3")
 
 					local vPoint = ply:GetPos() + Vector(0,0,50)
                     local healfx = EffectData()
@@ -370,7 +370,7 @@ end
 concommand.Add( "give_item", function( ply, _, args )
 
 	if SERVER then
-	
+
 	if ply:Team() ~= TEAM_SURVIVOR then print("Only survivors can have items") return end
 
 	SlashCo.ChangeSurvivorItem(ply:SteamID64(), tonumber(args[1]))
@@ -404,16 +404,17 @@ SlashCo.ItemPickUp = function(plyid, item, itid)
 
 	if SERVER then
 
-	local ply = player.GetBySteamID64(plyid)
+		local ply = player.GetBySteamID64(plyid)
 
-	if SlashCo.GetHeldItem(ply) > 0 then return end
+		if SlashCo.GetHeldItem(ply) > 0 then
+			return
+		end
 
-	SlashCo.ChangeSurvivorItem(ply:SteamID64(), itid)
+		SlashCo.ChangeSurvivorItem(ply:SteamID64(), itid)
 
-	table.RemoveByValue( SlashCo.CurRound.Selectables, item)
-	SlashCo.BroadcastSelectables()
+		SlashCo.RemoveSelectableNow(item)
 
-	ents.GetByIndex( item ):Remove()
+		ents.GetByIndex(item):Remove()
 
 	end
 
