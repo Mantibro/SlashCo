@@ -423,7 +423,7 @@ do
 	end
 end
 	::manspider::
-	if ply:GetModel() ~= "models/slashco/slashers/manspider/manspider.mdl" then goto next end --Free Smiley's Animator
+	if ply:GetModel() ~= "models/slashco/slashers/manspider/manspider.mdl" then goto watcher end --Manspider's Animator
 do
 
 	if ply:IsOnGround() then
@@ -449,7 +449,34 @@ do
 	end
 
 end
-	::next::
+	::watcher::
+	if ply:GetModel() ~= "models/slashco/slashers/watcher/watcher.mdl" then goto abomignat end --Watcher's Animator
+do
+
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_WALK
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	if manspider_nest then
+
+		ply.CalcSeqOverride = ply:LookupSequence("nest")
+
+	end
+
+end
+	::abomignat::
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
@@ -490,9 +517,12 @@ if SERVER then
 			ply.BorgStepTick = ply.BorgStepTick + 1
 
 			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/manspider/manspider.mdl" then --Free Smiley Footsteps
+		elseif ply:GetModel() == "models/slashco/slashers/manspider/manspider.mdl" then --Manspider Footsteps
 			ply:EmitSound( "slashco/slasher/manspider_step.mp3")
 			return true
+		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
+			ply:EmitSound( "npc/footsteps/hardboot_generic"..math.random(1,6)..".wav",50,90,0.75)
+			return false
 		end
 		
 	end
@@ -523,8 +553,10 @@ if CLIENT then
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/borgmire/borgmire.mdl" then --Borgmire Footsteps
 			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/manspider/manspider.mdl" then --Free Smiley Footsteps
+		elseif ply:GetModel() == "models/slashco/slashers/manspider/manspider.mdl" then --Manspider Footsteps
 			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
+			return false
 		end
 		
 	end

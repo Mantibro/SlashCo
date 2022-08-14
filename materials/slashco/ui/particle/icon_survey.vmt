@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/particle/icon_survey"
+	"$alphatest" 1
+	"$translucent" 1
+	"$ignorez" 1
+}
