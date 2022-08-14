@@ -1,0 +1,13 @@
+local SlashCo = SlashCo
+
+SlashCo.Items.NameMePlease.Model = ""
+SlashCo.Items.NameMePlease.Name = ""
+SlashCo.Items.NameMePlease.Icon = ""
+SlashCo.Items.NameMePlease.Price = 0
+SlashCo.Items.NameMePlease.Description = ""
+SlashCo.Items.NameMePlease.CamPos = Vector(0,0,0)
+SlashCo.Items.NameMePlease.MaxAllowed = 1 --optional
+SlashCo.Items.NameMePlease.OnUse = function(ply) --optional
+end
+SlashCo.Items.NameMePlease.OnDrop = function(ply) --optional
+end

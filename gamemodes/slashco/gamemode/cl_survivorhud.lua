@@ -4,6 +4,22 @@ include( "ui/fonts.lua" )
 
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 
+local ITEM0 = Material("slashco/ui/icons/items/item_0")
+local ITEM1 = Material("slashco/ui/icons/items/item_1")
+local ITEM2 = Material("slashco/ui/icons/items/item_2")
+local ITEM3 = Material("slashco/ui/icons/items/item_3")
+local ITEM4 = Material("slashco/ui/icons/items/item_4")
+local ITEM5 = Material("slashco/ui/icons/items/item_5")
+local ITEM6 = Material("slashco/ui/icons/items/item_6")
+local ITEM7 = Material("slashco/ui/icons/items/item_7")
+local ITEM8 = Material("slashco/ui/icons/items/item_8")
+local ITEM9 = Material("slashco/ui/icons/items/item_9")
+local ITEM10 = Material("slashco/ui/icons/items/item_10")
+local ITEM11 = Material("slashco/ui/icons/items/item_11")
+
+local ITEM2_99 = Material("slashco/ui/icons/items/item_2_99")
+
+
 net.Receive("slashcoSelectables", function(_,_)
 
 	Selectables = net.ReadTable()
@@ -32,22 +48,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 	local ply = LocalPlayer()
 	
 	if ply:Team() == TEAM_SURVIVOR then
-
-		local ITEM0 = Material("slashco/ui/icons/items/item_0")
-		local ITEM1 = Material("slashco/ui/icons/items/item_1")
-		local ITEM2 = Material("slashco/ui/icons/items/item_2")
-		local ITEM3 = Material("slashco/ui/icons/items/item_3")
-		local ITEM4 = Material("slashco/ui/icons/items/item_4")
-		local ITEM5 = Material("slashco/ui/icons/items/item_5")
-		local ITEM6 = Material("slashco/ui/icons/items/item_6")
-		local ITEM7 = Material("slashco/ui/icons/items/item_7")
-		local ITEM8 = Material("slashco/ui/icons/items/item_8")
-		local ITEM9 = Material("slashco/ui/icons/items/item_9")
-		local ITEM10 = Material("slashco/ui/icons/items/item_10")
-		local ITEM11 = Material("slashco/ui/icons/items/item_11")
-
-		local ITEM2_99 = Material("slashco/ui/icons/items/item_2_99")
-
 		if HeldItem == nil then HeldItem = 0 end
 
 		local itemx = ScrW() - (ScrW()/7)
@@ -56,9 +56,32 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		if not input.IsButtonDown( 15 ) then isGassing = false end
 
-		--//item selection crosshair//--
+		--//gas fuel meter//--
 
 		local hitPos = ply:GetShootPos()
+		if isGassing and IsValid(Entity(gasCan)) then
+			local genPos = Entity(gasCan):GetPos()
+			local realDistance = hitPos:Distance(genPos)
+			if realDistance < 100 then
+				genPos = genPos:ToScreen()
+				local fade = math.Round((100 - realDistance) * 2.8)
+				local parsedLiters = markup.Parse("<font=TVCD>" .. math.Round(gas * 10) .. "L</font>") --this only exists to find the length lol
+				local width = 206 + parsedLiters:GetWidth()
+				local xClamp = math.Clamp(genPos.x, ScrW() * 0.025 + width / 2, ScrW() * 0.975 - width / 2)
+				local yClamp = math.Clamp(genPos.y, ScrH() * 0.05 + 24, ScrH() * 0.95 - 51)
+				local half = math.Clamp((gas * 8), 0, 8) % 1 >= 0.5
+
+				surface.SetDrawColor(0, 128, 0, fade)
+				surface.DrawRect(xClamp - width / 2, yClamp - 13, width, 27)
+				draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + 205 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText("FUEL " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+			else
+				isGassing = false
+			end
+		end
+
+		--//item selection crosshair//--
+
 		--draw.SimpleText(#Selectables, "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		for _, p in pairs(Selectables) do
 			local entity = Entity(p)
@@ -113,29 +136,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		parsed:Draw(ScrW() * 0.025+4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 		parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
-
-		--//gas fuel meter//--
-
-		if isGassing and IsValid(Entity(gasCan)) then
-			local genPos = Entity(gasCan):GetPos()
-			local realDistance = hitPos:Distance(genPos)
-			if realDistance < 100 then
-				genPos = genPos:ToScreen()
-				local fade = math.Round((100 - realDistance) * 2.8)
-				local parsedLiters = markup.Parse("<font=TVCD>" .. math.Round(gas * 10) .. "L</font>") --this only exists to find the length lol
-				local width = 206 + parsedLiters:GetWidth()
-				local xClamp = math.Clamp(genPos.x, ScrW() * 0.025 + width / 2, ScrW() * 0.975 - width / 2)
-				local yClamp = math.Clamp(genPos.y, ScrH() * 0.05 + 24, ScrH() * 0.95 - 51)
-				local half = math.Clamp((gas * 8), 0, 8) % 1 >= 0.5
-
-				surface.SetDrawColor(0, 128, 0, fade)
-				surface.DrawRect(xClamp - width / 2, yClamp - 13, width, 27)
-				draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + 205 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-				draw.SimpleText("FUEL " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-			else
-				isGassing = false
-			end
-		end
 
 		--Item Display
 
@@ -229,14 +229,14 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			item_usable = false
 		end
 
-		surface.SetMaterial(item_mat)
-		surface.DrawTexturedRect(itemx, itemy, itemsize, itemsize)
-		draw.SimpleText( item_name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-		if item_droppable then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
-		if item_usable then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
-
+		if (HeldItem ~= 0) then
+			surface.SetMaterial(item_mat)
+			surface.DrawTexturedRect(itemx, itemy, itemsize, itemsize)
+			draw.SimpleText( item_name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+			if item_droppable then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
+			if item_usable then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
+		end
 	end
-	
 end)
 
 hook.Add( "Think", "Slasher_Chasing_Light", function()
