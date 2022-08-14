@@ -81,7 +81,7 @@ local PLAYER_LINE = {
 				self.team_status = TEAM_SLASHER
 				self.teamcolor = Color(255,0,0,255)
 				self.teamorder = 0
-				break 
+				break
 			end
 
 		end
@@ -131,10 +131,10 @@ local PLAYER_LINE = {
 
 			self.Mute.PaintOver = function( s, w, h )
 				if ( not IsValid( self.Player ) ) then return end
-			
+
 				local a = 255 - math.Clamp( CurTime() - ( s.LastTick or 0 ), 0, 3 ) * 255
 				if ( a <= 0 ) then return end
-				
+
 				draw.RoundedBox( 4, 0, 0, w, h, Color( 0, 0, 0, a * 0.75 ) )
 				draw.SimpleText( math.ceil( self.Player:GetVoiceVolumeScale() * 100 ) .. "%", "DermaDefaultBold", w / 2, h / 2, Color( 255, 255, 255, a ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 			end
@@ -274,7 +274,7 @@ SCORE_BOARD = vgui.RegisterTable( SCORE_BOARD, "EditablePanel" )
 -----------------------------------------------------------]]
 function GM:ScoreboardShow()
 
-	if ( not IsValid( g_Scoreboard ) ) and PlayerData != nil then
+	if ( not IsValid( g_Scoreboard ) ) and PlayerData ~= nil then
 		g_Scoreboard = vgui.CreateFromTable( SCORE_BOARD )
 	end
 

@@ -152,13 +152,12 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			displayPrevHpBar = 0
 		end
 
-		surface.SetDrawColor(0,0,128,255)
-		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420, 27)
-
 		local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
 		local parsed = markup.Parse("<font=TVCD>HP "..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
 
-		surface.DrawRect(ScrW() * 0.025+407, ScrH() * 0.95-24, parsedValue:GetWidth()+11, 27) --extra little bit of background, changes with value
+		surface.SetDrawColor(0,0,128,255)
+		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420+parsedValue:GetWidth(), 27)
+
 		parsed:Draw(ScrW() * 0.025+4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 		parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 
