@@ -155,7 +155,10 @@ end
 
                 target:SetPos(slasher:GetPos() + Vector(47,0,53))
 
-                target:SetVelocity( (slasher:GetForward() * 1600 + (SO * 450)) + Vector(0,0,800 + (SO * 150)) )
+                local strength_forward = 1600 + (SO * 450)
+                local strength_up = 800 + (SO * 150)
+
+                target:SetVelocity( (slasher:GetForward() * strength_forward) + Vector(0,0,strength_up) )
 
                 target:Freeze(false)
                 if target:Health() > 1 then target:SetHealth( target:Health() - (target:Health() / 4) ) end
@@ -188,8 +191,11 @@ end
     slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
 
     timer.Simple(1, function()  
+
+        local strength_forward = 800 + (SO * 500)
+        local strength_up = 200 + (SO * 100)
     
-        slasher:SetVelocity(  (slasher:EyeAngles():Forward() * 800 + (SO * 500)) + Vector(0,0,200 + (SO * 100))  )
+        slasher:SetVelocity(  (slasher:EyeAngles():Forward() * strength_forward) + Vector(0,0,strength_up)  )
         slasher:Freeze(false)
 
     end)
