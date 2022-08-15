@@ -2,23 +2,9 @@
 include( "ui/fonts.lua" )
 --include( "ui/data_info.lua" )
 
+local SlashCoItems = SlashCoItems
+
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
-
-local ITEM0 = Material("slashco/ui/icons/items/item_0")
-local ITEM1 = Material("slashco/ui/icons/items/item_1")
-local ITEM2 = Material("slashco/ui/icons/items/item_2")
-local ITEM3 = Material("slashco/ui/icons/items/item_3")
-local ITEM4 = Material("slashco/ui/icons/items/item_4")
-local ITEM5 = Material("slashco/ui/icons/items/item_5")
-local ITEM6 = Material("slashco/ui/icons/items/item_6")
-local ITEM7 = Material("slashco/ui/icons/items/item_7")
-local ITEM8 = Material("slashco/ui/icons/items/item_8")
-local ITEM9 = Material("slashco/ui/icons/items/item_9")
-local ITEM10 = Material("slashco/ui/icons/items/item_10")
-local ITEM11 = Material("slashco/ui/icons/items/item_11")
-
-local ITEM2_99 = Material("slashco/ui/icons/items/item_2_99")
-
 
 net.Receive("slashcoSelectables", function(_,_)
 
@@ -46,8 +32,11 @@ end)
 hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	local ply = LocalPlayer()
-	
+
 	if ply:Team() == TEAM_SURVIVOR then
+
+		--ply:ChatPrint(SlashCoItems.DeathWard.Name)
+
 		if HeldItem == nil then HeldItem = 0 end
 
 		local itemx = ScrW() - (ScrW()/7)
@@ -83,18 +72,20 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		--//item selection crosshair//--
 
 		--draw.SimpleText(#Selectables, "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-		for _, p in pairs(Selectables) do
-			local entity = Entity(p)
-			if not IsValid(entity) then continue end
-			local gasPos = entity:GetPos()
-			local realDistance = hitPos:Distance(gasPos)
-			if realDistance < 100 and not (isGassing and gasCan == p) then
-				local trace = util.QuickTrace(hitPos,gasPos-hitPos,ply)
-				if trace.Hit and trace.Entity ~= entity then continue end
-				gasPos = gasPos:ToScreen()
-				local centerDistance = math.Distance(ScrW()/2,ScrH()/2,gasPos.x,gasPos.y)
-				draw.SimpleText("[", "Indicator", gasPos.x-centerDistance/2-12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		if Selectables then
+			for _, p in pairs(Selectables) do
+				local entity = Entity(p)
+				if not IsValid(entity) then continue end
+				local gasPos = entity:GetPos()
+				local realDistance = hitPos:Distance(gasPos)
+				if realDistance < 100 and not (isGassing and gasCan == p) then
+					local trace = util.QuickTrace(hitPos,gasPos-hitPos,ply)
+					if trace.Hit and trace.Entity ~= entity then continue end
+					gasPos = gasPos:ToScreen()
+					local centerDistance = math.Distance(ScrW()/2,ScrH()/2,gasPos.x,gasPos.y)
+					draw.SimpleText("[", "Indicator", gasPos.x-centerDistance/2-12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				end
 			end
 		end
 
@@ -125,11 +116,14 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
 		local displayHp = math.Round(aHp)
-		local displayHpBar = math.floor(math.Clamp(hp/maxHp,0,1)*27)
+		local hpOver = math.Clamp(hp-maxHp,0,100)
+		local hpAdjust = math.Clamp(hp,0,100)-hpOver
+		local displayHpBar = math.floor(math.Clamp(hpAdjust/maxHp,0,1)*27)
+		local displayHpOverBar = math.ceil(math.Clamp(hpOver/maxHp,0,1)*27)
 		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.ceil(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
 
 		local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
-		local parsed = markup.Parse("<font=TVCD>HP "..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
+		local parsed = markup.Parse("<font=TVCD>HP <colour=0,255,255,255>"..string.rep("█",displayHpOverBar).."</colour>"..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
 
 		surface.SetDrawColor(0,0,128,255)
 		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420+parsedValue:GetWidth(), 27)
@@ -143,96 +137,19 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 			t = net.ReadTable()
 
-			for i = 1, #t do
-				if t[i].steamid == LocalPlayer():SteamID64() then
-					HeldItem = t[i].itemid
-				end
+			if (t[LocalPlayer():SteamID64()]) then
+				HeldItem = t[LocalPlayer():SteamID64()].itemid
 			end
 
 		end)
 
-		net.Receive("mantislashcoSendGlobalInfoTable", function()
+		if SlashCoItems[HeldItem] then
+			if SlashCoItems[HeldItem].OnDrop then item_droppable = true else item_droppable = false end
+			if SlashCoItems[HeldItem].OnUse then item_usable = true else item_usable = false end
 
-			SCInfo = net.ReadTable()
-
-		end)
-
-		local item_name = ""
-		local item_droppable = false
-		local item_usable = false
-		local item_mat = ITEM0
-
-		if HeldItem == 0 then
-			item_mat = ITEM0
-			item_name = ""
-			item_droppable = false
-			item_usable = false
-		elseif HeldItem == 1 then
-			item_mat = ITEM1
-			item_name = "Fuel Can"
-			item_droppable = true
-			item_usable = false
-		elseif HeldItem == 2 then
-			item_mat = ITEM2
-			item_name = "The Deathward"
-			item_droppable = false
-			item_usable = false
-		elseif HeldItem == 3 then
-			item_mat = ITEM3
-			item_name = "Milk Jug"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 4 then
-			item_mat = ITEM4
-			item_name = "Cookie"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 5 then
-			item_mat = ITEM5
-			item_name = "Mayonnaise"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 6 then
-			item_mat = ITEM6
-			item_name = "Step Decoy"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 7 then
-			item_mat = ITEM7
-			item_name = "The Baby"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 8 then
-			item_mat = ITEM8
-			item_name = "B-Gone Soda"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 9 then
-			item_mat = ITEM9
-			item_name = "Distress Beacon"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 10 then
-			item_mat = ITEM10
-			item_name = "Devil's Gamble"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 11 then
-			item_mat = ITEM11
-			item_name = "Personal Radio Set"
-			item_droppable = false
-			item_usable = false
-		elseif HeldItem == 99 then
-			item_mat = ITEM2_99
-			item_name = "The Deathward"
-			item_droppable = false
-			item_usable = false
-		end
-
-		if (HeldItem ~= 0) then
-			surface.SetMaterial(item_mat)
+			surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
 			surface.DrawTexturedRect(itemx, itemy, itemsize, itemsize)
-			draw.SimpleText( item_name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+			draw.SimpleText( SlashCoItems[HeldItem].Name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 			if item_droppable then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
 			if item_usable then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
 		end

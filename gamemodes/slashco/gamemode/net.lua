@@ -152,8 +152,9 @@ end
 
 SlashCo.PlayerItemStashRequest = function(id)
 
-    if SlashCo.GetHeldItem(player.GetBySteamID64(id)) ~= 0 then
-        player.GetBySteamID64(id):ChatPrint("You have already chosen an item.")
+	local ply = player.GetBySteamID64(id)
+    if SlashCo.GetHeldItem(ply) ~= "none" then
+		ply:ChatPrint("You have already chosen an item.")
         return
     end
 

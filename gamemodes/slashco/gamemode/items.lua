@@ -1,298 +1,40 @@
 local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 
 SlashCo.GetHeldItem = function(ply)
 	local id = ply:SteamID64()
 
-	for _, v in ipairs(SlashCo.CurRound.SurvivorData.Items) do
-        if v.steamid == id then
-			return v.itemid
-		end
+	if not SlashCo.CurRound.SurvivorData.Items[id] then
+		return "none"
 	end
-end
 
-function IsPlayerHoldingItem(id)
-	for _, v in ipairs(SlashCo.CurRound.SurvivorData.Items) do
-        if v.steamid == id then
-	        if v.itemid > 0 then
-		    return true
-            else
-                return false
-	        end
-        else
-            return false
-        end
-	end
+	return SlashCo.CurRound.SurvivorData.Items[id].itemid
 end
 
 SlashCo.UseItem = function(ply)
 
 	if SERVER then
 
-	if game.GetMap() == "sc_lobby" then return end
-
-	if ply:Team() ~= TEAM_SURVIVOR then return end
-
-	if ply:IsFrozen() then return end
-
-	local itid = SlashCo.GetHeldItem(ply)
-
-	--Skip the non-usable items
-	if itid < 3 or itid == 11 then return end
-
-	if itid == 3 then
-
-		--While the item is stored, a survivor can press R to consume it. It will set their sprint speed to 400 for 15 seconds.
-
-		ply:SetRunSpeed( 400 )
-
-		ply:EmitSound("slashco/survivor/drink_milk.mp3")
-
-		timer.Simple(15, function()
-
-			ply:SetRunSpeed( 300 )
-
-			ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
-        end)
-
-		SlashCo.ThirstyRage(ply)
-
-	end
-
-	if itid == 4 then
-
-		--While the item is stored, a survivor can press R to consume it. It will set their sprint speed to 350 for 30 seconds.
-
-		ply:SetRunSpeed( 350 )
-
-		ply:EmitSound("slashco/survivor/eat_cookie.mp3")
-
-		timer.Simple(30, function()
-
-			ply:SetRunSpeed( 300 )
-
-			ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
-        end)
-
-		SlashCo.SidRage(ply)
-
-	end
-
-	if itid == 5 then
-
-		--While the item is stored, a survivor can press R to consume it. It will set their health to 200, regardless of current health.
-
-		ply:SetHealth( 200 )
-
-		ply:EmitSound("slashco/survivor/eat_mayo.mp3")
-
-	end
-
-	if itid == 6 then
-
-		--Active Step Decoy
-
-		local decoy = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld( Vector(10 , 0, 5) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
-
-		Entity( decoy ):SetNWBool("StepDecoyActive", true)
-
-	end
-
-	if itid == 7 then
-
-		--When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
-		--Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
-		--(50 - 10%, 25 - 60% ,1 - 100%).
-		--Using it will spawn a spent baby in the position the survivor used it.
-
-		ply:EmitSound("slashco/survivor/baby_use.mp3")
-
-		local deathchance = math.random(0, math.floor( ply:Health() / 5 ) )
-
-		local hpafter = ply:Health() / 2
-
-		ply:SetHealth( hpafter )
-
-		timer.Simple(1, function()
-
-
-			if ply:Health() < 51 then
-
-				if deathchance < 2 then ply:Kill() return end
-
-			end
-
-			ply:SetPos( SlashCo.TraceHullLocator() )
-
-        end)
-
-	end
-
-	if itid == 8 then
-
-		--When used, the survivor will become undetectable for 30 seconds.
-
-		ply:EmitSound("slashco/survivor/soda_drink"..math.random(1,2)..".mp3")
-
-		ply:SetMaterial("Models/effects/vol_light001")
-		ply:SetColor(Color(0,0,0,0))
-		ply:SetNWBool("BGoneSoda", true)
-
-		timer.Simple(30, function()
-
-			ply:SetMaterial("")
-			ply:SetColor(Color(255,255,255,255))
-			ply:SetNWBool("BGoneSoda", false)
-
-			ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
-        end)
-
-	end
-
-	if itid == 9 then
-
-		--If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
-
-		if #team.GetPlayers(TEAM_SURVIVOR) > 1 then ply:ChatPrint("You can activate the beacon only if you're the last living survivor.") return end
-
-		if SlashCo.CurRound.EscapeHelicopterSummoned then ply:ChatPrint("The Helicopter is already on its way.") return end
-
-		local r1 = ents.FindByClass( "sc_generator")[1]:EntIndex()
-		local r2 = ents.FindByClass( "sc_generator")[2]:EntIndex()
-
-		if SlashCo.CurRound.Generators[r1].Running or SlashCo.CurRound.Generators[r2].Running then
-
-			if SlashCo.CurRound.DistressBeaconUsed == false then
-
-				SlashCo.SummonEscapeHelicopter()
-
-				SlashCo.CurRound.DistressBeaconUsed = true
-
-				SlashCo.CreateItem("sc_activebeacon",ply:GetPos(),Angle(0,0,0))
-
-
-			end
-
-		else
-			ply:ChatPrint("You can activate the beacon once one generator has been turned on.")
+		if game.GetMap() == "sc_lobby" then
 			return
 		end
 
-	end
+		if ply:Team() ~= TEAM_SURVIVOR then
+			return
+		end
 
-	if itid == 10 then
+		if ply:IsFrozen() then
+			return
+		end
 
-		--[[
+		local itid = SlashCo.GetHeldItem(ply)
 
-		Upon use, this item will apply a random effect from the set.
-		-Spawn two Fuel Cans in front of the Survivor
-		-Set their sprint speed to 450 for 45 seconds.
-		-Heal the Survivor by 1-100
-		-Damage the Survivor by 1-100
-		-Teleport them 100u in front of the Slasher and hardlock their speed at 200 for 5 seconds.
-		-Play a really loud sound which can be heard mapwide
-		-Kill the Survivor
-
-		]]
-
-		ply:EmitSound("slashco/survivor/devildie_roll.mp3")
-
-		timer.Simple(2, function()
-
-			ply:EmitSound("slashco/survivor/devildie_break.mp3")
-
-			local rand = math.random(1,6)
-
-			if rand == 1 then
-
-				SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , 20, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
-				SlashCo.CreateGasCan(ply:LocalToWorld( Vector(30 , -20, 60) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
-
-				ply:EmitSound("slashco/survivor/devildie_fuel.mp3")
-
-			elseif rand == 2 then
-
-				ply:SetRunSpeed( 450 )
-
-				ply:EmitSound("slashco/survivor/devildie_speed.mp3")
-
-				timer.Simple(45, function()
-
-					ply:SetRunSpeed( 300 )
-
-					ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
-        		end)
-
-			elseif rand == 3 then
-
-				local hpd = math.random(-100,100)
-
-				if hpd <= ply:Health() then hpd = (-ply:Health()) + 1 end
-				if hpd + ply:Health() > 200 then hpd = 200-ply:Health() end
-
-				ply:SetHealth( ply:Health() + hpd )
-
-				if hpd <= 0 then
-					ply:EmitSound("slashco/survivor/devildie_hurt.mp3")
-
-					local vPoint = ply:GetPos() + Vector(0,0,50)
-                    local bloodfx = EffectData()
-                    bloodfx:SetOrigin( vPoint )
-                    util.Effect( "BloodImpact", bloodfx )
-				end
-
-				if hpd > 0 then
-					ply:EmitSound("slashco/survivor/devildie_heal.mp3")
-
-					local vPoint = ply:GetPos() + Vector(0,0,50)
-                    local healfx = EffectData()
-                    healfx:SetOrigin( vPoint )
-                    util.Effect( "TeslaZap", healfx )
-				end
-
-			elseif rand == 4 then
-
-				if #team.GetPlayers(TEAM_SLASHER) < 1 then return end
-
-				local slasher = team.GetPlayers(TEAM_SLASHER)[1]
-
-				ply:SetPos(slasher:LocalToWorld( Vector(100 , 0, 10) ) )
-				ply:SetRunSpeed( 200 )
-
-				timer.Simple(5, function()
-					ply:SetRunSpeed( 300 )
-					ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-        		end)
-
-			elseif rand == 5 then
-
-				PlayGlobalSound("slashco/survivor/devildie_siren.mp3", 96, ply)
-
-			elseif rand == 6 then
-
-				ply:EmitSound("slashco/survivor/devildie_kill.mp3")
-
-				timer.Simple(0.5, function()
-					local vPoint = ply:GetPos() + Vector(0,0,50)
-                    local killfx = EffectData()
-                    killfx:SetOrigin( vPoint )
-                    util.Effect( "HelicopterImpact", killfx )
-
-					ply:Kill()
-        		end)
-
-			end
-
-        end)
+		if SlashCoItems[itid] and SlashCoItems[itid].OnUse then
+			SlashCoItems[itid].OnUse(ply)
+			SlashCo.ChangeSurvivorItem(ply:SteamID64(), "none")
+		end
 
 	end
-
-	SlashCo.ChangeSurvivorItem(ply:SteamID64(), 0)
-
-end
 
 end
 
@@ -314,89 +56,64 @@ SlashCo.DropItem = function(ply)
 
 		local itid = SlashCo.GetHeldItem(ply)
 
-		--Skip the non-droppable items
-		if itid == 0 or itid == 2 or itid == 11 then
-			return
+		if SlashCoItems[itid] and SlashCoItems[itid].OnDrop then
+			SlashCoItems[itid].OnDrop(ply)
+			SlashCo.BroadcastSelectables()
+			SlashCo.ChangeSurvivorItem(ply:SteamID64(), "none")
 		end
-
-		local case = {
-			[1] = function()
-				SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-			end,
-			[3] = function()
-				local droppeditem = SlashCo.CreateItem("sc_milkjug", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
-			end,
-			[4] = function()
-				local droppeditem = SlashCo.CreateItem("sc_cookie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
-			end,
-			[5] = function()
-				local droppeditem = SlashCo.CreateItem("sc_mayo", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
-			end,
-			[6] = function()
-				local droppeditem = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
-			end,
-			[7] = function()
-				local droppeditem = SlashCo.CreateItem("sc_baby", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
-			end,
-			[8] = function()
-				local droppeditem = SlashCo.CreateItem("sc_soda", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
-			end,
-			[9] = function()
-				local droppeditem = SlashCo.CreateItem("sc_beacon", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 750)
-			end,
-			[10] = function()
-				local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-				Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
-			end
-		}
-		assert(case[itid], "Tried to drop an item that doesn't exist! ID: "..(itid or "nil"))
-		case[itid]()
-
-		SlashCo.BroadcastSelectables()
-
-		SlashCo.ChangeSurvivorItem(ply:SteamID64(), 0)
 
 	end
 
 end
 
-concommand.Add( "give_item", function( ply, _, args )
+concommand.Add("give_item", function(ply, _, args)
 
 	if SERVER then
 
-	if ply:Team() ~= TEAM_SURVIVOR then print("Only survivors can have items") return end
+		if ply:Team() ~= TEAM_SURVIVOR then
+			print("Only survivors can have items")
+			return
+		end
 
-	SlashCo.ChangeSurvivorItem(ply:SteamID64(), tonumber(args[1]))
-
-	if tonumber(args[1]) == 2 then SlashCo.PlayerData[ply:SteamID64()].Lives = 2 end
-
+		if SlashCoItems[args[1]] then
+			SlashCo.ChangeSurvivorItem(ply:SteamID64(), args[1])
+		else
+			print("Item doesn't exist, removing current item")
+			SlashCo.ChangeSurvivorItem(ply:SteamID64(), "none")
+		end
 	end
-
-end )
+end)
 
 SlashCo.ChangeSurvivorItem = function(plyid, id)
 
-if SERVER then
+	if SERVER then
 
-	--Change the survivor's item.
-	for _, v in ipairs(SlashCo.CurRound.SurvivorData.Items) do
-		if v.steamid == plyid then
-			v.itemid = id
+		if not SlashCo.CurRound.SurvivorData.Items[plyid] then
+			if player.GetBySteamID64(plyid):Team() == TEAM_SURVIVOR then
+				SlashCo.CurRound.SurvivorData.Items[plyid] = {}
+			else
+				return
+			end
 		end
+
+		if SlashCoItems[id] then
+			local ply = player.GetBySteamID64(plyid)
+
+			SlashCo.CurRound.SurvivorData.Items[plyid].itemid = id
+
+			if (SlashCoItems[id].OnPickUp) and game.GetMap() ~= "sc_lobby" then
+				SlashCoItems[id].OnPickUp(ply)
+			end
+
+			if id ~= 0 then
+				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+			end
+		elseif id == "none" then
+			SlashCo.CurRound.SurvivorData.Items[plyid].itemid = id
+		end
+
+		SlashCo.BroadcastItemData()
 	end
-
-	if id ~= 0 then player.GetBySteamID64(plyid):EmitSound("slashco/survivor/item_equip"..math.random(1,2)..".mp3") end
-
-    SlashCo.BroadcastItemData()
-
-end
 
 end
 
@@ -406,7 +123,7 @@ SlashCo.ItemPickUp = function(plyid, item, itid)
 
 		local ply = player.GetBySteamID64(plyid)
 
-		if SlashCo.GetHeldItem(ply) > 0 then
+		if SlashCo.GetHeldItem(ply) ~= "none" then
 			return
 		end
 

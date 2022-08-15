@@ -3,6 +3,7 @@ include( "cl_scoreboard.lua" )
 include( "cl_headbob.lua" )
 include( "ui/fonts.lua" )
 
+include( "items/items_init.lua" )
 include( "cl_lobbyhud.lua" )
 include( "cl_survivorhud.lua" )
 include( "cl_intro_hud.lua" )

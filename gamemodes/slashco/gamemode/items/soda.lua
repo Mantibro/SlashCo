@@ -1,12 +1,13 @@
-local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 
-SlashCo.Items.Soda.Model = "models/props_junk/PopCan01a.mdl"
-SlashCo.Items.Soda.Name = "B-Gone Soda"
-SlashCo.Items.Soda.Icon = "slashco/ui/icons/items/item_8"
-SlashCo.Items.Soda.Price = 20
-SlashCo.Items.Soda.Description = "A can of strange soda. It has a sweet smell. \nConsuming it will turn you invisible for a short while."
-SlashCo.Items.Soda.CamPos = Vector(30,0,0)
-SlashCo.Items.Soda.OnUse = function(ply)
+SlashCoItems.Soda = {}
+SlashCoItems.Soda.Model = "models/props_junk/PopCan01a.mdl"
+SlashCoItems.Soda.Name = "B-Gone Soda"
+SlashCoItems.Soda.Icon = "slashco/ui/icons/items/item_8"
+SlashCoItems.Soda.Price = 20
+SlashCoItems.Soda.Description = "A can of strange soda. It has a sweet smell. \nConsuming it will turn you invisible for a short while."
+SlashCoItems.Soda.CamPos = Vector(30,0,0)
+SlashCoItems.Soda.OnUse = function(ply)
     --When used, the survivor will become undetectable for 30 seconds.
 
     ply:EmitSound("slashco/survivor/soda_drink"..math.random(1,2)..".mp3")
@@ -25,7 +26,7 @@ SlashCo.Items.Soda.OnUse = function(ply)
 
     end)
 end
-SlashCo.Items.Soda.OnDrop = function(ply)
+SlashCoItems.Soda.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_soda", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
 end

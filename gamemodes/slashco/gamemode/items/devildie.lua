@@ -1,12 +1,13 @@
-local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 
-SlashCo.Items.DevilDie.Model = "models/slashco/items/devildie.mdl"
-SlashCo.Items.DevilDie.Name = "Devil's Gamble"
-SlashCo.Items.DevilDie.Icon = "slashco/ui/icons/items/item_10"
-SlashCo.Items.DevilDie.Price = 40
-SlashCo.Items.DevilDie.Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
-SlashCo.Items.DeathWard.CamPos = Vector(30,0,10)
-SlashCo.Items.DevilDie.OnUse = function(ply)
+SlashCoItems.DevilDie = {}
+SlashCoItems.DevilDie.Model = "models/slashco/items/devildie.mdl"
+SlashCoItems.DevilDie.Name = "Devil's Gamble"
+SlashCoItems.DevilDie.Icon = "slashco/ui/icons/items/item_10"
+SlashCoItems.DevilDie.Price = 40
+SlashCoItems.DevilDie.Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
+SlashCoItems.DevilDie.CamPos = Vector(30,0,10)
+SlashCoItems.DevilDie.OnUse = function(ply)
     --[[
 
     Upon use, this item will apply a random effect from the set.
@@ -32,6 +33,7 @@ SlashCo.Items.DevilDie.OnUse = function(ply)
 
             SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, 20, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
             SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, -20, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+            SlashCo.BroadcastSelectables()
 
             ply:EmitSound("slashco/survivor/devildie_fuel.mp3")
 
@@ -53,12 +55,12 @@ SlashCo.Items.DevilDie.OnUse = function(ply)
 
             local hpd = math.random(-100, 100)
 
-            if hpd <= ply:Health() then
-                hpd = (-ply:Health()) + 1
-            end
             if hpd + ply:Health() > 200 then
                 hpd = 200 - ply:Health()
+            elseif hpd <= ply:Health() then
+                hpd = (-ply:Health()) + 1
             end
+
 
             ply:SetHealth(ply:Health() + hpd)
 
@@ -118,7 +120,7 @@ SlashCo.Items.DevilDie.OnUse = function(ply)
     end)
     
 end
-SlashCo.Items.DevilDie.OnDrop = function(ply)
+SlashCoItems.DevilDie.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
 end

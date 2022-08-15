@@ -1,6 +1,7 @@
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 
+include( "items/items_init.lua" )
 include( "shared.lua" )
 include( "player.lua" )
 include( "globals.lua" )
@@ -17,7 +18,6 @@ include( "slasher/slasher_specialability.lua" )
 include( "slasher/slasher_ability_handler.lua" )
 include( "selectables.lua" )
 
-
 --[[
 
 SlashCo Credits:
@@ -31,12 +31,13 @@ Extra credits: undo, Jim, DarkGrey
 ]]
 
 local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
 CreateConVar( "slashco_map_default", 0, FCVAR_NONE, "Allow the gamemode to access all conifgured maps.", 0, 1 )
 CreateConVar( "slashco_force_difficulty", 0, FCVAR_NONE, "Have the gamemode force a certan difficulty.(0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)", 0, 4 )
 
-concommand.Add( "slashco_add_survivor", function( ply, cmd, args )
+concommand.Add( "slashco_add_survivor", function( ply, _, args )
 	
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -77,7 +78,7 @@ concommand.Add( "slashco_add_survivor", function( ply, cmd, args )
 		return
 	end
 
-	if player.GetBySteamID64(theman):Team() != TEAM_SPECTATOR then
+	if player.GetBySteamID64(theman):Team() ~= TEAM_SPECTATOR then
 		ply:ChatPrint("Player must be Spectator.")
 		return
 	end
@@ -102,7 +103,7 @@ concommand.Add( "slashco_add_survivor", function( ply, cmd, args )
          
 end )
 
-concommand.Add( "slashco_add_slasher", function( ply, cmd, args )
+concommand.Add( "slashco_add_slasher", function( ply, _, args )
 	
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -149,7 +150,7 @@ concommand.Add( "slashco_add_slasher", function( ply, cmd, args )
 		return
 	end
 
-	if player.GetBySteamID64(theman):Team() != TEAM_SPECTATOR then
+	if player.GetBySteamID64(theman):Team() ~= TEAM_SPECTATOR then
 		ply:ChatPrint("Player must be Spectator.")
 		return
 	end
@@ -174,7 +175,7 @@ concommand.Add( "slashco_add_slasher", function( ply, cmd, args )
 	ply:Spawn()
 end )
 
-hook.Add( "CanExitVehicle", "PlayerMotion", function( veh, ply )
+hook.Add( "CanExitVehicle", "PlayerMotion", function( _, _ )
     return false
 end )
 
@@ -198,19 +199,20 @@ function GM:Initialize()
 	--end
 
     --If there is no data folder then make one.
-    if not file.Exists("slashco", "DATA") then
-        print("[SlashCo] The data folder for this gamemode doesn't appear to exist, creating it now.")
-        file.CreateDir("slashco/playerdata")
+	if not file.Exists("slashco", "DATA") then
+		print("[SlashCo] The data folder for this gamemode doesn't appear to exist, creating it now.")
+		file.CreateDir("slashco/playerdata")
 
 		--Return to the lobby if no game is in progress and we just loaded in.
-			if GAMEMODE.State ~= GAMEMODE.States.IN_GAME and game.GetMap() ~= "sc_lobby" then
+		if GAMEMODE.State ~= GAMEMODE.States.IN_GAME and game.GetMap() ~= "sc_lobby" then
 			SlashCo.GoToLobby()
+			--print("tried to go to lobby (bad state)")
 			GAMEMODE.State = GAMEMODE.States.LOBBY
 		else
 			GAMEMODE.State = GAMEMODE.States.IN_GAME
 		end
 
-    end
+	end
 
 	if game.GetMap() == "sc_lobby" then
 
@@ -370,16 +372,6 @@ function GM:PlayerButtonDown(ply, button)
 				Sndd:Play()
 				Sndd:ChangeVolume(0.5, 0)
 				Sndd:ChangePitch(80, 0)
-
---[[				if(#team.GetPlayers(TEAM_LOBBY) > 2) then	--Joining the Spectator team. --no need for this lol
-				
-					ply:SetTeam(TEAM_SPECTATOR)
-					ply:Spawn()
-					ply:ChatPrint( "Now joining Spectators..." )
-
-				else 
-					ply:ChatPrint( "Cannot Spectate with less than 3 players." )
-				end]]
 			end	
 		end
 
@@ -539,10 +531,14 @@ local Think = function()
 
 	if SERVER then
 		local plys = player.GetAll()
-		for i=1, #plys do
-			if not plys[i]:IsConnected() then
-				print("[SlashCo] Not everyone is connected yet.")
-				return
+		if engine.TickCount()%math.floor(5/engine.TickInterval()) == 0 then
+			for _, p in ipairs(plys) do
+				if p:Team() == TEAM_SURVIVOR then
+					local health = p:Health()
+					if health > 100 then
+						p:SetHealth(health-1)
+					end
+				end
 			end
 		end
 		
@@ -735,19 +731,32 @@ end
 
 end)
 
-
 function GM:PlayerDeath(victim, _, _)
-	
-		if not IsValid(victim) then return end
-	
-		if GAMEMODE.State == GAMEMODE.States.IN_GAME and victim:Team() == TEAM_SURVIVOR then
+
+	if not IsValid(victim) then
+		return
+	end
+
+	if GAMEMODE.State == GAMEMODE.States.IN_GAME and victim:Team() == TEAM_SURVIVOR then
+
+		victim:SetNWBool("DynamicFlashlight", false)
+
+		SlashCo.DropItem(victim)
+		local itid = SlashCo.GetHeldItem(victim)
+		tickLife = false
+
+		if SlashCoItems[itid] and SlashCoItems[itid].OnDie then
+			tickLife = SlashCoItems[itid].OnDie(victim)
+		end
+
+		if not tickLife then
 			local pid = victim:SteamID64()
 			local lives = SlashCo.PlayerData[pid].Lives
-			SlashCo.PlayerData[pid].Lives = tonumber(lives)-1
-			
-			if tonumber(lives)-1 <= 0 then
-				print("[SlashCo] '"..victim:GetName().."' is out of lives, moving them to the Spectator team.")
-	
+			SlashCo.PlayerData[pid].Lives = tonumber(lives) - 1
+
+			if tonumber(lives) - 1 <= 0 then
+				print("[SlashCo] '" .. victim:GetName() .. "' is out of lives, moving them to the Spectator team.")
+
 				--Spawn the Ragdoll
 
 				local ragdoll = ents.Create("prop_ragdoll")
@@ -760,42 +769,42 @@ function GM:PlayerDeath(victim, _, _)
 
 				if victim:GetNWBool("SurvivorDecapitate") then
 
-					ragdoll:ManipulateBoneScale( ragdoll:LookupBone( "ValveBiped.Bip01_Head1" ), Vector(0,0,0) )
+					ragdoll:ManipulateBoneScale(ragdoll:LookupBone("ValveBiped.Bip01_Head1"), Vector(0, 0, 0))
 
-					local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone( "ValveBiped.Bip01_Head1" ))
+					local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone("ValveBiped.Bip01_Head1"))
 
-                	local bloodfx = EffectData()
-                	bloodfx:SetOrigin( vPoint )
-                	util.Effect( "BloodImpact", bloodfx )
+					local bloodfx = EffectData()
+					bloodfx:SetOrigin(vPoint)
+					util.Effect("BloodImpact", bloodfx)
 
 					local dripfx = EffectData()
-                	dripfx:SetOrigin( vPoint )
-					dripfx:SetFlags( 3 )
-					dripfx:SetColor( 0 )
-					dripfx:SetScale( 6 )
-                	util.Effect( "bloodspray", dripfx )
+					dripfx:SetOrigin(vPoint)
+					dripfx:SetFlags(3)
+					dripfx:SetColor(0)
+					dripfx:SetScale(6)
+					util.Effect("bloodspray", dripfx)
 
 					ang_offset = 180
 
 				end
 
-				ragdoll:SetAngles(Angle(0,victim:EyeAngles()[2] + ang_offset,0))
+				ragdoll:SetAngles(Angle(0, victim:EyeAngles()[2] + ang_offset, 0))
 
 				local physCount = ragdoll:GetPhysicsObjectCount()
 
 				for i = 0, (physCount - 1) do
 					local PhysBone = ragdoll:GetPhysicsObjectNum(i)
-		
+
 					if PhysBone:IsValid() then
 						PhysBone:SetVelocity(victim:GetVelocity() * 2)
 						PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
 
-						ragdoll:TranslatePhysBoneToBone( i ) --local ragbone =
+						ragdoll:TranslatePhysBoneToBone(i) --local ragbone =
 						for b = 1, victim:GetBoneCount() do
-							local plybone = victim:TranslateBoneToPhysBone( b )
+							local plybone = victim:TranslateBoneToPhysBone(b)
 
 							if plybone == PhysBone then
-								PhysBone:SetAngles( PhysBone:GetAngles(), plybone:GetAngles())
+								PhysBone:SetAngles(PhysBone:GetAngles(), plybone:GetAngles())
 							end
 
 						end
@@ -803,48 +812,15 @@ function GM:PlayerDeath(victim, _, _)
 				end
 
 				--...............
-	
-				victim:SetTeam( TEAM_SPECTATOR )
+
+				victim:SetTeam(TEAM_SPECTATOR)
 				victim:Spawn()
 				victim:SetPos(ragdoll:GetPos())
-				
+
 			end
 		end
-	
-	
-end
-	
-hook.Add("PlayerDeath", "SurvivorDying", function(victim, _, _) --Deathward
-	
-	if SERVER then
-	
-		if victim:Team() ~= TEAM_SURVIVOR then return end
-	
-		local pid = victim:SteamID64()
-	
-		if SlashCo.GetHeldItem(victim) ~= 0 or SlashCo.GetHeldItem(victim) ~= 2 or SlashCo.GetHeldItem(victim) ~= 99 then
-			SlashCo.DropItem(victim)
-		end
-	
-		victim:SetNWBool("DynamicFlashlight", false)
-	
-		if SlashCo.PlayerData[pid] == nil then return end
-	
-		if SlashCo.PlayerData[pid].Lives > 1 then
-			victim:EmitSound( "slashco/survivor/deathward.mp3")
-			victim:EmitSound( "slashco/survivor/deathward_break"..math.random(1,2)..".mp3")
-	
-			SlashCo.RespawnPlayer(victim)
-	
-			SlashCo.ChangeSurvivorItem(pid, 99)
-	
-			return
-		end
-	
 	end
-		
-end)
-
+end
 
 --Dynamic Flashlight by RiggsMacKay
 --https://github.com/RiggsMackay/Dynamic-Flashlight

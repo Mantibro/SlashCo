@@ -175,8 +175,8 @@ if SERVER then
 
     local delay = 1
 
-    local idoffirst = firstid
-    local idofsecond = secondid
+    --local idoffirst = firstid
+    --local idofsecond = secondid
 
     print("[SlashCo] Current Difficulty: "..SlashCo.CurRound.Difficulty)
     print("int Difficulty: "..SlashCo.Difficulty.INTERMEDIATE )
@@ -212,7 +212,7 @@ SlashCo.SpawnSlasher = function()
 
             print("[SlashCo] Spawning Slasher...")
 
-            if SlashCo.CurRound.SlashersToBeSpawned != nil then
+            if SlashCo.CurRound.SlashersToBeSpawned ~= nil then
 
                 for i = 1, #SlashCo.CurRound.SlashersToBeSpawned do
 

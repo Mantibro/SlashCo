@@ -1,6 +1,7 @@
 AddCSLuaFile()
 
-local SlashCo = SlashCo
+--local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 
 ENT.Type = "anim"
 
@@ -15,7 +16,7 @@ local rotate = 0
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel( SlashCo.Items.DISTRESS_BEACON.Model)
+		self:SetModel(SlashCoItems.Beacon.Model) --SlashCo.Items.DISTRESS_BEACON.Model
 		self:SetSolid( SOLID_VPHYSICS )
 		self:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
 		self:SetAngles(Angle(180,0,0))

@@ -114,7 +114,8 @@ SCInfo.Slasher = {
 
 }
 
-SCInfo.Item = {
+--[[
+SCIngfo.Item = {
 
     {
         Name = "Fuel Can",
@@ -176,13 +177,16 @@ SCInfo.Item = {
         Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
     }
 
-    --[[{
+    ]]
+--[[{
         Name = "The Rock",
         Price = 25,
         Description = "A strange, rock-shaped, rock-behaving device.\nWhile it's held, your footsteps will not make any noise, however\nyou will be slowed down slightly."
-    }]]
+    }]]--[[
+
 
 }
+]]
 
 SCInfo.RoundEnd = {
 

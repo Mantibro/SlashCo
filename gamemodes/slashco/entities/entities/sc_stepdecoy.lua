@@ -1,6 +1,7 @@
 AddCSLuaFile()
 
 local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 
 ENT.Type = "anim"
 
@@ -13,7 +14,7 @@ ENT.Instructions	= ""
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel( SlashCo.Items.STEP_DECOY.Model)
+		self:SetModel( SlashCoItems.StepDecoy.Model ) --SlashCo.Items.STEP_DECOY.Model
 		self:SetSolid( SOLID_VPHYSICS )
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetUseType( SIMPLE_USE )
@@ -53,7 +54,7 @@ if SERVER then
 
 	if activator:Team() == TEAM_SURVIVOR then 
 
-		SlashCo.ItemPickUp(activator:SteamID64(), self:EntIndex(), 6)
+		SlashCo.ItemPickUp(activator:SteamID64(), self:EntIndex(), "StepDecoy")
 
 		if ( self:IsPlayerHolding() ) then return end
 		activator:PickupObject( self )
