@@ -54,7 +54,7 @@ if SERVER then
 
 	if activator:Team() == TEAM_SURVIVOR then 
 
-		SlashCo.ItemPickUp(activator:SteamID64(), self:EntIndex(), "StepDecoy")
+		SlashCo.ItemPickUp(activator, self:EntIndex(), "StepDecoy")
 
 		if ( self:IsPlayerHolding() ) then return end
 		activator:PickupObject( self )

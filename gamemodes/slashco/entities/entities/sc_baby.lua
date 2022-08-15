@@ -33,7 +33,7 @@ if SERVER then
 
 	if activator:Team() == TEAM_SURVIVOR then 
 
-		SlashCo.ItemPickUp(activator:SteamID64(), self:EntIndex(), "Baby")
+		SlashCo.ItemPickUp(activator, self:EntIndex(), "Baby")
 
 		if ( self:IsPlayerHolding() ) then return end
 		activator:PickupObject( self )

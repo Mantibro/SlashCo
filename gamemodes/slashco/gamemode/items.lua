@@ -31,7 +31,7 @@ SlashCo.UseItem = function(ply)
 
 		if SlashCoItems[itid] and SlashCoItems[itid].OnUse then
 			SlashCoItems[itid].OnUse(ply)
-			SlashCo.ChangeSurvivorItem(ply:SteamID64(), "none")
+			SlashCo.ChangeSurvivorItem(ply, "none")
 		end
 
 	end
@@ -59,37 +59,21 @@ SlashCo.DropItem = function(ply)
 		if SlashCoItems[itid] and SlashCoItems[itid].OnDrop then
 			SlashCoItems[itid].OnDrop(ply)
 			SlashCo.BroadcastSelectables()
-			SlashCo.ChangeSurvivorItem(ply:SteamID64(), "none")
+			SlashCo.ChangeSurvivorItem(ply, "none")
 		end
 
 	end
 
 end
 
-concommand.Add("give_item", function(ply, _, args)
+SlashCo.ChangeSurvivorItem = function(ply, id)
 
 	if SERVER then
 
-		if ply:Team() ~= TEAM_SURVIVOR then
-			print("Only survivors can have items")
-			return
-		end
-
-		if SlashCoItems[args[1]] then
-			SlashCo.ChangeSurvivorItem(ply:SteamID64(), args[1])
-		else
-			print("Item doesn't exist, removing current item")
-			SlashCo.ChangeSurvivorItem(ply:SteamID64(), "none")
-		end
-	end
-end)
-
-SlashCo.ChangeSurvivorItem = function(plyid, id)
-
-	if SERVER then
+		local plyid = ply:SteamID64()
 
 		if not SlashCo.CurRound.SurvivorData.Items[plyid] then
-			if player.GetBySteamID64(plyid):Team() == TEAM_SURVIVOR then
+			if ply:Team() == TEAM_SURVIVOR then
 				SlashCo.CurRound.SurvivorData.Items[plyid] = {}
 			else
 				return
@@ -97,8 +81,6 @@ SlashCo.ChangeSurvivorItem = function(plyid, id)
 		end
 
 		if SlashCoItems[id] then
-			local ply = player.GetBySteamID64(plyid)
-
 			SlashCo.CurRound.SurvivorData.Items[plyid].itemid = id
 
 			if (SlashCoItems[id].OnPickUp) and game.GetMap() ~= "sc_lobby" then
@@ -117,17 +99,17 @@ SlashCo.ChangeSurvivorItem = function(plyid, id)
 
 end
 
-SlashCo.ItemPickUp = function(plyid, item, itid)
+SlashCo.ItemPickUp = function(ply, item, itid)
 
 	if SERVER then
 
-		local ply = player.GetBySteamID64(plyid)
+		--local ply = player.GetBySteamID64(plyid)
 
 		if SlashCo.GetHeldItem(ply) ~= "none" then
 			return
 		end
 
-		SlashCo.ChangeSurvivorItem(ply:SteamID64(), itid)
+		SlashCo.ChangeSurvivorItem(ply, itid)
 
 		SlashCo.RemoveSelectableNow(item)
 

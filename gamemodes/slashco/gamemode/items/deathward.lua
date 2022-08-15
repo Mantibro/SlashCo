@@ -16,7 +16,7 @@ SlashCoItems.DeathWard.OnDie = function(ply)
 
     SlashCo.RespawnPlayer(ply)
 
-    SlashCo.ChangeSurvivorItem(pid, "DeathWardUsed")
+    SlashCo.ChangeSurvivorItem(ply, "DeathWardUsed")
 
     return true
 end
