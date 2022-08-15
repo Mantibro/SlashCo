@@ -66,6 +66,14 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     end
 
+    if slid == 10 then
+
+        ply:SetViewOffset( Vector(0,0,100) )
+
+        ply:SetCurrentViewOffset( Vector(0,0,100) )
+
+    end
+
 end
 
 SlashCo.InsertSlasherToTable = function(id)

@@ -95,11 +95,22 @@ SCInfo.Slasher = {
         Class = "Cryptid",
         Danger = "Considerable",
         Description = "The Huntsman Slasher which is picky with its victims.\n\n-Manspider can only target one Survivor at a time.\n-He will slowly gather aggression while close to Survivors.\n-He can nest somewhere for a chance to instantly find Prey.",
-        ProTip = "-.",
+        ProTip = "-This Slasher is a very selective hunter.",
         SpeedRating = "★★★☆☆",
         EyeRating = "★★★☆☆",
         DiffRating = "★☆☆☆☆"
     }
+
+    --[[{
+        Name = "The Watcher",
+        Class = "Umbra",
+        Danger = "Considerable",
+        Description = "The Observing Slasher who.\n\n-1.\n-2.\n-3.",
+        ProTip = "-.",
+        SpeedRating = "★★★★☆",
+        EyeRating = "★★★★☆",
+        DiffRating = "★★☆☆☆"
+    }]]
 
 }
 
@@ -166,9 +177,9 @@ SCInfo.Item = {
     }
 
     --[[{
-        Name = "Personal Radio Set",
-        Price = 0,
-        Description = "A full set of short-wave radio transmitters which will allow your team\nto communicate remotely. Only one can be taken."
+        Name = "The Rock",
+        Price = 25,
+        Description = "A strange, rock-shaped, rock-behaving device.\nWhile it's held, your footsteps will not make any noise, however\nyou will be slowed down slightly."
     }]]
 
 }

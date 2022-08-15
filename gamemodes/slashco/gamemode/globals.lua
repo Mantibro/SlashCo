@@ -16,6 +16,7 @@ SlashCo.Maps = {
         ID = "sc_summercamp",
         NAME = "Summer Camp",
         AUTHOR = "Steinman",
+        DEFAULT = true,
         SIZE = 2,
         MIN_PLAYERS = 1,
         LEVELS = {
@@ -27,6 +28,7 @@ SlashCo.Maps = {
         ID = "sc_highschool",
         NAME = "High School",
         AUTHOR = "Steinman",
+        DEFAULT = true,
         SIZE = 2,
         MIN_PLAYERS = 2,
         LEVELS = {
@@ -34,24 +36,26 @@ SlashCo.Maps = {
             100,
             600
         }
-    }
+    },
 
-    --[[{
+    {
         ID = "rp_deadcity",
         NAME = "Dead City",
         AUTHOR = "NuclearGhost",
+        DEFAULT = false,
         SIZE = 3,
         MIN_PLAYERS = 2,
         LEVELS = {
             150,
             350
         }
-    }
+    },
 
     {
         ID = "rp_redforest",
         NAME = "Red Forest",
         AUTHOR = "NuclearGhost",
+        DEFAULT = false,
         SIZE = 4,
         MIN_PLAYERS = 3,
         LEVELS = {
@@ -60,7 +64,7 @@ SlashCo.Maps = {
             -630,
             -650
         }
-    }]]
+    }
 
 }
 
@@ -116,7 +120,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillDelay = 3,
         GasCanMod = 0,
         ProwlSpeed = 150,
-        ChaseSpeed = 295,
+        ChaseSpeed = 298,
         Perception = 1.0,
         Eyesight = 5,
         KillDistance = 135,
@@ -182,7 +186,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillDelay = 8,
         GasCanMod = 0,
         ProwlSpeed = 150,
-        ChaseSpeed = 290,
+        ChaseSpeed = 296,
         Perception = 4.5,
         Eyesight = 6,
         KillDistance = 130,
@@ -204,7 +208,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillDelay = 2,
         GasCanMod = 0,
         ProwlSpeed = 100,
-        ChaseSpeed = 250,
+        ChaseSpeed = 260,
         Perception = 1.0,
         Eyesight = 2,
         KillDistance = 150,
@@ -292,7 +296,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillDelay = 5,
         GasCanMod = 0,
         ProwlSpeed = 150,
-        ChaseSpeed = 288,
+        ChaseSpeed = 296,
         Perception = 1.0,
         Eyesight = 5,
         KillDistance = 150,
@@ -304,6 +308,28 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseMusic = "slashco/slasher/manspider_chase.wav",
         KillSound = "slashco/slasher/manspider_kill.mp3"
     }
+
+    --[[{
+        NAME = "The Watcher",
+        ID = 10,
+        CLS = 3,
+        DNG = 2,
+        Model = "models/slashco/slashers/watcher/watcher.mdl",
+        KillDelay = 5,
+        GasCanMod = 0,
+        ProwlSpeed = 200,
+        ChaseSpeed = 340,
+        Perception = 0.8,
+        Eyesight = 7,
+        KillDistance = 150,
+        ChaseRange = 2000,
+        ChaseRadius = 0.96,
+        ChaseDuration = 3.0,
+        ChaseCooldown = 2,
+        JumpscareDuration = 2,
+        ChaseMusic = "slashco/slasher/watcher_chase.wav",
+        KillSound = "slashco/slasher/watcher_kill.mp3"
+    }]]
 
 }
 

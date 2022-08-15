@@ -31,12 +31,13 @@ do
 
     local target = NULL
 
-
     if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist then
         target = slasher:GetEyeTrace().Entity
         goto FOUND
     end
+
 do
+
     for i = 1, #find do
 
         if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 

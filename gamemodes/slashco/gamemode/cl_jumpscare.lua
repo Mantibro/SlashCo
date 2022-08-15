@@ -156,9 +156,9 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 
 		local DestroyerFace = Material("slashco/ui/overlays/tyler_destroyer_face")
 
-		Overlay:SetFloat( "$alpha", math.Rand(0.1,0.3) )
+		Overlay:SetFloat( "$alpha", math.Rand(0.2,0.23) )
 
-		DestroyerFace:SetFloat( "$alpha", math.Rand(-1.5,0.4) )
+		DestroyerFace:SetFloat( "$alpha", math.Rand(0,0.1) )
 
 		surface.SetDrawColor(255,255,255,255)	
 		surface.SetMaterial(Overlay)

@@ -16,7 +16,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 			ChaseRange = 500
 			CanKill = false
 			ChaseDur = 10.0
-			ChaseTick = SlasherTable[lid].CurrentChaseTick
+			ChaseTick = 0
 		end
 
 		--Range (in units) = 2.5 * SurvivorSpeed * PerceptionReal
@@ -268,13 +268,21 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 			if V1 < 2 then
 
-				ply:SetMaterial( "models/debug/debugwhite" )
-				ply:SetColor( Color( 255, 255, 255, ply:GetVelocity():Length() * (1 + (V1*2)) ) ) 
+				local l_ang = math.abs(ply:EyeAngles()[1]) + math.abs(ply:EyeAngles()[2]) + math.abs(ply:EyeAngles()[3])
+
+				if ply.MonitorLook == nil then ply.MonitorLook = 0 end
+
+				ply.LookSpeed = math.abs(ply.MonitorLook - l_ang) * (V1+1) * 20
+
+				ply.MonitorLook = l_ang
+
+				ply:SetMaterial( "lights/white" )
+				ply:SetColor( Color( 255, 255, 255, (ply.LookSpeed + ply:GetVelocity():Length()) * (1 + (V1*2)) ) ) 
 				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
 
 			else
 
-				ply:SetMaterial( "models/debug/debugwhite" )
+				ply:SetMaterial( "lights/white" )
 				ply:SetColor( Color( 255, 255, 255, 255 ) )
 				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
 
@@ -525,6 +533,34 @@ do
 end
 
 	::watcher::
+	if SlashID != 10 then goto abomignat end
+do
+
+	local SurveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+
+	if LocalPlayer():GetNWBool("WatcherWatched") then
+		draw.SimpleText( "YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW()/2, ScrH()/4, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	end
+
+	for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+		local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+		if surv:GetNWBool("SurvivorWatcherSurveyed") then
+
+			local pos = (survivor:GetPos()+Vector(0,0,60)):ToScreen()
+
+			if pos.visible then
+				surface.SetMaterial(SurveyNoticeIcon)
+				surface.DrawTexturedRect(pos.x - ScrW()/32, pos.y - ScrW()/32, ScrW()/16, ScrW()/16)
+			end
+
+		end
+
+	end
+
+end
+	::abomignat::
 
 		--Slasher-Shared function \/ \/ \/ 
 

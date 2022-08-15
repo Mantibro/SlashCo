@@ -2,7 +2,16 @@ local SlashCo = SlashCo
 
 concommand.Add( "lobby_debug_proceed", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if SERVER then
 	
 	SlashCo.LobbyData.LOBBYSTATE = 1 
 
@@ -38,17 +47,22 @@ concommand.Add( "lobby_debug_proceed", function( ply, _, _ )
 
 	lobbyRoundSetup()
 
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
-
 	end
 
 end )
 
 concommand.Add( "lobby_debug_transition", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if SERVER then
 	
 	SlashCo.LobbyData.LOBBYSTATE = 2
 
@@ -62,19 +76,22 @@ concommand.Add( "lobby_debug_transition", function( ply, _, _ )
 		net.Broadcast()
 	end
 
-	--ply:ChatPrint("(Debug) Lobby transitioning...")
-
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
-
 	end
 
 end )
 
 concommand.Add( "lobby_debug_brief", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if SERVER then
 	
 	SlashCo.LobbyData.LOBBYSTATE = 3
 
@@ -87,23 +104,24 @@ concommand.Add( "lobby_debug_brief", function( ply, _, _ )
 		net.Broadcast()
 	end
 
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
-
 	end
 
 end )
 
 concommand.Add( "timer_start", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
 
-	lobbyReadyTimer(30)
+	if SERVER then
 
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
+		lobbyReadyTimer(30)
 
 	end
 
@@ -111,7 +129,16 @@ end )
 
 concommand.Add( "lobby_reset", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if SERVER then
 	
 	SlashCo.LobbyData.LOBBYSTATE = 0
 
@@ -135,44 +162,48 @@ concommand.Add( "lobby_reset", function( ply, _, _ )
 
 	ply:ChatPrint("(Debug) Lobby reset.")
 
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
-
 	end
 
 end )
 
 concommand.Add( "lobby_openitems", function( ply, _, _ )
+
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
 	
-	if ply:IsAdmin() or SERVER then
+	if SERVER then
 
-	SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_itembox"))
-    SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Open")
-
-	ply:ChatPrint("(Debug) Items opened.")
-
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
+		SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_itembox"))
+    	SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Open")
 
 	end
 
 end )
 
 concommand.Add( "lobby_leave", function( ply, _, _ )
+
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
 	
-	if ply:IsAdmin() or SERVER then
+	if SERVER then
 
 		SlashCo.ClearDatabase()
 
 		timer.Simple(1, function() 
 			lobbySaveCurData() 
 		end)
-
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
 
 	end
 
@@ -344,6 +375,9 @@ function lobbyRoundSetup()
 
 	SlashCo.LobbyData.SelectedDifficulty = math.random( 0, 3 ) --Randomizing the Difficulty
 
+	if GetConVar( "slashco_force_difficulty" ):GetInt() > 0 then
+		SlashCo.LobbyData.SelectedDifficulty = GetConVar( "slashco_force_difficulty" ):GetInt() - 1
+	end
 
 	--Difficulty-based Slasher Selection:
 
@@ -519,6 +553,10 @@ function lobbyRoundSetup()
 	SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
 	
 	if #SlashCo.LobbyData.AssignedSurvivors < SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then goto Map_reroll end
+
+	if GetConVar( "slashco_map_default" ):GetInt() < 1 then
+		if SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].DEFAULT == false then goto Map_reroll end
+	end
 	
 
 	--for i, ply in ipairs( player.GetAll() ) do
@@ -882,7 +920,16 @@ end
 
 concommand.Add( "debug_datatest_read", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if SERVER then
 
 	print("basedata: ")
 	PrintTable( sql.Query("SELECT * FROM slashco_table_basedata; ") )
@@ -891,23 +938,24 @@ concommand.Add( "debug_datatest_read", function( ply, _, _ )
 	print("slasherdata: ")
 	PrintTable( sql.Query("SELECT * FROM slashco_table_slasherdata; ") )
 
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
-
 	end
 
 end )
 
 concommand.Add( "debug_datatest_error", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if SERVER then
 
 	print(sql.LastError())
-
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
 
 	end
 
@@ -915,13 +963,18 @@ end )
 
 concommand.Add( "debug_datatest_delete", function( ply, _, _ )
 
-	if ply:IsAdmin() or SERVER then
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if SERVER then
 
 		SlashCo.ClearDatabase()
-
-	else
-
-	ply:ChatPrint("Only admins can use debug commands!")
 
 	end
 

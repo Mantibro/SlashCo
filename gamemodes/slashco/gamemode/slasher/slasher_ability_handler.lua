@@ -823,7 +823,7 @@ do
 
             local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-            if s:GetPos():Distance( slasher:GetPos() ) < (1000 + (v3 * 3)) then
+            if s:GetPos():Distance( slasher:GetPos() ) < (1000 + (v3 * 3) + (SO * 750)) then
 
                 local tr = util.TraceLine( {
                     start = slasher:EyePos(),
@@ -870,7 +870,7 @@ do
     
                     if tr.Entity == s then
 
-                        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = v4 + ( FrameTime() + (  (1000-d)  / 10000  )   )
+                        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = v4 + ( FrameTime() + (  (1000-d)  / 10000  )   )  + (SO * FrameTime())
 
                         if v4 > 100 then
                             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
@@ -894,6 +894,95 @@ do
 end
 
     ::WATCHER::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 10 then goto ABOMIGNAT end
+do
+
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Survey Length
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Survey Cooldown
+    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Watched
+
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = BoolToNumber( slasher:GetNWBool("WatcherWatched") )
+
+    if slasher:GetNWBool("InSlasherChaseMode") then
+
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 60) )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 60) )
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 60) )
+
+    else
+
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 100) )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 100) )
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 100) )
+
+    end
+
+    if v2 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v2 - FrameTime() end
+
+    if not slasher:GetNWBool("WatcherRage") then
+        if v1 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 - FrameTime() end
+    else
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
+    end
+
+    for s = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+        local surv = team.GetPlayers(TEAM_SURVIVOR)[s]
+
+        if v1 > 0 then
+
+            if not surv:GetNWBool("SurvivorWatcherSurveyed") then surv:SetNWBool("SurvivorWatcherSurveyed", true) end
+            if slasher:GetNWBool("WatcherWatched") then slasher:SetNWBool("WatcherWatched", false) end
+
+        else
+
+            local find = ents.FindInCone( surv:GetPos(), surv:GetEyeTrace().Normal, 3000, 0.5 )
+
+            local target = NULL
+
+            if slasher:GetEyeTrace().Entity == slasher then
+                target = slasher
+                goto FOUND
+            end
+
+            do
+                for i = 1, #find do
+                    if find[i] == slasher then 
+                        target = find[i]
+                        break 
+                    end
+                end
+
+                if not target:IsValid() then 
+                    return
+                end
+
+                local tr = util.TraceLine( {
+                    start = surv:EyePos(),
+                    endpos = target:GetPos()+Vector(0,0,50),
+                    filter = surv
+                } )
+
+                if tr.Entity != target then return end
+            end
+            ::FOUND::
+
+            if target == slasher then 
+                surv:SetNWBool("SurvivorWatcherSurveyed", true) 
+                slasher:SetNWBool("WatchedWatched", true) 
+            else
+                if surv:GetNWBool("SurvivorWatcherSurveyed") then surv:SetNWBool("SurvivorWatcherSurveyed", false) end
+                slasher:SetNWBool("WatchedWatched", false) 
+            end
+
+        end
+
+    end
+
+
+end
+
+    ::ABOMIGNAT::
 
 end
 

@@ -33,11 +33,150 @@ Extra credits: undo, Jim, DarkGrey
 local SlashCo = SlashCo
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
---[[concommand.Add( "set_team", function( ply, cmd, args )
-	local Team = args[1] or 1
-	ply:SetTeam( Team )
+CreateConVar( "slashco_map_default", 0, FCVAR_NONE, "Allow the gamemode to access all conifgured maps.", 0, 1 )
+CreateConVar( "slashco_force_difficulty", 0, FCVAR_NONE, "Have the gamemode force a certan difficulty.(0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)", 0, 4 )
+
+concommand.Add( "slashco_add_survivor", function( ply, cmd, args )
+	
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if args[1] == nil or args[1] == "" or args[2] == nil or args[2] == "" then
+		ply:ChatPrint("Command format: slashco_add_survivor [Player Name]")
+
+		return
+	end
+
+	if game.GetMap() == "sc_lobby" then
+		ply:ChatPrint("Cannot assign Survivor while in lobby.")
+
+		return
+	end
+
+	local theman = ""
+
+	for i = 1, #player.GetAll() do
+
+		local p = player.GetAll()[1]
+
+		if p:GetName() == args[1] then
+			theman = p:SteamID64()
+			break
+		end
+
+	end
+
+	if theman == "" then
+		ply:ChatPrint("Player not found.")
+		return
+	end
+
+	if player.GetBySteamID64(theman):Team() != TEAM_SPECTATOR then
+		ply:ChatPrint("Player must be Spectator.")
+		return
+	end
+
+	for s = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
+
+		if SlashCo.CurRound.SlasherData.AllSurvivors[s].id == theman then
+			goto FOUND
+		end
+
+	end
+
+	table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = theman, GameContribution = 0})
+    table.insert(SlashCo.CurRound.SurvivorData.Items, {steamid = theman, itemid = 0})  
+
+	::FOUND::
+
+	ply:ChatPrint("New Survivor successfully assigned.")
+
+	ply:SetTean( TEAM_SURVIVOR )
 	ply:Spawn()
-end )]]
+         
+end )
+
+concommand.Add( "slashco_add_slasher", function( ply, cmd, args )
+	
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if game.GetMap() == "sc_lobby" then
+		ply:ChatPrint("Cannot assign Slasher while in lobby.")
+
+		return
+	end
+
+	if args[1] == nil or args[1] == "" or args[2] == nil or args[2] == "" then
+		ply:ChatPrint("Command format: slashco_add_slasher [Player Name] [Slasher ID]")
+
+		return
+	end
+
+	if tonumber(args[2]) > #SlashCo.SlasherData or tonumber(args[2]) < 1 then
+		ply:ChatPrint("Incorrect Slasher ID")
+
+		return
+	end
+
+	local theman = ""
+
+	for i = 1, #player.GetAll() do
+
+		local p = player.GetAll()[1]
+
+		if p:GetName() == args[1] then
+			theman = p:SteamID64()
+			break
+		end
+
+	end
+
+	if theman == "" then
+		ply:ChatPrint("Player not found.")
+		return
+	end
+
+	if player.GetBySteamID64(theman):Team() != TEAM_SPECTATOR then
+		ply:ChatPrint("Player must be Spectator.")
+		return
+	end
+
+	for s = 1, #SlashCo.CurRound.SlasherData do
+
+		if SlashCo.CurRound.SlasherData[theman] ~= nil then
+			goto ALREADYIN
+		end
+
+	end
+
+	SlashCo.InsertSlasherToTable(theman)
+
+	::ALREADYIN::
+
+	SlashCo.SelectSlasher(tonumber(args[2]), theman)
+
+	ply:ChatPrint("New Slasher successfully assigned.")
+
+	ply:SetTean( TEAM_SLASHER )
+	ply:Spawn()
+end )
+
+hook.Add( "CanExitVehicle", "PlayerMotion", function( veh, ply )
+    return false
+end )
 
 --Initialize global variable to hold functions.
 if not SlashCo then SlashCo = {} end
