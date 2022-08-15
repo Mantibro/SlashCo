@@ -17,6 +17,7 @@ include( "slasher/slasher_mainability.lua" )
 include( "slasher/slasher_specialability.lua" )
 include( "slasher/slasher_ability_handler.lua" )
 include( "selectables.lua" )
+include( "concommands.lua")
 
 --[[
 

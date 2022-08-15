@@ -1,7 +1,9 @@
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
 
-concommand.Add( "lobby_debug_proceed", function( ply, _, _ )
+--//lobby concommands//--
+
+concommand.Add("lobby_debug_proceed", function(ply, _, _)
 
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -13,46 +15,47 @@ concommand.Add( "lobby_debug_proceed", function( ply, _, _ )
 	end
 
 	if SERVER then
-	
-	SlashCo.LobbyData.LOBBYSTATE = 1 
 
-	SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_primary"))
-    SlashCo.LobbyData.ButtonDoorPrimary:Fire("Open")
+		SlashCo.LobbyData.LOBBYSTATE = 1
 
-	for i = 1, #SlashCo.LobbyData.Players do --If someone is not ready, force them as ready survivor.
+		SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_primary"))
+		SlashCo.LobbyData.ButtonDoorPrimary:Fire("Open")
 
-		local ply1 = player.GetBySteamID64( SlashCo.LobbyData.Players[i].steamid )
+		for i = 1, #SlashCo.LobbyData.Players do
+			--If someone is not ready, force them as ready survivor.
 
-		if getReadyState(ply1) < 1 then
-			lobbyPlayerReadying(ply1, 1)
+			local ply1 = player.GetBySteamID64(SlashCo.LobbyData.Players[i].steamid)
+
+			if getReadyState(ply1) < 1 then
+				lobbyPlayerReadying(ply1, 1)
+			end
 		end
+		if SERVER then
+			net.Start("mantislashcoGiveLobbyStatus")
+			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+			net.Broadcast()
+		end
+
+		--ply:ChatPrint("(Debug) Lobby advanced, Finalizing teams...")
+
+		table.Empty(SlashCo.LobbyData.PotentialSlashers)
+		table.Empty(SlashCo.LobbyData.PotentialSurvivors)
+		table.Empty(SlashCo.LobbyData.AssignedSurvivors)
+		table.Empty(SlashCo.LobbyData.AssignedSlashers)
+
+		SlashCo.LobbyData.SelectedSlasherInfo.NAME = "Unknown"
+		SlashCo.LobbyData.SelectedSlasherInfo.ID = 0
+		SlashCo.LobbyData.SelectedSlasherInfo.CLS = 0
+		SlashCo.LobbyData.SelectedSlasherInfo.DNG = 0
+		SlashCo.LobbyData.SelectedSlasherInfo.TIP = "--//--"
+
+		lobbyRoundSetup()
+
 	end
-	if SERVER then
-		net.Start("mantislashcoGiveLobbyStatus")
-		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE,3)
-		net.Broadcast()
-	end
 
-	--ply:ChatPrint("(Debug) Lobby advanced, Finalizing teams...")
+end)
 
-	table.Empty( SlashCo.LobbyData.PotentialSlashers )
-	table.Empty( SlashCo.LobbyData.PotentialSurvivors )
-	table.Empty( SlashCo.LobbyData.AssignedSurvivors )
-	table.Empty( SlashCo.LobbyData.AssignedSlashers )
-
-	SlashCo.LobbyData.SelectedSlasherInfo.NAME = "Unknown"
-	SlashCo.LobbyData.SelectedSlasherInfo.ID = 0
-	SlashCo.LobbyData.SelectedSlasherInfo.CLS = 0
-	SlashCo.LobbyData.SelectedSlasherInfo.DNG = 0
-	SlashCo.LobbyData.SelectedSlasherInfo.TIP = "--//--"
-
-	lobbyRoundSetup()
-
-	end
-
-end )
-
-concommand.Add( "lobby_debug_transition", function( ply, _, _ )
+concommand.Add("lobby_debug_transition", function(ply, _, _)
 
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -64,24 +67,24 @@ concommand.Add( "lobby_debug_transition", function( ply, _, _ )
 	end
 
 	if SERVER then
-	
-	SlashCo.LobbyData.LOBBYSTATE = 2
 
-	SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_primary"))
-    SlashCo.LobbyData.ButtonDoorPrimary:Fire("Close")
+		SlashCo.LobbyData.LOBBYSTATE = 2
 
-	lobbyTransitionTimer()
-	if SERVER then
-		net.Start("mantislashcoGiveLobbyStatus")
-		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE,3)
-		net.Broadcast()
+		SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_primary"))
+		SlashCo.LobbyData.ButtonDoorPrimary:Fire("Close")
+
+		lobbyTransitionTimer()
+		if SERVER then
+			net.Start("mantislashcoGiveLobbyStatus")
+			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+			net.Broadcast()
+		end
+
 	end
 
-	end
+end)
 
-end )
-
-concommand.Add( "lobby_debug_brief", function( ply, _, _ )
+concommand.Add("lobby_debug_brief", function(ply, _, _)
 
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -93,23 +96,23 @@ concommand.Add( "lobby_debug_brief", function( ply, _, _ )
 	end
 
 	if SERVER then
-	
-	SlashCo.LobbyData.LOBBYSTATE = 3
 
-	SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_secondary"))
-    SlashCo.LobbyData.ButtonDoorPrimary:Fire("Open")
+		SlashCo.LobbyData.LOBBYSTATE = 3
 
-	if SERVER then
-		net.Start("mantislashcoGiveLobbyStatus")
-		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE,3)
-		net.Broadcast()
+		SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_secondary"))
+		SlashCo.LobbyData.ButtonDoorPrimary:Fire("Open")
+
+		if SERVER then
+			net.Start("mantislashcoGiveLobbyStatus")
+			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+			net.Broadcast()
+		end
+
 	end
 
-	end
+end)
 
-end )
-
-concommand.Add( "timer_start", function( ply, _, _ )
+concommand.Add("timer_start", function(ply, _, _)
 
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -126,9 +129,9 @@ concommand.Add( "timer_start", function( ply, _, _ )
 
 	end
 
-end )
+end)
 
-concommand.Add( "lobby_reset", function( ply, _, _ )
+concommand.Add("lobby_reset", function(ply, _, _)
 
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -140,34 +143,34 @@ concommand.Add( "lobby_reset", function( ply, _, _ )
 	end
 
 	if SERVER then
-	
-	SlashCo.LobbyData.LOBBYSTATE = 0
 
-	table.Empty(SlashCo.LobbyData.Players)
-	table.Empty(SlashCo.LobbyData.AssignedSlashers)
-	table.Empty(SlashCo.LobbyData.AssignedSurvivors)
+		SlashCo.LobbyData.LOBBYSTATE = 0
 
-	SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_lobby_primary"))
-    SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Close")
+		table.Empty(SlashCo.LobbyData.Players)
+		table.Empty(SlashCo.LobbyData.AssignedSlashers)
+		table.Empty(SlashCo.LobbyData.AssignedSurvivors)
 
-	SlashCo.LobbyData.ButtonDoorSecondaryClose = table.Random(ents.FindByName("door_lobby_secondary"))
-    SlashCo.LobbyData.ButtonDoorSecondaryClose:Fire("Close")
+		SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_lobby_primary"))
+		SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Close")
 
-	timer.Destroy("AllReadyLobby")
+		SlashCo.LobbyData.ButtonDoorSecondaryClose = table.Random(ents.FindByName("door_lobby_secondary"))
+		SlashCo.LobbyData.ButtonDoorSecondaryClose:Fire("Close")
 
-	if SERVER then
-		net.Start("mantislashcoGiveLobbyStatus")
-		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE,3)
-		net.Broadcast()
+		timer.Destroy("AllReadyLobby")
+
+		if SERVER then
+			net.Start("mantislashcoGiveLobbyStatus")
+			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+			net.Broadcast()
+		end
+
+		ply:ChatPrint("(Debug) Lobby reset.")
+
 	end
 
-	ply:ChatPrint("(Debug) Lobby reset.")
+end)
 
-	end
-
-end )
-
-concommand.Add( "lobby_openitems", function( ply, _, _ )
+concommand.Add("lobby_openitems", function(ply, _, _)
 
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -177,17 +180,17 @@ concommand.Add( "lobby_openitems", function( ply, _, _ )
 			end
 		end
 	end
-	
+
 	if SERVER then
 
 		SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_itembox"))
-    	SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Open")
+		SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Open")
 
 	end
 
-end )
+end)
 
-concommand.Add( "lobby_leave", function( ply, _, _ )
+concommand.Add("lobby_leave", function(ply, _, _)
 
 	if IsValid(ply) then
 		if ply:IsPlayer() then
@@ -197,18 +200,20 @@ concommand.Add( "lobby_leave", function( ply, _, _ )
 			end
 		end
 	end
-	
+
 	if SERVER then
 
 		SlashCo.ClearDatabase()
 
-		timer.Simple(1, function() 
-			lobbySaveCurData() 
+		timer.Simple(1, function()
+			lobbySaveCurData()
 		end)
 
 	end
 
-end )
+end)
+
+--//actual real code//--
 
 --Only run this and the removePlayerFromLobby function using the GM:PlayerChangedTeam hook: https://wiki.facepunch.com/gmod/GM:PlayerChangedTeam
 function addPlayerToLobby(ply)
@@ -311,7 +316,7 @@ function lobbyChooseItem(plyid, id)
 
 	--Change the survivor's chosen item.
 
-	SlashCo.ChangeSurvivorItem(plyid, id)
+	SlashCo.ChangeSurvivorItem(player.GetBySteamID64(plyid), id)
 	--SlashCo.CurRound.SurvivorData.Items[plyid] = {}
 	--SlashCo.CurRound.SurvivorData.Items[plyid].itid = id
 
@@ -912,68 +917,6 @@ function lobbySaveCurData()
 	end
 
 end
-
-concommand.Add( "debug_datatest_read", function( ply, _, _ )
-
-	if IsValid(ply) then
-		if ply:IsPlayer() then
-			if not ply:IsAdmin() then
-				ply:ChatPrint("Only admins can use debug commands!")
-				return
-			end
-		end
-	end
-
-	if SERVER then
-
-	print("basedata: ")
-	PrintTable( sql.Query("SELECT * FROM slashco_table_basedata; ") )
-	print("survivordata: ")
-	PrintTable( sql.Query("SELECT * FROM slashco_table_survivordata; ") )
-	print("slasherdata: ")
-	PrintTable( sql.Query("SELECT * FROM slashco_table_slasherdata; ") )
-
-	end
-
-end )
-
-concommand.Add( "debug_datatest_error", function( ply, _, _ )
-
-	if IsValid(ply) then
-		if ply:IsPlayer() then
-			if not ply:IsAdmin() then
-				ply:ChatPrint("Only admins can use debug commands!")
-				return
-			end
-		end
-	end
-
-	if SERVER then
-
-	print(sql.LastError())
-
-	end
-
-end )
-
-concommand.Add( "debug_datatest_delete", function( ply, _, _ )
-
-	if IsValid(ply) then
-		if ply:IsPlayer() then
-			if not ply:IsAdmin() then
-				ply:ChatPrint("Only admins can use debug commands!")
-				return
-			end
-		end
-	end
-
-	if SERVER then
-
-		SlashCo.ClearDatabase()
-
-	end
-
-end )
 
 function lobbyFinish() 
 

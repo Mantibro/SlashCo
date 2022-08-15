@@ -590,90 +590,6 @@ SlashCo.RoundBeginTimer = function()
 	timer.Create( "GameStart", 15, 1, function() if SERVER then RunConsoleCommand("slashco_run_curconfig") end end)
 end
 
-concommand.Add( "slashco_run_curconfig", function( _, _, _ )
-
-    --SlashCo.RemoveAllCurRoundEnts()
-
-    SlashCo.LoadCurRoundTeams()
-
-    SlashCo.SpawnCurConfig()
-
-end )
-
-concommand.Add( "slashco_debug_run_curconfig", function( _, _, _ )
-
-    --SlashCo.RemoveAllCurRoundEnts()
-
-    SlashCo.LoadCurRoundTeams()
-
-    SlashCo.SpawnCurConfig(true)
-
-end )
-
-concommand.Add( "slashco_debug_run_survivor", function( _, _, _ )
-
-    --SlashCo.RemoveAllCurRoundEnts()
-
-    --SlashCo.LoadCurRoundTeams()
-    for _, k in pairs(player.GetAll()) do
-        k:SetTeam(TEAM_SURVIVOR)
-        k:Spawn()
-        print(k:Name() .. " now Survivor")
-    end
-    SlashCo.CurRound.SurvivorCount = player.GetAll()
-    timer.Simple(0.05, function()
-
-        print("[SlashCo] Now proceeding with Spawns...")
-
-        SlashCo.PrepareSlasherForSpawning()
-
-        SlashCo.SpawnPlayers()
-
-        SlashCo.BroadcastItemData()
-
-    end)
-
-    SlashCo.SpawnCurConfig(true)
-
-end )
-
-concommand.Add( "slashco_debug_clear_database", function( _, _, _ )
-    SlashCo.ClearDatabase()
-end)
-
-concommand.Add("slashco_debug_dummy_database", function(_, _, _)
-    if SERVER then
-        if not sql.TableExists("slashco_table_basedata") and not sql.TableExists("slashco_table_survivordata") and not sql.TableExists("slashco_table_slasherdata")then
-            --Create the database table
-
-            local diff = SlashCo.LobbyData.SelectedDifficulty
-            local offer = SlashCo.LobbyData.Offering
-            local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
-            local slasher1id = SlashCo.LobbyData.FinalSlasherID
-            local slasher2id = math.random(1, #SlashCo.SlasherData)
-
-            sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary NUMBER , SlasherIDSecondary NUMBER , SurviorGasMod NUMBER);")
-            sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
-            sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
-
-            sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( 90071996842377216 );")
-            sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( 90071996842377216, " .. sql.SQLStr("none") .. " );")
-            sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", " .. slasher1id .. ", " .. slasher2id .. ", " .. survivorgasmod .. " );")
-            print("Dummy Database made.")
-        else
-            print("Database already exists.")
-            local baseTable = sql.TableExists("slashco_table_basedata") and "present" or "nil"
-            local survivorTable = sql.TableExists("slashco_table_survivordata") and "present" or "nil"
-            local slasherTable = sql.TableExists("slashco_table_slasherdata") and "present" or "nil"
-            print("base table: "..baseTable)
-            print("survivor table: "..survivorTable)
-            print("slasher table: "..slasherTable)
-        end
-
-        print(sql.LastError())
-    end
-end)
-
 SlashCo.LoadCurRoundTeams = function()
 
     if SERVER then
@@ -699,10 +615,6 @@ SlashCo.LoadCurRoundTeams = function()
                         playercur:SetTeam(TEAM_SURVIVOR)
                         playercur:Spawn()
                         print(playercur:Name() .. " now Survivor")
-
---[[                        if SlashCo.GetHeldItem(playercur) == 2 then
-                            SlashCo.PlayerData[id].Lives = 2
-                        end --Apply Deathward]]
 
                         break
 
