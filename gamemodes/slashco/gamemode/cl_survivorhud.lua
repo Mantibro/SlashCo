@@ -3,7 +3,7 @@ include( "ui/fonts.lua" )
 --include( "ui/data_info.lua" )
 
 local SlashCoItems = SlashCoItems
-
+local prevHp, SetTime, ShowDamage, prevHp1, aHp
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 
 net.Receive("slashcoSelectables", function(_,_)
@@ -29,13 +29,21 @@ net.Receive( "mantislashcoGasPourProgress", function( )
 	end
 end)
 
+net.Receive("mantislashcoGiveItemData", function()
+
+	t = net.ReadTable()
+
+	if (t[LocalPlayer():SteamID64()]) then
+		HeldItem = t[LocalPlayer():SteamID64()].itemid
+	end
+
+end)
+
 hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	local ply = LocalPlayer()
 
 	if ply:Team() == TEAM_SURVIVOR then
-
-		--ply:ChatPrint(SlashCoItems.DeathWard.Name)
 
 		if HeldItem == nil then HeldItem = 0 end
 
@@ -116,14 +124,20 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
 		local displayHp = math.Round(aHp)
-		local hpOver = math.Clamp(hp-maxHp,0,100)
-		local hpAdjust = math.Clamp(hp,0,100)-hpOver
-		local displayHpBar = math.floor(math.Clamp(hpAdjust/maxHp,0,1)*27)
-		local displayHpOverBar = math.ceil(math.Clamp(hpOver/maxHp,0,1)*27)
-		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.ceil(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
-
+		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
 		local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
-		local parsed = markup.Parse("<font=TVCD>HP <colour=0,255,255,255>"..string.rep("█",displayHpOverBar).."</colour>"..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
+		local parsed
+
+		if hp >= 25 then
+			local hpOver = math.Clamp(hp-maxHp,0,100)
+			local hpAdjust = math.Clamp(hp,0,100)-hpOver
+			local displayHpBar = math.Round(math.Clamp(hpAdjust/maxHp,0,1)*27)
+			local displayHpOverBar = math.Round(math.Clamp(hpOver/maxHp,0,1)*27)
+			parsed = markup.Parse("<font=TVCD>HP <colour=0,255,255,255>"..string.rep("█",displayHpOverBar).."</colour>"..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
+		else
+			local displayHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(hp/maxHp,0,1)*27) or 0
+			parsed = markup.Parse("<font=TVCD>HP <colour=255,255,0,255>"..string.rep("█",displayHpBar).."</colour><colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
+		end
 
 		surface.SetDrawColor(0,0,128,255)
 		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420+parsedValue:GetWidth(), 27)
@@ -131,27 +145,14 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		parsed:Draw(ScrW() * 0.025+4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 		parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 
-		--Item Display
-
-		net.Receive("mantislashcoGiveItemData", function()
-
-			t = net.ReadTable()
-
-			if (t[LocalPlayer():SteamID64()]) then
-				HeldItem = t[LocalPlayer():SteamID64()].itemid
-			end
-
-		end)
+		--//item display//--
 
 		if SlashCoItems[HeldItem] then
-			if SlashCoItems[HeldItem].OnDrop then item_droppable = true else item_droppable = false end
-			if SlashCoItems[HeldItem].OnUse then item_usable = true else item_usable = false end
-
 			surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
 			surface.DrawTexturedRect(itemx, itemy, itemsize, itemsize)
 			draw.SimpleText( SlashCoItems[HeldItem].Name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-			if item_droppable then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
-			if item_usable then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
+			if SlashCoItems[HeldItem].OnDrop then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
+			if SlashCoItems[HeldItem].OnUse then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
 		end
 	end
 end)
