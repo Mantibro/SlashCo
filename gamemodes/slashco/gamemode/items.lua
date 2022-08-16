@@ -30,8 +30,8 @@ SlashCo.UseItem = function(ply)
 		local itid = SlashCo.GetHeldItem(ply)
 
 		if SlashCoItems[itid] and SlashCoItems[itid].OnUse then
-			SlashCoItems[itid].OnUse(ply)
-			SlashCo.ChangeSurvivorItem(ply, "none")
+			local doNotRemove = SlashCoItems[itid].OnUse(ply)
+			if not doNotRemove then SlashCo.ChangeSurvivorItem(ply, "none") end
 		end
 
 	end

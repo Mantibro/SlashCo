@@ -41,7 +41,7 @@ end
 SlashCoItems.NameMePlease.DisplayColor = function(ply) --optional, color to display on the background of the name on player's hud (runs clientside; don't use SlashCo)
     return 0, 0, 128, 255
 end
-SlashCoItems.NameMePlease.OnUse = function(ply) --optional, when pressing r
+SlashCoItems.NameMePlease.OnUse = function(ply) --optional, when pressing r, return true to disable removing the item
 end
 SlashCoItems.NameMePlease.OnDrop = function(ply) --optional, when pressing q
 end

@@ -17,8 +17,9 @@ SlashCoItems.Beacon.OnUse = function(ply)
 
     if SlashCo.CurRound.EscapeHelicopterSummoned then ply:ChatPrint("The Helicopter is already on its way.") return end
 
-    local r1 = ents.FindByClass( "sc_generator")[1]:EntIndex()
-    local r2 = ents.FindByClass( "sc_generator")[2]:EntIndex()
+    local gens = ents.FindByClass( "sc_generator")
+    local r1 = gens[1]:EntIndex()
+    local r2 = gens[2]:EntIndex()
 
     if SlashCo.CurRound.Generators[r1].Running or SlashCo.CurRound.Generators[r2].Running then
 
@@ -35,7 +36,7 @@ SlashCoItems.Beacon.OnUse = function(ply)
 
     else
         ply:ChatPrint("You can activate the beacon once one generator has been turned on.")
-        return
+        return true
     end
 end
 SlashCoItems.Beacon.OnDrop = function(ply)

@@ -146,7 +146,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		end
 
 		aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
-		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
+		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*26.9) or 0
 		local parsed
 
 		if hp >= 25 or not GetConVar("slashcohud_show_lowhealth"):GetBool() then
