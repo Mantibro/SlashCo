@@ -2,6 +2,9 @@
 include( "ui/fonts.lua" )
 --include( "ui/data_info.lua" )
 
+CreateClientConVar( "slashcohud_show_lowhealth", 1, true, false, "Whether to display the survivor's hud as blinking yellow when at low health.", 0, 1 )
+CreateClientConVar( "slashcohud_show_healthvalue", 1, true, false, "Whether to display the value of the survivor's health on their hud.", 0, 1 )
+
 local SlashCoItems = SlashCoItems
 local prevHp, SetTime, ShowDamage, prevHp1, aHp
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
@@ -45,13 +48,33 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	if ply:Team() == TEAM_SURVIVOR then
 
-		if HeldItem == nil then HeldItem = 0 end
-
-		local itemx = ScrW() - (ScrW()/7)
-		local itemy = ScrH() - (ScrH()/3.5)
-		local itemsize = ScrH()/5
-
 		if not input.IsButtonDown( 15 ) then isGassing = false end
+
+		--//item display//--
+
+		if SlashCoItems[HeldItem or "none"] then
+			local parsedItem = markup.Parse("<font=TVCD>---     "..string.upper(SlashCoItems[HeldItem].Name).."     ---</font>")
+			if SlashCoItems[HeldItem].DisplayColor then
+				surface.SetDrawColor(SlashCoItems[HeldItem].DisplayColor(ply))
+			else
+				surface.SetDrawColor(0,0,128,255)
+			end
+			surface.DrawRect(ScrW() * 0.975-parsedItem:GetWidth()-8, ScrH() * 0.95-24, parsedItem:GetWidth()+8, 27)
+			parsedItem:Draw(ScrW() * 0.975-4, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+
+			local offset = 0
+			if SlashCoItems[HeldItem].OnUse then
+				draw.SimpleText("[R] USE", "TVCD", ScrW() * 0.975-104, ScrH() * 0.95-30, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+				offset = 30
+			end
+			if SlashCoItems[HeldItem].OnDrop then
+				draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975-104, ScrH() * 0.95-30-offset, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			end
+
+			surface.SetDrawColor(255, 255, 255, 255)
+			surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
+			surface.DrawTexturedRect(ScrW() * 0.975-100, ScrH() * 0.95-130, 100, 100)
+		end
 
 		--//gas fuel meter//--
 
@@ -123,37 +146,35 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		end
 
 		aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
-		local displayHp = math.Round(aHp)
 		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*27) or 0
-		local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
 		local parsed
 
-		if hp >= 25 then
+		if hp >= 25 or not GetConVar("slashcohud_show_lowhealth"):GetBool() then
 			local hpOver = math.Clamp(hp-maxHp,0,100)
 			local hpAdjust = math.Clamp(hp,0,100)-hpOver
 			local displayHpBar = math.Round(math.Clamp(hpAdjust/maxHp,0,1)*27)
 			local displayHpOverBar = math.Round(math.Clamp(hpOver/maxHp,0,1)*27)
-			parsed = markup.Parse("<font=TVCD>HP <colour=0,255,255,255>"..string.rep("█",displayHpOverBar).."</colour>"..string.rep("█",displayHpBar).."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
+			parsed = markup.Parse("<font=TVCD>HP <colour=0,255,255,255>"..string.rep("█",displayHpOverBar).."</colour>" --overheal
+					..string.rep("█",displayHpBar) --hp
+					.."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>") --indicator
 		else
 			local displayHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(hp/maxHp,0,1)*27) or 0
-			parsed = markup.Parse("<font=TVCD>HP <colour=255,255,0,255>"..string.rep("█",displayHpBar).."</colour><colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>")
+			parsed = markup.Parse("<font=TVCD>HP <colour=255,255,0,255>"..string.rep("█",displayHpBar).."</colour><colour=255,0,0,255>" --hp
+					..string.rep("█",displayPrevHpBar).."</colour></font>") --indicator
 		end
 
 		surface.SetDrawColor(0,0,128,255)
-		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420+parsedValue:GetWidth(), 27)
+
+		if not GetConVar("slashcohud_show_healthvalue"):GetBool() then
+			surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 410, 27)
+		else
+			local displayHp = math.Round(aHp)
+			local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
+			surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420+parsedValue:GetWidth(), 27)
+			parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+		end
 
 		parsed:Draw(ScrW() * 0.025+4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
-		parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
-
-		--//item display//--
-
-		if SlashCoItems[HeldItem] then
-			surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
-			surface.DrawTexturedRect(itemx, itemy, itemsize, itemsize)
-			draw.SimpleText( SlashCoItems[HeldItem].Name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-			if SlashCoItems[HeldItem].OnDrop then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
-			if SlashCoItems[HeldItem].OnUse then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
-		end
 	end
 end)
 

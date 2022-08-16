@@ -35,8 +35,11 @@ SlashCoItems.NameMePlease.Icon = ""
 SlashCoItems.NameMePlease.Price = 0 --don't include to remove from shop
 SlashCoItems.NameMePlease.Description = "" --optional if price isn't included
 SlashCoItems.NameMePlease.CamPos = Vector(0,0,0) --optional if price isn't included
-SlashCoItems.NameMePlease.MaxAllowed = function() --optional, return the number of allowed items
+SlashCoItems.NameMePlease.MaxAllowed = function() --optional, return the number of allowed items (runs clientside; don't use SlashCo)
     return 1
+end
+SlashCoItems.NameMePlease.DisplayColor = function(ply) --optional, color to display on the background of the name on player's hud (runs clientside; don't use SlashCo)
+    return 0, 0, 128, 255
 end
 SlashCoItems.NameMePlease.OnUse = function(ply) --optional, when pressing r
 end

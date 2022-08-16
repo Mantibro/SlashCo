@@ -7,6 +7,12 @@ SlashCoItems.Baby.Icon = "slashco/ui/icons/items/item_7"
 SlashCoItems.Baby.Price = 35
 SlashCoItems.Baby.Description = "A decrepit-looking doll of a baby. Upon use, this item will halve your \nhealth and teleport you away from the slasher. \nThe lower your health, the more likely you are to\nsuffer a premature death upon use."
 SlashCoItems.Baby.CamPos = Vector(50,0,0)
+SlashCoItems.Baby.DisplayColor = function(ply)
+    local setcolor = 360-math.Clamp(ply:Health(),0,100)*1.2
+    local color = HSVToColor(setcolor,1,0.5)
+
+    return color.r, color.g, color.b, color.a
+end
 SlashCoItems.Baby.OnUse = function(ply)
     --When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
     --Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
