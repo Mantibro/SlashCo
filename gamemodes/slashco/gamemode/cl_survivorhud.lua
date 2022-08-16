@@ -6,7 +6,9 @@ CreateClientConVar( "slashcohud_show_lowhealth", 1, true, false, "Whether to dis
 CreateClientConVar( "slashcohud_show_healthvalue", 1, true, false, "Whether to display the value of the survivor's health on their hud.", 0, 1 )
 
 local SlashCoItems = SlashCoItems
-local prevHp, SetTime, ShowDamage, prevHp1, aHp
+local prevHp, SetTime, ShowDamage, prevHp1, aHp, TimeToFuel, TimeUntilFueled
+local FuelingCan
+local IsFueling
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 
 net.Receive("slashcoSelectables", function(_,_)
@@ -17,19 +19,11 @@ end)
 
 net.Receive( "mantislashcoGasPourProgress", function( )
 
-	local ReceivedTable = net.ReadTable()
+	TimeToFuel = net.ReadUInt(8)
+	FuelingCan = net.ReadEntity()
+	IsFueling = net.ReadBool()
+	TimeUntilFueled = net.ReadFloat()
 
-	if ReceivedTable then
-		--ply:ChatPrint(table.ToString(ReceivedTable))
-		gasCan = ReceivedTable.gasCan
-		local progress = ReceivedTable.progress
-		gas = 1 - (progress / 13)
-		if progress > 0 and progress <= 13 then
-			isGassing = true
-		else
-			isGassing = false
-		end
-	end
 end)
 
 net.Receive("mantislashcoGiveItemData", function()
@@ -48,7 +42,17 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	if ply:Team() == TEAM_SURVIVOR then
 
-		if not input.IsButtonDown( 15 ) then isGassing = false end
+		local gas
+		if IsFueling then
+			gas = (TimeUntilFueled - CurTime())/TimeToFuel
+			if not input.IsButtonDown(KEY_E) then
+				--print("not e")
+				IsFueling = false
+			elseif CurTime() >= TimeUntilFueled then
+				--print("not fuel")
+				IsFueling = false
+			end
+		end
 
 		--//item display//--
 
@@ -79,8 +83,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		--//gas fuel meter//--
 
 		local hitPos = ply:GetShootPos()
-		if isGassing and IsValid(Entity(gasCan)) then
-			local genPos = Entity(gasCan):GetPos()
+		if IsFueling and IsValid(FuelingCan) then
+			local genPos = FuelingCan:GetPos()
 			local realDistance = hitPos:Distance(genPos)
 			if realDistance < 100 then
 				genPos = genPos:ToScreen()
@@ -96,7 +100,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + 205 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 				draw.SimpleText("FUEL " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			else
-				isGassing = false
+				IsFueling = false
 			end
 		end
 
@@ -104,12 +108,12 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		--draw.SimpleText(#Selectables, "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		if Selectables then
-			for _, p in pairs(Selectables) do
+			for _, p in ipairs(Selectables) do
 				local entity = Entity(p)
 				if not IsValid(entity) then continue end
 				local gasPos = entity:GetPos()
 				local realDistance = hitPos:Distance(gasPos)
-				if realDistance < 100 and not (isGassing and gasCan == p) then
+				if realDistance < 100 and not (IsFueling and FuelingCan == entity) then
 					local trace = util.QuickTrace(hitPos,gasPos-hitPos,ply)
 					if trace.Hit and trace.Entity ~= entity then continue end
 					gasPos = gasPos:ToScreen()

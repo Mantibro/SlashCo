@@ -395,9 +395,6 @@ SlashCo.ResetCurRoundData = function()
             GasCanMod = 0, --This will decrement if someone chooses a gas can to take in as an item.
             Items = {}
         },
-        Generators = {
-            --This will store all active generators during the round and their power/fuel state.
-        },
         SlasherEntities = { --Slasher's unique entities, such as bababooey's clones.
 
         },
@@ -904,21 +901,7 @@ SlashCo.CreateGenerator = function(pos, ang)
     Ent:SetAngles( ang )
     Ent:Spawn()
 
-    local id = Ent:EntIndex()
-
-    SlashCo.CurRound.Generators[id] = {
-        Running = false,
-        Remaining = SlashCo.GasCansPerGenerator,
-        Interaction = false,
-        Pouring = false,
-        Progress = 0.0,
-        PouredCanID = 0,
-        CorrentPourer = 0,
-        ConsistentPourer = 0,
-        HasBattery = false
-    }
-
-    return id
+    return Ent:EntIndex()
 end
 
 --Spawn a gas can
@@ -1090,45 +1073,6 @@ SlashCo.CreateBatteriesE = function(spawnpoints)
     end
 end
 
---Inserts a given battery into a generator
-SlashCo.InsertBattery = function(generator, battery)
-    local gid = generator:EntIndex()
-    local bid = battery:EntIndex()
-    --If either of the two inputs aren't registered to the current round table, exit silently.
-    if SlashCo.CurRound.Generators[gid] == nil or not table.HasValue(SlashCo.CurRound.Batteries, bid) then return end
-
-    SlashCo.CurRound.Generators[gid].HasBattery = true
-    battery:SetMoveType( MOVETYPE_NONE )
-    battery:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
-    battery:SetPos( generator:LocalToWorld( Vector(-7,25,50) ) )
-    battery:SetAngles( generator:LocalToWorldAngles( Angle(0,90,0) ) )
-    battery:SetParent( generator )
-    battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-    battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
-    SlashCo.RemoveSelectableNow(bid)
-end
-
---Inserts a given gas can into a generator
-SlashCo.AddGas = function(generator)
-
-    local gid = generator:EntIndex()
-
-    SlashCo.CurRound.Generators[gid].Remaining = SlashCo.CurRound.Generators[gid].Remaining - 1
-
-end
-
---Remove a gas can from the table as it is now being poured in the generator.
-SlashCo.RemoveGas = function(generator, gas)
-    local gid = generator:EntIndex()
-    local gasid = gas:EntIndex()
-    --If either of the two inputs aren't registered to the current round table, exit silently.
-    if SlashCo.CurRound.Generators[gid] == nil or not table.HasValue(SlashCo.CurRound.GasCans, gasid) then return end
-
-    gas:Remove()
-    table.RemoveByValue( SlashCo.CurRound.GasCans, gasid )
-    SlashCo.RemoveSelectableNow(gasid)
-end
-
 --Spawn the helicopter 
 SlashCo.CreateHelicopter = function(pos, ang)
     local Ent = ents.Create( "sc_helicopter" )
@@ -1186,11 +1130,10 @@ SlashCo.CreateOfferTable = function(pos, ang)
 end
 
 SlashCo.RemoveAllCurRoundEnts = function()
-    local ents = table.GetKeys(SlashCo.CurRound.Generators)
-    for I=1, #ents do
-        if IsValid(Entity(ents[I])) then
-            Entity(ents[I]):Remove()
-        end
+
+    local gens = ents.FindByClass( "sc_generator")
+    for _, v in ipairs(gens) do
+        v:Remove()
     end
 
     for I=1, #(SlashCo.CurRound.GasCans) do
@@ -1330,9 +1273,9 @@ SlashCo.RoundHeadstart = function()
 
     for _ = 1, (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
 
-        local r = ents.FindByClass("sc_generator")[math.random(1,2)]:EntIndex()
-
-        SlashCo.CurRound.Generators[r].Remaining =  SlashCo.CurRound.Generators[r].Remaining - 1
+        local gens = ents.FindByClass("sc_generator")
+        local random = math.random(#gens)
+        gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or SlashCo.GasCansPerGenerator)-1,0,SlashCo.GasCansPerGenerator)
 
     end
 

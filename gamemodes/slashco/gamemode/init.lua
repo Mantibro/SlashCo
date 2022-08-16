@@ -565,56 +565,37 @@ local Think = function()
 			end
 		end
 
-		if SlashCo.CurRound ~= nil and GAMEMODE.State == GAMEMODE.States.IN_GAME and #(table.GetKeys(SlashCo.CurRound.Generators)) > 0 then
+		local gens = ents.FindByClass( "sc_generator")
+		if SlashCo.CurRound and GAMEMODE.State == GAMEMODE.States.IN_GAME and #gens > 0 then
+			local runningCount = 0
+			for _, v in ipairs(gens) do
+				if v.IsRunning then runningCount = runningCount + 1 end
+			end
+
 			local allRunning = true
-			local gens = table.GetKeys(SlashCo.CurRound.Generators)
-			for I=1, #gens do
-
-				if not SlashCo.CurRound.Generators[gens[I]].Running then
-					allRunning = false
-					break
-				end
-
+			if runningCount < 2 then
+				allRunning = false
 			end
 
-			for I=1, #gens do
-
-				if SlashCo.CurRound.OfferingData.DO then
-
-					if SlashCo.CurRound.Generators[gens[I]].Running then
-						allRunning = true
-						break
-					end
-
-				end
-
-			end
-
-			--DRAINAGE \/ \/ \/
+			--//drainage//--
 
 			if SlashCo.CurRound.OfferingData.CurrentOffering == 3 then
 
-				local gn1 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[1]:EntIndex()].Remaining
-    			local gn2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].Remaining
+				local totalCansRemaining = 0
+				for _, v in ipairs(gens) do
+					totalCansRemaining = totalCansRemaining + (v.CansRemaining or SlashCo.GasCansPerGenerator)
+				end
 
-				local needed = gn1 + gn2
+				if #SlashCo.CurRound.GasCans < (totalCansRemaining + 1) then return end --Prevent draining if there is too few gas cans
 
-				if #SlashCo.CurRound.GasCans < (needed + 1) then return end --Prevent draining if there is too few gas cans
-
-				SlashCo.CurRound.OfferingData.DrainageTick = SlashCo.CurRound.OfferingData.DrainageTick + FrameTime()
-
-				if SlashCo.CurRound.OfferingData.DrainageTick > 50 then --Drain the gas
-					SlashCo.CurRound.OfferingData.DrainageTick = 0
-					local r = math.random(1,2)
-
-					if SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[r]:EntIndex()].Remaining < 4 then
-						SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[r]:EntIndex()].Remaining = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[r]:EntIndex()].Remaining + 1
-					end
+				if engine.TickCount()%math.floor(240/engine.TickInterval()) == 0 then
+					local random = math.random(#gens)
+					gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or SlashCo.GasCansPerGenerator)+1,0,SlashCo.GasCansPerGenerator)
 				end
 
 			end
 
-			--DRAINAGE /\ /\ /\
+			--//helicopters//--
 
 			if allRunning and SlashCo.CurRound.SummonHelicopter == false then
 				SlashCo.CurRound.SummonHelicopter = true

@@ -2,18 +2,21 @@ local SlashCo = SlashCo
 
 hook.Add("Tick", "HandleSlasherAbilities", function()
 
-    if #ents.FindByClass("sc_generator") < 1 then return end
+    local gens = ents.FindByClass("sc_generator")
+    if #gens < 1 then return end
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
     --Calculate the Game Progress Value
     --The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (1 - 10)
-    local gpg = SlashCo.GasCansPerGenerator
-    local gen1 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[1]:EntIndex()].Remaining
-    local gen2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].Remaining
-    local bg1 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[1]:EntIndex()].HasBattery
-    local bg2 = SlashCo.CurRound.Generators[ents.FindByClass("sc_generator")[2]:EntIndex()].HasBattery
-    if SlashCo.CurRound.SlasherData.GameProgress > -1 then SlashCo.CurRound.SlasherData.GameProgress = (gpg - gen1) + (gpg - gen2) + BoolToNumber(bg1) + BoolToNumber(bg2) end
+    local totalProgress = 0
+    for _, v in ipairs(gens) do
+        totalProgress = totalProgress + (SlashCo.GasCansPerGenerator - (v.CansRemaining or SlashCo.GasCansPerGenerator))
+        if v.HasBattery then totalProgress = totalProgress + 1 end
+    end
+    if SlashCo.CurRound.SlasherData.GameProgress > -1 then
+        SlashCo.CurRound.SlasherData.GameProgress = totalProgress
+    end
 
 for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 

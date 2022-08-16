@@ -13,15 +13,18 @@ end
 SlashCoItems.Beacon.OnUse = function(ply)
     --If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
 
-    if #team.GetPlayers(TEAM_SURVIVOR) > 1 then ply:ChatPrint("You can activate the beacon only if you're the last living survivor.") return end
+    if #team.GetPlayers(TEAM_SURVIVOR) > 1 then ply:ChatPrint("You can activate the beacon only if you're the last living survivor.") return true end
 
-    if SlashCo.CurRound.EscapeHelicopterSummoned then ply:ChatPrint("The Helicopter is already on its way.") return end
+    if SlashCo.CurRound.EscapeHelicopterSummoned then ply:ChatPrint("The Helicopter is already on its way.") return true end
 
     local gens = ents.FindByClass( "sc_generator")
-    local r1 = gens[1]:EntIndex()
-    local r2 = gens[2]:EntIndex()
+    local runningCount = 0
+    for _, v in ipairs(gens) do
+        if v.IsRunning then runningCount = runningCount + 1 end
 
-    if SlashCo.CurRound.Generators[r1].Running or SlashCo.CurRound.Generators[r2].Running then
+    end
+
+    if runningCount >= 1 then
 
         if SlashCo.CurRound.DistressBeaconUsed == false then
 

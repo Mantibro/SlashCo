@@ -114,5 +114,5 @@ hook.Add( "PlayerUse", "STOP", function( ply, _ )
 end )
 
 hook.Add( "AllowPlayerPickup", "DiscardedCanPickup", function( _, ent )
-	return not table.HasValue( SlashCo.CurRound.DiscardedCans, ent:EntIndex() )
+	return not SlashCo.CurRound.DiscardedCans[ent:EntIndex()]
 end )
