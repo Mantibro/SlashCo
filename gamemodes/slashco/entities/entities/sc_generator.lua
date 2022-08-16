@@ -20,8 +20,18 @@ function ENT:Initialize()
         self:PhysicsInit(SOLID_VPHYSICS)
         self:SetMoveType(MOVETYPE_NONE)
         self:GetPhysicsObject():EnableMotion(false)
-        self:SetUseType(ONOFF_USE)
+        self:SetUseType(SIMPLE_USE)
     end
+end
+
+function ENT:SendData(ply)
+    --print("sending data")
+    net.Start("mantislashcoGasPourProgress")
+    net.WriteUInt(TimeToFuel, 8)
+    net.WriteEntity(self.FuelingCan)
+    net.WriteBool(self.IsFueling)
+    net.WriteFloat(self.TimeUntilFueled)
+    net.Send(ply)
 end
 
 function ENT:Touch(otherEnt)
@@ -75,42 +85,16 @@ function ENT:Touch(otherEnt)
     end
 end
 
-function ENT:Use(activator, _, usetype)
+function ENT:Use(activator, _, _)
 
     if SERVER then
 
         if activator:Team() == TEAM_SURVIVOR and IsValid(self.FuelingCan) and activator:GetPos():Distance(self:GetPos()) <= 100 then
-
-            if usetype == USE_ON then
-                --print((self.FuelProgress or "nil").." do e")
-                self.IsFueling = true
-                self.CurrentPourer = activator
-                self.AntiSpam = false
-                self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
-                net.Start("mantislashcoGasPourProgress")
-                net.WriteUInt(TimeToFuel, 8)
-                net.WriteEntity(self.FuelingCan)
-                net.WriteBool(self.IsFueling)
-                net.WriteFloat(self.TimeUntilFueled)
-                net.Send(activator)
-                self:EmitSound("slashco/generator_fill.wav")
-            elseif usetype == USE_OFF then
-                --print((self.FuelProgress or "nil").." done e")
-                if not self.TimeUntilFueled then
-                    self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
-                end
-                self.IsFueling = false
-                self.AntiSpam = false
-                self.FuelProgress = self.TimeUntilFueled - CurTime()
-                net.Start("mantislashcoGasPourProgress")
-                net.WriteUInt(TimeToFuel, 8)
-                net.WriteEntity(self.FuelingCan)
-                net.WriteBool(self.IsFueling)
-                net.WriteFloat(self.TimeUntilFueled)
-                net.Send(activator)
-                self.CurrentPourer = nil
-                self:StopSound("slashco/generator_fill.wav")
-            end
+            self.IsFueling = true
+            self.CurrentPourer = activator
+            self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
+            self:SendData(activator)
+            self:EmitSound("slashco/generator_fill.wav")
 
         end
 
@@ -128,24 +112,15 @@ function ENT:Think()
 
         if IsValid(self.FuelingCan) and self.IsFueling then
 
-            if self.CurrentPourer:GetPos():Distance(self:GetPos()) > 100 then
+            if self.CurrentPourer:GetPos():Distance(self:GetPos()) > 100 or not self.CurrentPourer:KeyDown(IN_USE) then
                 self.IsFueling = false
-                self.AntiSpam = false
                 self.FuelProgress = self.TimeUntilFueled - CurTime()
-                --print((self.FuelProgress or "nil").." distance")
-                net.Start("mantislashcoGasPourProgress")
-                net.WriteUInt(TimeToFuel, 8)
-                net.WriteEntity(self.FuelingCan)
-                net.WriteBool(self.IsFueling)
-                net.WriteFloat(self.TimeUntilFueled)
-                net.Send(self.CurrentPourer)
+                print((self.FuelProgress or "nil").." distance")
+                self:SendData(self.CurrentPourer)
+                self.TimeUntilFueled = nil
                 self.CurrentPourer = nil
                 self:StopSound("slashco/generator_fill.wav")
-            end
-
-            if self.AntiSpam == false then
-                --self:EmitSound("slashco/generator_fill.wav")
-                self.AntiSpam = true
+                return
             end
 
             local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
@@ -154,21 +129,14 @@ function ENT:Think()
 
             if CurTime() >= self.TimeUntilFueled then
                 self.IsFueling = false
-                self.AntiSpam = false
                 self.FuelProgress = nil
                 --print((self.FuelProgress or `nil`).." donefueling")
-                net.Start("mantislashcoGasPourProgress")
-                net.WriteUInt(TimeToFuel, 8)
-                net.WriteEntity(self.FuelingCan)
-                net.WriteBool(self.IsFueling)
-                net.WriteFloat(self.TimeUntilFueled)
-                net.Send(self.CurrentPourer)
+                self:SendData(self.CurrentPourer)
                 self.TimeUntilFueled = nil
                 self.CurrentPourer = nil
                 self:StopSound("slashco/generator_fill.wav")
 
                 self.CansRemaining = (self.CansRemaining or SlashCo.GasCansPerGenerator) - 1
-                self.AntiSpam = false
                 self:StopSound("slashco/generator_fill.wav")
 
                 --//discard gas can//--
