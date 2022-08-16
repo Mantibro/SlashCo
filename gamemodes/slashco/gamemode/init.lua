@@ -176,8 +176,10 @@ concommand.Add( "slashco_add_slasher", function( ply, _, args )
 	ply:Spawn()
 end )
 
-hook.Add( "CanExitVehicle", "PlayerMotion", function( _, _ )
-    return false
+hook.Add( "CanExitVehicle", "PlayerMotion", function( veh, ply )
+	if ply:Team() == TEAM_SURVIVOR then
+		return veh:GetClass() ~= "sc_helicopter"
+	end
 end )
 
 --Initialize global variable to hold functions.

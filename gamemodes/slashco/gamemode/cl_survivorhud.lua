@@ -108,8 +108,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		--draw.SimpleText(#Selectables, "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		if Selectables then
-			for _, p in ipairs(Selectables) do
-				local entity = Entity(p)
+			for k, _ in pairs(Selectables) do
+				local entity = Entity(k)
 				if not IsValid(entity) then continue end
 				local gasPos = entity:GetPos()
 				local realDistance = hitPos:Distance(gasPos)

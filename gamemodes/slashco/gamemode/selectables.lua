@@ -10,20 +10,20 @@ SlashCo.BroadcastSelectables = function()
 end
 
 SlashCo.MakeSelectable = function(index)
-    table.insert(selectables, index)
+    selectables[index] = true
 end
 
 SlashCo.RemoveSelectable = function(index)
-    table.RemoveByValue( selectables, index )
+    selectables[index] = nil
 end
 
 SlashCo.MakeSelectableNow = function(index)
-    table.insert(selectables, index)
+    selectables[index] = true
     SlashCo.BroadcastSelectables()
 end
 
 SlashCo.RemoveSelectableNow = function(index)
-    table.RemoveByValue( selectables, index )
+    selectables[index] = nil
     SlashCo.BroadcastSelectables()
 end
 
