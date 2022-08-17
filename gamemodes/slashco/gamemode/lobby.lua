@@ -495,6 +495,14 @@ function lobbyRoundSetup()
 
 	end
 
+	if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == 4 then
+		SlashCo.LobbyData.Offering = 0
+
+		for i, play in ipairs( player.GetAll() ) do
+				play:ChatPrint("[SlashCo] No Spectators, Duality Offering was cleared.") 
+			end
+	end
+
 	if SlashCo.LobbyData.Offering == 4 then --Duality Slasher
 
 		local dual_random = 0
