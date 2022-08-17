@@ -106,20 +106,18 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		--//item selection crosshair//--
 
-		--draw.SimpleText(#Selectables, "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		if Selectables then
-			for k, _ in pairs(Selectables) do
-				local entity = Entity(k)
-				if not IsValid(entity) then continue end
-				local gasPos = entity:GetPos()
-				local realDistance = hitPos:Distance(gasPos)
-				if realDistance < 100 and not (IsFueling and FuelingCan == entity) then
+			for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
+				if Selectables[v:EntIndex()] and not (IsFueling and FuelingCan == v) then
+					local gasPos = v:GetPos()
 					local trace = util.QuickTrace(hitPos,gasPos-hitPos,ply)
-					if trace.Hit and trace.Entity ~= entity then continue end
-					gasPos = gasPos:ToScreen()
-					local centerDistance = math.Distance(ScrW()/2,ScrH()/2,gasPos.x,gasPos.y)
-					draw.SimpleText("[", "Indicator", gasPos.x-centerDistance/2-12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-					draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					if not trace.Hit or trace.Entity == v then
+						local realDistance = hitPos:Distance(gasPos)
+						gasPos = gasPos:ToScreen()
+						local centerDistance = math.Distance(ScrW()/2,ScrH()/2,gasPos.x,gasPos.y)
+						draw.SimpleText("[", "Indicator", gasPos.x-centerDistance/2-12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+						draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					end
 				end
 			end
 		end
