@@ -57,7 +57,7 @@ function ENT:Use(activator, _, _, _)
 
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
-		if game.GetMap() ~= "sc_lobby" and SlashCo.CurRound.EscapeHelicopterSummoned == false then
+		if game.GetMap() ~= "sc_lobby" and not SlashCo.CurRound.EscapeHelicopterSummoned then
 			return
 		end
 

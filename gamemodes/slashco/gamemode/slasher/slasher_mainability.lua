@@ -1,4 +1,5 @@
 local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 
 SlashCo.SlasherMainAbility = function(slasher)
 
@@ -9,7 +10,7 @@ SlashCo.SlasherMainAbility = function(slasher)
 
     --Bababooey's Invisibility ability \/ \/ \/
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 1 then goto SID end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 1 then goto SID end
 
 do --To Prevent local value jump error
     local cooldown = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1
@@ -45,7 +46,7 @@ do --To Prevent local value jump error
 
             target = slasher:GetEyeTrace().Entity	
 
-            if target:Team() != TEAM_SURVIVOR then goto SKIP end  
+            if target:Team() ~= TEAM_SURVIVOR then goto SKIP end
 
             if slasher:GetPos():Distance(target:GetPos()) < 150 then
   
@@ -86,7 +87,7 @@ end --ends here
     ::SID::
 
     --Sid's Cookie Eating \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2 then goto AMOGUS end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 2 then goto AMOGUS end
 
     if slasher:GetEyeTrace().Entity:GetClass() == "sc_cookie" then
 
@@ -124,7 +125,7 @@ end --ends here
     ::AMOGUS::
 
     --Amogus Human Transform \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 4 then goto THIRSTY end
 
     if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 
@@ -197,7 +198,7 @@ end --ends here
     ::THIRSTY::
 
     --Thirsty's Milk Drinking \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then goto MALE07 end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 5 then goto MALE07 end
 
     if slasher:GetEyeTrace().Entity:GetClass() == "sc_milkjug" then
 
@@ -221,7 +222,7 @@ end --ends here
 
 		    chugjug:SetMoveType( MOVETYPE_NONE )
             chugjug:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
-		    chugjug:SetModel( SlashCo.Items.MILK.Model )
+		    chugjug:SetModel( SlashCoItems.MilkJug.Model )
     	    chugjug:SetPos( pos )
     	    chugjug:SetAngles( ang )
 
@@ -237,7 +238,7 @@ end --ends here
 		        emptyjug:PhysicsInit( SOLID_VPHYSICS )
 		        emptyjug:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
 		        emptyjug:SetMoveType( MOVETYPE_VPHYSICS)
-		        emptyjug:SetModel( SlashCo.Items.MILK.Model )
+		        emptyjug:SetModel( SlashCoItems.MilkJug.Model )
     	        emptyjug:SetPos( pos )
     	        emptyjug:SetAngles( ang )
                 emptyjug:Spawn()
@@ -273,7 +274,7 @@ end --ends here
 
     ::MALE07::
     --Male07's State Switch \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 6 then goto TYLER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 6 then goto TYLER end
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then return end
 
@@ -345,7 +346,7 @@ end --ends here
 
     ::TYLER::
     --Tyler's State Switch \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto MANSPIDER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 7 then goto MANSPIDER end
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 0 then
 
@@ -371,9 +372,9 @@ end --ends here
     --Borgmire has no main ability
 
     ::MANSPIDER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 9 then goto WATCHER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 9 then goto WATCHER end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != "" then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 ~= "" then return end
 
     if not slasher:GetNWBool("ManspiderNested") then
 

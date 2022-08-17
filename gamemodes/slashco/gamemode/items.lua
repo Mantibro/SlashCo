@@ -8,7 +8,7 @@ SlashCo.GetHeldItem = function(ply)
 		return "none"
 	end
 
-	return SlashCo.CurRound.SurvivorData.Items[id].itemid
+	return SlashCo.CurRound.SurvivorData.Items[id]
 end
 
 SlashCo.UseItem = function(ply)
@@ -72,16 +72,8 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 
 		local plyid = ply:SteamID64()
 
-		if not SlashCo.CurRound.SurvivorData.Items[plyid] then
-			if ply:Team() == TEAM_SURVIVOR then
-				SlashCo.CurRound.SurvivorData.Items[plyid] = {}
-			else
-				return
-			end
-		end
-
 		if SlashCoItems[id] then
-			SlashCo.CurRound.SurvivorData.Items[plyid].itemid = id
+			SlashCo.CurRound.SurvivorData.Items[plyid] = id
 
 			if (SlashCoItems[id].OnPickUp) and game.GetMap() ~= "sc_lobby" then
 				SlashCoItems[id].OnPickUp(ply)
@@ -91,7 +83,7 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
 			end
 		elseif id == "none" then
-			SlashCo.CurRound.SurvivorData.Items[plyid].itemid = id
+			SlashCo.CurRound.SurvivorData.Items[plyid] = id
 		end
 
 		SlashCo.BroadcastItemData()

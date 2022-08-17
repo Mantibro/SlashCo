@@ -159,7 +159,7 @@ SlashCo.PlayerItemStashRequest = function(id)
     end
 
     net.Start("mantislashcoStartItemPicking")
-	net.WriteTable({ply = id, wardsleft = SlashCo.LobbyData.DeathwardsLeft})
+	net.WriteTable({ply = id, wardsleft = 0})
 	net.Broadcast()
 
 end
@@ -181,14 +181,12 @@ SlashCo.RoundOverScreen = function(state)
 
 	local heli = table.Random(ents.FindByClass("sc_helicopter"))
 
-	if not IsValid(heli) then goto skipsound end
-
-	heli:StopSound("slashco/helicopter_engine_distant.wav")
-	heli:StopSound("slashco/helicopter_rotors_distant.wav")
-	heli:StopSound("slashco/helicopter_engine_close.wav")
-	heli:StopSound("slashco/helicopter_rotors_close.wav")
-
-	::skipsound::
+	if IsValid(heli) then
+		heli:StopSound("slashco/helicopter_engine_distant.wav")
+		heli:StopSound("slashco/helicopter_rotors_distant.wav")
+		heli:StopSound("slashco/helicopter_engine_close.wav")
+		heli:StopSound("slashco/helicopter_rotors_close.wav")
+	end
 
     net.Start("mantislashcoRoundEnd")
 

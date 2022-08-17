@@ -93,7 +93,6 @@ concommand.Add( "slashco_add_survivor", function( ply, _, args )
 	end
 
 	table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = theman, GameContribution = 0})
-    table.insert(SlashCo.CurRound.SurvivorData.Items, {steamid = theman, itemid = 0})  
 
 	::FOUND::
 
@@ -544,28 +543,6 @@ local Think = function()
 				end
 			end
 		end
-		
-		--Assign everyone to the data table.
-		if not setupPlayerData then
-			--local plys = player.GetAll()
-			for i=1, #plys do
-				if IsValid(plys[i]) and plys[i]:Team() == TEAM_SURVIVOR then
-					table.insert(SlashCo.CurRound.AlivePlayers, plys[i])
-				elseif IsValid(plys[i]) and plys[i]:Team() == TEAM_SLASHER then
-					table.insert(SlashCo.CurRound.Slashers, plys[i])
-				end
-			end
-			setupPlayerData = true
-		end
-
-		--If a survivor is dead move em over to the dead players list.
-		--local plys = player.GetAll()
-		for i=1, #plys do
-			if IsValid(plys[i]) and plys[i]:Team() == TEAM_SPECTATOR and table.HasValue(SlashCo.CurRound.AlivePlayers, plys[i]) then
-				table.insert(SlashCo.CurRound.DeadPlayers, plys[i])
-				table.RemoveByValue(SlashCo.CurRound.AlivePlayers, plys[i])
-			end
-		end
 
 		local gens = ents.FindByClass( "sc_generator")
 		if SlashCo.CurRound and GAMEMODE.State == GAMEMODE.States.IN_GAME and #gens > 0 then
@@ -588,7 +565,7 @@ local Think = function()
 					totalCansRemaining = totalCansRemaining + (v.CansRemaining or SlashCo.GasCansPerGenerator)
 				end
 
-				if #SlashCo.CurRound.GasCans < (totalCansRemaining + 1) then return end --Prevent draining if there is too few gas cans
+				if table.Count(SlashCo.CurRound.GasCans) <= totalCansRemaining then return end --Prevent draining if there is too few gas cans
 
 				if engine.TickCount()%math.floor(240/engine.TickInterval()) == 0 then
 					local random = math.random(#gens)
@@ -599,20 +576,18 @@ local Think = function()
 
 			--//helicopters//--
 
-			if allRunning and SlashCo.CurRound.SummonHelicopter == false then
-				SlashCo.CurRound.SummonHelicopter = true
+			if allRunning and not SlashCo.CurRound.EscapeHelicopterSummoned then
 
 				--(SPAWN HELICOPTER)
 
-				SlashCo.SummonEscapeHelicopter()	
+				local failed = SlashCo.SummonEscapeHelicopter()
 				
-				SlashCo.CurRound.DistressBeaconUsed = false
+				if not failed then SlashCo.CurRound.DistressBeaconUsed = false end
 
 			end
 
-			SlashCo.CurRound.SurvivorCount = #(team.GetPlayers(TEAM_SURVIVOR))
 			--Go back to lobby if everyone dies.
-			if SlashCo.CurRound.SurvivorCount == 0 and SlashCo.CurRound.roundOverToggle then
+			if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
 				SlashCo.EndRound()
 

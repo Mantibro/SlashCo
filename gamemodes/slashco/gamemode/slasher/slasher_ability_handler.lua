@@ -11,8 +11,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
     --The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (1 - 10)
     local totalProgress = 0
     for _, v in ipairs(gens) do
-        totalProgress = totalProgress + (SlashCo.GasCansPerGenerator - (v.CansRemaining or SlashCo.GasCansPerGenerator))
-        if v.HasBattery then totalProgress = totalProgress + 1 end
+        totalProgress = totalProgress + (SlashCo.GasCansPerGenerator - (v.CansRemaining or SlashCo.GasCansPerGenerator)) + ((v.HasBattery and 1) or 0)
     end
     if SlashCo.CurRound.SlasherData.GameProgress > -1 then
         SlashCo.CurRound.SlasherData.GameProgress = totalProgress
@@ -46,12 +45,12 @@ do
         local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCo.CurRound.SlasherData[slasherid].ChaseRadius + inv )
         local find_p = NULL
 
-        for i = 1, #find do
+        for p = 1, #find do
 
-            if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
+            if find[p]:IsPlayer() and find[p]:Team() == TEAM_SURVIVOR then
 
                 SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
-                find_p = find[i]
+                find_p = find[p]
 
             end
 
@@ -78,8 +77,8 @@ do
         end
 
         if not slasher:GetNWBool("InSlasherChaseMode") then
-            for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-                local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+            for p = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+                local ply = team.GetPlayers(TEAM_SURVIVOR)[p]
                 if ply:GetNWBool("SurvivorChased") then ply:SetNWBool("SurvivorChased",false) end
             end
         end
@@ -94,7 +93,7 @@ end
 
 
         --Bababooey's Abilites
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 1 then goto SID end
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 1 then goto SID end
     do
         v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Cooldown for being able to trigger
         v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Cooldown for being able to kill
@@ -122,7 +121,7 @@ end
     end
         ::SID::
         --Sid's Abilities
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2 then goto TROLLGE end
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 2 then goto TROLLGE end
     do
         v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Cookies Eaten
         v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Pacification
@@ -215,7 +214,7 @@ end
     end
         ::TROLLGE::
         --Trollge's Abilities
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 3 then goto AMOGUS end
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 3 then goto AMOGUS end
     do
         v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Stage
         v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Claw cooldown
@@ -236,8 +235,8 @@ end
             slasher:StopSound("slashco/slasher/trollge_breathing.wav")
             PlayGlobalSound("slashco/slasher/trollge_transition.mp3",125,slasher)
 
-            for i = 1, #player.GetAll() do
-                local ply = player.GetAll()[i]
+            for p = 1, #player.GetAll() do
+                local ply = player.GetAll()[p]
                 ply:SetNWBool("DisplayTrollgeTransition",true)
             end
 
@@ -304,7 +303,7 @@ end
 
     ::AMOGUS::
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto THIRSTY end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 4 then goto THIRSTY end
     --Amogus' Abilities
 do
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Transformation type
@@ -333,7 +332,7 @@ do
     
 end
     ::THIRSTY::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then goto MALE07 end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 5 then goto MALE07 end
     --Thirsty's Abilities
 do
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Milk drank
@@ -386,7 +385,7 @@ do
 
 end
     ::MALE07::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 6 then goto TYLER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 6 then goto TYLER end
     --Male_07's Abilities
 do
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --State
@@ -485,7 +484,7 @@ do
 
 end
     ::TYLER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then goto BORGMIRE end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 7 then goto BORGMIRE end
     --Tyler's Abilities
 do
 
@@ -563,7 +562,7 @@ do
 
         end
 
-        if slasher:GetNWBool("TylerCreating") and SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 != 1.8 then
+        if slasher:GetNWBool("TylerCreating") and SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 ~= 1.8 then
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = 1.8
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
@@ -704,7 +703,7 @@ do
 
 end
     ::BORGMIRE::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto MANSPIDER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 8 then goto MANSPIDER end
 do
 
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Time Spent chasing
@@ -762,7 +761,7 @@ do
 
 end
     ::MANSPIDER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 9 then goto WATCHER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 9 then goto WATCHER end
 do
 
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Target SteamID
@@ -784,7 +783,7 @@ do
         SlashCo.CurRound.SlasherData[slasherid].CanChase = true
         SlashCo.CurRound.SlasherData[slasherid].CanKill = true
 
-        if not IsValid(  player.GetBySteamID64( v1 ) ) or player.GetBySteamID64( v1 ):Team() != TEAM_SURVIVOR then SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = "" end
+        if not IsValid(  player.GetBySteamID64( v1 ) ) or player.GetBySteamID64( v1 ):Team() ~= TEAM_SURVIVOR then SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = "" end
 
     end
 
@@ -804,7 +803,7 @@ do
 
             if tr.Entity == s then
 
-                if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != s:SteamID64() then 
+                if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 ~= s:SteamID64() then
 
                     SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = s:SteamID64()
                     slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
@@ -897,7 +896,7 @@ do
 end
 
     ::WATCHER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 10 then goto ABOMIGNAT end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 10 then goto ABOMIGNAT end
 do
 
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Survey Length
@@ -966,7 +965,7 @@ do
                     filter = surv
                 } )
 
-                if tr.Entity != target then return end
+                if tr.Entity ~= target then return end
             end
             ::FOUND::
 
@@ -1000,7 +999,7 @@ SlashCo.ThirstyRage = function(ply)
         local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
         local slasher = team.GetPlayers(TEAM_SLASHER)[i]
 
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 5 then return end
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 5 then return end
 
         if slasher:GetPos():Distance( pos ) > 1600 then return end
 
@@ -1034,7 +1033,7 @@ SlashCo.SidRage = function(ply)
         local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
         local slasher = team.GetPlayers(TEAM_SLASHER)[i]
 
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2 then return end
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 2 then return end
 
         if slasher:GetPos():Distance( pos ) > 1800 then return end
 

@@ -84,19 +84,6 @@ end
 
 SlashCo.MAXPLAYERS = 5
 
-SlashCo.Items = {
-    MILK = {Model = "models/props_junk/garbage_milkcarton001a.mdl", Material = ""},
-    COOKIE = {Model = "models/slashco/items/cookie.mdl", Material = ""},
-    BABY = {Model = "models/props_c17/doll01.mdl", Material = ""},
-    STEP_DECOY = {Model = "models/props_junk/Shoe001a.mdl", Material = ""},
-    GAS_CAN = {Model = SlashCo.GasCanModel, Material = ""},
-    DEATHWARD = {Model = "models/slashco/items/deathward.mdl", Material = ""},
-    DISTRESS_BEACON = {Model = "models/props_c17/light_cagelight01_on.mdl", Material = ""},
-    MAYO = {Model = "models/props_lab/jar01a.mdl", Material = ""},
-    DEVILS_GAMBLE = {Model = "models/slashco/items/devildie.mdl", Material = ""},
-    SODA = {Model = "models/props_junk/PopCan01a.mdl", Material = ""}
-}
-
 SlashCo.SlasherData = {     --Information about Slashers.
 
     --[[
@@ -363,7 +350,7 @@ SlashCo.LobbyData = {
     },
     SelectedMapNum = 0,
     FinalSlasherID = 0,
-    DeathwardsLeft = 0
+    --DeathwardsLeft = 0 --not used
 
 }
 
@@ -372,8 +359,8 @@ SlashCo.ResetCurRoundData = function()
     SlashCo.CurRound = {
         Difficulty = SlashCo.Difficulty.EASY,
         ExpectedPlayers = {},
-        ExpectedPlayersLoaded = false,
-        ConnectedPlayers = {},
+        --ExpectedPlayersLoaded = false, --not used
+        --ConnectedPlayers = {}, --not used
         AntiLoopSpawn = false,
         OfferingData = {
             CurrentOffering = 0,
@@ -403,30 +390,29 @@ SlashCo.ResetCurRoundData = function()
         Batteries = {},
         Items = {},
         Helicopter = 0,
-        AlivePlayers = {},
-        DeadPlayers = {},
-        SkipSlasherSpawnTimer = false,
+        --AlivePlayers = {}, --not used
+        --DeadPlayers = {}, --not used
+        --SkipSlasherSpawnTimer = false, --not used
         SlashersToBeSpawned = {},
-        Slashers = {},
-        Spectators = {},
-        SurvivorCount = 0,
-        GeneratorCount = 2,
+        --Slashers = {}, --not used
+        --Spectators = {}, --not used
+        --SurvivorCount = 0, --not used
+        GeneratorCount = 2, --may not need to be here (Def 2)
         GasCanCount = 8,
         ItemCount = 6,
-        roundOverToggle = false,
-        SlasherSpawned = false,
-        SummonHelicopter = false,
-        EscapeHelicopterLanded = false,
+        roundOverToggle = false, --weird
+        --SlasherSpawned = false, --not used
+        --SummonHelicopter = false, --not used
+        --EscapeHelicopterLanded = false, --not used
         HelicopterSpawnPosition = Vector(0,0,0),
         HelicopterInitialSpawnPosition = Vector(0,0,0),
         HelicopterTargetPosition = Vector(0,0,0),
-        HelicopterRescuedPlayers = {},
-        AllowRoundEndSequence = false,
+        HelicopterRescuedPlayers = {}, --need opt
+        --AllowRoundEndSequence = false, --not used
         EscapeHelicopterSummoned = false,
-        EscapeHelicopterSpawned = false,
+        --EscapeHelicopterSpawned = false, --not used
         DistressBeaconUsed = false,
-        IsRadioTalkEnabled = false,
-        DiscardedCans = {} --Used specifically to prevent used cans from being carried again
+        --IsRadioTalkEnabled = false, --not used
     }
 end
 SlashCo.ResetCurRoundData()
@@ -482,17 +468,13 @@ if SERVER then
                     table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors, GameContribution = 0})
                 --Items
                 local steamid = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors
-                SlashCo.CurRound.SurvivorData.Items[steamid] = {}
-                SlashCo.CurRound.SurvivorData.Items[steamid].itemid = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Item
-                --table.insert(SlashCo.CurRound.SurvivorData.Items, {steamid = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors, itemid = tonumber(sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Item) })
+                SlashCo.CurRound.SurvivorData.Items[steamid] = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Item
             end
 
         end
 
         print("[SlashCo] First 2 Expected Players assigned: "..SlashCo.CurRound.ExpectedPlayers[1].steamid..SlashCo.CurRound.ExpectedPlayers[2].steamid)
         print("[SlashCo] Expected Player table size: "..#SlashCo.CurRound.ExpectedPlayers)
-
-        SlashCo.CurRound.ExpectedPlayersLoaded = true
 
         for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
 
@@ -643,14 +625,14 @@ SlashCo.LoadCurRoundTeams = function()
                         playercur:SetTeam(TEAM_SPECTATOR)
                         playercur:Spawn()
 
-                        table.insert(SlashCo.CurRound.SlashersToBeSpawned, { ID = id })
+
+
+                        table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
 
                     end
                 end
 
             end
-
-            SlashCo.CurRound.SurvivorCount = #survivors
 
             --local id1 = slashers[1].Slashers
             local id2 = 0
@@ -921,7 +903,7 @@ SlashCo.CreateGasCan = function(pos, ang)
     Ent:Spawn()
 
     local id = Ent:EntIndex()
-    table.insert(SlashCo.CurRound.GasCans, id)
+    SlashCo.CurRound.GasCans[id] = true
     SlashCo.MakeSelectable(id)
 
     return id
@@ -975,8 +957,6 @@ SlashCo.CreateItem = function(class, pos, ang)
                 PostActivation = false
             }
         end
-    else
-        SlashCo.MakeSelectable(id)
     end
 
     return id
@@ -999,7 +979,7 @@ SlashCo.CreateBattery = function(pos, ang)
     Ent:Spawn()
 
     local id = Ent:EntIndex()
-    table.insert(SlashCo.CurRound.Batteries, id)
+    SlashCo.CurRound.Batteries[id] = true
     SlashCo.MakeSelectable(id)
 
     return id
@@ -1047,7 +1027,9 @@ SlashCo.CreateItems = function(spawnpoints, item)
         --Occupied spawn
         --table.RemoveByValue( SlashCo.CurConfig.Items.Spawnpoints, spawnpoints[I] )
 
-        SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
+        local id = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
+        SlashCo.CurRound.Items[id] = true
+        SlashCo.MakeSelectable(id)
     end
 end
 
@@ -1133,25 +1115,24 @@ SlashCo.RemoveAllCurRoundEnts = function()
 
     local gens = ents.FindByClass( "sc_generator")
     for _, v in ipairs(gens) do
+        local ent = Entity(v.FuelingCan) --make sure any attached cans go too
+        if IsValid(ent) then ent:Remove() end
         v:Remove()
     end
 
-    for I=1, #(SlashCo.CurRound.GasCans) do
-        if IsValid(Entity(SlashCo.CurRound.GasCans[I])) then
-            Entity(SlashCo.CurRound.GasCans[I]):Remove()
-        end
+    for k, _ in pairs(SlashCo.CurRound.GasCans) do
+        local ent = Entity(k)
+        if IsValid(ent) then ent:Remove() end
     end
 
-    for I=1, #(SlashCo.CurRound.Items) do
-        if IsValid(Entity(SlashCo.CurRound.Items[I])) then
-            Entity(SlashCo.CurRound.Items[I]):Remove()
-        end
+    for k, _ in pairs(SlashCo.CurRound.Items) do
+        local ent = Entity(k)
+        if IsValid(ent) then ent:Remove() end
     end
 
-    for I=1, #(SlashCo.CurRound.Batteries) do
-        if IsValid(Entity(SlashCo.CurRound.Batteries[I])) then
-            Entity(SlashCo.CurRound.Batteries[I]):Remove()
-        end
+    for k, _ in pairs(SlashCo.CurRound.Batteries) do
+        local ent = Entity(k)
+        if IsValid(ent) then ent:Remove() end
     end
 
     for I=1, #(SlashCo.CurRound.ExposureSpawns) do
@@ -1167,11 +1148,12 @@ SlashCo.EndRound = function()
     local delay = 20
 
     local survivorsWon = true
-    if SlashCo.CurRound.SurvivorCount == 0 then --All Survivors are Dead
+    local SurvivorCount = #team.GetPlayers(TEAM_SURVIVOR)
+    if SurvivorCount == 0 then --All Survivors are Dead
 
         survivorsWon = false
 
-        if not SlashCo.CurRound.SummonHelicopter then --Assignment Failed
+        if not SlashCo.CurRound.EscapeHelicopterSummoned or SlashCo.CurRound.DistressBeaconUsed then --Assignment Failed
 
             SlashCo.RoundOverScreen(3)
 
@@ -1198,7 +1180,7 @@ SlashCo.EndRound = function()
 
         else --Normal Win
 
-            if #SlashCo.CurRound.SlasherData.AllSurvivors == #team.GetPlayers(TEAM_SURVIVOR) then --Everyone lived
+            if #SlashCo.CurRound.SlasherData.AllSurvivors >= SurvivorCount then --Everyone lived
 
                 SlashCo.RoundOverScreen(0)
 
@@ -1338,30 +1320,27 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         local itemSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.ItemCount, #possibleItemSpawnpoints)
 
-        local item_class = ""
+        --local item_class = ""
 
         --Decide if what and if items should be spawned according to the selected slasher
-        for s = 1, #SlashCo.CurRound.SlashersToBeSpawned do
+        for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 
-            local plyid = SlashCo.CurRound.SlashersToBeSpawned[s].ID
+            local slashid = SlashCo.CurRound.SlasherData[p:SteamID64()].SlasherID
 
-            local slashid = SlashCo.CurRound.SlasherData[plyid].SlasherID
-
+            local itemClass
             if slashid == 2 then
-                item_class = "sc_cookie"
+                itemClass = "sc_cookie"
             elseif slashid == 5 then
-                item_class = "sc_milkjug"
-            else
-                item_class = ""
+                itemClass = "sc_milkjug"
             end
 
-            if item_class ~= "" then SlashCo.CreateItems(itemSpawns, item_class) print("[SlashCo] Spawning Items.") end
+            if itemClass then SlashCo.CreateItems(itemSpawns, itemClass) print("[SlashCo] Spawning Items.") end
 
             if slashid == 6 then
 
                 local diff = SlashCo.CurRound.Difficulty
 
-                for count = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
+                for _ = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
 
                     SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0,0,0))
 
@@ -1369,7 +1348,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             end
 
-            slashergasmod = slashergasmod + SlashCo.CurRound.SlasherData[plyid].GasCanMod
+            slashergasmod = slashergasmod + SlashCo.CurRound.SlasherData[p:SteamID64()].GasCanMod
 
         end
 
@@ -1394,7 +1373,9 @@ SlashCo.SpawnCurConfig = function(isDebug)
         local r = math.random(1, #possibleItemSpawnpoints)
         local pickedpoint = possibleItemSpawnpoints[r]
 
-        SlashCo.CreateItem("sc_beacon", Vector(pickedpoint.pos[1],pickedpoint.pos[2],pickedpoint.pos[3]), Angle(pickedpoint.ang[1],pickedpoint.ang[2],pickedpoint.ang[3])) --Spawn one distress beacon
+        local id = SlashCo.CreateItem("sc_beacon", Vector(pickedpoint.pos[1],pickedpoint.pos[2],pickedpoint.pos[3]), Angle(pickedpoint.ang[1],pickedpoint.ang[2],pickedpoint.ang[3])) --Spawn one distress beacon
+        SlashCo.CurRound.Items[id] = true
+        SlashCo.MakeSelectable(id)
 
         SlashCo.BroadcastItemData()
 
@@ -1483,7 +1464,7 @@ end
 
 SlashCo.SummonEscapeHelicopter = function()
 
-    if SlashCo.CurRound.EscapeHelicopterSummoned then return end
+    if SlashCo.CurRound.EscapeHelicopterSummoned then return true end
 
     SlashCo.CurRound.EscapeHelicopterSummoned = true
 
@@ -1503,30 +1484,18 @@ SlashCo.SummonEscapeHelicopter = function()
 
     timer.Simple(delay, function()
 
-		SlashCo.CreateEscapeHelicopter()
+        SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
+
+        timer.Simple(0.1, function()
+
+            SlashCo.HelicopterGoAboveLand(entID)
+
+        end)
+
+        net.Start("mantislashcoHelicopterMusic")
+        net.Broadcast()
 
     end)
-
-end
-
-SlashCo.CreateEscapeHelicopter = function()
-
-    if SlashCo.CurRound.EscapeHelicopterSpawned == true then return end
-
-    local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
-
-    SlashCo.CurRound.EscapeHelicopterSpawned = true
-
-    SlashCo.CurRound.Helicopter = entID
-
-    timer.Simple(0.1, function()
-
-        SlashCo.HelicopterGoAboveLand(entID)
-
-    end)
-
-    net.Start("mantislashcoHelicopterMusic")
-	net.Broadcast()
 
 end
 

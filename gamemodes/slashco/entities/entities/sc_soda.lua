@@ -14,7 +14,7 @@ ENT.Instructions	= ""
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel( SlashCoItems.Soda.Model ) --SlashCo.Items.SODA.Model
+		self:SetModel( SlashCoItems.Soda.Model )
 		self:SetSolid( SOLID_VPHYSICS )
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetUseType( SIMPLE_USE )

@@ -31,7 +31,7 @@ net.Receive("mantislashcoGiveItemData", function()
 	t = net.ReadTable()
 
 	if (t[LocalPlayer():SteamID64()]) then
-		HeldItem = t[LocalPlayer():SteamID64()].itemid
+		HeldItem = t[LocalPlayer():SteamID64()]
 	end
 
 end)

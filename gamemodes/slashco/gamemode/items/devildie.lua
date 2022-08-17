@@ -123,4 +123,6 @@ end
 SlashCoItems.DevilDie.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+    SlashCo.CurRound.Items[droppeditem] = true
+    SlashCo.MakeSelectable(droppeditem)
 end

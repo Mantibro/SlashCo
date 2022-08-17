@@ -317,8 +317,6 @@ function lobbyChooseItem(plyid, id)
 	--Change the survivor's chosen item.
 
 	SlashCo.ChangeSurvivorItem(player.GetBySteamID64(plyid), id)
-	--SlashCo.CurRound.SurvivorData.Items[plyid] = {}
-	--SlashCo.CurRound.SurvivorData.Items[plyid].itid = id
 
 	if SlashCoItems[id].OnBuy then
 		SlashCoItems[id].OnBuy()
@@ -357,8 +355,6 @@ function lobbyRoundSetup()
 	if SERVER then
 
 	SlashCo.BroadcastGlobalData()
-
-	SlashCo.CurRound.ConnectedPlayers = SlashCo.LobbyData.Players
 
 	for _, play in ipairs( player.GetAll() ) do
 		local pid = play:SteamID64()
@@ -400,9 +396,7 @@ function lobbyRoundSetup()
 
 	end
 
-	SlashCo.LobbyData.DeathwardsLeft = 2 - SlashCo.LobbyData.SelectedDifficulty
-
-	if SlashCo.LobbyData.DeathwardsLeft < 0 then SlashCo.LobbyData.DeathwardsLeft = 0 end
+	--SlashCo.LobbyData.DeathwardsLeft = 2 - SlashCo.LobbyData.SelectedDifficulty
 
 	for i = 1, #SlashCo.LobbyData.Players do --Setup for assigning that players' in-game teams
 
@@ -519,9 +513,6 @@ function lobbyRoundSetup()
 			ply:SetTeam(TEAM_SURVIVOR)
 			ply:Spawn()
 
-			--Fill the Items table
-			table.insert(SlashCo.CurRound.SurvivorData.Items, {steamid = ply:SteamID64(), itemid = "none"})
-
 			print("Survivor "..i.." selection successful, the Survivor is: "..ply:GetName())
 	
 		end
@@ -611,7 +602,11 @@ net.Receive("mantislashcoPickItem", function()
 
 	if SlashCoItems[t.id].MaxAllowed then
 		local numAllowed = SlashCoItems[t.id].MaxAllowed()
-		if #table.KeysFromValue(SlashCo.CurRound.SurvivorData.Items, {itid = t.id}) >= numAllowed then
+		local itemCount = 0
+		for _, v in pairs(SlashCo.CurRound.SurvivorData.Items) do
+			if v == t.id then itemCount = itemCount + 1 end
+		end
+		if itemCount >= numAllowed then
 			ply:ChatPrint("Too many players already have this item.")
 			return
 		end
@@ -845,15 +840,15 @@ function lobbySaveCurData()
 			for i = 1, #team.GetPlayers(TEAM_SPECTATOR) do
 				--Save the Current Spectators to the database
 
-				if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[1].steamid then
+--[[				if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[1].steamid then
 
 					if SlashCo.LobbyData.AssignedSlashers[2] ~= nil and team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[2].steamid then
 
 						--They're just a regular Spectator
 
-					end
+					end]]
 
-				else
+				if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
 
 					--If the Spectator is the Slasher, save them as the Slasher
 					table.insert(slashers, { steamid = team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() })
@@ -877,12 +872,10 @@ function lobbySaveCurData()
 		--Major data dump SOON: Duality
 		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", " .. slasher1id .. ", " .. slasher2id .. ", " .. survivorgasmod .. " );")
 
-		--i = 1, #SlashCo.CurRound.SurvivorData.Items
 		for k, p in pairs(SlashCo.CurRound.SurvivorData.Items) do
 			--Save the Current Survivors to the database
 
-			sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. k .. ", " .. sql.SQLStr(p.itemid) .. " );")
-			--sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( "..SlashCo.CurRound.SurvivorData.Items[i].steamid..", "..SlashCo.CurRound.SurvivorData.Items[i].itemid.." );")
+			sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. k .. ", " .. sql.SQLStr(p) .. " );")
 
 		end
 

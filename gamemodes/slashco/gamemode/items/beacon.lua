@@ -26,14 +26,15 @@ SlashCoItems.Beacon.OnUse = function(ply)
 
     if runningCount >= 1 then
 
-        if SlashCo.CurRound.DistressBeaconUsed == false then
+        if not SlashCo.CurRound.DistressBeaconUsed then
 
-            SlashCo.SummonEscapeHelicopter()
+            local failed = SlashCo.SummonEscapeHelicopter()
 
-            SlashCo.CurRound.DistressBeaconUsed = true
+            if not failed then
+                SlashCo.CurRound.DistressBeaconUsed = true
 
-            SlashCo.CreateItem("sc_activebeacon",ply:GetPos(),Angle(0,0,0))
-
+                SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
+            end
 
         end
 
@@ -45,4 +46,6 @@ end
 SlashCoItems.Beacon.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_beacon", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 750)
+    SlashCo.CurRound.Items[droppeditem] = true
+    SlashCo.MakeSelectable(droppeditem)
 end

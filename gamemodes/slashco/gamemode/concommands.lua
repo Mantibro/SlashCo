@@ -42,7 +42,7 @@ concommand.Add( "slashco_debug_run_survivor", function( ply, _, _ )
         k:Spawn()
         print(k:Name() .. " now Survivor")
     end
-    SlashCo.CurRound.SurvivorCount = player.GetAll()
+
     timer.Simple(0.05, function()
 
         print("[SlashCo] Now proceeding with Spawns...")

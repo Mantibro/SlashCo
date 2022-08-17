@@ -16,7 +16,7 @@ local rotate = 0
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel(SlashCoItems.Beacon.Model) --SlashCo.Items.DISTRESS_BEACON.Model
+		self:SetModel(SlashCoItems.Beacon.Model)
 		self:SetSolid( SOLID_VPHYSICS )
 		self:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
 		self:SetAngles(Angle(180,0,0))

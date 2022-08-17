@@ -36,10 +36,11 @@ end
 
 function ENT:Touch(otherEnt)
     if SERVER then
-        if not self.FuelingCan and otherEnt:GetModel() == SlashCo.GasCanModel and otherEnt:IsPlayerHolding() and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+        local index = otherEnt:EntIndex()
+        if not self.FuelingCan and SlashCo.CurRound.GasCans[index] and otherEnt:IsPlayerHolding() and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
             --print("Gas Touch")
 
-            table.RemoveByValue(SlashCo.CurRound.GasCans, otherEnt:EntIndex())
+            SlashCo.CurRound.GasCans[index] = nil
 
             DropEntityIfHeld(otherEnt)
             otherEnt:SetMoveType(MOVETYPE_NONE)
@@ -50,10 +51,8 @@ function ENT:Touch(otherEnt)
 
             self.FuelingCan = otherEnt
 
-            SlashCo.CancelSlasherSpawnDelay()
-        end
-
-        if not self.HasBattery and otherEnt:GetModel() == SlashCo.BatteryModel and otherEnt:IsPlayerHolding() and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
+            SlashCo.SpawnSlasher()
+        elseif not self.HasBattery and SlashCo.CurRound.Batteries[index] and otherEnt:IsPlayerHolding() and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
             --print("Battery Touch")
             self.HasBattery = true
             DropEntityIfHeld(otherEnt)
@@ -64,9 +63,9 @@ function ENT:Touch(otherEnt)
             otherEnt:SetParent(self)
             otherEnt:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
             otherEnt:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
-            SlashCo.RemoveSelectableNow(otherEnt:EntIndex())
+            SlashCo.RemoveSelectableNow(index)
 
-            SlashCo.CancelSlasherSpawnDelay()
+            SlashCo.SpawnSlasher()
         end
 
         if (self.CansRemaining or SlashCo.GasCansPerGenerator) <= 0 and self.HasBattery and not self.IsRunning then
@@ -115,7 +114,7 @@ function ENT:Think()
             if self.CurrentPourer:GetPos():Distance(self:GetPos()) > 100 or not self.CurrentPourer:KeyDown(IN_USE) then
                 self.IsFueling = false
                 self.FuelProgress = self.TimeUntilFueled - CurTime()
-                print((self.FuelProgress or "nil").." distance")
+                --print((self.FuelProgress or "nil").." distance")
                 self:SendData(self.CurrentPourer)
                 self.TimeUntilFueled = nil
                 self.CurrentPourer = nil
@@ -148,8 +147,6 @@ function ENT:Think()
 
                 SlashCo.RemoveSelectableNow(self.FuelingCan:EntIndex())
 
-                SlashCo.CurRound.DiscardedCans[self.FuelingCan:EntIndex()] = true
-
                 local FuelingCanPhysics = self.FuelingCan:GetPhysicsObject()
                 FuelingCanPhysics:SetVelocity(Vector(math.random(-200, 200), math.random(-200, 200), 200))
 
@@ -159,7 +156,6 @@ function ENT:Think()
 
                 local CanToRemove = self.FuelingCan
                 timer.Simple(5, function()
-                    SlashCo.CurRound.DiscardedCans[CanToRemove:EntIndex()] = nil
                     CanToRemove:Remove()
                 end)
 

@@ -14,7 +14,7 @@ ENT.Instructions	= ""
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel( SlashCoItems.DevilDie.Model ) --SlashCo.Items.DEVILS_GAMBLE.Model
+		self:SetModel( SlashCoItems.DevilDie.Model )
 		self:SetSolid( SOLID_VPHYSICS )
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetUseType( SIMPLE_USE )

@@ -11,10 +11,14 @@ SlashCoItems.StepDecoy.OnUse = function(ply)
     --Active Step Decoy
 
     local decoy = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld( Vector(10 , 0, 5) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
-
     Entity( decoy ):SetNWBool("StepDecoyActive", true)
+    SlashCo.CurRound.Items[decoy] = true
+    SlashCo.MakeSelectable(decoy)
 end
 SlashCoItems.StepDecoy.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+    Entity(droppeditem):DropToFloor()
+    --Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+    SlashCo.CurRound.Items[droppeditem] = true
+    SlashCo.MakeSelectable(droppeditem)
 end

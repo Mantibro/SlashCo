@@ -1,3 +1,4 @@
+--[[
 AddCSLuaFile()
 
 local SlashCo = SlashCo
@@ -176,17 +177,17 @@ function ENT:Think()
 
 end
 
---[[function ENT:Use( activator )
+function ENT:Use( activator )
 
 	if SERVER then
 
 
 	end
 
-end]]
+end
 
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_ALWAYS 
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
 end
 
 if CLIENT then
@@ -194,3 +195,4 @@ if CLIENT then
 		self:DrawModel()
 	end
 end
+--]]
