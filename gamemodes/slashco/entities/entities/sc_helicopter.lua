@@ -13,8 +13,8 @@ ENT.Purpose			= "Transport of SlashCo workers."
 ENT.Instructions	= ""
 ENT.AutomaticFrameAdvance = true 
 
-local plyCount = 0
-local switch = false
+--local plyCount = 0
+--local switch = false
 
 function ENT:Initialize()
 	if SERVER then
@@ -46,7 +46,8 @@ function ENT:Initialize()
 
 end
 
-function ENT:Use( activator, caller, useType, value )
+function ENT:Use(activator, _, _, _)
+	--activator, caller, useType, value
 
 	if SERVER then
 
@@ -56,113 +57,119 @@ function ENT:Use( activator, caller, useType, value )
 
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
-		if game.GetMap() != "sc_lobby" and SlashCo.CurRound.EscapeHelicopterSummoned == false then return end
+		if game.GetMap() ~= "sc_lobby" and not SlashCo.CurRound.EscapeHelicopterSummoned then
+			return
+		end
 
-		if SatPlayers[4] == nil then availabilityHeli = true end
+		if SatPlayers[4] == nil then
+			availabilityHeli = true
+		end
 
-		if activator:Team() == TEAM_SURVIVOR and availabilityHeli then --The Player is sat down in the helicopter
+		if activator:Team() == TEAM_SURVIVOR and availabilityHeli then
+			--The Player is sat down in the helicopter
 
-			if activator:GetNWBool("DynamicFlashlight") then activator:SetNWBool("DynamicFlashlight", false) end
-
-		for _, v in ipairs(SatPlayers) do
-			local id = activator:SteamID64()
-
-			if v.steamid == id then
-				--If the steamid in this entry matches the one we're looking for, that means the player is already in the copter.
-				userEnteredAlready = true
-				--return
+			if activator:GetNWBool("DynamicFlashlight") then
+				activator:SetNWBool("DynamicFlashlight", false)
 			end
+
+			for _, v in ipairs(SatPlayers) do
+				local id = activator:SteamID64()
+
+				if v.steamid == id then
+					--If the steamid in this entry matches the one we're looking for, that means the player is already in the copter.
+					userEnteredAlready = true
+					--return
+				end
+			end
+
+			if userEnteredAlready == false then
+				table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, { steamid = activator:SteamID64() })
+			end
+
+			local vehicle = ents.Create("prop_vehicle_prisoner_pod")
+			--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
+
+			--if t == false then
+			--	SafeRemoveEntity(vehicle)
+			--	return false
+			--end
+
+
+			--local ang = Angle(0,0,0)
+			--local pos = Vector(0,0,0)
+
+			if SatPlayers[1] ~= nil and SatPlayers[1].steamid == activator:SteamID64() then
+				pos = self:LocalToWorld(Vector(-30, -17, 40))
+				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
+
+			elseif SatPlayers[2] ~= nil and SatPlayers[2].steamid == activator:SteamID64() then
+				pos = self:LocalToWorld(Vector(-30, 17, 40))
+				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
+
+			elseif SatPlayers[3] ~= nil and SatPlayers[3].steamid == activator:SteamID64() then
+				pos = self:LocalToWorld(Vector(30, -17, 40))
+				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
+
+			elseif SatPlayers[4] ~= nil and SatPlayers[4].steamid == activator:SteamID64() then
+				pos = self:LocalToWorld(Vector(30, 17, 40))
+				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
+			end
+
+			vehicle:SetPos(pos)
+			vehicle:SetAngles(ang)
+
+			vehicle.playerdynseat = true
+			vehicle:SetNWBool("playerdynseat", true)
+
+			vehicle:SetModel("models/nova/airboat_seat.mdl") -- DO NOT CHANGE OR CRASHES WILL HAPPEN
+
+			vehicle:SetKeyValue("vehiclescript", "scripts/vehicles/prisoner_pod.txt")
+			vehicle:SetKeyValue("limitview", "1")
+			vehicle:Spawn()
+			vehicle:Activate()
+
+			if not IsValid(vehicle) or not IsValid(vehicle:GetPhysicsObject()) then
+				SafeRemoveEntity(vehicle)
+				return false
+			end
+
+			local phys = vehicle:GetPhysicsObject()
+			-- Let's try not to crash
+			vehicle:SetMoveType(MOVETYPE_PUSH)
+			phys:Sleep()
+			vehicle:SetCollisionGroup(COLLISION_GROUP_WORLD)
+
+			vehicle:SetNotSolid(true)
+			phys:Sleep()
+			phys:EnableGravity(false)
+			phys:EnableMotion(false)
+			phys:EnableCollisions(false)
+			phys:SetMass(1)
+
+			vehicle:CollisionRulesChanged()
+
+			-- Visibles
+			vehicle:DrawShadow(false)
+			vehicle:SetColor(Color(0, 0, 0, 0))
+			vehicle:SetRenderMode(RENDERMODE_TRANSALPHA)
+			vehicle:SetNoDraw(true)
+
+			vehicle.VehicleName = "Airboat Seat"
+			vehicle.ClassOverride = "prop_vehicle_prisoner_pod"
+
+			vehicle:SetParent(self)
+
+			activator:EnterVehicle(vehicle)
+
+			if #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3 and SlashCo.LobbyData.LOBBYSTATE < 5 and GAMEMODE.State == GAMEMODE.States.LOBBY then
+
+				lobbyFinish()
+
+			end
+
 		end
 
-		if userEnteredAlready == false then 
-			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, {steamid = activator:SteamID64()}) 
-		end
-
-		local vehicle = ents.Create("prop_vehicle_prisoner_pod")
-		--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
-
-		--if t == false then
-		--	SafeRemoveEntity(vehicle)
-		--	return false
-		--end
-
-
-		local ang = Angle(0,0,0)
-		local pos = Vector(0,0,0)
-
-		if SatPlayers[1] != nil and SatPlayers[1].steamid == activator:SteamID64() then 
-			pos = self:LocalToWorld( Vector(-30 , -17, 40) ) 
-			ang = self:LocalToWorldAngles( Angle(0,-90,0) ) 
-
-		elseif SatPlayers[2] != nil and SatPlayers[2].steamid == activator:SteamID64() then 
-			pos = self:LocalToWorld( Vector(-30 , 17, 40) ) 
-			ang = self:LocalToWorldAngles( Angle(0,-90,0) )
-
-		elseif SatPlayers[3] != nil and SatPlayers[3].steamid == activator:SteamID64() then 
-			pos = self:LocalToWorld( Vector(30 , -17, 40) ) 
-			ang = self:LocalToWorldAngles( Angle(0,90,0) )
-
-		elseif SatPlayers[4] != nil and SatPlayers[4].steamid == activator:SteamID64() then 
-			pos = self:LocalToWorld( Vector(30 , 17, 40) ) 
-			ang = self:LocalToWorldAngles( Angle(0,90,0) )	
-		end
-
-		vehicle:SetPos(pos)
-		vehicle:SetAngles(ang)
-
-
-		vehicle.playerdynseat = true
-		vehicle:SetNWBool("playerdynseat", true)
-
-		vehicle:SetModel("models/nova/airboat_seat.mdl") -- DO NOT CHANGE OR CRASHES WILL HAPPEN
-
-		vehicle:SetKeyValue("vehiclescript", "scripts/vehicles/prisoner_pod.txt")
-		vehicle:SetKeyValue("limitview","1")
-		vehicle:Spawn()
-		vehicle:Activate()
-
-		if not IsValid(vehicle) or not IsValid(vehicle:GetPhysicsObject()) then
-			SafeRemoveEntity(vehicle)
-			return false
-		end
-
-		local phys = vehicle:GetPhysicsObject()
-		-- Let's try not to crash
-		vehicle:SetMoveType(MOVETYPE_PUSH)
-		phys:Sleep()
-		vehicle:SetCollisionGroup(COLLISION_GROUP_WORLD)
-
-		vehicle:SetNotSolid(true)
-		phys:Sleep()
-		phys:EnableGravity(false)
-		phys:EnableMotion(false)
-		phys:EnableCollisions(false)
-		phys:SetMass(1)
-
-		vehicle:CollisionRulesChanged()
-
-		-- Visibles
-		vehicle:DrawShadow(false)
-		vehicle:SetColor(Color(0,0,0,0))
-		vehicle:SetRenderMode(RENDERMODE_TRANSALPHA)
-		vehicle:SetNoDraw(true)
-
-		vehicle.VehicleName = "Airboat Seat"
-		vehicle.ClassOverride = "prop_vehicle_prisoner_pod"
-
-		vehicle:SetParent(self)
-
-		activator:EnterVehicle(vehicle)
-
-		if #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3 and SlashCo.LobbyData.LOBBYSTATE < 5 and GAMEMODE.State == GAMEMODE.States.LOBBY then 
-
-			lobbyFinish()
-
-		end
-		
 	end
-
-end
 
 end
 
@@ -178,7 +185,7 @@ function ENT:Think()
 
 	TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
 
-	if self.EnableMovement and TargetPosition != nil then
+	if self.EnableMovement and TargetPosition ~= nil then
 
 		if pitchgo == nil then pitchgo = 0 end
 
@@ -269,7 +276,7 @@ function ENT:Think()
 
 	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers >= (#team.GetPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
 
-		if SlashCo.CurRound.Difficulty != 1 then return end
+		if SlashCo.CurRound.Difficulty ~= 1 then return end
 
 		local abandon = math.random(50, 120)
 
@@ -286,7 +293,7 @@ function ENT:Think()
 
 	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
 
-		if SlashCo.CurRound.Difficulty != 2 then return end
+		if SlashCo.CurRound.Difficulty ~= 2 then return end
 
 		local abandon = math.random(50, 120)
 

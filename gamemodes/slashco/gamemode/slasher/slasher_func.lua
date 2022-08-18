@@ -175,8 +175,8 @@ if SERVER then
 
     local delay = 1
 
-    local idoffirst = firstid
-    local idofsecond = secondid
+    --local idoffirst = firstid
+    --local idofsecond = secondid
 
     print("[SlashCo] Current Difficulty: "..SlashCo.CurRound.Difficulty)
     print("int Difficulty: "..SlashCo.Difficulty.INTERMEDIATE )
@@ -193,48 +193,35 @@ end
 
 end
 
-SlashCo.CancelSlasherSpawnDelay = function()
-
-    if SlashCo.CurRound.SlasherSpawned == false then
-
-        print("[SlashCo] Spawning Slasher prematurely...")
-        SlashCo.SpawnSlasher()
-
-    end
-
-end
+local SlasherSpawned
 
 SlashCo.SpawnSlasher = function()
 
     if SERVER then
 
-        if SlashCo.CurRound.SlasherSpawned == false then
+        if not SlasherSpawned then
 
             print("[SlashCo] Spawning Slasher...")
 
-            if SlashCo.CurRound.SlashersToBeSpawned != nil then
+            if SlashCo.CurRound.SlashersToBeSpawned then
 
-                for i = 1, #SlashCo.CurRound.SlashersToBeSpawned do
-
-                    ply = player.GetBySteamID64(SlashCo.CurRound.SlashersToBeSpawned[i].ID) 
-
+                for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
                     rand = math.random( 1, #SlashCo.CurConfig.Spawnpoints.Slasher)
 
                     local pos = Vector(SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[1],SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[2],SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[3])
                     local ang = Angle( 0, SlashCo.CurConfig.Spawnpoints.Slasher[rand].ang ,0 )
 
-                    ply:SetTeam(TEAM_SLASHER)
-                    ply:Spawn()
-                    ply:SetPos( pos )
-                    ply:SetAngles( ang )
+                    p:SetTeam(TEAM_SLASHER)
+                    p:Spawn()
+                    p:SetPos( pos )
+                    p:SetAngles( ang )
 
                     SlashCo.BroadcastSlasherData()
 
-                    SlashCo.OnSlasherSpawned(ply)
-
+                    SlashCo.OnSlasherSpawned(p)
                 end
 
-                SlashCo.CurRound.SlasherSpawned = true
+                SlasherSpawned = true
 
             else
 

@@ -11,17 +11,16 @@ util.AddNetworkString("mantislashcoGiveSlasherData")
 util.AddNetworkString("mantislashcoSlasherChaseMode")
 util.AddNetworkString("mantislashcoSlasherKillPlayer")
 util.AddNetworkString("mantiSlashCoPickingSlasher")
-util.AddNetworkString("mantiSlashCoSelectSlasher") 
+util.AddNetworkString("mantiSlashCoSelectSlasher")
 util.AddNetworkString("mantislashcoStartItemPicking")
 util.AddNetworkString("mantislashcoPickItem")
-util.AddNetworkString("mantislashcoGiveItemData")
-util.AddNetworkString("mantislashcoSendLobbyItemGlobal") 
+util.AddNetworkString("mantislashcoSendLobbyItemGlobal")
 util.AddNetworkString("mantislashcoSendGlobalInfoTable")
 util.AddNetworkString("mantislashcoGlobalSound")
 util.AddNetworkString("mantislashcoGameIntro")
 util.AddNetworkString("mantislashcoRoundEnd")
 util.AddNetworkString("mantislashcoBriefing")
-util.AddNetworkString("mantislashcoStartOfferingPicking") 
+util.AddNetworkString("mantislashcoStartOfferingPicking")
 util.AddNetworkString("mantislashcoBeginOfferingVote")
 util.AddNetworkString("mantislashcoOfferingVoteOut")
 util.AddNetworkString("mantislashcoVoteForOffering")
@@ -31,6 +30,7 @@ util.AddNetworkString("mantislashcoGiveMasterDatabase")
 util.AddNetworkString("mantislashcoSendRoundData")
 util.AddNetworkString("mantislashcoHelicopterMusic")
 util.AddNetworkString("mantislashcoLobbySlasherInformation")
+util.AddNetworkString("slashcoSelectables")
 
 function PlayGlobalSound(sound, level, ent, vol)
 
@@ -99,7 +99,7 @@ net.Receive("mantislashcoBeginOfferingVote", function()
 	timer.Create( "OfferingVoteTimer", 20, 1, function() SlashCo.OfferingVoteFail() end)
 
 	for _, play in ipairs( player.GetAll() ) do
-        play:ChatPrint(player.GetBySteamID64(t.ply):GetName().." would like to offer "..SCInfo.Offering[t.id].Name) 
+        play:ChatPrint(player.GetBySteamID64(t.ply):GetName().." would like to offer "..SCInfo.Offering[t.id].Name)
     end
 
 end)
@@ -137,10 +137,10 @@ SlashCo.StartGameIntro = function()
 	if SlashCo.LobbyData.Offering > 0 then offering = SCInfo.Offering[SlashCo.LobbyData.Offering].Name end
 
     net.Start("mantislashcoGameIntro")
-	net.WriteTable({	
-		map = SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME,  
-		diff = SlashCo.LobbyData.SelectedDifficulty, 
-		offer = offering, 
+	net.WriteTable({
+		map = SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME,
+		diff = SlashCo.LobbyData.SelectedDifficulty,
+		offer = offering,
 		s_name = SlashCo.LobbyData.SelectedSlasherInfo.NAME,
 		s_class = SlashCo.LobbyData.SelectedSlasherInfo.CLS,
 		s_danger = SlashCo.LobbyData.SelectedSlasherInfo.DNG
@@ -151,22 +151,23 @@ end
 
 SlashCo.PlayerItemStashRequest = function(id)
 
-    if SlashCo.GetHeldItem(player.GetBySteamID64(id)) ~= 0 then
-        player.GetBySteamID64(id):ChatPrint("You have already chosen an item.")
-        return 
+	local ply = player.GetBySteamID64(id)
+    if ply:GetNWString("item", "none") ~= "none" or ply:GetNWString("item2", "none") ~= "none" then
+		ply:ChatPrint("You have already chosen an item.")
+        return
     end
 
     net.Start("mantislashcoStartItemPicking")
-	net.WriteTable({ply = id, wardsleft = SlashCo.LobbyData.DeathwardsLeft})
+	net.WriteTable({ply = id, wardsleft = 0})
 	net.Broadcast()
 
 end
 
 SlashCo.PlayerOfferingTableRequest = function(id)
 
-    if SlashCo.LobbyData.Offering > 0 or #SlashCo.LobbyData.Offerors > 0 then 
+    if SlashCo.LobbyData.Offering > 0 or #SlashCo.LobbyData.Offerors > 0 then
         player.GetBySteamID64(id):ChatPrint("An Offering has already been made.")
-        return 
+        return
     end
 
     net.Start("mantislashcoStartOfferingPicking")
@@ -179,14 +180,12 @@ SlashCo.RoundOverScreen = function(state)
 
 	local heli = table.Random(ents.FindByClass("sc_helicopter"))
 
-	if not IsValid(heli) then goto skipsound end
-
-	heli:StopSound("slashco/helicopter_engine_distant.wav")
-	heli:StopSound("slashco/helicopter_rotors_distant.wav")
-	heli:StopSound("slashco/helicopter_engine_close.wav")
-	heli:StopSound("slashco/helicopter_rotors_close.wav")
-
-	::skipsound::
+	if IsValid(heli) then
+		heli:StopSound("slashco/helicopter_engine_distant.wav")
+		heli:StopSound("slashco/helicopter_rotors_distant.wav")
+		heli:StopSound("slashco/helicopter_engine_close.wav")
+		heli:StopSound("slashco/helicopter_rotors_close.wav")
+	end
 
     net.Start("mantislashcoRoundEnd")
 
@@ -213,19 +212,19 @@ SlashCo.RoundOverScreen = function(state)
 	local rescued_players = SlashCo.CurRound.HelicopterRescuedPlayers
 	local alive_survivors = ""
 
-	if #rescued_players == 1 then 
+	if #rescued_players == 1 then
 
 		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()
 
-	elseif #rescued_players == 2 then 
+	elseif #rescued_players == 2 then
 
 		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[2].steamid):GetName()
 
-	elseif #rescued_players == 3 then 
+	elseif #rescued_players == 3 then
 
 		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[2].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[3].steamid):GetName()
 
-	elseif #rescued_players == 4 then 
+	elseif #rescued_players == 4 then
 
 		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[2].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[3].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[4].steamid):GetName()
 
@@ -240,27 +239,27 @@ SlashCo.RoundOverScreen = function(state)
 
 		for s = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
 
-			if spec == SlashCo.CurRound.SlasherData.AllSurvivors[s].id then 
-				table.insert(deadsurv_table, {id = spec}) 
+			if spec == SlashCo.CurRound.SlasherData.AllSurvivors[s].id then
+				table.insert(deadsurv_table, {id = spec})
 			end
 
 		end
 
 	end
 
-	if #deadsurv_table == 1 then 
+	if #deadsurv_table == 1 then
 
 		dead_survivors = player.GetBySteamID64(deadsurv_table[1].id):GetName()
 
-	elseif #deadsurv_table == 2 then 
+	elseif #deadsurv_table == 2 then
 
 		dead_survivors = player.GetBySteamID64(deadsurv_table[1].id):GetName().." and "..player.GetBySteamID64(deadsurv_table[2].id):GetName()
 
-	elseif #deadsurv_table == 3 then 
+	elseif #deadsurv_table == 3 then
 
 		dead_survivors = player.GetBySteamID64(deadsurv_table[1].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[2].id):GetName().." and "..player.GetBySteamID64(deadsurv_table[3].id):GetName()
 
-	elseif #deadsurv_table == 4 then 
+	elseif #deadsurv_table == 4 then
 
 		dead_survivors = player.GetBySteamID64(deadsurv_table[1].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[2].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[3].id):GetName().." and "..player.GetBySteamID64(deadsurv_table[4].id):GetName()
 
@@ -276,7 +275,7 @@ SlashCo.RoundOverScreen = function(state)
 		for r = 1, #rescued_players do
 
 			local r_ply = rescued_players[r].steamid
-			
+
 			if r_ply == a_ply then goto RESCUED end
 
 		end
@@ -287,19 +286,19 @@ SlashCo.RoundOverScreen = function(state)
 
 	end
 
-	if #absurv_table == 1 then 
+	if #absurv_table == 1 then
 
 		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()
 
-	elseif #absurv_table == 2 then 
+	elseif #absurv_table == 2 then
 
 		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName().." and "..player.GetBySteamID64(absurv_table[2].id):GetName()
 
-	elseif #absurv_table == 3 then 
+	elseif #absurv_table == 3 then
 
 		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()..", "..player.GetBySteamID64(absurv_table[2].id):GetName().." and "..player.GetBySteamID64(absurv_table[3].id):GetName()
 
-	elseif #absurv_table == 4 then 
+	elseif #absurv_table == 4 then
 
 		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()..", "..player.GetBySteamID64(absurv_table[2].id):GetName()..", "..player.GetBySteamID64(absurv_table[3].id):GetName().." and "..player.GetBySteamID64(absurv_table[4].id):GetName()
 
@@ -318,7 +317,7 @@ SlashCo.RoundOverScreen = function(state)
 		l1 = SCInfo.RoundEnd[1].On
 		l2 = SCInfo.RoundEnd[2].NonFullTeam
 
-		if #team.GetPlayers(TEAM_SURVIVOR) > 1 then 
+		if #team.GetPlayers(TEAM_SURVIVOR) > 1 then
 			l3 = alive_survivors..SCInfo.RoundEnd[2].AlivePlayers
 		else
 			l3 = alive_survivors..SCInfo.RoundEnd[2].OnlyOneAlive
@@ -336,7 +335,7 @@ SlashCo.RoundOverScreen = function(state)
 
 		l1 = SCInfo.RoundEnd[1].On
 		l2 = SCInfo.RoundEnd[2].Fail
-		l3 = "" 
+		l3 = ""
 		l4 = ""
 		l5 = ""
 
@@ -349,7 +348,7 @@ SlashCo.RoundOverScreen = function(state)
 		l5 = ""
 
 	elseif state == 4 then
-		if #all_survivors > 1 then	
+		if #all_survivors > 1 then
 			l1 = SCInfo.RoundEnd[1].DB
 
 			if #dead_survivors > 1 then
@@ -384,20 +383,6 @@ SlashCo.RoundOverScreen = function(state)
 
 end
 
-SlashCo.BroadcastItemData = function()
-
-	if SERVER then
-
-    net.Start("mantislashcoGiveItemData")
-	net.WriteTable(SlashCo.CurRound.SurvivorData.Items)
-	net.Broadcast()
-
-	SlashCo.BroadcastGlobalData()
-
-	end
-
-end
-
 SlashCo.BroadcastGlobalData = function()
 
 	if SERVER then
@@ -423,3 +408,13 @@ SlashCo.BroadcastMasterDatabaseForClient = function(ply_id)
 	end
 
 end
+
+--[[
+SlashCo.BroadcastSelectables = function()
+	if SERVER then
+		net.Start("slashcoSelectables")
+		net.WriteTable(SlashCo.CurRound.Selectables)
+		net.Broadcast()
+	end
+end
+]]

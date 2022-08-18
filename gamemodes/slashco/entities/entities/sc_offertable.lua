@@ -54,7 +54,7 @@ if SERVER then
 
 	if activator:Team() == TEAM_LOBBY then 
 
-		if #SlashCo.LobbyData.Offerors > 0 or SlashCo.LobbyData.Offering != 0 then activator:ChatPrint("An Offering has already been made.") return end
+		if #SlashCo.LobbyData.Offerors > 0 or SlashCo.LobbyData.Offering ~= 0 then activator:ChatPrint("An Offering has already been made.") return end
 
 		--if #team.GetPlayers(TEAM_LOBBY) < 2 then activator:ChatPrint("Not enough players to make an Offering.") return end
 

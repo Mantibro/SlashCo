@@ -3,6 +3,7 @@ include( "cl_scoreboard.lua" )
 include( "cl_headbob.lua" )
 include( "ui/fonts.lua" )
 
+include( "items/items_init.lua" )
 include( "cl_lobbyhud.lua" )
 include( "cl_survivorhud.lua" )
 include( "cl_intro_hud.lua" )
@@ -178,7 +179,8 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
     surface.SetDrawColor(255,255,255,255)	
 
-    local xoffset = -250 
+    local xoffset = (#SurvivorTeam + #SlasherTeam)*-50 - 25
+    --local xoffset = -250
 
     for i = 1, #SurvivorTeam do --Survivor team visualization before game start
 

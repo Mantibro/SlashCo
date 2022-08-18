@@ -8,19 +8,24 @@ function DrawThePlayermodelSelectorBox()
 	PMSelectFrame = vgui.Create( "DFrame" )
 	PMSelectFrame:SetTitle( "Choose your Playermodel" )
 
-	local x = 0
-	for i = 1, 9 do
-	
-		local Item = vgui.Create( "SpawnIcon", PMSelectFrame )
-		function Item.DoClick() PlayerModelChosen("models/slashco/survivor/male_0"..i..".mdl") HidePlayermodelSelection() end
-		Item:SetPos( 10 + x, 30 )
-		Item:SetModel( "models/slashco/survivor/male_0"..i..".mdl" )
-		
-		x = x + 80
-		
+	--local x = 0
+	--local y = 0
+	for c = 0, 2 do
+		for i = 0, 2 do
+
+			local Item = vgui.Create( "SpawnIcon", PMSelectFrame )
+			local val = i+c+1
+			function Item.DoClick() PlayerModelChosen("models/slashco/survivor/male_0"..val..".mdl") HidePlayermodelSelection() end
+			Item:SetPos( 10 + i*80, 30 + c*80 )
+			Item:SetModel( "models/slashco/survivor/male_0"..val..".mdl" )
+
+			--x = x + 80
+
+		end
+		--y = y + 80
 	end
 
-	PMSelectFrame:SetSize( 100 + x, 100 )
+	PMSelectFrame:SetSize( 240, 260 )
 	PMSelectFrame:Center()
 	PMSelectFrame:MakePopup()
 	PMSelectFrame:SetKeyboardInputEnabled( false )
