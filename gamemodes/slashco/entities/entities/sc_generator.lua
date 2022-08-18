@@ -4,220 +4,222 @@ local SlashCo = SlashCo
 
 ENT.Type = "anim"
 
-ENT.ClassName 		= "sc_generator"
-ENT.PrintName		= "generator"
-ENT.Author			= "Octo"
-ENT.Contact			= ""
-ENT.Purpose			= "Combustion engine powered generator unit."
-ENT.Instructions	= ""
+ENT.ClassName    = "sc_generator"
+ENT.PrintName    = "generator"
+ENT.Author       = "Octo"
+ENT.Contact      = ""
+ENT.Purpose      = "Combustion engine powered generator unit."
+ENT.Instructions = ""
 
---local InInteraction = false
-local SenderTable = {
-	prog = 0,
-	id = 0
-}
-local AntiSpam = false
+local TimeToFuel = 13
 
 function ENT:Initialize()
     if SERVER then
-        self:SetModel( SlashCo.GeneratorModel )
-        self:SetSolid( SOLID_VPHYSICS )
-        self:PhysicsInit( SOLID_VPHYSICS )
-        self:SetMoveType( MOVETYPE_NONE )
-	self:GetPhysicsObject():EnableMotion( false )
-        self:SetUseType( ONOFF_USE )
+        self:SetModel(SlashCo.GeneratorModel)
+        self:SetSolid(SOLID_VPHYSICS)
+        self:PhysicsInit(SOLID_VPHYSICS)
+        self:SetMoveType(MOVETYPE_NONE)
+        self:GetPhysicsObject():EnableMotion(false)
+        self:SetUseType(SIMPLE_USE)
     end
 end
 
+function ENT:SendData(ply)
+    --print("sending data")
+    net.Start("mantislashcoGasPourProgress")
+    net.WriteUInt(TimeToFuel, 8)
+    net.WriteEntity(self.FuelingCan)
+    net.WriteBool(self.IsFueling)
+    net.WriteFloat(self.TimeUntilFueled)
+    net.Send(ply)
+end
+
 function ENT:Touch(otherEnt)
-	if SERVER then
-		if not SlashCo.CurRound.Generators[self:EntIndex()].Interaction and otherEnt:GetModel() == SlashCo.GasCanModel and otherEnt:IsPlayerHolding() and SlashCo.CurRound.Generators[self:EntIndex()].Remaining > 0 then
-			--print("Gas Touch")
+    if SERVER then
+        local index = otherEnt:EntIndex()
+        if not self.MakingCan and not self.FuelingCan and SlashCo.CurRound.GasCans[index] and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+            --print("Gas Touch")
 
-		SlashCo.RemoveGas( self, otherEnt )
-		SlashCo.CancelSlasherSpawnDelay()
+            SlashCo.RemoveSelectableNow(index)
+            SlashCo.CurRound.GasCans[index] = nil
+            otherEnt:Remove()
 
-		local pgas = ents.Create( "prop_physics" )
+            local gasCan = ents.Create("prop_physics")
 
-		pgas:SetMoveType( MOVETYPE_NONE )
-    	pgas:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
-		pgas:SetModel( SlashCo.GasCanModel )
-    	pgas:SetPos( self:LocalToWorld( Vector(-18,30,55+(SlashCo.CurRound.Generators[self:EntIndex()].Progress*2)) ) )
-    	pgas:SetAngles( self:LocalToWorldAngles( Angle(0,0,45+SlashCo.CurRound.Generators[self:EntIndex()].Progress) ) )
-    	pgas:SetParent( self )
+            gasCan:SetModel( SlashCo.GasCanModel )
+            gasCan:SetMoveType(MOVETYPE_NONE)
+            gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+            gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
+            gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
+            gasCan:SetParent(self)
 
-		SlashCo.CurRound.Generators[self:EntIndex()].PouredCanID = pgas:EntIndex()
+            SlashCo.MakeSelectableNow(index)
+            self.FuelingCan = gasCan
 
-		SlashCo.CurRound.Generators[self:EntIndex()].Interaction = true
+            SlashCo.SpawnSlasher()
+        elseif not self.HasBattery and SlashCo.CurRound.Batteries[index] and otherEnt:IsPlayerHolding() and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
+            --print("Battery Touch")
+            self.HasBattery = true
+            DropEntityIfHeld(otherEnt)
+            otherEnt:SetMoveType(MOVETYPE_NONE)
+            otherEnt:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+            otherEnt:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
+            otherEnt:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+            otherEnt:SetParent(self)
+            otherEnt:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
+            otherEnt:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+            SlashCo.RemoveSelectableNow(index)
 
-		end
+            SlashCo.SpawnSlasher()
+        end
 
-		if not SlashCo.CurRound.Generators[self:EntIndex()].HasBattery and otherEnt:GetModel() == SlashCo.BatteryModel and otherEnt:IsPlayerHolding() and otherEnt:GetPos():Distance(self:LocalToWorld( Vector(-7,25,50) )) < 18 then
-			--print("Battery Touch")
-			SlashCo.InsertBattery( self, otherEnt )
+        if (self.CansRemaining or SlashCo.GasCansPerGenerator) <= 0 and self.HasBattery and not self.IsRunning then
+            self.IsRunning = true
+            local delay = 6
+            self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
 
-			SlashCo.CancelSlasherSpawnDelay()
-		end
+            timer.Simple(delay, function()
 
-		if SlashCo.CurRound.Generators[self:EntIndex()].Remaining == 0 and SlashCo.CurRound.Generators[self:EntIndex()].HasBattery and not SlashCo.CurRound.Generators[self:EntIndex()].Running then
-			SlashCo.CurRound.Generators[self:EntIndex()].Running = true
-			local delay = 6
-			self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
+                PlayGlobalSound("slashco/generator_loop.wav", 85, self)
 
-    		timer.Simple(delay, function()
+            end)
 
-				--self:EmitSound("slashco/generator_loop.wav", 85, 100, 1)
-				PlayGlobalSound("slashco/generator_loop.wav", 85, self)
+        end
 
-    		end)
-
-		end
-
-	end
+    end
 end
 
-function ENT:Use( activator, caller, usetype )
+function ENT:Use(activator, _, _)
 
-if SERVER then
+    if SERVER then
 
-	if activator:Team() == TEAM_SURVIVOR then 
+        if activator:Team() == TEAM_SURVIVOR and activator:GetPos():Distance(self:GetPos()) <= 100 then
+            if IsValid(self.FuelingCan) then
+                self.IsFueling = true
+                self.CurrentPourer = activator
+                self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
+                self:SendData(activator)
+                self:EmitSound("slashco/generator_fill.wav")
+            elseif not self.MakingCan and activator:GetNWString("item2", "none") == "GasCan" and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+                activator:SetNWString("item2", "none")
+                activator:SetRunSpeed(300)
 
-		if usetype == USE_ON then 
-			SlashCo.CurRound.Generators[self:EntIndex()].Pouring = true 
-			SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer = activator:SteamID64()
-			AntiSpam = false
+                self.MakingCan = true
+                timer.Simple(0.25, function()
+                    self.MakingCan = nil
+                    local gasCan = ents.Create("prop_physics")
 
-			if SlashCo.CurRound.Generators[self:EntIndex()].Remaining > 3 then
-				SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer = activator:SteamID64()
-			else
-				if SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer != SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer then
+                    gasCan:SetModel( SlashCo.GasCanModel )
+                    gasCan:SetMoveType(MOVETYPE_NONE)
+                    gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+                    gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
+                    gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
+                    gasCan:SetParent(self)
 
-					SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer = 0
+                    SlashCo.MakeSelectableNow(gasCan)
+                    self.FuelingCan = gasCan
 
-				end
-			end
-		end
-		if usetype == USE_OFF then 
-			SlashCo.CurRound.Generators[self:EntIndex()].Pouring = false 
-			SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer = 0
-			AntiSpam = false
-			self:StopSound("slashco/generator_fill.wav")
-		end
-
-	end
-
-end
-
+                    SlashCo.SpawnSlasher()
+                end)
+            end
+        end
+    end
 end
 
 function ENT:Think()
 
-	if SERVER then
+    if SERVER then
+        if not IsValid(self.CurrentPourer) then
+            self:StopSound("slashco/generator_fill.wav")
+            return
+        end
 
-	local activator = player.GetBySteamID64(SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer)
+        if IsValid(self.FuelingCan) and self.IsFueling then
 
-	if not IsValid(activator) then self:StopSound("slashco/generator_fill.wav") return end
+            if self.CurrentPourer:GetPos():Distance(self:GetPos()) > 100 or not self.CurrentPourer:KeyDown(IN_USE) then
+                self.IsFueling = false
+                self.FuelProgress = self.TimeUntilFueled - CurTime()
+                --print((self.FuelProgress or "nil").." distance")
+                self:SendData(self.CurrentPourer)
+                self.TimeUntilFueled = nil
+                self.CurrentPourer = nil
+                self:StopSound("slashco/generator_fill.wav")
+                return
+            end
 
-	if SlashCo.CurRound.Generators[self:EntIndex()].Interaction and SlashCo.CurRound.Generators[self:EntIndex()].Pouring then
+            local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
+            self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45 + fuelprog * 80)))
+            self.FuelingCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55 + fuelprog * 26)))
 
-		if activator:GetPos():Distance( self:GetPos() ) > 100 then 
-			SlashCo.CurRound.Generators[self:EntIndex()].Pouring = false 
-			SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer = 0
-			self:StopSound("slashco/generator_fill.wav")
-			AntiSpam = false
-		end
+            if CurTime() >= self.TimeUntilFueled then
+                self.IsFueling = false
+                self.FuelProgress = nil
+                --print((self.FuelProgress or `nil`).." donefueling")
+                self:SendData(self.CurrentPourer)
+                self.TimeUntilFueled = nil
+                self.CurrentPourer = nil
+                self:StopSound("slashco/generator_fill.wav")
 
-		SlashCo.CurRound.Generators[self:EntIndex()].Progress = SlashCo.CurRound.Generators[self:EntIndex()].Progress + 0.01
+                self.CansRemaining = (self.CansRemaining or SlashCo.GasCansPerGenerator) - 1
+                self:StopSound("slashco/generator_fill.wav")
 
-		net.Start("mantislashcoGasPourProgress")
+                --//discard gas can//--
 
-		SenderTable.prog = SlashCo.CurRound.Generators[self:EntIndex()].Progress
-		SenderTable.id = activator:SteamID64()
+                self.FuelingCan:PhysicsInit(SOLID_VPHYSICS)
+                self.FuelingCan:SetMoveType(MOVETYPE_VPHYSICS)
+                self.FuelingCan:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+                self.FuelingCan:SetParent(nil)
 
-		net.WriteTable( SenderTable )
-		net.Broadcast()
+                SlashCo.RemoveSelectableNow(self.FuelingCan:EntIndex())
 
-		if AntiSpam == false then
-			self:EmitSound("slashco/generator_fill.wav")
-			AntiSpam = true
-		end
-	end
+                local FuelingCanPhysics = self.FuelingCan:GetPhysicsObject()
+                FuelingCanPhysics:SetVelocity(Vector(math.random(-200, 200), math.random(-200, 200), 200))
 
-	if SlashCo.CurRound.Generators[self:EntIndex()].Progress > 0 then
+                local randomvec = Vector(0, 0, 0)
+                randomvec:Random(-1000, 1000)
+                FuelingCanPhysics:SetAngleVelocity(randomvec)
 
-		local PouredGas = ents.GetByIndex(SlashCo.CurRound.Generators[self:EntIndex()].PouredCanID)
+                local CanToRemove = self.FuelingCan
+                timer.Simple(5, function()
+                    CanToRemove:Remove()
+                end)
 
-		if PouredGas != nil then
-			if PouredGas != NULL then
-				PouredGas:SetAngles( self:LocalToWorldAngles( Angle(0,0,45+(SlashCo.CurRound.Generators[self:EntIndex()].Progress*6)) ) )
-				PouredGas:SetPos( self:LocalToWorld( Vector(-18,30,55+(SlashCo.CurRound.Generators[self:EntIndex()].Progress*2)) ) )
-			end
-		end
+                --//start generator if ready//--
 
-		if SlashCo.CurRound.Generators[self:EntIndex()].Progress > 13 then 
+                if self.CansRemaining <= 0 and self.HasBattery and not self.IsRunning then
+                    self.IsRunning = true
 
-			SlashCo.AddGas( self )
+                    self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
 
-			SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer].PointsTotal + 5
+                    timer.Simple(6.4, function()
 
-			AntiSpam = false
-			self:StopSound("slashco/generator_fill.wav")
+                        PlayGlobalSound("slashco/generator_loop.wav", 85, self, 1)
 
-			SlashCo.CurRound.Generators[self:EntIndex()].PouredCanID = 0
-		
-			PouredGas:Remove()
-		
-			SlashCo.CurRound.Generators[self:EntIndex()].Progress = 0
-		
-			if SlashCo.CurRound.Generators[self:EntIndex()].Remaining == 0 and SlashCo.CurRound.Generators[self:EntIndex()].HasBattery and not SlashCo.CurRound.Generators[self:EntIndex()].Running then
-				SlashCo.CurRound.Generators[self:EntIndex()].Running = true
-				self:StopSound("slashco/generator_fill.wav")
-				AntiSpam = false
+                    end)
 
-				local delay = 6.4
-				self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
+                elseif self.HasBattery and self.CansRemaining > 0 then
 
-				if SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer == SlashCo.CurRound.Generators[self:EntIndex()].CurrentPourer then
+                    self:EmitSound("slashco/generator_failstart.wav", 85, 100, 1)
 
-					--SlashCoDatabase.UpdateStats(SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer, "Points", 25)
-					SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.Generators[self:EntIndex()].ConsistentPourer].PointsTotal + 25
+                end
 
-				end
+                self.FuelingCan = nil
+            end
 
-				timer.Simple(delay, function()
+            self:NextThink(CurTime()) -- Set the next think to run as soon as possible, i.e. the next frame.
+            return true -- Apply NextThink call
+        end
 
-					PlayGlobalSound("slashco/generator_loop.wav", 85, self, 1)
-
-				end)
-
-			elseif SlashCo.CurRound.Generators[self:EntIndex()].HasBattery and SlashCo.CurRound.Generators[self:EntIndex()].Remaining > 0 then
-
-				self:EmitSound("slashco/generator_failstart.wav", 85, 100, 1)
-				
-			end
-
-			SlashCo.CurRound.Generators[self:EntIndex()].Pouring = false
-		
-			SlashCo.CurRound.Generators[self:EntIndex()].Interaction = false
-		
-		end
-
-	end
-
-	self:NextThink( CurTime() ) -- Set the next think to run as soon as possible, i.e. the next frame.
-
-	return true -- Apply NextThink call
+    end
 
 end
 
-end
-
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_ALWAYS 
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
 end
 
 if CLIENT then
     function ENT:Draw()
-		self:DrawModel()
-	end
+        self:DrawModel()
+    end
 end

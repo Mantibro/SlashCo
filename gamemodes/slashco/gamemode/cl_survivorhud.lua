@@ -2,247 +2,173 @@
 include( "ui/fonts.lua" )
 --include( "ui/data_info.lua" )
 
+CreateClientConVar( "slashcohud_show_lowhealth", 1, true, false, "Whether to display the survivor's hud as blinking yellow when at low health.", 0, 1 )
+CreateClientConVar( "slashcohud_show_healthvalue", 1, true, false, "Whether to display the value of the survivor's health on their hud.", 0, 1 )
+
+local SlashCoItems = SlashCoItems
+local prevHp, SetTime, ShowDamage, prevHp1, aHp, TimeToFuel, TimeUntilFueled
+local FuelingCan
+local IsFueling
+local maxHp = 100 --ply:GetMaxHealth() seems to be 200
+
+net.Receive("slashcoSelectables", function(_,_)
+
+	Selectables = net.ReadTable()
+
+end)
+
+net.Receive( "mantislashcoGasPourProgress", function( )
+
+	TimeToFuel = net.ReadUInt(8)
+	FuelingCan = net.ReadEntity()
+	IsFueling = net.ReadBool()
+	TimeUntilFueled = net.ReadFloat()
+
+end)
+
 hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	local ply = LocalPlayer()
-	
+
 	if ply:Team() == TEAM_SURVIVOR then
 
-		local ITEM0 = Material("slashco/ui/icons/items/item_0")
-		local ITEM1 = Material("slashco/ui/icons/items/item_1")
-		local ITEM2 = Material("slashco/ui/icons/items/item_2")
-		local ITEM3 = Material("slashco/ui/icons/items/item_3")
-		local ITEM4 = Material("slashco/ui/icons/items/item_4")
-		local ITEM5 = Material("slashco/ui/icons/items/item_5")
-		local ITEM6 = Material("slashco/ui/icons/items/item_6")
-		local ITEM7 = Material("slashco/ui/icons/items/item_7")
-		local ITEM8 = Material("slashco/ui/icons/items/item_8")
-		local ITEM9 = Material("slashco/ui/icons/items/item_9")
-		local ITEM10 = Material("slashco/ui/icons/items/item_10")
-		local ITEM11 = Material("slashco/ui/icons/items/item_11")
+		local gas
+		if IsFueling then
+			gas = (TimeUntilFueled - CurTime())/TimeToFuel
+			if not input.IsButtonDown(KEY_E) then
+				--print("not e")
+				IsFueling = false
+			elseif CurTime() >= TimeUntilFueled then
+				--print("not fuel")
+				IsFueling = false
+			end
+		end
 
-		local ITEM2_99 = Material("slashco/ui/icons/items/item_2_99")
+		--//item display//--
+
+		local HeldItem = ply:GetNWString("item", "none")
+		if SlashCoItems[HeldItem or "none"] then
+			local parsedItem = markup.Parse("<font=TVCD>---     "..string.upper(SlashCoItems[HeldItem].Name).."     ---</font>")
+			if SlashCoItems[HeldItem].DisplayColor then
+				surface.SetDrawColor(SlashCoItems[HeldItem].DisplayColor(ply))
+			else
+				surface.SetDrawColor(0,0,128,255)
+			end
+			surface.DrawRect(ScrW() * 0.975-parsedItem:GetWidth()-8, ScrH() * 0.95-24, parsedItem:GetWidth()+8, 27)
+			parsedItem:Draw(ScrW() * 0.975-4, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+
+			local offset = 0
+			if SlashCoItems[HeldItem].OnUse then
+				draw.SimpleText("[R] USE", "TVCD", ScrW() * 0.975-4, ScrH() * 0.95-30, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+				offset = 30
+			end
+			if SlashCoItems[HeldItem].OnDrop then
+				draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975-4, ScrH() * 0.95-30-offset, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			end
+
+			--surface.SetDrawColor(255, 255, 255, 255)
+			--surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
+			--surface.DrawTexturedRect(ScrW() * 0.975-100, ScrH() * 0.95-130, 100, 100)
+		end
+
+		--//gas fuel meter//--
+
+		local hitPos = ply:GetShootPos()
+		if IsFueling and IsValid(FuelingCan) then
+			local genPos = FuelingCan:GetPos()
+			local realDistance = hitPos:Distance(genPos)
+			if realDistance < 100 then
+				genPos = genPos:ToScreen()
+				local fade = math.Round((100 - realDistance) * 2.8)
+				local parsedLiters = markup.Parse("<font=TVCD>" .. math.Round(gas * 10) .. "L</font>") --this only exists to find the length lol
+				local width = 206 + parsedLiters:GetWidth()
+				local xClamp = math.Clamp(genPos.x, ScrW() * 0.025 + width / 2, ScrW() * 0.975 - width / 2)
+				local yClamp = math.Clamp(genPos.y, ScrH() * 0.05 + 24, ScrH() * 0.95 - 51)
+				local half = math.Clamp((gas * 8), 0, 8) % 1 >= 0.5
+
+				surface.SetDrawColor(0, 128, 0, fade)
+				surface.DrawRect(xClamp - width / 2, yClamp - 13, width, 27)
+				draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + 205 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+				draw.SimpleText("FUEL " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2, yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+			else
+				IsFueling = false
+			end
+		end
+
+		--//item selection crosshair//--
+
+		if Selectables then
+			for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
+				if Selectables[v:EntIndex()] and not (IsFueling and FuelingCan == v) then
+					local gasPos = v:GetPos()
+					local trace = util.QuickTrace(hitPos,gasPos-hitPos,ply)
+					if not trace.Hit or trace.Entity == v then
+						local realDistance = hitPos:Distance(gasPos)
+						gasPos = gasPos:ToScreen()
+						local centerDistance = math.Distance(ScrW()/2,ScrH()/2,gasPos.x,gasPos.y)
+						draw.SimpleText("[", "Indicator", gasPos.x-centerDistance/2-12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+						draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					end
+				end
+			end
+		end
+
+		--//health//--
 
 		local hp = ply:Health()
 
-		if Gasseous == nil then Gasseous = 0 end
-		if IsGassing == nil then IsGassing = false end
-		if HeldItem == nil then HeldItem = 0 end
-
-		local showLow = 0
-
-		local HealthBack = Material("slashco/ui/health_back")
-		local HealthBase = Material("slashco/ui/health_base")
-		local HealthOver = Material("slashco/ui/health_over")
-		local HealthTop = Material("slashco/ui/health_top")
-		local HealthTopLow = Material("slashco/ui/health_top_low")
-
-		local GasBack = Material("slashco/ui/gas_back")
-		local GasBase = Material("slashco/ui/gas_base")
-		local GasTop = Material("slashco/ui/gas_top")
-
-		local healthx = ScrW()/25
-		local healthy = ScrH() - (ScrH()/3.5)
-		local healthsize = ScrH()/4
-
-		local itemx = ScrW() - (ScrW()/7)
-		local itemy = ScrH() - (ScrH()/3.5)
-		local itemsize = ScrH()/5
-
-		local ints = 1.5 + (1 - (hp / 100) )
-
-		local a = 1 + (CurTime() * ints * 6)
-
-		local hpt = 0.86 - (hp/100)*0.74 --Deadzone: 0.12 , 0.86
-
-		local hptover = 0.86 - ((hp-100)/100)*0.74 --Deadzone: 0.12 , 0.86
-
-		local pouringas = 0
-
-		net.Receive( "mantislashcoGasPourProgress", function( )
-
-			local ReceivedTable = net.ReadTable()
-
-			IsGassing = false
-
-			if ReceivedTable ~= nil then
-
-				local man = ReceivedTable.id
-				local prog = ReceivedTable.prog
-
-				if man == LocalPlayer():SteamID64() then
-
-					if prog <= 0 or prog > 12.98 then 
-						IsGassing = false
-					else 
-						IsGassing = true
-					end
-
-				else
-					IsGassing = false
-				end
-
-				Gasseous = 1 - (prog / 13)
-				if Gasseous == 0 or Gasseous > 13 then IsGassing = false end
-
-			else
-
-				IsGassing = false
-
-			end
-
-		end)
-
-		net.Receive( "mantislashcoGasPourEnded", function( )
-
-			local ReceivedTable = net.ReadTable()
-
-			if ReceivedTable ~= nil then
-				if man == LocalPlayer():SteamID64() then
-					IsGassing = false
-				end
-			end
-
-		end)
-
-		local gas = Gasseous
-
-		if IsGassing == true then pouringas = 1 else pouringas = 0 end
-
-		if not input.IsButtonDown( 15 ) then IsGassing = false end
-
-		if hp > 100 then hpt = 0.12 end
-		if hp <= 100 then hptover = 0.86 end
-
-		if hp < 40 then showLow = 1 else showLow = 0 end
-
-		surface.SetDrawColor(255,255,255,255)	
-
-		surface.SetMaterial(HealthBack)
-		surface.DrawTexturedRect(healthx, healthy, healthsize, healthsize)
-
-		surface.SetMaterial(HealthBase)
-		surface.DrawTexturedRectUV( healthx,healthy + healthsize*hpt, healthsize, healthsize * (1-hpt),		 0, hpt, 1, 1 )
-
-		surface.SetMaterial(HealthOver)
-		surface.DrawTexturedRectUV(healthx,healthy + healthsize*hptover, healthsize, healthsize * (1-hptover),		 0, hptover, 1, 1 )
-
-		surface.SetMaterial(HealthTop)
-		surface.DrawTexturedRect(	healthx - math.sin(a)*ints*3	, 	healthy - math.sin(a)*ints*3	, healthsize + math.sin(a)*ints*6, healthsize + math.sin(a)*ints*6)
-
-		surface.SetMaterial(HealthTopLow)
-		surface.DrawTexturedRect(	healthx - math.sin(a)*ints*3	, 	healthy - math.sin(a)*ints*3	,showLow * (healthsize + math.sin(a)*ints*6),showLow * (healthsize + math.sin(a)*ints*6))
-
-		surface.SetMaterial(GasBack)
-		surface.DrawTexturedRect((ScrW()/2) - ScrW()/16, (ScrH()/2)  - ScrW()/16, pouringas*ScrW()/8, ScrW()/8)
-
-		surface.SetMaterial(GasBase)
-		surface.DrawTexturedRectUV((ScrW()/2) - ScrW()/16	,		(ScrH()/2) - (		(ScrW()/8) * (1-gas) 	)	+	ScrW()/16, 	ScrW()/8	, pouringas*(ScrW()/8 ) * (1-gas)		,0, gas, 1, 1 )
-
-		surface.SetMaterial(GasTop)
-		surface.DrawTexturedRect((ScrW()/2) - ScrW()/16, (ScrH()/2)  - ScrW()/16, ScrW()/8, pouringas*ScrW()/8)
-
-		--Item Display
-
-		net.Receive("mantislashcoGiveItemData", function()
-
-			t = net.ReadTable()
-
-			for i = 1, #t do
-				if t[i].steamid == LocalPlayer():SteamID64() then
-					HeldItem = t[i].itemid
-				end
-			end 
-		
-		end)
-
-
-		net.Receive("mantislashcoSendGlobalInfoTable", function()
-
-			SCInfo = net.ReadTable()
-		
-		end)
-
-		local item_name = ""
-		local item_droppable = false
-		local item_usable = false
-		local item_mat = ITEM0
-
-		if HeldItem == 0 then
-			item_mat = ITEM0
-			item_name = ""
-			item_droppable = false
-			item_usable = false
-		elseif HeldItem == 1 then
-			item_mat = ITEM1
-			item_name = "Fuel Can"
-			item_droppable = true
-			item_usable = false
-		elseif HeldItem == 2 then
-			item_mat = ITEM2
-			item_name = "The Deathward"
-			item_droppable = false
-			item_usable = false
-		elseif HeldItem == 3 then
-			item_mat = ITEM3
-			item_name = "Milk Jug"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 4 then
-			item_mat = ITEM4
-			item_name = "Cookie"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 5 then
-			item_mat = ITEM5
-			item_name = "Mayonnaise"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 6 then
-			item_mat = ITEM6
-			item_name = "Step Decoy"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 7 then
-			item_mat = ITEM7
-			item_name = "The Baby"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 8 then
-			item_mat = ITEM8
-			item_name = "B-Gone Soda"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 9 then
-			item_mat = ITEM9
-			item_name = "Distress Beacon"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 10 then
-			item_mat = ITEM10
-			item_name = "Devil's Gamble"
-			item_droppable = true
-			item_usable = true
-		elseif HeldItem == 11 then
-			item_mat = ITEM11
-			item_name = "Personal Radio Set"
-			item_droppable = false
-			item_usable = false
-		elseif HeldItem == 99 then
-			item_mat = ITEM2_99
-			item_name = "The Deathward"
-			item_droppable = false
-			item_usable = false
+		if hp > (prevHp or 100) then --reset damage indicator upon healing
+			prevHp = math.Clamp(hp,0,100)
+			SetTime = 0
 		end
 
-		surface.SetMaterial(item_mat)
-		surface.DrawTexturedRect(itemx, itemy, itemsize, itemsize)
-		draw.SimpleText( item_name, "LobbyFont2", ScrW()/1.04, ScrH()/1.02, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-		if item_droppable then draw.SimpleText( "Q to drop", "ItemFontTip", itemx + itemsize, itemy-(itemsize/3), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
-		if item_usable then draw.SimpleText( "R to use", "ItemFontTip", itemx + itemsize, itemy-(itemsize/6), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP ) end
+		if (CurTime() >= (SetTime or 0)) then
+			if ShowDamage then --update prevHp once the indicator time is up
+				prevHp = math.Clamp(hp,0,100)
+				ShowDamage = false
+			end
 
+			if hp < (prevHp or 100) then --start the damage indicator time
+				prevHp1 = math.Clamp(hp,0,100)
+				ShowDamage = true
+				SetTime = CurTime() + 2.1
+			end
+		elseif hp < prevHp1 then --reset indicator time if more damage is taken
+			prevHp1 = math.Clamp(hp,0,100)
+			SetTime = CurTime() + 2.1
+		end
+
+		aHp = Lerp(FrameTime()*3, (aHp or 100), hp)
+		local displayPrevHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(((prevHp or 100) - hp)/maxHp,0,1)*26.9) or 0
+		local parsed
+
+		if hp >= 25 or not GetConVar("slashcohud_show_lowhealth"):GetBool() then
+			local hpOver = math.Clamp(hp-maxHp,0,100)
+			local hpAdjust = math.Clamp(hp,0,100)-hpOver
+			local displayHpBar = math.Round(math.Clamp(hpAdjust/maxHp,0,1)*27)
+			local displayHpOverBar = math.Round(math.Clamp(hpOver/maxHp,0,1)*27)
+			parsed = markup.Parse("<font=TVCD>HP <colour=0,255,255,255>"..string.rep("█",displayHpOverBar).."</colour>" --overheal
+					..string.rep("█",displayHpBar) --hp
+					.."<colour=255,0,0,255>"..string.rep("█",displayPrevHpBar).."</colour></font>") --indicator
+		else
+			local displayHpBar = (CurTime()%0.7 > 0.35) and math.Round(math.Clamp(hp/maxHp,0,1)*27) or 0
+			parsed = markup.Parse("<font=TVCD>HP <colour=255,255,0,255>"..string.rep("█",displayHpBar).."</colour><colour=255,0,0,255>" --hp
+					..string.rep("█",displayPrevHpBar).."</colour></font>") --indicator
+		end
+
+		surface.SetDrawColor(0,0,128,255)
+
+		if not GetConVar("slashcohud_show_healthvalue"):GetBool() then
+			surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 410, 27)
+		else
+			local displayHp = math.Round(aHp)
+			local parsedValue = markup.Parse("<font=TVCD>"..displayHp.."</font>")
+			surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95-24, 420+parsedValue:GetWidth(), 27)
+			parsedValue:Draw(ScrW() * 0.025+417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+		end
+
+		parsed:Draw(ScrW() * 0.025+4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 	end
-	
 end)
 
 hook.Add( "Think", "Slasher_Chasing_Light", function()

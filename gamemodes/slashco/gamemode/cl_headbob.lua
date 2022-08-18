@@ -20,16 +20,16 @@ function HeadBob(pl, pos, ang, fov)
 			HBPosZ = HBPosZ + (pl:GetVelocity():Length()/17) * FrameTime()
             PitchReset = false
 
-            if HBPitch == nil then HBPitch = 0 end
-            if HBRoll == nil then HBRoll = 0 end
+            --if HBPitch == nil then HBPitch = 0 end
+            --if HBRoll == nil then HBRoll = 0 end
 
-            HBPitch = HBPitch + (pl:GetVelocity():Length()/17) * FrameTime()
-            HBRoll = HBRoll + (pl:GetVelocity():Length()/25) * FrameTime()
+            HBPitch = (HBPitch or 0) + (pl:GetVelocity():Length()/17) * FrameTime() --/17
+            HBRoll = (HBRoll or 0) + (pl:GetVelocity():Length()/25) * FrameTime() --/25
             HBPitchPost = math.sin(HBPitch)*0.25*velCoef
             HBRollPost = math.cos(HBRoll)*0.15*velCoef
             v.ang.pitch = v.ang.pitch + HBPitchPost
             v.ang.roll = v.ang.roll + HBRollPost
-        else --Reste view pitch
+        else --Reset view pitch
             if not PitchReset then
                 HBPitch = HBPitchPost
                 HBRoll = HBRollPost
@@ -57,7 +57,7 @@ function HeadBob(pl, pos, ang, fov)
 	
     pl.OLDANG = v.ang
     pl.OLDPOS = v.pos
-    v.pos.z = v.pos.z - math.cos(HBPosZ)*(pl:GetVelocity():Length()/350)
+    v.pos.z = v.pos.z - math.cos(HBPosZ)*(pl:GetVelocity():Length()/1000)
     v.ang.roll = v.ang.roll + add
 
 	return GAMEMODE:CalcView(pl, v.pos, v.ang, v.fov)

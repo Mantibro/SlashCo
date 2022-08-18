@@ -34,7 +34,7 @@ function EFFECT:Init( data )
 			particle:SetAirResistance( 100 )
 			particle:SetGravity( Vector( 0, 0, 50+(Pos[1]*25) ) )
 
-			local RandDarkness = math.Rand( 0.8, 1.0 )
+			--local RandDarkness = math.Rand( 0.8, 1.0 )
 			particle:SetColor( 50, 50, 50 )
 
 			particle:SetCollide( true )
@@ -65,7 +65,7 @@ function EFFECT:Init( data )
 			particleflash:SetAirResistance( 100 )
 			particleflash:SetGravity( Vector( 0, 0, 50+(Pos[1]*25) ) )
 
-			local RandDarkness = math.Rand( 0.8, 1.0 )
+			--local RandDarkness = math.Rand( 0.8, 1.0 )
 			particleflash:SetColor( 50, 50, 50 )
 
 			particleflash:SetCollide( true )

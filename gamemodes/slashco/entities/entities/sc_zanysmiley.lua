@@ -1,3 +1,4 @@
+--[[
 AddCSLuaFile()
 
 local SlashCo = SlashCo
@@ -42,7 +43,7 @@ function ENT:HaveEnemy()
 			-- FindEnemy() will return true if an enemy is found, making this function return true
 			return self:FindEnemy()
 		-- If the enemy is dead( we have to check if its a player before we use Alive() )
-		elseif ( self:GetEnemy():IsPlayer() and !self:GetEnemy():Alive() ) then
+		elseif ( self:GetEnemy():IsPlayer() and not self:GetEnemy():Alive() ) then
 			return self:FindEnemy()		-- Return false if the search finds nothing
 		end	
 		-- The enemy is neither too far nor too dead so we can return true
@@ -62,7 +63,7 @@ function ENT:FindEnemy()
 	-- This can be done any way you want eg. ents.FindInCone() to replicate eyesight
 	local _ents = ents.FindInSphere( self:GetPos(), self.SearchRadius )
 	-- Here we loop through every entity the above search finds and see if it's the one we want
-	for k,v in ipairs( _ents ) do
+	for _,v in ipairs( _ents ) do
 		if ( v:IsPlayer() and v:Team() == TEAM_SURVIVOR ) then
 			-- We found one so lets set it as our enemy and return true
 			local tr = util.TraceLine( {
@@ -117,13 +118,13 @@ end
 
 function ENT:ChaseEnemy( options )
 
-	local options = options or {}
+	local options1 = options or {}
 	local path = Path( "Follow" )
-	path:SetMinLookAheadDistance( options.lookahead or 300 )
-	path:SetGoalTolerance( options.tolerance or 20 )
+	path:SetMinLookAheadDistance( options1.lookahead or 300 )
+	path:SetGoalTolerance( options1.tolerance or 20 )
 	path:Compute( self, self:GetEnemy():GetPos() )		-- Compute the path towards the enemy's position
 
-	if ( !path:IsValid() ) then return "failed" end
+	if ( not path:IsValid() ) then return "failed" end
 
 	while ( path:IsValid() and self:HaveEnemy() ) do
 	
@@ -132,7 +133,7 @@ function ENT:ChaseEnemy( options )
 		end
 		path:Update( self )								-- This function moves the bot along the path
 		
-		if ( options.draw ) then path:Draw() end
+		if ( options1.draw ) then path:Draw() end
 		-- If we're stuck then call the HandleStuck function and abandon
 		if ( self.loco:IsStuck() ) then
 			self:HandleStuck()
@@ -176,17 +177,17 @@ function ENT:Think()
 
 end
 
---[[function ENT:Use( activator )
+function ENT:Use( activator )
 
 	if SERVER then
 
 
 	end
 
-end]]
+end
 
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_ALWAYS 
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
 end
 
 if CLIENT then
@@ -194,3 +195,4 @@ if CLIENT then
 		self:DrawModel()
 	end
 end
+--]]

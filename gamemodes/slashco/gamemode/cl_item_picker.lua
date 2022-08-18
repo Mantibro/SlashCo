@@ -1,5 +1,6 @@
 include( "ui/fonts.lua" )
 
+local SlashCoItems = SlashCoItems
 local ReceivedLocalPlayerID = ""
 
 function SelectThisItem(itemID)
@@ -39,24 +40,23 @@ function DrawTheSelectorBox()
 	ItemSelectFrame = vgui.Create( "DFrame" )
 	ItemSelectFrame:SetTitle( "Pick Your Item" )
 
-	if SelectedItem == nil then SelectedItem = 0 end
+	if SelectedItem == nil then SelectedItem = "Baby" end
 
 	local y = 30
-	for i = 1, #SCInfo.Item do
-	
+	for k, p in SortedPairs(SlashCoItems) do
+		if not p.Price then continue end
 		local Item = vgui.Create( "DButton", ItemSelectFrame )
-		function Item.DoClick() SelectThisItem(i) end
+		function Item.DoClick() SelectThisItem(k) end
 		Item:SetPos( 10, y )
 		Item:SetSize( 160, 30 )
-		Item:SetText( SCInfo.Item[i].Name )
+		Item:SetText( p.Name )
 		Item:SetFont( "MenuFont1" )
 
-		if SelectedItem == i  then
+		if SelectedItem == k then
 			Item:SetDisabled( true )
 		end
-			
+
 		y = y + 40
-		
 	end
 
 	local confirmselect = vgui.Create( "DButton", ItemSelectFrame )
@@ -66,127 +66,36 @@ function DrawTheSelectorBox()
 	confirmselect:SetText( "Confirm" )
 	confirmselect:SetFont( "MenuFont1" )
 
-	if SelectedItem == 0  then
-		confirmselect:SetDisabled( true )
-	end
-
-	if SelectedItem == 2 and readtable.wardsleft < 1 then
-		confirmselect:SetDisabled( true )
-	end
-
-
 	-- Model panel
 	local mdl = vgui.Create("DModelPanel", ItemSelectFrame)
 	mdl:SetPos(250, 30)
 	mdl:SetSize(350, 200)
-	--mdl:SetModel("models/props_junk/metalgascan.mdl")
-	--mdl:SetCamPos(Vector(80, 0, 0))
 	mdl:SetLookAt(Vector(0, 0, 0))
 	mdl:SetFOV(40)
+	mdl:SetModel(SlashCoItems[SelectedItem].Model)
+	mdl:SetCamPos(SlashCoItems[SelectedItem].CamPos)
 
 	local ILabel = vgui.Create( "DLabel", ItemSelectFrame )
 	ILabel:SetPos( 180, 230 )
 	ILabel:SetSize(600, 200)
-	ILabel:SetText( " " )
+	if (SlashCoItems[SelectedItem].MaxAllowed) then
+		local numRemain = SlashCoItems[t.id].MaxAllowed()
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if v:GetNWString("item", "none") == t.id then numRemain = numRemain - 1 end
+		end
+		ILabel:SetText(SlashCoItems[SelectedItem].Name.." ( "..SlashCoItems[SelectedItem].Price.." Points ) ( "..numRemain.." remaining )")
+	else
+		ILabel:SetText(SlashCoItems[SelectedItem].Name.." ( "..SlashCoItems[SelectedItem].Price.." Points )")
+	end
 	ILabel:SetFont( "MenuFont2" )
 	ILabel:SetAutoStretchVertical( true )
 
 	local IDesc = vgui.Create( "DLabel", ItemSelectFrame )
 	IDesc:SetPos( 180, 260 )
 	IDesc:SetSize(600, 200)
-	IDesc:SetText(  " " )
+	IDesc:SetText(SlashCoItems[SelectedItem].Description)
 	IDesc:SetFont( "MenuFont1" )
 	IDesc:SetAutoStretchVertical( true )
-
-	if SelectedItem == 1 then
-
-		mdl:SetModel("models/props_junk/metalgascan.mdl")
-		mdl:SetCamPos(Vector(80, 0, 0))
-
-		ILabel:SetText( SCInfo.Item[1].Name.." ( "..SCInfo.Item[1].Price.." Points )" )
-		IDesc:SetText( SCInfo.Item[1].Description )
-
-	elseif SelectedItem == 2 then
-
-		mdl:SetModel("models/slashco/items/deathward.mdl")
-		mdl:SetCamPos(Vector(40, 0, 15))
-
-		ILabel:SetText( SCInfo.Item[2].Name.." ( "..SCInfo.Item[2].Price.." Points )" )
-		IDesc:SetText( SCInfo.Item[2].Description.."\nWards left: "..tostring(readtable.wardsleft) )
-
-	elseif SelectedItem == 3 then
-
-		mdl:SetModel("models/props_junk/garbage_milkcarton001a.mdl")
-		mdl:SetCamPos(Vector(60, 0, 10))
-
-		ILabel:SetText( SCInfo.Item[3].Name.." ( "..SCInfo.Item[3].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[3].Description )
-
-	elseif SelectedItem == 4 then
-
-		mdl:SetModel("models/slashco/items/cookie.mdl")
-		mdl:SetCamPos(Vector(50, 0, 20))
-
-		ILabel:SetText( SCInfo.Item[4].Name.." ( "..SCInfo.Item[4].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[4].Description )
-
-	elseif SelectedItem == 5 then
-
-		mdl:SetModel("models/props_lab/jar01a.mdl")
-		mdl:SetCamPos(Vector(60, 0, 10))
-
-		ILabel:SetText( SCInfo.Item[5].Name.." ( "..SCInfo.Item[5].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[5].Description )
-
-	elseif SelectedItem == 6 then
-
-		mdl:SetModel("models/props_junk/Shoe001a.mdl")
-		mdl:SetCamPos(Vector(50, 0, 20))
-
-		ILabel:SetText( SCInfo.Item[6].Name.." ( "..SCInfo.Item[6].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[6].Description )
-
-	elseif SelectedItem == 7 then
-
-		mdl:SetModel("models/props_c17/doll01.mdl")
-		mdl:SetCamPos(Vector(50, 0, 0))
-
-		ILabel:SetText( SCInfo.Item[7].Name.." ( "..SCInfo.Item[7].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[7].Description )
-
-	elseif SelectedItem == 8 then
-
-		mdl:SetModel("models/props_junk/PopCan01a.mdl")
-		mdl:SetCamPos(Vector(30, 0, 0))
-
-		ILabel:SetText( SCInfo.Item[8].Name.." ( "..SCInfo.Item[8].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[8].Description )
-
-	elseif SelectedItem == 9 then
-
-		mdl:SetModel("models/props_c17/light_cagelight01_on.mdl")
-		mdl:SetCamPos(Vector(50, 0, 10))
-
-		ILabel:SetText( SCInfo.Item[9].Name.." ( "..SCInfo.Item[9].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[9].Description )
-
-	elseif SelectedItem == 10 then
-
-		mdl:SetModel("models/slashco/items/devildie.mdl")
-		mdl:SetCamPos(Vector(30, 0, 10))
-
-		ILabel:SetText( SCInfo.Item[10].Name.." ( "..SCInfo.Item[10].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[10].Description )
-
-	elseif SelectedItem == 11 then
-
-		mdl:SetModel("models/props_phx/gibs/flakgib1.mdl")
-		mdl:SetCamPos(Vector(30, 0, 10))
-
-		ILabel:SetText( SCInfo.Item[11].Name.." ( "..SCInfo.Item[11].Price.." Points )"  )
-		IDesc:SetText( SCInfo.Item[11].Description )
-
-	end
 
 	ItemSelectFrame:SetSize( 800, y )
 	ItemSelectFrame:Center()
@@ -200,7 +109,7 @@ function HideItemSelection()
 	if ( IsValid(ItemSelectFrame) ) then
 		ItemSelectFrame:Remove()
 		ItemSelectFrame = nil
-		SelectedItem = 0
+		SelectedItem = "Baby"
 		ReceivedLocalPlayerID = ""
 	end
 
