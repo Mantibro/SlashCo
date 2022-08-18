@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_slashco/items/rock/rock_tex"
+	"$bumpmap" "models/props_slashco/items/rock/rock_bump"
+	"$halflambert" 1
+}
