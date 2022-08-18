@@ -900,6 +900,7 @@ do
     v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Survey Length
     v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Survey Cooldown
     v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Watched
+    v4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 --Times Surveyed 
 
     SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = BoolToNumber( slasher:GetNWBool("WatcherWatched") )
 
@@ -940,7 +941,7 @@ do
 
             local target = NULL
 
-            if slasher:GetEyeTrace().Entity == slasher then
+            if surv:GetEyeTrace().Entity == slasher then
                 target = slasher
                 goto FOUND
             end
@@ -953,26 +954,22 @@ do
                     end
                 end
 
-                if not target:IsValid() then 
-                    return
-                end
-
                 local tr = util.TraceLine( {
                     start = surv:EyePos(),
                     endpos = target:GetPos()+Vector(0,0,50),
                     filter = surv
                 } )
 
-                if tr.Entity != target then return end
+                if tr.Entity != target then target = NULL end
             end
             ::FOUND::
 
-            if target == slasher then 
+            if IsValid(target) and target == slasher then 
                 surv:SetNWBool("SurvivorWatcherSurveyed", true) 
-                slasher:SetNWBool("WatchedWatched", true) 
+                slasher:SetNWBool("WatcherWatched", true) 
             else
                 if surv:GetNWBool("SurvivorWatcherSurveyed") then surv:SetNWBool("SurvivorWatcherSurveyed", false) end
-                slasher:SetNWBool("WatchedWatched", false) 
+                slasher:SetNWBool("WatcherWatched", false) 
             end
 
         end

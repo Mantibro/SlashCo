@@ -411,5 +411,32 @@ end --ends here
     end
 
     ::WATCHER::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 10 then goto ABOMIGNAT end
+
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 > 0 then return end
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 10 + (SO * 10)
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 100 - (SO * 35)
+
+        PlayGlobalSound("slashco/slasher/watcher_locate.mp3", 100, slasher, 1)
+
+        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+            local p = team.GetPlayers(TEAM_SURVIVOR)[i]
+            p:SetNWBool("WatcherSurveyed", true)
+            p:EmitSound("slashco/slasher/watcher_see.mp3")
+        end
+
+        timer.Simple(5, function() 
+        
+            for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+                local p = team.GetPlayers(TEAM_SURVIVOR)[i]
+                p:SetNWBool("WatcherSurveyed", false)
+            end
+        
+        end)
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 + 1
+
+    ::ABOMIGNAT::
 
 end
