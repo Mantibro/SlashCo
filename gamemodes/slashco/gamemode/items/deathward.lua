@@ -20,3 +20,14 @@ SlashCoItems.DeathWard.OnDie = function(ply)
 
     return true
 end
+SlashCoItems.DeathWard.ViewModel = {
+    model = "models/slashco/items/deathward.mdl",
+    pos = Vector(64, 0, -6),
+    angle = Angle(45, -70, -120),
+    size = Vector(0.5, 0.5, 0.5),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

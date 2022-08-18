@@ -37,19 +37,24 @@ end
 function ENT:Touch(otherEnt)
     if SERVER then
         local index = otherEnt:EntIndex()
-        if not self.FuelingCan and SlashCo.CurRound.GasCans[index] and otherEnt:IsPlayerHolding() and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+        if not self.MakingCan and not self.FuelingCan and SlashCo.CurRound.GasCans[index] and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
             --print("Gas Touch")
 
+            SlashCo.RemoveSelectableNow(index)
             SlashCo.CurRound.GasCans[index] = nil
+            otherEnt:Remove()
 
-            DropEntityIfHeld(otherEnt)
-            otherEnt:SetMoveType(MOVETYPE_NONE)
-            otherEnt:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-            otherEnt:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
-            otherEnt:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
-            otherEnt:SetParent(self)
+            local gasCan = ents.Create("prop_physics")
 
-            self.FuelingCan = otherEnt
+            gasCan:SetModel( SlashCo.GasCanModel )
+            gasCan:SetMoveType(MOVETYPE_NONE)
+            gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+            gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
+            gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
+            gasCan:SetParent(self)
+
+            SlashCo.MakeSelectableNow(index)
+            self.FuelingCan = gasCan
 
             SlashCo.SpawnSlasher()
         elseif not self.HasBattery and SlashCo.CurRound.Batteries[index] and otherEnt:IsPlayerHolding() and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
@@ -88,17 +93,37 @@ function ENT:Use(activator, _, _)
 
     if SERVER then
 
-        if activator:Team() == TEAM_SURVIVOR and IsValid(self.FuelingCan) and activator:GetPos():Distance(self:GetPos()) <= 100 then
-            self.IsFueling = true
-            self.CurrentPourer = activator
-            self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
-            self:SendData(activator)
-            self:EmitSound("slashco/generator_fill.wav")
+        if activator:Team() == TEAM_SURVIVOR and activator:GetPos():Distance(self:GetPos()) <= 100 then
+            if IsValid(self.FuelingCan) then
+                self.IsFueling = true
+                self.CurrentPourer = activator
+                self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
+                self:SendData(activator)
+                self:EmitSound("slashco/generator_fill.wav")
+            elseif not self.MakingCan and activator:GetNWString("item2", "none") == "GasCan" and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+                activator:SetNWString("item2", "none")
+                activator:SetRunSpeed(300)
 
+                self.MakingCan = true
+                timer.Simple(0.25, function()
+                    self.MakingCan = nil
+                    local gasCan = ents.Create("prop_physics")
+
+                    gasCan:SetModel( SlashCo.GasCanModel )
+                    gasCan:SetMoveType(MOVETYPE_NONE)
+                    gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+                    gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
+                    gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
+                    gasCan:SetParent(self)
+
+                    SlashCo.MakeSelectableNow(gasCan)
+                    self.FuelingCan = gasCan
+
+                    SlashCo.SpawnSlasher()
+                end)
+            end
         end
-
     end
-
 end
 
 function ENT:Think()

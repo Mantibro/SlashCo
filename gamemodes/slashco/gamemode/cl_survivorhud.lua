@@ -26,16 +26,6 @@ net.Receive( "mantislashcoGasPourProgress", function( )
 
 end)
 
-net.Receive("mantislashcoGiveItemData", function()
-
-	t = net.ReadTable()
-
-	if (t[LocalPlayer():SteamID64()]) then
-		HeldItem = t[LocalPlayer():SteamID64()]
-	end
-
-end)
-
 hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	local ply = LocalPlayer()
@@ -56,6 +46,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		--//item display//--
 
+		local HeldItem = ply:GetNWString("item", "none")
 		if SlashCoItems[HeldItem or "none"] then
 			local parsedItem = markup.Parse("<font=TVCD>---     "..string.upper(SlashCoItems[HeldItem].Name).."     ---</font>")
 			if SlashCoItems[HeldItem].DisplayColor then
@@ -68,16 +59,16 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 			local offset = 0
 			if SlashCoItems[HeldItem].OnUse then
-				draw.SimpleText("[R] USE", "TVCD", ScrW() * 0.975-104, ScrH() * 0.95-30, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+				draw.SimpleText("[R] USE", "TVCD", ScrW() * 0.975-4, ScrH() * 0.95-30, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 				offset = 30
 			end
 			if SlashCoItems[HeldItem].OnDrop then
-				draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975-104, ScrH() * 0.95-30-offset, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+				draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975-4, ScrH() * 0.95-30-offset, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 			end
 
-			surface.SetDrawColor(255, 255, 255, 255)
-			surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
-			surface.DrawTexturedRect(ScrW() * 0.975-100, ScrH() * 0.95-130, 100, 100)
+			--surface.SetDrawColor(255, 255, 255, 255)
+			--surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
+			--surface.DrawTexturedRect(ScrW() * 0.975-100, ScrH() * 0.95-130, 100, 100)
 		end
 
 		--//gas fuel meter//--

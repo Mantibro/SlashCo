@@ -322,12 +322,6 @@ function lobbyChooseItem(plyid, id)
 		SlashCoItems[id].OnBuy()
 	end
 
-	timer.Simple(0.1, function()
-
-		SlashCo.BroadcastItemData()
-
-	end)
-
 end
 
 --				***Begin the post-ready timer***
@@ -485,7 +479,7 @@ function lobbyRoundSetup()
 	if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == 4 then
 		SlashCo.LobbyData.Offering = 0
 
-		for i, play in ipairs( player.GetAll() ) do
+		for _, play in ipairs( player.GetAll() ) do
 				play:ChatPrint("[SlashCo] No Spectators, Duality Offering was cleared.") 
 			end
 	end
@@ -611,8 +605,8 @@ net.Receive("mantislashcoPickItem", function()
 	if SlashCoItems[t.id].MaxAllowed then
 		local numAllowed = SlashCoItems[t.id].MaxAllowed()
 		local itemCount = 0
-		for _, v in pairs(SlashCo.CurRound.SurvivorData.Items) do
-			if v == t.id then itemCount = itemCount + 1 end
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if v:GetNWString("item", "none") == t.id then itemCount = itemCount + 1 end
 		end
 		if itemCount >= numAllowed then
 			ply:ChatPrint("Too many players already have this item.")
@@ -880,10 +874,14 @@ function lobbySaveCurData()
 		--Major data dump SOON: Duality
 		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", " .. slasher1id .. ", " .. slasher2id .. ", " .. survivorgasmod .. " );")
 
-		for k, p in pairs(SlashCo.CurRound.SurvivorData.Items) do
+		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			--Save the Current Survivors to the database
 
-			sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. k .. ", " .. sql.SQLStr(p) .. " );")
+			local item = p:GetNWString("item2", "none")
+			if item == "none" then
+				item = p:GetNWString("item", "none")
+			end
+			sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. p:SteamID64() .. ", " .. sql.SQLStr(item) .. " );")
 
 		end
 

@@ -51,8 +51,6 @@ concommand.Add( "slashco_debug_run_survivor", function( ply, _, _ )
 
         SlashCo.SpawnPlayers()
 
-        SlashCo.BroadcastItemData()
-
     end)
 
     SlashCo.SpawnCurConfig(true)

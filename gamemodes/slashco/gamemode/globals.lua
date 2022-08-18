@@ -379,8 +379,8 @@ SlashCo.ResetCurRoundData = function()
             GameReadyToBegin = false
         },
         SurvivorData = {
-            GasCanMod = 0, --This will decrement if someone chooses a gas can to take in as an item.
-            Items = {}
+            GasCanMod = 0 --This will decrement if someone chooses a gas can to take in as an item.
+            --Items = {} --not used
         },
         SlasherEntities = { --Slasher's unique entities, such as bababooey's clones.
 
@@ -426,88 +426,94 @@ SlashCo.PlayerData = {} --Holds all loaded playerdata
 
 SlashCo.LoadCurRoundData = function()
 
-if SERVER then
+    if SERVER then
 
-    table.Empty( SlashCo.CurRound.ExpectedPlayers )
+        table.Empty(SlashCo.CurRound.ExpectedPlayers)
 
-    if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
+        if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
 
-        --Load relevant data from the database
-        local diff = sql.Query("SELECT Difficulty FROM slashco_table_basedata; ")[1].Difficulty
-        local offering = sql.Query("SELECT Offering FROM slashco_table_basedata; ")[1].Offering
-        local slasher1id = sql.Query("SELECT SlasherIDPrimary FROM slashco_table_basedata; ")[1].SlasherIDPrimary
-        local slasher2id = sql.Query("SELECT SlasherIDSecondary FROM slashco_table_basedata; ")[1].SlasherIDSecondary
-        local survivorgasmod = sql.Query("SELECT SurviorGasMod FROM slashco_table_basedata; ")[1].SurviorGasMod
+            --Load relevant data from the database
+            local diff = sql.Query("SELECT Difficulty FROM slashco_table_basedata; ")[1].Difficulty
+            local offering = sql.Query("SELECT Offering FROM slashco_table_basedata; ")[1].Offering
+            local slasher1id = sql.Query("SELECT SlasherIDPrimary FROM slashco_table_basedata; ")[1].SlasherIDPrimary
+            local slasher2id = sql.Query("SELECT SlasherIDSecondary FROM slashco_table_basedata; ")[1].SlasherIDSecondary
+            local survivorgasmod = sql.Query("SELECT SurviorGasMod FROM slashco_table_basedata; ")[1].SurviorGasMod
 
-        print("[SlashCo] RoundData Loaded with Difficulty of: "..diff..", Offering of: "..offering.." and GasMod of: "..survivorgasmod)
+            print("[SlashCo] RoundData Loaded with Difficulty of: " .. diff .. ", Offering of: " .. offering .. " and GasMod of: " .. survivorgasmod)
 
-        --Transfer loaded data into the main table
-        SlashCo.CurRound.Difficulty = diff
-        SlashCo.CurRound.SurvivorData.GasCanMod = survivorgasmod
-        SlashCo.CurRound.OfferingData.CurrentOffering = tonumber(offering)
-        if SlashCo.CurRound.OfferingData.CurrentOffering > 0 then
-            SlashCo.CurRound.OfferingData.OfferingName = SCInfo.Offering[SlashCo.CurRound.OfferingData.CurrentOffering].Name
-        end
-
-        --First we insert the Slasher. If the Slasher does not join in time the game cannot begin.
-
-        --Insert the First and second Slasher into the table
-        for e = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
-            table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[e].Slashers})
-        end
-
-        --Survivors don't necessarily have to join in time, as the game can continue with at least 1. (TODO)
-        --TODO: timer which starts the game premature if some survivors don't join in time.
-
-        for i = 1, #sql.Query("SELECT * FROM slashco_table_survivordata; ") do
-
-            if sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors ~= nil then
-                --Survivors due to connect
-                table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors})
-                    --For the slasher's clientside view also
-                    table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors, GameContribution = 0})
-                --Items
-                local steamid = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Survivors
-                SlashCo.CurRound.SurvivorData.Items[steamid] = sql.Query("SELECT * FROM slashco_table_survivordata; ")[i].Item
+            --Transfer loaded data into the main table
+            SlashCo.CurRound.Difficulty = diff
+            SlashCo.CurRound.SurvivorData.GasCanMod = survivorgasmod
+            SlashCo.CurRound.OfferingData.CurrentOffering = tonumber(offering)
+            if SlashCo.CurRound.OfferingData.CurrentOffering > 0 then
+                SlashCo.CurRound.OfferingData.OfferingName = SCInfo.Offering[SlashCo.CurRound.OfferingData.CurrentOffering].Name
             end
 
+            --First we insert the Slasher. If the Slasher does not join in time the game cannot begin.
+
+            --Insert the First and second Slasher into the table
+            for e = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
+                table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[e].Slashers })
+            end
+
+            --Survivors don't necessarily have to join in time, as the game can continue with at least 1. (TODO)
+            --TODO: timer which starts the game premature if some survivors don't join in time.
+
+            local query = sql.Query("SELECT * FROM slashco_table_survivordata; ")
+            for i = 1, #query do
+
+                if query[i].Survivors ~= nil then
+                    --Survivors due to connect
+
+                    local steamid = query[i].Survivors
+                    table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = steamid })
+                    --For the slasher's clientside view also
+                    table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = steamid, GameContribution = 0 })
+                end
+
+            end
+
+            print("[SlashCo] First 2 Expected Players assigned: " .. SlashCo.CurRound.ExpectedPlayers[1].steamid .. SlashCo.CurRound.ExpectedPlayers[2].steamid)
+            print("[SlashCo] Expected Player table size: " .. #SlashCo.CurRound.ExpectedPlayers)
+
+            for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
+
+                local id = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[s].Slashers
+                if id == "90071996842377216" then
+                    break
+                end
+
+                SlashCo.InsertSlasherToTable(id)
+
+                timer.Simple(1, function()
+
+                    print("[SlashCo] Selecting Slasher for player with id: " .. id)
+                    if s == 1 then
+                        SlashCo.SelectSlasher(tonumber(slasher1id), id)
+                    end
+                    if s == 2 then
+                        SlashCo.SelectSlasher(tonumber(slasher2id), id)
+                    end
+
+                end)
+
+            end
+
+
+        else
+            print("[SlashCo] Something went wrong while trying to load the round data from the Database! Restart imminent. (init)")
+            local baseTable = sql.TableExists("slashco_table_basedata") and "present" or "nil"
+            local survivorTable = sql.TableExists("slashco_table_survivordata") and "present" or "nil"
+            local slasherTable = sql.TableExists("slashco_table_slasherdata") and "present" or "nil"
+            print("base table: " .. baseTable)
+            print("survivor table: " .. survivorTable)
+            print("slasher table: " .. slasherTable)
+
+            SlashCo.EndRound()
+
         end
-
-        print("[SlashCo] First 2 Expected Players assigned: "..SlashCo.CurRound.ExpectedPlayers[1].steamid..SlashCo.CurRound.ExpectedPlayers[2].steamid)
-        print("[SlashCo] Expected Player table size: "..#SlashCo.CurRound.ExpectedPlayers)
-
-        for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
-
-            local id = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[s].Slashers
-            if id == "90071996842377216" then break end
-
-            SlashCo.InsertSlasherToTable(id)
-
-            timer.Simple(1, function()
-
-                print("[SlashCo] Selecting Slasher for player with id: "..id)
-                if s == 1 then SlashCo.SelectSlasher(tonumber(slasher1id), id) end
-                if s == 2 then SlashCo.SelectSlasher(tonumber(slasher2id), id) end
-
-            end)
-
-        end
-
-
-    else
-        print("[SlashCo] Something went wrong while trying to load the round data from the Database! Restart imminent. (init)")
-        local baseTable = sql.TableExists("slashco_table_basedata") and "present" or "nil"
-        local survivorTable = sql.TableExists("slashco_table_survivordata") and "present" or "nil"
-        local slasherTable = sql.TableExists("slashco_table_slasherdata") and "present" or "nil"
-        print("base table: "..baseTable)
-        print("survivor table: "..survivorTable)
-        print("slasher table: "..slasherTable)
-
-        SlashCo.EndRound()
 
     end
-
-end
 
 end
 
@@ -647,8 +653,6 @@ SlashCo.LoadCurRoundTeams = function()
                 SlashCo.PrepareSlasherForSpawning()
 
                 SlashCo.SpawnPlayers()
-
-                SlashCo.BroadcastItemData()
 
             end)
 
@@ -888,7 +892,7 @@ end
 
 --Spawn a gas can
 SlashCo.CreateGasCan = function(pos, ang)
-    local Ent = ents.Create( "prop_physics" )
+    local Ent = ents.Create( "sc_gascan" )
 
     if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create an exposure gas can at ("..tostring(pos).."), entity was NULL.\n")
@@ -897,21 +901,20 @@ SlashCo.CreateGasCan = function(pos, ang)
 
     Ent:SetPos( pos )
     Ent:SetAngles( ang )
-    Ent:SetModel( SlashCo.GasCanModel )
-    Ent:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
-    Ent:PhysicsInit( SOLID_VPHYSICS )
+    --Ent:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
+    --Ent:PhysicsInit( SOLID_VPHYSICS )
     Ent:Spawn()
 
     local id = Ent:EntIndex()
     SlashCo.CurRound.GasCans[id] = true
     SlashCo.MakeSelectable(id)
 
-    return id
+    return Ent
 end
 
 --Spawn a gas can (testing only for exposure spawnpoints)
 SlashCo.CreateGasCanE = function(pos, ang)
-    local Ent = ents.Create( "prop_physics" )
+    local Ent = ents.Create( "sc_gascan" )
 
     if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a gas can at ("..tostring(pos).."), entity was NULL.\n")
@@ -920,9 +923,8 @@ SlashCo.CreateGasCanE = function(pos, ang)
 
     Ent:SetPos( pos )
     Ent:SetAngles( ang )
-    Ent:SetModel( SlashCo.GasCanModel )
-    Ent:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
-    Ent:PhysicsInit( SOLID_VPHYSICS )
+    --Ent:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
+    --Ent:PhysicsInit( SOLID_VPHYSICS )
     Ent:Spawn()
     Ent:SetColor( Color(255, 0, 0, 255) )
 
@@ -1376,14 +1378,6 @@ SlashCo.SpawnCurConfig = function(isDebug)
         local id = SlashCo.CreateItem("sc_beacon", Vector(pickedpoint.pos[1],pickedpoint.pos[2],pickedpoint.pos[3]), Angle(pickedpoint.ang[1],pickedpoint.ang[2],pickedpoint.ang[3])) --Spawn one distress beacon
         SlashCo.CurRound.Items[id] = true
         SlashCo.MakeSelectable(id)
-
-        SlashCo.BroadcastItemData()
-
-		timer.Simple(0.5, function()
-
-			SlashCo.BroadcastItemData() --Fallback
-
-        end)
 
         SlashCo.CurRound.roundOverToggle = true
         GAMEMODE.State = GAMEMODE.States.IN_GAME

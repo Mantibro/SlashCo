@@ -472,8 +472,6 @@ hook.Add("OnPlayerChangedTeam", "octoSlashCoOnPlayerChangedTeam", function( ply,
 
 	SlashCo.BroadcastGlobalData()
 
-	SlashCo.BroadcastItemData()
-
 end)
 
 hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
@@ -605,52 +603,68 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 
 	if SERVER then
 
-	ply:SetTeam(TEAM_SPECTATOR)
-	ply:Spawn()
+		ply:SetTeam(TEAM_SPECTATOR)
+		ply:Spawn()
 
-	local pid = ply:SteamID64()
-	local data = {}
+		local pid = ply:SteamID64()
+		local data = {}
 
-	--Don't load playerdata if it's already loaded
-	if SlashCo.PlayerData[ply:SteamID64()] ~= nil then return end
+		--Don't load playerdata if it's already loaded
+		if SlashCo.PlayerData[ply:SteamID64()] ~= nil then
+			return
+		end
 
-	--If the player doesn't have a save file then create one for them.
-	if not file.Exists("slashco/playerdata/"..tostring(ply:SteamID64())..".json", "DATA") then
-		local json = '{ "Stats": { "RoundsWon": { "Survivor": 0, "Slasher": 0 }, "Achievements": [] } }'
+		--If the player doesn't have a save file then create one for them.
+		if not file.Exists("slashco/playerdata/" .. tostring(ply:SteamID64()) .. ".json", "DATA") then
+			local json = '{ "Stats": { "RoundsWon": { "Survivor": 0, "Slasher": 0 }, "Achievements": [] } }'
 
-		print("[SlashCo] No playerdata file found for '"..ply:GetName().."', making one for them.")
+			print("[SlashCo] No playerdata file found for '" .. ply:GetName() .. "', making one for them.")
 
-		data = util.JSONToTable(json)
-		file.Write("slashco/playerdata/"..tostring(ply:SteamID64())..".json", json)
-	else 
-		data = util.JSONToTable(file.Read("slashco/playerdata/"..tostring(ply:SteamID64())..".json", "DATA"))
-	end
+			data = util.JSONToTable(json)
+			file.Write("slashco/playerdata/" .. tostring(ply:SteamID64()) .. ".json", json)
+		else
+			data = util.JSONToTable(file.Read("slashco/playerdata/" .. tostring(ply:SteamID64()) .. ".json", "DATA"))
+		end
 
-	print("[SlashCo] Loaded playerdata for '"..ply:GetName().."'")
+		print("[SlashCo] Loaded playerdata for '" .. ply:GetName() .. "'")
 
-	SlashCo.PlayerData[pid] = {}
-	SlashCo.PlayerData[pid].Lives = 1
-	SlashCo.PlayerData[pid].RoundsWonSurvivor = data.Stats.RoundsWon.Survivor or 0
-	SlashCo.PlayerData[pid].RoundsWonSlasher = data.Stats.RoundsWon.Slasher or 0
-	SlashCo.PlayerData[pid].PointsTotal = 0
+		SlashCo.PlayerData[pid] = {}
+		SlashCo.PlayerData[pid].Lives = 1
+		SlashCo.PlayerData[pid].RoundsWonSurvivor = data.Stats.RoundsWon.Survivor or 0
+		SlashCo.PlayerData[pid].RoundsWonSlasher = data.Stats.RoundsWon.Slasher or 0
+		SlashCo.PlayerData[pid].PointsTotal = 0
 
-	hook.Run("LobbyInfoText")
+		hook.Run("LobbyInfoText")
 
-	SlashCoDatabase.OnPlayerJoined(pid)
+		SlashCoDatabase.OnPlayerJoined(pid)
 
-	SlashCo.AwaitExpectedPlayers()
+		SlashCo.AwaitExpectedPlayers()
 
-	SlashCo.BroadcastGlobalData()
-
-	timer.Simple(2, function() 
-
-		SlashCo.BroadcastMasterDatabaseForClient(pid) 
-		SlashCo.BroadcastCurrentRoundData()
 		SlashCo.BroadcastGlobalData()
 
-	end)
+		timer.Simple(2, function()
 
-end
+			SlashCo.BroadcastMasterDatabaseForClient(pid)
+			SlashCo.BroadcastCurrentRoundData()
+			SlashCo.BroadcastGlobalData()
+
+		end)
+
+		if game.GetMap() ~= "sc_lobby" then
+			local query = sql.Query("SELECT * FROM slashco_table_survivordata; ") --This table shouldn't be organized like this.
+			for _, v in ipairs(query) do
+				if (v.Survivors == ply:SteamID64()) then
+					if SlashCoItems[v.Item].IsSecondary then
+						ply:SetNWString( "item2", v.Item)
+					else
+						ply:SetNWString( "item", v.Item)
+					end
+					break
+				end
+			end
+		end
+
+	end
 
 end)
 
@@ -700,8 +714,8 @@ function GM:PlayerDeath(victim, _, _)
 
 		victim:SetNWBool("DynamicFlashlight", false)
 
-		SlashCo.DropItem(victim)
-		local itid = SlashCo.GetHeldItem(victim)
+		local itid = victim:GetNWString("item", "none")
+		SlashCo.DropAllItems(victim)
 		tickLife = false
 
 		if SlashCoItems[itid] and SlashCoItems[itid].OnDie then

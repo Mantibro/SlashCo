@@ -121,8 +121,19 @@ SlashCoItems.DevilDie.OnUse = function(ply)
     
 end
 SlashCoItems.DevilDie.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
+    local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
     SlashCo.MakeSelectable(droppeditem)
 end
+SlashCoItems.DevilDie.ViewModel = {
+    model = "models/slashco/items/devildie.mdl",
+    pos = Vector(64, 0, -6),
+    angle = Angle(45, -70, -120),
+    size = Vector(0.5, 0.5, 0.5),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

@@ -14,7 +14,6 @@ util.AddNetworkString("mantiSlashCoPickingSlasher")
 util.AddNetworkString("mantiSlashCoSelectSlasher")
 util.AddNetworkString("mantislashcoStartItemPicking")
 util.AddNetworkString("mantislashcoPickItem")
-util.AddNetworkString("mantislashcoGiveItemData")
 util.AddNetworkString("mantislashcoSendLobbyItemGlobal")
 util.AddNetworkString("mantislashcoSendGlobalInfoTable")
 util.AddNetworkString("mantislashcoGlobalSound")
@@ -153,7 +152,7 @@ end
 SlashCo.PlayerItemStashRequest = function(id)
 
 	local ply = player.GetBySteamID64(id)
-    if SlashCo.GetHeldItem(ply) ~= "none" then
+    if ply:GetNWString("item", "none") ~= "none" or ply:GetNWString("item2", "none") ~= "none" then
 		ply:ChatPrint("You have already chosen an item.")
         return
     end
@@ -381,20 +380,6 @@ SlashCo.RoundOverScreen = function(state)
 	})
 
 	net.Broadcast()
-
-end
-
-SlashCo.BroadcastItemData = function()
-
-	if SERVER then
-
-    net.Start("mantislashcoGiveItemData")
-	net.WriteTable(SlashCo.CurRound.SurvivorData.Items)
-	net.Broadcast()
-
-	SlashCo.BroadcastGlobalData()
-
-	end
 
 end
 

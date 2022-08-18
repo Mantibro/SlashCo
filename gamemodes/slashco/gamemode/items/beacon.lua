@@ -44,8 +44,21 @@ SlashCoItems.Beacon.OnUse = function(ply)
     end
 end
 SlashCoItems.Beacon.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_beacon", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 750)
+    local droppeditem = SlashCo.CreateItem("sc_beacon", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
     SlashCo.MakeSelectable(droppeditem)
 end
+SlashCoItems.Beacon.ViewModel = {
+    type = "Model",
+    model = "models/props_c17/light_cagelight01_on.mdl",
+    rel = "",
+    pos = Vector(66, 0, -7),
+    angle = Angle(45, -70, -120),
+    size = Vector(0.5, 0.5, 0.5),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

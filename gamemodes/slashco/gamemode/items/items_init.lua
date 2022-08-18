@@ -29,6 +29,7 @@ include("deathward_used.lua")
 local SlashCoItems = SlashCoItems
 
 SlashCoItems.NameMePlease = {}
+SlashCoItems.NameMePlease.IsSecondary = false --optional, to let gascans and batteries not take up an item slot
 SlashCoItems.NameMePlease.Model = ""
 SlashCoItems.NameMePlease.Name = ""
 SlashCoItems.NameMePlease.Icon = ""
@@ -51,4 +52,17 @@ SlashCoItems.NameMePlease.OnPickUp = function(ply) --optional, when received
 end
 SlashCoItems.NameMePlease.OnBuy = function(plyid) --optional, when buying from lobby store
 end
+SlashCoItems.NameMePlease.ViewModel = { --optional (i guess), use the SWEP construction kit on the workshop to help set this up
+    model = "",
+    pos = Vector(64, 0, -6),
+    angle = Angle(45, -70, -120),
+    size = Vector(0.5, 0.5, 0.5),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false, --this name is stupid but that's what the construction kit outputs so we're keeping it
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+--^IMPORTANT: The item display will ALWAYS place the item on ValveBiped.Bip01_Spine4
+SlashCoItems.NameMePlease.WorldModel = {} --optional, not set up yet
 ]]

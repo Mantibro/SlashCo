@@ -25,8 +25,20 @@ SlashCoItems.Cookie.OnUse = function(ply)
     SlashCo.SidRage(ply)
 end
 SlashCoItems.Cookie.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_cookie", ply:LocalToWorld(Vector(30, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    local droppeditem = SlashCo.CreateItem("sc_cookie", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
     SlashCo.MakeSelectable(droppeditem)
 end
+SlashCoItems.Cookie.ViewModel = {
+    model = "models/slashco/items/cookie.mdl",
+    bone = "ValveBiped.Bip01_Spine4",
+    pos = Vector(64, 0, -5),
+    angle = Angle(45, -140, -60),
+    size = Vector(0.5, 0.5, 0.5),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

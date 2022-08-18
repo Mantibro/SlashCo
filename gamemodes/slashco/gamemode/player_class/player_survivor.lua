@@ -23,6 +23,7 @@ end
 
 function PLAYER:Loadout()
 	self.Player:RemoveAllAmmo()
+	self.Player:Give( "sc_survivorhands" )
 end
 
 function PLAYER:SetModel()
