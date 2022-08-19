@@ -966,7 +966,7 @@ end
 
 --Spawn a battery
 SlashCo.CreateBattery = function(pos, ang)
-    local Ent = ents.Create( "prop_physics" )
+    local Ent = ents.Create( "sc_battery" )
 
     if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a battery at ("..tostring(pos).."), entity was NULL.\n")
@@ -984,7 +984,7 @@ SlashCo.CreateBattery = function(pos, ang)
     SlashCo.CurRound.Batteries[id] = true
     SlashCo.MakeSelectable(id)
 
-    return id
+    return Ent
 end
 
 SlashCo.CreateGenerators = function(spawnpoints)
@@ -1117,8 +1117,10 @@ SlashCo.RemoveAllCurRoundEnts = function()
 
     local gens = ents.FindByClass( "sc_generator")
     for _, v in ipairs(gens) do
-        local ent = Entity(v.FuelingCan) --make sure any attached cans go too
-        if IsValid(ent) then ent:Remove() end
+        local can = v.FuelingCan --make sure any attached cans and bats go too
+        local bat = v.HasBattery
+        if IsValid(can) then can:Remove() end
+        if IsValid(bat) then bat:Remove() end
         v:Remove()
     end
 

@@ -10,6 +10,7 @@ AddCSLuaFile("milkjug.lua")
 AddCSLuaFile("soda.lua")
 AddCSLuaFile("stepdecoy.lua")
 AddCSLuaFile("deathward_used.lua")
+AddCSLuaFile("battery.lua")
 
 if not SlashCoItems then SlashCoItems = {} end
 
@@ -24,6 +25,7 @@ include("milkjug.lua")
 include("soda.lua")
 include("stepdecoy.lua")
 include("deathward_used.lua")
+include("battery.lua")
 
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems
@@ -63,6 +65,6 @@ SlashCoItems.NameMePlease.ViewModel = { --optional (i guess), use the SWEP const
     skin = 0,
     bodygroup = {}
 }
---^IMPORTANT: The item display will ALWAYS place the item on ValveBiped.Bip01_Spine4
-SlashCoItems.NameMePlease.WorldModel = {} --optional, not set up yet
+--^IMPORTANT: The item display will ALWAYS place the item on "ValveBiped.Bip01_Spine4", with viewmodel set to "models/weapons/c_arms.mdl"
+SlashCoItems.NameMePlease.WorldModel = {} --optional, similar to above but with choice of bone and holdtype
 ]]

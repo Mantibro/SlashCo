@@ -36,6 +36,7 @@ SlashCoItems.GasCan.ViewModel = {
     bodygroup = {}
 }
 SlashCoItems.GasCan.WorldModel = {
+    holdtype = "duel",
     model = "models/props_junk/metalgascan.mdl",
     bone = "ValveBiped.Bip01_R_Hand",
     pos = Vector(-2.597, 10.909, 1.557),

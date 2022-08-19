@@ -123,18 +123,28 @@ function SWEP:DrawWorldModel()
         return
     end
 
-    local v = self.GasCanModelWorld
+    local item = self.Owner:GetNWString("item2", "none")
+    if item == "none" then
+        item = self.Owner:GetNWString("item", "none")
+    end
 
+    local v
+    if SlashCoItems[item] and SlashCoItems[item].WorldModel then
+        v = SlashCoItems[item].WorldModel
+    end
+    if not v then
+        self.heldEntityWorld:SetNoDraw(true)
+        self.HoldType = "normal"
+        return
+    end
+
+    self.HoldType = v.holdtype
     local bone = self.Owner:LookupBone(v.bone)
     assert(bone, "Tried to use a bone that doesn't exist! (worldmodel)")
     local m = self.Owner:GetBoneMatrix(bone)
     local pos, ang = Vector(0,0,0), Angle(0,0,0)
     if m then
         pos, ang = m:GetTranslation(), m:GetAngles()
-    end
-
-    if self.ViewModelFlip then
-        ang.r = -ang.r -- Fixes mirrored models
     end
 
     if IsValid(self.heldEntityWorld) then

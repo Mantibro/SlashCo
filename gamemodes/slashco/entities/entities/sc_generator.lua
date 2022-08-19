@@ -37,7 +37,7 @@ end
 function ENT:Touch(otherEnt)
     if SERVER then
         local index = otherEnt:EntIndex()
-        if not self.MakingCan and not self.FuelingCan and SlashCo.CurRound.GasCans[index] and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+        if not self.MakingItem and not self.FuelingCan and SlashCo.CurRound.GasCans[index] and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
             --print("Gas Touch")
 
             SlashCo.RemoveSelectableNow(index)
@@ -57,18 +57,24 @@ function ENT:Touch(otherEnt)
             self.FuelingCan = gasCan
 
             SlashCo.SpawnSlasher()
-        elseif not self.HasBattery and SlashCo.CurRound.Batteries[index] and otherEnt:IsPlayerHolding() and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
+        elseif not self.MakingItem and not self.HasBattery and SlashCo.CurRound.Batteries[index] and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
             --print("Battery Touch")
-            self.HasBattery = true
-            DropEntityIfHeld(otherEnt)
-            otherEnt:SetMoveType(MOVETYPE_NONE)
-            otherEnt:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-            otherEnt:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
-            otherEnt:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
-            otherEnt:SetParent(self)
-            otherEnt:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-            otherEnt:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+
             SlashCo.RemoveSelectableNow(index)
+            SlashCo.CurRound.Batteries[index] = nil
+            otherEnt:Remove()
+
+            local battery = ents.Create("prop_physics")
+            self.HasBattery = battery
+
+            battery:SetModel( SlashCo.BatteryModel )
+            battery:SetMoveType(MOVETYPE_NONE)
+            battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+            battery:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
+            battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+            battery:SetParent(self)
+            battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
+            battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
 
             SlashCo.SpawnSlasher()
         end
@@ -100,27 +106,50 @@ function ENT:Use(activator, _, _)
                 self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
                 self:SendData(activator)
                 self:EmitSound("slashco/generator_fill.wav")
-            elseif not self.MakingCan and activator:GetNWString("item2", "none") == "GasCan" and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
-                activator:SetNWString("item2", "none")
-                activator:SetRunSpeed(300)
+            elseif not self.MakingItem then
+                if activator:GetNWString("item2", "none") == "GasCan" and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+                    activator:SetNWString("item2", "none")
+                    activator:SetRunSpeed(300)
 
-                self.MakingCan = true
-                timer.Simple(0.25, function()
-                    self.MakingCan = nil
-                    local gasCan = ents.Create("prop_physics")
+                    self.MakingItem = true
+                    timer.Simple(0.25, function()
+                        self.MakingItem = nil
+                        local gasCan = ents.Create("prop_physics")
 
-                    gasCan:SetModel( SlashCo.GasCanModel )
-                    gasCan:SetMoveType(MOVETYPE_NONE)
-                    gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-                    gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
-                    gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
-                    gasCan:SetParent(self)
+                        gasCan:SetModel( SlashCo.GasCanModel )
+                        gasCan:SetMoveType(MOVETYPE_NONE)
+                        gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+                        gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
+                        gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
+                        gasCan:SetParent(self)
 
-                    SlashCo.MakeSelectableNow(gasCan)
-                    self.FuelingCan = gasCan
+                        SlashCo.MakeSelectableNow(gasCan)
+                        self.FuelingCan = gasCan
 
-                    SlashCo.SpawnSlasher()
-                end)
+                        SlashCo.SpawnSlasher()
+                    end)
+                elseif activator:GetNWString("item2", "none") == "Battery" and not self.HasBattery then
+                    activator:SetNWString("item2", "none")
+
+                    self.MakingItem = true
+                    timer.Simple(0.25, function()
+                        self.MakingItem = nil
+
+                        local battery = ents.Create("prop_physics")
+                        self.HasBattery = battery
+
+                        battery:SetModel( SlashCo.BatteryModel )
+                        battery:SetMoveType(MOVETYPE_NONE)
+                        battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+                        battery:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
+                        battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+                        battery:SetParent(self)
+                        battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
+                        battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+
+                        SlashCo.SpawnSlasher()
+                    end)
+                end
             end
         end
     end
