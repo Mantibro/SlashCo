@@ -625,7 +625,7 @@ end
 
 			local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-			if survivor:GetNWBool("BGoneSoda") then goto gone end
+			if (survivor:GetNWBool("BGoneSoda") or survivor:GetNWString("item", "none") == "Rock") then goto gone end
 
 			local vel = (survivor:GetVelocity()):Length()
 
