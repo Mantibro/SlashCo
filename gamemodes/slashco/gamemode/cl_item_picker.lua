@@ -79,9 +79,9 @@ function DrawTheSelectorBox()
 	ILabel:SetPos( 180, 230 )
 	ILabel:SetSize(600, 200)
 	if (SlashCoItems[SelectedItem].MaxAllowed) then
-		local numRemain = SlashCoItems[t.id].MaxAllowed()
+		local numRemain = SlashCoItems[SelectedItem].MaxAllowed()
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if v:GetNWString("item", "none") == t.id then numRemain = numRemain - 1 end
+			if v:GetNWString("item", "none") == SelectedItem then numRemain = numRemain - 1 end
 		end
 		ILabel:SetText(SlashCoItems[SelectedItem].Name.." ( "..SlashCoItems[SelectedItem].Price.." Points ) ( "..numRemain.." remaining )")
 	else
