@@ -7,7 +7,7 @@ SlashCoItems.Battery.Name = "Battery"
 SlashCoItems.Battery.Description = "A lead-acid battery that serves as a reusable source of electric current."
 SlashCoItems.Battery.CamPos = Vector(80,0,0)
 SlashCoItems.Battery.OnDrop = function(ply)
-    local battery SlashCo.CreateBattery(ply:LocalToWorld(Vector(0, 0, 45)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    local battery = SlashCo.CreateBattery(ply:LocalToWorld(Vector(0, 0, 55)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     battery:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
 end
 SlashCoItems.Battery.ViewModel = {
@@ -21,8 +21,6 @@ SlashCoItems.Battery.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
-
-
 SlashCoItems.Battery.WorldModel = {
     holdtype = "duel",
     model = "models/items/car_battery01.mdl",

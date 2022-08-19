@@ -10,6 +10,7 @@ AddCSLuaFile("milkjug.lua")
 AddCSLuaFile("soda.lua")
 AddCSLuaFile("stepdecoy.lua")
 AddCSLuaFile("deathward_used.lua")
+AddCSLuaFile("battery.lua")
 
 if not SlashCoItems then SlashCoItems = {} end
 
@@ -24,6 +25,7 @@ include("milkjug.lua")
 include("soda.lua")
 include("stepdecoy.lua")
 include("deathward_used.lua")
+include("battery.lua")
 
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems
