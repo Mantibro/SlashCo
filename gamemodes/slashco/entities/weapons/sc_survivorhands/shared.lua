@@ -4,7 +4,7 @@ SWEP.DrawCrosshair	= false
 SWEP.Author         = "textstack"
 SWEP.Purpose        = "Main 'weapon' for survivors in SlashCo"
 
-SWEP.HoldType = "duel"
+SWEP.HoldType = "normal"
 SWEP.ViewModelFOV = 69 --nice
 SWEP.ViewModelFlip = false
 SWEP.UseHands = true
