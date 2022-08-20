@@ -128,7 +128,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		end
 		--Bababooey \/ \/ \/
 
-		if SlashID != 1 then goto sid end
+		if SlashID ~= 1 then goto sid end
 		do
 
 		local invis =  LocalPlayer():GetNWBool("BababooeyInvisibility")
@@ -162,7 +162,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		::sid::
 
 		--Sid \/ \/ \/
-		if SlashID != 2 then goto trollge end
+		if SlashID ~= 2 then goto trollge end
 		do
 		local SidGunInactive = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1_disabled")
 		local SidGunUnavailable = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1_unavailable")
@@ -232,7 +232,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 		::trollge::
 		--Trollge \/ \/ \/
-		if SlashID != 3 then goto amogus end
+		if SlashID ~= 3 then goto amogus end
 		do
 			local TrollgeStage1 = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s1")
 			local TrollgeStage2 = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s2")
@@ -294,7 +294,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		::amogus::
 		--Amogus \/ \/ \/
 
-		if SlashID != 4 then goto thirsty end
+		if SlashID ~= 4 then goto thirsty end
 		do
 			local AmogusSurvivor = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1")
 			local AmogusFuel = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a2")
@@ -344,7 +344,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		::thirsty::
 
 		--Thirsty \/ \/ \/
-		if SlashID != 5 then goto male07 end
+		if SlashID ~= 5 then goto male07 end
 do
 
 		local milk = 1 - (V3/100)
@@ -365,19 +365,19 @@ end
 		::male07::
 
 		--Male07 \/ \/ \/
-		if SlashID != 6 then goto tyler end
+		if SlashID ~= 6 then goto tyler end
 do
 
 		local MaleSpecter = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s0")
 		local MaleMonster = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s2")
 					
-		if V1 != 0 then
+		if V1 ~= 0 then
 			draw.SimpleText( "R - Unpossess Vessel", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 		else
 			draw.SimpleText( "R - Possess Vessel", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 		end
 
-		if V1 != 1 then
+		if V1 ~= 1 then
 			willdrawmain = false
 
 			if V1 == 0 then
@@ -404,7 +404,7 @@ end
 		--Male07 /\ /\ /\
 
 		::tyler::
-		if SlashID != 7 then goto borgmire end
+		if SlashID ~= 7 then goto borgmire end
 do
 
 	local DestroyerIcon = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s1")
@@ -444,7 +444,7 @@ do
 end
 
 	::borgmire::
-	if SlashID != 8 then goto manspider end
+	if SlashID ~= 8 then goto manspider end
 do
 
 	local PunchIcon = Material("slashco/ui/icons/slasher/s_punch")
@@ -463,14 +463,14 @@ do
 end
 
 	::manspider::
-	if SlashID != 9 then goto watcher end
+	if SlashID ~= 9 then goto watcher end
 do
 
 	local LeapIcon = Material("slashco/ui/icons/slasher/s_punch")
 
 	local is_nested = LocalPlayer():GetNWBool("ManspiderNested")
 
-	if V1 != "" then
+	if V1 ~= "" then
 
 		if IsValid( player.GetBySteamID64( V1 ) ) then
 
@@ -488,7 +488,7 @@ do
 				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
 			end
 
-			if ply:SteamID64() != V1 then
+			if ply:SteamID64() ~= V1 then
 				ply:SetMaterial( "" )
 				ply:SetColor( Color( 255, 255, 255, 255 ) )
 				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
@@ -533,7 +533,7 @@ do
 end
 
 	::watcher::
-	if SlashID != 10 then goto abomignat end
+	if SlashID ~= 10 then goto abomignat end
 do
 
 	local SurveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
@@ -625,7 +625,7 @@ end
 
 			local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-			if (survivor:GetNWBool("BGoneSoda") or survivor:GetNWString("item", "none") == "Rock") then goto gone end
+			if survivor:GetNWBool("BGoneSoda") or survivor:GetNWString("item", "none") == "Rock" then goto gone end
 
 			local vel = (survivor:GetVelocity()):Length()
 
@@ -686,7 +686,7 @@ end)
 
 hook.Add( "Think", "Slasher_Vision_Light", function()
 
-	if LocalPlayer():Team() != TEAM_SLASHER then return end
+	if LocalPlayer():Team() ~= TEAM_SLASHER then return end
 
 	--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright ) 
 
@@ -704,7 +704,7 @@ hook.Add( "Think", "Slasher_Vision_Light", function()
 end )
 hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
 
-	if LocalPlayer():Team() != TEAM_SLASHER then return end
+	if LocalPlayer():Team() ~= TEAM_SLASHER then return end
 
 	local tab = {
 		["$pp_colour_addr"] = 0.01,

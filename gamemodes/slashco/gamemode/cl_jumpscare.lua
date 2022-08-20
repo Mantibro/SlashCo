@@ -48,7 +48,7 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		if al == nil then al = 0 end
 		if al < 100 then al = al+(FrameTime()*100) end
 
-		Overlay:SetFloat( "$alpha", 1 - (al/100) )
+		Overlay:SetFloat( "$alpha", al )
 
 		local Overlay = Material("slashco/ui/overlays/watcher_see")
 

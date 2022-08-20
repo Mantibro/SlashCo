@@ -28,10 +28,10 @@ do
     if slasher:GetEyeTrace().Entity:IsPlayer() then
         local target = slasher:GetEyeTrace().Entity	
 
-        if target:Team() != TEAM_SURVIVOR then return end
+        if target:Team() ~= TEAM_SURVIVOR then return end
 
         if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 9 then --Manspider Condition
-            if target:SteamID64() != SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 then 
+            if target:SteamID64() ~= SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 then
                 slasher:ChatPrint("You can only kill your Prey.")
                 return 
             end
@@ -70,7 +70,7 @@ do
 end
 
     ::sidgun::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2 or not slasher:GetNWBool("SidGun") then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 2 or not slasher:GetNWBool("SidGun") then return end
 do
 
     local spread = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4
@@ -124,7 +124,7 @@ do
         if slasher:GetEyeTrace().Entity:IsPlayer() then
             local target = slasher:GetEyeTrace().Entity	
     
-            if target:Team() != TEAM_SURVIVOR then return end
+            if target:Team() ~= TEAM_SURVIVOR then return end
     
             if slasher:GetPos():Distance(target:GetPos()) < dist*1.4 and not target:GetNWBool("SurvivorBeingJumpscared") then
 
@@ -220,13 +220,13 @@ do
 end
 
     ::amogusstealth::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 or not slasher:GetNWBool("AmogusSurvivorDisguise") then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 4 or not slasher:GetNWBool("AmogusSurvivorDisguise") then return end
 do
 
     if slasher:GetEyeTrace().Entity:IsPlayer() then
         local target = slasher:GetEyeTrace().Entity	
 
-        if target:Team() != TEAM_SURVIVOR then return end
+        if target:Team() ~= TEAM_SURVIVOR then return end
 
         if SlashCo.CurRound.SlasherData[slasherid].KillDelayTick > 0 then return end
 
@@ -256,9 +256,9 @@ do
 end
 
     ::trollclaw::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 3 then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 3 then return end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != 0 then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 ~= 0 then return end
 do
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 < 0.01 and not slasher:GetNWBool("TrollgeTransition") then
 
@@ -275,7 +275,7 @@ do
 
                 if target:IsPlayer() then
 
-                    if target:Team() != TEAM_SURVIVOR then return end
+                    if target:Team() ~= TEAM_SURVIVOR then return end
 
                     local vPoint = target:GetPos() + Vector(0,0,50)
                     local bloodfx = EffectData()
@@ -307,7 +307,7 @@ do
 end
 
     ::maleclaw::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 6 then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 6 then return end
 
 do
 
@@ -329,7 +329,7 @@ do
 
                 if target:IsPlayer() then
 
-                    if target:Team() != TEAM_SURVIVOR then return end
+                    if target:Team() ~= TEAM_SURVIVOR then return end
 
                     local vPoint = target:GetPos() + Vector(0,0,50)
                     local bloodfx = EffectData()
@@ -401,9 +401,9 @@ end
 
     ::tylerdestroy::
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 7 then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 7 then return end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 != 3 then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 ~= 3 then return end
 
     do
 
@@ -417,7 +417,7 @@ end
 
             local c = target:GetClass()
     
-            if not target:IsPlayer() and c != "prop_physics" and c != "sc_milkjug" and c != "sc_cookie" and c != "sc_stepdecoy" and c != "sc_baby" and c != "sc_devildie" and c != "sc_mayo" and c != "sc_soda" then return end
+            if not target:IsPlayer() and c ~= "prop_physics" and c ~= "sc_milkjug" and c ~= "sc_cookie" and c ~= "sc_stepdecoy" and c ~= "sc_baby" and c ~= "sc_devildie" and c ~= "sc_mayo" and c ~= "sc_soda" then return end
     
             if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
     
@@ -476,7 +476,7 @@ end
     end
 
     ::borgpunch::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 or slasher:GetNWBool("BorgmireThrow") then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 8 or slasher:GetNWBool("BorgmireThrow") then return end
 do
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 < 0.01 then

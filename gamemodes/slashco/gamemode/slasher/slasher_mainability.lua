@@ -412,7 +412,7 @@ end --ends here
     end
 
     ::WATCHER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 10 then goto ABOMIGNAT end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 10 then goto ABOMIGNAT end
 
         if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 > 0 then return end
 

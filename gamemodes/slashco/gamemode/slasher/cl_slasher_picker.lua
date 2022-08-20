@@ -19,7 +19,7 @@ end)
 
 function SelectThisSlasher(slasherID)
 
-	--if LocalPlayer():SteamID64() != readtable.ply then return end
+	--if LocalPlayer():SteamID64() ~= readtable.ply then return end
 
 	if ( IsValid(SlasherSelectFrame) ) then
 		SlasherSelectFrame:Remove()
@@ -56,7 +56,7 @@ function DrawTheSlasherSelectorBox()
 
 	if ( IsValid( ItemSelectFrame ) ) then return end
 
-	if LocalPlayer():SteamID64() != readtable.slashersteamid then return end
+	if LocalPlayer():SteamID64() ~= readtable.slashersteamid then return end
 	
 	local SlasherPickingID = readtable.slashID
 	local SlasherPickingCLASS = readtable.slashClass
@@ -66,7 +66,7 @@ function DrawTheSlasherSelectorBox()
 
 	if ( IsValid( SlasherSelectFrame ) ) then print("not valid!") return end
 
-	--if  SlasherPickingID != 0 then SlasherChosen(SlasherPickingID) return end
+	--if  SlasherPickingID ~= 0 then SlasherChosen(SlasherPickingID) return end
 	
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create( "DFrame" )
@@ -85,7 +85,7 @@ function DrawTheSlasherSelectorBox()
 
 		if SlasherPickingCLASS > 0 then
 			
-			if SlasherData[i].CLS != SlasherPickingCLASS  then --not the desired class
+			if SlasherData[i].CLS ~= SlasherPickingCLASS  then --not the desired class
 				Slash:SetDisabled( true )
 			end
 
@@ -93,7 +93,7 @@ function DrawTheSlasherSelectorBox()
 
 		if SlasherPickingDANGER > 0 then
 			
-			if SlasherData[i].DNG != SlasherPickingDANGER  then --not the desired danger
+			if SlasherData[i].DNG ~= SlasherPickingDANGER  then --not the desired danger
 				Slash:SetDisabled( true )
 			end
 
