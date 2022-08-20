@@ -963,7 +963,7 @@ do
                 } )
 
 
-            if tr.Entity != target then target = NULL end
+            if tr.Entity ~= target then target = NULL end
 
             end
             ::FOUND::

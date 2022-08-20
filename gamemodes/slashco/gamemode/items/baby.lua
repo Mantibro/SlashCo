@@ -44,7 +44,6 @@ SlashCoItems.Baby.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_baby", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
-    SlashCo.MakeSelectable(droppeditem)
 end
 SlashCoItems.Baby.ViewModel = {
     model = "models/props_c17/doll01.mdl",

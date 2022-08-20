@@ -16,7 +16,6 @@ include( "slasher/slasher_chasemode.lua" )
 include( "slasher/slasher_mainability.lua" )
 include( "slasher/slasher_specialability.lua" )
 include( "slasher/slasher_ability_handler.lua" )
-include( "selectables.lua" )
 include( "concommands.lua")
 
 --[[
@@ -177,7 +176,7 @@ end )
 
 hook.Add( "CanExitVehicle", "PlayerMotion", function( veh, ply )
 	if ply:Team() == TEAM_SURVIVOR then
-		return veh:GetClass() ~= "sc_helicopter"
+		return veh.VehicleName ~= "Airboat Seat"
 	end
 end )
 
@@ -563,7 +562,7 @@ local Think = function()
 					totalCansRemaining = totalCansRemaining + (v.CansRemaining or SlashCo.GasCansPerGenerator)
 				end
 
-				if table.Count(SlashCo.CurRound.GasCans) <= totalCansRemaining then return end --Prevent draining if there is too few gas cans
+				if #ents.FindByClass( "sc_gascan") <= totalCansRemaining then return end --Prevent draining if there is too few gas cans
 
 				if engine.TickCount()%math.floor(240/engine.TickInterval()) == 0 then
 					local random = math.random(#gens)
@@ -649,20 +648,6 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 			SlashCo.BroadcastGlobalData()
 
 		end)
-
-		if game.GetMap() ~= "sc_lobby" then
-			local query = sql.Query("SELECT * FROM slashco_table_survivordata; ") --This table shouldn't be organized like this.
-			for _, v in ipairs(query) do
-				if (v.Survivors == ply:SteamID64()) then
-					if SlashCoItems[v.Item].IsSecondary then
-						ply:SetNWString( "item2", v.Item)
-					else
-						ply:SetNWString( "item", v.Item)
-					end
-					break
-				end
-			end
-		end
 
 	end
 

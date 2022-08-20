@@ -56,6 +56,10 @@ SlashCoItems.NameMePlease.OnPickUp = function(ply) --optional, when received
 end
 SlashCoItems.NameMePlease.OnBuy = function(plyid) --optional, when buying from lobby store
 end
+SlashCoItems.NameMePlease.OnSwitchFrom = function(ply) --optional, when item is removed without dropping (NOT called when item is dropped)
+end
+SlashCoItems.NameMePlease.EquipSound = function() --optional, string return of sound to play when equipping the item
+end
 SlashCoItems.NameMePlease.ViewModel = { --optional (i guess), use the SWEP construction kit on the workshop to help set this up
     model = "",
     pos = Vector(64, 0, -6),

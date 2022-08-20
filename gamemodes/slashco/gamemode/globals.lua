@@ -369,7 +369,7 @@ SlashCo.ResetCurRoundData = function()
             SO = 0,
             DO = false,
             SatO = 0,
-            DrainageTick = 0,
+            --DrainageTick = 0, --not used
             ItemMod = 0
         },
         SlasherData = {
@@ -385,9 +385,9 @@ SlashCo.ResetCurRoundData = function()
         SlasherEntities = { --Slasher's unique entities, such as bababooey's clones.
 
         },
-        GasCans = {},
+        --GasCans = {}, --not used
         ExposureSpawns = {}, --This is only used in TestConfig()
-        Batteries = {},
+        --Batteries = {}, --not used
         Items = {},
         Helicopter = 0,
         --AlivePlayers = {}, --not used
@@ -417,9 +417,9 @@ SlashCo.ResetCurRoundData = function()
 end
 SlashCo.ResetCurRoundData()
 
-SlashCo.GasCanModel = "models/props_junk/metalgascan.mdl" --Model path for the gas cans
+--SlashCo.GasCanModel = "models/props_junk/metalgascan.mdl" --Model path for the gas cans
 SlashCo.GeneratorModel = "models/props_vehicles/generatortrailer01.mdl" --Model path for the generators
-SlashCo.BatteryModel = "models/items/car_battery01.mdl" --Model path for the batteries
+--SlashCo.BatteryModel = "models/items/car_battery01.mdl" --Model path for the batteries
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
 SlashCo.GasCansPerGenerator = 4 --Number of gas cans required to fill up a generator
 SlashCo.PlayerData = {} --Holds all loaded playerdata
@@ -594,11 +594,18 @@ SlashCo.LoadCurRoundTeams = function()
 
                 print("name: " .. playercur:Name())
 
+                local query = sql.Query("SELECT * FROM slashco_table_survivordata; ") --This table shouldn't be organized like this.
                 for i = 1, #survivors do
                     if id == survivors[i].Survivors then
 
                         playercur:SetTeam(TEAM_SURVIVOR)
                         playercur:Spawn()
+                        for _, v in ipairs(query) do
+                            if (v.Survivors == playercur:SteamID64()) then
+                                SlashCo.ChangeSurvivorItem(playercur, v.Item)
+                                break
+                            end
+                        end
                         print(playercur:Name() .. " now Survivor")
 
                         break
@@ -901,13 +908,7 @@ SlashCo.CreateGasCan = function(pos, ang)
 
     Ent:SetPos( pos )
     Ent:SetAngles( ang )
-    --Ent:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
-    --Ent:PhysicsInit( SOLID_VPHYSICS )
     Ent:Spawn()
-
-    local id = Ent:EntIndex()
-    SlashCo.CurRound.GasCans[id] = true
-    SlashCo.MakeSelectable(id)
 
     return Ent
 end
@@ -923,14 +924,11 @@ SlashCo.CreateGasCanE = function(pos, ang)
 
     Ent:SetPos( pos )
     Ent:SetAngles( ang )
-    --Ent:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
-    --Ent:PhysicsInit( SOLID_VPHYSICS )
     Ent:Spawn()
     Ent:SetColor( Color(255, 0, 0, 255) )
 
     local id = Ent:EntIndex()
     table.insert(SlashCo.CurRound.ExposureSpawns, id)
-    SlashCo.MakeSelectable(id)
 
     return id
 end
@@ -975,71 +973,59 @@ SlashCo.CreateBattery = function(pos, ang)
 
     Ent:SetPos( pos )
     Ent:SetAngles( ang )
-    Ent:SetModel(SlashCo.BatteryModel)
-    Ent:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
-    Ent:PhysicsInit( SOLID_VPHYSICS )
     Ent:Spawn()
-
-    local id = Ent:EntIndex()
-    SlashCo.CurRound.Batteries[id] = true
-    SlashCo.MakeSelectable(id)
 
     return Ent
 end
 
 SlashCo.CreateGenerators = function(spawnpoints)
-    for I=1, #spawnpoints do
-        local pos = SlashCo.CurConfig.Generators.Spawnpoints[spawnpoints[I]].pos
-        local ang = SlashCo.CurConfig.Generators.Spawnpoints[spawnpoints[I]].ang
+    for _, v in ipairs(spawnpoints) do
+        local pos = SlashCo.CurConfig.Generators.Spawnpoints[v].pos
+        local ang = SlashCo.CurConfig.Generators.Spawnpoints[v].ang
 
         SlashCo.CreateGenerator( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) ) --local entID =
     end
 end
 
 SlashCo.CreateGasCans = function(spawnpoints)
-    for I=1, #spawnpoints do
-        local pos = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].pos
-        local ang = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].ang
+    for _, v in ipairs(spawnpoints) do
+        local pos = SlashCo.CurConfig.GasCans.Spawnpoints[v].pos
+        local ang = SlashCo.CurConfig.GasCans.Spawnpoints[v].ang
 
         if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --Exposure Offering Spawnpoints
-            pos = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[spawnpoints[I]].pos
-            ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[spawnpoints[I]].ang
+            pos = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].pos
+            ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].ang
         end
 
         SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
-
 end
 
 --Testing only function for exposure spawnpoints
 SlashCo.CreateGasCansE = function(spawnpoints)
-    for I=1, #spawnpoints do
-        local pos = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].pos
-        local ang = SlashCo.CurConfig.GasCans.Spawnpoints[spawnpoints[I]].ang
+    for _, v in ipairs(spawnpoints) do
+        local pos = SlashCo.CurConfig.GasCans.Spawnpoints[v].pos
+        local ang = SlashCo.CurConfig.GasCans.Spawnpoints[v].ang
 
         SlashCo.CreateGasCanE( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
 end
 
 SlashCo.CreateItems = function(spawnpoints, item)
-    for I=1, #spawnpoints do
-        local pos = SlashCo.CurConfig.Items.Spawnpoints[spawnpoints[I]].pos
-        local ang = SlashCo.CurConfig.Items.Spawnpoints[spawnpoints[I]].ang
-
-        --Occupied spawn
-        --table.RemoveByValue( SlashCo.CurConfig.Items.Spawnpoints, spawnpoints[I] )
+    for _, v in ipairs(spawnpoints) do
+        local pos = SlashCo.CurConfig.Items.Spawnpoints[v].pos
+        local ang = SlashCo.CurConfig.Items.Spawnpoints[v].ang
 
         local id = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
         SlashCo.CurRound.Items[id] = true
-        SlashCo.MakeSelectable(id)
     end
 end
 
 SlashCo.CreateBatteries = function(spawnpoints)
-    for I=1, #spawnpoints do
-        local rand = math.random(1, #(SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]]))
-        local pos = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][rand].pos
-        local ang = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][rand].ang
+    for _, v in ipairs(spawnpoints) do
+        local rand = math.random(1, #(SlashCo.CurConfig.Batteries.Spawnpoints[v]))
+        local pos = SlashCo.CurConfig.Batteries.Spawnpoints[v][rand].pos
+        local ang = SlashCo.CurConfig.Batteries.Spawnpoints[v][rand].ang
 
         SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
@@ -1047,10 +1033,10 @@ end
 
 --For testing configs only, spawns batteries in ever possible spot.
 SlashCo.CreateBatteriesE = function(spawnpoints)
-    for I=1, #spawnpoints do
-        for J=1, #(SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]])do
-            local pos = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][J].pos
-            local ang = SlashCo.CurConfig.Batteries.Spawnpoints[spawnpoints[I]][J].ang
+    for _, v in ipairs(spawnpoints) do
+        for J=1, #(SlashCo.CurConfig.Batteries.Spawnpoints[v])do
+            local pos = SlashCo.CurConfig.Batteries.Spawnpoints[v][J].pos
+            local ang = SlashCo.CurConfig.Batteries.Spawnpoints[v][J].ang
 
             SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
         end
@@ -1124,9 +1110,9 @@ SlashCo.RemoveAllCurRoundEnts = function()
         v:Remove()
     end
 
-    for k, _ in pairs(SlashCo.CurRound.GasCans) do
-        local ent = Entity(k)
-        if IsValid(ent) then ent:Remove() end
+    local cans = ents.FindByClass( "sc_gascan")
+    for _, v in ipairs(cans) do
+        v:Remove()
     end
 
     for k, _ in pairs(SlashCo.CurRound.Items) do
@@ -1134,9 +1120,9 @@ SlashCo.RemoveAllCurRoundEnts = function()
         if IsValid(ent) then ent:Remove() end
     end
 
-    for k, _ in pairs(SlashCo.CurRound.Batteries) do
-        local ent = Entity(k)
-        if IsValid(ent) then ent:Remove() end
+    local bats = ents.FindByClass( "sc_battery")
+    for _, v in ipairs(bats) do
+        v:Remove()
     end
 
     for I=1, #(SlashCo.CurRound.ExposureSpawns) do
@@ -1144,8 +1130,6 @@ SlashCo.RemoveAllCurRoundEnts = function()
             Entity(SlashCo.CurRound.ExposureSpawns[I]):Remove()
         end
     end
-
-    SlashCo.ClearSelectables()
 end
 
 SlashCo.EndRound = function()
@@ -1379,7 +1363,6 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         local id = SlashCo.CreateItem("sc_beacon", Vector(pickedpoint.pos[1],pickedpoint.pos[2],pickedpoint.pos[3]), Angle(pickedpoint.ang[1],pickedpoint.ang[2],pickedpoint.ang[3])) --Spawn one distress beacon
         SlashCo.CurRound.Items[id] = true
-        SlashCo.MakeSelectable(id)
 
         SlashCo.CurRound.roundOverToggle = true
         GAMEMODE.State = GAMEMODE.States.IN_GAME
@@ -1400,8 +1383,6 @@ SlashCo.SpawnCurConfig = function(isDebug)
         SlashCo.RoundHeadstart()
 
         SlashCo.BroadcastSlasherData()
-
-        SlashCo.BroadcastSelectables()
     end
 end
 

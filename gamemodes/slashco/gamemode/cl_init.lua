@@ -22,10 +22,14 @@ function GM:HUDDrawTargetID()
 	return false
 end 
 
+local disable = {
+    CHudHealth = true,
+    CHudBattery = true,
+    CHudWeaponSelection = true
+}
+
 hook.Add( "HUDShouldDraw", "DisableDefaultHUD", function( name )
-	if ( name == "CHudHealth" or name == "CHudBattery") then
-	    return false
-	end
+	return not disable[name]
 end)
 
 function GM:DrawDeathNotice(_, _)

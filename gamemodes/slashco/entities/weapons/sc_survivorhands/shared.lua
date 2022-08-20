@@ -23,3 +23,19 @@ SWEP.Secondary.Automatic	= false
 SWEP.Secondary.Ammo		    = "none"
 
 SWEP.BobScale = 0
+
+function SWEP:CanPrimaryAttack()
+    return true
+end
+
+function SWEP:CanSecondaryAttack()
+    return true
+end
+
+function SWEP:PrimaryAttack()
+    return
+end
+
+function SWEP:SecondaryAttack()
+    return
+end

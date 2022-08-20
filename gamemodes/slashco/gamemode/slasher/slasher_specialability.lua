@@ -7,7 +7,7 @@ SlashCo.SlasherSpecialAbility = function(slasher)
     local SO = SlashCo.CurRound.OfferingData.SO
 
     --Bababooey's Clone ability
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 1 then goto SID end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 1 then goto SID end
 do
     if #ents.FindByClass( "sc_babaclone") > SO then return end
     local clone = SlashCo.CreateItem("sc_babaclone",slasher:GetPos(), slasher:GetAngles())
@@ -15,7 +15,7 @@ end
 
     ::SID::
     --Sid's Gun
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 2 then goto AMOGUS end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 2 then goto AMOGUS end
     if SlashCo.CurRound.SlasherData.GameProgress < 5 then return end
 
     if not slasher:GetNWBool("SidGun") and SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 < 0.01 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then --Equip the gun
@@ -69,7 +69,7 @@ end
     ::AMOGUS::
 
     --Amogus Fuel Transform \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 4 then goto BORGMIRE end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 4 then goto BORGMIRE end
 
     if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 
@@ -97,7 +97,7 @@ end
 
             g:SetPos( slasher:GetPos() + Vector(0,0,15) )
             g:SetAngles( slasher:GetAngles() + Angle(0,90,0) )
-            g:SetModel( SlashCo.GasCanModel )
+            g:SetModel( SlashCoItems.GasCan.Model )
             g:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
             g:Spawn()
 
@@ -121,12 +121,12 @@ end
 
     ::BORGMIRE::
     --Borgmire's Throw \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 8 then goto MANSPIDER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 8 then goto MANSPIDER end
 
     if slasher:GetEyeTrace().Entity:IsPlayer() and not slasher:GetNWBool("BorgmireThrow") then
         local target = slasher:GetEyeTrace().Entity	
 
-        if target:Team() != TEAM_SURVIVOR then return end
+        if target:Team() ~= TEAM_SURVIVOR then return end
 
         if slasher:GetPos():Distance(target:GetPos()) < 200 and not target:GetNWBool("SurvivorBeingJumpscared") then
 
@@ -177,7 +177,7 @@ end
 
     --Borgmire's Throw /\ /\ /\
     ::MANSPIDER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID != 9 then goto WATCHER end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 9 then goto WATCHER end
     --Manspider's Leap \/ \/ \/
     if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 > 0 then return end
 

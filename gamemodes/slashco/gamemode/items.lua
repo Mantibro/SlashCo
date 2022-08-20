@@ -67,16 +67,34 @@ SlashCo.DropItem = function(ply)
 				ply:SetNWString( "item2", "none" )
 				timer.Simple(0.25, function()
 					SlashCoItems[item].OnDrop(ply)
-					SlashCo.BroadcastSelectables()
 				end)
 			else
-				SlashCo.ChangeSurvivorItem(ply, "none")
+				ply:SetNWString( "item", "none" )
 				timer.Simple(0.18, function()
 					SlashCoItems[item].OnDrop(ply)
-					SlashCo.BroadcastSelectables()
 				end)
 			end
 		end
+	end
+end
+
+SlashCo.RemoveItem = function(ply, isSec)
+	if isSec then
+		local item = ply:GetNWString("item2", "none")
+		timer.Simple(0.25, function()
+			if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
+				SlashCoItems[item].OnSwitchFrom(ply)
+			end
+		end)
+		ply:SetNWString( "item2", "none" )
+	else
+		local item = ply:GetNWString("item", "none")
+		timer.Simple(0.18, function()
+			if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
+				SlashCoItems[item].OnSwitchFrom(ply)
+			end
+		end)
+		ply:SetNWString( "item", "none" )
 	end
 end
 
@@ -86,8 +104,16 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 
 		if SlashCoItems[id] then
 			if SlashCoItems[id].IsSecondary then
+				local item = ply:GetNWString("item2", "none")
+				if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
+					SlashCoItems[item].OnSwitchFrom(ply)
+				end
 				ply:SetNWString( "item2", id )
 			else
+				local item = ply:GetNWString("item", "none")
+				if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
+					SlashCoItems[item].OnSwitchFrom(ply)
+				end
 				ply:SetNWString( "item", id )
 			end
 
@@ -95,7 +121,9 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 				SlashCoItems[id].OnPickUp(ply)
 			end
 
-			if id ~= 0 then
+			if SlashCoItems[id].EquipSound then
+				ply:EmitSound(SlashCoItems[id].EquipSound())
+			else
 				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
 			end
 		elseif id == "none" then
@@ -115,8 +143,6 @@ SlashCo.ItemPickUp = function(ply, item, itid)
 		end
 
 		SlashCo.ChangeSurvivorItem(ply, itid)
-
-		SlashCo.RemoveSelectableNow(item)
 
 		ents.GetByIndex(item):Remove()
 

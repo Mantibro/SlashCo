@@ -11,6 +11,7 @@ ENT.Author			= "Manti"
 ENT.Contact			= ""
 ENT.Purpose			= "A seemingly cursed die."
 ENT.Instructions	= ""
+ENT.IsSelectable 	= true
 
 function ENT:Initialize()
 	if SERVER then

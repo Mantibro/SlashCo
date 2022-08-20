@@ -2,6 +2,10 @@ include( "globals.lua" )
 
 --local SlashCo = SlashCo
 
+function GM:PlayerSwitchWeapon( _, _, _ )
+	return false
+end
+
 function GM:PlayerInitialSpawn(ply, _)
 	if game.GetMap() == "sc_lobby" then
 		ply:SetTeam(TEAM_SPECTATOR)

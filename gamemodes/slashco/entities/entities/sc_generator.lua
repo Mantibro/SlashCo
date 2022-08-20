@@ -36,38 +36,35 @@ end
 
 function ENT:Touch(otherEnt)
     if SERVER then
-        local index = otherEnt:EntIndex()
-        if not self.MakingItem and not self.FuelingCan and SlashCo.CurRound.GasCans[index] and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+        --local index = otherEnt:EntIndex()
+        local class = otherEnt:GetClass()
+        if not self.MakingItem and not self.FuelingCan and class == "sc_gascan" and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
             --print("Gas Touch")
 
-            SlashCo.RemoveSelectableNow(index)
-            SlashCo.CurRound.GasCans[index] = nil
             otherEnt:Remove()
 
             local gasCan = ents.Create("prop_physics")
 
-            gasCan:SetModel( SlashCo.GasCanModel )
+            gasCan:SetModel( SlashCoItems.GasCan.Model )
             gasCan:SetMoveType(MOVETYPE_NONE)
             gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
             gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
             gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
             gasCan:SetParent(self)
 
-            SlashCo.MakeSelectableNow(index)
+            --gasCan.IsSelectable = true
             self.FuelingCan = gasCan
 
             SlashCo.SpawnSlasher()
-        elseif not self.MakingItem and not self.HasBattery and SlashCo.CurRound.Batteries[index] and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
+        elseif not self.MakingItem and not self.HasBattery and class == "sc_battery" and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7, 25, 50))) < 18 then
             --print("Battery Touch")
 
-            SlashCo.RemoveSelectableNow(index)
-            SlashCo.CurRound.Batteries[index] = nil
             otherEnt:Remove()
 
             local battery = ents.Create("prop_physics")
             self.HasBattery = battery
 
-            battery:SetModel( SlashCo.BatteryModel )
+            battery:SetModel( SlashCoItems.Battery.Model )
             battery:SetMoveType(MOVETYPE_NONE)
             battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
             battery:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
@@ -108,22 +105,22 @@ function ENT:Use(activator, _, _)
                 self:EmitSound("slashco/generator_fill.wav")
             elseif not self.MakingItem then
                 if activator:GetNWString("item2", "none") == "GasCan" and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
-                    activator:SetNWString("item2", "none")
-                    activator:SetRunSpeed(300)
+                    SlashCo.RemoveItem(activator, true)
+                    --activator:SetNWString("item2", "none")
+                    --activator:SetRunSpeed(300)
 
                     self.MakingItem = true
                     timer.Simple(0.25, function()
                         self.MakingItem = nil
                         local gasCan = ents.Create("prop_physics")
 
-                        gasCan:SetModel( SlashCo.GasCanModel )
+                        gasCan:SetModel( SlashCoItems.GasCan.Model )
                         gasCan:SetMoveType(MOVETYPE_NONE)
                         gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
                         gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
                         gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
                         gasCan:SetParent(self)
 
-                        SlashCo.MakeSelectableNow(gasCan)
                         self.FuelingCan = gasCan
 
                         SlashCo.SpawnSlasher()
@@ -138,7 +135,7 @@ function ENT:Use(activator, _, _)
                         local battery = ents.Create("prop_physics")
                         self.HasBattery = battery
 
-                        battery:SetModel( SlashCo.BatteryModel )
+                        battery:SetModel( SlashCoItems.Battery.Model )
                         battery:SetMoveType(MOVETYPE_NONE)
                         battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
                         battery:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
@@ -198,8 +195,6 @@ function ENT:Think()
                 self.FuelingCan:SetMoveType(MOVETYPE_VPHYSICS)
                 self.FuelingCan:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
                 self.FuelingCan:SetParent(nil)
-
-                SlashCo.RemoveSelectableNow(self.FuelingCan:EntIndex())
 
                 local FuelingCanPhysics = self.FuelingCan:GetPhysicsObject()
                 FuelingCanPhysics:SetVelocity(Vector(math.random(-200, 200), math.random(-200, 200), 200))

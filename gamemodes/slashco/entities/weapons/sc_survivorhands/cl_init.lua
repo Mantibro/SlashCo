@@ -134,11 +134,11 @@ function SWEP:DrawWorldModel()
     end
     if not v then
         self.heldEntityWorld:SetNoDraw(true)
-        self.HoldType = "normal"
+        self:SetHoldType("normal")
         return
     end
 
-    self.HoldType = v.holdtype
+    self:SetHoldType(v.holdtype)
     local bone = self.Owner:LookupBone(v.bone)
     assert(bone, "Tried to use a bone that doesn't exist! (worldmodel)")
     local m = self.Owner:GetBoneMatrix(bone)

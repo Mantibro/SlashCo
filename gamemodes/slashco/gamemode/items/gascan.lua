@@ -8,21 +8,31 @@ SlashCoItems.GasCan.Icon = "slashco/ui/icons/items/item_1"
 SlashCoItems.GasCan.Price = 15
 SlashCoItems.GasCan.Description = "A jerry can full of high-octane gas. Useful for refuelling Cars and \nGenerators. Taking it with you will reduce how much gas you will find\nwithin the Zone. \nOnce you drop this item, you will not be able to store it again."
 SlashCoItems.GasCan.CamPos = Vector(80,0,0)
+SlashCoItems.GasCan.ChangesSpeed = true
 SlashCoItems.GasCan.OnDrop = function(ply)
+    SlashCoItems.GasCan.OnSwitchFrom(ply)
+    local gasCan = SlashCo.CreateGasCan(ply:LocalToWorld(Vector(0, 0, 45)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    gasCan:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
+end
+SlashCoItems.GasCan.OnSwitchFrom = function(ply)
     timer.Simple(0.25, function()
-        if ply:GetNWString("item2", "none") ~= SlashCoItems.GasCan then --janky way of preventing slowdown from being cancelled
+        local item = ply:GetNWString("item2", "none")
+        if item == "none" then
+            item = ply:GetNWString("item", "none")
+        end
+        if not SlashCoItems[item] or not SlashCoItems[item].ChangesSpeed then
             ply:SetRunSpeed(300)
         end
     end)
-
-    local gasCan = SlashCo.CreateGasCan(ply:LocalToWorld(Vector(0, 0, 45)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    gasCan:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
 end
 SlashCoItems.GasCan.OnBuy = function(_)
     SlashCo.LobbyData.SurvivorGasMod = SlashCo.LobbyData.SurvivorGasMod + 1
 end
 SlashCoItems.GasCan.OnPickUp = function(ply)
     ply:SetRunSpeed(200)
+end
+SlashCoItems.GasCan.EquipSound = function()
+    return "slashco/survivor/gascan_pickup"..math.random(1, 3)..".wav"
 end
 SlashCoItems.GasCan.ViewModel = {
     model = "models/props_junk/metalgascan.mdl",

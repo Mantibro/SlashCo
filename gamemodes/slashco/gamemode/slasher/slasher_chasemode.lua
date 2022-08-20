@@ -57,13 +57,13 @@ do
         filter = slasher
     } )
 
-    if tr.Entity != target then return end
+    if tr.Entity ~= target then return end
 end
     ::FOUND::
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 9 then --Manspider Condition
 
-        if target:SteamID64() != SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 then return end
+        if target:SteamID64() ~= SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 then return end
 
     end
 
