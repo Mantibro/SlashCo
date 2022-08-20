@@ -30,7 +30,6 @@ util.AddNetworkString("mantislashcoGiveMasterDatabase")
 util.AddNetworkString("mantislashcoSendRoundData")
 util.AddNetworkString("mantislashcoHelicopterMusic")
 util.AddNetworkString("mantislashcoLobbySlasherInformation")
-util.AddNetworkString("slashcoSelectables")
 
 function PlayGlobalSound(sound, level, ent, vol)
 
@@ -408,13 +407,3 @@ SlashCo.BroadcastMasterDatabaseForClient = function(ply_id)
 	end
 
 end
-
---[[
-SlashCo.BroadcastSelectables = function()
-	if SERVER then
-		net.Start("slashcoSelectables")
-		net.WriteTable(SlashCo.CurRound.Selectables)
-		net.Broadcast()
-	end
-end
-]]

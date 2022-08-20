@@ -11,6 +11,7 @@ ENT.Author			= "textstack"
 ENT.Contact			= ""
 ENT.Purpose			= "free power!!!!"
 ENT.Instructions	= ""
+ENT.IsSelectable 	= true
 
 function ENT:Initialize()
     if SERVER then
@@ -34,7 +35,6 @@ function ENT:Use( activator )
         if activator:Team() == TEAM_SURVIVOR then
 
             local index = self:EntIndex()
-            SlashCo.CurRound.GasCans[index] = nil
             SlashCo.ItemPickUp(activator, index, "Battery")
 
         end

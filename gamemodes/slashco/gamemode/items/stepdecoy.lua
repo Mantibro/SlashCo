@@ -14,14 +14,12 @@ SlashCoItems.StepDecoy.OnUse = function(ply)
     Entity(decoy):DropToFloor()
     Entity( decoy ):SetNWBool("StepDecoyActive", true)
     SlashCo.CurRound.Items[decoy] = true
-    SlashCo.MakeSelectable(decoy)
 end
 SlashCoItems.StepDecoy.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld(Vector(0, 0, 30)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):DropToFloor()
     --Entity(droppeditem):GetPhysicsObject():ApplyForceCenter(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
-    SlashCo.MakeSelectable(droppeditem)
 end
 SlashCoItems.StepDecoy.ViewModel = {
     model = "models/props_junk/Shoe001a.mdl",

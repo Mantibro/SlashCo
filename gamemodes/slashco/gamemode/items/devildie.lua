@@ -33,7 +33,6 @@ SlashCoItems.DevilDie.OnUse = function(ply)
 
             SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, 20, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
             SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, -20, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-            SlashCo.BroadcastSelectables()
 
             ply:EmitSound("slashco/survivor/devildie_fuel.mp3")
 
@@ -122,9 +121,12 @@ SlashCoItems.DevilDie.OnUse = function(ply)
 end
 SlashCoItems.DevilDie.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
+    local physics = Entity(droppeditem):GetPhysicsObject()
+    physics:SetVelocity(ply:GetAimVector() * 250)
+    local randomvec = Vector(0, 0, 0)
+    randomvec:Random(-1000, 1000)
+    physics:SetAngleVelocity(randomvec)
     SlashCo.CurRound.Items[droppeditem] = true
-    SlashCo.MakeSelectable(droppeditem)
 end
 SlashCoItems.DevilDie.ViewModel = {
     model = "models/slashco/items/devildie.mdl",

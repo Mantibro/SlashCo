@@ -97,7 +97,7 @@ end
 
             g:SetPos( slasher:GetPos() + Vector(0,0,15) )
             g:SetAngles( slasher:GetAngles() + Angle(0,90,0) )
-            g:SetModel( SlashCo.GasCanModel )
+            g:SetModel( SlashCoItems.GasCan.Model )
             g:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
             g:Spawn()
 
