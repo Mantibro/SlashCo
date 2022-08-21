@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\abomignat\eye"
+	"$halflambert" 1
+}
