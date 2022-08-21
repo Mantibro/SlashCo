@@ -201,7 +201,7 @@ hook.Add( "Think", "Slasher_Chasing_Light", function()
 
 		end
 
-		if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") then return end
+		if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage") then return end
 		
 		local dlight = DynamicLight( slasher:EntIndex() )
 		if ( dlight ) then

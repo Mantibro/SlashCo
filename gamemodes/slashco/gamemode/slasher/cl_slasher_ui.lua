@@ -537,16 +537,21 @@ end
 do
 
 	local SurveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+	local SurveyIcon = Material("slashco/ui/icons/slasher/s_10_a1")
 
 	if LocalPlayer():GetNWBool("WatcherWatched") then
 		draw.SimpleText( "YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW()/2, ScrH()/4, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	end
+
+	if LocalPlayer():GetNWBool("WatcherStalking") then
+		draw.SimpleText( "OBSERVING A SURVIVOR. . .", "ItemFontTip", ScrW()/2, ScrH()/4, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 	end
 
 	for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
 
 		local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-		if surv:GetNWBool("SurvivorWatcherSurveyed") then
+		if survivor:GetNWBool("SurvivorWatcherSurveyed") then
 
 			local pos = (survivor:GetPos()+Vector(0,0,60)):ToScreen()
 
@@ -557,6 +562,22 @@ do
 
 		end
 
+	end
+
+	if V2 < 1 and not LocalPlayer():GetNWBool("WatcherRage") then 
+		draw.SimpleText( "R - Survey", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+	else
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+	end
+
+	if GameProgress > (10 - (V4/25)) and not LocalPlayer():GetNWBool("WatcherRage") then
+		surface.SetMaterial(SurveyIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "F - Full Surveillance", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	else
+		surface.SetMaterial(SurveyIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 	end
 
 end

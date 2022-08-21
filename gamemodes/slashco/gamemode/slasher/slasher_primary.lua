@@ -43,7 +43,6 @@ do
             target:SetNWBool("SurvivorJumpscare_"..SlashCo.CurRound.SlasherData[slasherid].SlasherID, true)
 
             SlashCo.CurRound.SlasherData[slasherid].CanChase = false
-            SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99
 
             slasher:EmitSound(SlashCo.CurRound.SlasherData[slasherid].KillSound)
                 
@@ -61,6 +60,8 @@ do
                 slasher:Freeze(false)
                 target:Freeze(false)
                 target:Kill()
+                SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
+                SlashCo.CurRound.SlasherData[slasherid].CanChase = true
         
             end)
         end
@@ -142,7 +143,6 @@ do
     
                     target:SetNWBool("SurvivorBeingJumpscared",true)
                     SlashCo.CurRound.SlasherData[slasherid].CanChase = false
-                    SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 99
 
                     PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 85, slasher, 1)
 

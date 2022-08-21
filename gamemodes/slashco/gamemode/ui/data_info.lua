@@ -99,9 +99,9 @@ SCInfo.Slasher = {
         SpeedRating = "★★★☆☆",
         EyeRating = "★★★☆☆",
         DiffRating = "★☆☆☆☆"
-    }
+    },
 
-    --[[{
+    {
         Name = "The Watcher",
         Class = "Umbra",
         Danger = "Considerable",
@@ -110,7 +110,7 @@ SCInfo.Slasher = {
         SpeedRating = "★★★★☆",
         EyeRating = "★★★★☆",
         DiffRating = "★★☆☆☆"
-    }]]
+    }
 
 }
 

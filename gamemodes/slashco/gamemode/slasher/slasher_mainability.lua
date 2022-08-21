@@ -415,6 +415,7 @@ end --ends here
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 10 then goto ABOMIGNAT end
 
         if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 > 0 then return end
+        if slasher:GetNWBool("WatcherRage") then return end
 
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 10 + (SO * 10)
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 100 - (SO * 35)
@@ -435,8 +436,6 @@ end --ends here
             end
         
         end)
-
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 + 1
 
     ::ABOMIGNAT::
 

@@ -203,5 +203,16 @@ end
     --Manspider's Leap /\ /\ /\
 
     ::WATCHER::
-    
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 10 then goto ABOMIGNAT end
+    --Watcher Surveillance \/ \/ \/
+
+    if SlashCo.CurRound.SlasherData.GameProgress < (10 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue4/25)) then return end
+    if slasher:GetNWBool("WatcherRage") then return end
+    if #team.GetPlayers(TEAM_SURVIVOR) < 2 then return end
+
+    slasher:SetNWBool("WatcherRage", true)
+    PlayGlobalSound("slashco/slasher/watcher_rage.wav", 100, slasher, 1)
+
+    --Watcher Surveillance /\ /\ /\
+    ::ABOMIGNAT::
 end

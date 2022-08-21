@@ -294,9 +294,9 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/manspider_chase.wav",
         KillSound = "slashco/slasher/manspider_kill.mp3"
-    }
+    },
 
-    --[[{
+    {
         NAME = "The Watcher",
         ID = 10,
         CLS = 3,
@@ -316,7 +316,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/watcher_chase.wav",
         KillSound = "slashco/slasher/watcher_kill.mp3"
-    }]]
+    }
 
 }
 
@@ -1376,7 +1376,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             SlashCo.HelicopterTakeOffIntro()
 
-            if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
+            --if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
 
         end)
 
@@ -1461,7 +1461,7 @@ SlashCo.SummonEscapeHelicopter = function()
 
     timer.Simple(delay, function()
 
-        SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
+        local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
 
         timer.Simple(0.1, function()
 

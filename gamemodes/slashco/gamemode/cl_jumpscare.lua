@@ -48,14 +48,15 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		if al == nil then al = 0 end
 		if al < 100 then al = al+(FrameTime()*100) end
 
-		Overlay:SetFloat( "$alpha", 1 - (al/100) )
-
 		local Overlay = Material("slashco/ui/overlays/watcher_see")
+
+		Overlay:SetFloat( "$alpha", 1 - (al/100) )
 
 		surface.SetDrawColor(255,255,255,60)	
 		surface.SetMaterial(Overlay)
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-
+	else
+		al = nil
 	end
 
 	if ply:GetNWBool("SurvivorJumpscare_1") == true  then
