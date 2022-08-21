@@ -700,14 +700,14 @@ function GM:PlayerDeath(victim, _, _)
 		victim:SetNWBool("DynamicFlashlight", false)
 
 		local itid = victim:GetNWString("item", "none")
-		SlashCo.DropAllItems(victim)
-		tickLife = false
+		local tickLife = false
 
 		if SlashCoItems[itid] and SlashCoItems[itid].OnDie then
 			tickLife = SlashCoItems[itid].OnDie(victim)
 		end
 
 		if not tickLife then
+			SlashCo.DropAllItems(victim)
 			local pid = victim:SteamID64()
 			local lives = SlashCo.PlayerData[pid].Lives
 			SlashCo.PlayerData[pid].Lives = tonumber(lives) - 1
