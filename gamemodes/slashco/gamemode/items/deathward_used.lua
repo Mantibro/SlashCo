@@ -18,5 +18,5 @@ SlashCoItems.DeathWardUsed.ViewModel = {
     surpresslightning = false,
     material = "",
     skin = 0,
-    bodygroup = {}
+    bodygroup = {1}
 }
