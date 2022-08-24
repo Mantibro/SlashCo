@@ -35,13 +35,13 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 	draw.SimpleText( "[LMB] FOLLOW PLAYER", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-110, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 	draw.SimpleText( "[SPACE] SWITCH VIEW", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-80, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 	draw.SimpleText( "[R] TOGGLE LIGHT", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-50, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-	--draw.SimpleText("LMB to follow player. | Space to switch view. | R to toggle illumination." , "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.12), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
 end)
 
 hook.Add("KeyPress", "ToggleLight", function(ply, key)
+	if not IsFirstTimePredicted() then return end
 
-	if ply ~= LocalPlayer() or LocalPlayer():Team() ~= TEAM_SPECTATOR or SERVER then return end --rejecting server might prevent the flickering bug (?)
+	if ply ~= LocalPlayer() or LocalPlayer():Team() ~= TEAM_SPECTATOR or SERVER then return end
 
 	if SlasherSteamID ~= nil and SlasherSteamID == LocalPlayer():SteamID64() then
 		return
@@ -49,7 +49,7 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 
 	if key == 8192 then
 		vision = not vision
-		Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
 		Sndd:ChangePitch(100, 0)
