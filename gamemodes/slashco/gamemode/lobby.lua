@@ -692,8 +692,8 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
 	if SlashCo.LobbyData.LOBBYSTATE == 1 then
 
-		local minx = -1520
-		local maxx = -1360
+		local minx = -1550
+		local maxx = -1320
 		local miny = -270
 		local maxy = -140
 
