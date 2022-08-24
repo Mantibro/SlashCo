@@ -295,7 +295,7 @@ do
 
 	local angle = Angle(0,90,90)
 
-	local pos = Vector(-1759, -445, 326)
+	local pos = Vector(-1755.5, -425, 310)
 
     if BriefingTable == nil then return end
 

@@ -217,9 +217,9 @@ function GM:Initialize()
 
 	if game.GetMap() == "sc_lobby" then
 
-		SlashCo.CreateHelicopter( Vector(-544, 625, 200), Angle(0,45,0))
+		SlashCo.CreateHelicopter( Vector(-544, 625, 238), Angle(0,45,0))
 
-		SlashCo.CreateItemStash(Vector(-1168, -550, 300), Angle(0,90,90) )
+		SlashCo.CreateItemStash(Vector(-850, -510, 287), Angle(0,0,90) )
 
 		SlashCo.CreateOfferTable(Vector(-1435, 736, 224), Angle(0,-90,0))
 

@@ -455,7 +455,8 @@ end
                     SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
 
                     slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
-                    timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav") end)
+                    slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
+                    timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav") slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav") end)
 
                     slasher:SetColor(Color(0,0,0,0))
                     slasher:DrawShadow(false)

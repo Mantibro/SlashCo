@@ -168,6 +168,8 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 	elseif ply:GetNWBool("SurvivorJumpscare_10") == true then
 		local Overlay = Material("slashco/ui/overlays/watcher_see")
 
+		Overlay:SetFloat( "$alpha", 1 )
+
 		surface.SetDrawColor(255,255,255,255)	
 		surface.SetMaterial(Overlay)
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())

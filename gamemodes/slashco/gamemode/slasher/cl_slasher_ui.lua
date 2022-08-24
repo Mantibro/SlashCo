@@ -570,7 +570,7 @@ do
 		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
 	end
 
-	if GameProgress > (10 - (V4/25)) and not LocalPlayer():GetNWBool("WatcherRage") then
+	if GameProgress > (10 - (V4/25)) and not LocalPlayer():GetNWBool("WatcherRage") and #team.GetPlayers(TEAM_SURVIVOR) > 1 then
 		surface.SetMaterial(SurveyIcon)
 		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
 		draw.SimpleText( "F - Full Surveillance", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )

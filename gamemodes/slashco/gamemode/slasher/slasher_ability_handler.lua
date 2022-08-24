@@ -530,7 +530,7 @@ do
         if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
             slasher.TylerSongPickedID = math.random(1,6)
 
-            PlayGlobalSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3",  98 , slasher,  0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.08))
+            PlayGlobalSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3",  98 , slasher,  0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.12))
         end
 
         if v2 > ( ms * 40) - (v4 * 4) then --Time ran out
@@ -566,6 +566,8 @@ do
 
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 = 1.8
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+
+            slasher:EmitSound("slashco/slasher/tyler_create.mp3")
 
             timer.Simple(3, function() 
             
@@ -623,6 +625,7 @@ do
             timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_alarm.wav") end) --idk man only works if i stop it twice shut up
 
             PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 98, slasher, 1)
+            PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 101, slasher, 0.75)
 
             slasher:Freeze(false)
 
@@ -660,7 +663,8 @@ do
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
 
             slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
-            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav") end)
+            slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
+            timer.Simple(0.1, function() slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav") slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav") end)
 
             slasher:SetColor(Color(0,0,0,0))
             slasher:DrawShadow(false)
@@ -910,21 +914,21 @@ do
         if v1 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 - FrameTime() end
     else
         SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0.5 
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0.65 
         SlashCo.CurRound.SlasherData[slasherid].CanChase = false
     end
 
     if slasher:GetNWBool("InSlasherChaseMode") or slasher:GetNWBool("WatcherRage") then
 
-        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 60) )
-        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 60) )
-        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 60) )
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 80) )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 80) )
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - (v3 * 80) )
 
     else
 
-        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 100) )
-        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 100) )
-        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 100) )
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 120) )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 120) )
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed - (v3 * 120) )
 
     end
 
