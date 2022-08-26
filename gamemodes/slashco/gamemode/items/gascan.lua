@@ -9,6 +9,7 @@ SlashCoItems.GasCan.Price = 15
 SlashCoItems.GasCan.Description = "A jerry can full of high-octane gas. Useful for refuelling Cars and \nGenerators. Taking it with you will reduce how much gas you will find\nwithin the Zone. \nOnce you drop this item, you will not be able to store it again."
 SlashCoItems.GasCan.CamPos = Vector(80,0,0)
 SlashCoItems.GasCan.ChangesSpeed = true
+SlashCoItems.GasCan.IsSpawnable = false
 SlashCoItems.GasCan.OnDrop = function(ply)
     SlashCoItems.GasCan.OnSwitchFrom(ply)
     local gasCan = SlashCo.CreateGasCan(ply:LocalToWorld(Vector(0, 0, 45)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

@@ -2,6 +2,7 @@ local SlashCoItems = SlashCoItems
 
 SlashCoItems.DeathWard = {}
 SlashCoItems.DeathWard.Model = "models/slashco/items/deathward.mdl"
+SlashCoItems.DeathWard.EntClass = "sc_deathward"
 SlashCoItems.DeathWard.Name = "Deathward"
 SlashCoItems.DeathWard.Icon = "slashco/ui/icons/items/item_2"
 SlashCoItems.DeathWard.Price = 50
@@ -10,8 +11,9 @@ SlashCoItems.DeathWard.CamPos = Vector(40,0,15)
 SlashCoItems.DeathWard.MaxAllowed = function()
     return 2
 end
+SlashCoItems.DeathWard.IsSpawnable = true
 SlashCoItems.DeathWard.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_deathward", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    local droppeditem = SlashCo.CreateItem(SlashCoItems.DeathWard.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
 end

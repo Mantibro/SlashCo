@@ -2,6 +2,7 @@ local SlashCoItems = SlashCoItems
 
 SlashCoItems.Beacon = {}
 SlashCoItems.Beacon.Model = "models/props_c17/light_cagelight01_on.mdl"
+SlashCoItems.Beacon.EntClass = "sc_beacon"
 SlashCoItems.Beacon.Name = "Distress Beacon"
 SlashCoItems.Beacon.Icon = "slashco/ui/icons/items/item_9"
 SlashCoItems.Beacon.Price = 45
@@ -10,6 +11,7 @@ SlashCoItems.Beacon.CamPos = Vector(50,0,10)
 SlashCoItems.Beacon.MaxAllowed = function()
     return 1
 end
+SlashCoItems.Beacon.IsSpawnable = false
 SlashCoItems.Beacon.OnUse = function(ply)
     --If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
 

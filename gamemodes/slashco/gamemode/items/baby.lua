@@ -2,6 +2,7 @@ local SlashCoItems = SlashCoItems
 
 SlashCoItems.Baby = {}
 SlashCoItems.Baby.Model = "models/props_c17/doll01.mdl"
+SlashCoItems.Baby.EntClass = "sc_baby"
 SlashCoItems.Baby.Name = "The Baby"
 SlashCoItems.Baby.Icon = "slashco/ui/icons/items/item_7"
 SlashCoItems.Baby.Price = 35
@@ -13,6 +14,7 @@ SlashCoItems.Baby.DisplayColor = function(ply)
 
     return color.r, color.g, color.b, color.a
 end
+SlashCoItems.Baby.IsSpawnable = true
 SlashCoItems.Baby.OnUse = function(ply)
     --When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
     --Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
@@ -41,7 +43,7 @@ SlashCoItems.Baby.OnUse = function(ply)
     end)
 end
 SlashCoItems.Baby.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_baby", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    local droppeditem = SlashCo.CreateItem(SlashCoItems.Baby.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
 end

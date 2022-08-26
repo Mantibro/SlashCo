@@ -3,14 +3,16 @@ local SlashCoItems = SlashCoItems
 SlashCoItems.Rock = {}
 SlashCoItems.Rock.Model = "models/slashco/items/rock.mdl"
 SlashCoItems.Rock.Name = "The Rock"
+SlashCoItems.Rock.EntClass = "sc_rock"
 SlashCoItems.Rock.Icon = "slashco/ui/icons/items/item_7"
 SlashCoItems.Rock.Price = 30
 SlashCoItems.Rock.Description = "An ornamented stone of crude plutonium.\nWhile it's held, your footsteps will not make any noise, however\nyou will be unable to sprint."
 SlashCoItems.Rock.CamPos = Vector(50,0,0)
 SlashCoItems.Rock.ChangesSpeed = true
+SlashCoItems.Rock.IsSpawnable = true
 SlashCoItems.Rock.OnDrop = function(ply)
     SlashCoItems.Rock.OnSwitchFrom(ply)
-    local droppeditem = SlashCo.CreateItem("sc_rock", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    local droppeditem = SlashCo.CreateItem(SlashCoItems.Rock.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
 end

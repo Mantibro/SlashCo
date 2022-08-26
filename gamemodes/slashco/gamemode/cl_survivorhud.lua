@@ -3,7 +3,7 @@ include( "ui/fonts.lua" )
 --include( "ui/data_info.lua" )
 
 CreateClientConVar( "slashcohud_show_lowhealth", 1, true, false, "Whether to display the survivor's hud as blinking yellow when at low health.", 0, 1 )
-CreateClientConVar( "slashcohud_show_healthvalue", 1, true, false, "Whether to display the value of the survivor's health on their hud.", 0, 1 )
+CreateClientConVar( "slashcohud_show_healthvalue", 0, true, false, "Whether to display the value of the survivor's health on their hud.", 0, 1 )
 
 local SlashCoItems = SlashCoItems
 local prevHp, SetTime, ShowDamage, prevHp1, aHp, TimeToFuel, TimeUntilFueled

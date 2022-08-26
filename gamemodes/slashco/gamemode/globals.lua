@@ -1307,6 +1307,12 @@ SlashCo.SpawnCurConfig = function(isDebug)
         end
 
         local itemSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.ItemCount, #possibleItemSpawnpoints)
+        local random_itemSpawns = SlashCo.GetSpawnpoints(5 - #SlashCo.CurRound.SlasherData.AllSurvivors, #possibleItemSpawnpoints)
+
+        for _ = 1, #random_itemSpawns do --Free items spawned during the round
+            local cls = SlashCo.SpawnableItems[math.random(1, #SlashCo.SpawnableItems)]
+            SlashCo.CreateItems({math.random(1,#SlashCo.CurConfig.Items.Spawnpoints)}, cls)
+        end
 
         --local item_class = ""
 

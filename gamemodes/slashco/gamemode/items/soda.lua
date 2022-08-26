@@ -3,10 +3,12 @@ local SlashCoItems = SlashCoItems
 SlashCoItems.Soda = {}
 SlashCoItems.Soda.Model = "models/props_junk/PopCan01a.mdl"
 SlashCoItems.Soda.Name = "B-Gone Soda"
+SlashCoItems.Soda.EntClass = "sc_soda"
 SlashCoItems.Soda.Icon = "slashco/ui/icons/items/item_8"
 SlashCoItems.Soda.Price = 20
 SlashCoItems.Soda.Description = "A can of strange soda. It has a sweet smell. \nConsuming it will turn you invisible for a short while."
 SlashCoItems.Soda.CamPos = Vector(30,0,0)
+SlashCoItems.Soda.IsSpawnable = true
 SlashCoItems.Soda.OnUse = function(ply)
     --When used, the survivor will become undetectable for 30 seconds.
 
@@ -27,7 +29,7 @@ SlashCoItems.Soda.OnUse = function(ply)
     end)
 end
 SlashCoItems.Soda.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_soda", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    local droppeditem = SlashCo.CreateItem(SlashCoItems.Soda.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
 end

@@ -2,11 +2,13 @@ local SlashCoItems = SlashCoItems
 
 SlashCoItems.DevilDie = {}
 SlashCoItems.DevilDie.Model = "models/slashco/items/devildie.mdl"
+SlashCoItems.DevilDie.EntClass = "sc_devildie"
 SlashCoItems.DevilDie.Name = "Devil's Gamble"
 SlashCoItems.DevilDie.Icon = "slashco/ui/icons/items/item_10"
 SlashCoItems.DevilDie.Price = 40
 SlashCoItems.DevilDie.Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
 SlashCoItems.DevilDie.CamPos = Vector(30,0,10)
+SlashCoItems.DevilDie.IsSpawnable = true
 SlashCoItems.DevilDie.OnUse = function(ply)
     --[[
 
@@ -120,7 +122,7 @@ SlashCoItems.DevilDie.OnUse = function(ply)
     
 end
 SlashCoItems.DevilDie.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_devildie", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+    local droppeditem = SlashCo.CreateItem(SlashCoItems.DevilDie.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     local physics = Entity(droppeditem):GetPhysicsObject()
     physics:SetVelocity(ply:GetAimVector() * 250)
     local randomvec = Vector(0, 0, 0)

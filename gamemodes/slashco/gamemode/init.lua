@@ -183,6 +183,15 @@ end )
 --Initialize global variable to hold functions.
 if not SlashCo then SlashCo = {} end
 
+SlashCo.SpawnableItems = {}
+
+for k, p in SortedPairs(SlashCoItems) do
+	if p.IsSpawnable then
+		--table.insert(SlashCo.SpawnableItems, {p.EntClass})
+		SlashCo.SpawnableItems[1 + #SlashCo.SpawnableItems] = p.EntClass
+	end
+end
+
 function GM:Initialize()
 
 	--if CLIENT then
