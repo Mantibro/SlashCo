@@ -428,7 +428,7 @@ end --ends here
             p:EmitSound("slashco/slasher/watcher_see.mp3")
         end
 
-        timer.Simple(5, function() 
+        timer.Simple(5 + (SO*5), function() 
         
             for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
                 local p = team.GetPlayers(TEAM_SURVIVOR)[i]

@@ -2,7 +2,7 @@ local SlashCoItems = SlashCoItems
 
 SlashCoItems.DeathWard = {}
 SlashCoItems.DeathWard.Model = "models/slashco/items/deathward.mdl"
-SlashCoItems.DeathWard.Name = "Death Ward"
+SlashCoItems.DeathWard.Name = "Deathward"
 SlashCoItems.DeathWard.Icon = "slashco/ui/icons/items/item_2"
 SlashCoItems.DeathWard.Price = 50
 SlashCoItems.DeathWard.Description = "A ceramic, skull-shaped charm. Will save you from certain death,\nbut only once. Your team can only have a limited amount of them.\nThis item will take up your Item Slot, even if spent."

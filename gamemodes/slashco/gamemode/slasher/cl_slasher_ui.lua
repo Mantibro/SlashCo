@@ -73,13 +73,14 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 				surface.PlaySound("slashco/slashco_progress_full.mp3")
 			end
 
-			lerper = 0.02
+			--lerper = 0.02
 
 		end
 
-		if lerper < 1 then lerper = (lerper + (( 0.01 + ( 0.005 / lerper ) ))/5) * (1-g) end
+		--if lerper < 1 then lerper = (lerper + (( 0.01 + ( 0.005 / lerper ) ))/5) * (1-g) end
 
-		local gp = Lerp( g + lerper, 0, g )
+		--local gp = Lerp( g + lerper, 0, g )
+		local gp = g
 
 		g_monitor = g
 
