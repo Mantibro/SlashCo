@@ -39,6 +39,20 @@ SlashCo.Maps = {
     },
 
     {
+        ID = "sc_hospital",
+        NAME = "Hospital",
+        AUTHOR = "sparkz",
+        DEFAULT = true,
+        SIZE = 2,
+        MIN_PLAYERS = 2,
+        LEVELS = {
+            -1750,
+            -2100,
+            50
+        }
+    },
+
+    {
         ID = "rp_deadcity",
         NAME = "Dead City",
         AUTHOR = "NuclearGhost",
