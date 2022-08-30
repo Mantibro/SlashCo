@@ -1475,7 +1475,7 @@ SlashCo.SummonEscapeHelicopter = function()
 
 	]]
 
-    local delay = 30 + math.random( 0, 30 + ( SlashCo.CurRound.Difficulty * 15 ) )
+    local delay = 30 + math.random( 0, 30 + ( SlashCo.CurRound.Difficulty * 20 ) )
 
 	print("[SlashCo] Generators On. The Helicopter will arrive in "..delay.." seconds.")
 
@@ -1519,11 +1519,12 @@ SlashCo.HelicopterLand = function(pos)
 
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3])
 
-    --Will the Helicopter Abandom players?
+    --Will the Helicopter Abandon players?
 
     if SlashCo.CurRound.Difficulty ~= 3 then return end
 
     local abandon = math.random(50, 120)
+    print("[SlashCo] Helicopter set to abandon players in "..tostring(abandon).." seconds.")
 
     timer.Simple(abandon, function()
 

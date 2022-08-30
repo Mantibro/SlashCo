@@ -14,7 +14,7 @@ ENT.Instructions	= ""
 ENT.AutomaticFrameAdvance = true 
 
 --local plyCount = 0
---local switch = false
+--local self.switch = false
 
 function ENT:Initialize()
 	if SERVER then
@@ -24,6 +24,7 @@ function ENT:Initialize()
 		self:SetMoveType( MOVETYPE_NONE )
 
 		self.EnableMovement = false
+		self.switch = nil
 
 		self.final_dir = self:GetAngles()[2]
 
@@ -264,45 +265,45 @@ function ENT:Think()
 
 	end
 
-	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
+	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then 
 
 		SlashCo.SurvivorWinFinish()
 
 		SlashCo.HelicopterTakeOff()
 
-		switch = true 
+		self.switch = true 
 
 	end
 
-	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers >= (#team.GetPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
+	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers >= (#team.GetPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then 
 
 		if SlashCo.CurRound.Difficulty ~= 1 then return end
+		self.switch = true
 
-		local abandon = math.random(50, 120)
+		local abandon = math.random(80, 220)
+		print("[SlashCo] Helicopter set to abandon players in "..tostring(abandon).." seconds.")
 
     	timer.Simple(abandon, function() 
     
         	SlashCo.HelicopterTakeOff()
         	SlashCo.SurvivorWinFinish()
-
-			switch = true 
 
     	end)
 
 	end
 
-	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and switch == false then 
+	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then 
 
 		if SlashCo.CurRound.Difficulty ~= 2 then return end
+		self.switch = true 
 
-		local abandon = math.random(50, 120)
+		local abandon = math.random(50, 160)
+		print("[SlashCo] Helicopter set to abandon players in "..tostring(abandon).." seconds.")
 
     	timer.Simple(abandon, function() 
     
         	SlashCo.HelicopterTakeOff()
         	SlashCo.SurvivorWinFinish()
-
-			switch = true 
 
     	end)
 
