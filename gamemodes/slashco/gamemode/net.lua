@@ -279,7 +279,7 @@ SlashCo.RoundOverScreen = function(state)
 
 		end
 
-		table.insert(absurv_table, a_ply)
+		table.insert(absurv_table, {id = a_ply})
 
 		::RESCUED::
 
@@ -315,14 +315,18 @@ SlashCo.RoundOverScreen = function(state)
 
 		l1 = SCInfo.RoundEnd[1].On
 		l2 = SCInfo.RoundEnd[2].NonFullTeam
+		l3 = ""
+		l4 = ""
 
-		if #team.GetPlayers(TEAM_SURVIVOR) > 1 then
+		if #rescued_players > 1 then
 			l3 = alive_survivors..SCInfo.RoundEnd[2].AlivePlayers
-		else
+		elseif #rescued_players == 1 then
 			l3 = alive_survivors..SCInfo.RoundEnd[2].OnlyOneAlive
 		end
 
-		l4 = dead_survivors..SCInfo.RoundEnd[2].DeadPlayers
+		if #deadsurv_table > 0 then
+			l4 = dead_survivors..SCInfo.RoundEnd[2].DeadPlayers
+		end
 
 		if #absurv_table > 0 then
 			l5 = abandoned_survivors..SCInfo.RoundEnd[2].LeftBehindPlayers

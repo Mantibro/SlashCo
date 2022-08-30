@@ -456,7 +456,7 @@ SlashCo.LoadCurRoundData = function()
             print("[SlashCo] RoundData Loaded with Difficulty of: " .. diff .. ", Offering of: " .. offering .. " and GasMod of: " .. survivorgasmod)
 
             --Transfer loaded data into the main table
-            SlashCo.CurRound.Difficulty = diff
+            SlashCo.CurRound.Difficulty = tonumber(diff)
             SlashCo.CurRound.SurvivorData.GasCanMod = survivorgasmod
             SlashCo.CurRound.OfferingData.CurrentOffering = tonumber(offering)
             if SlashCo.CurRound.OfferingData.CurrentOffering > 0 then
@@ -1182,7 +1182,7 @@ SlashCo.EndRound = function()
 
         else --Normal Win
 
-            if #SlashCo.CurRound.SlasherData.AllSurvivors >= SurvivorCount then --Everyone lived
+            if #SlashCo.CurRound.SlasherData.AllSurvivors >= SurvivorCount and SurvivorCount == #SlashCo.CurRound.HelicopterRescuedPlayers then --Everyone lived
 
                 SlashCo.RoundOverScreen(0)
 
@@ -1269,7 +1269,7 @@ SlashCo.SurvivorWinFinish = function()
     local delay = 16
 
     for _, play in ipairs( player.GetAll() ) do
-        play:ChatPrint("[SlashCo] All Living survivors are in the Helicopter.")
+        play:ChatPrint("[SlashCo] The Helicopter will now leave.")
     end
 
     timer.Simple(delay, function()
@@ -1520,6 +1520,7 @@ SlashCo.HelicopterLand = function(pos)
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3])
 
     --Will the Helicopter Abandon players?
+    print(SlashCo.CurRound.Difficulty.."  yyyah")
 
     if SlashCo.CurRound.Difficulty ~= 3 then return end
 
