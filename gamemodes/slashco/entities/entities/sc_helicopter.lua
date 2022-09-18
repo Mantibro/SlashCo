@@ -62,7 +62,7 @@ function ENT:Use(activator, _, _, _)
 			return
 		end
 
-		if SatPlayers[4] == nil then
+		if SatPlayers[SlashCo.MAXPLAYERS - 1] == nil then
 			availabilityHeli = true
 		end
 
@@ -104,15 +104,23 @@ function ENT:Use(activator, _, _, _)
 				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
 
 			elseif SatPlayers[2] ~= nil and SatPlayers[2].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(-30, 17, 40))
+				pos = self:LocalToWorld(Vector(-30, 0, 40))
 				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
 
 			elseif SatPlayers[3] ~= nil and SatPlayers[3].steamid == activator:SteamID64() then
+				pos = self:LocalToWorld(Vector(-30, -17, 40))
+				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
+
+			elseif SatPlayers[4] ~= nil and SatPlayers[4].steamid == activator:SteamID64() then
 				pos = self:LocalToWorld(Vector(30, -17, 40))
 				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
 
-			elseif SatPlayers[4] ~= nil and SatPlayers[4].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(30, 17, 40))
+			elseif SatPlayers[5] ~= nil and SatPlayers[5].steamid == activator:SteamID64() then
+				pos = self:LocalToWorld(Vector(30, 0, 40))
+				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
+
+			elseif SatPlayers[6] ~= nil and SatPlayers[6].steamid == activator:SteamID64() then
+				pos = self:LocalToWorld(Vector(30, -17, 40))
 				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
 			end
 

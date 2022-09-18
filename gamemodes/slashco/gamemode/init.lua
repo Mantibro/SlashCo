@@ -356,7 +356,7 @@ function GM:PlayerButtonDown(ply, button)
 		--Switching Teams
 		if button == 58 and SlashCo.LobbyData.LOBBYSTATE == 0 then
 			if ply:Team() == TEAM_SPECTATOR then
-				if(#team.GetPlayers(TEAM_LOBBY) < 5) then	--Joining the Lobby team.
+				if(#team.GetPlayers(TEAM_LOBBY) < SlashCo.MAXPLAYERS) then	--Joining the Lobby team.
 				
 					ply:SetTeam(TEAM_LOBBY)
 					ply:Spawn()

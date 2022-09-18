@@ -96,7 +96,7 @@ SlashCo.ReturnMapIndex = function()
 
 end
 
-SlashCo.MAXPLAYERS = 5
+SlashCo.MAXPLAYERS = 7
 
 SlashCo.SlasherData = {     --Information about Slashers.
 
@@ -1253,9 +1253,9 @@ end
 
 SlashCo.RoundHeadstart = function()
 
-    if #SlashCo.CurRound.SlasherData.AllSurvivors > 3 then return end
+    if #SlashCo.CurRound.SlasherData.AllSurvivors > (SlashCo.MAXPLAYERS - 2) then return end
 
-    for _ = 1, (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
+    for _ = 1, (6 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
 
         local gens = ents.FindByClass("sc_generator")
         local random = math.random(#gens)

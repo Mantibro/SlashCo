@@ -227,6 +227,14 @@ SlashCo.RoundOverScreen = function(state)
 
 		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[2].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[3].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[4].steamid):GetName()
 
+	elseif #rescued_players == 5 then
+
+		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[2].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[3].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[4].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[5].steamid):GetName()
+
+	elseif #rescued_players == 6 then
+
+		alive_survivors = player.GetBySteamID64(rescued_players[1].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[2].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[3].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[4].steamid):GetName()..", "..player.GetBySteamID64(rescued_players[5].steamid):GetName().." and "..player.GetBySteamID64(rescued_players[6].steamid):GetName()
+
 	end
 
 	local deadsurv_table = {}
@@ -261,6 +269,14 @@ SlashCo.RoundOverScreen = function(state)
 	elseif #deadsurv_table == 4 then
 
 		dead_survivors = player.GetBySteamID64(deadsurv_table[1].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[2].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[3].id):GetName().." and "..player.GetBySteamID64(deadsurv_table[4].id):GetName()
+
+	elseif #deadsurv_table == 5 then
+
+		dead_survivors = player.GetBySteamID64(deadsurv_table[1].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[2].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[3].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[4].id):GetName().." and "..player.GetBySteamID64(deadsurv_table[5].id):GetName()
+
+	elseif #deadsurv_table == 6 then
+
+		dead_survivors = player.GetBySteamID64(deadsurv_table[1].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[2].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[3].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[4].id):GetName()..", "..player.GetBySteamID64(deadsurv_table[5].id):GetName().." and "..player.GetBySteamID64(deadsurv_table[6].id):GetName()
 
 	end
 
@@ -300,6 +316,14 @@ SlashCo.RoundOverScreen = function(state)
 	elseif #absurv_table == 4 then
 
 		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()..", "..player.GetBySteamID64(absurv_table[2].id):GetName()..", "..player.GetBySteamID64(absurv_table[3].id):GetName().." and "..player.GetBySteamID64(absurv_table[4].id):GetName()
+
+	elseif #absurv_table == 5 then
+
+		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()..", "..player.GetBySteamID64(absurv_table[2].id):GetName()..", "..player.GetBySteamID64(absurv_table[3].id):GetName()..", "..player.GetBySteamID64(absurv_table[4].id):GetName().." and "..player.GetBySteamID64(absurv_table[5].id):GetName()
+
+	elseif #absurv_table == 6 then
+
+		abandoned_survivors = player.GetBySteamID64(absurv_table[1].id):GetName()..", "..player.GetBySteamID64(absurv_table[2].id):GetName()..", "..player.GetBySteamID64(absurv_table[3].id):GetName()..", "..player.GetBySteamID64(absurv_table[4].id):GetName()..", "..player.GetBySteamID64(absurv_table[5].id):GetName().." and "..player.GetBySteamID64(absurv_table[6].id):GetName()
 
 	end
 
