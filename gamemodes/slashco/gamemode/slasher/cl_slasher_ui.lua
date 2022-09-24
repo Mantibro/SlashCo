@@ -57,8 +57,17 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		local willdrawmain = true
 
 		local pacified = LocalPlayer():GetNWBool("DemonPacified")
+		local blinded = LocalPlayer():GetNWBool("SlasherBlinded")
 
 		surface.SetDrawColor(255,255,255,255)	
+
+		if blinded then
+
+			local black = Material("models/slashco/slashers/trollge/body")
+			surface.SetMaterial(black)
+			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
+		end
 
 		local g = (GameProgress/10)
 		if g_monitor == nil then g_monitor = g end

@@ -12,6 +12,7 @@ AddCSLuaFile("stepdecoy.lua")
 AddCSLuaFile("deathward_used.lua")
 AddCSLuaFile("battery.lua")
 AddCSLuaFile("rock.lua")
+AddCSLuaFile("pocketsand.lua")
 
 if not SlashCoItems then SlashCoItems = {} end
 
@@ -28,6 +29,7 @@ include("stepdecoy.lua")
 include("deathward_used.lua")
 include("battery.lua")
 include("rock.lua")
+include("pocketsand.lua")
 
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems
