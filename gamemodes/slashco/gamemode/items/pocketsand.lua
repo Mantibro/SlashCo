@@ -33,7 +33,7 @@ SlashCoItems.PocketSand.OnUse = function(ply)
                 filter = slasher
             } )
 
-            if tr.Entity:IsPlayer() and tr.Entity():Team() == TEAM_SLASHER then found = tr.Entity goto FOUNDMAN end
+            if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SLASHER then found = tr.Entity goto FOUNDMAN end
 
         end
 
