@@ -862,6 +862,8 @@ SlashCo.ValidateMap = function(map)
 
     gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) - SlashCo.CurRound.SurvivorData.GasCanMod
 
+    if gasCount < 8 then gasCount = 8 end
+
     if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --The Exposure Offering caps gas cans at 8.
         SlashCo.CurRound.GasCanCount = 8 - SlashCo.CurRound.SurvivorData.GasCanMod
     else
