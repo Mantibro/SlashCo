@@ -18,7 +18,6 @@ SlashCo.OnSlasherSpawned = function(ply)
     if slid == 5 then
 
         ply:SetViewOffset( Vector(0,0,20) )
-
         ply:SetCurrentViewOffset( Vector(0,0,20) )
 
     end
@@ -71,6 +70,12 @@ SlashCo.OnSlasherSpawned = function(ply)
         ply:SetViewOffset( Vector(0,0,100) )
 
         ply:SetCurrentViewOffset( Vector(0,0,100) )
+
+    end
+
+    if slid == 11 then
+
+        PlayGlobalSound("slashco/slasher/abomignat_breathing.wav",65,ply)
 
     end
 

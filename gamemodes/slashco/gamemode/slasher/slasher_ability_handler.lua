@@ -1033,6 +1033,94 @@ do
 end
 
     ::ABOMIGNAT::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 then goto CRIMINAL end
+do
+
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Main Slash Cooldown
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Forward charge
+    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Lunge Finish Antispam
+    v4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 --Lunge Duration
+
+    if v1 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 - FrameTime() end
+
+    if slasher:IsOnGround() then slasher:SetVelocity(slasher:GetForward() * v2 * 8) end
+
+    if slasher:GetNWBool("AbomignatLunging") then
+
+        local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,30)), Vector(-15,-15,-60), Vector(15,15,60), 50, DMG_SLASH, 5, false )
+
+        SlashCo.BustDoor(slasher, target, 25000)
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = v4 + 1
+
+        if ( slasher:GetVelocity():Length() < 450 or target:IsValid() ) and v4 > 30 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 == 0 then
+
+            slasher:SetNWBool("AbomignatLungeFinish",true)
+            timer.Simple(0.6, function() slasher:EmitSound("slashco/slasher/abomignat_scream"..math.random(1,3)..".mp3") end)
+
+            slasher:SetNWBool("AbomignatLunging",false)
+            slasher:SetCycle( 0 )
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 1
+
+            timer.Simple(4, function() 
+                if v3 == 1 then
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 2
+                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 0
+                    slasher:SetNWBool("AbomignatLungeFinish",false)   
+                    slasher:Freeze(false)  
+                end       
+            end)
+
+        end
+
+
+    end
+
+    if slasher:GetNWBool("AbomignatCrawling") then 
+    
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+
+        slasher:SetSlowWalkSpeed( 350 )
+        slasher:SetWalkSpeed( 350 )
+        slasher:SetRunSpeed( 350 )
+
+        SlashCo.CurRound.SlasherData[slasherid].Eyesight = 0
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 0
+
+        if slasher:GetVelocity():Length() < 3 then 
+            slasher:SetNWBool("AbomignatCrawling",false) 
+            SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown 
+        end
+
+        if not slasher:IsOnGround() then 
+            slasher:SetNWBool("AbomignatCrawling",false) 
+            SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown 
+        end
+
+        slasher:SetViewOffset( Vector(0,0,20) )
+        slasher:SetCurrentViewOffset( Vector(0,0,20) )
+
+    else
+
+        SlashCo.CurRound.SlasherData[slasherid].CanChase = true
+    
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+
+        SlashCo.CurRound.SlasherData[slasherid].Eyesight = 6
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 0.5
+
+        slasher:SetViewOffset( Vector(0,0,70) )
+        slasher:SetCurrentViewOffset( Vector(0,0,70) )
+
+    end
+
+end
+
+    ::CRIMINAL::
 
 end
 

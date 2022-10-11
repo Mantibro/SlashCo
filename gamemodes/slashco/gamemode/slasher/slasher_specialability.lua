@@ -214,5 +214,47 @@ end
     PlayGlobalSound("slashco/slasher/watcher_rage.wav", 100, slasher, 1)
 
     --Watcher Surveillance /\ /\ /\
+
     ::ABOMIGNAT::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 then goto CRIMINAL end
+    
+    --Abomignat lunge \/ \/ \/
+
+    if slasher:GetNWBool("AbomignatCrawling") then return end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then return end
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 10 - (SO * 4)
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 8 + (SO*4)
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
+
+    slasher:Freeze(true)
+
+    slasher:SetNWBool("AbomignatLunging", true)
+    slasher:EmitSound("slashco/slasher/abomignat_lunge.mp3")
+
+    timer.Simple(1.75, function()
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 == 0 then
+            slasher:SetNWBool("AbomignatLungeFinish",true)
+            timer.Simple(0.6, function() slasher:EmitSound("slashco/slasher/abomignat_scream"..math.random(1,3)..".mp3") end)
+
+            slasher:SetNWBool("AbomignatLunging",false)
+            slasher:SetCycle( 0 )
+
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 1
+        end
+
+        timer.Simple(4, function() 
+            if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 == 1 then
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 2
+                SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 0
+                slasher:SetNWBool("AbomignatLungeFinish",false)     
+                slasher:Freeze(false)
+            end       
+        end)
+
+    end)
+
+    --Abomignat lunge /\ /\ /\
+    ::CRIMINAL::
 end

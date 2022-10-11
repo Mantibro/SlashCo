@@ -66,6 +66,12 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	local manspider_nest = ply:GetNWBool("ManspiderNested")
 
+	local abomignat_mainslash = ply:GetNWBool("AbomignatSlashing")
+	local abomignat_lunge = ply:GetNWBool("AbomignatLunging")
+	local abomignat_lungefinish = ply:GetNWBool("AbomignatLungeFinish")
+
+	local abomignat_crawl = ply:GetNWBool("AbomignatCrawling")
+
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
 	if ply:GetModel() ~= "models/slashco/slashers/baba/baba.mdl" then goto sid end --Bababooey's Animator
@@ -477,6 +483,54 @@ do
 
 end
 	::abomignat::
+
+	if ply:GetModel() ~= "models/slashco/slashers/abomignat/abomignat.mdl" then goto criminal end --Abomignat's Animator
+
+	if not abomignat_mainslash and not abomignat_lunge and not abomignat_lungefinish then anim_antispam = false end
+
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_HL2MP_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN 
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+		if abomignat_crawl then
+			ply.CalcSeqOverride = ply:LookupSequence("crawl")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	if abomignat_mainslash then
+
+		ply.CalcSeqOverride = ply:LookupSequence("slash_charge")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
+	if abomignat_lunge then
+
+		ply.CalcSeqOverride = ply:LookupSequence("lunge")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
+	if abomignat_lungefinish then
+
+		ply.CalcSeqOverride = ply:LookupSequence("lunge_post")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
+	::criminal::
+
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
@@ -523,6 +577,9 @@ if SERVER then
 		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
 			ply:EmitSound( "npc/footsteps/hardboot_generic"..math.random(1,6)..".wav",50,90,0.75)
 			return false
+		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Watcher Footsteps
+			ply:EmitSound( "slashco/slasher/abomignat_step"..math.random(1,3)..".mp3")
+			return false
 		end
 		
 	end
@@ -557,6 +614,8 @@ if CLIENT then
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
 			return false
+		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Watcher Footsteps
+			return true
 		end
 		
 	end

@@ -110,6 +110,28 @@ SCInfo.Slasher = {
         SpeedRating = "★★★★☆",
         EyeRating = "★★★★☆",
         DiffRating = "★★☆☆☆"
+    },
+
+    {
+        Name = "Abomignat",
+        Class = "Cryptid",
+        Danger = "Considerable",
+        Description = "The Monstrous Slasher which uses basic abilities to achieve quick kills.\n\n-Abomignat can use its sharp claws to quickly damage Survivors.\n-It can perform a short-range high-speed lunge to finish off its victims.\n-Its Crawling Mode can enable swift map traversal.",
+        ProTip = "-This Slasher enters bursts of speed while attacking.",
+        SpeedRating = "★★★☆☆",
+        EyeRating = "★★★★☆",
+        DiffRating = "★☆☆☆☆"
+    },
+
+    {
+        Name = "Criminal",
+        Class = "Cryptid",
+        Danger = "Devastating",
+        Description = "The Tormented Slasher which relies on confusion and entrapment to catch his victims.\n\n-Criminal is only able to attack while standing still.\n-He can summon clones around himself as a tool of confusion.\n",
+        ProTip = "-This Slasher was seen surrounded by fake copies of itself.",
+        SpeedRating = "★★★★☆",
+        EyeRating = "★★☆☆☆",
+        DiffRating = "★★★★★"
     }
 
 }

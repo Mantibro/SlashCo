@@ -325,11 +325,55 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillDistance = 150,
         ChaseRange = 2000,
         ChaseRadius = 0.96,
-        ChaseDuration = 3.0,
+        ChaseDuration = 2.0,
         ChaseCooldown = 2,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/watcher_chase.wav",
         KillSound = "slashco/slasher/watcher_kill.mp3"
+    },
+
+    {
+        NAME = "Abomignat",
+        ID = 11,
+        CLS = 1,
+        DNG = 2,
+        Model = "models/slashco/slashers/abomignat/abomignat.mdl",
+        KillDelay = 5,
+        GasCanMod = 0,
+        ProwlSpeed = 150,
+        ChaseSpeed = 280,
+        Perception = 0.5,
+        Eyesight = 6,
+        KillDistance = 150,
+        ChaseRange = 1400,
+        ChaseRadius = 0.82,
+        ChaseDuration = 5.0,
+        ChaseCooldown = 5,
+        JumpscareDuration = 2,
+        ChaseMusic = "slashco/slasher/abomignat_chase.wav",
+        KillSound = ""
+    },
+
+    {
+        NAME = "Criminal",
+        ID = 12,
+        CLS = 1,
+        DNG = 3,
+        Model = "models/slashco/slashers/criminal/criminal.mdl",
+        KillDelay = 10,
+        GasCanMod = 0,
+        ProwlSpeed = 200,
+        ChaseSpeed = 350,
+        Perception = 1,
+        Eyesight = 3,
+        KillDistance = 110,
+        ChaseRange = 0,
+        ChaseRadius = 1,
+        ChaseDuration = 5.0,
+        ChaseCooldown = 5,
+        JumpscareDuration = 2,
+        ChaseMusic = "",
+        KillSound = "slashco/slasher/criminal_kill.mp3"
     }
 
 }
@@ -1402,7 +1446,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             SlashCo.HelicopterTakeOffIntro()
 
-            if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
+            --if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
 
         end)
 
