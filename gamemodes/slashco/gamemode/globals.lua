@@ -341,7 +341,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillDelay = 5,
         GasCanMod = 0,
         ProwlSpeed = 150,
-        ChaseSpeed = 280,
+        ChaseSpeed = 285,
         Perception = 0.5,
         Eyesight = 6,
         KillDistance = 150,
@@ -357,20 +357,42 @@ SlashCo.SlasherData = {     --Information about Slashers.
     {
         NAME = "Criminal",
         ID = 12,
-        CLS = 1,
+        CLS = 3,
         DNG = 3,
         Model = "models/slashco/slashers/criminal/criminal.mdl",
         KillDelay = 10,
         GasCanMod = 0,
         ProwlSpeed = 200,
-        ChaseSpeed = 350,
+        ChaseSpeed = 310,
         Perception = 1,
         Eyesight = 3,
         KillDistance = 110,
         ChaseRange = 0,
         ChaseRadius = 1,
         ChaseDuration = 5.0,
-        ChaseCooldown = 5,
+        ChaseCooldown = 10,
+        JumpscareDuration = 4,
+        ChaseMusic = "",
+        KillSound = "slashco/slasher/criminal_kill.mp3"
+    },
+
+    {
+        NAME = "Free Smiley Dealer",
+        ID = 13,
+        CLS = 1,
+        DNG = 2,
+        Model = "models/slashco/slashers/freesmiley/freesmiley.mdl",
+        KillDelay = 2,
+        GasCanMod = 0,
+        ProwlSpeed = 100,
+        ChaseSpeed = 275,
+        Perception = 2.5,
+        Eyesight = 8,
+        KillDistance = 150,
+        ChaseRange = 1600,
+        ChaseRadius = 0.86,
+        ChaseDuration = 5.0,
+        ChaseCooldown = 4,
         JumpscareDuration = 2,
         ChaseMusic = "",
         KillSound = "slashco/slasher/criminal_kill.mp3"
@@ -1727,6 +1749,96 @@ SlashCo.RadialTester = function(ent, dist, secondary)
     end
 
     return last_best_angle
+
+end
+
+SlashCo.LocalizedTraceHullLocator = function(ent, input_range)
+
+    --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
+
+    local height_offset = 10
+    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+
+    local range = input_range
+
+    local pos = Vector(0,0,h)
+
+    local err = 0
+
+    ::RELOCATE::
+
+    if err > 250 then print("TRACE LOCATOR FAILURE.") return end
+
+    pos = ent:LocalToWorld(Vector(math.random(-range,range),math.random(-range,range),height_offset * 50))
+
+    local tr_l = util.TraceLine( {
+		start = pos,
+		endpos = pos - Vector(0,0,1000),
+	} )
+
+    if not tr_l.Hit then err = err+1 goto RELOCATE end
+
+    local tr = util.TraceHull( {
+		start = pos,
+		endpos = pos + Vector(0,0,tr_l.HitPos[3] - height_offset),
+		maxs = Vector(18,18,72),
+		mins = Vector(-18,-18,0),
+	} )
+
+    if tr.Hit then err = err+1 goto RELOCATE end
+
+    pos = tr_l.HitPos
+
+    return pos
+
+end
+
+SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, input_range, offset)
+
+    --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
+
+    local height_offset = 10
+    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+
+    local range = input_range
+
+    local pos = Vector(0,0,h)
+
+    local err = 0
+
+    local offset_local = ent:GetForward() * offset
+
+    ::RELOCATE::
+
+    if err > 250 then print("TRACE LOCATOR FAILURE.") return end
+
+    local x_s = math.random(-range,range)
+    local y_s = math.random(-range,range)
+
+    if math.abs(x_s) < min_range then y_s = min_range + math.random(0,range-min_range) end 
+    if math.abs(y_s) < min_range then y_s = min_range + math.random(0,range-min_range) end 
+
+    pos = ent:LocalToWorld(offset_local + Vector((x_s) ,y_s , height_offset * 50))
+
+    local tr_l = util.TraceLine( {
+		start = pos,
+		endpos = pos - Vector(0,0,1000),
+	} )
+
+    if not tr_l.Hit then err = err+1 goto RELOCATE end
+
+    local tr = util.TraceHull( {
+		start = pos,
+		endpos = pos + Vector(0,0,tr_l.HitPos[3] - height_offset),
+		maxs = Vector(18,18,72),
+		mins = Vector(-18,-18,0),
+	} )
+
+    if tr.Hit then err = err+1 goto RELOCATE end
+
+    pos = tr_l.HitPos
+
+    return pos
 
 end
 

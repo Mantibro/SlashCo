@@ -1,5 +1,6 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models\slashco\slashers\criminal\suit_sheet"
+	"$basetexture" "models\debug\debugwhite"
+	"$bumpmap" "models/slashco/slashers/criminal/arms_nm"
 	"$halflambert" 1
 }

@@ -20,6 +20,8 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 11 then goto abomslash end
 
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 12 and slasher:GetVelocity():Length() > 5 then return end
+
     if slasher:GetNWBool("SidGun") then goto sidgun end
 do
 

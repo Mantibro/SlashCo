@@ -125,7 +125,7 @@ SCInfo.Slasher = {
 
     {
         Name = "Criminal",
-        Class = "Cryptid",
+        Class = "Umbra",
         Danger = "Devastating",
         Description = "The Tormented Slasher which relies on confusion and entrapment to catch his victims.\n\n-Criminal is only able to attack while standing still.\n-He can summon clones around himself as a tool of confusion.\n",
         ProTip = "-This Slasher was seen surrounded by fake copies of itself.",

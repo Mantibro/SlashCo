@@ -52,6 +52,9 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
 		local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
+		local CrimCloneIcon = Material("slashco/ui/icons/slasher/s_12_a1")
+		local CrimRage = Material("slashco/ui/icons/slasher/s_12_1")
+
 		local willdrawkill = true
 		local willdrawchase = true
 		local willdrawmain = true
@@ -622,6 +625,37 @@ do
 	end
 end
 	::criminal::
+	if SlashID ~= 12 then goto freesmiley end
+do
+	willdrawchase = false
+	local clones_active = LocalPlayer():GetNWBool("CriminalCloning")
+	local rage_active = LocalPlayer():GetNWBool("CriminalRage")
+
+	surface.SetMaterial(CrimCloneIcon)
+	surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
+	if not clones_active then
+		draw.SimpleText( "M2 - Summon Clones", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	else
+		draw.SimpleText( "M2 - Unsummon Clones", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	end
+
+	if rage_active then
+		surface.SetMaterial(CrimRage)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+		willdrawmain = false
+	end
+
+	if not rage_active then
+		surface.SetMaterial(CrimRage)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		if GameProgress > 6 then
+			draw.SimpleText( "F - Rage", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		else
+			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		end
+	end
+end
+	::freesmiley::
 
 		--Slasher-Shared function \/ \/ \/ 
 

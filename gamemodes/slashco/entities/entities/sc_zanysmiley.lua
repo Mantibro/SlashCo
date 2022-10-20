@@ -1,4 +1,3 @@
---[[
 AddCSLuaFile()
 
 local SlashCo = SlashCo
@@ -10,7 +9,7 @@ ENT.Spawnable		= true
 
 function ENT:Initialize()
 
-	self:SetModel( "models/Humans/Group01/male_07.mdl" )
+	self:SetModel( "models/slashco/slashers/freesmiley/zanysmiley.mdl" )
 
 	self.CollideSwitch = 3
 
@@ -39,7 +38,6 @@ function ENT:HaveEnemy()
 	if ( self:GetEnemy() and IsValid(self:GetEnemy()) ) then
 		-- If the enemy is too far
 		if ( self:GetRangeTo(self:GetEnemy():GetPos()) > self.LoseTargetDist ) then
-			-- If the enemy is lost then call FindEnemy() to look for a new one
 			-- FindEnemy() will return true if an enemy is found, making this function return true
 			return self:FindEnemy()
 		-- If the enemy is dead( we have to check if its a player before we use Alive() )
@@ -59,6 +57,7 @@ end
 -- Returns true and sets our enemy if we find one
 ----------------------------------------------------
 function ENT:FindEnemy()
+
 	-- Search around us for entities
 	-- This can be done any way you want eg. ents.FindInCone() to replicate eyesight
 	local _ents = ents.FindInSphere( self:GetPos(), self.SearchRadius )
@@ -66,14 +65,19 @@ function ENT:FindEnemy()
 	for _,v in ipairs( _ents ) do
 		if ( v:IsPlayer() and v:Team() == TEAM_SURVIVOR ) then
 			-- We found one so lets set it as our enemy and return true
+
 			local tr = util.TraceLine( {
-				start = self:GetPos()+Vector(0,0,60),
-				endpos = v:GetPos()+Vector(0,0,60),
+				start = self:GetPos()+Vector(0,0,40),
+				endpos = v:GetPos()+Vector(0,0,40),
 				filter = self
 			} )
+
 			if tr.Entity == v then
 				self:SetEnemy(v)
 				return true
+			else
+				self:SetEnemy(nil)
+				return false
 			end
 		end
 	end	
@@ -91,26 +95,30 @@ function ENT:RunBehaviour()
 		-- Lets use the above mentioned functions to see if we have/can find a enemy
 		if ( self:HaveEnemy() ) then
 			-- Now that we have a enemy, the code in this block will run
+			self:SetSequence(self:LookupSequence("attack"))
+			self:EmitSound("slashco/slasher/zany_attack.mp3")
 			self.loco:FaceTowards(self:GetEnemy():GetPos())	-- Face our enemy
-			self:StartActivity( ACT_WALK )			-- Set the animation
+			--self:StartActivity( ACT_WALK )			-- Set the animation
 			self.loco:SetDesiredSpeed( 400 )		-- Set the speed that we will be moving at. Don't worry, the animation will speed up/slow down to match
 			self.loco:SetAcceleration(900)			-- We are going to run at the enemy quickly, so we want to accelerate really fast
 			self:ChaseEnemy( ) 						-- The new function like MoveToPos that will be looked at soon.
 			self.loco:SetAcceleration(400)			-- Set this back to its default since we are done chasing the enemy
-			self:StartActivity( ACT_IDLE )			--We are done so go back to idle
+			--self:StartActivity( ACT_IDLE )			--We are done so go back to idle
 			-- Now once the above function is finished doing what it needs to do, the code will loop back to the start
 			-- unless you put stuff after the if statement. Then that will be run before it loops
 		else
 			-- Since we can't find an enemy, lets wander
 			-- Its the same code used in Garry's test bot
-			self:StartActivity( ACT_WALK )			-- Walk anmimation
+			self:SetSequence(self:LookupSequence("idle"))
+			self:EmitSound("slashco/slasher/zany_breath"..math.random(1,3)..".mp3")
+			--self:StartActivity( ACT_WALK )			-- Walk anmimation
 			self.loco:SetDesiredSpeed( 50 )		-- Walk speed
-			self:MoveToPos( SlashCo.TraceHullLocator() ) -- Walk to a random place within about 400 units (yielding)
-			self:StartActivity( ACT_IDLE )
+			self:MoveToPos( SlashCo.LocalizedTraceHullLocatorAdvanced(self, 50, 150, 150) ) -- Walk to a random place
+			--self:StartActivity( ACT_IDLE )
 		end
 		-- At this point in the code the bot has stopped chasing the player or finished walking to a random spot
 		-- Using this next function we are going to wait 2 seconds until we go ahead and repeat it 
-		coroutine.wait(math.Rand( 0, 6 ))
+		--coroutine.wait(math.Rand( 0, 1 ))
 		
 	end
 
@@ -173,6 +181,20 @@ function ENT:Think()
 
 		end
 
+		local _ents = ents.FindInSphere( self:GetPos(), self.SearchRadius )
+		for _,v in ipairs( _ents ) do
+			if ( v:IsPlayer() and v:Team() == TEAM_SURVIVOR ) then
+				if not self:HaveEnemy() then self:FindEnemy() end
+
+				if v:GetPos():Distance(self:GetPos()) < 50 then
+
+					self:Remove()
+					v:TakeDamage( 50, self, self )
+
+				end
+			end
+		end	
+
 	end
 
 end
@@ -195,4 +217,3 @@ if CLIENT then
 		self:DrawModel()
 	end
 end
---]]

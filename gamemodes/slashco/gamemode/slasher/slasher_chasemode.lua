@@ -4,7 +4,11 @@ SlashCo.SlasherCallForChaseMode = function(slasher)
 
     local slasherid = slasher:SteamID64()
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     if slasher:GetNWBool("SidGunEquipped") then goto sidaim end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 12 then goto crimclone end
 do
     if SlashCo.CurRound.SlasherData[slasherid].CanChase == false then return end
 
@@ -93,6 +97,7 @@ end
 
 end
     ::sidaim::
+do
     if not slasher:GetNWBool("SidGunEquipped") then return end
     local gunrage = slasher:GetNWBool("SidGunRage")
 
@@ -129,5 +134,47 @@ end
         end
 
     end
+end
+    ::crimclone::
+do
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 12 then return end
+
+    if SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown > 0 then return end
+    SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown
+
+    if slasher:GetNWBool("CriminalCloning") then
+
+        for i = 1, #ents.FindByClass("sc_crimclone") do
+
+            local cln = ents.FindByClass("sc_crimclone")[i]
+
+            if cln.IsMain ~= true then cln:Remove() end
+            cln:StopSound("slashco/slasher/criminal_loop.wav")	
+            cln:StopSound("slashco/slasher/criminal_rage.wav")	
+
+        end
+
+        slasher:SetNWBool("CriminalCloning", false)
+        slasher:SetNWBool("CriminalRage", false)
+
+    else
+
+        for i = 1, math.random(4+(SO * 3),6+(SO * 3)) do
+
+            local clone = ents.Create( "sc_crimclone" )
+
+            clone:SetPos( slasher:GetPos() )
+            clone:SetAngles( slasher:GetAngles() )
+            clone.AssignedSlasher = slasher:SteamID64()
+            clone.IsMain = false
+            clone:Spawn()
+            clone:Activate()
+
+        end
+
+        slasher:SetNWBool("CriminalCloning", true)
+
+    end
+end
 
 end

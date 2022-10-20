@@ -1105,10 +1105,6 @@ do
     else
 
         SlashCo.CurRound.SlasherData[slasherid].CanChase = true
-    
-        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
 
         SlashCo.CurRound.SlasherData[slasherid].Eyesight = 6
         SlashCo.CurRound.SlasherData[slasherid].Perception = 0.5
@@ -1116,11 +1112,65 @@ do
         slasher:SetViewOffset( Vector(0,0,70) )
         slasher:SetCurrentViewOffset( Vector(0,0,70) )
 
+        if not slasher:GetNWBool("InSlasherChaseMode") then
+            slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+            slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+            slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        end
+
     end
 
 end
 
     ::CRIMINAL::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 12 then goto FREESMILEY end
+do
+
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Cloning Duration
+
+    if slasher:GetVelocity():Length() > 5 then
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = false
+    else
+        SlashCo.CurRound.SlasherData[slasherid].CanKill = true
+    end
+
+    
+    if slasher:GetNWBool("CriminalCloning") then
+
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + FrameTime()
+
+        if not slasher:GetNWBool("CriminalRage") then
+
+            local speed = SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - ( v1 / (4 + SO))
+
+            slasher:SetSlowWalkSpeed( speed )
+            slasher:SetWalkSpeed( speed  )
+            slasher:SetRunSpeed( speed  )
+        else
+
+            local speed = 25 + SlashCo.CurRound.SlasherData[slasherid].ChaseSpeed - ( v1 / (5 + SO))
+
+            slasher:SetSlowWalkSpeed( speed )
+            slasher:SetWalkSpeed( speed  )
+            slasher:SetRunSpeed( speed  )
+        end
+
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 0
+        SlashCo.CurRound.SlasherData[slasherid].Eyesight = 3
+
+    else
+        slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+
+        SlashCo.CurRound.SlasherData[slasherid].Perception = 1
+        SlashCo.CurRound.SlasherData[slasherid].Eyesight = 6
+
+    end
+
+end
+    ::FREESMILEY::
 
 end
 

@@ -165,6 +165,28 @@ end)
 
 hook.Add( "Think", "Slasher_Chasing_Light", function()
 
+	for s = 1, #ents.FindByClass("sc_crimclone") do
+
+		local clone = ents.FindByClass("sc_crimclone")[s]
+
+		if clone:GetNWBool("MainRageClone") then 
+
+			local tlight = DynamicLight( clone:EntIndex() + 1 )
+			if ( tlight ) then
+			tlight.pos = clone:LocalToWorld( Vector(0,0,20) )
+			tlight.r = 255
+			tlight.g = 0
+			tlight.b = 255
+			tlight.brightness = 5
+			tlight.Decay = 1000
+			tlight.Size = 250
+			tlight.DieTime = CurTime() + 1
+		end
+		
+		end
+
+	end
+
 	for s = 1, #team.GetPlayers(TEAM_SLASHER) do
 
 		local slasher = team.GetPlayers(TEAM_SLASHER)[s]

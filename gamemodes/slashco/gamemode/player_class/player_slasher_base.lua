@@ -531,6 +531,32 @@ end
 
 	::criminal::
 
+	if ply:GetModel() ~= "models/slashco/slashers/criminal/criminal.mdl" then goto freesmiley end --Criminal's Animator
+
+	ply.CalcSeqOverride = 3
+
+	::freesmiley::
+
+	if ply:GetModel() ~= "models/slashco/slashers/freesmiley/freesmiley.mdl" then goto bren end --Smiley's Animator
+
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_HL2MP_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN 
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	::bren::
+
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
@@ -580,6 +606,26 @@ if SERVER then
 		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Watcher Footsteps
 			ply:EmitSound( "slashco/slasher/abomignat_step"..math.random(1,3)..".mp3")
 			return false
+		elseif ply:GetModel() == "models/slashco/slashers/criminal/criminal.mdl" then --Criminal Footsteps
+			if ply.CrimStepTick == nil or ply.CrimStepTick > 2 then ply.CrimStepTick = 0 end
+
+			if ply.CrimStepTick == 0 then ply:EmitSound( "slashco/slasher/criminal_step"..math.random(1,6)..".mp3") end
+
+			ply.CrimStepTick = ply.CrimStepTick + 1
+
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Criminal Footsteps
+			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then ply.SmileyStepTick = 0 end
+
+			if ply.SmileyStepTick == 0 then 
+				ply:EmitSound( "npc/footsteps/hardboot_generic"..math.random(1,6)..".wav",50,70,0.75) 
+				ply.SmileyStepTick = ply.SmileyStepTick + 1
+				return false
+			end
+
+			ply.SmileyStepTick = ply.SmileyStepTick + 1
+
+			return true 
 		end
 		
 	end
@@ -614,8 +660,21 @@ if CLIENT then
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
 			return false
-		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Watcher Footsteps
+		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Abomignat Footsteps
 			return true
+		elseif ply:GetModel() == "models/slashco/slashers/criminal/criminal.mdl" then --Criminal Footsteps
+			return true
+		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Smiley Footsteps
+			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then ply.SmileyStepTick = 0 end
+
+			if ply.SmileyStepTick == 0 then 
+				ply.SmileyStepTick = ply.SmileyStepTick + 1
+				return false
+			end
+
+			ply.SmileyStepTick = ply.SmileyStepTick + 1
+
+			return true 
 		end
 		
 	end

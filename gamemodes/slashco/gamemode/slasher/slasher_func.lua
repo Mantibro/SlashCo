@@ -79,6 +79,24 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     end
 
+    if slid == 12 then
+
+        local clone = ents.Create( "sc_crimclone" )
+
+        clone:SetPos( ply:GetPos() )
+        clone:SetAngles( ply:GetAngles() )
+        clone.AssignedSlasher = ply:SteamID64()
+        clone.IsMain = true
+        clone:Spawn()
+        clone:Activate()
+
+        ply:SetColor(Color(0,0,0,0))
+        ply:DrawShadow(false)
+		ply:SetRenderMode(RENDERMODE_TRANSALPHA)
+		ply:SetNoDraw(true)
+
+    end
+
 end
 
 SlashCo.InsertSlasherToTable = function(id)

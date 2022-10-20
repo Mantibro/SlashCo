@@ -257,4 +257,29 @@ end
 
     --Abomignat lunge /\ /\ /\
     ::CRIMINAL::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 12 then goto FREESMILEY end
+    --Criminal Rage \/ \/ \/
+
+    if not slasher:GetNWBool("CriminalCloning") then return end
+    if slasher:GetNWBool("CriminalRage") then return end
+    if SlashCo.CurRound.SlasherData.GameProgress < 7 then return end
+
+    for i = 1, math.random(2+(SO * 2),4+(SO * 2)) do
+
+        local clone = ents.Create( "sc_crimclone" )
+
+        clone:SetPos( slasher:GetPos() )
+        clone:SetAngles( slasher:GetAngles() )
+        clone.AssignedSlasher = slasher:SteamID64()
+        clone.IsMain = false
+        clone:Spawn()
+        clone:Activate()
+
+    end
+
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+    slasher:SetNWBool("CriminalRage",true)
+
+    --Criminal Rage /\ /\ /\
+    ::FREESMILEY::
 end
