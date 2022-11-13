@@ -883,18 +883,32 @@ SlashCo.ValidateMap = function(map)
     --Transfer json to a global
     SlashCo.CurConfig = json
 
+	-- ============================ HELICOPTER ============================
+	SlashCo.CurRound.HelicopterSpawnPosition = Vector(json.Helicopter.StartLocation.pos[1],json.Helicopter.StartLocation.pos[2],json.Helicopter.StartLocation.pos[3])
+    SlashCo.CurRound.HelicopterIntroPosition = Vector(json.Helicopter.IntroLocation.pos[1],json.Helicopter.IntroLocation.pos[2],json.Helicopter.IntroLocation.pos[3])
+    SlashCo.CurRound.HelicopterIntroAngle = Angle(json.Helicopter.IntroLocation.ang[1],json.Helicopter.IntroLocation.ang[2],json.Helicopter.IntroLocation.ang[3])
+	
+	if SlashCo.CurRound.HelicopterSpawnPosition == nil then
+		MsgC( Color( 255, 50, 50 ), "[SlashCo] This map has no helicopter spawn position defined and will not be playable!\n")
+		valid = false
+	end
+		
+	if SlashCo.CurRound.HelicopterIntroPosition == nil then
+		MsgC( Color( 255, 50, 50 ), "[SlashCo] This map has no helicopter intro cutscene position defined and will not be playable!\n")
+		valid = false
+	end
+		
+	if SlashCo.CurRound.HelicopterIntroAngle == nil then
+		MsgC( Color( 255, 50, 50 ), "[SlashCo] This map has no helicopter intro cutscene angle defined and will not be playable!\n")
+		valid = false
+	end
+	-- ============================ HELICOPTER ============================
+	
     -- ============================ GENERATORS ============================
     local genCount = json.Generators.Count
     --local gasCount = math.max(json.GasCans.Count, #(json.GasCans.Spawnpoints))
     local batCount = math.max(json.Generators.Count, #(json.Batteries.Spawnpoints))
     local itemCount = #(json.Items.Spawnpoints)
-    --local HeliCount = #(json.Helicopter.Spawnpoints)
-
-    SlashCo.CurRound.HelicopterSpawnPosition = Vector(json.Helicopter.StartLocation.pos[1],json.Helicopter.StartLocation.pos[2],json.Helicopter.StartLocation.pos[3])
-
-    SlashCo.CurRound.HelicopterIntroPosition = Vector(json.Helicopter.IntroLocation.pos[1],json.Helicopter.IntroLocation.pos[2],json.Helicopter.IntroLocation.pos[3])
-
-    SlashCo.CurRound.HelicopterIntroAngle = Angle(json.Helicopter.IntroLocation.ang[1],json.Helicopter.IntroLocation.ang[2],json.Helicopter.IntroLocation.ang[3])
 
     --Add gas can spawns to the number of item spawns if allowed by the config
     local usesGasSpawns = ""
@@ -916,6 +930,7 @@ SlashCo.ValidateMap = function(map)
 
     if batCount < genCount then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] This map has too few battery spawnpoints for the number of given generators ("..tostring(batCount).." Gas Cans < "..tostring(genCount).." Generators), this map will not be playable!\n")
+		valid = false
     end
 
     --Make sure every battery spawnpoint has at least one entry.
