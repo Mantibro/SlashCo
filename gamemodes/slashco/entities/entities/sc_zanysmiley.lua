@@ -13,8 +13,8 @@ function ENT:Initialize()
 
 	self.CollideSwitch = 3
 
-	self.LoseTargetDist	= 2000	-- How far the enemy has to be before we lose them
-	self.SearchRadius 	= 3000	-- How far to search for enemies
+	self.LoseTargetDist	= 1500	-- How far the enemy has to be before we lose them
+	self.SearchRadius 	= 2000	-- How far to search for enemies
 
 end
 
@@ -93,7 +93,9 @@ function ENT:RunBehaviour()
 
 	while ( true ) do
 		-- Lets use the above mentioned functions to see if we have/can find a enemy
+		self:StartActivity( ACT_IDLE )
 		if ( self:HaveEnemy() ) then
+			self.Enemy:SetNWBool("MarkedBySmiley",true)
 			-- Now that we have a enemy, the code in this block will run
 			self:SetSequence(self:LookupSequence("attack"))
 			self:EmitSound("slashco/slasher/zany_attack.mp3")
@@ -190,6 +192,9 @@ function ENT:Think()
 
 					self:Remove()
 					v:TakeDamage( 50, self, self )
+					v:SetNWBool("MarkedBySmiley",false)
+					timer.Simple(0.25, function() v:SetNWBool("MarkedBySmiley",false) end)
+					self:StopSound("slashco/slasher/zany_attack.mp3")
 
 				end
 			end

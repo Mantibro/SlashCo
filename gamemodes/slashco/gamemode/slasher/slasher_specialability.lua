@@ -282,4 +282,39 @@ end
 
     --Criminal Rage /\ /\ /\
     ::FREESMILEY::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 13 then goto BREN end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then return end
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 80 - (SO*40)
+
+    slasher:SetNWBool("FreeSmileySummoning", true)
+
+    slasher:Freeze(true)
+    timer.Simple(4, function() 
+        
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 0 then 
+            local smiley = ents.Create( "sc_zanysmiley" ) 
+            smiley:SetPos( slasher:LocalToWorld(Vector(60,0,0)) )
+            smiley:SetAngles( slasher:GetAngles() )
+            smiley:Spawn()
+            smiley:Activate()
+        end
+        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 1 then 
+            local smiley = ents.Create( "sc_pensivesmiley" ) 
+            smiley:SetPos( slasher:LocalToWorld(Vector(60,0,0)) )
+            smiley:SetAngles( slasher:GetAngles() )
+            smiley:Spawn()
+            smiley:Activate()
+        end
+
+    end)
+
+    timer.Simple(6, function() 
+
+        slasher:Freeze(false)
+        slasher:SetNWBool("FreeSmileySummoning", false)
+
+    end)
+
+    ::BREN::
 end

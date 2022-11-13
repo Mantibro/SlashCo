@@ -72,6 +72,8 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	local abomignat_crawl = ply:GetNWBool("AbomignatCrawling")
 
+	local smiley_summon = ply:GetNWBool("FreeSmileySummoning")
+
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
 	if ply:GetModel() ~= "models/slashco/slashers/baba/baba.mdl" then goto sid end --Bababooey's Animator
@@ -555,6 +557,13 @@ end
 
 	end
 
+	if smiley_summon then
+
+		ply.CalcSeqOverride = ply:LookupSequence("summon")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
 	::bren::
 
    	return ply.CalcIdeal, ply.CalcSeqOverride
@@ -614,7 +623,7 @@ if SERVER then
 			ply.CrimStepTick = ply.CrimStepTick + 1
 
 			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Criminal Footsteps
+		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Smiley Footsteps
 			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then ply.SmileyStepTick = 0 end
 
 			if ply.SmileyStepTick == 0 then 

@@ -394,8 +394,8 @@ SlashCo.SlasherData = {     --Information about Slashers.
         ChaseDuration = 5.0,
         ChaseCooldown = 4,
         JumpscareDuration = 2,
-        ChaseMusic = "",
-        KillSound = "slashco/slasher/criminal_kill.mp3"
+        ChaseMusic = "slashco/slasher/freesmiley_chase.wav",
+        KillSound = "slashco/slasher/freesmiley_kill.mp3"
     }
 
 }
@@ -1181,6 +1181,24 @@ SlashCo.CreateOfferTable = function(pos, ang)
     return id
 end
 
+--Spawn the radio
+SlashCo.CreateRadio = function(pos, ang)
+    local Ent = ents.Create( "radio" )
+
+    if not IsValid(Ent) then
+        MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create the offertable at ("..tostring(pos).."), entity was NULL.\n")
+        return nil
+    end
+
+    Ent:SetPos( pos )
+    Ent:SetAngles( ang )
+    Ent:Spawn()
+
+    local id = Ent:EntIndex()
+
+    return id
+end
+
 SlashCo.RemoveAllCurRoundEnts = function()
 
     local gens = ents.FindByClass( "sc_generator")
@@ -1468,7 +1486,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             SlashCo.HelicopterTakeOffIntro()
 
-            --if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
+            if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
 
         end)
 
@@ -1781,8 +1799,8 @@ SlashCo.LocalizedTraceHullLocator = function(ent, input_range)
     local tr = util.TraceHull( {
 		start = pos,
 		endpos = pos + Vector(0,0,tr_l.HitPos[3] - height_offset),
-		maxs = Vector(18,18,72),
-		mins = Vector(-18,-18,0),
+		maxs = Vector(12,12,72),
+		mins = Vector(-12,-12,0),
 	} )
 
     if tr.Hit then err = err+1 goto RELOCATE end

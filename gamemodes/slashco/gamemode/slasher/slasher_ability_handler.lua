@@ -1171,6 +1171,18 @@ do
 
 end
     ::FREESMILEY::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 13 then goto BREN end
+do
+
+    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Summon Cooldown
+    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Selected Summon
+
+    if v1 > 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 - FrameTime() end
+
+
+
+end
+    ::BREN::
 
 end
 

@@ -232,6 +232,8 @@ function GM:Initialize()
 
 		SlashCo.CreateOfferTable(Vector(-1435, 736, 224), Angle(0,-90,0))
 
+		SlashCo.CreateRadio(Vector( -1965.8, 704.8, 259.8 ), Angle(0 , -90, 0))
+
 	end
 
 	if SERVER then
@@ -595,7 +597,7 @@ local Think = function()
 			--Go back to lobby if everyone dies.
 			if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
-				--SlashCo.EndRound()
+				SlashCo.EndRound()
 
 				SlashCo.CurRound.roundOverToggle = false
 			end

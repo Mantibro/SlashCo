@@ -438,7 +438,7 @@ end --ends here
         end)
 
     ::ABOMIGNAT::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 then goto CRIMINAL end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 then goto FREESMILEY end
 
     if slasher:GetNWBool("AbomignatCrawling") then 
         slasher:SetNWBool("AbomignatCrawling",false) 
@@ -454,6 +454,15 @@ end --ends here
 
     if not slasher:GetNWBool("AbomignatCrawling") then slasher:SetNWBool("AbomignatCrawling",true) end
 
-    ::CRIMINAL::
+    ::FREESMILEY::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 13 then goto BREN end
+
+    if slasher:GetNWBool("FreeSmileySummoning") then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then return end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 1 return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0 return end
+
+    ::BREN::
 
 end

@@ -97,6 +97,27 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     end
 
+    if slid == 13 then
+
+        SlashCo.SmileyIdle(ply)
+
+    end
+
+end
+
+SlashCo.SmileyIdle = function(slasher)
+
+    if not slasher:GetNWBool("InSlasherChaseMode") then 
+        slasher:EmitSound("slashco/slasher/freesmiley_idle"..math.random(1,7)..".mp3")     
+    end
+
+    timer.Simple(math.random(3,5), function()
+
+        SlashCo.SmileyIdle(slasher)
+    
+    end)
+    
+
 end
 
 SlashCo.InsertSlasherToTable = function(id)

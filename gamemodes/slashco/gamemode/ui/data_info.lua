@@ -127,11 +127,22 @@ SCInfo.Slasher = {
         Name = "Criminal",
         Class = "Umbra",
         Danger = "Devastating",
-        Description = "The Tormented Slasher which relies on confusion and entrapment to catch his victims.\n\n-Criminal is only able to attack while standing still.\n-He can summon clones around himself as a tool of confusion.\n",
+        Description = "The Tormented Slasher which relies on confusion and\nentrapment to catch his victims.\n\n-Criminal is only able to attack while standing still.\n-He can summon clones around himself as a tool of confusion.\n",
         ProTip = "-This Slasher was seen surrounded by fake copies of itself.",
         SpeedRating = "★★★★☆",
         EyeRating = "★★☆☆☆",
         DiffRating = "★★★★★"
+    },
+
+    {
+        Name = "Free Smiley Dealer",
+        Class = "Cryptid",
+        Danger = "Devastating",
+        Description = "The Summoner Slasher which uses his minions to take control of the map.\n\n-Free Smiley Dealer can summon two types of minions, Pensive and Zany.\nBoth will alert him when a Survivor is detected.\n-Pensive can stun a Survivor for a short while.\n-Zany will charge at Survivors and damage them.",
+        ProTip = "-This Slasher does not work alone.",
+        SpeedRating = "★☆☆☆☆",
+        EyeRating = "★★★☆☆",
+        DiffRating = "★★☆☆☆"
     }
 
 }

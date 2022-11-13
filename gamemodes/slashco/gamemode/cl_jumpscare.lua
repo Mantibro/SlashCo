@@ -187,6 +187,15 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		surface.SetMaterial(Overlay)
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
+	elseif ply:GetNWBool("SurvivorJumpscare_13") == true then
+		local Overlay = Material("slashco/ui/overlays/jumpscare_13")
+
+		Overlay:SetFloat( "$alpha", 1 )
+
+		surface.SetDrawColor(255,255,255,255)	
+		surface.SetMaterial(Overlay)
+		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
 	elseif ply:GetNWBool("DisplayTylerTheDestroyerEffects") == true  then
 
 		local Overlay = Material("slashco/ui/overlays/tyler_static")
