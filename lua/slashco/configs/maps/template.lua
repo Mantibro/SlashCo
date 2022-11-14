@@ -28,7 +28,11 @@
 		}
 	},
 	"Helicopter": {
-
+		"IntroLocation": {
+			"pos":  [0, 0, 0],
+			"ang":  [0, 0, 0]							 
+		},
+		
 		"StartLocation": {
 			"pos":  [0, 0, 0]
 		},
