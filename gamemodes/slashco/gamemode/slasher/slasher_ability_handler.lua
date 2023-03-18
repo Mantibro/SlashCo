@@ -1033,8 +1033,6 @@ do
 end
 
     ::ABOMIGNAT::
-<<<<<<< Updated upstream
-=======
     if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 then goto CRIMINAL end
 do
 
@@ -1238,7 +1236,6 @@ do
 end
 
 ::NEXT::
->>>>>>> Stashed changes
 
 end
 

@@ -477,8 +477,6 @@ do
 
 end
 	::abomignat::
-<<<<<<< Updated upstream
-=======
 
 	if ply:GetModel() ~= "models/slashco/slashers/abomignat/abomignat.mdl" then goto criminal end --Abomignat's Animator
 
@@ -580,8 +578,6 @@ end
 	end
 
 	::next::
-
->>>>>>> Stashed changes
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
@@ -628,8 +624,6 @@ if SERVER then
 		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
 			ply:EmitSound( "npc/footsteps/hardboot_generic"..math.random(1,6)..".wav",50,90,0.75)
 			return false
-<<<<<<< Updated upstream
-=======
 		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Watcher Footsteps
 			ply:EmitSound( "slashco/slasher/abomignat_step"..math.random(1,3)..".mp3")
 			return false
@@ -657,7 +651,7 @@ if SERVER then
 		elseif ply:GetModel() == "models/slashco/slashers/leuonard/leuonard.mdl" then --Leuonard Footsteps
 			ply:EmitSound( "slashco/slasher/leuonard_step"..math.random(1,3)..".mp3")
 			return true
->>>>>>> Stashed changes
+
 		end
 		
 	end
@@ -692,8 +686,6 @@ if CLIENT then
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
 			return false
-<<<<<<< Updated upstream
-=======
 		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Abomignat Footsteps
 			return true
 		elseif ply:GetModel() == "models/slashco/slashers/criminal/criminal.mdl" then --Criminal Footsteps
@@ -711,7 +703,7 @@ if CLIENT then
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/leuonard/meuonard.mdl" then --Criminal Footsteps
 			return true
->>>>>>> Stashed changes
+
 		end
 		
 	end

@@ -5,116 +5,116 @@ local ConvoCount = 19
 SlashCo.LobbyConvos = {
 
     {
-        Length1 = 4
-        Length2 = 4
+        Length1 = 4,
+        Length2 = 4,
         Length3 = 4
     },
 
     {
-        Length1 = 2
-        Length2 = 2
+        Length1 = 2,
+        Length2 = 2,
         Length3 = 3
     },
 
     {
-        Length1 = 5.5
-        Length2 = 4
+        Length1 = 5.5,
+        Length2 = 4,
         Length3 = 2
     },
 
     {
-        Length1 = 2.5
-        Length2 = 2
+        Length1 = 2.5,
+        Length2 = 2,
         Length3 = 3
     },
 
     {
-        Length1 = 4
-        Length2 = 2
+        Length1 = 4,
+        Length2 = 2,
         Length3 = 10
     },
 
     {
-        Length1 = 5
-        Length2 = 5
+        Length1 = 5,
+        Length2 = 5,
         Length3 = 3
     },
 
     {
-        Length1 = 4
-        Length2 = 1
+        Length1 = 4,
+        Length2 = 1,
         Length3 = 4
     },
 
     {
-        Length1 = 3
-        Length2 = 2
+        Length1 = 3,
+        Length2 = 2,
         Length3 = 3
     },
 
     {
-        Length1 = 11
-        Length2 = 1
+        Length1 = 11,
+        Length2 = 1,
         Length3 = 1
     },
 
     {
-        Length1 = 13
-        Length2 = 1
+        Length1 = 13,
+        Length2 = 1,
         Length3 = 6
     },
 
     {
-        Length1 = 2
-        Length2 = 2
+        Length1 = 2,
+        Length2 = 2,
         Length3 = 4
     },
 
     {
-        Length1 = 5
-        Length2 = 3
+        Length1 = 5,
+        Length2 = 3,
         Length3 = 3
     },
 
     {
-        Length1 = 0.85
-        Length2 = 2
+        Length1 = 0.85,
+        Length2 = 2,
         Length3 = 4
     },
 
     {
-        Length1 = 6
-        Length2 = 2
+        Length1 = 6,
+        Length2 = 2,
         Length3 = 1
     },
 
     {
-        Length1 = 5
-        Length2 = 2
+        Length1 = 5,
+        Length2 = 2,
         Length3 = 2
     },
 
     {
-        Length1 = 4
-        Length2 = 3
+        Length1 = 4,
+        Length2 = 3,
         Length3 = 3
     },
 
     {
-        Length1 = 5
-        Length2 = 2
+        Length1 = 5,
+        Length2 = 2,
         Length3 = 3
     },
 
     {
-        Length1 = 3
-        Length2 = 9.5
+        Length1 = 3,
+        Length2 = 9.5,
         Length3 = 6
     },
 
     {
-        Length1 = 2
-        Length2 = 3
+        Length1 = 2,
+        Length2 = 3,
         Length3 = 2
     }
 }

@@ -592,13 +592,11 @@ do
 
 end
 	::abomignat::
-
-<<<<<<< Updated upstream
-=======
-		surface.SetMaterial(KillDisabledIcon)
-		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-	end
+	if SlashID ~= 11 then goto criminal end
+do
+	surface.SetMaterial(KillDisabledIcon)
+	surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+	draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 
 	if not is_crawling then 
 		draw.SimpleText( "R - Start Crawling", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
@@ -606,6 +604,8 @@ end
 		draw.SimpleText( "R - Stop Crawling", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
 	end
 end
+
+
 	::criminal::
 	if SlashID ~= 12 then goto freesmiley end
 do
@@ -705,7 +705,7 @@ end
 
 	::next::
 
->>>>>>> Stashed changes
+
 		--Slasher-Shared function \/ \/ \/ 
 
 		--Slasher Main Icon

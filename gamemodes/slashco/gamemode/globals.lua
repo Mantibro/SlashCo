@@ -330,8 +330,6 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/watcher_chase.wav",
         KillSound = "slashco/slasher/watcher_kill.mp3"
-<<<<<<< Updated upstream
-=======
     },
 
     {
@@ -420,7 +418,6 @@ SlashCo.SlasherData = {     --Information about Slashers.
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/leuonard_chase.mp3",
         KillSound = "slashco/slasher/freesmiley_kill.mp3"
->>>>>>> Stashed changes
     }
 
 }

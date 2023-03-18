@@ -110,8 +110,6 @@ SCInfo.Slasher = {
         SpeedRating = "★★★★☆",
         EyeRating = "★★★★☆",
         DiffRating = "★★☆☆☆"
-<<<<<<< Updated upstream
-=======
     },
 
     {
@@ -156,7 +154,6 @@ SCInfo.Slasher = {
         SpeedRating = "★★★★☆",
         EyeRating = "★★★☆☆",
         DiffRating = "★★★★☆"
->>>>>>> Stashed changes
     }
 
 }
