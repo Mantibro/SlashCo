@@ -330,7 +330,7 @@ function lobbyReadyTimer(count)
 end
 --				***Begin the transition timer***
 function lobbyTransitionTimer()
-	timer.Create( "LobbyTransition", 5, 1, function() if SERVER then 
+	timer.Create( "LobbyTransition", SlashCo.LobbyBanter(), 1, function() if SERVER then 
 		RunConsoleCommand("lobby_debug_brief") 
 		SlashCo.LobbyPlayerBriefing()
 

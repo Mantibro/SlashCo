@@ -17,6 +17,7 @@ include( "slasher/slasher_mainability.lua" )
 include( "slasher/slasher_specialability.lua" )
 include( "slasher/slasher_ability_handler.lua" )
 include( "concommands.lua")
+include( "ply_voicelines.lua")
 
 --[[
 
@@ -595,7 +596,7 @@ local Think = function()
 			--Go back to lobby if everyone dies.
 			if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
-				SlashCo.EndRound()
+				--SlashCo.EndRound()
 
 				SlashCo.CurRound.roundOverToggle = false
 			end

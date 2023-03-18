@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/leuonard/Superhero1Mtl"
+	"$halflambert" 1
+}

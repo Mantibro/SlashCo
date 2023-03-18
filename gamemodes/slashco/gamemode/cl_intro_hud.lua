@@ -12,7 +12,7 @@ net.Receive( "mantislashcoGameIntro", function( _, _ )
 	elseif introtable.diff == 1 then
 		intro_diff = "NOVICE"
 	elseif introtable.diff == 2 then
-		intro_diff = "INTRERMEDIATE"
+		intro_diff = "INTERMEDIATE"
 	elseif introtable.diff == 3 then
 		intro_diff = "HARD"
 	end

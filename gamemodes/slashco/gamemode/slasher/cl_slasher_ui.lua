@@ -593,6 +593,119 @@ do
 end
 	::abomignat::
 
+<<<<<<< Updated upstream
+=======
+		surface.SetMaterial(KillDisabledIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	end
+
+	if not is_crawling then 
+		draw.SimpleText( "R - Start Crawling", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+	else
+		draw.SimpleText( "R - Stop Crawling", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+	end
+end
+	::criminal::
+	if SlashID ~= 12 then goto freesmiley end
+do
+	willdrawchase = false
+	local clones_active = LocalPlayer():GetNWBool("CriminalCloning")
+	local rage_active = LocalPlayer():GetNWBool("CriminalRage")
+
+	surface.SetMaterial(CrimCloneIcon)
+	surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
+	if not clones_active then
+		draw.SimpleText( "M2 - Summon Clones", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	else
+		draw.SimpleText( "M2 - Unsummon Clones", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	end
+
+	if rage_active then
+		surface.SetMaterial(CrimRage)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+		willdrawmain = false
+	end
+
+	if not rage_active then
+		surface.SetMaterial(CrimRage)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		if GameProgress > 6 then
+			draw.SimpleText( "F - Rage", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		else
+			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		end
+	end
+end
+	::freesmiley::
+	if SlashID ~= 13 then goto leuonard end
+do
+
+	local ZanyIcon = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1")
+	local PensiveIcon = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a2")
+	local SurveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+
+	if V1 < 0.1 then 
+		draw.SimpleText( "R - Switch your Deal", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+
+		if V2 == 0 then
+			surface.SetMaterial(ZanyIcon)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+			draw.SimpleText( "F - Deal a Zany", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		else
+			surface.SetMaterial(PensiveIcon)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+			draw.SimpleText( "F - Deal a Pensive", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		end
+
+	else
+		surface.SetMaterial(KillDisabledIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+	end
+
+	for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+		local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+		if survivor:GetNWBool("MarkedBySmiley") then
+
+			local pos = (survivor:GetPos()+Vector(0,0,60)):ToScreen()
+
+			if pos.visible then
+				surface.SetMaterial(SurveyNoticeIcon)
+				surface.DrawTexturedRect(pos.x - ScrW()/32, pos.y - ScrW()/32, ScrW()/16, ScrW()/16)
+			end
+
+		end
+
+	end
+
+end
+	::leuonard::
+	if SlashID ~= 14 then goto next end
+do
+
+	surface.SetDrawColor( 0, 0, 0)
+	surface.DrawRect( cx-200, cy +ScrH()/4, 400, 25 )
+
+	local b_pad = 6
+
+	local rape_val = V1
+
+	surface.SetDrawColor( 255, 0, 0)
+	surface.DrawRect( cx-200+(b_pad/2),(b_pad/2)+cy +ScrH()/4, (400-b_pad)*(rape_val/100), 25-b_pad )
+
+	draw.SimpleText( "RAPE", "ItemFontTip", cx-300, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
+	draw.SimpleText( math.floor(rape_val).." %", "ItemFontTip", cx+220, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
+
+end
+
+	::next::
+
+>>>>>>> Stashed changes
 		--Slasher-Shared function \/ \/ \/ 
 
 		--Slasher Main Icon

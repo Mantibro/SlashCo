@@ -110,6 +110,53 @@ SCInfo.Slasher = {
         SpeedRating = "★★★★☆",
         EyeRating = "★★★★☆",
         DiffRating = "★★☆☆☆"
+<<<<<<< Updated upstream
+=======
+    },
+
+    {
+        Name = "Abomignat",
+        Class = "Cryptid",
+        Danger = "Considerable",
+        Description = "The Monstrous Slasher which uses basic abilities to achieve quick kills.\n\n-Abomignat can use its sharp claws to quickly damage Survivors.\n-It can perform a short-range high-speed lunge to finish off its victims.\n-Its Crawling Mode can enable swift map traversal.",
+        ProTip = "-This Slasher enters bursts of speed while attacking.",
+        SpeedRating = "★★★☆☆",
+        EyeRating = "★★★★☆",
+        DiffRating = "★☆☆☆☆"
+    },
+
+    {
+        Name = "Criminal",
+        Class = "Umbra",
+        Danger = "Devastating",
+        Description = "The Tormented Slasher which relies on confusion and\nentrapment to catch his victims.\n\n-Criminal is only able to attack while standing still.\n-He can summon clones around himself as a tool of confusion.\n",
+        ProTip = "-This Slasher was seen surrounded by fake copies of itself.",
+        SpeedRating = "★★★★☆",
+        EyeRating = "★★☆☆☆",
+        DiffRating = "★★★★★"
+    },
+
+    {
+        Name = "Free Smiley Dealer",
+        Class = "Cryptid",
+        Danger = "Devastating",
+        Description = "The Summoner Slasher which uses his minions to take control of the map.\n\n-Free Smiley Dealer can summon two types of minions, Pensive and Zany.\nBoth will alert him when a Survivor is detected.\n-Pensive can stun a Survivor for a short while.\n-Zany will charge at Survivors and damage them.",
+        ProTip = "-This Slasher does not work alone.",
+        SpeedRating = "★☆☆☆☆",
+        EyeRating = "★★★☆☆",
+        DiffRating = "★★☆☆☆"
+    },
+
+    {
+        Name = "Leuonard",
+        Class = "Demon",
+        Danger = "Devastating",
+        Description = "The Horny Slasher which rapes.\n\n-Leuonard's Rape will increase over time.\n-He must fuck a dog to decrease Rape.\n-Reaching 100% Rape will cause Leuonard to become powerful, but hard to control.",
+        ProTip = "-This Slasher seems to have a fondness for dogs.",
+        SpeedRating = "★★★★☆",
+        EyeRating = "★★★☆☆",
+        DiffRating = "★★★★☆"
+>>>>>>> Stashed changes
     }
 
 }

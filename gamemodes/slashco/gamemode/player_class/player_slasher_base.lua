@@ -523,6 +523,36 @@ if SERVER then
 		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
 			ply:EmitSound( "npc/footsteps/hardboot_generic"..math.random(1,6)..".wav",50,90,0.75)
 			return false
+<<<<<<< Updated upstream
+=======
+		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Watcher Footsteps
+			ply:EmitSound( "slashco/slasher/abomignat_step"..math.random(1,3)..".mp3")
+			return false
+		elseif ply:GetModel() == "models/slashco/slashers/criminal/criminal.mdl" then --Criminal Footsteps
+			if ply.CrimStepTick == nil or ply.CrimStepTick > 2 then ply.CrimStepTick = 0 end
+
+			if ply.CrimStepTick == 0 then ply:EmitSound( "slashco/slasher/criminal_step"..math.random(1,6)..".mp3") end
+
+			ply.CrimStepTick = ply.CrimStepTick + 1
+
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Smiley Footsteps
+			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then ply.SmileyStepTick = 0 end
+
+			if ply.SmileyStepTick == 0 then 
+				ply:EmitSound( "npc/footsteps/hardboot_generic"..math.random(1,6)..".wav",50,70,0.75) 
+				ply.SmileyStepTick = ply.SmileyStepTick + 1
+				return false
+			end
+
+			ply.SmileyStepTick = ply.SmileyStepTick + 1
+
+			return true 
+
+		elseif ply:GetModel() == "models/slashco/slashers/leuonard/leuonard.mdl" then --Leuonard Footsteps
+			ply:EmitSound( "slashco/slasher/leuonard_step"..math.random(1,3)..".mp3")
+			return true
+>>>>>>> Stashed changes
 		end
 		
 	end
@@ -557,6 +587,26 @@ if CLIENT then
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/watcher/watcher.mdl" then --Watcher Footsteps
 			return false
+<<<<<<< Updated upstream
+=======
+		elseif ply:GetModel() == "models/slashco/slashers/abomignat/abomignat.mdl" then --Abomignat Footsteps
+			return true
+		elseif ply:GetModel() == "models/slashco/slashers/criminal/criminal.mdl" then --Criminal Footsteps
+			return true
+		elseif ply:GetModel() == "models/slashco/slashers/freesmiley/freesmiley.mdl" then --Smiley Footsteps
+			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then ply.SmileyStepTick = 0 end
+
+			if ply.SmileyStepTick == 0 then 
+				ply.SmileyStepTick = ply.SmileyStepTick + 1
+				return false
+			end
+
+			ply.SmileyStepTick = ply.SmileyStepTick + 1
+
+			return true 
+		elseif ply:GetModel() == "models/slashco/slashers/leuonard/meuonard.mdl" then --Criminal Footsteps
+			return true
+>>>>>>> Stashed changes
 		end
 		
 	end
