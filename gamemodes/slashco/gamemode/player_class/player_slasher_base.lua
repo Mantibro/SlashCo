@@ -477,6 +477,111 @@ do
 
 end
 	::abomignat::
+<<<<<<< Updated upstream
+=======
+
+	if ply:GetModel() ~= "models/slashco/slashers/abomignat/abomignat.mdl" then goto criminal end --Abomignat's Animator
+
+	if not abomignat_mainslash and not abomignat_lunge and not abomignat_lungefinish then anim_antispam = false end
+
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_HL2MP_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN 
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+		if abomignat_crawl then
+			ply.CalcSeqOverride = ply:LookupSequence("crawl")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	if abomignat_mainslash then
+
+		ply.CalcSeqOverride = ply:LookupSequence("slash_charge")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
+	if abomignat_lunge then
+
+		ply.CalcSeqOverride = ply:LookupSequence("lunge")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
+	if abomignat_lungefinish then
+
+		ply.CalcSeqOverride = ply:LookupSequence("lunge_post")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
+	::criminal::
+
+	if ply:GetModel() ~= "models/slashco/slashers/criminal/criminal.mdl" then goto freesmiley end --Criminal's Animator
+
+	ply.CalcSeqOverride = 3
+
+	::freesmiley::
+
+	if ply:GetModel() ~= "models/slashco/slashers/freesmiley/freesmiley.mdl" then goto leuonard end --Smiley's Animator
+
+	if ply:IsOnGround() then
+
+		if not chase then 
+			ply.CalcIdeal = ACT_HL2MP_WALK 
+			ply.CalcSeqOverride = ply:LookupSequence("prowl")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN 
+			ply.CalcSeqOverride = ply:LookupSequence("chase")
+		end
+
+	else
+
+		ply.CalcSeqOverride = ply:LookupSequence("float")
+
+	end
+
+	if smiley_summon then
+
+		ply.CalcSeqOverride = ply:LookupSequence("summon")
+		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+
+	end
+
+	::leuonard::
+	if ply:GetModel() ~= "models/slashco/slashers/leuonard/leuonard.mdl" then goto next end --Smiley's Animator
+
+	if not chase then 
+		ply.CalcIdeal = ACT_HL2MP_WALK 
+		ply.CalcSeqOverride = ply:LookupSequence("walk")
+	else
+		ply.CalcIdeal = ACT_HL2MP_RUN 
+		ply.CalcSeqOverride = ply:LookupSequence("chase")
+	end
+
+	if ply:GetNWBool("LeuonardFullRape") then
+		ply.CalcIdeal = ACT_HL2MP_RUN 
+		ply.CalcSeqOverride = ply:LookupSequence("specialrun")
+	end
+
+	if ply:GetVelocity():Length() < 2 then
+		ply.CalcIdeal = ACT_HL2MP_IDLE 
+		ply.CalcSeqOverride = ply:LookupSequence("ragdoll")
+	end
+
+	::next::
+
+>>>>>>> Stashed changes
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
