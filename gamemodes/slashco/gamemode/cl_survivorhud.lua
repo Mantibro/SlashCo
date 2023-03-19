@@ -10,6 +10,9 @@ local prevHp, SetTime, ShowDamage, prevHp1, aHp, TimeToFuel, TimeUntilFueled
 local FuelingCan
 local IsFueling
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
+local prompt = 0
+local ref_eyeang = Angle(0,0,0)
+local voice_cooldown = 0
 
 net.Receive( "mantislashcoGasPourProgress", function( )
 
@@ -89,6 +92,110 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			end
 		end
 
+		--//voice prompts//--
+
+		if input.IsKeyDown( KEY_R ) then
+
+			draw.SimpleText("[SAY]", "TVCD", ScrW()/2, ScrH()/2 - 35, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+			local ht = (ref_eyeang[1] - LocalPlayer():EyeAngles()[1])*10
+			local xt = (ref_eyeang[2] - LocalPlayer():EyeAngles()[2])*10
+
+			local yes_select = false
+			local no_select = false
+			local follow_select = false
+			local spot_select = false
+			local help_select = false
+			local run_select = false
+
+			if math.abs((-250) - xt) < 50 and math.abs((0) - ht) < 50 then
+				yes_select = true
+			end
+
+			if math.abs((250) - xt) < 50 and math.abs((0) - ht) < 50 then
+				no_select = true
+			end
+
+			if math.abs((-150) - xt) < 50 and math.abs((-100) - ht) < 50 then
+				follow_select = true
+			end
+
+			if math.abs((150) - xt) < 50 and math.abs((-100) - ht) < 50 then
+				spot_select = true
+			end
+
+			if math.abs((-150) - xt) < 50 and math.abs((100) - ht) < 50 then
+				help_select = true
+			end
+
+			if math.abs((150) - xt) < 50 and math.abs((100) - ht) < 50 then
+				run_select = true
+			end
+
+			if yes_select then
+				draw.SimpleText("[ \"YES\" ]", "TVCD", ScrW()/2 - 250, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				prompt = 1
+			else
+				draw.SimpleText("  \"YES\"  ", "TVCD", ScrW()/2 - 250, ScrH()/2, Color( 255, 255, 255, 20 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			if no_select then
+				draw.SimpleText("[ \"NO\" ]", "TVCD", ScrW()/2 + 250, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				prompt = 2
+			else
+				draw.SimpleText("  \"NO\"  ", "TVCD", ScrW()/2 + 250, ScrH()/2, Color( 255, 255, 255, 20 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			if follow_select then
+				draw.SimpleText("[ \"FOLLOW ME\" ]", "TVCD", ScrW()/2 - 150, ScrH()/2 + 100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				prompt = 3
+			else
+				draw.SimpleText("  \"FOLLOW ME\"  ", "TVCD", ScrW()/2 - 150, ScrH()/2 + 100, Color( 255, 255, 255, 20 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			if spot_select then
+				draw.SimpleText("[ \"SLASHER HERE\" ]", "TVCD", ScrW()/2 + 150, ScrH()/2 + 100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				prompt = 4
+			else
+				draw.SimpleText("  \"SLASHER HERE\"  ", "TVCD", ScrW()/2 + 150, ScrH()/2 + 100, Color( 255, 255, 255, 20 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			if help_select then
+				draw.SimpleText("[ \"HELP ME\" ]", "TVCD", ScrW()/2 - 150, ScrH()/2 - 100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				prompt = 5
+			else
+				draw.SimpleText("  \"HELP ME\"  ", "TVCD", ScrW()/2 - 150, ScrH()/2 - 100, Color( 255, 255, 255, 20 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			if run_select then
+				draw.SimpleText("[ \"RUN\" ]", "TVCD", ScrW()/2 + 150, ScrH()/2 - 100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				prompt = 6
+			else
+				draw.SimpleText("  \"RUN\"  ", "TVCD", ScrW()/2 + 150, ScrH()/2 - 100, Color( 255, 255, 255, 20 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			draw.SimpleText("[]", "TVCD", ScrW()/2 + xt, ScrH()/2 - ht, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+		else
+
+			ref_eyeang = LocalPlayer():EyeAngles()
+
+			if prompt > 0 and voice_cooldown <= 0 then
+
+				net.Start("mantislashcoSurvivorVoicePrompt")
+				net.WriteEntity(LocalPlayer())
+				net.WriteUInt(prompt, 3)
+				net.SendToServer()
+
+				voice_cooldown = 2
+
+				prompt = 0
+			end
+
+		end
+
+		if voice_cooldown > 0 then voice_cooldown = voice_cooldown - RealFrameTime() end
+
 		--//item selection crosshair//--
 
 		for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
@@ -164,6 +271,28 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 end)
 
 hook.Add( "Think", "Slasher_Chasing_Light", function()
+
+	for s = 1, #ents.FindByClass("sc_crimclone") do
+
+		local clone = ents.FindByClass("sc_crimclone")[s]
+
+		if clone:GetNWBool("MainRageClone") then 
+
+			local tlight = DynamicLight( clone:EntIndex() + 1 )
+			if ( tlight ) then
+			tlight.pos = clone:LocalToWorld( Vector(0,0,20) )
+			tlight.r = 255
+			tlight.g = 0
+			tlight.b = 255
+			tlight.brightness = 5
+			tlight.Decay = 1000
+			tlight.Size = 250
+			tlight.DieTime = CurTime() + 1
+		end
+		
+		end
+
+	end
 
 	for s = 1, #team.GetPlayers(TEAM_SLASHER) do
 

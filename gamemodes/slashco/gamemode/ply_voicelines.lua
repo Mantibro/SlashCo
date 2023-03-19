@@ -1,6 +1,6 @@
 local SlashCo = SlashCo
 
-local ConvoCount = 19
+local ConvoCount = 26
 
 SlashCo.LobbyConvos = {
 
@@ -116,12 +116,55 @@ SlashCo.LobbyConvos = {
         Length1 = 2,
         Length2 = 3,
         Length3 = 2
+    },
+
+    {
+        Length1 = 1.5,
+        Length2 = 1.3,
+        Length3 = 3
+    },
+
+    {
+        Length1 = 1.8,
+        Length2 = 4,
+        Length3 = 3
+    },
+
+    {
+        Length1 = 10,
+        Length2 = 3,
+        Length3 = 4
+    },
+
+    {
+        Length1 = 2,
+        Length2 = 3,
+        Length3 = 3
+    },
+
+    {
+        Length1 = 6,
+        Length2 = 1.5,
+        Length3 = 3
+    },
+
+    {
+        Length1 = 11,
+        Length2 = 1,
+        Length3 = 1
+    },
+
+    {
+        Length1 = 4,
+        Length2 = 3,
+        Length3 = 2
     }
+
 }
 
 SlashCo.LobbyBanter = function()
 
-    local survivors = team.getPlayers(TEAM_SURVIVOR)
+    local survivors = team.GetPlayers(TEAM_SURVIVOR)
 
     if #survivors < 2 then return 5 end
 
@@ -137,10 +180,30 @@ SlashCo.LobbyBanter = function()
 
     playVocal(convo, 1)
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1, playVocal(convo, 2))
+    timer.Simple(SlashCo.LobbyConvos[convo].Length1, function() playVocal(convo, 2) end)
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, playVocal(convo, 3))
+    timer.Simple(SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()  playVocal(convo, 3) end)
 
     return totalLength
 
 end
+
+net.Receive("mantislashcoSurvivorVoicePrompt", function() 
+
+    local ply = net.ReadEntity()
+    local prompt = net.ReadUInt(3)
+
+    if prompt == 1 then
+        ply:EmitSound("slashco/survivor/voice/prompt_yes"..math.random(1,5)..".mp3")
+    elseif prompt == 2 then
+        ply:EmitSound("slashco/survivor/voice/prompt_no"..math.random(1,6)..".mp3")
+    elseif prompt == 3 then
+        ply:EmitSound("slashco/survivor/voice/prompt_follow"..math.random(1,6)..".mp3")
+    elseif prompt == 4 then
+        ply:EmitSound("slashco/survivor/voice/prompt_spot"..math.random(1,5)..".mp3")
+    elseif prompt == 5 then
+        ply:EmitSound("slashco/survivor/voice/prompt_help"..math.random(1,6)..".mp3")
+    elseif prompt == 6 then
+        ply:EmitSound("slashco/survivor/voice/prompt_run"..math.random(1,7)..".mp3")
+    end
+end)

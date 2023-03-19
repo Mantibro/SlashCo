@@ -30,6 +30,7 @@ util.AddNetworkString("mantislashcoGiveMasterDatabase")
 util.AddNetworkString("mantislashcoSendRoundData")
 util.AddNetworkString("mantislashcoHelicopterMusic")
 util.AddNetworkString("mantislashcoLobbySlasherInformation")
+util.AddNetworkString("mantislashcoSurvivorVoicePrompt")
 
 function PlayGlobalSound(sound, level, ent, vol)
 

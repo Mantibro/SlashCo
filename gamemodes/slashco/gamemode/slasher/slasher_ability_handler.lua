@@ -1224,12 +1224,28 @@ do
 
         if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 1 then
             SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
-            slasher:SetEyeAngles( Angle( slasher:EyeAngles()[1] + (slasher.MouseDrift[1]/7), slasher:EyeAngles()[2] + (slasher.MouseDrift[2]/3), 0 ) )
+            slasher:SetEyeAngles( Angle( slasher:EyeAngles()[1] + (slasher.MouseDrift[1]/5), slasher:EyeAngles()[2] + (slasher.MouseDrift[2]/2), 0 ) )
         end
 
         local lol = math.random(0,1)
 
-        slasher:SetVelocity( Vector(slasher.MouseDrift[1+lol] * 5,slasher.MouseDrift[2-lol] * 5,0) )
+        slasher:SetVelocity( Vector(slasher.MouseDrift[1+lol] * 6,slasher.MouseDrift[2-lol] * 6,0) )
+
+        local find = ents.FindInSphere(slasher:GetPos(), 80)
+
+        for i = 1, #find do
+            local ent = find[i]
+
+            if ent:GetClass() == "prop_door_rotating" then
+                SlashCo.BustDoor(slasher, ent, 25000)
+            end
+
+            if ent:IsPlayer() and ent ~= slasher then
+                ent:SetVelocity( slasher:GetForward() * 300 )
+                timer.Simple(0.05, function() ent:Kill() end)
+            end
+
+        end
 
     end
 
