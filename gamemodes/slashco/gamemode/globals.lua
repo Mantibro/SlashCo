@@ -1575,6 +1575,8 @@ SlashCo.SummonEscapeHelicopter = function()
 
         local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
 
+        SlashCo.EscapeVoicePrompt()
+
         timer.Simple(0.1, function()
 
             SlashCo.HelicopterGoAboveLand(entID)

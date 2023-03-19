@@ -210,7 +210,7 @@ end)
 
 SlashCo.EscapeVoicePrompt = function()
 
-    local function playVoice(ply) ply:EmitSound("slashco/survivor/voice/prompt_escape"..math.random(1,6)..".mp3") end
+    local function playVoice(ply) ply:EmitSound("slashco/survivor/voice/prompt_escape"..math.random(1,5)..".mp3") end
 
     local survs = team.GetPlayers(TEAM_SURVIVOR)
 
