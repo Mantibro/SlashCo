@@ -585,6 +585,10 @@ end
 		ply.CalcSeqOverride = ply:LookupSequence("ragdoll")
 	end
 
+	if ply:GetNWBool("LeuonardRaping") then
+		ply.CalcSeqOverride = ply:LookupSequence("mondaynightraw")
+	end
+
 	::next::
 
    	return ply.CalcIdeal, ply.CalcSeqOverride

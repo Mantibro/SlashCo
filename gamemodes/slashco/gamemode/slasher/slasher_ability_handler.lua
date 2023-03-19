@@ -1197,9 +1197,46 @@ if slasher.MouseDrift == nil then
 end
 
 if v1 < 100 then
+    if not slasher:GetNWBool("LeuonardRaping") then
 
-    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + ( FrameTime() * 0.25)
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + ( FrameTime() * 0.5)
 
+        --LOCATE THE DOG..........
+
+        local find = ents.FindInSphere(slasher:GetPos(), 80)
+
+        for f = 1, #find do
+            local ent = find[f]
+
+            if ent:GetClass() == "sc_dogg" then --I FOUND YOU........
+                ent:Remove()
+                slasher:SetNWBool("LeuonardRaping", true)
+                slasher:EmitSound("slashco/slasher/leuonard_yell1.mp3")
+                slasher:Freeze(true)
+                timer.Simple(4, function() 
+                    slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.wav")
+                    slasher:SetPlaybackRate(5)
+                end)
+            end
+
+        end
+
+    else
+        if v1 > 0 then
+            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 - ( FrameTime() * 2)
+            slasher:SetBodygroup(1,1)
+        else
+            slasher:SetNWBool("LeuonardRaping", false)
+            slasher:SetBodygroup(1,0)
+            slasher:Freeze(false)
+
+            SlashCo.CreateItem("sc_dogg", SlashCo.TraceHullLocator(), Angle(0,0,0))
+
+            slasher:StopSound("slashco/slasher/leuonard_grunt_loop.wav")
+            slasher:EmitSound("slashco/slasher/leuonard_grunt_finish.mp3")
+
+        end
+    end
 else
 
     SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 100.25

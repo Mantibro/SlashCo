@@ -15,7 +15,7 @@ ENT.IsSelectable 	= true
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel( SlashCoItems.Cookie.Model )
+		self:SetModel( "models/slashco/items/dogg.mdl" )
 		self:SetSolid( SOLID_VPHYSICS )
 		self:PhysicsInit( SOLID_VPHYSICS )
 		self:SetUseType( SIMPLE_USE )
@@ -30,6 +30,21 @@ function ENT:Initialize()
 	self.SoundTick = 0
 end
 
+function ENT:Use( activator )
+
+if SERVER then
+
+	if activator:Team() == TEAM_SURVIVOR then 
+
+		if ( self:IsPlayerHolding() ) then return end
+		activator:PickupObject( self )
+
+	end
+
+end
+
+end
+
 function ENT:Think( )
 	if SERVER then
 
@@ -37,7 +52,7 @@ function ENT:Think( )
 
 		if self.SoundTick > 100 then
 
-			slasher:EmitSound("slashco/dogg"..math.random(1,4)..".mp3") 
+			self:EmitSound("slashco/dogg"..math.random(1,4)..".mp3") 
 			self.SoundTick = 0
 		end
 

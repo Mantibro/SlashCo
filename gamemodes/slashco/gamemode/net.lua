@@ -31,6 +31,18 @@ util.AddNetworkString("mantislashcoSendRoundData")
 util.AddNetworkString("mantislashcoHelicopterMusic")
 util.AddNetworkString("mantislashcoLobbySlasherInformation")
 util.AddNetworkString("mantislashcoSurvivorVoicePrompt")
+util.AddNetworkString("mantislashcoSurvivorPings")
+util.AddNetworkString("mantislashcoSurvivorPreparePing")
+
+net.Receive("mantislashcoSurvivorPreparePing", function()
+
+	t = net.ReadTable()
+
+    net.Start("mantislashcoSurvivorPings")
+	net.WriteTable(t)
+	net.Broadcast()
+
+end)
 
 function PlayGlobalSound(sound, level, ent, vol)
 

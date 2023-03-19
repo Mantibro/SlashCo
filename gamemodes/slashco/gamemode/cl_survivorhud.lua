@@ -13,6 +13,20 @@ local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 local prompt = 0
 local ref_eyeang = Angle(0,0,0)
 local voice_cooldown = 0
+local global_pings = {}
+local last_pinged = 0
+
+local GeneratorIcon = Material("slashco/ui/icons/slasher/progbar_icon")
+
+local function FindPos(search)
+
+	if type( search ) == "Entity" then
+		return search:GetPos()
+	elseif type( search ) == "Vector" then
+		return search
+	end
+
+end
 
 net.Receive( "mantislashcoGasPourProgress", function( )
 
@@ -20,6 +34,36 @@ net.Receive( "mantislashcoGasPourProgress", function( )
 	FuelingCan = net.ReadEntity()
 	IsFueling = net.ReadBool()
 	TimeUntilFueled = net.ReadFloat()
+
+end)
+
+net.Receive( "mantislashcoSurvivorPings", function( )
+
+	local ping = net.ReadTable()
+
+	for i = 1, #global_pings do
+
+		local pn = global_pings[i]
+
+		if pn.Player == ping.Player then
+			global_pings[i] = nil
+		end
+
+	end
+
+	if ping.Type == "Generator" then
+		LocalPlayer():EmitSound("slashco/ping_generator.mp3")
+	elseif ping.Type ~= "LOOK HERE" and ping.Type ~= "LOOK AT THIS" then
+		LocalPlayer():EmitSound("slashco/ping_item.mp3")
+	end
+
+	table.insert(global_pings, ping)
+
+	if ping.ExpiryTime > 0 then
+		timer.Simple(ping.ExpiryTime, function() 
+			table.RemoveByValue( global_pings, ping )
+		end)
+	end
 
 end)
 
@@ -94,7 +138,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		--//voice prompts//--
 
-		if input.IsKeyDown( KEY_R ) then
+		if input.IsKeyDown( KEY_T ) then
 
 			draw.SimpleText("[SAY]", "TVCD", ScrW()/2, ScrH()/2 - 35, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
@@ -195,6 +239,129 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		end
 
 		if voice_cooldown > 0 then voice_cooldown = voice_cooldown - RealFrameTime() end
+
+		--//prompts for items//--
+
+		local lookent = LocalPlayer():GetEyeTrace().Entity 
+
+		if LocalPlayer():GetVelocity():Length() > 250 then
+
+			if lookent:GetClass() == "prop_door_rotating" or lookent:GetClass() == "func_door_rotating" then
+				if lookent:GetPos():Distance( LocalPlayer():GetPos() ) < 150 then
+					draw.SimpleText("[M1 TO SLAM OPEN!]", "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				end
+			end
+
+		end
+
+		if last_pinged <= 0 and input.IsKeyDown(KEY_G ) then
+
+			last_pinged = 10
+
+			local ping_info = {}
+
+			ping_info.Player = LocalPlayer()
+
+			local lookfinal = lookent
+
+			ping_info.ExpiryTime = 0
+
+			if lookfinal:EntIndex() ~= 0 then
+				if lookfinal:GetClass() == "sc_generator" then
+					ping_info.Type = "Generator"
+				elseif lookfinal:GetClass() == "sc_gascan" then
+					ping_info.Type = "Fuel Can"
+				elseif lookfinal:GetClass() == "sc_baby" then
+					ping_info.Type = "The Baby"
+				elseif lookfinal:GetClass() == "sc_battery" then
+					ping_info.Type = "Battery"
+				elseif lookfinal:GetClass() == "sc_soda" then
+					ping_info.Type = "B-Gone Soda"
+				elseif lookfinal:GetClass() == "sc_beacon" then
+					ping_info.Type = "Distress Beacon"
+				elseif lookfinal:GetClass() == "sc_cookie" then
+					ping_info.Type = "Cookie"
+				elseif lookfinal:GetClass() == "sc_deathward" then
+					ping_info.Type = "Deathward"
+				elseif lookfinal:GetClass() == "sc_devildie" then
+					ping_info.Type = "Devil's Gamble"
+				elseif lookfinal:GetClass() == "sc_helicopter" then
+					ping_info.Type = "Helicopter"
+				elseif lookfinal:GetClass() == "sc_mayo" then
+					ping_info.Type = "Mayonnaise"
+				elseif lookfinal:GetClass() == "sc_milkjug" then
+					ping_info.Type = "Milk Jug"
+				elseif lookfinal:GetClass() == "sc_rock" then
+					ping_info.Type = "The Rock"
+				elseif lookfinal:GetClass() == "sc_pocketsand" then
+					ping_info.Type = "Pocket Sand"
+				elseif lookfinal:GetClass() == "sc_stepdecoy" then
+					ping_info.Type = "Step Decoy"
+				elseif lookfinal:GetClass() == "sc_dogg" then
+					ping_info.Type = "Plush Dog"
+				else
+
+					ping_info.Type = "LOOK AT THIS"
+
+					ping_info.ExpiryTime = 10
+
+				end
+
+			else
+				lookfinal = LocalPlayer():GetEyeTrace().HitPos
+
+				ping_info.Type = "LOOK HERE"
+
+				ping_info.ExpiryTime = 10
+			end
+
+
+			ping_info.Entity = lookfinal
+
+			net.Start("mantislashcoSurvivorPreparePing")
+			net.WriteTable(ping_info)
+			net.SendToServer()
+
+		end
+
+		if last_pinged > 0 then last_pinged = last_pinged - RealFrameTime() end
+
+		--(displaying them)
+
+		for i = 1, #global_pings do
+
+			if type(global_pings[i].Entity) ~= "Vector" and not IsValid( global_pings[i].Entity ) then
+				table.RemoveByValue( global_pings, global_pings[i] )
+				continue
+			end
+
+			if not IsValid( global_pings[i].Player ) then
+				table.RemoveByValue( global_pings, global_pings[i] )
+				continue
+			end
+
+			local pos = ( FindPos( global_pings[i].Entity ) ):ToScreen()
+
+			local showtext = global_pings[i].Type 
+
+			local showname = true
+
+			if global_pings[i].Type == "LOOK HERE" then 
+				showname = true
+			elseif global_pings[i].Type == "Generator" then
+				showname = false
+				surface.SetMaterial(GeneratorIcon)
+				surface.DrawTexturedRectRotated(pos.x, pos.y, ScrW()/32, ScrW()/32, 0)
+				showtext = "     "
+			end
+
+			if showname then
+				draw.SimpleText(global_pings[i].Player:GetName(), "TVCD", pos.x, pos.y - 25, Color( 255, 255, 255, 180 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
+
+			draw.SimpleText("["..showtext.."]", "TVCD", pos.x, pos.y, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+		end
 
 		--//item selection crosshair//--
 
