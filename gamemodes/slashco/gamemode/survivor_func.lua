@@ -19,8 +19,6 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, key)
 
             local localpos = lookent:WorldToLocal( ply:GetPos() )
 
-            print(localpos)
-
             if localpos.x < 0 then
                 lookent:SetKeyValue( "opendir", "1" )
             else

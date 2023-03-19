@@ -299,6 +299,16 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 					ping_info.Type = "Step Decoy"
 				elseif lookfinal:GetClass() == "sc_dogg" then
 					ping_info.Type = "Plush Dog"
+				elseif lookfinal:IsPlayer() then
+					if lookfinal:Team() == TEAM_SURVIVOR then
+						ping_info.Type = "SURVIVOR"
+					end
+
+					if lookfinal:Team() == TEAM_SLASHER then
+						ping_info.Type = "SLASHER"
+						lookfinal = LocalPlayer():GetEyeTrace().HitPos
+						ping_info.ExpiryTime = 5
+					end
 				else
 
 					ping_info.Type = "LOOK AT THIS"
@@ -346,8 +356,17 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 			local showname = true
 
+			local textcolor = Color( 255, 255, 255, 255 )
+
 			if global_pings[i].Type == "LOOK HERE" then 
 				showname = true
+			elseif global_pings[i].Type == "SURVIVOR" then 
+					showname = true
+					showtext = global_pings[i].Entity:GetName()
+					textcolor = Color(50,50,255,255)
+			elseif global_pings[i].Type == "SLASHER" then 
+					showname = true
+					textcolor = Color(255,50,50,255)
 			elseif global_pings[i].Type == "Generator" then
 				showname = false
 				surface.SetMaterial(GeneratorIcon)
@@ -359,7 +378,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				draw.SimpleText(global_pings[i].Player:GetName(), "TVCD", pos.x, pos.y - 25, Color( 255, 255, 255, 180 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 
-			draw.SimpleText("["..showtext.."]", "TVCD", pos.x, pos.y, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText("["..showtext.."]", "TVCD", pos.x, pos.y, textcolor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		end
 
@@ -375,9 +394,14 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 					local centerDistance = math.Distance(ScrW()/2,ScrH()/2,gasPos.x,gasPos.y)
 					draw.SimpleText("[", "Indicator", gasPos.x-centerDistance/2-12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 					draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+					if realDistance < 200 and centerDistance < 25 then
+						draw.SimpleText("['G' TO PING]", "TVCD", ScrW()/2, ScrH()/2 + 100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					end
 				end
 			end
 		end
+
 
 		--//health//--
 
