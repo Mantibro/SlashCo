@@ -207,3 +207,43 @@ net.Receive("mantislashcoSurvivorVoicePrompt", function()
         ply:EmitSound("slashco/survivor/voice/prompt_run"..math.random(1,7)..".mp3")
     end
 end)
+
+SlashCo.EscapeVoicePrompt = function()
+
+    local function playVoice(ply) ply:EmitSound("slashco/survivor/voice/prompt_escape"..math.random(1,6)..".mp3") end
+
+    local survs = team.GetPlayers(TEAM_SURVIVOR)
+
+    local speaking_survs = {}
+
+    if #survs < 2 then
+        playVoice(survs[1])
+        return
+    end
+
+    table.insert(speaking_survs, survs[1])
+
+    for i = 1, #survs do
+
+        local survivor = surv[i]
+
+        for s = 1, #speaking_survs do 
+            if speaking_survs[s] == survivor then 
+                goto SKIP 
+            end
+
+            if survivor:GetPos():Distance(speaking_survs[s]:GetPos()) > 750 then
+                table.insert(speaking_survs, survs[i])
+                goto SKIP 
+            end
+        end
+
+        ::SKIP::
+
+    end
+
+    for s = 1, #speaking_survs do 
+        playVoice(speaking_survs[s])
+    end
+
+end
