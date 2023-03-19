@@ -52,6 +52,9 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
 		local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
+		local CrimCloneIcon = Material("slashco/ui/icons/slasher/s_12_a1")
+		local CrimRage = Material("slashco/ui/icons/slasher/s_12_1")
+
 		local willdrawkill = true
 		local willdrawchase = true
 		local willdrawmain = true
@@ -594,9 +597,26 @@ end
 	::abomignat::
 	if SlashID ~= 11 then goto criminal end
 do
-	surface.SetMaterial(KillDisabledIcon)
-	surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-	draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	local is_crawling = LocalPlayer():GetNWBool("AbomignatCrawling")
+
+	willdrawkill = false
+	if not is_crawling and V1 < 0.1 then
+		surface.SetMaterial(GenericSlashIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "M1 - Slash Charge", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+		surface.SetMaterial(GenericSlashIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "F - Lunge", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	else
+		surface.SetMaterial(KillDisabledIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+		surface.SetMaterial(KillDisabledIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	end
 
 	if not is_crawling then 
 		draw.SimpleText( "R - Start Crawling", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
@@ -604,8 +624,6 @@ do
 		draw.SimpleText( "R - Stop Crawling", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
 	end
 end
-
-
 	::criminal::
 	if SlashID ~= 12 then goto freesmiley end
 do
@@ -684,28 +702,26 @@ do
 	end
 
 end
-	::leuonard::
-	if SlashID ~= 14 then goto next end
+::leuonard::
+if SlashID ~= 14 then goto next end
 do
 
-	surface.SetDrawColor( 0, 0, 0)
-	surface.DrawRect( cx-200, cy +ScrH()/4, 400, 25 )
+surface.SetDrawColor( 0, 0, 0)
+surface.DrawRect( cx-200, cy +ScrH()/4, 400, 25 )
 
-	local b_pad = 6
+local b_pad = 6
 
-	local rape_val = V1
+local rape_val = V1
 
-	surface.SetDrawColor( 255, 0, 0)
-	surface.DrawRect( cx-200+(b_pad/2),(b_pad/2)+cy +ScrH()/4, (400-b_pad)*(rape_val/100), 25-b_pad )
+surface.SetDrawColor( 255, 0, 0)
+surface.DrawRect( cx-200+(b_pad/2),(b_pad/2)+cy +ScrH()/4, (400-b_pad)*(rape_val/100), 25-b_pad )
 
-	draw.SimpleText( "RAPE", "ItemFontTip", cx-300, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
-	draw.SimpleText( math.floor(rape_val).." %", "ItemFontTip", cx+220, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
+draw.SimpleText( "RAPE", "ItemFontTip", cx-300, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
+draw.SimpleText( math.floor(rape_val).." %", "ItemFontTip", cx+220, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
 
 end
 
-	::next::
-
-
+::next::
 		--Slasher-Shared function \/ \/ \/ 
 
 		--Slasher Main Icon

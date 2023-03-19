@@ -66,6 +66,14 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	local manspider_nest = ply:GetNWBool("ManspiderNested")
 
+	local abomignat_mainslash = ply:GetNWBool("AbomignatSlashing")
+	local abomignat_lunge = ply:GetNWBool("AbomignatLunging")
+	local abomignat_lungefinish = ply:GetNWBool("AbomignatLungeFinish")
+
+	local abomignat_crawl = ply:GetNWBool("AbomignatCrawling")
+
+	local smiley_summon = ply:GetNWBool("FreeSmileySummoning")
+
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
 	if ply:GetModel() ~= "models/slashco/slashers/baba/baba.mdl" then goto sid end --Bababooey's Animator
@@ -578,6 +586,7 @@ end
 	end
 
 	::next::
+
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
 
@@ -651,7 +660,6 @@ if SERVER then
 		elseif ply:GetModel() == "models/slashco/slashers/leuonard/leuonard.mdl" then --Leuonard Footsteps
 			ply:EmitSound( "slashco/slasher/leuonard_step"..math.random(1,3)..".mp3")
 			return true
-
 		end
 		
 	end
@@ -701,9 +709,9 @@ if CLIENT then
 			ply.SmileyStepTick = ply.SmileyStepTick + 1
 
 			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/leuonard/meuonard.mdl" then --Criminal Footsteps
-			return true
 
+		elseif ply:GetModel() == "models/slashco/slashers/leuonard/leuonard.mdl" then --Criminal Footsteps
+			return true
 		end
 		
 	end

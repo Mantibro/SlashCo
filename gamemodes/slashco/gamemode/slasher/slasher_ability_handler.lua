@@ -1182,72 +1182,72 @@ do
 
 
 end
-    ::LEUONARD::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 14 then goto NEXT end
+::LEUONARD::
+if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 14 then goto NEXT end
 do
 
-    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Rape
-    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Tick to change mouse drift
-    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Tick to move mouse
+v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Rape
+v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Tick to change mouse drift
+v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Tick to move mouse
 
-    if slasher.MouseDrift == nil then
+if slasher.MouseDrift == nil then
 
-        slasher.MouseDrift = Vector(0,0,0)
+    slasher.MouseDrift = Vector(0,0,0)
+
+end
+
+if v1 < 100 then
+
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + ( FrameTime() * 0.25)
+
+else
+
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 100.25
+    slasher:SetNWBool("LeuonardFullRape", true)
+
+end
+
+if v1 == 100.25 then --100% bad word n stuff
+
+    slasher:SetWalkSpeed(450)
+    slasher:SetRunSpeed(450)
+
+    if v2 < 0 then
+        slasher.MouseDrift = Vector(math.random(-10,10),math.random(-10,10),0)
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2 + (math.random() * 2)
+
+        slasher:EmitSound("slashco/slasher/leuonard_yell"..math.random(1,7)..".mp3")
+    end
+
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 - FrameTime()
+    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 + 1
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 1 then
+        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
+        slasher:SetEyeAngles( Angle( slasher:EyeAngles()[1] + (slasher.MouseDrift[1]/5), slasher:EyeAngles()[2] + (slasher.MouseDrift[2]/2), 0 ) )
+    end
+
+    local lol = math.random(0,1)
+
+    slasher:SetVelocity( Vector(slasher.MouseDrift[1+lol] * 6,slasher.MouseDrift[2-lol] * 6,0) )
+
+    local find = ents.FindInSphere(slasher:GetPos(), 80)
+
+    for i = 1, #find do
+        local ent = find[i]
+
+        if ent:GetClass() == "prop_door_rotating" then
+            SlashCo.BustDoor(slasher, ent, 25000)
+        end
+
+        if ent:IsPlayer() and ent ~= slasher then
+            ent:SetVelocity( slasher:GetForward() * 300 )
+            timer.Simple(0.05, function() ent:Kill() end)
+        end
 
     end
 
-    if v1 < 100 then
- 
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = v1 + ( FrameTime() * 0.25)
-
-    else
-
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 100.25
-        slasher:SetNWBool("LeuonardFullRape", true)
-
-    end
-
-    if v1 == 100.25 then --100% bad word n stuff
-
-        slasher:SetWalkSpeed(450)
-        slasher:SetRunSpeed(450)
-
-        if v2 < 0 then
-            slasher.MouseDrift = Vector(math.random(-10,10),math.random(-10,10),0)
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2 + (math.random() * 2)
-
-            slasher:EmitSound("slashco/slasher/leuonard_yell"..math.random(1,7)..".mp3")
-        end
-
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 - FrameTime()
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = v3 + 1
-
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 1 then
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 0
-            slasher:SetEyeAngles( Angle( slasher:EyeAngles()[1] + (slasher.MouseDrift[1]/5), slasher:EyeAngles()[2] + (slasher.MouseDrift[2]/2), 0 ) )
-        end
-
-        local lol = math.random(0,1)
-
-        slasher:SetVelocity( Vector(slasher.MouseDrift[1+lol] * 6,slasher.MouseDrift[2-lol] * 6,0) )
-
-        local find = ents.FindInSphere(slasher:GetPos(), 80)
-
-        for i = 1, #find do
-            local ent = find[i]
-
-            if ent:GetClass() == "prop_door_rotating" then
-                SlashCo.BustDoor(slasher, ent, 25000)
-            end
-
-            if ent:IsPlayer() and ent ~= slasher then
-                ent:SetVelocity( slasher:GetForward() * 300 )
-                timer.Simple(0.05, function() ent:Kill() end)
-            end
-
-        end
-
-    end
+end
 
 end
 

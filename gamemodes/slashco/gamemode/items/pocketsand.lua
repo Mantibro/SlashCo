@@ -33,7 +33,7 @@ SlashCoItems.PocketSand.OnUse = function(ply)
                 filter = slasher
             } )
 
-            if tr.Entity:IsPlayer() and tr.Entity():Team() == TEAM_SLASHER then found = tr.Entity goto FOUNDMAN end
+            if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SLASHER then found = tr.Entity goto FOUNDMAN end
 
         end
 
@@ -48,7 +48,7 @@ SlashCoItems.PocketSand.OnUse = function(ply)
     ply:EmitSound("slashco/survivor/pocketsand_throw"..math.random(1,2)..".mp3")
     ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
 
-    timer.Simple(5, function()
+    timer.Simple(8, function()
         found:SetNWBool("SlasherBlinded", false)
     end)
 end

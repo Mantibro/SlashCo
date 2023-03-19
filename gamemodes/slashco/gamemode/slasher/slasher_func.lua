@@ -18,7 +18,6 @@ SlashCo.OnSlasherSpawned = function(ply)
     if slid == 5 then
 
         ply:SetViewOffset( Vector(0,0,20) )
-
         ply:SetCurrentViewOffset( Vector(0,0,20) )
 
     end
@@ -73,6 +72,51 @@ SlashCo.OnSlasherSpawned = function(ply)
         ply:SetCurrentViewOffset( Vector(0,0,100) )
 
     end
+
+    if slid == 11 then
+
+        PlayGlobalSound("slashco/slasher/abomignat_breathing.wav",65,ply)
+
+    end
+
+    if slid == 12 then
+
+        local clone = ents.Create( "sc_crimclone" )
+
+        clone:SetPos( ply:GetPos() )
+        clone:SetAngles( ply:GetAngles() )
+        clone.AssignedSlasher = ply:SteamID64()
+        clone.IsMain = true
+        clone:Spawn()
+        clone:Activate()
+
+        ply:SetColor(Color(0,0,0,0))
+        ply:DrawShadow(false)
+		ply:SetRenderMode(RENDERMODE_TRANSALPHA)
+		ply:SetNoDraw(true)
+
+    end
+
+    if slid == 13 then
+
+        SlashCo.SmileyIdle(ply)
+
+    end
+
+end
+
+SlashCo.SmileyIdle = function(slasher)
+
+    if not slasher:GetNWBool("InSlasherChaseMode") then 
+        slasher:EmitSound("slashco/slasher/freesmiley_idle"..math.random(1,7)..".mp3")     
+    end
+
+    timer.Simple(math.random(3,5), function()
+
+        SlashCo.SmileyIdle(slasher)
+    
+    end)
+    
 
 end
 

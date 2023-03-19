@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\criminal\suit_sheet_rage"
+	"$halflambert" 1
+}

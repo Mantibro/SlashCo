@@ -325,7 +325,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillDistance = 150,
         ChaseRange = 2000,
         ChaseRadius = 0.96,
-        ChaseDuration = 3.0,
+        ChaseDuration = 2.0,
         ChaseCooldown = 2,
         JumpscareDuration = 2,
         ChaseMusic = "slashco/slasher/watcher_chase.wav",
@@ -950,6 +950,8 @@ SlashCo.ValidateMap = function(map)
 
     gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) - SlashCo.CurRound.SurvivorData.GasCanMod
 
+    if gasCount < 8 then gasCount = 8 end
+
     if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then --The Exposure Offering caps gas cans at 8.
         SlashCo.CurRound.GasCanCount = 8 - SlashCo.CurRound.SurvivorData.GasCanMod
     else
@@ -1186,6 +1188,24 @@ end
 --Spawn the offering table
 SlashCo.CreateOfferTable = function(pos, ang)
     local Ent = ents.Create( "sc_offertable" )
+
+    if not IsValid(Ent) then
+        MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create the offertable at ("..tostring(pos).."), entity was NULL.\n")
+        return nil
+    end
+
+    Ent:SetPos( pos )
+    Ent:SetAngles( ang )
+    Ent:Spawn()
+
+    local id = Ent:EntIndex()
+
+    return id
+end
+
+--Spawn the radio
+SlashCo.CreateRadio = function(pos, ang)
+    local Ent = ents.Create( "radio" )
 
     if not IsValid(Ent) then
         MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create the offertable at ("..tostring(pos).."), entity was NULL.\n")
@@ -1555,6 +1575,8 @@ SlashCo.SummonEscapeHelicopter = function()
 
     if SlashCo.CurRound.EscapeHelicopterSummoned then return true end
 
+    SlashCo.EscapeVoicePrompt()
+
     SlashCo.CurRound.EscapeHelicopterSummoned = true
 
 	--[[
@@ -1574,8 +1596,6 @@ SlashCo.SummonEscapeHelicopter = function()
     timer.Simple(delay, function()
 
         local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
-
-        SlashCo.EscapeVoicePrompt()
 
         timer.Simple(0.1, function()
 
@@ -1771,6 +1791,96 @@ SlashCo.RadialTester = function(ent, dist, secondary)
     end
 
     return last_best_angle
+
+end
+
+SlashCo.LocalizedTraceHullLocator = function(ent, input_range)
+
+    --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
+
+    local height_offset = 10
+    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+
+    local range = input_range
+
+    local pos = Vector(0,0,h)
+
+    local err = 0
+
+    ::RELOCATE::
+
+    if err > 250 then print("TRACE LOCATOR FAILURE.") return end
+
+    pos = ent:LocalToWorld(Vector(math.random(-range,range),math.random(-range,range),height_offset * 50))
+
+    local tr_l = util.TraceLine( {
+		start = pos,
+		endpos = pos - Vector(0,0,1000),
+	} )
+
+    if not tr_l.Hit then err = err+1 goto RELOCATE end
+
+    local tr = util.TraceHull( {
+		start = pos,
+		endpos = pos + Vector(0,0,tr_l.HitPos[3] - height_offset),
+		maxs = Vector(12,12,72),
+		mins = Vector(-12,-12,0),
+	} )
+
+    if tr.Hit then err = err+1 goto RELOCATE end
+
+    pos = tr_l.HitPos
+
+    return pos
+
+end
+
+SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, input_range, offset)
+
+    --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
+
+    local height_offset = 10
+    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+
+    local range = input_range
+
+    local pos = Vector(0,0,h)
+
+    local err = 0
+
+    local offset_local = ent:GetForward() * offset
+
+    ::RELOCATE::
+
+    if err > 250 then print("TRACE LOCATOR FAILURE.") return end
+
+    local x_s = math.random(-range,range)
+    local y_s = math.random(-range,range)
+
+    if math.abs(x_s) < min_range then y_s = min_range + math.random(0,range-min_range) end 
+    if math.abs(y_s) < min_range then y_s = min_range + math.random(0,range-min_range) end 
+
+    pos = ent:LocalToWorld(offset_local + Vector((x_s) ,y_s , height_offset * 50))
+
+    local tr_l = util.TraceLine( {
+		start = pos,
+		endpos = pos - Vector(0,0,1000),
+	} )
+
+    if not tr_l.Hit then err = err+1 goto RELOCATE end
+
+    local tr = util.TraceHull( {
+		start = pos,
+		endpos = pos + Vector(0,0,tr_l.HitPos[3] - height_offset),
+		maxs = Vector(18,18,72),
+		mins = Vector(-18,-18,0),
+	} )
+
+    if tr.Hit then err = err+1 goto RELOCATE end
+
+    pos = tr_l.HitPos
+
+    return pos
 
 end
 

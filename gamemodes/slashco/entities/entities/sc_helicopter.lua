@@ -273,13 +273,13 @@ function ENT:Think()
 
 	end
 
-	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then 
+	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch_full == nil then 
 
 		SlashCo.SurvivorWinFinish()
 
 		SlashCo.HelicopterTakeOff()
 
-		self.switch = true 
+		self.switch_full = true 
 
 	end
 
@@ -293,6 +293,8 @@ function ENT:Think()
 
     	timer.Simple(abandon, function() 
     
+			if self.switch_full == true then return end
+
         	SlashCo.HelicopterTakeOff()
         	SlashCo.SurvivorWinFinish()
 
@@ -309,6 +311,8 @@ function ENT:Think()
 		print("[SlashCo] Helicopter set to abandon players in "..tostring(abandon).." seconds.")
 
     	timer.Simple(abandon, function() 
+
+			if self.switch_full == true then return end
     
         	SlashCo.HelicopterTakeOff()
         	SlashCo.SurvivorWinFinish()

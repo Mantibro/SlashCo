@@ -438,5 +438,31 @@ end --ends here
         end)
 
     ::ABOMIGNAT::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 then goto FREESMILEY end
+
+    if slasher:GetNWBool("AbomignatCrawling") then 
+        slasher:SetNWBool("AbomignatCrawling",false) 
+        SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown
+        return 
+    end
+
+    if slasher:GetNWBool("InSlasherChaseMode") then return end
+    if slasher:GetNWBool("AbomignatSlashing") then return end
+    if slasher:GetNWBool("AbomignatLunging") then return end
+    if slasher:GetNWBool("AbomignatLungeFinish") then return end
+    if SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown > 0 then return end
+
+    if not slasher:GetNWBool("AbomignatCrawling") then slasher:SetNWBool("AbomignatCrawling",true) end
+
+    ::FREESMILEY::
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 13 then goto BREN end
+
+    if slasher:GetNWBool("FreeSmileySummoning") then return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then return end
+
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 1 return end
+    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0 return end
+
+    ::BREN::
 
 end

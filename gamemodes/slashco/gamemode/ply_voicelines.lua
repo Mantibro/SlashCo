@@ -225,7 +225,7 @@ SlashCo.EscapeVoicePrompt = function()
 
     for i = 1, #survs do
 
-        local survivor = surv[i]
+        local survivor = survs[i]
 
         for s = 1, #speaking_survs do 
             if speaking_survs[s] == survivor then 
