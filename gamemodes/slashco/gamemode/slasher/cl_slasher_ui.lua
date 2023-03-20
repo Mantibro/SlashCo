@@ -275,33 +275,6 @@
 
 		end
 
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-
-			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-			if V1 < 2 then
-
-				local l_ang = math.abs(ply:EyeAngles()[1]) + math.abs(ply:EyeAngles()[2]) + math.abs(ply:EyeAngles()[3])
-
-				if ply.MonitorLook == nil then ply.MonitorLook = 0 end
-
-				ply.LookSpeed = math.abs(ply.MonitorLook - l_ang) * (V1+1) * 20
-
-				ply.MonitorLook = l_ang
-
-				ply:SetMaterial( "lights/white" )
-				ply:SetColor( Color( 255, 255, 255, (ply.LookSpeed + ply:GetVelocity():Length()) * (1 + (V1*2)) ) ) 
-				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
-
-			else
-
-				ply:SetMaterial( "lights/white" )
-				ply:SetColor( Color( 255, 255, 255, 255 ) )
-				ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
-
-			end
-		end
-
 		--Trollge /\ /\ /\
 
 		::amogus::
@@ -842,44 +815,4 @@ end
 
 	end
 	
-end)
-
-hook.Add( "Think", "Slasher_Vision_Light", function()
-
-	if LocalPlayer():Team() ~= TEAM_SLASHER then return end
-
-	--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright ) 
-
-	local dlight = DynamicLight( LocalPlayer():EntIndex() )
-	if ( dlight ) then
-		dlight.pos = LocalPlayer():GetShootPos()
-		dlight.r = 50 + (Eyesight * 2)
-		dlight.g = 50 + (Eyesight * 2)
-		dlight.b = 50 + (Eyesight * 2)
-		dlight.brightness = Eyesight / 50
-		dlight.Decay = 1000
-		dlight.Size = 250 * Eyesight
-		dlight.DieTime = CurTime() + 1
-	end
-end )
-hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
-
-	if LocalPlayer():Team() ~= TEAM_SLASHER then return end
-
-	local tab = {
-		["$pp_colour_addr"] = 0.01,
-		["$pp_colour_addg"] = 0,
-		["$pp_colour_addb"] = 0,
-		["$pp_colour_brightness"] = 0.1,
-		["$pp_colour_contrast"] = 1 + Eyesight / 5,
-		["$pp_colour_colour"] = Eyesight / 5,
-		["$pp_colour_mulr"] = 0,
-		["$pp_colour_mulg"] = 0,
-		["$pp_colour_mulb"] = 0
-	}
-
-	DrawColorModify( tab ) --Draws Color Modify effect
-end )
-
-
-]]
+end)]]

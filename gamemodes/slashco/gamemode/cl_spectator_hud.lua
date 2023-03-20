@@ -25,8 +25,18 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	if game.GetMap() == "sc_lobby" then return end
 
-	if SlasherSteamID ~= nil and SlasherSteamID == LocalPlayer():SteamID64() then
-		draw.SimpleText("You will spawn as "..SlashName.." soon. . ." , "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color( 255, 50, 50, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	local show_slasher_anticipation = false
+
+	if SlasherTeam ~= nil then
+		for i = 1, #SlasherTeam do
+			if SlasherTeam[i].s_id == LocalPlayer():SteamID64() then
+				show_slasher_anticipation = SlashCoSlasher[SlasherTeam[i].slasherkey].Name
+			end
+		end
+	end
+
+	if show_slasher_anticipation ~= false then
+		draw.SimpleText("You will spawn as "..show_slasher_anticipation.." soon. . ." , "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color( 255, 50, 50, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 		return
 	end
 

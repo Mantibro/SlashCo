@@ -119,13 +119,7 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn(ply)
 
-    --[[if slid == 3 then
-
-        PlayGlobalSound("slashco/slasher/trollge_breathing.wav",50,ply)
-
-    end
-
-    if slid == 5 then
+    --[[if slid == 5 then
 
         ply:SetViewOffset( Vector(0,0,20) )
         ply:SetCurrentViewOffset( Vector(0,0,20) )
@@ -328,6 +322,8 @@ SlashCo.Jumpscare = function(slasher)
     if not slasher:GetNWBool("CanKill") then return end
 
     if slasher.KillDelayTick > 0 then return end
+
+    local dist = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDistance
     
     if slasher:GetEyeTrace().Entity:IsPlayer() then
         local target = slasher:GetEyeTrace().Entity	

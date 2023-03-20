@@ -36,6 +36,9 @@ end
 
 SlashCoSlasher.ZYZZ.OnTickBehaviour = function(slasher)
 
+
+    slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.ZYZZ.Eyesight)
+    slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.ZYZZ.Perception)
 end
 
 SlashCoSlasher.ZYZZ.OnPrimaryFire = function(slasher)

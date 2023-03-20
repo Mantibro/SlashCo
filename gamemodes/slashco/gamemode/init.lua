@@ -680,7 +680,7 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 		timer.Simple(2, function()
 
 			SlashCo.BroadcastMasterDatabaseForClient(pid)
-			SlashCo.BroadcastCurrentRoundData()
+			SlashCo.BroadcastCurrentRoundData(false)
 			SlashCo.BroadcastGlobalData()
 
 		end)

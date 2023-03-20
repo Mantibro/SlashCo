@@ -560,16 +560,16 @@ SlashCo.LoadCurRoundData = function()
                     break
                 end
 
-                table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id })
-
                 timer.Simple(1, function()
 
                     print("[SlashCo] Selecting Slasher for player with id: " .. id)
                     if s == 1 then
                         SlashCo.SelectSlasher(slasher1id, id)
+                        table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher1id })
                     end
                     if s == 2 then
                         SlashCo.SelectSlasher(slasher2id, id)
+                        table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher2id })
                     end
 
                 end)
@@ -717,7 +717,7 @@ SlashCo.LoadCurRoundTeams = function()
 
                         table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
 
-                        table.insert(SlashCo.CurRound.SlasherData.AllSlashers, {s_id = playercur:SteamID64()})
+                        --table.insert(SlashCo.CurRound.SlasherData.AllSlashers, {s_id = playercur:SteamID64()})
 
                     end
                 end
@@ -1478,6 +1478,8 @@ SlashCo.SpawnCurConfig = function(isDebug)
         SlashCo.UpdateHelicopterSeek( SlashCo.CurRound.HelicopterIntroPosition )
 
         SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterIntroPosition, SlashCo.CurRound.HelicopterIntroAngle )
+
+        SlashCo.BroadcastCurrentRoundData(true)
 
         timer.Simple(8, function()
 

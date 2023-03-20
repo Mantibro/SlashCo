@@ -131,8 +131,6 @@ net.Receive("mantislashcoGiveSlasherData", function()
     SlasherTeam = SlasherTable.AllSlashers
     GameReady = SlasherTable.GameReadyToBegin
 
-    print("YEAH I RECEIVED IT")
-
     if LocalPlayer():Team() == TEAM_SLASHER then hook.Run("BaseSlasherHUD") end
 
 end)

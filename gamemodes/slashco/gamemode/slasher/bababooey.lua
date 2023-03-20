@@ -38,9 +38,9 @@ SlashCoSlasher.Bababooey.OnTickBehaviour = function(slasher)
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
-    v1 = slasher.SlasherValue1 --Cooldown for being able to trigger
-    v2 = slasher.SlasherValue2 --Cooldown for being able to kill
-    v3 = slasher.SlasherValue3 --Cooldown for spook animation
+    local v1 = slasher.SlasherValue1 --Cooldown for being able to trigger
+    local v2 = slasher.SlasherValue2 --Cooldown for being able to kill
+    local v3 = slasher.SlasherValue3 --Cooldown for spook animation
 
     if v1 > 0 then 
         slasher.SlasherValue1 = v1 - (FrameTime() + (SO * 0.04)) 
@@ -60,6 +60,12 @@ SlashCoSlasher.Bababooey.OnTickBehaviour = function(slasher)
 
     if v2 > 0 then slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04)) end
     if v3 > 0 then slasher.SlasherValue3 = v3 - (FrameTime() + (SO * 0.04)) end
+
+
+
+    
+    slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Bababooey.Eyesight)
+    slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Bababooey.Perception)
 
 end
 
@@ -217,5 +223,9 @@ SlashCoSlasher.Bababooey.PlayerJumpscare = function()
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
     end
+
+end
+
+SlashCoSlasher.Bababooey.ClientSideEffect = function()
 
 end

@@ -1,6 +1,6 @@
 SCInfo = {}
 
-SCInfo.Slasher = {
+--[[SCInfo.Slasher = {
 
     {
         Name = "Bababaooey",
@@ -156,7 +156,7 @@ SCInfo.Slasher = {
         DiffRating = "★★★★☆"
     }
 
-}
+}]]
 
 --[[
 SCIngfo.Item = {

@@ -145,7 +145,7 @@ function DrawTheSlasherSelectorBox()
 	if SelectedSlasher ~= "None" then 
 		ILabel:SetText( SlashCoSlasher[SelectedSlasher].Name ) 
 		ISDesc:SetText(SlashCoSlasher[SelectedSlasher].Description.."\n\nSpeed: "..SlashCoSlasher[SelectedSlasher].SpeedRating.."\nEyesight: "..SlashCoSlasher[SelectedSlasher].EyeRating.."\nDifficulty: "..SlashCoSlasher[SelectedSlasher].DiffRating ) 
-		ISClass:SetText( "Class: ".. TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class) ) 
+		ISClass:SetText( "Class: "..TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class) ) 
 		ISDanger:SetText( "Danger Level: "..TranslateDangerLevel(SlashCoSlasher[SelectedSlasher].DangerLevel)) 
 	else
 		ILabel:SetText( "" ) 

@@ -92,7 +92,7 @@ SlashCo.BroadcastLobbySlasherInformation = function()
 
 end
 
-SlashCo.BroadcastCurrentRoundData = function()
+SlashCo.BroadcastCurrentRoundData = function(readygame)
 
     net.Start("mantislashcoSendRoundData")
 	net.WriteTable({survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData.OfferingName})
@@ -104,7 +104,7 @@ SlashCo.BroadcastCurrentRoundData = function()
 	send_t.GameProgress = SlashCo.CurRound.GameProgress
 	send_t.AllSurvivors = SlashCo.CurRound.SlasherData.AllSurvivors
 	send_t.AllSlashers = SlashCo.CurRound.SlasherData.AllSlashers
-	send_t.GameReadyToBegin = false
+	send_t.GameReadyToBegin = readygame
 
 	net.WriteTable(send_t)
 	net.Broadcast()
