@@ -145,6 +145,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			local ht = (ref_eyeang[1] - LocalPlayer():EyeAngles()[1])*10
 			local xt = (ref_eyeang[2] - LocalPlayer():EyeAngles()[2])*10
 
+			local selected = false
 			local yes_select = false
 			local no_select = false
 			local follow_select = false
@@ -154,26 +155,32 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 			if math.abs((-250) - xt) < 50 and math.abs((0) - ht) < 50 then
 				yes_select = true
+				selected = true
 			end
 
 			if math.abs((250) - xt) < 50 and math.abs((0) - ht) < 50 then
 				no_select = true
+				selected = true
 			end
 
 			if math.abs((-150) - xt) < 50 and math.abs((-100) - ht) < 50 then
 				follow_select = true
+				selected = true
 			end
 
 			if math.abs((150) - xt) < 50 and math.abs((-100) - ht) < 50 then
 				spot_select = true
+				selected = true
 			end
 
 			if math.abs((-150) - xt) < 50 and math.abs((100) - ht) < 50 then
 				help_select = true
+				selected = true
 			end
 
 			if math.abs((150) - xt) < 50 and math.abs((100) - ht) < 50 then
 				run_select = true
+				selected = true
 			end
 
 			if yes_select then
@@ -218,7 +225,9 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				draw.SimpleText("  \"RUN\"  ", "TVCD", ScrW()/2 + 150, ScrH()/2 - 100, Color( 255, 255, 255, 20 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end
 
-			draw.SimpleText("[]", "TVCD", ScrW()/2 + xt, ScrH()/2 - ht, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			if not selected then
+				draw.SimpleText("[]", "TVCD", ScrW()/2 + xt, ScrH()/2 - ht, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			end
 
 		else
 
@@ -256,7 +265,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		if last_pinged <= 0 and input.IsKeyDown(KEY_G ) then
 
-			last_pinged = 10
+			last_pinged = 3
 
 			local ping_info = {}
 

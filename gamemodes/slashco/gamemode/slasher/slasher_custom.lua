@@ -80,7 +80,7 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
     local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
     local slasher = team.GetPlayers(TEAM_SLASHER)[i]
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID < 10 then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID < 10 then return end
 
     --[[
         The main ability handler which runs every tick.
@@ -90,11 +90,11 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
         Your code here:
     ]]
 
-    v1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 --Variable 1
-    v2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 --Variable 2
-    v3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 --Variable 3
-    v4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 --Variable 4
-    v5 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue5 --Variable 5
+    v1 = slasher.SlasherValue1 --Variable 1
+    v2 = slasher.SlasherValue2 --Variable 2
+    v3 = slasher.SlasherValue3 --Variable 3
+    v4 = slasher.SlasherValue4 --Variable 4
+    v5 = slasher.SlasherValue5 --Variable 5
 
 end
 

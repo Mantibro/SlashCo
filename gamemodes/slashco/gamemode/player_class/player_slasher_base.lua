@@ -18,7 +18,7 @@ end
 
 function PLAYER:SetModel()
 
-	local modelname = SlashCo.CurRound.SlasherData[self.Player:SteamID64()].Model
+	local modelname = SlashCoSlasher[self.Player:GetNWBool("Slasher")].Model
 	util.PrecacheModel( modelname )
 	self.Player:SetModel( modelname ) 
 	self.Player:SetCanWalk( false )
@@ -28,7 +28,7 @@ end
 player_manager.RegisterClass("player_slasher_base", PLAYER, "player_default")
 
 --Slasher Animation Controller
-hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
+--[[hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
 	if ply:Team() ~= TEAM_SLASHER then
 		return
@@ -722,4 +722,4 @@ if CLIENT then
 
 end
 
-end )
+end )]]

@@ -10,10 +10,10 @@ SlashCo.SlasherMainAbility = function(slasher)
 
     --Bababooey's Invisibility ability \/ \/ \/
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 1 then goto SID end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 1 then goto SID end
 
 do --To Prevent local value jump error
-    local cooldown = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1
+    local cooldown = slasher.SlasherValue1
 
     if cooldown > 0 then return end
     if slasher:GetNWBool("InSlasherChaseMode") then return end
@@ -22,7 +22,7 @@ do --To Prevent local value jump error
 
     if slasher:GetNWBool("BababooeyInvisibility") then --Turning invisible
 
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 4
+        slasher.SlasherValue1 = 4
         slasher:EmitSound("slashco/slasher/baba_hide.mp3")
 
         timer.Simple(1, function() --Delay for entering invisibility
@@ -51,8 +51,8 @@ do --To Prevent local value jump error
             if slasher:GetPos():Distance(target:GetPos()) < 150 then
   
                 slasher:SetNWBool("BababooeySpooking", true)
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 2
+                slasher.SlasherValue2 = 2
+                slasher.SlasherValue3 = 2
                 slasher:EmitSound("slashco/slasher/baba_scare.mp3",100)
                 slasher:Freeze(true)
                 timer.Simple(2.5, function() slasher:Freeze(false) end)
@@ -67,16 +67,16 @@ do --To Prevent local value jump error
         ::SKIP::
 
         --Quiet appear
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(3,(13 - (SO * 6)))
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 8
+        slasher.SlasherValue2 = math.random(3,(13 - (SO * 6)))
+        slasher.SlasherValue1 = 8
 
         ::SPOOKAPPEAR::
 
         slasher:SetMaterial("")
 		slasher:SetColor(Color(255,255,255,255))
 
-        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
 
     end
 
@@ -87,7 +87,7 @@ end --ends here
     ::SID::
 
     --Sid's Cookie Eating \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 2 then goto AMOGUS end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 2 then goto AMOGUS end
 
     if slasher:GetEyeTrace().Entity:GetClass() == "sc_cookie" then
 
@@ -96,7 +96,7 @@ end --ends here
         if slasher:GetPos():Distance(target:GetPos()) < 150 and not slasher:GetNWBool("SidEating") and not slasher:GetNWBool("SidGun")  then
 
             slasher:SetNWBool("SidEating", true)
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 99
+            slasher.SlasherValue2 = 99
             slasher:EmitSound("slashco/slasher/sid_cookie"..math.random(1,2)..".mp3")
 
             target:SetNWBool("BeingEaten", true)
@@ -111,8 +111,8 @@ end --ends here
                 slasher:Freeze(false) 
                 slasher:SetNWBool("SidEating", false) 
                 slasher:SetNWBool("DemonPacified", true)
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1 + SatO
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(15,25)
+                slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
+                slasher.SlasherValue2 = math.random(15,25)
                 target:Remove()
             end)
         end
@@ -125,7 +125,7 @@ end --ends here
     ::AMOGUS::
 
     --Amogus Human Transform \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 4 then goto THIRSTY end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 4 then goto THIRSTY end
 
     if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 
@@ -137,7 +137,7 @@ end --ends here
         timer.Simple(2, function() 
             slasher:Freeze(false) 
             slasher:SetNWBool("AmogusDisguising", false)
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2
+            slasher.SlasherValue2 = 2
 
             slasher:SetNWBool("AmogusSurvivorDisguise", true)
             slasher:SetNWBool("AmogusDisguised", true)
@@ -175,20 +175,20 @@ end --ends here
 		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		slasher:SetNoDraw(false)
 
-        slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
 
-        SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = 2 - (SO * 1.95) 
+        SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick = 2 - (SO * 1.95) 
 
-        if IsValid(ents.GetByIndex(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3)) then
+        if IsValid(ents.GetByIndex(slasher.SlasherValue3)) then
 
-            ents.GetByIndex(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3):Remove()
+            ents.GetByIndex(slasher.SlasherValue3):Remove()
 
         end
 
         timer.Simple(2 - (SO * 1.95), function() 
             slasher:Freeze(false) 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2.5 - (SO * 2.4)
+            slasher.SlasherValue2 = 2.5 - (SO * 2.4)
         end)
 
     end
@@ -198,7 +198,7 @@ end --ends here
     ::THIRSTY::
 
     --Thirsty's Milk Drinking \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 5 then goto MALE07 end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 5 then goto MALE07 end
 
     if slasher:GetEyeTrace().Entity:GetClass() == "sc_milkjug" then
 
@@ -208,8 +208,8 @@ end --ends here
 
             slasher:SetNWBool("ThirstyDrinking", true)
             slasher:SetNWBool("InSlasherChaseMode", false) 
-            slasher:StopSound(SlashCo.CurRound.SlasherData[slasherid].ChaseMusic)
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 99
+            slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic)
+            slasher.SlasherValue2 = 99
             slasher:Freeze(true)
 
             target:Remove()
@@ -258,13 +258,13 @@ end --ends here
                 slasher:SetNWBool("ThirstyDrinking", false) 
                 slasher:SetNWBool("DemonPacified", true)
 
-                if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 < ( 4 + SatO) then
-                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 + 1 + SatO
+                if slasher.SlasherValue1 < ( 4 + SatO) then
+                    slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
                 end
 
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = math.random(20,35)
+                slasher.SlasherValue2 = math.random(20,35)
 
-                if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 2 then
+                if slasher.SlasherValue1 > 2 then
                     slasher:SetNWBool("ThirstyBigMlik", true)
                 end
             end)
@@ -274,11 +274,11 @@ end --ends here
 
     ::MALE07::
     --Male07's State Switch \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 6 then goto TYLER end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 6 then goto TYLER end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then return end
+    if slasher.SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then return end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 0 and slasher:GetEyeTrace().Entity:GetClass() == "sc_maleclone" then
+    if slasher.SlasherValue1 == 0 and slasher:GetEyeTrace().Entity:GetClass() == "sc_maleclone" then
 
         target = slasher:GetEyeTrace().Entity	
 
@@ -300,11 +300,11 @@ end --ends here
 		    slasher:SetNoDraw(false)
             slasher:SetMoveType(MOVETYPE_WALK)
 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
+            slasher.SlasherValue1 = 1
 
-            SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
+            SlashCoSlasher[slasher:GetNWBool("Slasher")].CurrentChaseTick = 0
 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 3
+            slasher.SlasherValue3 = 3
 
             slasher:SetWalkSpeed(100)
             slasher:SetRunSpeed(100)
@@ -315,7 +315,7 @@ end --ends here
 
     end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then
+    if slasher.SlasherValue1 > 0 then
 
         local modelname = "models/hunter/plates/plate.mdl"
 	    util.PrecacheModel( modelname )
@@ -329,11 +329,11 @@ end --ends here
 
         SlashCo.CreateItem("sc_maleclone",slasher:GetPos(),slasher:GetAngles())
 
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+        slasher.SlasherValue1 = 0
 
         slasher:EmitSound("slashco/slasher/male07_unpossess"..math.random(1,2)..".mp3")
 
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 3
+        slasher.SlasherValue3 = 3
 
         slasher:SetWalkSpeed(300)
         slasher:SetRunSpeed(300)
@@ -346,11 +346,11 @@ end --ends here
 
     ::TYLER::
     --Tyler's State Switch \/ \/ \/
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 7 then goto MANSPIDER end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 7 then goto MANSPIDER end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 0 then
+    if slasher.SlasherValue1 == 0 then
 
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 1
+        slasher.SlasherValue1 = 1
 
         --local song = math.random(1,6)
 
@@ -359,11 +359,11 @@ end --ends here
 		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		slasher:SetNoDraw(false)
 
-        --PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)), slasher, 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
+        --PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(slasher.SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)), slasher, 0.8 - (slasher.SlasherValue3 * 0.05))
 
         --slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..song..".mp3")
-        --slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(SlashCo.CurRound.SlasherData[slasherid].SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
-        --slasher.TylerSong:ChangeVolume( 0.8 - (SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 * 0.05))
+        --slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(slasher.SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
+        --slasher.TylerSong:ChangeVolume( 0.8 - (slasher.SlasherValue3 * 0.05))
 
     end
 
@@ -372,9 +372,9 @@ end --ends here
     --Borgmire has no main ability
 
     ::MANSPIDER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 9 then goto WATCHER end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 9 then goto WATCHER end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 ~= "" then return end
+    if slasher.SlasherValue1 ~= "" then return end
 
     if not slasher:GetNWBool("ManspiderNested") then
 
@@ -399,26 +399,26 @@ end --ends here
 
     else
 
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 > 100 then
+        if slasher.SlasherValue3 > 100 then
 
             slasher:SetNWBool("ManspiderNested", false)
 
-            slasher:SetRunSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-            slasher:SetWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
-            slasher:SetSlowWalkSpeed( SlashCo.CurRound.SlasherData[slasherid].ProwlSpeed )
+            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
+            slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
+            slasher:SetSlowWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
 
         end
 
     end
 
     ::WATCHER::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 10 then goto ABOMIGNAT end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 10 then goto ABOMIGNAT end
 
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 > 0 then return end
+        if slasher.SlasherValue2 > 0 then return end
         if slasher:GetNWBool("WatcherRage") then return end
 
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 10 + (SO * 10)
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 100 - (SO * 35)
+        slasher.SlasherValue1 = 10 + (SO * 10)
+        slasher.SlasherValue2 = 100 - (SO * 35)
 
         PlayGlobalSound("slashco/slasher/watcher_locate.mp3", 100, slasher, 1)
 
@@ -438,11 +438,11 @@ end --ends here
         end)
 
     ::ABOMIGNAT::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 then goto FREESMILEY end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 11 then goto FREESMILEY end
 
     if slasher:GetNWBool("AbomignatCrawling") then 
         slasher:SetNWBool("AbomignatCrawling",false) 
-        SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown = SlashCo.CurRound.SlasherData[slasherid].ChaseCooldown
+        SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseCooldown
         return 
     end
 
@@ -450,18 +450,18 @@ end --ends here
     if slasher:GetNWBool("AbomignatSlashing") then return end
     if slasher:GetNWBool("AbomignatLunging") then return end
     if slasher:GetNWBool("AbomignatLungeFinish") then return end
-    if SlashCo.CurRound.SlasherData[slasherid].ChaseActivationCooldown > 0 then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseActivationCooldown > 0 then return end
 
     if not slasher:GetNWBool("AbomignatCrawling") then slasher:SetNWBool("AbomignatCrawling",true) end
 
     ::FREESMILEY::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 13 then goto BREN end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 13 then goto BREN end
 
     if slasher:GetNWBool("FreeSmileySummoning") then return end
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then return end
+    if slasher.SlasherValue1 > 0 then return end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 0 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 1 return end
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 == 1 then SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0 return end
+    if slasher.SlasherValue2 == 0 then slasher.SlasherValue2 = 1 return end
+    if slasher.SlasherValue2 == 1 then slasher.SlasherValue2 = 0 return end
 
     ::BREN::
 

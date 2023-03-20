@@ -2,6 +2,8 @@ AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
 
 include( "items/items_init.lua" )
+include( "slasher/slasher_init.lua" )
+
 include( "shared.lua" )
 include( "player.lua" )
 include( "globals.lua" )
@@ -127,7 +129,7 @@ concommand.Add( "slashco_add_slasher", function( ply, _, args )
 		return
 	end
 
-	if tonumber(args[2]) > #SlashCo.SlasherData or tonumber(args[2]) < 1 then
+	if tonumber(args[2]) > table.Count(SlashCoSlasher) or tonumber(args[2]) < 1 then
 		ply:ChatPrint("Incorrect Slasher ID")
 
 		return
@@ -168,7 +170,7 @@ concommand.Add( "slashco_add_slasher", function( ply, _, args )
 
 	::ALREADYIN::
 
-	SlashCo.SelectSlasher(tonumber(args[2]), theman)
+	--SlashCo.SelectSlasher(tonumber(args[2]), theman)
 
 	ply:ChatPrint("New Slasher successfully assigned.")
 
@@ -404,10 +406,30 @@ function GM:PlayerButtonDown(ply, button)
 
 		if ply:Team() == TEAM_SLASHER then 
 
-			if button == 107 then SlashCo.SlasherPrimaryFire(ply) end --Killing / Damaging
-			if button == 108 then SlashCo.SlasherCallForChaseMode(ply) end --Activate Chase Mode
-			if button == 28 then SlashCo.SlasherMainAbility(ply) end --Main Ability
-			if button == 16 then SlashCo.SlasherSpecialAbility(ply) end --Special
+			if button == 107 then 
+
+				if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnPrimaryFire ) ~= "function" then return end
+    			SlashCoSlasher[ply:GetNWString("Slasher")].OnPrimaryFire(ply)
+
+			end --Killing / Damaging
+			if button == 108 then
+
+				if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnSecondaryFire ) ~= "function" then return end
+    			SlashCoSlasher[ply:GetNWString("Slasher")].OnSecondaryFire(ply)
+
+			end --Activate Chase Mode
+			if button == 28 then 
+
+				if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnMainAbilityFire ) ~= "function" then return end
+    			SlashCoSlasher[ply:GetNWString("Slasher")].OnMainAbilityFire(ply)
+
+			end --Main Ability
+			if button == 16 then 
+
+				if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnSpecialAbilityFire ) ~= "function" then return end
+    			SlashCoSlasher[ply:GetNWString("Slasher")].OnSpecialAbilityFire(ply)
+
+			end --Special
 
 		end
 
@@ -497,7 +519,7 @@ hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
 			GAMEMODE.State = GAMEMODE.States.IN_GAME
 
 			SlashCo.LoadCurRoundData()
-			--SlashCo.LoadCurRoundTeams()
+			SlashCo.CurRound.GameProgress = -1
 
 		end
 	end
@@ -506,13 +528,6 @@ end)
 
 local setupPlayerData = false
 local Think = function()
-
-	if SlasherData_Tick == nil then SlasherData_Tick = 0 end
-	SlasherData_Tick = SlasherData_Tick + 1
-
-	if GAMEMODE.State == GAMEMODE.States.IN_GAME and SlasherData_Tick > 5 then SlashCo.BroadcastSlasherData() SlasherData_Tick = 0 end
-	--I LOVE SENDING A MASSIVE DATA TABLE EVERY (5)TICK!
-	--This is the best way to do it I promise!
 
 	if CLIENT then
 		for i = 1, #player.GetAll() do
@@ -653,6 +668,8 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 		SlashCo.AwaitExpectedPlayers()
 
 		SlashCo.BroadcastGlobalData()
+
+		SlashCo.ApplySlasherToPlayer(ply)
 
 		timer.Simple(2, function()
 

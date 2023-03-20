@@ -4,6 +4,7 @@ SlashCoItems.Battery = {}
 SlashCoItems.Battery.IsSecondary = true
 SlashCoItems.Battery.Model = "models/items/car_battery01.mdl"
 SlashCoItems.Battery.Name = "Battery"
+SlashCoItems.Battery.EntClass = "sc_battery"
 SlashCoItems.Battery.Description = "A lead-acid battery that serves as a reusable source of electric current."
 SlashCoItems.Battery.CamPos = Vector(80,0,0)
 SlashCoItems.Battery.IsSpawnable = false

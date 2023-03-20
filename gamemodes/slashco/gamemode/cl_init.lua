@@ -4,6 +4,8 @@ include( "cl_headbob.lua" )
 include( "ui/fonts.lua" )
 
 include( "items/items_init.lua" )
+include( "slasher/slasher_init.lua" )
+
 include( "cl_lobbyhud.lua" )
 include( "cl_survivorhud.lua" )
 include( "cl_intro_hud.lua" )
@@ -120,36 +122,16 @@ if CLIENT then
 end
 
 net.Receive("mantislashcoGiveSlasherData", function()
-  
-	--I LOVE RECEIVING A MASSIVE DATA TABLE EVERY TICK!
-	--This is the best way to do it I promise!
 
 	local SlasherTable = net.ReadTable()
 	if not LocalPlayer():IsValid() then return end
-	local lid = LocalPlayer():SteamID64()
 
 	GameProgress = SlasherTable.GameProgress
 	SurvivorTeam = SlasherTable.AllSurvivors
     SlasherTeam = SlasherTable.AllSlashers
     GameReady = SlasherTable.GameReadyToBegin
 
-	if SlasherTable[lid] ~= nil then
-		SlashID = SlasherTable[lid].SlasherID
-		SlashName = SlasherTable[lid].NAME
-		Eyesight = SlasherTable[lid].Eyesight
-		Perception = SlasherTable[lid].Perception
-		CanChase = SlasherTable[lid].CanChase
-		ChaseRange = SlasherTable[lid].ChaseRang
-		CanKill = SlasherTable[lid].CanKill
-		ChaseDur = SlasherTable[lid].ChaseDuration
-		ChaseTick = SlasherTable[lid].CurrentChaseTick
-		V1 = SlasherTable[lid].SlasherValue1
-        V2 = SlasherTable[lid].SlasherValue2
-        V3 = SlasherTable[lid].SlasherValue3
-        V4 = SlasherTable[lid].SlasherValue4
-        V5 = SlasherTable[lid].SlasherValue5
-        SlasherSteamID = SlasherTable[lid].SteamID
-	end
+    print("YEAH I RECEIVED IT")
 
     if LocalPlayer():Team() == TEAM_SLASHER then hook.Run("BaseSlasherHUD") end
 

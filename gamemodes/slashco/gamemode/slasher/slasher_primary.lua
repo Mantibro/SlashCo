@@ -6,79 +6,34 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
-    local dist = SlashCo.CurRound.SlasherData[slasherid].KillDistance
+    local dist = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDistance
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 3 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 < 1 then goto trollclaw end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 3 and slasher.SlasherValue1 < 1 then goto trollclaw end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 4 and slasher:GetNWBool("AmogusSurvivorDisguise") then goto amogusstealth end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 4 and slasher:GetNWBool("AmogusSurvivorDisguise") then goto amogusstealth end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 6 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 2 then goto maleclaw end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 6 and slasher.SlasherValue1 == 2 then goto maleclaw end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 7 and SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 == 3 then goto tylerdestroy end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 7 and slasher.SlasherValue1 == 3 then goto tylerdestroy end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 8 then goto borgpunch end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 8 then goto borgpunch end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 11 then goto abomslash end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 11 then goto abomslash end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 12 and slasher:GetVelocity():Length() > 5 then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 12 and slasher:GetVelocity():Length() > 5 then return end
 
     if slasher:GetNWBool("SidGun") then goto sidgun end
 do
 
-    if SlashCo.CurRound.SlasherData[slasherid].CanKill == false then return end
-
-    if SlashCo.CurRound.SlasherData[slasherid].KillDelayTick > 0 then return end
-    
-    if slasher:GetEyeTrace().Entity:IsPlayer() then
-        local target = slasher:GetEyeTrace().Entity	
-
-        if target:Team() ~= TEAM_SURVIVOR then return end
-
-        if SlashCo.CurRound.SlasherData[slasherid].SlasherID == 9 then --Manspider Condition
-            if target:SteamID64() ~= SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 then
-                slasher:ChatPrint("You can only kill your Prey.")
-                return 
-            end
-        end
-
-        if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
-
-            target:SetNWBool("SurvivorBeingJumpscared",true)
-            target:SetNWBool("SurvivorJumpscare_"..SlashCo.CurRound.SlasherData[slasherid].SlasherID, true)
-
-            SlashCo.CurRound.SlasherData[slasherid].CanChase = false
-
-            slasher:EmitSound(SlashCo.CurRound.SlasherData[slasherid].KillSound)
-                
-            target:Freeze(true)
-            slasher:Freeze(true)
-
-            SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
-
-            timer.Simple(SlashCo.CurRound.SlasherData[slasherid].JumpscareDuration, function()
-
-                target:SetNWBool("SurvivorBeingJumpscared",false)
-                target:SetNWBool("SurvivorJumpscare_"..SlashCo.CurRound.SlasherData[slasherid].SlasherID, false)
-                target:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
-                slasher:Freeze(false)
-                target:Freeze(false)
-                target:Kill()
-                SlashCo.CurRound.SlasherData[slasherid].CurrentChaseTick = 0
-                SlashCo.CurRound.SlasherData[slasherid].CanChase = true
-        
-            end)
-        end
-
-    end
+    --
 
 end
 
     ::sidgun::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 2 or not slasher:GetNWBool("SidGun") then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 2 or not slasher:GetNWBool("SidGun") then return end
 do
 
-    local spread = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4
+    local spread = slasher.SlasherValue4
 
     if slasher:GetNWBool("SidGunAimed") and spread < 2.4 then
 
@@ -117,7 +72,7 @@ do
             shell:SetAngles( ang ) 
             util.Effect( "ShellEject", shell )
 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 3
+            slasher.SlasherValue4 = 3
 
             timer.Create( "SidGunDecay", 1.5, 1, function() slasher:SetNWBool("SidGunShoot",false) end)
         end)
@@ -146,7 +101,7 @@ do
                     target:Freeze(true)
     
                     target:SetNWBool("SurvivorBeingJumpscared",true)
-                    SlashCo.CurRound.SlasherData[slasherid].CanChase = false
+                    SlashCoSlasher[slasher:GetNWBool("Slasher")].CanChase = false
 
                     PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 85, slasher, 1)
 
@@ -159,7 +114,7 @@ do
                     target:SetPos(slasher:GetPos())
                     target:SetEyeAngles(   Angle(0,pick_ang,0)   )  
     
-                    SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+                    SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelay
 
                     timer.Simple(1, function() 
                         target:EmitSound("ambient/voices/citizen_beaten4.wav") 
@@ -224,7 +179,7 @@ do
 end
 
     ::amogusstealth::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 4 or not slasher:GetNWBool("AmogusSurvivorDisguise") then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 4 or not slasher:GetNWBool("AmogusSurvivorDisguise") then return end
 do
 
     if slasher:GetEyeTrace().Entity:IsPlayer() then
@@ -232,7 +187,7 @@ do
 
         if target:Team() ~= TEAM_SURVIVOR then return end
 
-        if SlashCo.CurRound.SlasherData[slasherid].KillDelayTick > 0 then return end
+        if SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick > 0 then return end
 
         if slasher:GetVelocity():Length() > 1 then return end
 
@@ -245,7 +200,7 @@ do
             target:Freeze(true)
             slasher:Freeze(true)
 
-            SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+            SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelay
 
             timer.Simple(1.25, function()
                 target:SetNWBool("SurvivorBeingJumpscared",false)
@@ -260,11 +215,11 @@ do
 end
 
     ::trollclaw::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 3 then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 3 then return end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 ~= 0 then return end
+    if slasher.SlasherValue1 ~= 0 then return end
 do
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 < 0.01 and not slasher:GetNWBool("TrollgeTransition") then
+    if slasher.SlasherValue2 < 0.01 and not slasher:GetNWBool("TrollgeTransition") then
 
         slasher:SetNWBool("TrollgeSlashing",false)
         timer.Remove("TrollgeSlashDecay")
@@ -288,7 +243,7 @@ do
 
                     target:EmitSound("slashco/slasher/trollge_hit.wav")
 
-                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 + 1 + SO
+                    slasher.SlasherValue3 = slasher.SlasherValue3 + 1 + SO
 
                 end
 
@@ -302,7 +257,7 @@ do
 
             timer.Create( "TrollgeSlashDecay", 0.6, 1, function() slasher:SetNWBool("TrollgeSlashing",false) end)
 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 + 0.5
+            slasher.SlasherValue2 = slasher.SlasherValue2 + 0.5
 
         end)
 
@@ -311,15 +266,15 @@ do
 end
 
     ::maleclaw::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 6 then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 6 then return end
 
 do
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 < 0.01 then
+    if slasher.SlasherValue4 < 0.01 then
 
         slasher:SetNWBool("Male07Slashing",false)
         timer.Remove("Male07SlashDecay")
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = 2
+        slasher.SlasherValue4 = 2
 
         timer.Simple(0.5, function() 
 
@@ -364,15 +319,15 @@ end
 
     ::tylerdestroy::
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 7 then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 7 then return end
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 ~= 3 then return end
+    if slasher.SlasherValue1 ~= 3 then return end
 
     do
 
-        if SlashCo.CurRound.SlasherData[slasherid].CanKill == false then return end
+        if SlashCoSlasher[slasher:GetNWBool("Slasher")].CanKill == false then return end
     
-        if SlashCo.CurRound.SlasherData[slasherid].KillDelayTick > 0 then return end
+        if SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick > 0 then return end
         
         if slasher:GetEyeTrace().Entity then
 
@@ -385,21 +340,21 @@ end
             if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
     
                 target:SetNWBool("SurvivorBeingJumpscared",true)
-                target:SetNWBool("SurvivorJumpscare_"..SlashCo.CurRound.SlasherData[slasherid].SlasherID, true)
+                target:SetNWBool("SurvivorJumpscare_"..SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID, true)
     
-                slasher:EmitSound(SlashCo.CurRound.SlasherData[slasherid].KillSound)
+                slasher:EmitSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].KillSound)
                     
                 if target:IsPlayer() then target:Freeze(true) end
                 slasher:Freeze(true)
     
-                SlashCo.CurRound.SlasherData[slasherid].KillDelayTick = SlashCo.CurRound.SlasherData[slasherid].KillDelay
+                SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelay
 
-                SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+                slasher.SlasherValue2 = 0
     
-                timer.Simple(SlashCo.CurRound.SlasherData[slasherid].JumpscareDuration, function()
+                timer.Simple(SlashCoSlasher[slasher:GetNWBool("Slasher")].JumpscareDuration, function()
     
                     target:SetNWBool("SurvivorBeingJumpscared",false)
-                    target:SetNWBool("SurvivorJumpscare_"..SlashCo.CurRound.SlasherData[slasherid].SlasherID, false)
+                    target:SetNWBool("SurvivorJumpscare_"..SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID, false)
     
                     slasher:Freeze(false)
 
@@ -410,12 +365,12 @@ end
 
                     else
                         target:Remove()
-                        SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 + 0.5
+                        slasher.SlasherValue4 = slasher.SlasherValue4 + 0.5
                     end
 
-                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 = SlashCo.CurRound.SlasherData[slasherid].SlasherValue4 + 1
+                    slasher.SlasherValue4 = slasher.SlasherValue4 + 1
 
-                    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 0
+                    slasher.SlasherValue1 = 0
 
                     slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
                     slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
@@ -440,20 +395,20 @@ end
     end
 
     ::borgpunch::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 8 or slasher:GetNWBool("BorgmireThrow") then goto abomslash end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 8 or slasher:GetNWBool("BorgmireThrow") then goto abomslash end
 do
 
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 < 0.01 then
+    if slasher.SlasherValue2 < 0.01 then
 
         slasher:SetNWBool("BorgmirePunch",false)
         timer.Remove("BorgmirePunchDecay")
-        SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 2
+        slasher.SlasherValue2 = 2
 
         timer.Simple(0.3, function() 
 
             slasher:EmitSound("slashco/slasher/borgmire_swing"..math.random(1,2)..".mp3")
 
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue3 = 2
+            slasher.SlasherValue3 = 2
 
             if SERVER then
 
@@ -495,14 +450,14 @@ do
 end
 
     ::abomslash::
-    if SlashCo.CurRound.SlasherData[slasherid].SlasherID ~= 11 or SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 > 0 then return end
+    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 11 or slasher.SlasherValue1 > 0 then return end
 do
 
     if slasher:GetNWBool("AbomignatCrawling") then return end
     --slasher:Freeze(true)
     slasher:SetNWBool("AbomignatSlashing",true)
-    SlashCo.CurRound.SlasherData[slasherid].SlasherValue1 = 6  - (SO * 3)
-    SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 5
+    slasher.SlasherValue1 = 6  - (SO * 3)
+    slasher.SlasherValue2 = 5
 
     slasher:EmitSound("slashco/slasher/abomignat_scream"..math.random(1,3)..".mp3")
 
@@ -510,7 +465,7 @@ do
 
             slasher:EmitSound("slashco/slasher/trollge_swing.wav")
             slasher:Freeze(true)
-            SlashCo.CurRound.SlasherData[slasherid].SlasherValue2 = 0
+            slasher.SlasherValue2 = 0
 
             if SERVER then
 

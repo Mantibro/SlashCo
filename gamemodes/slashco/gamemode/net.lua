@@ -38,6 +38,31 @@ net.Receive("mantislashcoSurvivorPreparePing", function()
 
 	t = net.ReadTable()
 
+	local ply = t.Player
+
+	if t.Type == "LOOK HERE" or t.Type == "LOOK AT THIS" then
+		ply:EmitSound("slashco/survivor/voice/prompt_look"..math.random(1,3)..".mp3")
+	elseif t.Type == "Generator" then
+		ply:EmitSound("slashco/survivor/voice/prompt_generator"..math.random(1,3)..".mp3")
+	elseif t.Type == "Helicopter" then
+		ply:EmitSound("slashco/survivor/voice/prompt_helicopter"..math.random(1,3)..".mp3")
+	elseif t.Type == "Plush Dog" then
+		ply:EmitSound("slashco/survivor/voice/prompt_dogg"..math.random(1,3)..".mp3")
+	else
+
+		for k, v in SortedPairs(SlashCoItems) do
+
+			if v.Name == t.Type then
+				local input = v.EntClass
+				local class = string.Replace( input, "sc_", "")
+
+				ply:EmitSound("slashco/survivor/voice/prompt_"..class..math.random(1,3)..".mp3")
+			end
+	
+		end
+
+	end
+
     net.Start("mantislashcoSurvivorPings")
 	net.WriteTable(t)
 	net.Broadcast()
@@ -59,18 +84,10 @@ function PlayGlobalSound(sound, level, ent, vol)
 
 end
 
-SlashCo.BroadcastSlasherData = function()
-
-    net.Start("mantislashcoGiveSlasherData")
-	net.WriteTable(SlashCo.CurRound.SlasherData)
-	net.Broadcast()
-
-end
-
 SlashCo.BroadcastLobbySlasherInformation = function()
 
     net.Start("mantislashcoLobbySlasherInformation")
-	net.WriteTable({ player = SlashCo.LobbyData.AssignedSlasher, slasher = SlashCo.SlasherData[SlashCo.LobbyData.FinalSlasherID].Name })
+	net.WriteTable({ player = SlashCo.LobbyData.AssignedSlasher, slasher = SlashCoSlasher[SlashCo.LobbyData.PickedSlasher].Name })
 	net.Broadcast()
 
 end
@@ -80,6 +97,18 @@ SlashCo.BroadcastCurrentRoundData = function()
     net.Start("mantislashcoSendRoundData")
 	net.WriteTable({survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData.OfferingName})
 	net.Broadcast()
+
+	net.Start("mantislashcoGiveSlasherData")
+	local send_t = {}
+
+	send_t.GameProgress = SlashCo.CurRound.GameProgress
+	send_t.AllSurvivors = SlashCo.CurRound.SlasherData.AllSurvivors
+	send_t.AllSlashers = SlashCo.CurRound.SlasherData.AllSlashers
+	send_t.GameReadyToBegin = false
+
+	net.WriteTable(send_t)
+	net.Broadcast()
+
 
 end
 

@@ -364,29 +364,25 @@ function lobbyRoundSetup()
 
 	--Difficulty-based Slasher Selection:
 
+	local rand_name = GetRandomSlasher()
+
 	if SlashCo.LobbyData.SelectedDifficulty == 0 then
 
-		local rand = math.random( 1, #SlashCo.SlasherData)
-
 		SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
-		SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCo.SlasherData[rand].CLS
-		SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCo.SlasherData[rand].DNG
-		SlashCo.LobbyData.SelectedSlasherInfo.NAME = SlashCo.SlasherData[rand].NAME
-		SlashCo.LobbyData.SelectedSlasherInfo.TIP = SCInfo.Slasher[rand].ProTip
+		SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCoSlasher[rand_name].Class
+		SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCoSlasher[rand_name].DangerLevel
+		SlashCo.LobbyData.SelectedSlasherInfo.NAME = SlashCoSlasher[rand_name].Name
+		SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlasher[rand_name].ProTip
 
-		SlashCo.LobbyData.FinalSlasherID = rand
+		SlashCo.LobbyData.PickedSlasher = rand_name
 
 	elseif SlashCo.LobbyData.SelectedDifficulty == 1 then
 
-		local rand = math.random( 1, #SlashCo.SlasherData)
-
-		SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCo.SlasherData[rand].CLS
+		SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCoSlasher[rand_name].Class
 
 	elseif SlashCo.LobbyData.SelectedDifficulty == 2 then
 
-		local rand = math.random( 1, #SlashCo.SlasherData)
-
-		SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCo.SlasherData[rand].DNG
+		SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCoSlasher[rand_name].DangerLevel
 
 	end
 
@@ -549,10 +545,6 @@ function lobbyRoundSetup()
 	--	ply:ChatPrint("(Debug) Lobby Setup complete. Difficulty: "..SlashCo.LobbyData.SelectedDifficulty)
 	--end
 
-	net.Start("mantislashcoSendLobbyItemGlobal") 
-	net.WriteTable(SlashCo.SlasherData)
-	net.Broadcast()
-
 	if SlashCo.LobbyData.SelectedDifficulty > 0 then BeginSlasherSelection() end
 
 	end
@@ -581,7 +573,7 @@ end)
 SlashCo.ChooseTheSlasherLobby = function(id)
 
 	if SERVER then
-		SlashCo.LobbyData.FinalSlasherID = id
+		SlashCo.LobbyData.PickedSlasher = id
 		print("[SlashCo] Slasher Picked. ("..id..")")
 	end
 
@@ -773,52 +765,52 @@ function lobbySaveCurData()
 		--Clear the database before saving
 		--RunConsoleCommand("debug_datatest_delete")
 
-		if SlashCo.LobbyData.FinalSlasherID == 0 then
+		if SlashCo.LobbyData.PickedSlasher == "None" then
 			--If the slasher wasn't selected, randomize it based on possible options
 
 			:: retry ::
 
-			local rand = math.random(1, #SlashCo.SlasherData) --random id for this roll
+			local rand_name = GetRandomSlasher()
 
-			if SlashCo.LobbyData.SelectedSlasherInfo.CLS == 0 then
+			if SlashCo.LobbyData.SelectedSlasherInfo.CLS == "Unknown" then
 				--Check if the random id of slasher has the appropriate class for the difficulty
 
 				--The difficulty allows for any class.
 
 			else
 
-				if SlashCo.LobbyData.SelectedSlasherInfo.CLS ~= SlashCo.SlasherData[rand].CLS then
+				if SlashCo.LobbyData.SelectedSlasherInfo.CLS ~= SlashCoSlasher[rand_name].Class then
 					goto retry
 				end --the random slasher's class does not match.
 
 			end
 
-			if SlashCo.LobbyData.SelectedSlasherInfo.DNG == 0 then
+			if SlashCo.LobbyData.SelectedSlasherInfo.DNG == "Unknown" then
 				--Check if the random id of slasher has the appropriate danger level for the difficulty
 
 				--The difficulty allows for any danger level.
 
 			else
 
-				if SlashCo.LobbyData.SelectedSlasherInfo.DNG ~= SlashCo.SlasherData[rand].DNG then
+				if SlashCo.LobbyData.SelectedSlasherInfo.DNG ~= SlashCoSlasher[rand_name].DangerLevel then
 					goto retry
 				end --the random slasher's danger level does not match.
 
 			end
 
-			SlashCo.ChooseTheSlasherLobby(rand)
+			SlashCo.ChooseTheSlasherLobby(rand_name)
 
 		end
 
-		local slasher1id = SlashCo.LobbyData.FinalSlasherID
-		local slasher2id = math.random(1, #SlashCo.SlasherData)
+		local slasher1id = SlashCo.LobbyData.PickedSlasher
+		local slasher2id = GetRandomSlasher()
 
 		print("Now beginning database...")
 
 		if not sql.TableExists("slashco_table_basedata") then
 			--Create the database table
 
-			sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary NUMBER , SlasherIDSecondary NUMBER , SurviorGasMod NUMBER);")
+			sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary TEXT , SlasherIDSecondary TEXT , SurviorGasMod NUMBER);")
 			sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
 			sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
 
@@ -872,7 +864,7 @@ function lobbySaveCurData()
 		end
 
 		--Major data dump SOON: Duality
-		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", " .. slasher1id .. ", " .. slasher2id .. ", " .. survivorgasmod .. " );")
+		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
 
 		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			--Save the Current Survivors to the database

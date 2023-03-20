@@ -98,19 +98,7 @@ end
 
 SlashCo.MAXPLAYERS = 7
 
-SlashCo.SlasherData = {     --Information about Slashers.
-
-    --[[
-        CLS - Slasher Class
-        1 - Cryptid
-        2 - Demon
-        3 - Umbra
-
-        DNG - Danger Level
-        1 - Moderate
-        2 - Considerable
-        3 - Devastating
-    ]]
+--[[SlashCo.SlasherData = {     --Information about Slashers
 
     {
         NAME = "Bababooey",
@@ -420,7 +408,7 @@ SlashCo.SlasherData = {     --Information about Slashers.
         KillSound = "slashco/slasher/freesmiley_kill.mp3"
     }
 
-}
+}]]
 
 SlashCo.LobbyData = {
 
@@ -444,14 +432,14 @@ SlashCo.LobbyData = {
     SelectedSlasherInfo = {
 
         ID = 0,
-        CLS = 0,
-        DNG = 0,
+        CLS = "Unknown",
+        DNG = "Unknown",
         NAME = "Unknown",
         TIP = "--//--"
 
     },
     SelectedMapNum = 0,
-    FinalSlasherID = 0,
+    PickedSlasher = "None",
     --DeathwardsLeft = 0 --not used
 
 }
@@ -477,9 +465,9 @@ SlashCo.ResetCurRoundData = function()
         SlasherData = {
             AllSurvivors = {}, --This table holds all survivors loaded for this round, dead or alive, as well as their contribution value to the round. (TODO: game contribution)
             AllSlashers = {},
-            GameProgress = -1,
             GameReadyToBegin = false
         },
+        GameProgress = -1,
         SurvivorData = {
             GasCanMod = 0 --This will decrement if someone chooses a gas can to take in as an item.
             --Items = {} --not used
@@ -487,34 +475,21 @@ SlashCo.ResetCurRoundData = function()
         SlasherEntities = { --Slasher's unique entities, such as bababooey's clones.
 
         },
-        --GasCans = {}, --not used
         ExposureSpawns = {}, --This is only used in TestConfig()
-        --Batteries = {}, --not used
         Items = {},
         Helicopter = 0,
-        --AlivePlayers = {}, --not used
-        --DeadPlayers = {}, --not used
-        --SkipSlasherSpawnTimer = false, --not used
         SlashersToBeSpawned = {},
-        --Slashers = {}, --not used
-        --Spectators = {}, --not used
-        --SurvivorCount = 0, --not used
+        Slashers = {},
         GeneratorCount = 2, --may not need to be here (Def 2)
         GasCanCount = 8,
         ItemCount = 6,
         roundOverToggle = false, --weird
-        --SlasherSpawned = false, --not used
-        --SummonHelicopter = false, --not used
-        --EscapeHelicopterLanded = false, --not used
         HelicopterSpawnPosition = Vector(0,0,0),
         HelicopterInitialSpawnPosition = Vector(0,0,0),
         HelicopterTargetPosition = Vector(0,0,0),
         HelicopterRescuedPlayers = {}, --need opt
-        --AllowRoundEndSequence = false, --not used
         EscapeHelicopterSummoned = false,
-        --EscapeHelicopterSpawned = false, --not used
         DistressBeaconUsed = false,
-        --IsRadioTalkEnabled = false, --not used
     }
 end
 SlashCo.ResetCurRoundData()
@@ -585,16 +560,16 @@ SlashCo.LoadCurRoundData = function()
                     break
                 end
 
-                SlashCo.InsertSlasherToTable(id)
+                table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id })
 
                 timer.Simple(1, function()
 
                     print("[SlashCo] Selecting Slasher for player with id: " .. id)
                     if s == 1 then
-                        SlashCo.SelectSlasher(tonumber(slasher1id), id)
+                        SlashCo.SelectSlasher(slasher1id, id)
                     end
                     if s == 2 then
-                        SlashCo.SelectSlasher(tonumber(slasher2id), id)
+                        SlashCo.SelectSlasher(slasher2id, id)
                     end
 
                 end)
@@ -740,9 +715,9 @@ SlashCo.LoadCurRoundTeams = function()
                         playercur:SetTeam(TEAM_SPECTATOR)
                         playercur:Spawn()
 
-
-
                         table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
+
+                        table.insert(SlashCo.CurRound.SlasherData.AllSlashers, {s_id = playercur:SteamID64()})
 
                     end
                 end
@@ -1445,12 +1420,12 @@ SlashCo.SpawnCurConfig = function(isDebug)
         --Decide if what and if items should be spawned according to the selected slasher
         for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 
-            local slashid = SlashCo.CurRound.SlasherData[p:SteamID64()].SlasherID
+            local slashid = SlashCo.CurRound.Slashers[p:SteamID64()].SlasherID
 
             local itemClass
-            if slashid == 2 then
+            if slashid == "Sid" then
                 itemClass = "sc_cookie"
-            elseif slashid == 5 then
+            elseif slashid == "Thirsty" then
                 itemClass = "sc_milkjug"
             end
 
@@ -1468,7 +1443,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             end
 
-            slashergasmod = slashergasmod + SlashCo.CurRound.SlasherData[p:SteamID64()].GasCanMod
+            slashergasmod = slashergasmod + SlashCo.CurRound.Slashers[p:SteamID64()].GasCanMod
 
         end
 
@@ -1498,7 +1473,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         SlashCo.CurRound.roundOverToggle = true
         GAMEMODE.State = GAMEMODE.States.IN_GAME
-        SlashCo.CurRound.SlasherData.GameProgress = 0
+        SlashCo.CurRound.GameProgress = 0
 
         SlashCo.UpdateHelicopterSeek( SlashCo.CurRound.HelicopterIntroPosition )
 
@@ -1513,8 +1488,6 @@ SlashCo.SpawnCurConfig = function(isDebug)
         end)
 
         SlashCo.RoundHeadstart()
-
-        SlashCo.BroadcastSlasherData()
     end
 end
 

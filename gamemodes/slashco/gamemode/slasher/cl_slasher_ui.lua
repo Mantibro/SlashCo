@@ -1,4 +1,4 @@
-hook.Add("HUDPaint", "BaseSlasherHUD", function()
+--[[hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 	local ply = LocalPlayer()
 
@@ -880,3 +880,6 @@ hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
 
 	DrawColorModify( tab ) --Draws Color Modify effect
 end )
+
+
+]]

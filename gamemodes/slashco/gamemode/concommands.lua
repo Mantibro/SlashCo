@@ -77,8 +77,8 @@ concommand.Add("slashco_debug_datatest_makedummy", function(ply, _, _)
             local diff = SlashCo.LobbyData.SelectedDifficulty
             local offer = SlashCo.LobbyData.Offering
             local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
-            local slasher1id = SlashCo.LobbyData.FinalSlasherID
-            local slasher2id = math.random(1, #SlashCo.SlasherData)
+            local slasher1id = SlashCo.LobbyData.PickedSlasher
+            local slasher2id = GetRandomSlasher()
 
             sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary NUMBER , SlasherIDSecondary NUMBER , SurviorGasMod NUMBER);")
             sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")

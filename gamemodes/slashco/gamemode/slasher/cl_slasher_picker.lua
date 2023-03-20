@@ -1,23 +1,15 @@
-net.Receive("mantislashcoSendLobbyItemGlobal", function()
-
-	SlasherData = net.ReadTable()
-
-end)
-
 net.Receive("mantiSlashCoPickingSlasher", function()
 
 	readtable = net.ReadTable()
 
-	if SlasherData == nil then return end
-
 	SlasherIcon = "slashco/ui/icons/slasher/s_0"
-	SelectedSlasher = 0
+	SelectedSlasher = "None"
 
 	DrawTheSlasherSelectorBox()
 
 end)
 
-function SelectThisSlasher(slasherID)
+function SelectThisSlasher(slasherName)
 
 	--if LocalPlayer():SteamID64() ~= readtable.ply then return end
 
@@ -26,7 +18,7 @@ function SelectThisSlasher(slasherID)
 		SlasherSelectFrame = nil
 	end
 
-	SelectedSlasher = slasherID
+	SelectedSlasher = slasherName
 
 	DrawTheSlasherSelectorBox()
 
@@ -47,7 +39,7 @@ function SlasherChosen(My_Pick)
 	net.WriteTable({pick = My_Pick})
 	net.SendToServer()
 
-	print("Slasher chosen with the ID of "..My_Pick)
+	print("Slasher chosen with the Name of "..My_Pick)
 
 end
 
@@ -66,7 +58,7 @@ function DrawTheSlasherSelectorBox()
 
 	if ( IsValid( SlasherSelectFrame ) ) then print("not valid!") return end
 
-	--if  SlasherPickingID ~= 0 then SlasherChosen(SlasherPickingID) return end
+	if  SlasherPickingID ~= 0 then SlasherChosen(SlasherPickingID) return end
 	
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create( "DFrame" )
@@ -74,18 +66,21 @@ function DrawTheSlasherSelectorBox()
 
 	local y = 30
 	local diff = PickDifficulty
-	for i = 1, #SlasherData do
+
+	for k, v in pairs( SlashCoSlasher ) do
 	
+
+
 		local Slash = vgui.Create( "DButton", SlasherSelectFrame )
-		function Slash.DoClick() SelectThisSlasher(i) end
+		function Slash.DoClick() SelectThisSlasher(k) end
 		Slash:SetPos( 30, y )
 		Slash:SetSize( 200, 30 )
-		Slash:SetText( SlasherData[i].NAME )
+		Slash:SetText( v.Name )
 		Slash:SetFont( "MenuFont1" )
 
 		if SlasherPickingCLASS > 0 then
 			
-			if SlasherData[i].CLS ~= SlasherPickingCLASS  then --not the desired class
+			if v.Class ~= SlasherPickingCLASS  then --not the desired class
 				Slash:SetDisabled( true )
 			end
 
@@ -93,7 +88,7 @@ function DrawTheSlasherSelectorBox()
 
 		if SlasherPickingDANGER > 0 then
 			
-			if SlasherData[i].DNG ~= SlasherPickingDANGER  then --not the desired danger
+			if v.DangerLevel ~= SlasherPickingDANGER  then --not the desired danger
 				Slash:SetDisabled( true )
 			end
 
@@ -101,9 +96,9 @@ function DrawTheSlasherSelectorBox()
 			
 		y = y + 40
 
-		if SelectedSlasher == i  then
+		if SelectedSlasher == k  then
 			Slash:SetDisabled( true )
-			SlasherIcon = "slashco/ui/icons/slasher/s_"..SelectedSlasher
+			SlasherIcon = "slashco/ui/icons/slasher/s_"..SlashCoSlasher[SelectedSlasher].ID
 		end
 		
 	end
@@ -115,11 +110,11 @@ function DrawTheSlasherSelectorBox()
 	confirmselect:SetText( "Confirm" )
 	confirmselect:SetFont( "MenuFont1" )
 
-	if SelectedItem == 0  then
+	if SelectedSlasher == "None"  then
 		confirmselect:SetDisabled( true )
 	end
 
-	SlasherSelectFrame:SetSize( 900, 500 + y )
+	SlasherSelectFrame:SetSize( 900, 1000 )
 	SlasherSelectFrame:Center()
 	SlasherSelectFrame:MakePopup()
 	SlasherSelectFrame:SetKeyboardInputEnabled( false )
@@ -147,11 +142,11 @@ function DrawTheSlasherSelectorBox()
 	ISDesc:SetPos( 250, 650 )
 	ISDesc:SetSize(650, 100)
 
-	if SelectedSlasher > 0 then 
-		ILabel:SetText( SCInfo.Slasher[SelectedSlasher].Name ) 
-		ISDesc:SetText( SCInfo.Slasher[SelectedSlasher].Description.."\n\nSpeed: "..SCInfo.Slasher[SelectedSlasher].SpeedRating.."\nEyesight: "..SCInfo.Slasher[SelectedSlasher].EyeRating.."\nDifficulty: "..SCInfo.Slasher[SelectedSlasher].DiffRating ) 
-		ISClass:SetText( "Class: "..SCInfo.Slasher[SelectedSlasher].Class ) 
-		ISDanger:SetText( "Danger Level: "..SCInfo.Slasher[SelectedSlasher].Danger) 
+	if SelectedSlasher ~= "None" then 
+		ILabel:SetText( SlashCoSlasher[SelectedSlasher].Name ) 
+		ISDesc:SetText(SlashCoSlasher[SelectedSlasher].Description.."\n\nSpeed: "..SlashCoSlasher[SelectedSlasher].SpeedRating.."\nEyesight: "..SlashCoSlasher[SelectedSlasher].EyeRating.."\nDifficulty: "..SlashCoSlasher[SelectedSlasher].DiffRating ) 
+		ISClass:SetText( "Class: "..SlashCoSlasher[SelectedSlasher].Class ) 
+		ISDanger:SetText( "Danger Level: "..SlashCoSlasher[SelectedSlasher].DangerLevel) 
 	else
 		ILabel:SetText( "" ) 
 		ISDesc:SetText( "" ) 
