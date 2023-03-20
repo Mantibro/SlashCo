@@ -297,16 +297,8 @@ do
 
         local txtcolor = color_white
 
-        local s_cls_t = "Unknown"
-        local s_dng_t = "Unknown"
-
-        if s_cls == 1 then s_cls_t = "Cryptid"
-        elseif s_cls == 2 then s_cls_t = "Demon"
-        elseif s_cls == 3 then s_cls_t = "Umbra" end
-
-        if s_dng == 1 then s_dng_t = "Moderate"
-        elseif s_dng == 2 then s_dng_t = "Considerable"
-        elseif s_dng == 3 then s_dng_t = "Devastating" end
+        local s_cls_t = TranslateSlasherClass(s_cls)
+        local s_dng_t = TranslateDangerLevel(s_dng)
 
 		surface.SetDrawColor( 0, 0, 0, 255 )
 		surface.DrawRect( -monitorsize/2, -monitorsize/2, monitorsize, monitorsize)

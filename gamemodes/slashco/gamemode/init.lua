@@ -256,13 +256,19 @@ hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, _ )
 
 	if ply:Team() == TEAM_SLASHER then
 
-		if SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherID == 6 and SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherValue1 == 0 then
+		if type( SlashCoSlasher[ply:SteamID64()].PickUpAttempt ) == "function" then
+
+			return SlashCoSlasher[ply:SteamID64()].PickUpAttempt(ply)
+
+		end
+
+		--[[if SlashCoSlasher[ply:SteamID64()].ID == 6 and ply.SlasherValue1 == 0 then
 			return false
 		end
 
-		if SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherID == 7 and SlashCo.CurRound.SlasherData[ply:SteamID64()].SlasherValue1 == 0 then
+		if SlashCoSlasher[ply:SteamID64()].ID == 7 and ply.SlasherValue1 == 0 then
 			return false
-		end
+		end]]
 
 	end
 

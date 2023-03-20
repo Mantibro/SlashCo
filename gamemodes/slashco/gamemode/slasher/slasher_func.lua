@@ -82,10 +82,6 @@ SlashCo.SpawnSlasher = function()
                     p:SetPos( pos )
                     p:SetAngles( ang )
 
-                    p.ChaseActivationCooldown = 0
-                    p.KillDelayTick = 0
-                    p.CurrentChaseTick = 0
-
                     SlashCo.OnSlasherSpawned(p)
                 end
 
@@ -111,6 +107,15 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     ply:SetRunSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
     ply:SetWalkSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
+
+    ply.ChaseActivationCooldown = 0
+    ply.KillDelayTick = 0
+    ply.CurrentChaseTick = 0
+    ply.SlasherValue1 = 0
+    ply.SlasherValue2 = 0
+    ply.SlasherValue3 = 0
+    ply.SlasherValue4 = 0
+    ply.SlasherValue5 = 0
 
     SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn(ply)
 
@@ -339,7 +344,7 @@ SlashCo.Jumpscare = function(slasher)
         if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
 
             target:SetNWBool("SurvivorBeingJumpscared",true)
-            target:SetNWBool("SurvivorJumpscare_"..SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID, true)
+            target:SetNWBool("SurvivorJumpscare_"..SlashCoSlasher[slasher:GetNWBool("Slasher")].ID, true)
 
             slasher:SetNWBool("CanChase", false)
 

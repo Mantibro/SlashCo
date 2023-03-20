@@ -69,7 +69,7 @@ function DrawTheSlasherSelectorBox()
 
 	for k, v in pairs( SlashCoSlasher ) do
 	
-
+		if not v.IsSelectable then continue end
 
 		local Slash = vgui.Create( "DButton", SlasherSelectFrame )
 		function Slash.DoClick() SelectThisSlasher(k) end
@@ -145,8 +145,8 @@ function DrawTheSlasherSelectorBox()
 	if SelectedSlasher ~= "None" then 
 		ILabel:SetText( SlashCoSlasher[SelectedSlasher].Name ) 
 		ISDesc:SetText(SlashCoSlasher[SelectedSlasher].Description.."\n\nSpeed: "..SlashCoSlasher[SelectedSlasher].SpeedRating.."\nEyesight: "..SlashCoSlasher[SelectedSlasher].EyeRating.."\nDifficulty: "..SlashCoSlasher[SelectedSlasher].DiffRating ) 
-		ISClass:SetText( "Class: "..SlashCoSlasher[SelectedSlasher].Class ) 
-		ISDanger:SetText( "Danger Level: "..SlashCoSlasher[SelectedSlasher].DangerLevel) 
+		ISClass:SetText( "Class: ".. TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class) ) 
+		ISDanger:SetText( "Danger Level: "..TranslateDangerLevel(SlashCoSlasher[SelectedSlasher].DangerLevel)) 
 	else
 		ILabel:SetText( "" ) 
 		ISDesc:SetText( "" ) 

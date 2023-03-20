@@ -27,11 +27,11 @@ SlashCoSlasher.Bababooey.EyeRating = "★★★☆☆"
 SlashCoSlasher.Bababooey.DiffRating = "★☆☆☆☆"
 
 SlashCoSlasher.Bababooey.OnSpawn = function(slasher)
-    slasher.SlasherValue1 = 0
-    slasher.SlasherValue2 = 0
-    slasher.SlasherValue3 = 0
-    slasher.SlasherValue4 = 0
-    slasher.SlasherValue5 = 0
+
+end
+
+SlashCoSlasher.Bababooey.PickUpAttempt = function(ply)
+    return false
 end
 
 SlashCoSlasher.Bababooey.OnTickBehaviour = function(slasher)
@@ -70,7 +70,6 @@ end
 SlashCoSlasher.Bababooey.OnSecondaryFire = function(slasher)
     SlashCo.StartChaseMode(slasher)
 end
-
 
 SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
 
