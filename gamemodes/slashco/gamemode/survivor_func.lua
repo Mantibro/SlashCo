@@ -25,9 +25,17 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, key)
                 lookent:SetKeyValue( "opendir", "2" )
             end
 
-            lookent:Fire("SetSpeed", 750)
+            lookent:Fire("SetSpeed", 1000)
             lookent:Fire("Open")
-            --lookent:Fire("OpenAwayFrom", ply)
+            timer.Simple(0.1, function()
+                lookent:Fire("SetSpeed", 1)
+                lookent:Fire("Open")
+            end)
+           
+            for i = 1, 10 do
+                timer.Simple(i/8, function() lookent:Fire("Open") end)
+            end
+
             timer.Simple(0.5, function() 
 
                 lookent:Fire("SetSpeed", 100) 

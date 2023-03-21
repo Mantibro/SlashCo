@@ -48,6 +48,8 @@ net.Receive("mantislashcoSurvivorPreparePing", function()
 		ply:EmitSound("slashco/survivor/voice/prompt_helicopter"..math.random(1,3)..".mp3")
 	elseif t.Type == "Plush Dog" then
 		ply:EmitSound("slashco/survivor/voice/prompt_dogg"..math.random(1,3)..".mp3")
+	elseif t.Type == "Basketball" then
+		ply:EmitSound("slashco/survivor/voice/prompt_ballin"..math.random(1,3)..".mp3")
 	else
 
 		for k, v in SortedPairs(SlashCoItems) do

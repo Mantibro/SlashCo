@@ -308,6 +308,9 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 					ping_info.Type = "Step Decoy"
 				elseif lookfinal:GetClass() == "sc_dogg" then
 					ping_info.Type = "Plush Dog"
+				elseif lookfinal:GetModel() == "models/ldi/basketball.mdl" then
+					ping_info.Type = "Basketball"
+					ping_info.ExpiryTime = 15
 				elseif lookfinal:IsPlayer() then
 					if lookfinal:Team() == TEAM_SURVIVOR then
 						ping_info.Type = "SURVIVOR"
