@@ -148,6 +148,8 @@ SlashCoSlasher.Sid.OnPrimaryFire = function(slasher)
 
     local spread = slasher.SlasherValue4
 
+    local dist = SlashCoSlasher.Sid.KillDistance
+
     if slasher:GetNWBool("SidGunAimed") and spread < 2.4 then
 
         slasher:SetNWBool("SidGunShoot",false)
@@ -530,19 +532,57 @@ end
 
 if CLIENT then
 
-    SlashCoSlasher.Sid.PlayerJumpscare = function()
+    local f
 
-        if f == nil then f = 0 end
-        if f < 39 then f = f+(FrameTime()*30) end
+    hook.Add("HUDPaint", SlashCoSlasher.Sid.Name.."_Jumpscare", function()
 
-        local Overlay = Material("slashco/ui/overlays/jumpscare_2")
-        Overlay:SetInt( "$frame", math.floor(f) )
+        if LocalPlayer():GetNWBool("SurvivorJumpscare_Sid") == true  then
 
-        surface.SetDrawColor(255,255,255,255)	
-        surface.SetMaterial(Overlay)
-        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+            if LocalPlayer().sid_f == nil then LocalPlayer().sid_f = 0 end
+            if LocalPlayer().sid_f < 39 then LocalPlayer().sid_f = LocalPlayer().sid_f+(FrameTime()*30) end
 
-    end
+            local Overlay = Material("slashco/ui/overlays/jumpscare_2")
+            Overlay:SetInt( "$frame", math.floor(LocalPlayer().sid_f) )
+
+            surface.SetDrawColor(255,255,255,255)	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        else
+            LocalPlayer().sid_f = nil
+        end
+
+        if LocalPlayer():GetNWBool("SidFuck") == true  then
+            local Overlay = Material("slashco/ui/overlays/sid_fuck")
+    
+            surface.SetDrawColor(255,255,255,60)	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+    
+            if c == nil then
+                surface.PlaySound("slashco/slasher/sid_rage_drone.mp3")
+                c = true
+            end
+    
+        end
+    
+
+    end)
+
+    hook.Add("CalcView", "SidExecution", function(ply, pos, angles, fov)
+
+        if ply:Team() ~= TEAM_SURVIVOR then return end
+    
+        if ply:GetNWBool("SurvivorSidExecution") then
+    
+            pos = ply:LocalToWorld( Vector(120,120,60) )
+            angles = ply:LocalToWorldAngles( Angle(0,-135,0) )
+    
+            return GAMEMODE:CalcView(ply, pos, angles, fov)
+        else
+            return
+        end
+    
+    end)
 
     local SidGunInactive = Material("slashco/ui/icons/slasher/s_2_a1_disabled")
     local SidGunUnavailable = Material("slashco/ui/icons/slasher/s_2_a1_unavailable")
@@ -562,6 +602,8 @@ if CLIENT then
 		local is_aiming_gun =  LocalPlayer():GetNWBool("SidGunAimed")
 
         local gun_uses =  LocalPlayer():GetNWInt("SidGunUses")
+
+        local GameProgress = LocalPlayer():GetNWInt("GameProgressDisplay")
 
 		if GameProgress < 5 then
 			surface.SetMaterial(SidGunInactive)
@@ -621,6 +663,47 @@ if CLIENT then
 
     SlashCoSlasher.Sid.ClientSideEffect = function()
 
+    end
+
+end
+
+if SERVER then
+
+    SlashCo.SidRage = function(ply)
+
+        local pos = ply:GetPos()
+    
+        for i = 1, #team.GetPlayers(TEAM_SLASHER) do
+    
+            local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
+            local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+    
+            if SlashCoSlasher[slasher:GetNWBool("Slasher")].ID ~= 2 then return end
+    
+            if slasher:GetPos():Distance( pos ) > 1800 then return end
+    
+            slasher.SlasherValue1 = slasher.SlasherValue1 + 2
+    
+            PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 95, slasher, 1)
+    
+            for i = 1, #player.GetAll() do
+                local ply = player.GetAll()[i]
+                ply:SetNWBool("SidFuck",true)
+            end
+    
+            timer.Simple(3, function() 
+            
+                for i = 1, #player.GetAll() do
+                    local ply = player.GetAll()[i]
+                    ply:SetNWBool("SidFuck",false)
+                end
+    
+                PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85, slasher, 1)
+            
+            end)
+    
+        end
+    
     end
 
 end

@@ -19,7 +19,7 @@ SlashCoSlasher.Trollge.ChaseDuration = 0.0
 SlashCoSlasher.Trollge.ChaseCooldown = 3
 SlashCoSlasher.Trollge.JumpscareDuration = 2
 SlashCoSlasher.Trollge.ChaseMusic = ""
-SlashCoSlasher.Trollge.KillSound = "slashco/slasher/trollge_kill.mp3"
+SlashCoSlasher.Trollge.KillSound = "slashco/slasher/trollge_kill.wav"
 SlashCoSlasher.Trollge.Description = "The Bloodthirsty Slasher whose power grows with the amount of\nblood he has collected.\n\n-Trollge cannot see Survivors who stand still.\n-He must collect enough blood to unlock his true form.\n-He can not collect blood after the round has progressed enough."
 SlashCoSlasher.Trollge.ProTip = "-Its eyesight seems to be limited to moving objects."
 SlashCoSlasher.Trollge.SpeedRating = "★★☆☆☆"
@@ -137,6 +137,8 @@ SlashCoSlasher.Trollge.OnPrimaryFire = function(slasher)
         return 
     end
     
+    local SO = SlashCo.CurRound.OfferingData.SO
+
         if slasher.SlasherValue2 < 0.01 and not slasher:GetNWBool("TrollgeTransition") then
     
             slasher:SetNWBool("TrollgeSlashing",false)
@@ -258,20 +260,36 @@ end
 
 if CLIENT then
 
-    SlashCoSlasher.Trollge.PlayerJumpscare = function()
+    hook.Add("HUDPaint", SlashCoSlasher.Trollge.Name.."_Jumpscare", function()
 
-        if f == nil then f = 0 end
-        f = f+(FrameTime()*30)
-        if f > 86 then return end
+        if LocalPlayer():GetNWBool("SurvivorJumpscare_Trollge") == true  then
 
-        local Overlay = Material("slashco/ui/overlays/jumpscare_3")
-        Overlay:SetInt( "$frame", math.floor(f) )
+            if LocalPlayer().troll_f == nil then LocalPlayer().troll_f = 0 end
+            LocalPlayer().troll_f = LocalPlayer().troll_f+(FrameTime()*30)
+            if LocalPlayer().troll_f > 86 then return end
 
-        surface.SetDrawColor(255,255,255,255)	
-        surface.SetMaterial(Overlay)
-        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+            local Overlay = Material("slashco/ui/overlays/jumpscare_3")
+            Overlay:SetInt( "$frame", math.floor(LocalPlayer().troll_f) )
 
-    end
+            surface.SetDrawColor(255,255,255,255)	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        else
+            LocalPlayer().troll_f = nil
+        end
+
+        if LocalPlayer():GetNWBool("DisplayTrollgeTransition") == true  then
+
+            local Overlay = Material("slashco/ui/overlays/trollge_overlays")
+            Overlay:SetInt( "$frame", 0 )
+    
+            surface.SetDrawColor(255,255,255,60)	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
+        end
+
+    end)
 
     local TrollgeStage1 = Material("slashco/ui/icons/slasher/s_3_s1")
     local TrollgeStage2 = Material("slashco/ui/icons/slasher/s_3_s2")
@@ -315,7 +333,7 @@ if CLIENT then
 
             local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-            if not LocalPlayer():GetNWBool("TrollgeStage1") then
+            if not LocalPlayer():GetNWBool("TrollgeStage2") then
 
                 local l_ang = math.abs(ply:EyeAngles()[1]) + math.abs(ply:EyeAngles()[2]) + math.abs(ply:EyeAngles()[3])
 

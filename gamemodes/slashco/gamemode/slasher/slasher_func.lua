@@ -340,7 +340,7 @@ SlashCo.Jumpscare = function(slasher)
         if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
 
             target:SetNWBool("SurvivorBeingJumpscared",true)
-            target:SetNWBool("SurvivorJumpscare_"..SlashCoSlasher[slasher:GetNWBool("Slasher")].ID, true)
+            target:SetNWBool("SurvivorJumpscare_"..slasher:GetNWString("Slasher"), true)
 
             slasher:SetNWBool("CanChase", false)
 
@@ -354,7 +354,7 @@ SlashCo.Jumpscare = function(slasher)
             timer.Simple(SlashCoSlasher[slasher:GetNWBool("Slasher")].JumpscareDuration, function()
 
                 target:SetNWBool("SurvivorBeingJumpscared",false)
-                target:SetNWBool("SurvivorJumpscare_"..SlashCoSlasher[slasher:GetNWBool("Slasher")].ID, false)
+                target:SetNWBool("SurvivorJumpscare_"..slasher:GetNWString("Slasher"), false)
                 target:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 
                 slasher:Freeze(false)

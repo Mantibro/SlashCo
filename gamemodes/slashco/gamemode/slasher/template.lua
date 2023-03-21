@@ -82,9 +82,15 @@ end
 
 if CLIENT then
 
-    SlashCoSlasher.ZYZZ.PlayerJumpscare = function()
+    hook.Add("HUDPaint", SlashCoSlasher.ZYZZ.Name.."_Jumpscare", function()
 
-    end
+        if ply:GetNWBool("SurvivorJumpscare_ZYZZ") == true  then
+
+
+            
+        end
+
+    end)
 
     SlashCoSlasher.ZYZZ.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
 

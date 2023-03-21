@@ -34,43 +34,6 @@ SlashCo.ThirstyRage = function(ply)
 
 end
 
-SlashCo.SidRage = function(ply)
-
-    local pos = ply:GetPos()
-
-    for i = 1, #team.GetPlayers(TEAM_SLASHER) do
-
-        local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
-        local slasher = team.GetPlayers(TEAM_SLASHER)[i]
-
-        if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 2 then return end
-
-        if slasher:GetPos():Distance( pos ) > 1800 then return end
-
-        slasher.SlasherValue1 = slasher.SlasherValue1 + 2
-
-        PlayGlobalSound("slashco/slasher/sid_angry_"..math.random(1,4)..".mp3", 95, slasher, 1)
-
-        for i = 1, #player.GetAll() do
-            local ply = player.GetAll()[i]
-            ply:SetNWBool("SidFuck",true)
-        end
-
-        timer.Simple(3, function() 
-        
-            for i = 1, #player.GetAll() do
-                local ply = player.GetAll()[i]
-                ply:SetNWBool("SidFuck",false)
-            end
-
-            PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85, slasher, 1)
-        
-        end)
-
-    end
-
-end
-
 
 
 

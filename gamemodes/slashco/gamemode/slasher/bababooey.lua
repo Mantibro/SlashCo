@@ -209,20 +209,25 @@ end
 
 if CLIENT then
 
-    SlashCoSlasher.Bababooey.PlayerJumpscare = function()
+    hook.Add("HUDPaint", SlashCoSlasher.Bababooey.Name.."_Jumpscare", function()
 
-        if f == nil then f = 0 end
-        f = f+(FrameTime()*20)
-        if f > 45 then return end
+        if LocalPlayer():GetNWBool("SurvivorJumpscare_Bababooey") == true  then
 
-        local Overlay = Material("slashco/ui/overlays/jumpscare_1")
-        Overlay:SetInt( "$frame", math.floor(f) )
+            if LocalPlayer().baba_f == nil then LocalPlayer().baba_f = 0 end
+            LocalPlayer().baba_f = LocalPlayer().baba_f+(FrameTime()*20)
+            if LocalPlayer().baba_f > 45 then return end
 
-        surface.SetDrawColor(255,255,255,255)	
-        surface.SetMaterial(Overlay)
-        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+            local Overlay = Material("slashco/ui/overlays/jumpscare_1")
+            Overlay:SetInt( "$frame", math.floor(LocalPlayer().baba_f) )
 
-    end
+            surface.SetDrawColor(255,255,255,255)	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        else
+            f = nil
+        end
+
+    end)
 
     local BababooeyInvisible = Material("slashco/ui/icons/slasher/s_1_a1")
     local BababooeyInactiveClone = Material("slashco/ui/icons/slasher/s_1_a2_1")

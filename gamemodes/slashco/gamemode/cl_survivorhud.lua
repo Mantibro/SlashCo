@@ -39,6 +39,8 @@ end)
 
 net.Receive( "mantislashcoSurvivorPings", function( )
 
+	if LocalPlayer():Team() ~= TEAM_SURVIVOR then return end
+
 	local ping = net.ReadTable()
 
 	for i = 1, #global_pings do

@@ -3,17 +3,7 @@ include( "ui/fonts.lua" )
 
 hook.Add("HUDPaint", "SurvivorJumpscared", function()
 
-	local ply = LocalPlayer()
-
-	if ply:GetNWBool("DisplayTrollgeTransition") == true  then
-
-		local Overlay = Material("slashco/ui/overlays/trollge_overlays")
-		Overlay:SetInt( "$frame", 0 )
-
-		surface.SetDrawColor(255,255,255,60)	
-		surface.SetMaterial(Overlay)
-		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-	end
+	local ply = LocalPlayer() 
 
 	if ply:GetNWBool("ThirstyFuck") == true  then
 		local Overlay = Material("slashco/ui/overlays/thirsty_fuck")
@@ -25,20 +15,6 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		if c == nil then
 			surface.PlaySound("slashco/slasher/thirsty_rage1.mp3")
 			surface.PlaySound("slashco/slasher/thirsty_rage2.mp3")
-			c = true
-		end
-
-	end
-
-	if ply:GetNWBool("SidFuck") == true  then
-		local Overlay = Material("slashco/ui/overlays/sid_fuck")
-
-		surface.SetDrawColor(255,255,255,60)	
-		surface.SetMaterial(Overlay)
-		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-
-		if c == nil then
-			surface.PlaySound("slashco/slasher/sid_rage_drone.mp3")
 			c = true
 		end
 
@@ -59,20 +35,7 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		al = nil
 	end
 
-	if ply:GetNWBool("SurvivorJumpscare_1") == true  then
-
-		SlashCoSlasher.Bababooey.PlayerJumpscare()
-
-	elseif ply:GetNWBool("SurvivorJumpscare_2") == true then
-
-		SlashCoSlasher.Sid.PlayerJumpscare()
-
-
-	elseif ply:GetNWBool("SurvivorJumpscare_3") == true then
-
-		SlashCoSlasher.Trollge.PlayerJumpscare()
-
-	elseif ply:GetNWBool("SurvivorJumpscare_4") == true then
+	if ply:GetNWBool("SurvivorJumpscare_4") == true then
 
 		if f == nil then f = 0 end
 		f = f+(FrameTime()*20)
@@ -189,20 +152,4 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 	else
 		f = nil
 	end
-end)
-
-hook.Add("CalcView", "ThirdPersonSurvivorView", function(ply, pos, angles, fov)
-
-	if ply:Team() ~= TEAM_SURVIVOR then return end
-
-	if ply:GetNWBool("SurvivorSidExecution") then
-
-		pos = ply:LocalToWorld( Vector(120,120,60) )
-		angles = ply:LocalToWorldAngles( Angle(0,-135,0) )
-
-		return GAMEMODE:CalcView(ply, pos, angles, fov)
-	else
-		return
-	end
-
 end)

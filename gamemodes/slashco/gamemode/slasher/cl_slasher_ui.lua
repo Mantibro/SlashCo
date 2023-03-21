@@ -592,9 +592,9 @@ end
 		else
 			draw.SimpleText( "M2 - Stop Chasing", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 
-			if ChaseTick > (ChaseDur / 2) then 
+			--[[if ChaseTick > (ChaseDur / 2) then 
 				draw.SimpleText( "Look at a Survivor to maintain the chase!", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2.5), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-			end
+			end]]
 
 		end
 
