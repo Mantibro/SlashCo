@@ -71,7 +71,7 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
 
             slasher:SetRunSpeed( 280 )
             slasher:SetWalkSpeed( 150  )
-            --final_eyesight = 4
+            slasher:SetNWBool("CanKill", true)
 
             for i = 1, #player.GetAll() do
                 local ply = player.GetAll()[i]
@@ -119,6 +119,10 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
         final_eyesight = 10 - (   slasher:GetVelocity():Length() / 35 )
         final_perception = 5 - (   slasher:GetVelocity():Length() / 60 )
 
+    end
+
+    if slasher:GetNWInt("TrollgeStage") ~= v1 then
+        slasher:SetNWInt("TrollgeStage", v1)
     end
 
     slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
@@ -252,52 +256,88 @@ SlashCoSlasher.Trollge.Footstep = function(ply)
 
 end
 
-SlashCoSlasher.Trollge.PlayerJumpscare = function()
+if CLIENT then
 
-    if CLIENT then
+    SlashCoSlasher.Trollge.PlayerJumpscare = function()
 
         if f == nil then f = 0 end
-		f = f+(FrameTime()*30)
-		if f > 86 then return end
+        f = f+(FrameTime()*30)
+        if f > 86 then return end
 
-		local Overlay = Material("slashco/ui/overlays/jumpscare_3")
-		Overlay:SetInt( "$frame", math.floor(f) )
+        local Overlay = Material("slashco/ui/overlays/jumpscare_3")
+        Overlay:SetInt( "$frame", math.floor(f) )
 
-		surface.SetDrawColor(255,255,255,255)	
-		surface.SetMaterial(Overlay)
-		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        surface.SetDrawColor(255,255,255,255)	
+        surface.SetMaterial(Overlay)
+        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
     end
 
-end
+    local TrollgeStage1 = Material("slashco/ui/icons/slasher/s_3_s1")
+    local TrollgeStage2 = Material("slashco/ui/icons/slasher/s_3_s2")
+    local TrollgeClaw = Material("slashco/ui/icons/slasher/s_3_a1")
 
-SlashCoSlasher.Trollge.ClientSideEffect = function()
+    SlashCoSlasher.Trollge.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
 
-    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+        local willdrawkill = true
+        local willdrawchase = false
+        local willdrawmain = true
 
-        local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+        local trollge_stage = LocalPlayer():GetNWInt("TrollgeStage")
 
-        if not LocalPlayer():GetNWBool("TrollgeStage1") then
+        if trollge_stage == 0 then
+            willdrawkill = false
 
-            local l_ang = math.abs(ply:EyeAngles()[1]) + math.abs(ply:EyeAngles()[2]) + math.abs(ply:EyeAngles()[3])
-
-            if ply.MonitorLook == nil then ply.MonitorLook = 0 end
-
-            ply.LookSpeed = math.abs(ply.MonitorLook - l_ang) * 20
-
-            ply.MonitorLook = l_ang
-
-            ply:SetMaterial( "lights/white" )
-            ply:SetColor( Color( 255, 255, 255, (ply.LookSpeed + ply:GetVelocity():Length()) * 3) ) 
-            ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
-
+            surface.SetMaterial(TrollgeClaw)
+            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+            draw.SimpleText( "M1 - Claw", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
         else
-
-            ply:SetMaterial( "lights/white" )
-            ply:SetColor( Color( 255, 255, 255, 255 ) )
-            ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
-
+            willdrawkill = true
         end
+
+        if trollge_stage == 1 then
+            surface.SetMaterial(TrollgeStage1)
+            surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+            willdrawmain = false
+        elseif trollge_stage == 2 then
+            surface.SetMaterial(TrollgeStage2)
+            surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+            willdrawmain = false
+        end
+
+        return willdrawkill, willdrawchase, willdrawmain
+
+    end
+
+    SlashCoSlasher.Trollge.ClientSideEffect = function()
+
+        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+
+            local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+
+            if not LocalPlayer():GetNWBool("TrollgeStage1") then
+
+                local l_ang = math.abs(ply:EyeAngles()[1]) + math.abs(ply:EyeAngles()[2]) + math.abs(ply:EyeAngles()[3])
+
+                if ply.MonitorLook == nil then ply.MonitorLook = 0 end
+
+                ply.LookSpeed = math.abs(ply.MonitorLook - l_ang) * 20
+
+                ply.MonitorLook = l_ang
+
+                ply:SetMaterial( "lights/white" )
+                ply:SetColor( Color( 255, 255, 255, (ply.LookSpeed + ply:GetVelocity():Length()) * 3) ) 
+                ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
+
+            else
+
+                ply:SetMaterial( "lights/white" )
+                ply:SetColor( Color( 255, 255, 255, 255 ) )
+                ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
+
+            end
+        end
+
     end
 
 end

@@ -575,6 +575,14 @@ local Think = function()
 			end
 		end
 
+		if SlashCo.CurRound.GameProgress >= 0 then
+			for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+				if ply:GetNWInt("GameProgressDisplay") ~= SlashCo.CurRound.GameProgress then
+					ply:SetNWInt("GameProgressDisplay", SlashCo.CurRound.GameProgress)
+				end
+			end
+		end
+
 		local gens = ents.FindByClass( "sc_generator")
 		if SlashCo.CurRound and GAMEMODE.State == GAMEMODE.States.IN_GAME and #gens > 0 then
 			local runningCount = 0

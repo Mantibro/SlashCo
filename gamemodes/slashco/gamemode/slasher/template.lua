@@ -80,9 +80,23 @@ SlashCoSlasher.ZYZZ.Footstep = function(ply)
 
 end
 
-SlashCoSlasher.ZYZZ.PlayerJumpscare = function()
+if CLIENT then
 
-    if CLIENT then
+    SlashCoSlasher.ZYZZ.PlayerJumpscare = function()
+
+    end
+
+    SlashCoSlasher.ZYZZ.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+
+        local willdrawkill = true
+        local willdrawchase = true
+        local willdrawmain = true
+
+        return willdrawkill, willdrawchase, willdrawmain
+
+    end
+
+    SlashCoSlasher.ZYZZ.ClientSideEffect = function()
 
     end
 

@@ -1422,6 +1422,8 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             local slashid = SlashCo.CurRound.Slashers[p:SteamID64()].SlasherID
 
+            print("SLASHER ID: "..slashid)
+
             local itemClass
             if slashid == "Sid" then
                 itemClass = "sc_cookie"

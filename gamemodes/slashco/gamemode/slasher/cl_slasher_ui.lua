@@ -1,25 +1,27 @@
---[[hook.Add("HUDPaint", "BaseSlasherHUD", function()
+local MainIcon
+
+local ProgressBarBack = Material("slashco/ui/icons/slasher/progbar_back")
+local ProgressBarBase = Material("slashco/ui/icons/slasher/progbar_base")
+local ProgressBarIcon = Material("slashco/ui/icons/slasher/progbar_icon")
+local ProgressBarIconTop = Material("slashco/ui/icons/slasher/progbar_icon2")
+
+local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
+local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
+
+local KillIcon = Material("slashco/ui/icons/slasher/s_0")
+local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
+
+local ChaseIcon = Material("slashco/ui/icons/slasher/s_chase")
+local ChaseDisabledIcon = Material("slashco/ui/icons/slasher/chase_disabled")
+
+local SlashID = 0
+
+hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 	local ply = LocalPlayer()
 
-	if ply:Team() == TEAM_SLASHER then
+	if ply:Team() ~= TEAM_SLASHER then return end
 
-		--Fallback	
-		if SlashID == nil then
-			GameProgress = 0
-			SurvivorTeam = {}
-			SlashID = 1
-			SlashName = "ERROR"
-			Eyesight = 5
-			PerceptionReal = 1
-			CanChase = false
-			ChaseRange = 500
-			CanKill = false
-			ChaseDur = 10.0
-			ChaseTick = 0
-		end
-
-		--Range (in units) = 2.5 * SurvivorSpeed * PerceptionReal
 		local slasherpos = ply:GetPos()
 		local inchase = LocalPlayer():GetNWBool("InSlasherChaseMode")
 
@@ -29,31 +31,24 @@
 		local mainiconposx = cx/20
 		local mainiconposy = cy + (cy/2)
 
-		local GasBack = Material("slashco/ui/gas_back")
+		if SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].ID ~= SlashID then
+			SlashID = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].ID
+			MainIcon = Material("slashco/ui/icons/slasher/s_"..SlashID)
+		end
+
+		local GameProgress = LocalPlayer():GetNWInt("GameProgressDisplay")
+
+		--[[local GasBack = Material("slashco/ui/gas_back")
 		local MilkBase = Material("slashco/ui/milk_base")
 		local BloodBase = Material("slashco/ui/blood_base")
 		local GasTop = Material("slashco/ui/gas_top")
-
-		local ProgressBarBack = Material("slashco/ui/icons/slasher/progbar_back")
-		local ProgressBarBase = Material("slashco/ui/icons/slasher/progbar_base")
-		local ProgressBarIcon = Material("slashco/ui/icons/slasher/progbar_icon")
-		local ProgressBarIconTop = Material("slashco/ui/icons/slasher/progbar_icon2")
 
 		local MainIcon = Material("slashco/ui/icons/slasher/s_"..SlashID)
 
 		local GenericSlashIcon = Material("slashco/ui/icons/slasher/s_slash")
 
-		local KillIcon = Material("slashco/ui/icons/slasher/s_0")
-		local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
-
-		local ChaseIcon = Material("slashco/ui/icons/slasher/s_chase")
-		local ChaseDisabledIcon = Material("slashco/ui/icons/slasher/chase_disabled")
-
-		local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
-		local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
-
 		local CrimCloneIcon = Material("slashco/ui/icons/slasher/s_12_a1")
-		local CrimRage = Material("slashco/ui/icons/slasher/s_12_1")
+		local CrimRage = Material("slashco/ui/icons/slasher/s_12_1")]]
 
 		local willdrawkill = true
 		local willdrawchase = true
@@ -61,6 +56,9 @@
 
 		local pacified = LocalPlayer():GetNWBool("DemonPacified")
 		local blinded = LocalPlayer():GetNWBool("SlasherBlinded")
+
+		local CanKill = LocalPlayer():GetNWBool("CanKill")
+		local CanChase = LocalPlayer():GetNWBool("CanChase")
 
 		surface.SetDrawColor(255,255,255,255)	
 
@@ -85,13 +83,7 @@
 				surface.PlaySound("slashco/slashco_progress_full.mp3")
 			end
 
-			--lerper = 0.02
-
 		end
-
-		--if lerper < 1 then lerper = (lerper + (( 0.01 + ( 0.005 / lerper ) ))/5) * (1-g) end
-
-		--local gp = Lerp( g + lerper, 0, g )
 		local gp = g
 
 		g_monitor = g
@@ -139,146 +131,13 @@
 		if pacified then
 			draw.SimpleText( "(DEMON) You have been Pacified by consuming an item. You cannot Chase or Kill and your senses are dulled.", "ItemFontTip", ScrW()/2, ScrH()/4, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 		end
+
+		--Call for the HUD
+		local willdrawkill, willdrawchase, willdrawmain = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].UserInterface(cx, cy, mainiconposx, mainiconposy)
+
 		--Bababooey \/ \/ \/
 
-		if SlashID ~= 1 then goto sid end
-		do
-
-		local invis =  LocalPlayer():GetNWBool("BababooeyInvisibility")
-
-		local BababooeyInvisible = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1")
-		local BababooeyInactiveClone = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a2_1")
-		local BababooeyActiveClone = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a2")
-
-		if #ents.FindByClass( "sc_babaclone") > 0 then
-			surface.SetMaterial(BababooeyInactiveClone)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-			draw.SimpleText( "Clone Set", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-		else
-			surface.SetMaterial(BababooeyActiveClone)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.33), ScrW()/16, ScrW()/16)
-			draw.SimpleText( "F - Set Clone", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-		end
-		
-
-		if invis then 
-			surface.SetMaterial(BababooeyInvisible)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
-		end
-
-		willdrawmain = not invis
-
-		draw.SimpleText( "R - Toggle Invisibility", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-
-		end
-		--Bababooey /\ /\ /\
-		::sid::
-
-		--Sid \/ \/ \/
-		if SlashID ~= 2 then goto trollge end
-		do
-		local SidGunInactive = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1_disabled")
-		local SidGunUnavailable = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1_unavailable")
-		local SidGun = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1")
-
-		local SidGunShoot = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a2")
-		local SidGunAim = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a3")
-
-		local sid_has_gun = LocalPlayer():GetNWBool("SidGun")
-		local sid_equipped_gun = LocalPlayer():GetNWBool("SidGunEquipped")
-		local is_aiming_gun =  LocalPlayer():GetNWBool("SidGunAimed")
-
-		if GameProgress < 5 then
-			surface.SetMaterial(SidGunInactive)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-		elseif not sid_has_gun then
-			surface.SetMaterial(SidGunUnavailable)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-			draw.SimpleText( "F - Equip Gun", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-
-			draw.SimpleText( "Uses: "..V1, "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.5), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-		else
-			surface.SetMaterial(SidGun)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-			if not is_aiming_gun then 
-				draw.SimpleText( "F - Unequip Gun", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
-			else
-				draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
-			end
-		end
-
-		willdrawkill = not sid_equipped_gun
-		willdrawchase = not sid_equipped_gun
-
-		if sid_equipped_gun then
-			--icons for shooting/aiming
-
-			if not is_aiming_gun then
-				surface.SetMaterial(SidGunShoot)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
-				draw.SimpleText( "M2 - Aim", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-
-				surface.SetMaterial(SidGunAim)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
-				draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-			else
-				surface.SetMaterial(SidGunShoot)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
-				draw.SimpleText( "M2 - Lower Gun", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-
-				surface.SetMaterial(SidGunAim)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
-				draw.SimpleText( "M1 - Shoot", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-			end
-
-		end
-
-		if not sid_has_gun then
-			draw.SimpleText( "R - Eat Cookie", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-		else
-			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-		end
-
-		end
-		--Sid /\ /\ /\
-
-		::trollge::
-		--Trollge \/ \/ \/
-		if SlashID ~= 3 then goto amogus end
-		do
-			local TrollgeStage1 = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s1")
-			local TrollgeStage2 = Material("slashco/ui/icons/slasher/s_"..SlashID.."_s2")
-			local TrollgeClaw = Material("slashco/ui/icons/slasher/s_"..SlashID.."_a1")
-			
-			willdrawchase = false
-
-			if V1 == 0 then
-				willdrawkill = false
-
-				surface.SetMaterial(TrollgeClaw)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
-				draw.SimpleText( "M1 - Claw", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-			else
-				willdrawkill = true
-			end
-
-			if V1 == 1 then
-				surface.SetMaterial(TrollgeStage1)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
-				willdrawmain = false
-			elseif V1 == 2 then
-				surface.SetMaterial(TrollgeStage2)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
-				willdrawmain = false
-			end
-
-		end
-
-		--Trollge /\ /\ /\
-
-		::amogus::
-		--Amogus \/ \/ \/
+		--[[if SlashID ~= 1 then goto sid end
 
 		if SlashID ~= 4 then goto thirsty end
 		do
@@ -694,125 +553,57 @@ draw.SimpleText( math.floor(rape_val).." %", "ItemFontTip", cx+220, cy +ScrH()/4
 
 end
 
-::next::
-		--Slasher-Shared function \/ \/ \/ 
+::next::]]
+	--Slasher-Shared function \/ \/ \/ 
 
-		--Slasher Main Icon
+	--Slasher Main Icon
 
-		draw.SimpleText( SlashName, "LobbyFont2", mainiconposx+(cx/4), mainiconposy+(mainiconposy/4.25), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	local SlashName = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].Name
 
-		if not willdrawmain then goto skipmain end
+	draw.SimpleText( SlashName, "LobbyFont2", mainiconposx+(cx/4), mainiconposy+(mainiconposy/4.25), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 
-		surface.SetMaterial(MainIcon)
-		surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8)
-		::skipmain::
+	if not willdrawmain then goto skipmain end
 
-		if not willdrawkill then goto skipkill end
+	surface.SetMaterial(MainIcon)
+	surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8)
+	::skipmain::
 
-		if CanKill then
-			surface.SetMaterial(KillIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
-			draw.SimpleText( "M1 - Kill Survivor", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	if not willdrawkill then goto skipkill end
+
+	if CanKill then
+		surface.SetMaterial(KillIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "M1 - Kill Survivor", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	else
+		surface.SetMaterial(KillDisabledIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	end
+
+	::skipkill::
+
+	if not willdrawchase then goto skipchase end
+
+	if CanChase then
+		surface.SetMaterial(ChaseIcon)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
+		if not inchase then
+			draw.SimpleText( "M2 - Start Chasing", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 		else
-			surface.SetMaterial(KillDisabledIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
-			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-		end
+			draw.SimpleText( "M2 - Stop Chasing", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 
-		::skipkill::
-
-		if not willdrawchase then goto skipchase end
-
-		if CanChase then
-			surface.SetMaterial(ChaseIcon)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
-			if not inchase then
-				draw.SimpleText( "M2 - Start Chasing", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-			else
-				draw.SimpleText( "M2 - Stop Chasing", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-
-				if ChaseTick > (ChaseDur / 2) then 
-					draw.SimpleText( "Look at a Survivor to maintain the chase!", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2.5), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-				end
-
+			if ChaseTick > (ChaseDur / 2) then 
+				draw.SimpleText( "Look at a Survivor to maintain the chase!", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2.5), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 			end
 
-		else
-			surface.SetMaterial(ChaseDisabledIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
-			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
 		end
+
+	else
+		surface.SetMaterial(ChaseDisabledIcon)
+		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
+		draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+	end
 
 		::skipchase::
-
-		local PerceptionReal = Perception
-
-		if inchase then PerceptionReal = 0 end
-
-		local StepNotice = Material("slashco/ui/particle/step_notice")
-		if timeSinceLast == nil then timeSinceLast = 0 end
-		timeSinceLast = timeSinceLast + FrameTime()/3
-		if timeSinceLast > 0.2 then timeSinceLast = 0 end 
-		--Survivor Step Notice
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-
-			local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-			if survivor:GetNWBool("BGoneSoda") or survivor:GetNWString("item", "none") == "Rock" then goto gone end
-
-			local vel = (survivor:GetVelocity()):Length()
-
-			local range = 3 * vel * PerceptionReal
-
-			local pos = survivor:GetPos()
-
-			local em = ParticleEmitter(pos)
-    		local part = em:Add(	StepNotice,	pos	) 
-
-    		if part and timeSinceLast == 0 and  (  slasherpos	):Distance(	pos	) < range and survivor:IsOnGround() then 
-          		part:SetColor(255,255,255,math.random(255))
-          		part:SetVelocity(Vector(math.random(-1,1),math.random(-1,1),math.random(-1,1)):GetNormal() * 20)
-          		part:SetDieTime(1)
-          		part:SetLifeTime(0)
-          		part:SetStartSize(25)
-          		part:SetEndSize(0)
-    		end
-
-			em:Finish()
-
-			::gone::
-			
-		end
-
-		--Step Decoy Step Notice
-		for i = 1, #ents.FindByClass( "sc_stepdecoy" ) do
-
-			local boot = ents.FindByClass( "sc_stepdecoy" )[i]
-
-			local vel = 300
-
-			local range = 3 * vel * PerceptionReal
-
-			local offsetpos = Vector(math.random(-2, 2),math.random(-2, 2),0)
-
-			local pos = boot:GetPos() + offsetpos
-
-			local em = ParticleEmitter(pos)
-    		local part = em:Add(	StepNotice,	pos	) 
-
-    		if part and timeSinceLast == 0 and  (  slasherpos	):Distance(	pos	) < range then 
-          		part:SetColor(255,255,255,math.random(255))
-          		part:SetVelocity(Vector(math.random(-1,1),math.random(-1,1),math.random(-1,1)):GetNormal() * 20)
-          		part:SetDieTime(1)
-          		part:SetLifeTime(0)
-          		part:SetStartSize(25)
-          		part:SetEndSize(0)
-    		end
-			
-			em:Finish()
-
-		end
-
-	end
 	
-end)]]
+end)

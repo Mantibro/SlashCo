@@ -207,25 +207,61 @@ SlashCoSlasher.Bababooey.Footstep = function(ply)
 
 end
 
-SlashCoSlasher.Bababooey.PlayerJumpscare = function()
+if CLIENT then
 
-    if CLIENT then
+    SlashCoSlasher.Bababooey.PlayerJumpscare = function()
 
         if f == nil then f = 0 end
-		f = f+(FrameTime()*20)
-		if f > 45 then return end
+        f = f+(FrameTime()*20)
+        if f > 45 then return end
 
-		local Overlay = Material("slashco/ui/overlays/jumpscare_1")
-		Overlay:SetInt( "$frame", math.floor(f) )
+        local Overlay = Material("slashco/ui/overlays/jumpscare_1")
+        Overlay:SetInt( "$frame", math.floor(f) )
 
-		surface.SetDrawColor(255,255,255,255)	
-		surface.SetMaterial(Overlay)
-		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        surface.SetDrawColor(255,255,255,255)	
+        surface.SetMaterial(Overlay)
+        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
     end
 
-end
+    local BababooeyInvisible = Material("slashco/ui/icons/slasher/s_1_a1")
+    local BababooeyInactiveClone = Material("slashco/ui/icons/slasher/s_1_a2_1")
+    local BababooeyActiveClone = Material("slashco/ui/icons/slasher/s_1_a2")
 
-SlashCoSlasher.Bababooey.ClientSideEffect = function()
+    SlashCoSlasher.Bababooey.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+
+        local willdrawkill = true
+        local willdrawchase = true
+        local willdrawmain = true
+
+        local invis =  LocalPlayer():GetNWBool("BababooeyInvisibility")
+
+        if #ents.FindByClass( "sc_babaclone") > 0 then
+            surface.SetMaterial(BababooeyInactiveClone)
+            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+            draw.SimpleText( "Clone Set", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+        else
+            surface.SetMaterial(BababooeyActiveClone)
+            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.33), ScrW()/16, ScrW()/16)
+            draw.SimpleText( "F - Set Clone", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+        end
+            
+
+        if invis then 
+            surface.SetMaterial(BababooeyInvisible)
+            surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
+        end
+
+        willdrawmain = not invis
+
+        draw.SimpleText( "R - Toggle Invisibility", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+        return willdrawkill, willdrawchase, willdrawmain
+
+    end
+
+    SlashCoSlasher.Bababooey.ClientSideEffect = function()
+
+    end
 
 end

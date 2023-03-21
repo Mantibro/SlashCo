@@ -130,6 +130,10 @@ SlashCoSlasher.Sid.OnTickBehaviour = function(slasher)
 
         end
 
+    if slasher:GetNWInt("SidGunUses") ~= v1 then
+        slasher:SetNWInt("SidGunUses", v1)
+    end
+
     slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
     slasher:SetNWInt("Slasher_Perception", final_perception)
 
@@ -524,24 +528,99 @@ SlashCoSlasher.Sid.Footstep = function(ply)
 
 end
 
-SlashCoSlasher.Sid.PlayerJumpscare = function()
+if CLIENT then
 
-    if CLIENT then
+    SlashCoSlasher.Sid.PlayerJumpscare = function()
 
         if f == nil then f = 0 end
-		if f < 39 then f = f+(FrameTime()*30) end
+        if f < 39 then f = f+(FrameTime()*30) end
 
-		local Overlay = Material("slashco/ui/overlays/jumpscare_2")
-		Overlay:SetInt( "$frame", math.floor(f) )
+        local Overlay = Material("slashco/ui/overlays/jumpscare_2")
+        Overlay:SetInt( "$frame", math.floor(f) )
 
-		surface.SetDrawColor(255,255,255,255)	
-		surface.SetMaterial(Overlay)
-		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        surface.SetDrawColor(255,255,255,255)	
+        surface.SetMaterial(Overlay)
+        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
     end
 
-end
+    local SidGunInactive = Material("slashco/ui/icons/slasher/s_2_a1_disabled")
+    local SidGunUnavailable = Material("slashco/ui/icons/slasher/s_2_a1_unavailable")
+    local SidGun = Material("slashco/ui/icons/slasher/s_2_a1")
 
-SlashCoSlasher.Sid.ClientSideEffect = function()
+    local SidGunShoot = Material("slashco/ui/icons/slasher/s_2_a2")
+    local SidGunAim = Material("slashco/ui/icons/slasher/s_2_a3")
+
+    SlashCoSlasher.Sid.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+
+        local willdrawkill = true
+        local willdrawchase = true
+        local willdrawmain = true
+
+		local sid_has_gun = LocalPlayer():GetNWBool("SidGun")
+		local sid_equipped_gun = LocalPlayer():GetNWBool("SidGunEquipped")
+		local is_aiming_gun =  LocalPlayer():GetNWBool("SidGunAimed")
+
+        local gun_uses =  LocalPlayer():GetNWInt("SidGunUses")
+
+		if GameProgress < 5 then
+			surface.SetMaterial(SidGunInactive)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		elseif not sid_has_gun then
+			surface.SetMaterial(SidGunUnavailable)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+			draw.SimpleText( "F - Equip Gun", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+			draw.SimpleText( "Uses: "..gun_uses, "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.5), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		else
+			surface.SetMaterial(SidGun)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
+			if not is_aiming_gun then 
+				draw.SimpleText( "F - Unequip Gun", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+			else
+				draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
+			end
+		end
+
+		willdrawkill = not sid_equipped_gun
+		willdrawchase = not sid_equipped_gun
+
+		if sid_equipped_gun then
+			--icons for shooting/aiming
+
+			if not is_aiming_gun then
+				surface.SetMaterial(SidGunShoot)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
+				draw.SimpleText( "M2 - Aim", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+				surface.SetMaterial(SidGunAim)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+				draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+			else
+				surface.SetMaterial(SidGunShoot)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/2), ScrW()/16, ScrW()/16)
+				draw.SimpleText( "M2 - Lower Gun", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+				surface.SetMaterial(SidGunAim)
+				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
+				draw.SimpleText( "M1 - Shoot", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+			end
+
+		end
+
+		if not sid_has_gun then
+			draw.SimpleText( "R - Eat Cookie", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		else
+			draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		end
+
+        return willdrawkill, willdrawchase, willdrawmain
+
+    end
+
+    SlashCoSlasher.Sid.ClientSideEffect = function()
+
+    end
 
 end
