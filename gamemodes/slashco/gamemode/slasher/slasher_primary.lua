@@ -8,43 +8,6 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     local dist = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDistance
 
-
-    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 4 or not slasher:GetNWBool("AmogusSurvivorDisguise") then return end
-do
-
-    if slasher:GetEyeTrace().Entity:IsPlayer() then
-        local target = slasher:GetEyeTrace().Entity	
-
-        if target:Team() ~= TEAM_SURVIVOR then return end
-
-        if SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick > 0 then return end
-
-        if slasher:GetVelocity():Length() > 1 then return end
-
-        if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
-
-            target:SetNWBool("SurvivorBeingJumpscared",true)
-
-            slasher:EmitSound("slashco/slasher/amogus_stealthkill.mp3",60)
-
-            target:Freeze(true)
-            slasher:Freeze(true)
-
-            SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelay
-
-            timer.Simple(1.25, function()
-                target:SetNWBool("SurvivorBeingJumpscared",false)
-                slasher:Freeze(false)
-                target:Freeze(false)
-                target:Kill()     
-            end)
-        end
-
-    end
-
-end
-
-
 do
 
     if slasher.SlasherValue4 < 0.01 then

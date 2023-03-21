@@ -84,7 +84,7 @@ if CLIENT then
 
     hook.Add("HUDPaint", SlashCoSlasher.ZYZZ.Name.."_Jumpscare", function()
 
-        if ply:GetNWBool("SurvivorJumpscare_ZYZZ") == true  then
+        if LocalPlayer():GetNWBool("SurvivorJumpscare_ZYZZ") == true  then
 
 
             

@@ -45,38 +45,6 @@ end
 
 SlashCo.NEVERDOTHIS = function()
 
-
-    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 4 then goto THIRSTY end
-    --Amogus' Abilities
-do
-    v1 = slasher.SlasherValue1 --Transformation type
-    v2 = slasher.SlasherValue2 --Transform cooldown
-    v3 = slasher.SlasherValue3 --Fuel Can EntIndex
-
-    if IsValid(ents.GetByIndex(slasher.SlasherValue3)) then
-        ents.GetByIndex(slasher.SlasherValue3):SetAngles(Angle(0,slasher:EyeAngles()[2],0))
-    end
-
-    if v2 > 0 then 
-        slasher.SlasherValue2 = v2 - FrameTime() 
-        SlashCoSlasher[slasher:GetNWBool("Slasher")].CanKill = false
-        --SlashCoSlasher[slasher:GetNWBool("Slasher")].CanChase = false
-    else
-        if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
-            SlashCoSlasher[slasher:GetNWBool("Slasher")].CanKill = true
-            SlashCoSlasher[slasher:GetNWBool("Slasher")].CanChase = true
-            slasher.SlasherValue3 = 0
-        else
-            SlashCoSlasher[slasher:GetNWBool("Slasher")].CanKill = false
-            SlashCoSlasher[slasher:GetNWBool("Slasher")].CanChase = false
-        end
-    end   
-    
-    
-end
-    ::THIRSTY::
-    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 5 then goto MALE07 end
-    --Thirsty's Abilities
 do
     v1 = slasher.SlasherValue1 --Milk drank
     v2 = slasher.SlasherValue2 --Pacification

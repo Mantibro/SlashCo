@@ -35,20 +35,7 @@ hook.Add("HUDPaint", "SurvivorJumpscared", function()
 		al = nil
 	end
 
-	if ply:GetNWBool("SurvivorJumpscare_4") == true then
-
-		if f == nil then f = 0 end
-		f = f+(FrameTime()*20)
-		if f > 59 then f = 50 end
-
-		local Overlay = Material("slashco/ui/overlays/jumpscare_4")
-		Overlay:SetInt( "$frame", math.floor(f) )
-
-		surface.SetDrawColor(255,255,255,255)	
-		surface.SetMaterial(Overlay)
-		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-	
-	elseif ply:GetNWBool("SurvivorJumpscare_5") == true then
+	if ply:GetNWBool("SurvivorJumpscare_5") == true then
 
 		if f == nil then f = 0 end
 		f = f+(FrameTime()*20)

@@ -4,58 +4,6 @@ SlashCo.SlasherSpecialAbility = function(slasher)
 
     local slasherid = slasher:SteamID64()
 
-    --Amogus Fuel Transform \/ \/ \/
-    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 4 then goto BORGMIRE end
-
-    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
-
-        slasher:SetNWBool("AmogusDisguising", true)
-        slasher:Freeze(true)
-
-        slasher:EmitSound("slashco/slasher/amogus_transform"..math.random(1,2)..".mp3")
-
-        timer.Simple(2, function() 
-            slasher:Freeze(false) 
-            slasher:SetNWBool("AmogusDisguising", false)
-            slasher.SlasherValue2 = 2
-
-            slasher:SetNWBool("AmogusFuelDisguise", true)
-            slasher:SetNWBool("AmogusDisguised", true)
-
-            slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
-
-            slasher:SetColor(Color(0,0,0,0))
-            slasher:DrawShadow(false)
-		    slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
-		    slasher:SetNoDraw(true)
-
-            local g = ents.Create( "prop_physics" )
-
-            g:SetPos( slasher:GetPos() + Vector(0,0,15) )
-            g:SetAngles( slasher:GetAngles() + Angle(0,90,0) )
-            g:SetModel( SlashCoItems.GasCan.Model )
-            g:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
-            g:Spawn()
-
-            g:FollowBone( slasher, slasher:LookupBone( "Hips" ) )
-
-            local id = g:EntIndex()
-            slasher.SlasherValue3 = id
-
-            slasher:SetRunSpeed( 200 )
-            slasher:SetWalkSpeed( 200 )
-
-        end)
-
-    end
-
-    --Amogus Fuel Transform /\ /\ /\
-
-    --Thirsty has no special ability.
-    --Male07 has no special ability.
-    --Tyler has no special ability.
-
-    ::BORGMIRE::
     --Borgmire's Throw \/ \/ \/
     if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 8 then goto MANSPIDER end
 

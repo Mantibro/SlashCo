@@ -2,12 +2,14 @@ AddCSLuaFile()
 AddCSLuaFile("bababooey.lua")
 AddCSLuaFile("sid.lua")
 AddCSLuaFile("trollge.lua")
+AddCSLuaFile("amogus.lua")
 
 if not SlashCoSlasher then SlashCoSlasher = {} end
 
 include("bababooey.lua")
 include("sid.lua")
 include("trollge.lua")
+include("amogus.lua")
 
 function TranslateSlasherClass(id)
 
