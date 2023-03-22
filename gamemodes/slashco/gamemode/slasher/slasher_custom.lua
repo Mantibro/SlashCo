@@ -80,7 +80,7 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
     local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
     local slasher = team.GetPlayers(TEAM_SLASHER)[i]
 
-    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID < 10 then return end
+    if SlashCoSlasher[slasher:GetNWString("Slasher")].SlasherID < 10 then return end
 
     --[[
         The main ability handler which runs every tick.

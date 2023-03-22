@@ -229,7 +229,7 @@ SlashCoSlasher.Sid.OnPrimaryFire = function(slasher)
                     target:SetPos(slasher:GetPos())
                     target:SetEyeAngles(   Angle(0,pick_ang,0)   )  
     
-                    SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelay
+                    slasher.KillDelayTick = SlashCoSlasher[slasher:GetNWString("Slasher")].KillDelay
 
                     timer.Simple(1, function() 
                         target:EmitSound("ambient/voices/citizen_beaten4.wav") 
@@ -325,13 +325,13 @@ SlashCoSlasher.Sid.OnSecondaryFire = function(slasher)
         slasher.SlasherValue3 = 2
         slasher:SetNWBool("SidGunAiming", false)   
         slasher:SetNWBool("SidGunAimed", false) 
-        slasher:SetSlowWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )  
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
+        slasher:SetSlowWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )  
+        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
 
         if not gunrage then 
-            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed ) 
+            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed ) 
         else
-            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseSpeed ) 
+            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed ) 
         end
 
     end
@@ -412,7 +412,7 @@ SlashCoSlasher.Sid.OnSpecialAbilityFire = function(slasher)
 
             if slasher:GetNWBool("SidGunRage") then
 
-                slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseSpeed )
+                slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed )
 
             end
 
@@ -429,7 +429,7 @@ SlashCoSlasher.Sid.OnSpecialAbilityFire = function(slasher)
 
 end
 
-local anim_antispam
+
 
 SlashCoSlasher.Sid.Animator = function(ply) 
 
@@ -448,7 +448,7 @@ SlashCoSlasher.Sid.Animator = function(ply)
 
     if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
-    if not eating and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then anim_antispam = false end
+    if not eating and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then ply.anim_antispam = false end
 
 	if not equipping_gun then
 
@@ -474,7 +474,7 @@ SlashCoSlasher.Sid.Animator = function(ply)
 			else
 
 				ply.CalcSeqOverride = ply:LookupSequence("eat")
-				if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+				if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 
 			end
 
@@ -482,13 +482,13 @@ SlashCoSlasher.Sid.Animator = function(ply)
 
 	else
 		ply.CalcSeqOverride = ply:LookupSequence("arm")
-		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+		if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 	end
 
 	if aiming_gun then
 
 		ply.CalcSeqOverride = ply:LookupSequence("readygun")
-		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+		if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 
 	end
 
@@ -501,7 +501,7 @@ SlashCoSlasher.Sid.Animator = function(ply)
 		else
 
 			ply.CalcSeqOverride = ply:LookupSequence("shoot")
-			if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+			if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 
 		end
 
@@ -511,7 +511,7 @@ SlashCoSlasher.Sid.Animator = function(ply)
 
 		ply.CalcSeqOverride = ply:LookupSequence("execution")
 		ply:SetPlaybackRate( 1 )
-		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+		if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 
 	end
 
@@ -680,7 +680,7 @@ if SERVER then
             local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
             local slasher = team.GetPlayers(TEAM_SLASHER)[i]
     
-            if SlashCoSlasher[slasher:GetNWBool("Slasher")].ID ~= 2 then return end
+            if SlashCoSlasher[slasher:GetNWString("Slasher")].ID ~= 2 then return end
     
             if slasher:GetPos():Distance( pos ) > 1800 then return end
     

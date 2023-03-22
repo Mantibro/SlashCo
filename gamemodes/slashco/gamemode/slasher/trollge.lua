@@ -103,7 +103,7 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
             PlayGlobalSound("slashco/slasher/trollge_stage6.wav",60,slasher)
 
             slasher:SetRunSpeed( 450 )
-            slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseSpeed  )
+            slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed  )
             final_eyesight = 10
 
             for i = 1, #player.GetAll() do
@@ -198,7 +198,7 @@ SlashCoSlasher.Trollge.OnSpecialAbilityFire = function(slasher)
 
 end
 
-local anim_antispam
+
 
 SlashCoSlasher.Trollge.Animator = function(ply) 
 
@@ -206,7 +206,7 @@ SlashCoSlasher.Trollge.Animator = function(ply)
 	local trollge_stage2 = ply:GetNWBool("TrollgeStage2")
 	local trollge_slashing = ply:GetNWBool("TrollgeSlashing")
 
-    if not trollge_slashing then anim_antispam = false end
+    if not trollge_slashing then ply.anim_antispam = false end
 
 	if not trollge_stage1 and not trollge_stage2 then
 
@@ -221,9 +221,9 @@ SlashCoSlasher.Trollge.Animator = function(ply)
 
 				ply.CalcSeqOverride = ply:LookupSequence("walk")
 
-				if anim_antispam == nil or anim_antispam == false then
+				if ply.anim_antispam == nil or ply.anim_antispam == false then
 					ply:AddVCDSequenceToGestureSlot( 1, 2, 0, true )
-					anim_antispam = true 
+					ply.anim_antispam = true 
 				end
 
 			end

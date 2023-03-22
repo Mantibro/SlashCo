@@ -124,7 +124,7 @@ SlashCoSlasher.Thirsty.OnMainAbilityFire = function(slasher)
 
             slasher:SetNWBool("ThirstyDrinking", true)
             slasher:SetNWBool("InSlasherChaseMode", false) 
-            slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic)
+            slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
             slasher.SlasherValue2 = 99
             slasher:Freeze(true)
 
@@ -193,14 +193,14 @@ SlashCoSlasher.Thirsty.OnSpecialAbilityFire = function(slasher)
 
 end
 
-local anim_antispam
+
 
 SlashCoSlasher.Thirsty.Animator = function(ply) 
 
     local chase = ply:GetNWBool("InSlasherChaseMode")
     local pac = ply:GetNWBool("DemonPacified")
 
-    if not ply:GetNWBool("ThirstyDrinking") then anim_antispam = false end
+    if not ply:GetNWBool("ThirstyDrinking") then ply.anim_antispam = false end
 	
 	if ply:IsOnGround() then
 
@@ -242,7 +242,7 @@ SlashCoSlasher.Thirsty.Animator = function(ply)
 		
 		ply.CalcSeqOverride = ply:LookupSequence("drink") 
 
-		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+		if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 	
 	end
 
@@ -280,6 +280,21 @@ if CLIENT then
             surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
         else
             LocalPlayer().thrs_f = nil
+        end
+
+        if LocalPlayer():GetNWBool("ThirstyFuck") == true  then
+            local Overlay = Material("slashco/ui/overlays/thirsty_fuck")
+    
+            surface.SetDrawColor(255,255,255,60)	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+    
+            if c == nil then
+                surface.PlaySound("slashco/slasher/thirsty_rage1.mp3")
+                surface.PlaySound("slashco/slasher/thirsty_rage2.mp3")
+                c = true
+            end
+    
         end
 
     end)

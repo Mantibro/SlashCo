@@ -131,6 +131,10 @@ SlashCoSlasher.Male07.OnTickBehaviour = function(slasher)
 
         end
 
+    else
+
+        slasher.SlasherValue2 = 0
+
     end
 
     if slasher:GetNWInt("Male07State") ~= v1 then
@@ -274,7 +278,7 @@ SlashCoSlasher.Male07.OnSpecialAbilityFire = function(slasher)
 
 end
 
-local anim_antispam
+
 
 SlashCoSlasher.Male07.Animator = function(ply) 
 
@@ -317,7 +321,7 @@ SlashCoSlasher.Male07.Animator = function(ply)
 
 	elseif ply:GetModel() == "models/slashco/slashers/male_07/male_07_monster.mdl" then
 
-		if not male_slashing and not male_transforming then anim_antispam = false end
+		if not male_slashing and not male_transforming then ply.anim_antispam = false end
 		
 		if ply:IsOnGround() then
 
@@ -335,16 +339,16 @@ SlashCoSlasher.Male07.Animator = function(ply)
 	
 		end
 
-		if male_slashing and anim_antispam == nil or anim_antispam == false then
+		if male_slashing and ply.anim_antispam == nil or ply.anim_antispam == false then
 			ply:AddVCDSequenceToGestureSlot( 1, ply:LookupSequence("slash"), 0, true )
-			anim_antispam = true 
+			ply.anim_antispam = true 
 		end
 
 		if male_transforming then 
 		
 			ply.CalcSeqOverride = ply:LookupSequence("transform") 
 	
-			if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
+			if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 		
 		end
 	

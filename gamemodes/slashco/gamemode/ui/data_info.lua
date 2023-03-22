@@ -3,39 +3,6 @@ SCInfo = {}
 --[[SCInfo.Slasher = {
 
     {
-        Name = "Tyler",
-        Class = "Demon",
-        Danger = "Devastating",
-        Description = "The Balance Slasher who controls the progress of the round.\n\n-Tyler has two forms. Creator, and Destroyer.\n-Tyler, the Creator will create gas cans for survivors upon being found.\nTyler, the Destroyer will destroy anything in its path.",
-        ProTip = "-Noticeably fewer Fuel Cans were spotted in this Slasher's Zone.",
-        SpeedRating = "★★★★★",
-        EyeRating = "★☆☆☆☆",
-        DiffRating = "★★★★☆"
-    },
-
-    {
-        Name = "Borgmire",
-        Class = "Cryptid",
-        Danger = "Devastating",
-        Description = "The Brute Slasher who can overpower survivors with overwhelming strength.\n\n-Borgmire is most effective in short chases.\n-He can pick up and throw nearby Survivors for heavy damage.",
-        ProTip = "-This Slasher seems to suffer from exhaustion during long chases.",
-        SpeedRating = "★★★★☆",
-        EyeRating = "★☆☆☆☆",
-        DiffRating = "★☆☆☆☆"
-    },
-
-    {
-        Name = "Manspider",
-        Class = "Cryptid",
-        Danger = "Considerable",
-        Description = "The Huntsman Slasher which is picky with its victims.\n\n-Manspider can only target one Survivor at a time.\n-He will slowly gather aggression while close to Survivors.\n-He can nest somewhere for a chance to instantly find Prey.",
-        ProTip = "-This Slasher is a very selective hunter.",
-        SpeedRating = "★★★☆☆",
-        EyeRating = "★★★☆☆",
-        DiffRating = "★☆☆☆☆"
-    },
-
-    {
         Name = "The Watcher",
         Class = "Umbra",
         Danger = "Considerable",

@@ -3,10 +3,10 @@ local SlashCo = SlashCo
 --[[SlashCo.SlasherCallForChaseMode = function(ply)
 
 do
-    if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 12 then return end
+    if SlashCoSlasher[slasher:GetNWString("Slasher")].SlasherID ~= 12 then return end
 
-    if SlashCoSlasher[slasher:GetNWBool("Slasher")]ChaseActivationCooldown > 0 then return end
-    SlashCoSlasher[slasher:GetNWBool("Slasher")]ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWBool("Slasher")]ChaseCooldown
+    if SlashCoSlasher[slasher:GetNWString("Slasher")]ChaseActivationCooldown > 0 then return end
+    SlashCoSlasher[slasher:GetNWString("Slasher")]ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWString("Slasher")]ChaseCooldown
 
     if slasher:GetNWBool("CriminalCloning") then
 

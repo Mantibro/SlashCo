@@ -121,39 +121,6 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     --[[
 
-    end
-
-    if slid == 7 then
-
-        SlashCo.CurRound.SlasherData[plyid].SlasherValue1 = 0
-
-        ply:SetColor(Color(0,0,0,0))
-        ply:DrawShadow(false)
-		ply:SetRenderMode(RENDERMODE_TRANSALPHA)
-		ply:SetNoDraw(true)
-
-    end
-
-    if slid == 8 then
-
-        ply:SetViewOffset( Vector(0,0,85) )
-
-        ply:SetCurrentViewOffset( Vector(0,0,85) )
-
-        PlayGlobalSound("slashco/slasher/borgmire_heartbeat.wav",50,ply)
-
-    end
-
-    if slid == 9 then
-
-        ply:SetViewOffset( Vector(0,0,20) )
-
-        ply:SetCurrentViewOffset( Vector(0,0,20) )
-
-        PlayGlobalSound("slashco/slasher/manspider_idle.wav",50,ply)
-
-    end
-
     if slid == 10 then
 
         ply:SetViewOffset( Vector(0,0,100) )
@@ -224,12 +191,12 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 
         local slasher = team.GetPlayers(TEAM_SLASHER)[i]
-        local dist = SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseRange + (SO * 250)
+        local dist = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRange + (SO * 250)
 
         local slasher = team.GetPlayers(TEAM_SLASHER)[i]
 
         --Handle The Chase Functions \/ \/ \/
-        SlashCoSlasher[slasher:GetNWBool("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
+        SlashCoSlasher[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
         if slasher:GetNWBool("CanChase") == false then slasher.CurrentChaseTick = 99 end
 
         if slasher.ChaseActivationCooldown > 0 then 
@@ -242,10 +209,10 @@ for i = 1, #team.GetPlayers(TEAM_SLASHER) do
 do
         slasher.CurrentChaseTick = slasher.CurrentChaseTick + FrameTime()
 
-        --local inv = (1 - SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseRadius) / 2
+        --local inv = (1 - SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius) / 2
         local inv = -0.2
 
-        local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseRadius + inv )
+        local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius + inv )
         local find_p = NULL
 
         for p = 1, #find do
@@ -266,17 +233,17 @@ do
 
         if IsValid( find_p ) and not find_p:GetNWBool("SurvivorChased") then find_p:SetNWBool("SurvivorChased",true) end
 
-        if slasher.CurrentChaseTick > SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseDuration then 
+        if slasher.CurrentChaseTick > SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseDuration then 
 
             slasher:SetNWBool("InSlasherChaseMode", false) 
 
-            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
-            slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
-            slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic)
+            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+            slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+            slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
 
-            slasher.ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseCooldown
+            slasher.ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseCooldown
 
-            timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic) end)
+            timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
         end
 
         if not slasher:GetNWBool("InSlasherChaseMode") then
@@ -308,19 +275,12 @@ SlashCo.Jumpscare = function(slasher)
 
     if slasher.KillDelayTick > 0 then return end
 
-    local dist = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDistance
+    local dist = SlashCoSlasher[slasher:GetNWString("Slasher")].KillDistance
     
     if slasher:GetEyeTrace().Entity:IsPlayer() then
         local target = slasher:GetEyeTrace().Entity	
 
         if target:Team() ~= TEAM_SURVIVOR then return end
-
-        --[[if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 9 then --Manspider Condition
-            if target:SteamID64() ~= slasher.SlasherValue1 then
-                slasher:ChatPrint("You can only kill your Prey.")
-                return 
-            end
-        end]]
 
         if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
 
@@ -329,14 +289,14 @@ SlashCo.Jumpscare = function(slasher)
 
             slasher:SetNWBool("CanChase", false)
 
-            slasher:EmitSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].KillSound)
+            slasher:EmitSound(SlashCoSlasher[slasher:GetNWString("Slasher")].KillSound)
                 
             target:Freeze(true)
             slasher:Freeze(true)
 
-            slasher.KillDelayTick = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelay
+            slasher.KillDelayTick = SlashCoSlasher[slasher:GetNWString("Slasher")].KillDelay
 
-            timer.Simple(SlashCoSlasher[slasher:GetNWBool("Slasher")].JumpscareDuration, function()
+            timer.Simple(SlashCoSlasher[slasher:GetNWString("Slasher")].JumpscareDuration, function()
 
                 target:SetNWBool("SurvivorBeingJumpscared",false)
                 target:SetNWBool("SurvivorJumpscare_"..slasher:GetNWString("Slasher"), false)
@@ -361,24 +321,24 @@ SlashCo.StartChaseMode = function(slasher)
 
     if slasher.ChaseActivationCooldown > 0 then return end
 
-    slasher.ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseCooldown
+    slasher.ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseCooldown
 
     if slasher:GetNWBool("InSlasherChaseMode") then 
 
         slasher:SetNWBool("InSlasherChaseMode", false) 
 
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
-        slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic)
+        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+        slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
 
-        timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic) end)
+        timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
 
         return 
     end
 
-    local dist = SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseRange
+    local dist = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRange
 
-    local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist, SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseRadius )
+    local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist, SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius )
 
     local target = NULL
 
@@ -412,18 +372,10 @@ do
 end
     ::FOUND::
 
-    --[[if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 9 then --Manspider Condition
-
-        if target:SteamID64() ~= slasher.SlasherValue1 then return end
-
-    end]]
-
     if slasher:GetPos():Distance(target:GetPos()) < dist then
 
         slasher:SetNWBool("InSlasherChaseMode", true)
         slasher.CurrentChaseTick = 0
-
-        --[[if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID == 6 then SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherValue2 = 0 end]]
 
     end
 
@@ -431,15 +383,15 @@ end
 
     if chase then 
 
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseSpeed  )
-        PlayGlobalSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic,95,slasher)
+        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed )
+        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed  )
+        PlayGlobalSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic,95,slasher)
 
     else
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
-        slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic)
-        timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWBool("Slasher")].ChaseMusic) end)
+        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+        slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
+        timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
     end
 
 end

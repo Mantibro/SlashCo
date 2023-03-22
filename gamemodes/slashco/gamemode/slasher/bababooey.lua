@@ -143,8 +143,8 @@ SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
         slasher:SetMaterial("")
 		slasher:SetColor(Color(255,255,255,255))
 
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWBool("Slasher")].ProwlSpeed )
+        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
 
     end
 

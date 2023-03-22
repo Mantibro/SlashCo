@@ -36,6 +36,8 @@ end
 
 SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     v1 = slasher.SlasherValue1 --Transformation type
     v2 = slasher.SlasherValue2 --Transform cooldown
     v3 = slasher.SlasherValue3 --Fuel Can EntIndex
@@ -158,7 +160,7 @@ SlashCoSlasher.Amogus.OnMainAbilityFire = function(slasher)
         slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
         slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
 
-        SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDelayTick = 2 - (SO * 1.95) 
+        slasher.KillDelayTick = 2 - (SO * 1.95) 
 
         if IsValid(ents.GetByIndex(slasher.SlasherValue3)) then
             ents.GetByIndex(slasher.SlasherValue3):Remove()
