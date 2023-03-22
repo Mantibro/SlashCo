@@ -119,22 +119,7 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn(ply)
 
-    --[[if slid == 5 then
-
-        ply:SetViewOffset( Vector(0,0,20) )
-        ply:SetCurrentViewOffset( Vector(0,0,20) )
-
-    end
-
-    if slid == 6 then
-
-        SlashCo.CurRound.SlasherData[plyid].SlasherValue1 = 1
-
-    end
-
-    if slid == 6 then
-
-        SlashCo.CurRound.SlasherData[plyid].SlasherValue1 = 1
+    --[[
 
     end
 

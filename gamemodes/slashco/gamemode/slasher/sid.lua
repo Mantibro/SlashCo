@@ -429,6 +429,8 @@ SlashCoSlasher.Sid.OnSpecialAbilityFire = function(slasher)
 
 end
 
+local anim_antispam
+
 SlashCoSlasher.Sid.Animator = function(ply) 
 
     local chase = ply:GetNWBool("InSlasherChaseMode")

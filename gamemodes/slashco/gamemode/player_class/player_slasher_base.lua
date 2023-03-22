@@ -76,126 +76,6 @@ player_manager.RegisterClass("player_slasher_base", PLAYER, "player_default")
 
 	if gun_state then gun_prefix = "g_" else gun_prefix = "" end
 
-	if ply:GetModel() ~= "models/slashco/slashers/thirsty/thirsty.mdl" then goto male07 end --Thristy's Animator
-
-	if not ply:GetNWBool("ThirstyDrinking") then anim_antispam = false end
-	
-	if ply:IsOnGround() then
-
-		if not chase then 
-
-			if not ply:GetNWBool("ThirstyBigMlik") then
-
-				ply.CalcIdeal = ACT_HL2MP_WALK 
-				ply.CalcSeqOverride = ply:LookupSequence("prowl")
-
-			else
-
-				if not pac then
-
-					ply.CalcIdeal = ACT_HL2MP_RUN 
-					ply.CalcSeqOverride = ply:LookupSequence("chase2")
-
-				else
-
-					ply.CalcIdeal = ACT_HL2MP_WALK 
-					ply.CalcSeqOverride = ply:LookupSequence("prowl")
-
-				end
-
-			end
-
-		else
-			ply.CalcIdeal = ACT_HL2MP_RUN 
-			ply.CalcSeqOverride = ply:LookupSequence("chase")
-		end
-
-	else
-
-		ply.CalcSeqOverride = ply:LookupSequence("float")
-
-	end
-
-	if ply:GetNWBool("ThirstyDrinking") then 
-		
-		ply.CalcSeqOverride = ply:LookupSequence("drink") 
-
-		if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
-	
-	end
-
-	::male07::
-	--Male_07's animator
-
-	if ply:GetModel() == "models/humans/group01/male_07.mdl" then 
-	
-		if ply:IsOnGround() then
-
-			if not chase then 
-				ply.CalcIdeal = ACT_WALK 
-				ply.CalcSeqOverride = ply:LookupSequence("walk_all")
-			else
-				ply.CalcIdeal = ACT_RUN_SCARED
-				ply.CalcSeqOverride = ply:LookupSequence("run_all_panicked")
-			end
-	
-		else
-	
-			ply.CalcIdeal = ACT_JUMP
-			ply.CalcSeqOverride = ply:LookupSequence("jump_holding_jump")
-	
-		end
-
-		ply:SetPoseParameter( "move_x", ply:GetVelocity():Length()/100 )
-
-		--local a1 = -ply:GetVelocity()[2]
-		--local a2 = -ply:GetVelocity()[1]
-
-		--ply:SetPoseParameter( "move_yaw",-((( math.atan2( a1, a2 )*2/(-2*math.pi) ) 	* 180	) + ply:GetAngles()[2] - 180))
-
-		if ply:GetVelocity():Length() < 30 then 
-
-			ply.CalcIdeal = ACT_IDLE
-			ply.CalcSeqOverride = ply:LookupSequence("idle_all")
-
-		end
-
-	elseif ply:GetModel() == "models/slashco/slashers/male_07/male_07_monster.mdl" then
-
-		if not male_slashing and not male_transforming then anim_antispam = false end
-		
-		if ply:IsOnGround() then
-
-			if not chase then 
-				ply.CalcIdeal = ACT_HL2MP_WALK 
-				ply.CalcSeqOverride = ply:LookupSequence("prowl")
-			else
-				ply.CalcIdeal = ACT_HL2MP_RUN 
-				ply.CalcSeqOverride = ply:LookupSequence("chase")
-			end
-	
-		else
-	
-			ply.CalcSeqOverride = ply:LookupSequence("float")
-	
-		end
-
-		if male_slashing and anim_antispam == nil or anim_antispam == false then
-			ply:AddVCDSequenceToGestureSlot( 1, ply:LookupSequence("slash"), 0, true )
-			anim_antispam = true 
-		end
-
-		if male_transforming then 
-		
-			ply.CalcSeqOverride = ply:LookupSequence("transform") 
-	
-			if anim_antispam == nil or anim_antispam == false then ply:SetCycle( 0 ) anim_antispam = true end
-		
-		end
-	
-	
-	end
-
 	--TYLER
 
 	if ply:GetModel() ~= "models/slashco/slashers/tyler/tyler.mdl" then goto borgmire end --Tyler's Animator
@@ -443,22 +323,6 @@ if SERVER then
 
 	if ply:Team() == TEAM_SLASHER then 
 
-		if ply:GetModel() == "models/slashco/slashers/baba/baba.mdl" then --Bababooey Footsteps
-			if ply:GetNWBool("BababooeyInvisibility") then return true end
-			ply:EmitSound( "slashco/slasher/babastep_0"..math.random(1,3)..".mp3") 
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/sid/sid.mdl" then --Sid Footsteps
-			ply:EmitSound( "slashco/slasher/sid_step"..math.random(1,2)..".mp3") 
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/trollge/trollge.mdl" then --Trollge (no) Footsteps
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/amogus/amogus.mdl" then --Amogus Footsteps
-			if ply:GetNWBool("AmogusFuelDisguise") then return true end
-
-			ply:EmitSound( "slashco/slasher/amogus_step"..math.random(1,3)..".wav") 
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/thirsty/thirsty.mdl" then --Thirsty (no) Footsteps
-			return true 
 		elseif ply:GetModel() == "models/hunter/plates/plate.mdl" then --Male07Specter (no) Footsteps
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/tyler/tyler.mdl" then --Tyler (no) Footsteps
@@ -517,18 +381,6 @@ if CLIENT then
 
 	if ply:Team() == TEAM_SLASHER then 
 
-		if ply:GetModel() == "models/slashco/slashers/baba/baba.mdl" then --Bababooey Footsteps
-			if ply:GetNWBool("BababooeyInvisibility") then return true end
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/sid/sid.mdl" then --Sid Footsteps
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/trollge/trollge.mdl" then --Trollge (no) Footsteps
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/amogus/amogus.mdl" then --Amogus Footsteps
-			if ply:GetNWBool("AmogusFuelDisguise") then return true end
-			return true 
-		elseif ply:GetModel() == "models/slashco/slashers/thirsty/thirsty.mdl" then --Thirsty (no) Footsteps
-			return true 
 		elseif ply:GetModel() == "models/hunter/plates/plate.mdl" then --Male07Specter (no) Footsteps
 			return true 
 		elseif ply:GetModel() == "models/slashco/slashers/tyler/tyler.mdl" then --Tyler (no) Footsteps

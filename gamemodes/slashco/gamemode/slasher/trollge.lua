@@ -198,6 +198,8 @@ SlashCoSlasher.Trollge.OnSpecialAbilityFire = function(slasher)
 
 end
 
+local anim_antispam
+
 SlashCoSlasher.Trollge.Animator = function(ply) 
 
     local trollge_stage1 = ply:GetNWBool("TrollgeStage1")

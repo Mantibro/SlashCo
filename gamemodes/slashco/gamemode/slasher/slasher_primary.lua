@@ -8,55 +8,6 @@ SlashCo.SlasherPrimaryFire = function(slasher)
 
     local dist = SlashCoSlasher[slasher:GetNWBool("Slasher")].KillDistance
 
-do
-
-    if slasher.SlasherValue4 < 0.01 then
-
-        slasher:SetNWBool("Male07Slashing",false)
-        timer.Remove("Male07SlashDecay")
-        slasher.SlasherValue4 = 2
-
-        timer.Simple(0.5, function() 
-
-            slasher:EmitSound("slashco/slasher/trollge_swing.wav")
-
-            if SERVER then
-
-                local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,60)), Vector(-30,-40,-60), Vector(30,40,60), 50 + (SO*50), DMG_SLASH, 2, false )
-
-                if not target:IsValid() then return end
-
-                if target:IsPlayer() then
-
-                    if target:Team() ~= TEAM_SURVIVOR then return end
-
-                    local vPoint = target:GetPos() + Vector(0,0,50)
-                    local bloodfx = EffectData()
-                    bloodfx:SetOrigin( vPoint )
-                    util.Effect( "BloodImpact", bloodfx )
-
-                    target:EmitSound("slashco/slasher/trollge_hit.wav") 
-
-                end
-
-                SlashCo.BustDoor(slasher, target, 30000)
-
-            end
-
-        end)
-
-        timer.Simple(0.1, function() 
-
-            slasher:SetNWBool("Male07Slashing",true)
-
-            timer.Create( "Male07SlashDecay", 1.5, 1, function() slasher:SetNWBool("Male07Slashing",false) end)
-
-        end)
-
-    end
-
-end
-
     ::tylerdestroy::
 
     if SlashCoSlasher[slasher:GetNWBool("Slasher")].SlasherID ~= 7 then return end
