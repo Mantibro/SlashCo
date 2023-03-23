@@ -100,27 +100,27 @@ function ENT:Use(activator, _, _, _)
 			--local pos = Vector(0,0,0)
 
 			if SatPlayers[1] ~= nil and SatPlayers[1].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(-30, -20, 40))
+				pos = self:LocalToWorld(Vector(-34, 24.25, 44.5))
 				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
 
 			elseif SatPlayers[2] ~= nil and SatPlayers[2].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(-30, 0, 40))
+				pos = self:LocalToWorld(Vector(-34, 0, 44.5))
 				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
 
 			elseif SatPlayers[3] ~= nil and SatPlayers[3].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(-30, -20, 40))
+				pos = self:LocalToWorld(Vector(-34, -24.25, 44.5))
 				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
 
 			elseif SatPlayers[4] ~= nil and SatPlayers[4].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(30, -20, 40))
+				pos = self:LocalToWorld(Vector(24.5, 24.25, 44.5))
 				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
 
 			elseif SatPlayers[5] ~= nil and SatPlayers[5].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(30, 0, 40))
+				pos = self:LocalToWorld(Vector(24.5, 0, 44.5))
 				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
 
 			elseif SatPlayers[6] ~= nil and SatPlayers[6].steamid == activator:SteamID64() then
-				pos = self:LocalToWorld(Vector(30, -20, 40))
+				pos = self:LocalToWorld(Vector(24.5, -24.25, 44.5))
 				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
 			end
 
