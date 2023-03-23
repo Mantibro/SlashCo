@@ -28,6 +28,9 @@ SlashCoSlasher.Leuonard.DiffRating = "★★★★☆"
 
 SlashCoSlasher.Leuonard.OnSpawn = function(slasher)
     SlashCo.CreateItem("sc_dogg", SlashCo.TraceHullLocator(), Angle(0,0,0))
+    slasher.soundon = 0
+    slasher:SetNWBool("CanKill", true)
+    slasher:SetNWBool("CanChase", true)
 end
 
 SlashCoSlasher.Leuonard.PickUpAttempt = function(ply)
@@ -51,6 +54,23 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
             slasher.SlasherValue1 = v1 + ( FrameTime() * 0.5)
 
+            --sound
+
+            if math.floor(slasher.SlasherValue1) == 25 and slasher.soundon == 0 then
+                slasher:EmitSound("slashco/slasher/leuonard_25_"..math.random(1,3)..".mp3")
+                slasher.soundon = 1
+            end
+
+            if math.floor(slasher.SlasherValue1) == 50 and slasher.soundon == 1 then
+                slasher:EmitSound("slashco/slasher/leuonard_50_"..math.random(1,3)..".mp3")
+                slasher.soundon = 2
+            end
+
+            if math.floor(slasher.SlasherValue1) == 90 and slasher.soundon == 2 then
+                slasher:EmitSound("slashco/slasher/leuonard_90_"..math.random(1,3)..".mp3")
+                slasher.soundon = 3
+            end
+
             --LOCATE THE DOG..........
 
             local find = ents.FindInSphere(slasher:GetPos(), 80)
@@ -59,6 +79,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
                 local ent = find[f]
 
                 if ent:GetClass() == "sc_dogg" then --I FOUND YOU........
+                    slasher.soundon = 0
                     ent:Remove()
                     slasher:SetNWBool("LeuonardRaping", true)
                     slasher:EmitSound("slashco/slasher/leuonard_yell1.mp3")
@@ -92,9 +113,14 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
         slasher.SlasherValue1 = 100.25
         slasher:SetNWBool("LeuonardFullRape", true)
 
+        slasher:SetNWBool("CanKill", false)
+        slasher:SetNWBool("CanChase", false)
+
     end
 
     if v1 == 100.25 then --100% bad word n stuff
+
+        slasher.soundon = 0
 
         slasher:SetWalkSpeed(450)
         slasher:SetRunSpeed(450)

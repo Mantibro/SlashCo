@@ -31,7 +31,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 		for i = 1, #SlasherTeam do
 			if SlasherTeam[i].s_id == LocalPlayer():SteamID64() then
 
-				if LocalPlayer():GetNWString("Slasher") ~= show_slasher_anticipation then
+				if LocalPlayer():GetNWString("Slasher") ~= show_slasher_anticipation and LocalPlayer():GetNWString("Slasher") then
 					show_slasher_anticipation = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].Name
 				end
 
