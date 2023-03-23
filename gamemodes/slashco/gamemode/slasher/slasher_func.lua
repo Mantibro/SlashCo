@@ -1,20 +1,5 @@
 local SlashCo = SlashCo
 
-SlashCo.SmileyIdle = function(slasher)
-
-    if not slasher:GetNWBool("InSlasherChaseMode") then 
-        slasher:EmitSound("slashco/slasher/freesmiley_idle"..math.random(1,7)..".mp3")     
-    end
-
-    timer.Simple(math.random(3,5), function()
-
-        SlashCo.SmileyIdle(slasher)
-    
-    end)
-    
-
-end
-
 SlashCo.SelectSlasher = function(slasher_name, plyid)
     SlashCo.CurRound.Slashers[plyid] = {}
     SlashCo.CurRound.Slashers[plyid].SlasherID = slasher_name
@@ -118,52 +103,6 @@ SlashCo.OnSlasherSpawned = function(ply)
     ply.SlasherValue5 = 0
 
     SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn(ply)
-
-    --[[
-
-    if slid == 10 then
-
-        ply:SetViewOffset( Vector(0,0,100) )
-
-        ply:SetCurrentViewOffset( Vector(0,0,100) )
-
-    end
-
-    if slid == 11 then
-
-        PlayGlobalSound("slashco/slasher/abomignat_breathing.wav",65,ply)
-
-    end
-
-    if slid == 12 then
-
-        local clone = ents.Create( "sc_crimclone" )
-
-        clone:SetPos( ply:GetPos() )
-        clone:SetAngles( ply:GetAngles() )
-        clone.AssignedSlasher = ply:SteamID64()
-        clone.IsMain = true
-        clone:Spawn()
-        clone:Activate()
-
-        ply:SetColor(Color(0,0,0,0))
-        ply:DrawShadow(false)
-		ply:SetRenderMode(RENDERMODE_TRANSALPHA)
-		ply:SetNoDraw(true)
-
-    end
-
-    if slid == 13 then
-
-        SlashCo.SmileyIdle(ply)
-
-    end
-
-    if slid == 14 then
-
-        SlashCo.CreateItem("sc_dogg", SlashCo.TraceHullLocator(), Angle(0,0,0))
-
-    end]]
 
 end
 
@@ -392,6 +331,56 @@ end
         slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
         slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
         timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
+    end
+
+end
+
+SlashCo.BustDoor = function(slasher, target, force)
+
+    if !target:IsValid() then return end
+
+    if target:GetClass() == "prop_door_rotating" then
+
+        if SERVER then target:Fire("Open") end
+
+        timer.Simple(0.05, function() 
+
+            local tr = util.TraceLine( {
+                start = slasher:EyePos(),
+                endpos = slasher:EyePos() + slasher:GetForward() * 10000,
+                filter = slasher
+            } )
+
+            local trace = util.GetSurfaceData( tr.SurfaceProps ).name
+
+            if !target:IsValid() then return end
+
+            local prop = ents.Create( "prop_physics" )
+            local model = target:GetModel()
+            prop:SetModel(model)
+            prop:SetMoveType( MOVETYPE_NONE )
+            --prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
+            prop:SetPos( target:GetPos() + slasher:GetForward()*6 + Vector(0,0,1) )
+            prop:SetAngles( target:GetAngles() )
+            prop:Spawn()
+            prop:Activate()
+            prop:SetSkin (target:GetSkin() )
+            local phys = prop:GetPhysicsObject()
+            if phys:IsValid() then phys:Wake() end
+            phys:ApplyForceCenter( slasher:GetForward() * force )
+
+            if trace == "wood" then
+                target:EmitSound("physics/wood/wood_crate_break"..math.random(1,5)..".wav")
+            end
+
+            if trace == "metal" then
+                target:EmitSound("physics/metal/metal_box_break"..math.random(1,2)..".wav")
+            end
+
+            target:Remove()
+
+        end)
+
     end
 
 end

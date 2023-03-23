@@ -24,7 +24,7 @@ SlashCoItems.MilkJug.OnUse = function(ply)
 
     end)
 
-    SlashCo.ThirstyRage(ply)
+    SlashCoSlasher.ThirstyRage(ply)
 end
 SlashCoItems.MilkJug.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem(SlashCoItems.MilkJug.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

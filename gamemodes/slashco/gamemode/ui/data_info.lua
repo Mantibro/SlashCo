@@ -3,39 +3,6 @@ SCInfo = {}
 --[[SCInfo.Slasher = {
 
     {
-        Name = "The Watcher",
-        Class = "Umbra",
-        Danger = "Considerable",
-        Description = "The Observing Slasher whose power relies on sight.\n\n-The Watcher can Survey the map every once in a while to locate all survivors.\n-He will be slowed down if he is looked at, but anyone who does so will be located.\n-The Watcher can stalk Survivors to build up his special ability, Full Surveillance.",
-        ProTip = "-This Slasher suffers from a loss of speed while observed.",
-        SpeedRating = "★★★★☆",
-        EyeRating = "★★★★☆",
-        DiffRating = "★★☆☆☆"
-    },
-
-    {
-        Name = "Abomignat",
-        Class = "Cryptid",
-        Danger = "Considerable",
-        Description = "The Monstrous Slasher which uses basic abilities to achieve quick kills.\n\n-Abomignat can use its sharp claws to quickly damage Survivors.\n-It can perform a short-range high-speed lunge to finish off its victims.\n-Its Crawling Mode can enable swift map traversal.",
-        ProTip = "-This Slasher enters bursts of speed while attacking.",
-        SpeedRating = "★★★☆☆",
-        EyeRating = "★★★★☆",
-        DiffRating = "★☆☆☆☆"
-    },
-
-    {
-        Name = "Criminal",
-        Class = "Umbra",
-        Danger = "Devastating",
-        Description = "The Tormented Slasher which relies on confusion and\nentrapment to catch his victims.\n\n-Criminal is only able to attack while standing still.\n-He can summon clones around himself as a tool of confusion.\n",
-        ProTip = "-This Slasher was seen surrounded by fake copies of itself.",
-        SpeedRating = "★★★★☆",
-        EyeRating = "★★☆☆☆",
-        DiffRating = "★★★★★"
-    },
-
-    {
         Name = "Free Smiley Dealer",
         Class = "Cryptid",
         Danger = "Devastating",

@@ -377,6 +377,9 @@ end
 
 SlashCoSlasher.Tyler.Animator = function(ply) 
 
+    local tyler_creator = ply:GetNWBool("TylerTheCreator")
+	local tyler_creating = ply:GetNWBool("TylerCreating")
+
     if tyler_creator then
 
 		if not tyler_creating then

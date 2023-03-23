@@ -8,6 +8,11 @@ AddCSLuaFile("male07.lua")
 AddCSLuaFile("tyler.lua")
 AddCSLuaFile("borgmire.lua")
 AddCSLuaFile("manspider.lua")
+AddCSLuaFile("watcher.lua")
+AddCSLuaFile("abomignat.lua")
+AddCSLuaFile("criminal.lua")
+AddCSLuaFile("freesmiley.lua")
+AddCSLuaFile("leuonard.lua")
 
 if not SlashCoSlasher then SlashCoSlasher = {} end
 
@@ -20,6 +25,11 @@ include("male07.lua")
 include("tyler.lua")
 include("borgmire.lua")
 include("manspider.lua")
+include("watcher.lua")
+include("abomignat.lua")
+include("criminal.lua")
+include("freesmiley.lua")
+include("leuonard.lua")
 
 function TranslateSlasherClass(id)
 

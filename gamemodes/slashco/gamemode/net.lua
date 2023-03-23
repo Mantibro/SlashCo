@@ -34,43 +34,6 @@ util.AddNetworkString("mantislashcoSurvivorVoicePrompt")
 util.AddNetworkString("mantislashcoSurvivorPings")
 util.AddNetworkString("mantislashcoSurvivorPreparePing")
 
-net.Receive("mantislashcoSurvivorPreparePing", function()
-
-	t = net.ReadTable()
-
-	local ply = t.Player
-
-	if t.Type == "LOOK HERE" or t.Type == "LOOK AT THIS" then
-		ply:EmitSound("slashco/survivor/voice/prompt_look"..math.random(1,3)..".mp3")
-	elseif t.Type == "Generator" then
-		ply:EmitSound("slashco/survivor/voice/prompt_generator"..math.random(1,3)..".mp3")
-	elseif t.Type == "Helicopter" then
-		ply:EmitSound("slashco/survivor/voice/prompt_helicopter"..math.random(1,3)..".mp3")
-	elseif t.Type == "Plush Dog" then
-		ply:EmitSound("slashco/survivor/voice/prompt_dogg"..math.random(1,3)..".mp3")
-	elseif t.Type == "Basketball" then
-		ply:EmitSound("slashco/survivor/voice/prompt_ballin"..math.random(1,3)..".mp3")
-	else
-
-		for k, v in SortedPairs(SlashCoItems) do
-
-			if v.Name == t.Type then
-				local input = v.EntClass
-				local class = string.Replace( input, "sc_", "")
-
-				ply:EmitSound("slashco/survivor/voice/prompt_"..class..math.random(1,3)..".mp3")
-			end
-	
-		end
-
-	end
-
-    net.Start("mantislashcoSurvivorPings")
-	net.WriteTable(t)
-	net.Broadcast()
-
-end)
-
 function PlayGlobalSound(sound, level, ent, vol)
 
 	if vol == nil then vol = 1 end

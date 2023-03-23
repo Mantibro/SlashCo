@@ -331,3 +331,41 @@ if CLIENT then
     end
 
 end
+
+if SERVER then
+
+    SlashCoSlasher.ThirstyRage = function(ply)
+
+        local pos = ply:GetPos()
+    
+        for i = 1, #team.GetPlayers(TEAM_SLASHER) do
+    
+            local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
+            local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+    
+            if SlashCoSlasher[slasher:GetNWString("Slasher")].SlasherID ~= 5 then return end
+    
+            if slasher:GetPos():Distance( pos ) > 1600 then return end
+    
+            slasher.SlasherValue1 = 6
+            slasher:SetNWBool("ThirstyBigMlik", true)
+    
+            for i = 1, #player.GetAll() do
+                local ply = player.GetAll()[i]
+                ply:SetNWBool("ThirstyFuck",true)
+            end
+    
+            timer.Simple(3, function() 
+            
+                for i = 1, #player.GetAll() do
+                    local ply = player.GetAll()[i]
+                    ply:SetNWBool("ThirstyFuck",false)
+                end
+            
+            end)
+    
+        end
+    
+    end
+
+end
