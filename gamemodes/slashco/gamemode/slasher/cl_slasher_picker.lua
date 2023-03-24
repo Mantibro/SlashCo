@@ -46,13 +46,21 @@ end
 
 function DrawTheSlasherSelectorBox()
 
-	if ( IsValid( ItemSelectFrame ) ) then return end
+	--if ( IsValid( ItemSelectFrame ) ) then return end
 
-	if LocalPlayer():SteamID64() ~= readtable.slashersteamid then return end
-	
-	local SlasherPickingID = readtable.slashID
-	local SlasherPickingCLASS = readtable.slashClass
-	local SlasherPickingDANGER = readtable.slashDanger
+	--if LocalPlayer():SteamID64() ~= readtable.slashersteamid then return end
+
+	local SlasherPickingID = 0
+	local SlasherPickingCLASS = 0
+	local SlasherPickingDANGER = 0
+
+	if readtable ~= nil then
+		SlasherPickingID = readtable.slashID
+		SlasherPickingCLASS = readtable.slashClass
+		SlasherPickingDANGER = readtable.slashDanger
+	else
+
+	end
 
 	local SlasherIcon = SlasherIcon
 
@@ -64,24 +72,33 @@ function DrawTheSlasherSelectorBox()
 	SlasherSelectFrame = vgui.Create( "DFrame" )
 	SlasherSelectFrame:SetTitle( "Pick Your Slasher" )
 
-	local y = 30
+	local x = ScrW()/50
+	local y = ScrH()/25
 	local diff = PickDifficulty
+	local icon_size = ScrW()/15
+	local row = 0
+	local count = 1
 
-	for k, v in pairs( SlashCoSlasher ) do
+	for k, v in SortedPairs( SlashCoSlasher ) do
 	
 		if not v.IsSelectable then continue end
 
 		local Slash = vgui.Create( "DButton", SlasherSelectFrame )
-		function Slash.DoClick() SelectThisSlasher(k) end
-		Slash:SetPos( 30, y )
-		Slash:SetSize( 200, 30 )
-		Slash:SetText( v.Name )
-		Slash:SetFont( "MenuFont1" )
+		function Slash.DoClick() 
+			SelectThisSlasher(k) 
+			LocalPlayer():EmitSound("slashco/slasher_preview.mp3")
+		end
+		Slash:SetPos( 30 + x, 30 + y )
+		Slash:SetSize( icon_size, icon_size)
+		Slash:SetText( "" )
+		--Slash:SetFont( "MenuFont1" )
+		local select_color = 1
 
 		if SlasherPickingCLASS > 0 then
 			
 			if v.Class ~= SlasherPickingCLASS  then --not the desired class
 				Slash:SetDisabled( true )
+				select_color = 0.25
 			end
 
 		end
@@ -89,58 +106,82 @@ function DrawTheSlasherSelectorBox()
 		if SlasherPickingDANGER > 0 then
 			
 			if v.DangerLevel ~= SlasherPickingDANGER  then --not the desired danger
-				Slash:SetDisabled( true )
+				select_color = 0.25
 			end
 
 		end
-			
-		y = y + 40
+		
 
 		if SelectedSlasher == k  then
 			Slash:SetDisabled( true )
-			SlasherIcon = "slashco/ui/icons/slasher/s_"..SlashCoSlasher[SelectedSlasher].ID
+			select_color = 0.7
+			Slash:SetSize( icon_size*1.12, icon_size*1.12)
+			Slash:SetPos( (30 + x) - icon_size*0.06, (30 + y) - icon_size*0.06)
 		end
+
+		Slash.Paint = function( self, w, h )
+			surface.SetMaterial( Material( "slashco/ui/icons/slasher/s_"..SlashCoSlasher[k].ID ) )
+			surface.SetDrawColor( 255,255,255,255*select_color )
+			surface.DrawTexturedRect( 0, 0, w, h)
+		end
+
+		x = x + ScrW()/13
+		if math.floor(count / 6) > row then 
+			row = math.floor(count / 6) 
+			y = y + ScrW()/13
+			x = ScrW()/50
+		end
+
+		count = count + 1
 		
 	end
 
 	local confirmselect = vgui.Create( "DButton", SlasherSelectFrame )
-	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() end
-	confirmselect:SetPos( 730, 800 )
-	confirmselect:SetSize( 160, 40 )
-	confirmselect:SetText( "Confirm" )
-	confirmselect:SetFont( "MenuFont1" )
+	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() LocalPlayer():EmitSound("slashco/slasher_select.mp3") end
+	confirmselect:SetPos( ScrW()/2, ScrH()/1.1 )
+	confirmselect:SetSize( ScrW()/4, 40 )
+	confirmselect:SetText( "SELECT" )
+	confirmselect:SetFont( "MenuFont2" )
+	confirmselect.Paint = function( self, w, h )
+		draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 0, 0, 255 ) )
+	end
 
 	if SelectedSlasher == "None"  then
 		confirmselect:SetDisabled( true )
 	end
 
-	SlasherSelectFrame:SetSize( 900, 1000 )
+	SlasherSelectFrame:SetSize( ScrW(), ScrH() )
 	SlasherSelectFrame:Center()
 	SlasherSelectFrame:MakePopup()
 	SlasherSelectFrame:SetKeyboardInputEnabled( false )
 	SlasherSelectFrame:SetDraggable( false ) 
 	SlasherSelectFrame:ShowCloseButton( false )
+	SlasherSelectFrame.Paint = function( self, w, h )
+		draw.RoundedBox( 0, 0, 0, w, h, Color( 0, 0, 0, 255 ) ) 
+	end
 
 	local mat = vgui.Create("Material", SlasherSelectFrame)
-	mat:SetPos(250, 50)
-	mat:SetSize(20, 20)
-	mat:SetMaterial(SlasherIcon)
+	mat:SetPos(ScrW() - (ScrW()/2.5 ), 0)
+	mat:SetSize(ScrW()/2.5, ScrH()/1.5)
+	--mat:SetMaterial(Material( "slashco/ui/icons/slasher/preview/preview_"..SlashCoSlasher[k].ID ))
+	mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1" )
+	mat.AutoSize = false
 
 	local ILabel = vgui.Create( "DLabel", SlasherSelectFrame )
-	ILabel:SetPos( 250, 570 )
-	ILabel:SetSize(450, 100)
+	ILabel:SetPos( ScrW()/2, ScrH()/2 )
+	ILabel:SetSize(1024, 100)
 
 	local ISClass = vgui.Create( "DLabel", SlasherSelectFrame )
-	ISClass:SetPos( 250, 605 )
+	ISClass:SetPos( ScrW()/2, ScrH()/1.8 )
 	ISClass:SetSize(450, 100)
 
 	local ISDanger = vgui.Create( "DLabel", SlasherSelectFrame )
-	ISDanger:SetPos( 400, 605 )
+	ISDanger:SetPos( ScrW()/2, ScrH()/1.7 )
 	ISDanger:SetSize(450, 100)
 
 	local ISDesc = vgui.Create( "DLabel", SlasherSelectFrame )
-	ISDesc:SetPos( 250, 650 )
-	ISDesc:SetSize(650, 100)
+	ISDesc:SetPos( ScrW()/2, ScrH()/1.4 )
+	ISDesc:SetSize(ScrW()/2, 100)
 
 	if SelectedSlasher ~= "None" then 
 		ILabel:SetText( SlashCoSlasher[SelectedSlasher].Name ) 
@@ -159,8 +200,8 @@ function DrawTheSlasherSelectorBox()
 	ISDesc:SetAutoStretchVertical( true )
 	ILabel:SetFont( "MenuFont3" )
 	ILabel:SetColor(Color(255, 0, 0))
-	ISClass:SetFont( "MenuFont1" )
-	ISDanger:SetFont( "MenuFont1" )
+	ISClass:SetFont( "MenuFont2" )
+	ISDanger:SetFont( "MenuFont2" )
 	ISDesc:SetFont( "MenuFont1" )
 
 end
