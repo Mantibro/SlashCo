@@ -1147,7 +1147,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             if itemClass then SlashCo.CreateItems(itemSpawns, itemClass) print("[SlashCo] Spawning Items.") end
 
-            if slashid == 6 then
+            if slashid == "Male07" then
 
                 local diff = SlashCo.CurRound.Difficulty
 

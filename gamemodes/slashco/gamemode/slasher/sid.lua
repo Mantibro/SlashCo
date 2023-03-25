@@ -671,7 +671,7 @@ end
 
 if SERVER then
 
-    SlashCoSlasher.SidRage = function(ply)
+    SlashCoSlasher.Sid.SidRage = function(ply)
 
         local pos = ply:GetPos()
     

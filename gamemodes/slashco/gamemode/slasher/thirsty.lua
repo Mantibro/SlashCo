@@ -334,7 +334,7 @@ end
 
 if SERVER then
 
-    SlashCoSlasher.ThirstyRage = function(ply)
+    SlashCoSlasher.Thirsty.ThirstyRage = function(ply)
 
         local pos = ply:GetPos()
     

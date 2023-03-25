@@ -36,6 +36,8 @@ end
 
 SlashCoSlasher.Male07.OnTickBehaviour = function(slasher)
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     v1 = slasher.SlasherValue1 --State
     v2 = slasher.SlasherValue2 --Time Spent Human Chasing
     v3 = slasher.SlasherValue3 --Cooldown
@@ -148,7 +150,10 @@ end
 SlashCoSlasher.Male07.OnPrimaryFire = function(slasher)
     if slasher.SlasherValue1 == 1 then
         SlashCo.Jumpscare(slasher)
+        return
     end
+
+    local SO = SlashCo.CurRound.OfferingData.SO
 
     if slasher.SlasherValue1 == 0 then return end
 
@@ -306,11 +311,6 @@ SlashCoSlasher.Male07.Animator = function(ply)
 		end
 
 		ply:SetPoseParameter( "move_x", ply:GetVelocity():Length()/100 )
-
-		--local a1 = -ply:GetVelocity()[2]
-		--local a2 = -ply:GetVelocity()[1]
-
-		--ply:SetPoseParameter( "move_yaw",-((( math.atan2( a1, a2 )*2/(-2*math.pi) ) 	* 180	) + ply:GetAngles()[2] - 180))
 
 		if ply:GetVelocity():Length() < 30 then 
 

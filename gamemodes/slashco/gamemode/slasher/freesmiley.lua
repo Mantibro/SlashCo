@@ -27,7 +27,7 @@ SlashCoSlasher.FreeSmiley.EyeRating = "★★★☆☆"
 SlashCoSlasher.FreeSmiley.DiffRating = "★★☆☆☆"
 
 SlashCoSlasher.FreeSmiley.OnSpawn = function(slasher)
-    SlashCoSlasher.SmileyIdle(slasher)
+    SlashCoSlasher.FreeSmiley.SmileyIdle(slasher)
 end
 
 SlashCoSlasher.FreeSmiley.PickUpAttempt = function(ply)
@@ -181,6 +181,7 @@ if CLIENT then
     local ZanyIcon = Material("slashco/ui/icons/slasher/s_13_a1")
     local PensiveIcon = Material("slashco/ui/icons/slasher/s_13_a2")
     local SurveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+    local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
 
     SlashCoSlasher.FreeSmiley.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
 
@@ -241,7 +242,7 @@ end
 
 if SERVER then
 
-    SlashCoSlasher.SmileyIdle = function(slasher)
+    SlashCoSlasher.FreeSmiley.SmileyIdle = function(slasher)
 
         if not slasher:GetNWBool("InSlasherChaseMode") then 
             slasher:EmitSound("slashco/slasher/freesmiley_idle"..math.random(1,7)..".mp3")     
@@ -249,7 +250,7 @@ if SERVER then
     
         timer.Simple(math.random(3,5), function()
     
-            SlashCoSlasher.SmileyIdle(slasher)
+            SlashCoSlasher.FreeSmiley.SmileyIdle(slasher)
         
         end)
         
