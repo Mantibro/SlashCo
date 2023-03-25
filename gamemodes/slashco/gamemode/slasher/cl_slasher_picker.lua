@@ -64,6 +64,10 @@ function DrawTheSlasherSelectorBox()
 
 	local SlasherIcon = SlasherIcon
 
+	if not SelectedSlasher then
+		SelectedSlasher = "None"
+	end
+
 	if ( IsValid( SlasherSelectFrame ) ) then print("not valid!") return end
 
 	if  SlasherPickingID ~= 0 then SlasherChosen(SlasherPickingID) return end
@@ -92,13 +96,13 @@ function DrawTheSlasherSelectorBox()
 		Slash:SetSize( icon_size, icon_size)
 		Slash:SetText( "" )
 		--Slash:SetFont( "MenuFont1" )
-		local select_color = 1
+		local is_available = true
 
 		if SlasherPickingCLASS > 0 then
 			
 			if v.Class ~= SlasherPickingCLASS  then --not the desired class
 				Slash:SetDisabled( true )
-				select_color = 0.25
+				is_available = false
 			end
 
 		end
@@ -106,7 +110,8 @@ function DrawTheSlasherSelectorBox()
 		if SlasherPickingDANGER > 0 then
 			
 			if v.DangerLevel ~= SlasherPickingDANGER  then --not the desired danger
-				select_color = 0.25
+				Slash:SetDisabled( true )
+				is_available = false
 			end
 
 		end
@@ -114,14 +119,17 @@ function DrawTheSlasherSelectorBox()
 
 		if SelectedSlasher == k  then
 			Slash:SetDisabled( true )
-			select_color = 0.7
 			Slash:SetSize( icon_size*1.12, icon_size*1.12)
 			Slash:SetPos( (30 + x) - icon_size*0.06, (30 + y) - icon_size*0.06)
 		end
 
 		Slash.Paint = function( self, w, h )
-			surface.SetMaterial( Material( "slashco/ui/icons/slasher/s_"..SlashCoSlasher[k].ID ) )
-			surface.SetDrawColor( 255,255,255,255*select_color )
+			if is_available then
+				surface.SetMaterial( Material( "slashco/ui/icons/slasher/s_"..SlashCoSlasher[k].ID ) )
+			else
+				surface.SetMaterial( Material( "slashco/ui/icons/slasher/kill_disabled" ) )
+			end
+			surface.SetDrawColor( 255,255,255,255 )
 			surface.DrawTexturedRect( 0, 0, w, h)
 		end
 
@@ -150,14 +158,14 @@ function DrawTheSlasherSelectorBox()
 
 	if SelectedSlasher == "None"  then
 		confirmselect:SetDisabled( true )
+	else
+		local mat = vgui.Create("Material", SlasherSelectFrame)
+		mat:SetPos(ScrW() - (ScrW()/2.5 ), 0)
+		mat:SetSize(ScrW()/2.5, ScrH()/1.5)
+		mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_"..SlashCoSlasher[SelectedSlasher].ID)
+		--mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1" )
+		mat.AutoSize = false
 	end
-
-	local mat = vgui.Create("Material", SlasherSelectFrame)
-	mat:SetPos(ScrW() - (ScrW()/2.5 ), 0)
-	mat:SetSize(ScrW()/2.5, ScrH()/1.5)
-	mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_"..SlashCoSlasher[SelectedSlasher].ID)
-	--mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1" )
-	mat.AutoSize = false
 			
 	SlasherSelectFrame:SetSize( ScrW(), ScrH() )
 	SlasherSelectFrame:Center()
@@ -173,12 +181,23 @@ function DrawTheSlasherSelectorBox()
 	ILabel:SetPos( ScrW()/2, ScrH()/2 )
 	ILabel:SetSize(1024, 100)
 
+	local Descriptor = vgui.Create( "DLabel", SlasherSelectFrame )
+	Descriptor:SetPos( ScrW()/2, ScrH()/1.75 )
+	Descriptor:SetSize(1024, 600)
+	Descriptor:SetText([[SLASHER CLASS:
+	
+	
+	
+	DANGER LEVEL:]])
+	Descriptor:SetFont( "MenuFont1" )
+	Descriptor:SetAutoStretchVertical( true )
+
 	local ISClass = vgui.Create( "DLabel", SlasherSelectFrame )
-	ISClass:SetPos( ScrW()/2, ScrH()/1.8 )
+	ISClass:SetPos( ScrW()/2, ScrH()/1.7 )
 	ISClass:SetSize(450, 100)
 
 	local ISDanger = vgui.Create( "DLabel", SlasherSelectFrame )
-	ISDanger:SetPos( ScrW()/2, ScrH()/1.7 )
+	ISDanger:SetPos( ScrW()/2, ScrH()/1.55 )
 	ISDanger:SetSize(450, 100)
 
 	local ISDesc = vgui.Create( "DLabel", SlasherSelectFrame )
@@ -188,8 +207,20 @@ function DrawTheSlasherSelectorBox()
 	if SelectedSlasher ~= "None" then 
 		ILabel:SetText( SlashCoSlasher[SelectedSlasher].Name ) 
 		ISDesc:SetText(SlashCoSlasher[SelectedSlasher].Description.."\n\nSpeed: "..SlashCoSlasher[SelectedSlasher].SpeedRating.."\nEyesight: "..SlashCoSlasher[SelectedSlasher].EyeRating.."\nDifficulty: "..SlashCoSlasher[SelectedSlasher].DiffRating ) 
-		ISClass:SetText( "Class: "..TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class) ) 
-		ISDanger:SetText( "Danger Level: "..TranslateDangerLevel(SlashCoSlasher[SelectedSlasher].DangerLevel)) 
+		ISClass:SetText( TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class) ) 
+		ISDanger:SetText( TranslateDangerLevel(SlashCoSlasher[SelectedSlasher].DangerLevel)) 
+
+		if SlashCoSlasher[SelectedSlasher].DangerLevel == 1 then
+			ISDanger:SetTextColor( Color( 255, 200, 0) )
+		end
+
+		if SlashCoSlasher[SelectedSlasher].DangerLevel == 2 then
+			ISDanger:SetTextColor( Color( 255, 120, 120) )
+		end
+
+		if SlashCoSlasher[SelectedSlasher].DangerLevel == 3 then
+			ISDanger:SetTextColor( Color( 255, 0, 0) )
+		end
 	else
 		ILabel:SetText( "" ) 
 		ISDesc:SetText( "" ) 
@@ -202,8 +233,8 @@ function DrawTheSlasherSelectorBox()
 	ISDesc:SetAutoStretchVertical( true )
 	ILabel:SetFont( "MenuFont3" )
 	ILabel:SetColor(Color(255, 0, 0))
-	ISClass:SetFont( "MenuFont2" )
-	ISDanger:SetFont( "MenuFont2" )
+	ISClass:SetFont( "MenuFont4" )
+	ISDanger:SetFont( "MenuFont4" )
 	ISDesc:SetFont( "MenuFont1" )
 
 end
