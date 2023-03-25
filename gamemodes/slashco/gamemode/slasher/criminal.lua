@@ -29,17 +29,17 @@ SlashCoSlasher.Criminal.DiffRating = "★★★★★"
 SlashCoSlasher.Criminal.OnSpawn = function(slasher)
     local clone = ents.Create( "sc_crimclone" )
 
-    clone:SetPos( ply:GetPos() )
-    clone:SetAngles( ply:GetAngles() )
-    clone.AssignedSlasher = ply:SteamID64()
+    clone:SetPos( slasher:GetPos() )
+    clone:SetAngles( slasher:GetAngles() )
+    clone.AssignedSlasher = slasher:SteamID64()
     clone.IsMain = true
     clone:Spawn()
     clone:Activate()
 
-    ply:SetColor(Color(0,0,0,0))
-    ply:DrawShadow(false)
-    ply:SetRenderMode(RENDERMODE_TRANSALPHA)
-    ply:SetNoDraw(true)
+    slasher:SetColor(Color(0,0,0,0))
+    slasher:DrawShadow(false)
+    slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+    slasher:SetNoDraw(true)
 end
 
 SlashCoSlasher.Criminal.PickUpAttempt = function(ply)

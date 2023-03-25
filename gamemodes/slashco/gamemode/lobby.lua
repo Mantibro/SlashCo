@@ -364,9 +364,9 @@ function lobbyRoundSetup()
 
 	--Difficulty-based Slasher Selection:
 
-	local rand_name = GetRandomSlasher()
-
 	if SlashCo.LobbyData.SelectedDifficulty == 0 then
+
+		local rand_name = GetRandomSlasher()
 
 		SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
 		SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCoSlasher[rand_name].Class
@@ -378,11 +378,11 @@ function lobbyRoundSetup()
 
 	elseif SlashCo.LobbyData.SelectedDifficulty == 1 then
 
-		SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCoSlasher[rand_name].Class
+		SlashCo.LobbyData.SelectedSlasherInfo.CLS = math.random(1, 3)
 
 	elseif SlashCo.LobbyData.SelectedDifficulty == 2 then
 
-		SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCoSlasher[rand_name].DangerLevel
+		SlashCo.LobbyData.SelectedSlasherInfo.DNG = math.random(1, 3)
 
 	end
 
@@ -772,7 +772,7 @@ function lobbySaveCurData()
 
 			local rand_name = GetRandomSlasher()
 
-			if SlashCo.LobbyData.SelectedSlasherInfo.CLS == "Unknown" then
+			if SlashCo.LobbyData.SelectedSlasherInfo.CLS == 0 then
 				--Check if the random id of slasher has the appropriate class for the difficulty
 
 				--The difficulty allows for any class.
@@ -785,7 +785,7 @@ function lobbySaveCurData()
 
 			end
 
-			if SlashCo.LobbyData.SelectedSlasherInfo.DNG == "Unknown" then
+			if SlashCo.LobbyData.SelectedSlasherInfo.DNG == 0 then
 				--Check if the random id of slasher has the appropriate danger level for the difficulty
 
 				--The difficulty allows for any danger level.

@@ -24,7 +24,7 @@ SlashCoItems.Cookie.OnUse = function(ply)
 
     end)
 
-    SlashCo.SidRage(ply)
+    SlashCoSlasher.SidRage(ply)
 end
 SlashCoItems.Cookie.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem(SlashCoItems.Cookie.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

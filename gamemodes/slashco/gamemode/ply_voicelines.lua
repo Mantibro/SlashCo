@@ -296,9 +296,11 @@ net.Receive("mantislashcoSurvivorPreparePing", function()
 
 			if v.Name == t.Type then
 				local input = v.EntClass
-				local class = string.Replace( input, "sc_", "")
-
-				ply:EmitSound("slashco/survivor/voice/prompt_"..class..math.random(1,3)..".mp3")
+                class = "Item"
+                if input ~= nil then
+				    class = string.Replace( input, "sc_", "")
+                    ply:EmitSound("slashco/survivor/voice/prompt_"..class..math.random(1,3)..".mp3")
+                end
 			end
 	
 		end

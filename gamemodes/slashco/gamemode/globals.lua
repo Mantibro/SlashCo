@@ -146,9 +146,9 @@ SlashCo.LobbyData = {
     SelectedSlasherInfo = {
 
         ID = 0,
-        CLS = "Unknown",
-        DNG = "Unknown",
-        NAME = "Unknown",
+        CLS = 0,
+        DNG = 0,
+        NAME = 0,
         TIP = "--//--"
 
     },

@@ -29,6 +29,8 @@ SlashCoSlasher.Watcher.DiffRating = "★★☆☆☆"
 SlashCoSlasher.Watcher.OnSpawn = function(slasher)
     slasher:SetViewOffset( Vector(0,0,100) )
     slasher:SetCurrentViewOffset( Vector(0,0,100) )
+    slasher:SetNWBool("CanChase", true)
+    slasher:SetNWBool("CanKill", true)
 end
 
 SlashCoSlasher.Watcher.PickUpAttempt = function(ply)

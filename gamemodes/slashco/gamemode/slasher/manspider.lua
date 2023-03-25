@@ -56,6 +56,10 @@ SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
         slasher:SetNWBool("CanChase", false)
         slasher:SetNWBool("CanKill", false)
 
+        if #team.GetPlayers(TEAM_SURVIVOR) < 2 then
+            v1 = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
+        end
+
     else
 
         slasher:SetNWBool("CanChase", true)
@@ -188,6 +192,8 @@ end
 SlashCoSlasher.Manspider.OnPrimaryFire = function(slasher)
     local target = slasher:GetEyeTrace().Entity	
 
+    if not target:IsPlayer() then return end
+
     if target:SteamID64() ~= slasher.SlasherValue1 then
         slasher:ChatPrint("You can only kill your Prey.")
         return 
@@ -200,6 +206,8 @@ end
 SlashCoSlasher.Manspider.OnSecondaryFire = function(slasher)
 
     local target = slasher:GetEyeTrace().Entity	
+
+    if not target:IsPlayer() then return end
 
     if target:SteamID64() ~= slasher.SlasherValue1 then return end
 

@@ -45,10 +45,13 @@ net.Receive( "mantislashcoSurvivorPings", function( )
 
 	for i = 1, #global_pings do
 
+		if global_pings[i] == nil then continue end
+
 		local pn = global_pings[i]
 
 		if pn.Player == ping.Player then
-			global_pings[i] = nil
+			table.RemoveByValue( global_pings, pn )
+			break
 		end
 
 	end
@@ -316,9 +319,10 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				elseif lookfinal:IsPlayer() then
 					if lookfinal:Team() == TEAM_SURVIVOR then
 						ping_info.Type = "SURVIVOR"
-					end
-
-					if lookfinal:Team() == TEAM_SLASHER then
+						ping_info.SurvivorName = lookfinal:Nick()
+						lookfinal = LocalPlayer():GetEyeTrace().HitPos
+						ping_info.ExpiryTime = 5
+					elseif lookfinal:Team() == TEAM_SLASHER then
 						ping_info.Type = "SLASHER"
 						lookfinal = LocalPlayer():GetEyeTrace().HitPos
 						ping_info.ExpiryTime = 5
@@ -354,6 +358,9 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		for i = 1, #global_pings do
 
+			if global_pings[i] == nil then continue end
+			if global_pings[i].Entity == nil then continue end
+
 			if type(global_pings[i].Entity) ~= "Vector" and not IsValid( global_pings[i].Entity ) then
 				table.RemoveByValue( global_pings, global_pings[i] )
 				continue
@@ -376,7 +383,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				showname = true
 			elseif global_pings[i].Type == "SURVIVOR" then 
 					showname = true
-					showtext = global_pings[i].Entity:GetName()
+					showtext = global_pings[i].SurvivorName
 					textcolor = Color(50,50,255,255)
 			elseif global_pings[i].Type == "SLASHER" then 
 					showname = true
@@ -388,6 +395,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				showtext = "     "
 			end
 
+			if global_pings[i].Entity == nil then continue end
 			if showname then
 				draw.SimpleText(global_pings[i].Player:GetName(), "TVCD", pos.x, pos.y - 25, Color( 255, 255, 255, 180 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			end

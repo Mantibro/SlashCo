@@ -48,7 +48,7 @@ function DrawTheSlasherSelectorBox()
 
 	--if ( IsValid( ItemSelectFrame ) ) then return end
 
-	--if LocalPlayer():SteamID64() ~= readtable.slashersteamid then return end
+	if LocalPlayer():SteamID64() ~= readtable.slashersteamid then return end
 
 	local SlasherPickingID = 0
 	local SlasherPickingCLASS = 0
@@ -186,7 +186,7 @@ function DrawTheSlasherSelectorBox()
 	Descriptor:SetSize(1024, 600)
 	Descriptor:SetText([[SLASHER CLASS:
 	
-	
+
 	
 	DANGER LEVEL:]])
 	Descriptor:SetFont( "MenuFont1" )
