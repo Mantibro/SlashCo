@@ -133,6 +133,8 @@ function DrawTheSlasherSelectorBox()
 		end
 
 		count = count + 1
+
+		
 		
 	end
 
@@ -150,6 +152,13 @@ function DrawTheSlasherSelectorBox()
 		confirmselect:SetDisabled( true )
 	end
 
+	local mat = vgui.Create("Material", SlasherSelectFrame)
+	mat:SetPos(ScrW() - (ScrW()/2.5 ), 0)
+	mat:SetSize(ScrW()/2.5, ScrH()/1.5)
+	mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_"..SlashCoSlasher[SelectedSlasher].ID)
+	--mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1" )
+	mat.AutoSize = false
+			
 	SlasherSelectFrame:SetSize( ScrW(), ScrH() )
 	SlasherSelectFrame:Center()
 	SlasherSelectFrame:MakePopup()
@@ -159,13 +168,6 @@ function DrawTheSlasherSelectorBox()
 	SlasherSelectFrame.Paint = function( self, w, h )
 		draw.RoundedBox( 0, 0, 0, w, h, Color( 0, 0, 0, 255 ) ) 
 	end
-
-	local mat = vgui.Create("Material", SlasherSelectFrame)
-	mat:SetPos(ScrW() - (ScrW()/2.5 ), 0)
-	mat:SetSize(ScrW()/2.5, ScrH()/1.5)
-	--mat:SetMaterial(Material( "slashco/ui/icons/slasher/preview/preview_"..SlashCoSlasher[k].ID ))
-	mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1" )
-	mat.AutoSize = false
 
 	local ILabel = vgui.Create( "DLabel", SlasherSelectFrame )
 	ILabel:SetPos( ScrW()/2, ScrH()/2 )
