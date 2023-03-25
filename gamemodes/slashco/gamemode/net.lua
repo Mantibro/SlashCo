@@ -33,6 +33,7 @@ util.AddNetworkString("mantislashcoLobbySlasherInformation")
 util.AddNetworkString("mantislashcoSurvivorVoicePrompt")
 util.AddNetworkString("mantislashcoSurvivorPings")
 util.AddNetworkString("mantislashcoSurvivorPreparePing")
+util.AddNetworkString("mantislashcoHelicopterVoice")
 
 function PlayGlobalSound(sound, level, ent, vol)
 
@@ -442,3 +443,12 @@ SlashCo.BroadcastMasterDatabaseForClient = function(ply_id)
 	end
 
 end
+
+SlashCo.HelicopterRadioVoice = function(type)
+
+	net.Start("mantislashcoHelicopterVoice")
+	net.WriteUInt(type, 4)
+	net.Broadcast()
+
+end
+

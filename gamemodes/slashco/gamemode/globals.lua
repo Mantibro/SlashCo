@@ -1205,6 +1205,8 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         end)
 
+        timer.Simple( math.random(2,4), function() SlashCo.HelicopterRadioVoice(1) end)
+
         SlashCo.RoundHeadstart()
     end
 end
@@ -1266,7 +1268,7 @@ SlashCo.SummonEscapeHelicopter = function()
 
     if SlashCo.CurRound.EscapeHelicopterSummoned then return true end
 
-    SlashCo.EscapeVoicePrompt()
+    timer.Simple( math.random(2,5), function() SlashCo.HelicopterRadioVoice(2) end)
 
     SlashCo.CurRound.EscapeHelicopterSummoned = true
 
@@ -1287,6 +1289,8 @@ SlashCo.SummonEscapeHelicopter = function()
     timer.Simple(delay, function()
 
         local entID = SlashCo.CreateHelicopter( SlashCo.CurRound.HelicopterSpawnPosition, Angle( 0,0,0 ) )
+
+        SlashCo.EscapeVoicePrompt()
 
         timer.Simple(0.1, function()
 
@@ -1324,8 +1328,9 @@ SlashCo.HelicopterLand = function(pos)
 
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1],pos[2],pos[3])
 
+    timer.Simple( math.random(4,6), function() SlashCo.HelicopterRadioVoice(3) end)
+
     --Will the Helicopter Abandon players?
-    print(SlashCo.CurRound.Difficulty.."  yyyah")
 
     if SlashCo.CurRound.Difficulty ~= 3 then return end
 

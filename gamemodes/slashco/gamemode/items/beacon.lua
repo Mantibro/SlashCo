@@ -35,6 +35,8 @@ SlashCoItems.Beacon.OnUse = function(ply)
             if not failed then
                 SlashCo.CurRound.DistressBeaconUsed = true
 
+                timer.Simple( math.random(3,6), function() SlashCo.HelicopterRadioVoice(4) end)
+
                 SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
             end
 

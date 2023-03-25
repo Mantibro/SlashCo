@@ -354,3 +354,29 @@ do
 end
 
 end )
+
+net.Receive( "mantislashcoHelicopterVoice", function( )
+
+    local t = net.ReadUInt(4)
+
+    if t == 1 then
+        LocalPlayer():EmitSound("slashco/helipilot/helipilot_intro"..math.random(1,8)..".mp3",100)
+        return
+    end
+
+    if t == 2 then
+        LocalPlayer():EmitSound("slashco/helipilot/helipilot_approach"..math.random(1,5)..".mp3",100)
+        return
+    end
+
+    if t == 3 then
+        LocalPlayer():EmitSound("slashco/helipilot/helipilot_land"..math.random(1,5)..".mp3",100)
+        return
+    end
+
+    if t == 4 then
+        LocalPlayer():EmitSound("slashco/helipilot/helipilot_beacon"..math.random(1,5)..".mp3",100)
+        return
+    end
+
+end)
