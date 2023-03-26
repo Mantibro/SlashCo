@@ -142,8 +142,6 @@ function DrawTheSlasherSelectorBox()
 
 		count = count + 1
 
-		
-		
 	end
 
 	local confirmselect = vgui.Create( "DButton", SlasherSelectFrame )
@@ -181,17 +179,6 @@ function DrawTheSlasherSelectorBox()
 	ILabel:SetPos( ScrW()/2, ScrH()/2 )
 	ILabel:SetSize(1024, 100)
 
-	local Descriptor = vgui.Create( "DLabel", SlasherSelectFrame )
-	Descriptor:SetPos( ScrW()/2, ScrH()/1.75 )
-	Descriptor:SetSize(1024, 600)
-	Descriptor:SetText([[SLASHER CLASS:
-	
-
-	
-	DANGER LEVEL:]])
-	Descriptor:SetFont( "MenuFont1" )
-	Descriptor:SetAutoStretchVertical( true )
-
 	local ISClass = vgui.Create( "DLabel", SlasherSelectFrame )
 	ISClass:SetPos( ScrW()/2, ScrH()/1.7 )
 	ISClass:SetSize(450, 100)
@@ -221,6 +208,17 @@ function DrawTheSlasherSelectorBox()
 		if SlashCoSlasher[SelectedSlasher].DangerLevel == 3 then
 			ISDanger:SetTextColor( Color( 255, 0, 0) )
 		end
+
+		local Descriptor = vgui.Create( "DLabel", SlasherSelectFrame )
+		Descriptor:SetPos( ScrW()/2, ScrH()/1.75 )
+		Descriptor:SetSize(1024, 600)
+		Descriptor:SetText([[SLASHER CLASS:
+		
+
+		
+		DANGER LEVEL:]])
+		Descriptor:SetFont( "MenuFont1" )
+		Descriptor:SetAutoStretchVertical( true )
 	else
 		ILabel:SetText( "" ) 
 		ISDesc:SetText( "" ) 
