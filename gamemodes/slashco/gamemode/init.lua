@@ -298,7 +298,7 @@ function GM:PlayerButtonDown(ply, button)
 
 				local ent = ply:GetObserverTarget()
 
-				for k, v in team.GetPlayers(TEAM_SURVIVOR) do
+				for k, v in ipairs( team.GetPlayers(TEAM_SURVIVOR) ) do
 
 					if ply:GetObserverTarget() == v then
 						if (k+1) >= #team.GetPlayers(TEAM_SURVIVOR) then
@@ -652,14 +652,17 @@ local Think = function()
 			end
 
 			--//duality condition//--
+			if SlashCo.CurRound.OfferingData.CurrentOffering == 4 then
 
-			if runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
+				if runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
 
-				--(SPAWN HELICOPTER)
+					--(SPAWN HELICOPTER)
 
-				local failed = SlashCo.SummonEscapeHelicopter()
-				
-				if not failed then SlashCo.CurRound.DistressBeaconUsed = false end
+					local failed = SlashCo.SummonEscapeHelicopter()
+					
+					if not failed then SlashCo.CurRound.DistressBeaconUsed = false end
+
+				end
 
 			end
 

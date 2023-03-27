@@ -26,10 +26,11 @@ SlashCoItems.Beacon.OnUse = function(ply)
         if v.IsRunning then runningCount = runningCount + 1 end
     end
 
-    local beacs = ents.FindByClass( "sc_activebeacon")
-    if #beacs > 0 then
-        ply:ChatPrint("There is already a beacon deployed.")
-        return true
+    for k, v in ipairs(ents.FindByClass( "sc_activebeacon")) do
+        if not v:GetNWBool("BeaconBroken") then
+            ply:ChatPrint("There is already a beacon deployed.")
+            return true 
+        end
     end
 
     if runningCount >= 1 then
@@ -44,15 +45,18 @@ SlashCoItems.Beacon.OnUse = function(ply)
                     timer.Simple(3, function() ply.BeaconWarning = false end)
                     return true
                 else 
-                    Entity(SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))):SetNWBool("ArmingBeacon", true)
+                    local ent = SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
+                    Entity(ent).DoArming = true
+                    Entity(ent):SetNWBool("ArmingBeacon", true)
                     return 
                 end
 
             else --instant because alone
 
                 SlashCo.CurRound.DistressBeaconUsed = true
-                timer.Simple( math.random(3,6), function() SlashCo.HelicopterRadioVoice(4) end)
-                SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
+                SlashCo.SummonEscapeHelicopter(true)
+                local ent = SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
+                PlayGlobalSound("slashco/survivor/distress_siren.wav", 98, Entity(ent))
 
                 return
 

@@ -100,12 +100,7 @@ function ENT:Use(activator, _, _)
             if IsValid(self.FuelingCan) then
                 self.IsFueling = true
                 self.CurrentPourer = activator
-
-                local efficiency = CurTime()
-
-                if activator:GetNWBool("CookieEaten") then efficiency = CurTime() * 2.5 end
-
-                self.TimeUntilFueled = efficiency + (self.FuelProgress or TimeToFuel)
+                self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
                 self:SendData(activator)
                 self:EmitSound("slashco/generator_fill.wav")
             elseif not self.MakingItem then
@@ -169,7 +164,12 @@ function ENT:Think()
 
             if self.CurrentPourer:GetPos():Distance(self:GetPos()) > 100 or not self.CurrentPourer:KeyDown(IN_USE) then
                 self.IsFueling = false
-                self.FuelProgress = self.TimeUntilFueled - CurTime()
+
+                local efficiency = CurTime()
+
+                if self.CurrentPourer:GetNWBool("CookieEaten") then efficiency = CurTime() * 2.5 end
+
+                self.FuelProgress = self.TimeUntilFueled - efficiency
                 --print((self.FuelProgress or "nil").." distance")
                 self:SendData(self.CurrentPourer)
                 self.TimeUntilFueled = nil

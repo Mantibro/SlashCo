@@ -176,7 +176,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 		--Activating the Beacon
 
-		for k,v in ents.FindByClass("sc_activebeacon") do
+		for k, v in ipairs(ents.FindByClass("sc_activebeacon")) do
 
             if v:GetNWBool("ArmingBeacon") then
 
@@ -188,7 +188,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
                 end
 
 				draw.SimpleText( "The Survivors are attempting to call emergency escape.", "ItemFontTip", ScrW()/2, ScrH()/1.5, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-				draw.SimpleText( "DESTROY THE BEACON.", "ItemFontTip", ScrW()/2, ScrH()/1.25, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+				draw.SimpleText( "DESTROY THE BEACON.", "ItemFontTip", ScrW()/2, ScrH()/1.45, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
             end
 

@@ -494,11 +494,17 @@ SlashCo.GoToLobby = function()
     SlashCo.ChangeMap("sc_lobby")
 end
 
-SlashCo.SummonEscapeHelicopter = function()
+SlashCo.SummonEscapeHelicopter = function(distress)
 
     if SlashCo.CurRound.EscapeHelicopterSummoned then return true end
 
-    timer.Simple( math.random(2,5), function() SlashCo.HelicopterRadioVoice(2) end)
+    timer.Simple( math.random(2,5), function() 
+        if distress then
+            SlashCo.HelicopterRadioVoice(4) 
+        else
+            SlashCo.HelicopterRadioVoice(2) 
+        end
+    end)
 
     SlashCo.CurRound.EscapeHelicopterSummoned = true
 

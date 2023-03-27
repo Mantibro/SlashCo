@@ -191,7 +191,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
                     SlashCo.BustDoor(slasher, ent, 25000)
                 end
 
-                if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR then
+                if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR and ent.Devastate ~= true then
                     ent:SetVelocity( slasher:GetForward() * 500 )
                     ent.Devastate = true
                     ent:EmitSound("slashco/body_medium_impact_hard"..math.random(1,5)..".wav")
@@ -206,6 +206,10 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
                     timer.Simple(0.1, function() 
                         ent:Kill() 
+                    end)
+
+                    timer.Simple(0.25, function() 
+                        ent.Devastate = false 
                     end)
                 end
 

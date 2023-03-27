@@ -25,6 +25,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	if stop_lobbymusic ~= true and (lobbymusic_antispam == nil or lobbymusic_antispam ~= true) then
 		lobby_music = CreateSound(LocalPlayer(), "slashco/music/slashco_lobby.wav")
 		lobby_music:Play()
+		lobby_music:ChangeVolume( 0.5 )
 		lobbymusic_antispam = true 
 	end
 
