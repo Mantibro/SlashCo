@@ -772,7 +772,7 @@ function GM:PlayerDeath(victim, _, _)
 				local ragdoll = ents.Create("prop_ragdoll")
 				ragdoll:SetModel(victim:GetModel())
 
-				if victim.Devastate ~= nil then ragdoll:SetModel("") end --OOGA
+				if victim.Devastate ~= nil then ragdoll:SetModel("models/player/corpse1.mdl") end
 
 				ragdoll:SetPos(victim:GetPos())
 				ragdoll:SetNoDraw(false)

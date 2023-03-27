@@ -164,7 +164,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
             if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR then
                 ent:SetVelocity( slasher:GetForward() * 300 )
                 ent.Devastate = true
-
+                ent:EmitSound("slashco/body_medium_impact_hard"..math.random(1,5)..".wav")
                 for a = 1, 10 do
                     timer.Simple(a*0.005, function() 
                         local vPoint = ent:GetPos() + Vector(math.random(-25,25),math.random(-25,25),50+math.random(-25,25))
