@@ -2,7 +2,7 @@ include( "ui/fonts.lua" )
 
 hook.Add("HUDPaint", "GameInfo_Info", function()
 
-	if LocalPlayer():Team() ~= TEAM_LOBBY and LocalPlayer():Team() ~= TEAM_SPECTATOR  then return end
+	if LocalPlayer():Team() ~= TEAM_LOBBY then return end
 
 	draw.SimpleText("[F6] GAME INFO" , "TVCD", ScrW() * 0.975, (ScrH() * 0.95), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 end)

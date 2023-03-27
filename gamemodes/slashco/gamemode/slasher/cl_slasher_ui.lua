@@ -14,6 +14,8 @@ local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
 local ChaseIcon = Material("slashco/ui/icons/slasher/s_chase")
 local ChaseDisabledIcon = Material("slashco/ui/icons/slasher/chase_disabled")
 
+local BeaconIcon = Material("slashco/ui/slasher_beacon")
+
 local SlashID = 0
 
 hook.Add("HUDPaint", "BaseSlasherHUD", function()
@@ -170,5 +172,26 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		end
 
 			::skipchase::
+
+
+		--Activating the Beacon
+
+		for k,v in ents.FindByClass("sc_activebeacon") do
+
+            if v:GetNWBool("ArmingBeacon") then
+
+                local pos = (v:GetPos()):ToScreen()
+
+                if pos.visible then
+                    surface.SetMaterial(BeaconIcon)
+                    surface.DrawTexturedRect(pos.x - ScrW()/32, pos.y - ScrW()/32, ScrW()/16, ScrW()/16)
+                end
+
+				draw.SimpleText( "The Survivors are attempting to call emergency escape.", "ItemFontTip", ScrW()/2, ScrH()/1.5, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+				draw.SimpleText( "DESTROY THE BEACON.", "ItemFontTip", ScrW()/2, ScrH()/1.25, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+
+            end
+
+        end
 	
 end)

@@ -55,7 +55,11 @@ net.Receive("octoSlashCoTestConfigHalos", function()
     end)
 end)
 
+showHalos = true
+showGasCanHalos = false
+
 hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
+
     if LocalPlayer():Team() == TEAM_SLASHER then
         halo.Add(ents.FindByClass("sc_generator"), Color( 255, 255, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
         halo.Add(ents.FindByClass("sc_babaclone"), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
@@ -63,9 +67,18 @@ hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
     end
 
     if LocalPlayer():Team() == TEAM_SPECTATOR then
-        halo.Add(ents.FindByClass("sc_generator"), Color( 255, 255, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
-        halo.Add(team.GetPlayers(TEAM_SURVIVOR), Color( 0, 0, 255 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
-        halo.Add(team.GetPlayers(TEAM_SLASHER), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
+
+        if showHalos then
+
+            halo.Add(ents.FindByClass("sc_generator"), Color( 255, 255, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
+            halo.Add(team.GetPlayers(TEAM_SURVIVOR), Color( 0, 0, 255 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
+            halo.Add(team.GetPlayers(TEAM_SLASHER), Color( 255, 0, 0 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
+
+            if showGasCanHalos then
+                halo.Add(ents.FindByClass("sc_gascan"), Color( 200, 200, 200 ), math.abs(math.sin(CurTime()))*2, math.abs(math.sin(CurTime()))*2, 5, true, true)
+            end
+
+        end
     end
 end)
 

@@ -495,7 +495,7 @@ SlashCo.EndRound = function()
 
         else --Normal Win
 
-            if #SlashCo.CurRound.SlasherData.AllSurvivors >= SurvivorCount and SurvivorCount == #SlashCo.CurRound.HelicopterRescuedPlayers then --Everyone lived
+            if #SlashCo.CurRound.SlasherData.AllSurvivors == SurvivorCount and SurvivorCount == #SlashCo.CurRound.HelicopterRescuedPlayers then --Everyone lived
 
                 SlashCo.RoundOverScreen(0)
 
@@ -559,7 +559,7 @@ SlashCo.EndRound = function()
 
         SlashCo.RemoveAllCurRoundEnts()
         SlashCo.ResetCurRoundData()
-        
+
         timer.Simple(0.5, function()
             SlashCo.GoToLobby()
         end)
@@ -608,6 +608,8 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         local slashergasmod = 0
 
+        local diff = SlashCo.CurRound.Difficulty
+
         if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
             SlashCo.CurRound.OfferingData.ItemMod = -2
         end
@@ -637,7 +639,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
         end
 
         local itemSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.ItemCount, #possibleItemSpawnpoints)
-        local random_itemSpawns = SlashCo.GetSpawnpoints(6 - #SlashCo.CurRound.SlasherData.AllSurvivors, #possibleItemSpawnpoints)
+        local random_itemSpawns = SlashCo.GetSpawnpoints(((SlashCo.MAXPLAYERS + 4) - diff) - #SlashCo.CurRound.SlasherData.AllSurvivors, #possibleItemSpawnpoints)
 
         if #random_itemSpawns < 1 then goto FULL end
 

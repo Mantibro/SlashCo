@@ -6,19 +6,18 @@ SlashCoItems.Cookie.EntClass = "sc_cookie"
 SlashCoItems.Cookie.Name = "Cookie"
 SlashCoItems.Cookie.Icon = "slashco/ui/icons/items/item_4"
 SlashCoItems.Cookie.Price = 15
-SlashCoItems.Cookie.Description = "A large chocolate chip cookie. Consuming it will grant you a speed boost\nfor a limited time. \nA certain Slasher seems to really like this item."
+SlashCoItems.Cookie.Description = "A large chocolate chip cookie. Consuming it will grant you an increase\nto fuel pouring efficiency for a while. \nA certain Slasher seems to really like this item."
 SlashCoItems.Cookie.CamPos = Vector(50,0,20)
 SlashCoItems.Cookie.IsSpawnable = true
 SlashCoItems.Cookie.OnUse = function(ply)
-    --While the item is stored, a survivor can press R to consume it. It will set their sprint speed to 350 for 30 seconds.
 
-    ply:SetRunSpeed( 350 )
+    ply:SetNWBool("CookieEaten", true)
 
     ply:EmitSound("slashco/survivor/eat_cookie.mp3")
 
     timer.Simple(30, function()
 
-        ply:SetRunSpeed( 300 )
+        ply:SetNWBool("CookieEaten", false)
 
         ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 

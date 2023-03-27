@@ -100,7 +100,12 @@ function ENT:Use(activator, _, _)
             if IsValid(self.FuelingCan) then
                 self.IsFueling = true
                 self.CurrentPourer = activator
-                self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
+
+                local efficiency = CurTime()
+
+                if activator:GetNWBool("CookieEaten") then efficiency = CurTime() * 2.5 end
+
+                self.TimeUntilFueled = efficiency + (self.FuelProgress or TimeToFuel)
                 self:SendData(activator)
                 self:EmitSound("slashco/generator_fill.wav")
             elseif not self.MakingItem then

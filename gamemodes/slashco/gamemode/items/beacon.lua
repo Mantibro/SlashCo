@@ -15,29 +15,47 @@ SlashCoItems.Beacon.IsSpawnable = false
 SlashCoItems.Beacon.OnUse = function(ply)
     --If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
 
-    if #team.GetPlayers(TEAM_SURVIVOR) > 1 then ply:ChatPrint("You can activate the beacon only if you're the last living survivor.") return true end
-
-    if SlashCo.CurRound.EscapeHelicopterSummoned then ply:ChatPrint("The Helicopter is already on its way.") return true end
+    if SlashCo.CurRound.EscapeHelicopterSummoned then 
+        ply:ChatPrint("The Helicopter is already on its way.") 
+        return true 
+    end
 
     local gens = ents.FindByClass( "sc_generator")
     local runningCount = 0
     for _, v in ipairs(gens) do
         if v.IsRunning then runningCount = runningCount + 1 end
+    end
 
+    local beacs = ents.FindByClass( "sc_activebeacon")
+    if #beacs > 0 then
+        ply:ChatPrint("There is already a beacon deployed.")
+        return true
     end
 
     if runningCount >= 1 then
 
         if not SlashCo.CurRound.DistressBeaconUsed then
 
-            local failed = SlashCo.SummonEscapeHelicopter()
+            if #team.GetPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
 
-            if not failed then
+                if not ply.BeaconWarning then
+                    ply:ChatPrint("Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm.")
+                    ply.BeaconWarning = true
+                    timer.Simple(3, function() ply.BeaconWarning = false end)
+                    return true
+                else 
+                    Entity(SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))):SetNWBool("ArmingBeacon", true)
+                    return 
+                end
+
+            else --instant because alone
+
                 SlashCo.CurRound.DistressBeaconUsed = true
-
                 timer.Simple( math.random(3,6), function() SlashCo.HelicopterRadioVoice(4) end)
-
                 SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
+
+                return
+
             end
 
         end

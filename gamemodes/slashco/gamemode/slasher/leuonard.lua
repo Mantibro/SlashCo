@@ -19,7 +19,7 @@ SlashCoSlasher.Leuonard.ChaseDuration = 5.0
 SlashCoSlasher.Leuonard.ChaseCooldown = 4
 SlashCoSlasher.Leuonard.JumpscareDuration = 2
 SlashCoSlasher.Leuonard.ChaseMusic = "slashco/slasher/leuonard_chase.mp3"
-SlashCoSlasher.Leuonard.KillSound = "slashco/slasher/"
+SlashCoSlasher.Leuonard.KillSound = "slashco/slasher/leuonard_yell1.mp3"
 SlashCoSlasher.Leuonard.Description = "The Horny Slasher which rapes.\n\n-Leuonard's Rape will increase over time.\n-He must fuck a dog to decrease Rape.\n-Reaching 100% Rape will cause Leuonard to become powerful, but hard to control."
 SlashCoSlasher.Leuonard.ProTip = "-This Slasher seems to have a fondness for dogs."
 SlashCoSlasher.Leuonard.SpeedRating = "★★★★☆"
@@ -73,7 +73,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
             --LOCATE THE DOG..........
 
-            local find = ents.FindInSphere(slasher:GetPos(), 80)
+            local find = ents.FindInSphere(slasher:GetPos(), 120)
 
             for f = 1, #find do
                 local ent = find[f]
@@ -86,7 +86,6 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
                     slasher:Freeze(true)
                     timer.Simple(4, function() 
                         slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.wav")
-                        slasher:SetPlaybackRate(5)
                     end)
                 end
 
@@ -116,11 +115,6 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
         SlashCo.StopChase(slasher)
 
-        PlayGlobalSound("slashco/slasher/leuonard_yell7.mp3",98, slasher, 1)
-
-        PlayGlobalSound("slashco/slasher/leuonard_full_close.wav",80, slasher, 1)
-        PlayGlobalSound("slashco/slasher/leuonard_full_far.wav",100, slasher, 0.6)
-
         slasher:SetNWBool("CanKill", false)
         slasher:SetNWBool("CanChase", false)
 
@@ -128,55 +122,93 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
     if v1 == 100.25 then --100% bad word n stuff
 
-        slasher.soundon = 0
+        --LOCATE THE DOG..........
+
+        local findd = ents.FindInSphere(slasher:GetPos(), 120)
+
+        for f = 1, #findd do
+            local ent = findd[f]
+
+            if ent:GetClass() == "sc_dogg" then --I FOUND YOU........
+                ent:Remove()
+                slasher:SetNWBool("LeuonardRaping", true)
+                slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.wav")
+                slasher:Freeze(true)
+                slasher:SetBodygroup(1,1)
+
+                timer.Simple(math.random(15,30), function() 
+                    slasher:StopSound("slashco/slasher/leuonard_grunt_loop.wav")
+                    slasher:Freeze(false)
+                    slasher:SetNWBool("LeuonardRaping", false)
+                    slasher:SetBodygroup(1,0)
+                end)
+            end
+
+        end
+
+        if slasher.soundon > 0 then
+
+            PlayGlobalSound("slashco/slasher/leuonard_yell7.mp3",98, slasher, 1)
+
+            PlayGlobalSound("slashco/slasher/leuonard_full_close.wav",80, slasher, 1)
+            PlayGlobalSound("slashco/slasher/leuonard_full_far.wav",125, slasher, 1)
+
+            slasher.soundon = 0
+
+        end
 
         slasher:SetWalkSpeed(450)
         slasher:SetRunSpeed(450)
 
-        if v2 < 0 then
-            slasher.MouseDrift = Vector(math.random(-10,10),math.random(-10,10),0)
-            slasher.SlasherValue2 = 2 + (math.random() * 2)
+        if not slasher:GetNWBool("LeuonardRaping") then
 
-            slasher:EmitSound("slashco/slasher/leuonard_yell"..math.random(1,7)..".mp3")
-        end
+            if v2 < 0 then
+                slasher.MouseDrift = Vector(math.random(-10,10),math.random(-10,10),0)
+                slasher.SlasherValue2 = 2 + (math.random() * 2)
 
-        slasher.SlasherValue2 = slasher.SlasherValue2 - FrameTime()
-        slasher.SlasherValue3 = v3 + 1
-
-        if slasher.SlasherValue3 > 1 then
-            slasher.SlasherValue3 = 0
-            slasher:SetEyeAngles( Angle( slasher:EyeAngles()[1] + (slasher.MouseDrift[1]/5), slasher:EyeAngles()[2] + (slasher.MouseDrift[2]/2), 0 ) )
-        end
-
-        local lol = math.random(0,1)
-
-        slasher:SetVelocity( Vector(slasher.MouseDrift[1+lol] * 6,slasher.MouseDrift[2-lol] * 6,0) )
-
-        local find = ents.FindInSphere(slasher:GetPos(), 80)
-
-        for i = 1, #find do
-            local ent = find[i]
-
-            if ent:GetClass() == "prop_door_rotating" then
-                SlashCo.BustDoor(slasher, ent, 25000)
+                slasher:EmitSound("slashco/slasher/leuonard_yell"..math.random(1,7)..".mp3")
             end
 
-            if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR then
-                ent:SetVelocity( slasher:GetForward() * 300 )
-                ent.Devastate = true
-                ent:EmitSound("slashco/body_medium_impact_hard"..math.random(1,5)..".wav")
-                for a = 1, 10 do
-                    timer.Simple(a*0.005, function() 
-                        local vPoint = ent:GetPos() + Vector(math.random(-25,25),math.random(-25,25),50+math.random(-25,25))
-                        local bloodfx = EffectData()
-                        bloodfx:SetOrigin( vPoint )
-                        util.Effect( "BloodImpact", bloodfx )
+            slasher.SlasherValue2 = slasher.SlasherValue2 - FrameTime()
+            slasher.SlasherValue3 = v3 + 1
+            
+
+            if slasher.SlasherValue3 > 1 then
+                slasher.SlasherValue3 = 0
+                slasher:SetEyeAngles( Angle( slasher:EyeAngles()[1] + (slasher.MouseDrift[1]/5), slasher:EyeAngles()[2] + (slasher.MouseDrift[2]/2), 0 ) )
+            end
+
+            local lol = math.random(0,1)
+
+            slasher:SetVelocity( Vector(slasher.MouseDrift[1+lol] * 6,slasher.MouseDrift[2-lol] * 6,0) )
+
+            local find = ents.FindInSphere(slasher:GetPos(), 80)
+
+            for i = 1, #find do
+                local ent = find[i]
+
+                if ent:GetClass() == "prop_door_rotating" then
+                    SlashCo.BustDoor(slasher, ent, 25000)
+                end
+
+                if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR then
+                    ent:SetVelocity( slasher:GetForward() * 500 )
+                    ent.Devastate = true
+                    ent:EmitSound("slashco/body_medium_impact_hard"..math.random(1,5)..".wav")
+                    for a = 1, 10 do
+                        timer.Simple(a*0.005, function() 
+                            local vPoint = ent:GetPos() + Vector(math.random(-25,25),math.random(-25,25),50+math.random(-25,25))
+                            local bloodfx = EffectData()
+                            bloodfx:SetOrigin( vPoint )
+                            util.Effect( "BloodImpact", bloodfx )
+                        end)
+                    end
+
+                    timer.Simple(0.1, function() 
+                        ent:Kill() 
                     end)
                 end
 
-                timer.Simple(0.05, function() 
-                    ent:Kill() 
-                end)
             end
 
         end
@@ -230,6 +262,13 @@ SlashCoSlasher.Leuonard.Animator = function(ply)
 
 	if ply:GetNWBool("LeuonardRaping") then
 		ply.CalcSeqOverride = ply:LookupSequence("mondaynightraw")
+
+        if not ply:GetNWBool("LeuonardFullRape") then
+            ply:SetPlaybackRate(2)
+        else
+            ply:SetPlaybackRate(8)
+        end
+
 	end
 
     return ply.CalcIdeal, ply.CalcSeqOverride
@@ -255,8 +294,18 @@ if CLIENT then
 
         if LocalPlayer():GetNWBool("SurvivorJumpscare_Leuonard") == true  then
 
+            if LocalPlayer().leuo_f == nil then LocalPlayer().leuo_f = 0 end
+            LocalPlayer().leuo_f = LocalPlayer().leuo_f+(FrameTime()*20)
+            if LocalPlayer().leuo_f > 10 then LocalPlayer().leuo_f = 0 end
 
-            
+            local Overlay = Material("slashco/ui/overlays/jumpscare_14")
+            Overlay:SetInt( "$frame", math.floor(LocalPlayer().leuo_f) )
+
+            surface.SetDrawColor(255,255,255,255)	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+        else
+            LocalPlayer().leuo_f = nil
         end
 
     end)
@@ -287,5 +336,31 @@ if CLIENT then
     SlashCoSlasher.Leuonard.ClientSideEffect = function()
 
     end
+
+    hook.Add( "Think", "LeuonardLight", function()
+    
+        for s = 1, #team.GetPlayers(TEAM_SLASHER) do
+    
+            local slasher = team.GetPlayers(TEAM_SLASHER)[s]
+    
+            if slasher:GetNWBool("LeuonardFullRape") then
+    
+                local tlight = DynamicLight( slasher:EntIndex() + 965 )
+                   if ( tlight ) then
+                        tlight.pos = slasher:LocalToWorld( Vector(0,0,20) )
+                        tlight.r = 255
+                        tlight.g = 0
+                        tlight.b = 0
+                        tlight.brightness = 5
+                        tlight.Decay = 1000
+                        tlight.Size = 5000
+                        tlight.DieTime = CurTime() + 1
+                    end
+    
+            end
+
+        end
+
+    end)
 
 end

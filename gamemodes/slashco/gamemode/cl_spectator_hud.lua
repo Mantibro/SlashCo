@@ -44,9 +44,15 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 		return
 	end
 
+	if input.IsKeyDown( KEY_Q ) then return end
+
 	draw.SimpleText("[YOU ARE SPECTATING]" , "TVCD", ScrW() * 0.5, (ScrH() * 0.05), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
-	draw.SimpleText( "[LMB] FOLLOW PLAYER", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-110, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+	draw.SimpleText( "[Q] HOLD TO HIDE INFO", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-260, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+	draw.SimpleText( "[ALT] TOGGLE HALOS", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-200, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+	draw.SimpleText( "[E] TOGGLE GAS CAN HALOS", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-170, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+	draw.SimpleText( "[LMB] FOLLOW PLAYER", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-140, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+	draw.SimpleText( "[RMB] CYCLE SURVIVORS", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-110, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 	draw.SimpleText( "[SPACE] SWITCH VIEW", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-80, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 	draw.SimpleText( "[R] TOGGLE LIGHT", "TVCD", ScrW() * 0.975, (ScrH() * 0.95)-50, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 
@@ -67,6 +73,26 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
 		Sndd:ChangePitch(100, 0)
+	end
+
+	if key == 262144 then
+
+		showHalos = not showHalos
+		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+		Sndd:Play()
+		Sndd:ChangeVolume(0.5, 0)
+		Sndd:ChangePitch(100, 0)
+
+	end
+
+	if key == 32 then
+
+		showGasCanHalos = not showGasCanHalos
+		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+		Sndd:Play()
+		Sndd:ChangeVolume(0.5, 0)
+		Sndd:ChangePitch(100, 0)
+
 	end
 
 end)

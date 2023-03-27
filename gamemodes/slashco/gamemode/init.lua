@@ -293,6 +293,36 @@ function GM:PlayerButtonDown(ply, button)
 			end
 		end
 
+		if button == 57 then --Spectator Right Clicks
+			if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then 
+
+				local ent = ply:GetObserverTarget()
+
+				for k, v in team.GetPlayers(TEAM_SURVIVOR) do
+
+					if ply:GetObserverTarget() == v then
+						if (k+1) >= #team.GetPlayers(TEAM_SURVIVOR) then
+							ent = team.GetPlayers(TEAM_SURVIVOR)[1]
+						else
+							ent = team.GetPlayers(TEAM_SURVIVOR)[k+1]
+						end
+
+					end
+
+				end
+
+				if ent:IsPlayer() then 
+					ply:SpectateEntity(ent)
+					--ply:SetObserverMode( OBS_MODE_CHASE )
+				end
+			else
+				if IsValid( team.GetPlayers(TEAM_SURVIVOR)[1] ) then
+					ply:SpectateEntity(team.GetPlayers(TEAM_SURVIVOR)[1])
+					ply:SetObserverMode( OBS_MODE_CHASE )
+				end
+			end
+		end
+
 		if button == 65 then --Spectator presses Space, cycles camera modes.
 			if ply:GetObserverMode() == OBS_MODE_CHASE then
 				ply:SetObserverMode( OBS_MODE_IN_EYE )
@@ -441,7 +471,7 @@ function GM:PlayerButtonDown(ply, button)
 
 		if button == 1 then 
 
-			--ply:SetNWBool("Taunt_Cali", true) --California girls --copyright :(
+			ply:SetNWBool("Taunt_Cali", true) --California girls
 			return
 
 		elseif button == 2 then 
@@ -636,7 +666,7 @@ local Think = function()
 			--Go back to lobby if everyone dies.
 			if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
-				SlashCo.EndRound()
+				--SlashCo.EndRound()
 
 				SlashCo.CurRound.roundOverToggle = false
 			end

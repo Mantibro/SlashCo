@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/slasher_beacon"
+	"$alphatest" 1
+	"$translucent" 1
+	"$ignorez" 1
+}
