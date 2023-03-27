@@ -57,17 +57,17 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
             --sound
 
             if math.floor(slasher.SlasherValue1) == 25 and slasher.soundon == 0 then
-                slasher:EmitSound("slashco/slasher/leuonard_25_"..math.random(1,3)..".mp3")
+                slasher:EmitSound("slashco/slasher/leuonard_25_"..math.random(1,3)..".mp3",95)
                 slasher.soundon = 1
             end
 
             if math.floor(slasher.SlasherValue1) == 50 and slasher.soundon == 1 then
-                slasher:EmitSound("slashco/slasher/leuonard_50_"..math.random(1,3)..".mp3")
+                slasher:EmitSound("slashco/slasher/leuonard_50_"..math.random(1,3)..".mp3",95)
                 slasher.soundon = 2
             end
 
             if math.floor(slasher.SlasherValue1) == 90 and slasher.soundon == 2 then
-                slasher:EmitSound("slashco/slasher/leuonard_90_"..math.random(1,3)..".mp3")
+                slasher:EmitSound("slashco/slasher/leuonard_90_"..math.random(1,3)..".mp3",95)
                 slasher.soundon = 3
             end
 
@@ -96,6 +96,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
             if v1 > 0 then
                 slasher.SlasherValue1 = v1 - ( FrameTime() * 2)
                 slasher:SetBodygroup(1,1)
+                SlashCo.StopChase(slasher)
             else
                 slasher:SetNWBool("LeuonardRaping", false)
                 slasher:SetBodygroup(1,0)
@@ -112,6 +113,13 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
         slasher.SlasherValue1 = 100.25
         slasher:SetNWBool("LeuonardFullRape", true)
+
+        SlashCo.StopChase(slasher)
+
+        PlayGlobalSound("slashco/slasher/leuonard_yell7.mp3",98, slasher, 1)
+
+        PlayGlobalSound("slashco/slasher/leuonard_full_close.wav",80, slasher, 1)
+        PlayGlobalSound("slashco/slasher/leuonard_full_far.wav",100, slasher, 0.6)
 
         slasher:SetNWBool("CanKill", false)
         slasher:SetNWBool("CanChase", false)
@@ -153,9 +161,22 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
                 SlashCo.BustDoor(slasher, ent, 25000)
             end
 
-            if ent:IsPlayer() and ent ~= slasher then
+            if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR then
                 ent:SetVelocity( slasher:GetForward() * 300 )
-                timer.Simple(0.05, function() ent:Kill() end)
+                ent.Devastate = true
+
+                for a = 1, 10 do
+                    timer.Simple(a*0.005, function() 
+                        local vPoint = ent:GetPos() + Vector(math.random(-25,25),math.random(-25,25),50+math.random(-25,25))
+                        local bloodfx = EffectData()
+                        bloodfx:SetOrigin( vPoint )
+                        util.Effect( "BloodImpact", bloodfx )
+                    end)
+                end
+
+                timer.Simple(0.05, function() 
+                    ent:Kill() 
+                end)
             end
 
         end

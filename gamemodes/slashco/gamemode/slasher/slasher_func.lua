@@ -254,6 +254,18 @@ SlashCo.Jumpscare = function(slasher)
 
 end
 
+SlashCo.StopChase = function(slasher)
+
+    slasher:SetNWBool("InSlasherChaseMode", false) 
+
+    slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+    slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+    slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
+
+    timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
+
+end
+
 SlashCo.StartChaseMode = function(slasher)
 
     if not slasher:GetNWBool("CanChase") then return end
@@ -264,13 +276,7 @@ SlashCo.StartChaseMode = function(slasher)
 
     if slasher:GetNWBool("InSlasherChaseMode") then 
 
-        slasher:SetNWBool("InSlasherChaseMode", false) 
-
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-        slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
-
-        timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
+        SlashCo.StopChase(slasher)
 
         return 
     end
@@ -327,10 +333,7 @@ end
         PlayGlobalSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic,95,slasher)
 
     else
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-        slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
-        timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
+        SlashCo.StopChase(slasher)
     end
 
 end

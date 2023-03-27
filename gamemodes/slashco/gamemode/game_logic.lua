@@ -514,6 +514,16 @@ SlashCo.EndRound = function()
 
         SlashCo.RemoveHelicopter()
 
+        for i = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
+            local man = SlashCo.CurRound.SlasherData.AllSurvivors[i].id
+
+            if IsValid(player.GetBySteamID64( man )) then
+                SlashCoDatabase.UpdateStats(man, "Points", SlashCo.PlayerData[man].PointsTotal)
+            end
+
+        end
+
+
         if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
             --Add to stats of the remaining survivors' wins.
             for i = 1, #SlashCo.CurRound.HelicopterRescuedPlayers do
@@ -532,16 +542,6 @@ SlashCo.EndRound = function()
             survivors[i]:Spawn()
 
         end
-
-        for i = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
-            local man = SlashCo.CurRound.SlasherData.AllSurvivors[i].id
-
-            if IsValid(player.GetBySteamID64( man )) then
-                SlashCoDatabase.UpdateStats(man, "Points", SlashCo.PlayerData[man].PointsTotal)
-            end
-
-        end
-
         local slashers = team.GetPlayers(TEAM_SLASHER)
         for i=1, #slashers do
             slashers[i]:SetTeam(TEAM_SPECTATOR)
@@ -559,7 +559,10 @@ SlashCo.EndRound = function()
 
         SlashCo.RemoveAllCurRoundEnts()
         SlashCo.ResetCurRoundData()
-        SlashCo.GoToLobby()
+        
+        timer.Simple(0.5, function()
+            SlashCo.GoToLobby()
+        end)
         --print("tried to go to lobby (round end)")
     end)
 end

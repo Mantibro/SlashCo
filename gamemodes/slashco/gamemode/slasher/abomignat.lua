@@ -9,7 +9,7 @@ SlashCoSlasher.Abomignat.Model = "models/slashco/slashers/abomignat/abomignat.md
 SlashCoSlasher.Abomignat.GasCanMod = 0
 SlashCoSlasher.Abomignat.KillDelay = 5
 SlashCoSlasher.Abomignat.ProwlSpeed = 150
-SlashCoSlasher.Abomignat.ChaseSpeed = 285
+SlashCoSlasher.Abomignat.ChaseSpeed = 305
 SlashCoSlasher.Abomignat.Perception = 0.5
 SlashCoSlasher.Abomignat.Eyesight = 6
 SlashCoSlasher.Abomignat.KillDistance = 150
@@ -27,7 +27,7 @@ SlashCoSlasher.Abomignat.EyeRating = "★★★★☆"
 SlashCoSlasher.Abomignat.DiffRating = "★☆☆☆☆"
 
 SlashCoSlasher.Abomignat.OnSpawn = function(slasher)
-    PlayGlobalSound("slashco/slasher/abomignat_breathing.wav",65,ply)
+    PlayGlobalSound("slashco/slasher/abomignat_breathing.wav",65,slasher)
 end
 
 SlashCoSlasher.Abomignat.PickUpAttempt = function(ply)
@@ -332,7 +332,7 @@ if CLIENT then
 
         local is_crawling = LocalPlayer():GetNWBool("AbomignatCrawling")
 
-        if not is_crawling and LocalPlayer():GetNWBool("AbomignatCanMainSlash") < 0.1 then
+        if not is_crawling and LocalPlayer():GetNWBool("AbomignatCanMainSlash") then
             surface.SetMaterial(GenericSlashIcon)
             surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
             draw.SimpleText( "M1 - Slash Charge", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )

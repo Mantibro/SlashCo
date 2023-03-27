@@ -621,6 +621,18 @@ local Think = function()
 
 			end
 
+			--//duality condition//--
+
+			if runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
+
+				--(SPAWN HELICOPTER)
+
+				local failed = SlashCo.SummonEscapeHelicopter()
+				
+				if not failed then SlashCo.CurRound.DistressBeaconUsed = false end
+
+			end
+
 			--Go back to lobby if everyone dies.
 			if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
@@ -759,6 +771,9 @@ function GM:PlayerDeath(victim, _, _)
 
 				local ragdoll = ents.Create("prop_ragdoll")
 				ragdoll:SetModel(victim:GetModel())
+
+				if victim.Devastate ~= nil then ragdoll:SetModel("") end --OOGA
+
 				ragdoll:SetPos(victim:GetPos())
 				ragdoll:SetNoDraw(false)
 				ragdoll:Spawn()
