@@ -327,9 +327,19 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 						lookfinal = LocalPlayer():GetEyeTrace().HitPos
 						ping_info.ExpiryTime = 5
 					elseif lookfinal:Team() == TEAM_SLASHER then
-						ping_info.Type = "SLASHER"
-						lookfinal = LocalPlayer():GetEyeTrace().HitPos
-						ping_info.ExpiryTime = 5
+
+						if not lookfinal:GetNWBool("AmogusSurvivorDisguise") then
+							ping_info.Type = "SLASHER"
+							lookfinal = LocalPlayer():GetEyeTrace().HitPos
+							ping_info.ExpiryTime = 5
+						else
+							ping_info.Type = "SURVIVOR"
+							ping_info.SurvivorName = table.Random( team.GetPlayers( TEAM_SURVIVOR ) ):Nick()
+							lookfinal = LocalPlayer():GetEyeTrace().HitPos
+							ping_info.ExpiryTime = 5
+						end
+
+
 					end
 				else
 

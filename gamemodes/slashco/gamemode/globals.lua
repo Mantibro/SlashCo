@@ -39,12 +39,27 @@ SlashCo.Maps = {
     },
 
     {
+        ID = "sc_redforest",
+        NAME = "Red Forest",
+        AUTHOR = "NuclearGhost",
+        DEFAULT = true,
+        SIZE = 4,
+        MIN_PLAYERS = 3,
+        LEVELS = {
+            250,
+            350,
+            -630,
+            -650
+        }
+    },
+
+    {
         ID = "sc_hospital",
         NAME = "Hospital",
         AUTHOR = "sparkz",
-        DEFAULT = true,
+        DEFAULT = false,
         SIZE = 2,
-        MIN_PLAYERS = 2,
+        MIN_PLAYERS = 4,
         LEVELS = {
             -1750,
             -2100,
@@ -58,25 +73,10 @@ SlashCo.Maps = {
         AUTHOR = "NuclearGhost",
         DEFAULT = false,
         SIZE = 3,
-        MIN_PLAYERS = 2,
+        MIN_PLAYERS = 3,
         LEVELS = {
             150,
             350
-        }
-    },
-
-    {
-        ID = "rp_redforest",
-        NAME = "Red Forest",
-        AUTHOR = "NuclearGhost",
-        DEFAULT = false,
-        SIZE = 4,
-        MIN_PLAYERS = 3,
-        LEVELS = {
-            250,
-            350,
-            -630,
-            -650
         }
     }
 
