@@ -39,6 +39,8 @@ end
 
 SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     v1 = slasher.SlasherValue1 --Rape
     v2 = slasher.SlasherValue2 --Tick to change mouse drift
     v3 = slasher.SlasherValue3 --Tick to move mouse
@@ -52,7 +54,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
     if v1 < 100 then
         if not slasher:GetNWBool("LeuonardRaping") then
 
-            slasher.SlasherValue1 = v1 + ( FrameTime() * 0.5)
+            slasher.SlasherValue1 = v1 + ( FrameTime() * ( 0.5 + (SO*0.5)))
 
             --sound
 
@@ -266,6 +268,7 @@ SlashCoSlasher.Leuonard.Animator = function(ply)
 
 	if ply:GetNWBool("LeuonardRaping") then
 		ply.CalcSeqOverride = ply:LookupSequence("mondaynightraw")
+        ply.CalcIdeal = 0
 
         if not ply:GetNWBool("LeuonardFullRape") then
             ply:SetPlaybackRate(2)

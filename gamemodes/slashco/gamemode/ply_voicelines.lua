@@ -194,19 +194,26 @@ SlashCo.LobbyBanter = function()
 
     local convo = math.random(1,ConvoCount)
 
-    local firstSpoken = NULL
-
     local totalLength = SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2 + SlashCo.LobbyConvos[convo].Length3
 
-    local function playVocal(conv, id)
-        survivors[math.random(1, #survivors)]:EmitSound("slashco/survivor/voice/maleconv_"..conv.."_"..id..".mp3")
+    local function playVocal(conv, id, plyid)
+        survivors[plyid]:EmitSound("slashco/survivor/voice/maleconv_"..conv.."_"..id..".mp3")
     end
 
-    playVocal(convo, 1)
+    local firstid = math.random(1, #survivors)
+    playVocal(convo, 1, firstid)
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1, function() playVocal(convo, 2) end)
+    local secondid = math.random(1, #survivors)
+    if secondid == firstid then secondid = 1 end
+    if secondid == firstid then secondid = 2 end
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()  playVocal(convo, 3) end)
+    local thirdid = math.random(1, #survivors)
+    if thirdid == secondid then thirdid = 1 end
+    if thirdid == secondid then thirdid = 2 end
+
+    timer.Simple(SlashCo.LobbyConvos[convo].Length1, function() playVocal(convo, 2, secondid) end)
+
+    timer.Simple(SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()  playVocal(convo, 3, thirdid) end)
 
     return totalLength
 
@@ -233,6 +240,8 @@ net.Receive("mantislashcoSurvivorVoicePrompt", function()
 end)
 
 SlashCo.EscapeVoicePrompt = function()
+
+    if #team.GetPlayers( TEAM_SURVIVOR ) < 1 then return end
 
     local function playVoice(ply) ply:EmitSound("slashco/survivor/voice/prompt_escape"..math.random(1,5)..".mp3") end
 

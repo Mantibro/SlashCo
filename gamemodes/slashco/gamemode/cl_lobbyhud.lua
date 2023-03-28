@@ -109,7 +109,7 @@ if StateOfLobby ~= nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN
 			plynum = #Lobby_Players 
 		end
 
-		draw.SimpleText( "["..plynum.."/5] ", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+		draw.SimpleText( "["..plynum.."/7] ", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 
 		for i = 1, #Lobby_Players do
 

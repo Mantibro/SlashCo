@@ -72,7 +72,7 @@ SlashCoSlasher.FreeSmiley.OnSpecialAbilityFire = function(slasher)
     local SO = SlashCo.CurRound.OfferingData.SO
 
     if slasher.SlasherValue1 > 0 then return end
-    slasher.SlasherValue1 = 80 - (SO*40)
+    slasher.SlasherValue1 = 50 - (SO*25)
 
     slasher:SetNWBool("FreeSmileySummoning", true)
 

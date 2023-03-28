@@ -47,7 +47,9 @@ if SERVER then
 		if self:GetNWBool("BeaconBroken") then return end
 
 		if self.DoArming and not self.TimersStarted then
-			local fin_time = ( ( #team.GetPlayers(TEAM_SURVIVOR)*15) + math.random(5,25) )
+			local ms = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+
+			local fin_time = ( #team.GetPlayers(TEAM_SURVIVOR)*15) + math.random(5,25) + (ms * 10)
 
 			print("[SlashCo] Beacon set to arm in "..fin_time.." seconds.")
 

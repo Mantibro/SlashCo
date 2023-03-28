@@ -17,7 +17,7 @@ SlashCo.Maps = {
         NAME = "Summer Camp",
         AUTHOR = "Steinman",
         DEFAULT = true,
-        SIZE = 2,
+        SIZE = 1,
         MIN_PLAYERS = 1,
         LEVELS = {
             500
@@ -58,7 +58,7 @@ SlashCo.Maps = {
         NAME = "Hospital",
         AUTHOR = "sparkz",
         DEFAULT = true,
-        SIZE = 2,
+        SIZE = 4,
         MIN_PLAYERS = 5,
         LEVELS = {
             -1750,

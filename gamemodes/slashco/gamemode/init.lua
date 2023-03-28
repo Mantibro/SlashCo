@@ -22,9 +22,9 @@ include( "survivor_func.lua")
 
 SlashCo Credits:
 
-Coding: Octo, Manti
+Coding: Octo, Manti, Text
 
-Assets: Manti, warman, Darken
+Assets: Manti, warman, Darken, Vee
 
 Extra credits: undo, Jim, DarkGrey
 
