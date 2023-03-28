@@ -258,14 +258,6 @@ hook.Add( "AllowPlayerPickup", "PickupNotSpectator", function( ply, _ )
 
 		end
 
-		--[[if SlashCoSlasher[ply:SteamID64()].ID == 6 and ply.SlasherValue1 == 0 then
-			return false
-		end
-
-		if SlashCoSlasher[ply:SteamID64()].ID == 7 and ply.SlasherValue1 == 0 then
-			return false
-		end]]
-
 	end
 
     return (ply:Team() ~= TEAM_SPECTATOR)
@@ -293,7 +285,7 @@ function GM:PlayerButtonDown(ply, button)
 			end
 		end
 
-		if button == 57 then --Spectator Right Clicks
+		if button == 108 then --Spectator Right Clicks
 			if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then 
 
 				local ent = ply:GetObserverTarget()

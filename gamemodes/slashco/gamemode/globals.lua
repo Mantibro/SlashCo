@@ -57,9 +57,9 @@ SlashCo.Maps = {
         ID = "sc_hospital",
         NAME = "Hospital",
         AUTHOR = "sparkz",
-        DEFAULT = false,
+        DEFAULT = true,
         SIZE = 2,
-        MIN_PLAYERS = 4,
+        MIN_PLAYERS = 5,
         LEVELS = {
             -1750,
             -2100,
@@ -97,32 +97,6 @@ SlashCo.ReturnMapIndex = function()
 end
 
 SlashCo.MAXPLAYERS = 7
-
---[[SlashCo.SlasherData = {     --Information about Slashers
-
-    {
-        NAME = "Leuonard",
-        ID = 14,
-        CLS = 2,
-        DNG = 3,
-        Model = "models/slashco/slashers/leuonard/leuonard.mdl",
-        KillDelay = 2,
-        GasCanMod = 0,
-        ProwlSpeed = 150,
-        ChaseSpeed = 290,
-        Perception = 1,
-        Eyesight = 5,
-        KillDistance = 150,
-        ChaseRange = 900,
-        ChaseRadius = 0.86,
-        ChaseDuration = 5.0,
-        ChaseCooldown = 4,
-        JumpscareDuration = 2,
-        ChaseMusic = "slashco/slasher/leuonard_chase.mp3",
-        KillSound = "slashco/slasher/freesmiley_kill.mp3"
-    }
-
-}]]
 
 SlashCo.LobbyData = {
 
@@ -232,7 +206,7 @@ SlashCo.CreateGenerator = function(pos, ang)
 end
 
 --Spawn a gas can
-SlashCo.CreateGasCan = function(pos, ang)
+SlashCo.CreateGasCan = function(pos, ang, test)
     local Ent = ents.Create( "sc_gascan" )
 
     if not IsValid(Ent) then
@@ -312,17 +286,21 @@ SlashCo.CreateBattery = function(pos, ang)
     return Ent
 end
 
-SlashCo.CreateGenerators = function(spawnpoints)
-    for _, v in ipairs(spawnpoints) do
+SlashCo.CreateGenerators = function(spawnpoints, testconfig)
+    for k, v in ipairs(spawnpoints) do
         local pos = SlashCo.CurConfig.Generators.Spawnpoints[v].pos
         local ang = SlashCo.CurConfig.Generators.Spawnpoints[v].ang
 
-        SlashCo.CreateGenerator( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) ) --local entID =
+        local entID = SlashCo.CreateGenerator( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) ) --local entID =
+
+        if testconfig then
+            Entity(entID):SetNWInt("SpawnPoint_ID", k)
+        end
     end
 end
 
-SlashCo.CreateGasCans = function(spawnpoints)
-    for _, v in ipairs(spawnpoints) do
+SlashCo.CreateGasCans = function(spawnpoints, testconfig)
+    for k, v in ipairs(spawnpoints) do
         local pos = SlashCo.CurConfig.GasCans.Spawnpoints[v].pos
         local ang = SlashCo.CurConfig.GasCans.Spawnpoints[v].ang
 
@@ -331,7 +309,11 @@ SlashCo.CreateGasCans = function(spawnpoints)
             ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].ang
         end
 
-        SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+        local ent = SlashCo.CreateGasCan( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
+
+        if testconfig then
+            ent:SetNWInt("SpawnPoint_ID", k)
+        end
     end
 end
 
@@ -345,13 +327,17 @@ SlashCo.CreateGasCansE = function(spawnpoints)
     end
 end
 
-SlashCo.CreateItems = function(spawnpoints, item)
-    for _, v in ipairs(spawnpoints) do
+SlashCo.CreateItems = function(spawnpoints, item, testconfig)
+    for k, v in ipairs(spawnpoints) do
         local pos = SlashCo.CurConfig.Items.Spawnpoints[v].pos
         local ang = SlashCo.CurConfig.Items.Spawnpoints[v].ang
 
         local id = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ))
         SlashCo.CurRound.Items[id] = true
+
+        if testconfig then
+            Entity(id):SetNWInt("SpawnPoint_ID", k)
+        end
     end
 end
 
@@ -367,12 +353,15 @@ end
 
 --For testing configs only, spawns batteries in ever possible spot.
 SlashCo.CreateBatteriesE = function(spawnpoints)
-    for _, v in ipairs(spawnpoints) do
+    for k, v in ipairs(spawnpoints) do
         for J=1, #(SlashCo.CurConfig.Batteries.Spawnpoints[v])do
             local pos = SlashCo.CurConfig.Batteries.Spawnpoints[v][J].pos
             local ang = SlashCo.CurConfig.Batteries.Spawnpoints[v][J].ang
 
-            SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+            local bat = SlashCo.CreateBattery( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
+
+            --bat:SetNWInt("SpawnPoint_ID_BatteryGenerator", k)
+            bat:SetNWInt("SpawnPoint_ID", J)
         end
     end
 end

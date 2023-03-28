@@ -15,6 +15,7 @@ local ref_eyeang = Angle(0,0,0)
 local voice_cooldown = 0
 local global_pings = {}
 local last_pinged = 0
+local doPing = false
 
 local GeneratorIcon = Material("slashco/ui/icons/slasher/progbar_icon")
 
@@ -262,13 +263,26 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 			if lookent:GetClass() == "prop_door_rotating" or lookent:GetClass() == "func_door_rotating" then
 				if lookent:GetPos():Distance( LocalPlayer():GetPos() ) < 150 then
-					draw.SimpleText("[M1 TO SLAM OPEN!]", "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					draw.SimpleText("[LMB TO SLAM OPEN!]", "TVCD", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				end
 			end
 
 		end
 
-		if last_pinged <= 0 and input.IsKeyDown(KEY_G ) then
+		hook.Add( "PlayerButtonDown", "SurvivorPinging_Input", function( ply, button )
+			if CLIENT then
+
+				if ply ~= LocalPlayer() then return end
+
+				if ( IsFirstTimePredicted() ) then 
+					if button == 109 then
+						doPing = true
+					end
+				end
+			end
+		end)
+
+		if last_pinged <= 0 and doPing then
 
 			last_pinged = 3
 
@@ -367,6 +381,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		end
 
 		if last_pinged > 0 then last_pinged = last_pinged - RealFrameTime() end
+		doPing = false
 
 		--(displaying them)
 
@@ -403,6 +418,9 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 					showname = true
 					textcolor = Color(255,50,50,255)
 			elseif global_pings[i].Type == "Generator" then
+
+				pos = ( FindPos( global_pings[i].Entity:GetPos() + Vector(0,0,40) ) ):ToScreen()
+
 				showname = false
 				surface.SetMaterial(GeneratorIcon)
 				surface.DrawTexturedRectRotated(pos.x, pos.y, ScrW()/32, ScrW()/32, 0)
@@ -432,7 +450,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 					draw.SimpleText("]", "Indicator", gasPos.x+centerDistance/2+12, gasPos.y, Color( 255, 255, 255, (100-realDistance)*(300-centerDistance)*0.02 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 					if realDistance < 200 and centerDistance < 25 then
-						draw.SimpleText("['G' TO PING]", "TVCD", ScrW()/2, ScrH()/2 + 100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+						draw.SimpleText("[MMB TO PING]", "TVCD", ScrW()/2, ScrH()/2 + 100, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 					end
 				end
 			end

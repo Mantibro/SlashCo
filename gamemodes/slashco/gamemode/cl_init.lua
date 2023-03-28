@@ -24,6 +24,8 @@ function GM:HUDDrawTargetID()
 	return false
 end 
 
+SlashCoTestConfig = false
+
 local disable = {
     CHudHealth = true,
     CHudBattery = true,
@@ -37,6 +39,38 @@ end)
 function GM:DrawDeathNotice(_, _)
 	return false
 end
+
+local fx_t = 0
+
+hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
+    if LocalPlayer():Team() ~= TEAM_SURVIVOR then return end
+	DrawBloom( 0.5, 2, 9, 9, 1, 1, 1, 1, 1 )
+
+    local blur_insensity = 0
+    local red_insensity = 0
+    local hp = LocalPlayer():Health()
+    if hp < 30 then
+        fx_t = fx_t + RealFrameTime() * 0.25
+        blur_intensity = math.sin( fx_t ) * (3 - (hp/10))
+        red_intensity = math.sin( fx_t ) * (0.05)  * (1 - (hp/30))
+    end
+
+    DrawBokehDOF( 12, 0.4, 4 - blur_insensity )
+
+    local tab = {
+        [ "$pp_colour_addr" ] =  red_insensity ,
+        [ "$pp_colour_addg" ] = 0,
+        [ "$pp_colour_addb" ] = 0,
+        [ "$pp_colour_brightness" ] = 0,
+        [ "$pp_colour_contrast" ] = 1,
+        [ "$pp_colour_colour" ] = 1,
+        [ "$pp_colour_mulr" ] = 0,
+        [ "$pp_colour_mulg" ] = 0,
+        [ "$pp_colour_mulb" ] = 0
+    }
+
+    DrawColorModify( tab )
+end )
 
 hook.Add("KeyPress", "PlayerSelect", function(ply, key) 
 
@@ -53,6 +87,7 @@ net.Receive("octoSlashCoTestConfigHalos", function()
         halo.Add( ents.FindByClass("prop_physics"), Color( 255, 0, 0 ), 2, 2, 8, true, true )
         halo.Add( ents.FindByClass("sc_*"), Color( 0, 255, 255 ), 2, 2, 4, true, true )
     end)
+    SlashCoTestConfig = true
 end)
 
 showHalos = true

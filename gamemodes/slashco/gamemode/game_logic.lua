@@ -760,16 +760,32 @@ SlashCo.TestConfig = function()
         end
     end
 
+    local itemSpawns = SlashCo.GetSpawnpoints(#(possibleItemSpawnpoints), #(possibleItemSpawnpoints))
+
     --Check Exposure offering spawnpoints too.
     if SlashCo.CurConfig.Offerings.Exposure.Spawnpoints then
         local exposureSpawns = SlashCo.GetSpawnpoints(#(SlashCo.CurConfig.Offerings.Exposure.Spawnpoints), #(SlashCo.CurConfig.Offerings.Exposure.Spawnpoints))
         SlashCo.CreateGasCansE(exposureSpawns)
     end
 
-    SlashCo.CreateGenerators(genSpawns)
-    SlashCo.CreateBatteriesE(genSpawns)
-    SlashCo.CreateGasCans(gasSpawns)
+    SlashCo.CreateGenerators(genSpawns, true)
+    print("[SlashCo] TESTCONFIG: Creating Generators.")
 
+    timer.Simple(1, function()
+        SlashCo.CreateBatteriesE(genSpawns)
+        print("[SlashCo] TESTCONFIG: Creating Batteries.")
+    end)
+
+    timer.Simple(2, function()
+        SlashCo.CreateGasCans(gasSpawns, true)
+        print("[SlashCo] TESTCONFIG: Creating Gas Cans.")
+    end)
+
+    timer.Simple(3, function()
+        SlashCo.CreateItems(itemSpawns, "sc_milkjug", true)
+        print("[SlashCo] TESTCONFIG: Creating Items.")
+    end)
+    
     net.Start("octoSlashCoTestConfigHalos")
     --net.WriteTable(send) --I'm so sorry for using this, I'm just too lazy.
     net.Broadcast()

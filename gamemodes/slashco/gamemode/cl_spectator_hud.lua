@@ -25,6 +25,23 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	if game.GetMap() == "sc_lobby" then return end
 
+	hook.Add( "PlayerButtonDown", "TestConfig_ID", function( ply, button )
+		if CLIENT then
+
+			if ply ~= LocalPlayer() then return end
+
+			if ( IsFirstTimePredicted() ) then 
+				if button == 107 and SlashCoTestConfig then
+					
+					if IsValid( ply:GetEyeTrace().Entity ) then
+						ply:ChatPrint("ENTITY SPAWNPOINT ID: "..ply:GetEyeTrace().Entity:GetNWInt("SpawnPoint_ID"))
+					end
+
+				end
+			end
+		end
+	end)
+
 	local show_slasher_anticipation = false
 
 	if SlasherTeam ~= nil then
