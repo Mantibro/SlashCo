@@ -320,8 +320,8 @@ end
 --Testing only function for exposure spawnpoints
 SlashCo.CreateGasCansE = function(spawnpoints)
     for _, v in ipairs(spawnpoints) do
-        local pos = SlashCo.CurConfig.GasCans.Spawnpoints[v].pos
-        local ang = SlashCo.CurConfig.GasCans.Spawnpoints[v].ang
+        local pos = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].pos
+        local ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].ang
 
         SlashCo.CreateGasCanE( Vector(pos[1], pos[2], pos[3]), Angle( ang[1], ang[2], ang[3] ) )
     end
