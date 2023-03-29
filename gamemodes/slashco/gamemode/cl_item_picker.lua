@@ -18,6 +18,35 @@ local function ItemChosen(itemID)
 	net.SendToServer()
 end
 
+local function BlockConfirm()
+	itemSelectFrame.Confirm:SetText("XXXXXXX")
+	function itemSelectFrame.Confirm.Paint(_, w, h)
+		surface.SetDrawColor(128, 0, 0)
+		surface.DrawRect(0, 0, w, h)
+	end
+	itemSelectFrame.Confirm:SetEnabled(false)
+end
+
+local function SetConfirm()
+	if LocalPlayer():GetNWString("item", "none") ~= "none" or LocalPlayer():GetNWString("item2", "none") ~= "none" then
+		BlockConfirm()
+	else
+		itemSelectFrame.Confirm:SetText("CONFIRM")
+		function itemSelectFrame.Confirm.Paint(_, w, h)
+			if itemSelectFrame.Confirm:IsHovered() then
+				surface.SetDrawColor(0, 0, 128)
+			else
+				surface.SetDrawColor(64, 64, 64)
+			end
+			surface.DrawRect(0, 0, w, h)
+		end
+		function itemSelectFrame.Confirm.DoClick()
+			ItemChosen(selectedItem)
+			HideItemSelection()
+		end
+	end
+end
+
 local function setItemLabel()
 	itemSelectFrame.ItemLabel:SetText(string.upper(SlashCoItems[selectedItem].Name))
 	if (SlashCoItems[selectedItem].MaxAllowed) then
@@ -32,8 +61,14 @@ local function setItemLabel()
 			end
 		end
 		itemSelectFrame.ItemValues:SetText("["..SlashCoItems[selectedItem].Price.." POINTS] ["..numRemain.." REMAINING]")
+		if numRemain <= 0 then
+			BlockConfirm()
+		else
+			SetConfirm()
+		end
 	else
 		itemSelectFrame.ItemValues:SetText("["..SlashCoItems[selectedItem].Price.." POINTS]")
+		SetConfirm()
 	end
 end
 
@@ -56,7 +91,13 @@ local function DrawItemSelectorBox()
 	itemSelectFrame = vgui.Create("DFrame")
 	itemSelectFrame:SetTitle("[PICK YOUR ITEM...]")
 
-	if selectedItem == nil then selectedItem = "Baby" end
+	selectedItem = selectedItem or "Baby"
+
+	local confirmSelect = vgui.Create("DButton", itemSelectFrame)
+	itemSelectFrame.Confirm = confirmSelect
+	confirmSelect:SetSize(160, 30)
+	confirmSelect:SetFont("TVCD")
+	confirmSelect:SetTextColor(color_white)
 
 	local leftSide = vgui.Create("DScrollPanel", itemSelectFrame)
 	itemSelectFrame.Left = leftSide
@@ -78,9 +119,9 @@ local function DrawItemSelectorBox()
 		item:SetText(string.upper(p.Name))
 		item:SetFont("TVCD_small")
 		item:SetTextColor(color_white)
-		local w = item:GetTextSize()
-		if w > width then
-			width = w
+		local wi = item:GetTextSize()
+		if wi > width then
+			width = wi
 		end
 
 		if selectedItem == k then
@@ -104,32 +145,6 @@ local function DrawItemSelectorBox()
 	end
 	leftSide:SetWidth(math.min(width+10, 250))
 
-	local confirmSelect = vgui.Create("DButton", itemSelectFrame)
-	confirmSelect:SetSize(160, 30)
-	confirmSelect:SetFont("TVCD")
-	confirmSelect:SetTextColor(color_white)
-	if LocalPlayer():GetNWString("item", "none") ~= "none" or LocalPlayer():GetNWString("item2", "none") ~= "none" then
-		confirmSelect:SetText("XXXXXXX")
-		function confirmSelect.Paint(_, w, h)
-			surface.SetDrawColor(128, 0, 0)
-			surface.DrawRect(0, 0, w, h)
-		end
-		confirmSelect:SetEnabled(false)
-	else
-		confirmSelect:SetText("CONFIRM")
-		function confirmSelect.Paint(_, w, h)
-			if confirmSelect:IsHovered() then
-				surface.SetDrawColor(0, 0, 128)
-			else
-				surface.SetDrawColor(64, 64, 64)
-			end
-			surface.DrawRect(0, 0, w, h)
-		end
-		function confirmSelect.DoClick()
-			ItemChosen(selectedItem)
-			HideItemSelection()
-		end
-	end
 	-- Model panel
 	local modelHolder = vgui.Create("Panel", itemSelectFrame)
 	itemSelectFrame.ModelHolder = modelHolder
