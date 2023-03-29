@@ -100,37 +100,37 @@ end
 
 SlashCo.ChangeSurvivorItem = function(ply, id)
 
-	if SERVER then
-
-		if SlashCoItems[id] then
-			if SlashCoItems[id].IsSecondary then
-				local item = ply:GetNWString("item2", "none")
-				if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
-					SlashCoItems[item].OnSwitchFrom(ply)
-				end
-				ply:SetNWString( "item2", id )
-			else
-				local item = ply:GetNWString("item", "none")
-				if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
-					SlashCoItems[item].OnSwitchFrom(ply)
-				end
-				ply:SetNWString( "item", id )
-			end
-
-			if (SlashCoItems[id].OnPickUp) and game.GetMap() ~= "sc_lobby" then
-				SlashCoItems[id].OnPickUp(ply)
-			end
-
-			if SlashCoItems[id].EquipSound then
-				ply:EmitSound(SlashCoItems[id].EquipSound())
-			else
-				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
-			end
-		elseif id == "none" then
-			ply:SetNWString( "item", "none" )
-		end
+	if CLIENT then
+		return
 	end
 
+	if SlashCoItems[id] then
+		if SlashCoItems[id].IsSecondary then
+			local item = ply:GetNWString("item2", "none")
+			if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
+				SlashCoItems[item].OnSwitchFrom(ply)
+			end
+			ply:SetNWString( "item2", id )
+		else
+			local item = ply:GetNWString("item", "none")
+			if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
+				SlashCoItems[item].OnSwitchFrom(ply)
+			end
+			ply:SetNWString( "item", id )
+		end
+
+		if SlashCoItems[id].OnPickUp then
+			SlashCoItems[id].OnPickUp(ply)
+		end
+
+		if SlashCoItems[id].EquipSound then
+			ply:EmitSound(SlashCoItems[id].EquipSound())
+		else
+			ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+		end
+	elseif id == "none" then
+		ply:SetNWString( "item", "none" )
+	end
 end
 
 SlashCo.ItemPickUp = function(ply, item, itid)

@@ -1,6 +1,6 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.DeathWardUsed = {}
+SlashCoItems.DeathWardUsed = SlashCoItems.DeathWardUsed or {}
 SlashCoItems.DeathWardUsed.Model = "models/slashco/items/deathward.mdl"
 SlashCoItems.DeathWardUsed.Name = "Deathward"
 SlashCoItems.DeathWardUsed.Icon = "slashco/ui/icons/items/item_2_99"

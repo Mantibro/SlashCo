@@ -1,12 +1,12 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.Mayonnaise = {}
+SlashCoItems.Mayonnaise = SlashCoItems.Mayonnaise or {}
 SlashCoItems.Mayonnaise.Model = "models/props_lab/jar01a.mdl"
 SlashCoItems.Mayonnaise.EntClass = "sc_mayo"
 SlashCoItems.Mayonnaise.Name = "Mayonnaise"
 SlashCoItems.Mayonnaise.Icon = "slashco/ui/icons/items/item_5"
 SlashCoItems.Mayonnaise.Price = 15
-SlashCoItems.Mayonnaise.Description = "A large jar full of highly caloric mayonnaise. Consuming it will grant \nyou a massive boost to your health."
+SlashCoItems.Mayonnaise.Description = "Get a large boost to health."
 SlashCoItems.Mayonnaise.CamPos = Vector(50,0,20)
 SlashCoItems.Mayonnaise.IsSpawnable = true
 SlashCoItems.Mayonnaise.OnUse = function(ply)

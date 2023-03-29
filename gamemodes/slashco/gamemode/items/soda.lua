@@ -1,12 +1,12 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.Soda = {}
+SlashCoItems.Soda = SlashCoItems.Soda or {}
 SlashCoItems.Soda.Model = "models/props_junk/PopCan01a.mdl"
 SlashCoItems.Soda.Name = "B-Gone Soda"
 SlashCoItems.Soda.EntClass = "sc_soda"
 SlashCoItems.Soda.Icon = "slashco/ui/icons/items/item_8"
 SlashCoItems.Soda.Price = 20
-SlashCoItems.Soda.Description = "A can of strange soda. It has a sweet smell. \nConsuming it will turn you invisible for a short while."
+SlashCoItems.Soda.Description = "Become invisible on use."
 SlashCoItems.Soda.CamPos = Vector(30,0,0)
 SlashCoItems.Soda.IsSpawnable = true
 SlashCoItems.Soda.OnUse = function(ply)

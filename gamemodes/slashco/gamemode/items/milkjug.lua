@@ -1,12 +1,12 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.MilkJug = {}
+SlashCoItems.MilkJug = SlashCoItems.MilkJug or {}
 SlashCoItems.MilkJug.Model = "models/props_junk/garbage_milkcarton001a.mdl"
 SlashCoItems.MilkJug.Name = "Milk Jug"
 SlashCoItems.MilkJug.EntClass = "sc_milkjug"
 SlashCoItems.MilkJug.Icon = "slashco/ui/icons/items/item_3"
 SlashCoItems.MilkJug.Price = 10
-SlashCoItems.MilkJug.Description = "A jug of fresh milk. Consuming it will grant you a large speed boost\n for a short while.\nA certain Slasher seems to really like this item."
+SlashCoItems.MilkJug.Description = "Gain a temporary boost in speed on use.\nA certain Slasher seems to really like this item."
 SlashCoItems.MilkJug.CamPos = Vector(60,0,10)
 SlashCoItems.MilkJug.IsSpawnable = true
 SlashCoItems.MilkJug.OnUse = function(ply)

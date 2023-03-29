@@ -159,15 +159,9 @@ end
 SlashCo.PlayerItemStashRequest = function(id)
 
 	local ply = player.GetBySteamID64(id)
-    if ply:GetNWString("item", "none") ~= "none" or ply:GetNWString("item2", "none") ~= "none" then
-		ply:ChatPrint("You have already chosen an item.")
-        return
-    end
 
     net.Start("mantislashcoStartItemPicking")
-	net.WriteTable({ply = id, wardsleft = 0})
-	net.Broadcast()
-
+	net.Send(ply)
 end
 
 SlashCo.PlayerOfferingTableRequest = function(id)

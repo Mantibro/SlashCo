@@ -6,11 +6,14 @@ SlashCoItems.GasCan.Model = "models/props_junk/metalgascan.mdl"
 SlashCoItems.GasCan.Name = "Fuel Can"
 SlashCoItems.GasCan.EntClass = "sc_gascan"
 SlashCoItems.GasCan.Icon = "slashco/ui/icons/items/item_1"
-SlashCoItems.GasCan.Price = 15
-SlashCoItems.GasCan.Description = "A jerry can full of high-octane gas. Useful for refuelling Cars and \nGenerators. Taking it with you will reduce how much gas you will find\nwithin the Zone. \nOnce you drop this item, you will not be able to store it again."
+SlashCoItems.GasCan.Price = 0
+SlashCoItems.GasCan.Description = "Take a gas can with you instead of having to find one. There will be less gas cans to find if you do this."
 SlashCoItems.GasCan.CamPos = Vector(80,0,0)
 SlashCoItems.GasCan.ChangesSpeed = true
 SlashCoItems.GasCan.IsSpawnable = false
+SlashCoItems.GasCan.MaxAllowed = function()
+    return 2
+end
 SlashCoItems.GasCan.OnDrop = function(ply)
     SlashCoItems.GasCan.OnSwitchFrom(ply)
     local gasCan = SlashCo.CreateGasCan(ply:LocalToWorld(Vector(0, 0, 45)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

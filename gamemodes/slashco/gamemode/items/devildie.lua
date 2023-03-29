@@ -1,12 +1,12 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.DevilDie = {}
+SlashCoItems.DevilDie = SlashCoItems.DevilDie or {}
 SlashCoItems.DevilDie.Model = "models/slashco/items/devildie.mdl"
 SlashCoItems.DevilDie.EntClass = "sc_devildie"
 SlashCoItems.DevilDie.Name = "Devil's Gamble"
 SlashCoItems.DevilDie.Icon = "slashco/ui/icons/items/item_10"
 SlashCoItems.DevilDie.Price = 40
-SlashCoItems.DevilDie.Description = "A seemingly cursed die. \nUpon use, this item will grant you a random effect."
+SlashCoItems.DevilDie.Description = "Gain a random effect on use; either good or horrible."
 SlashCoItems.DevilDie.CamPos = Vector(30,0,10)
 SlashCoItems.DevilDie.IsSpawnable = true
 SlashCoItems.DevilDie.OnUse = function(ply)

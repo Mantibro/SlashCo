@@ -349,7 +349,7 @@ function GM:PlayerButtonDown(ply, button)
 				if getReadyState(ply) ~= 2 then
 
 					--Check if the player has made an offering or agreed to one
-					if isPlyOfferor(ply) then
+					if isPlyOfferer(ply) then
 						ply:ChatPrint( "Cannot ready as Slasher as you have either made or agreed to an Offering." )
 						Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 						Sndd:Play()
@@ -376,7 +376,7 @@ function GM:PlayerButtonDown(ply, button)
 				end
 			end
 
-			if ply:Team() == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferor(ply) then 
+			if ply:Team() == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferer(ply) then
 				SlashCo.OfferingVote(ply, true)
 				SlashCo.EndOfferingVote(ply)
 				ply:ChatPrint("You agree to the Offering.")

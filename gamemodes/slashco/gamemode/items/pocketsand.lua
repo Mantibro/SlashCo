@@ -1,12 +1,12 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.PocketSand = {}
+SlashCoItems.PocketSand = SlashCoItems.PocketSand or {}
 SlashCoItems.PocketSand.Model = "models/slashco/items/pocketsand.mdl"
 SlashCoItems.PocketSand.EntClass = "sc_pocketsand"
 SlashCoItems.PocketSand.Name = "Pocket Sand"
 SlashCoItems.PocketSand.Icon = "slashco/ui/icons/items/item_1"
 SlashCoItems.PocketSand.Price = 30
-SlashCoItems.PocketSand.Description = "A bag of sand. That's it. Upon use, this item will blind a \nSlasher for a short while if one is nearby."
+SlashCoItems.PocketSand.Description = "Blinds a nearby slasher."
 SlashCoItems.PocketSand.CamPos = Vector(50,0,0)
 SlashCoItems.PocketSand.DisplayColor = function(ply)
     local setcolor = 360-math.Clamp(ply:Health(),0,100)*1.2

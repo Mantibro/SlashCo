@@ -1,49 +1,77 @@
-include( "ui/fonts.lua" )
+include("ui/fonts.lua")
+local pmSelectFrame
+
+local function HidePlayermodelSelection()
+	if IsValid(pmSelectFrame) then
+		pmSelectFrame:Remove()
+		pmSelectFrame = nil
+	end
+end
+
+local function PlayerModelChosen(mod)
+	RunConsoleCommand("cl_slashco_playermodel", mod)
+end
 
 function DrawThePlayermodelSelectorBox()
+	if IsValid(pmSelectFrame) then return end
 
-	if ( IsValid( PMSelectFrame ) ) then return end
-	
-	-- Slasher selectionBox
-	PMSelectFrame = vgui.Create( "DFrame" )
-	PMSelectFrame:SetTitle( "Choose your Playermodel" )
+	pmSelectFrame = vgui.Create("DFrame")
+	pmSelectFrame:SetTitle("[CHOOSE...]")
 
-	--local x = 0
-	--local y = 0
+	local val = 1
 	for c = 0, 2 do
 		for i = 0, 2 do
-
-			local Item = vgui.Create( "SpawnIcon", PMSelectFrame )
-			local val = i+c+1
-			function Item.DoClick() PlayerModelChosen("models/slashco/survivor/male_0"..val..".mdl") HidePlayermodelSelection() end
-			Item:SetPos( 10 + i*80, 30 + c*80 )
-			Item:SetModel( "models/slashco/survivor/male_0"..val..".mdl" )
-
-			--x = x + 80
-
+			local item = vgui.Create("SpawnIcon", pmSelectFrame)
+			function item.DoClick()
+				PlayerModelChosen("models/slashco/survivor/male_0"..val..".mdl")
+				HidePlayermodelSelection()
+			end
+			item:SetSize(80, 80)
+			item:SetPos(5 + i*80, 29 + c*80)
+			item:SetModel("models/slashco/survivor/male_0"..val..".mdl")
+			item:SetTooltip("Male 0"..val)
+			val = val+1
 		end
-		--y = y + 80
+	end
+	
+	pmSelectFrame.btnMaxim:Hide()
+	pmSelectFrame.btnMinim:Hide()
+	pmSelectFrame.lblTitle:SetFont("TVCD")
+	pmSelectFrame.lblTitle:SetTextColor(color_white)
+	function pmSelectFrame.Paint(_, w, h)
+		surface.SetDrawColor(0, 0, 128)
+		surface.DrawRect(0, 0, w, h)
+	end
+	function pmSelectFrame.btnClose.Paint()
+		if pmSelectFrame.btnClose:IsHovered() then
+			surface.SetTextColor(255, 0, 0)
+		else
+			surface.SetTextColor(255, 255, 255)
+		end
+		surface.SetFont("TVCD")
+		surface.SetTextPos(0, 0)
+		surface.DrawText("[X]")
 	end
 
-	PMSelectFrame:SetSize( 240, 260 )
-	PMSelectFrame:Center()
-	PMSelectFrame:MakePopup()
-	PMSelectFrame:SetKeyboardInputEnabled( false )
+	function pmSelectFrame:PerformLayout()
+		local titlePush = 0
 
-end
+		if IsValid(self.imgIcon) then
+			self.imgIcon:SetPos(5, 5)
+			self.imgIcon:SetSize(16, 16)
+			titlePush = 16
+		end
 
-function HidePlayermodelSelection()
+		self.btnClose:SetSize(48, 24)
+		self.btnClose:SetPos(self:GetWide() - 48 - 4, 1)
 
-	if ( IsValid(PMSelectFrame) ) then
-		PMSelectFrame:Remove()
-		PMSelectFrame = nil
+		self.lblTitle:SetPos(titlePush, 2)
+		self.lblTitle:SetSize(self:GetWide() - 25 - titlePush, 20)
 	end
 
-end
-
-function PlayerModelChosen(mod)
-
-	RunConsoleCommand( "cl_slashco_playermodel", mod )
-
+	pmSelectFrame:SetSize(80*3+10, 80*3+24+10)
+	pmSelectFrame:Center()
+	pmSelectFrame:MakePopup()
+	pmSelectFrame:SetKeyboardInputEnabled(false)
 end
 

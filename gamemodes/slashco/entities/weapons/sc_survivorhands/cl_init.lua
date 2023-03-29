@@ -59,7 +59,8 @@ function SWEP:ViewModelDrawn()
     v = self.lastEquip or v
 
     local bone = vm:LookupBone("ValveBiped.Bip01_Spine4")
-    assert(bone, "Tried to use a bone that doesn't exist! (viewmodel)")
+    if not bone then return end
+    --assert(bone, "Tried to use a bone that doesn't exist! (viewmodel)")
     local m = vm:GetBoneMatrix(bone)
     local pos, ang = Vector(0,0,0), Angle(0,0,0)
     if m then
@@ -114,6 +115,8 @@ function SWEP:ViewModelDrawn()
         if (v.surpresslightning) then
             render.SuppressEngineLighting(false)
         end
+    else
+        self:Initialize()
     end
 end
 
@@ -140,7 +143,8 @@ function SWEP:DrawWorldModel()
 
     self:SetHoldType(v.holdtype)
     local bone = self.Owner:LookupBone(v.bone)
-    assert(bone, "Tried to use a bone that doesn't exist! (worldmodel)")
+    if not bone then return end
+    --assert(bone, "Tried to use a bone that doesn't exist! (worldmodel)")
     local m = self.Owner:GetBoneMatrix(bone)
     local pos, ang = Vector(0,0,0), Angle(0,0,0)
     if m then
@@ -191,5 +195,7 @@ function SWEP:DrawWorldModel()
         if (v.surpresslightning) then
             render.SuppressEngineLighting(false)
         end
+    else
+        self:Initialize()
     end
 end

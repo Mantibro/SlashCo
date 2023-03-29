@@ -1,12 +1,12 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.Rock = {}
+SlashCoItems.Rock = SlashCoItems.Rock or {}
 SlashCoItems.Rock.Model = "models/slashco/items/rock.mdl"
 SlashCoItems.Rock.Name = "The Rock"
 SlashCoItems.Rock.EntClass = "sc_rock"
 SlashCoItems.Rock.Icon = "slashco/ui/icons/items/item_7"
 SlashCoItems.Rock.Price = 30
-SlashCoItems.Rock.Description = "An ornamented stone of crude plutonium.\nWhile it's held, your footsteps will not make any noise, however\nyou will be unable to sprint."
+SlashCoItems.Rock.Description = "Become silent but unable to sprint while equipped."
 SlashCoItems.Rock.CamPos = Vector(50,0,0)
 SlashCoItems.Rock.ChangesSpeed = true
 SlashCoItems.Rock.IsSpawnable = true

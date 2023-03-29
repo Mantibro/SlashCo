@@ -1,6 +1,6 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.Battery = {}
+SlashCoItems.Battery = SlashCoItems.Battery or {}
 SlashCoItems.Battery.IsSecondary = true
 SlashCoItems.Battery.Model = "models/items/car_battery01.mdl"
 SlashCoItems.Battery.Name = "Battery"

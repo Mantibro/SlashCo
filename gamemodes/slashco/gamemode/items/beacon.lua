@@ -1,13 +1,13 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.Beacon = {}
+SlashCoItems.Beacon = SlashCoItems.Beacon or {}
 SlashCoItems.Beacon.Model = "models/props_c17/light_cagelight01_on.mdl"
 SlashCoItems.Beacon.EntClass = "sc_beacon"
 SlashCoItems.Beacon.Name = "Distress Beacon"
 SlashCoItems.Beacon.Icon = "slashco/ui/icons/items/item_9"
-SlashCoItems.Beacon.Price = 45
-SlashCoItems.Beacon.Description = "A personal emergency terminal. \nIf at least one Generator has been activated and you are the last one alive, upon use \nthis item will alert the SlashCo headquarters to send emergency rescue. \nOnly one can be taken."
-SlashCoItems.Beacon.CamPos = Vector(50,0,10)
+SlashCoItems.Beacon.Price = 15
+SlashCoItems.Beacon.Description = "Alerts the SlashCo Headquarters to abort the mission. Only IMPORTANT circumstances get a fast response."
+SlashCoItems.Beacon.CamPos = Vector(50,0,35)
 SlashCoItems.Beacon.MaxAllowed = function()
     return 1
 end

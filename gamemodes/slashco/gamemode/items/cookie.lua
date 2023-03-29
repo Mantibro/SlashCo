@@ -1,12 +1,12 @@
 local SlashCoItems = SlashCoItems
 
-SlashCoItems.Cookie = {}
+SlashCoItems.Cookie = SlashCoItems.Cookie or {}
 SlashCoItems.Cookie.Model = "models/slashco/items/cookie.mdl"
 SlashCoItems.Cookie.EntClass = "sc_cookie"
 SlashCoItems.Cookie.Name = "Cookie"
 SlashCoItems.Cookie.Icon = "slashco/ui/icons/items/item_4"
 SlashCoItems.Cookie.Price = 15
-SlashCoItems.Cookie.Description = "A large chocolate chip cookie. Consuming it will grant you an increase\nto fuel pouring efficiency for a while. \nA certain Slasher seems to really like this item."
+SlashCoItems.Cookie.Description = "Gain a temporary bonus to fuel pouring on use.\nA certain Slasher seems to really like this item."
 SlashCoItems.Cookie.CamPos = Vector(50,0,20)
 SlashCoItems.Cookie.IsSpawnable = true
 SlashCoItems.Cookie.OnUse = function(ply)

@@ -35,6 +35,24 @@ surface.CreateFont( "TVCD", {
 	outline = false
 } )
 
+surface.CreateFont( "TVCD_small", {
+	font = "Tvcd",
+	extended = false,
+	size = 14,
+	weight = 500,
+	blursize = 1,
+	scanlines = 4,
+	antialias = true,
+	underline = false,
+	italic = false,
+	strikeout = false,
+	symbol = false,
+	rotary = false,
+	shadow = false,
+	additive = false,
+	outline = false
+} )
+
 surface.CreateFont( "Indicator", {
 	font = "Tvcd",
 	extended = false,
