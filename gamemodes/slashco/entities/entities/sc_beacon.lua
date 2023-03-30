@@ -12,7 +12,7 @@ ENT.Contact			= ""
 ENT.Purpose			= "A personal emergency terminal."
 ENT.Instructions	= ""
 ENT.IsSelectable 	= true
-ENT.PingPing = "DISTRESS BEACON"
+ENT.PingType = "ITEM"
 
 function ENT:Initialize()
 	if SERVER then
