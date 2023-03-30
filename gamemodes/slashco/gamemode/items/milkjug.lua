@@ -42,3 +42,28 @@ SlashCoItems.MilkJug.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
+SlashCoItems.MilkJug.WorldModelHolstered = {
+    model = "models/props_junk/garbage_milkcarton001a.mdl",
+    bone = "ValveBiped.Bip01_Pelvis",
+    pos = Vector(10, 2, 5),
+    angle = Angle(110, -80, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+SlashCoItems.MilkJug.WorldModel = {
+    holdtype = "slam",
+    model = "models/props_junk/garbage_milkcarton001a.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(1, 4.5, 1),
+    angle = Angle(180, -20, -25),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

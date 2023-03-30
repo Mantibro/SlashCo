@@ -32,3 +32,28 @@ SlashCoItems.Mayonnaise.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
+SlashCoItems.Mayonnaise.WorldModelHolstered = {
+    model = "models/props_lab/jar01a.mdl",
+    bone = "ValveBiped.Bip01_Pelvis",
+    pos = Vector(10, 2, 5),
+    angle = Angle(110, -80, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+SlashCoItems.Mayonnaise.WorldModel = {
+    holdtype = "slam",
+    model = "models/props_lab/jar01a.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(1, 4.5, -1),
+    angle = Angle(180, 0, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

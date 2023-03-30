@@ -12,6 +12,7 @@ ENT.Contact			= ""
 ENT.Purpose			= "Something I don't remember."
 ENT.Instructions	= ""
 ENT.IsSelectable 	= true
+ENT.PingType = "ITEM"
 
 function ENT:Initialize()
     if SERVER then

@@ -42,3 +42,28 @@ SlashCoItems.Cookie.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
+SlashCoItems.Cookie.WorldModelHolstered = {
+    model = "models/slashco/items/cookie.mdl",
+    bone = "ValveBiped.Bip01_Head1",
+    pos = Vector(3, 4.5, 0),
+    angle = Angle(90, 105, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+SlashCoItems.Cookie.WorldModel = {
+    holdtype = "camera",
+    model = "models/slashco/items/cookie.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(3, 5, -1),
+    angle = Angle(-80, 0, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

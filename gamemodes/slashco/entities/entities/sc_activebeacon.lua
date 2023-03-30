@@ -11,6 +11,7 @@ ENT.Author			= "Manti"
 ENT.Contact			= ""
 ENT.Purpose			= "Rescue."
 ENT.Instructions	= ""
+ENT.PingType = "DISTRESS BEACON"
 
 local rotate = 0
 local intensity = 0

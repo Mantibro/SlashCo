@@ -68,3 +68,29 @@ SlashCoItems.PocketSand.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
+SlashCoItems.PocketSand.WorldModelHolstered = {
+    model = "models/slashco/items/pocketsand.mdl",
+    bone = "ValveBiped.Bip01_Pelvis",
+    pos = Vector(5, 2, 5),
+    angle = Angle(110, -80, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+SlashCoItems.PocketSand.WorldModel = {
+    holdtype = "slam",
+    model = "models/slashco/items/pocketsand.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(3, 2.5, -1),
+    angle = Angle(180, 0, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+

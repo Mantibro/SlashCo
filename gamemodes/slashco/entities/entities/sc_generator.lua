@@ -10,6 +10,7 @@ ENT.Author       = "Octo"
 ENT.Contact      = ""
 ENT.Purpose      = "Combustion engine powered generator unit."
 ENT.Instructions = ""
+ENT.PingType = "GENERATOR"
 
 local TimeToFuel = 13
 

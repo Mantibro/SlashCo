@@ -141,3 +141,28 @@ SlashCoItems.DevilDie.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
+SlashCoItems.DevilDie.WorldModelHolstered = {
+    model = "models/slashco/items/devildie.mdl",
+    bone = "ValveBiped.Bip01_Pelvis",
+    pos = Vector(5, 2, 5),
+    angle = Angle(110, -80, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+SlashCoItems.DevilDie.WorldModel = {
+    holdtype = "slam",
+    model = "models/slashco/items/devildie.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(2, 3.5, -1.5),
+    angle = Angle(200, 0, -20),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

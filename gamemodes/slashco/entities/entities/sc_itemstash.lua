@@ -10,6 +10,7 @@ ENT.Author			= "Manti"
 ENT.Contact			= ""
 ENT.Purpose			= "Supplying SlashCo workers with an item."
 ENT.Instructions	= ""
+ENT.PingType = "ITEM STASH"
 
 function ENT:Initialize()
 	if SERVER then

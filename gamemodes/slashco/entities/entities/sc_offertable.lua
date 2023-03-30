@@ -10,6 +10,7 @@ ENT.Author			= "Manti"
 ENT.Contact			= ""
 ENT.Purpose			= "A table for offerings."
 ENT.Instructions	= ""
+ENT.PingType = "OFFERING TABLE"
 
 local offer = offer
 

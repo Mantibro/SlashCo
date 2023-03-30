@@ -186,64 +186,95 @@ SlashCo.LobbyConvos = {
 
 }
 
+local function sayPrompt(ply, input)
+    ply:EmitSound("slashco/survivor/voice/prompt_" .. input .. math.random(1, 3) .. ".mp3")
+end
+
+local typeCheck = {
+    ["LOOK HERE"] = "look",
+    ["LOOK AT THIS"] = "look",
+    ["HELICOPTER"] = "helicopter",
+    ["GENERATOR"] = "generator",
+    ["PLUSH DOG"] = "dogg",
+    ["BASKETBALL"] = "ballin",
+    ["SLASHER"] = "slasher"
+}
+
 SlashCo.LobbyBanter = function()
 
     local survivors = team.GetPlayers(TEAM_SURVIVOR)
 
-    if #survivors < 2 then return 5 end
+    if #survivors < 2 then
+        return 5
+    end
 
-    local convo = math.random(1,ConvoCount)
+    local convo = math.random(1, ConvoCount)
 
     local totalLength = SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2 + SlashCo.LobbyConvos[convo].Length3
 
     local function playVocal(conv, id, plyid)
-        survivors[plyid]:EmitSound("slashco/survivor/voice/maleconv_"..conv.."_"..id..".mp3")
+        survivors[plyid]:EmitSound("slashco/survivor/voice/maleconv_" .. conv .. "_" .. id .. ".mp3")
     end
 
     local firstid = math.random(1, #survivors)
     playVocal(convo, 1, firstid)
 
     local secondid = math.random(1, #survivors)
-    if secondid == firstid then secondid = 1 end
-    if secondid == firstid then secondid = 2 end
+    if secondid == firstid then
+        secondid = 1
+    end
+    if secondid == firstid then
+        secondid = 2
+    end
 
     local thirdid = math.random(1, #survivors)
-    if thirdid == secondid then thirdid = 1 end
-    if thirdid == secondid then thirdid = 2 end
+    if thirdid == secondid then
+        thirdid = 1
+    end
+    if thirdid == secondid then
+        thirdid = 2
+    end
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1, function() playVocal(convo, 2, secondid) end)
+    timer.Simple(SlashCo.LobbyConvos[convo].Length1, function()
+        playVocal(convo, 2, secondid)
+    end)
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()  playVocal(convo, 3, thirdid) end)
+    timer.Simple(SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()
+        playVocal(convo, 3, thirdid)
+    end)
 
     return totalLength
 
 end
 
-net.Receive("mantislashcoSurvivorVoicePrompt", function() 
+net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
 
-    local ply = net.ReadEntity()
     local prompt = net.ReadUInt(3)
 
     if prompt == 1 then
-        ply:EmitSound("slashco/survivor/voice/prompt_yes"..math.random(1,5)..".mp3")
+        ply:EmitSound("slashco/survivor/voice/prompt_yes" .. math.random(1, 5) .. ".mp3")
     elseif prompt == 2 then
-        ply:EmitSound("slashco/survivor/voice/prompt_no"..math.random(1,6)..".mp3")
+        ply:EmitSound("slashco/survivor/voice/prompt_no" .. math.random(1, 6) .. ".mp3")
     elseif prompt == 3 then
-        ply:EmitSound("slashco/survivor/voice/prompt_follow"..math.random(1,6)..".mp3")
+        ply:EmitSound("slashco/survivor/voice/prompt_follow" .. math.random(1, 6) .. ".mp3")
     elseif prompt == 4 then
-        ply:EmitSound("slashco/survivor/voice/prompt_spot"..math.random(1,5)..".mp3")
+        ply:EmitSound("slashco/survivor/voice/prompt_spot" .. math.random(1, 5) .. ".mp3")
     elseif prompt == 5 then
-        ply:EmitSound("slashco/survivor/voice/prompt_help"..math.random(1,6)..".mp3")
+        ply:EmitSound("slashco/survivor/voice/prompt_help" .. math.random(1, 6) .. ".mp3")
     elseif prompt == 6 then
-        ply:EmitSound("slashco/survivor/voice/prompt_run"..math.random(1,7)..".mp3")
+        ply:EmitSound("slashco/survivor/voice/prompt_run" .. math.random(1, 7) .. ".mp3")
     end
 end)
 
 SlashCo.EscapeVoicePrompt = function()
 
-    if #team.GetPlayers( TEAM_SURVIVOR ) < 1 then return end
+    if team.NumPlayers(TEAM_SURVIVOR) < 1 then
+        return
+    end
 
-    local function playVoice(ply) ply:EmitSound("slashco/survivor/voice/prompt_escape"..math.random(1,5)..".mp3") end
+    local function playVoice(ply)
+        ply:EmitSound("slashco/survivor/voice/prompt_escape" .. math.random(1, 5) .. ".mp3")
+    end
 
     local survs = team.GetPlayers(TEAM_SURVIVOR)
 
@@ -260,64 +291,93 @@ SlashCo.EscapeVoicePrompt = function()
 
         local survivor = survs[i]
 
-        for s = 1, #speaking_survs do 
-            if speaking_survs[s] == survivor then 
-                goto SKIP 
+        for s = 1, #speaking_survs do
+            if speaking_survs[s] == survivor then
+                goto SKIP
             end
 
             if survivor:GetPos():Distance(speaking_survs[s]:GetPos()) > 750 then
                 table.insert(speaking_survs, survs[i])
-                goto SKIP 
+                goto SKIP
             end
         end
 
-        ::SKIP::
+        :: SKIP ::
 
     end
 
-    for s = 1, #speaking_survs do 
+    for s = 1, #speaking_survs do
         playVoice(speaking_survs[s])
     end
 
 end
 
-net.Receive("mantislashcoSurvivorPreparePing", function()
+net.Receive("mantislashcoSurvivorPreparePing", function(_, ply)
 
-	t = net.ReadTable()
+    if ply.LastPinged and CurTime() - ply.LastPinged < 3 then
+        return
+    end
+    ply.LastPinged = CurTime()
 
-	local ply = t.Player
+    local look = ply:GetEyeTrace().Entity
+    local ping_info = {}
+    ping_info.ExpiryTime = 0
+    if look:EntIndex() ~= 0 then
+        if look.PingType then
+            ping_info.Type = look.PingType
+        elseif look:GetModel() == "models/ldi/basketball.mdl" then
+            ping_info.Type = "BASKETBALL"
+            ping_info.ExpiryTime = 15
+        elseif look:IsPlayer() then
+            if look:Team() == TEAM_SURVIVOR then
+                ping_info.Type = "SURVIVOR"
+                ping_info.SurvivorName = string.upper(look:Nick())
+                look = ply:GetEyeTrace().HitPos
+                ping_info.ExpiryTime = 5
+            elseif look:Team() == TEAM_SLASHER then
 
-	if t.Type == "LOOK HERE" or t.Type == "LOOK AT THIS" then
-		ply:EmitSound("slashco/survivor/voice/prompt_look"..math.random(1,3)..".mp3")
-	elseif t.Type == "Generator" then
-		ply:EmitSound("slashco/survivor/voice/prompt_generator"..math.random(1,3)..".mp3")
-	elseif t.Type == "Helicopter" then
-		ply:EmitSound("slashco/survivor/voice/prompt_helicopter"..math.random(1,3)..".mp3")
-	elseif t.Type == "Plush Dog" then
-		ply:EmitSound("slashco/survivor/voice/prompt_dogg"..math.random(1,3)..".mp3")
-	elseif t.Type == "Basketball" then
-		ply:EmitSound("slashco/survivor/voice/prompt_ballin"..math.random(1,3)..".mp3")
-	elseif t.Type == "SLASHER" then
-		ply:EmitSound("slashco/survivor/voice/prompt_slasher"..math.random(1,3)..".mp3")
-	else
-
-		for k, v in SortedPairs(SlashCoItems) do
-
-			if v.Name == t.Type then
-				local input = v.EntClass
-                class = "Item"
-                if input ~= nil then
-				    class = string.Replace( input, "sc_", "")
-                    ply:EmitSound("slashco/survivor/voice/prompt_"..class..math.random(1,3)..".mp3")
+                if not look:GetNWBool("AmogusSurvivorDisguise") then
+                    ping_info.Type = "SLASHER"
+                    look = ply:GetEyeTrace().HitPos
+                    ping_info.ExpiryTime = 5
+                else
+                    ping_info.Type = "SURVIVOR"
+                    ping_info.SurvivorName = string.upper(table.Random(team.GetPlayers(TEAM_SURVIVOR)):Nick())
+                    look = ply:GetEyeTrace().HitPos
+                    ping_info.ExpiryTime = 5
                 end
-			end
-	
-		end
+            end
+        else
+            ping_info.Type = "LOOK AT THIS"
 
-	end
+            ping_info.ExpiryTime = 10
+        end
+    else
+        look = ply:GetEyeTrace().HitPos
 
+        ping_info.Type = "LOOK HERE"
+
+        ping_info.ExpiryTime = 10
+    end
+
+    if typeCheck[ping_info.Type] then
+        sayPrompt(ply, typeCheck[ping_info.Type])
+    elseif ping_info.Type == "ITEM" and type(look) == "Entity" then
+        local class = look:GetClass()
+        for _, v in pairs(SlashCoItems) do
+            local input = v.EntClass
+            if not input then continue end
+            if v.EntClass == class then
+                sayPrompt(ply, string.sub(input, 4))
+                ping_info.Name = string.upper(v.Name)
+                break
+            end
+        end
+    end
+
+    ping_info.Entity = look
+    ping_info.Player = ply
     net.Start("mantislashcoSurvivorPings")
-	net.WriteTable(t)
-	net.Broadcast()
-
+    net.WriteTable(ping_info)
+    net.Send(team.GetPlayers(TEAM_SURVIVOR))
 end)

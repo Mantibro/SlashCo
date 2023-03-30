@@ -19,5 +19,30 @@ SlashCoItems.DeathWardUsed.ViewModel = {
     surpresslightning = false,
     material = "",
     skin = 0,
-    bodygroup = {1}
+    bodygroup = {[0] = 1}
+}
+SlashCoItems.DeathWardUsed.WorldModelHolstered = {
+    model = "models/slashco/items/deathward.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(3, 0, 0),
+    angle = Angle(10, -20, -90),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {[0] = 1}
+}
+SlashCoItems.DeathWardUsed.WorldModel = {
+    holdtype = "normal",
+    model = "models/slashco/items/deathward.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(3, 0, 0),
+    angle = Angle(10, -20, -90),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {[0] = 1}
 }

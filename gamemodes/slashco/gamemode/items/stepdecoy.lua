@@ -34,3 +34,28 @@ SlashCoItems.StepDecoy.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
+SlashCoItems.StepDecoy.WorldModelHolstered = {
+    model = "models/props_junk/Shoe001a.mdl",
+    bone = "ValveBiped.Bip01_R_Foot",
+    pos = Vector(2.5, 3, -0.2),
+    angle = Angle(0, -33, 90),
+    size = Vector(1.3, 1.3, 1.3),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+SlashCoItems.StepDecoy.WorldModel = {
+    holdtype = "slam",
+    model = "models/props_junk/Shoe001a.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(4, 6, -1),
+    angle = Angle(180, 90, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

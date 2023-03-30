@@ -87,3 +87,28 @@ SlashCoItems.Beacon.ViewModel = {
     skin = 0,
     bodygroup = {}
 }
+SlashCoItems.Beacon.WorldModelHolstered = {
+    model = "models/props_c17/light_cagelight01_on.mdl",
+    bone = "ValveBiped.Bip01_Spine2",
+    pos = Vector(4, 1, 4),
+    angle = Angle(0, -90, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}
+SlashCoItems.Beacon.WorldModel = {
+    holdtype = "passive",
+    model = "models/props_c17/light_cagelight01_on.mdl",
+    bone = "ValveBiped.Bip01_R_Hand",
+    pos = Vector(9, 1, 4),
+    angle = Angle(-30, 180, 0),
+    size = Vector(1, 1, 1),
+    color = Color(255, 255, 255, 255),
+    surpresslightning = false,
+    material = "",
+    skin = 0,
+    bodygroup = {}
+}

@@ -464,7 +464,6 @@ local function lobbyRoundSetup()
 			local ply = player.GetBySteamID64( SlashCo.LobbyData.AssignedSurvivors[i].steamid )
 
 			ply:SetTeam(TEAM_SURVIVOR)
-			ply:Give("sc_survivorhands")
 			ply:Spawn()
 
 			print("Survivor "..i.." selection successful, the Survivor is: "..ply:GetName())
@@ -528,12 +527,16 @@ SlashCo.ChooseTheSlasherLobby = function(id)
 end
 
 net.Receive("mantislashcoPickItem", function(_, ply)
+	if ply:Team() ~= TEAM_SURVIVOR then
+		return
+	end
 
 	if ply:GetNWString("item", "none") ~= "none" or ply:GetNWString("item2", "none") ~= "none" then
 		ply:ChatPrint("You have already chosen an item.")
 		return
 	end
 
+	ply:Give("sc_survivorhands")
 	local item = net.ReadString()
 	local plyID = ply:SteamID64()
 

@@ -11,7 +11,8 @@ ENT.Author			= "Manti"
 ENT.Contact			= ""
 ENT.Purpose			= "Transport of SlashCo workers."
 ENT.Instructions	= ""
-ENT.AutomaticFrameAdvance = true 
+ENT.AutomaticFrameAdvance = true
+ENT.PingType = "HELICOPTER"
 
 --local plyCount = 0
 --local self.switch = false

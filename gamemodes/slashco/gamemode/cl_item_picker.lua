@@ -44,6 +44,7 @@ local function SetConfirm()
 			ItemChosen(selectedItem)
 			HideItemSelection()
 		end
+		itemSelectFrame.Confirm:SetEnabled(true)
 	end
 end
 
@@ -157,7 +158,7 @@ local function DrawItemSelectorBox()
 
 	local itemModel = vgui.Create("DModelPanel", modelHolder)
 	itemSelectFrame.ItemModel = itemModel
-	itemModel:SetLookAt(Vector(0, 0, 0))
+	itemModel:SetLookAt(vector_origin)
 	itemModel:SetFOV(40)
 	itemModel:SetModel(SlashCoItems[selectedItem].Model)
 	itemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)

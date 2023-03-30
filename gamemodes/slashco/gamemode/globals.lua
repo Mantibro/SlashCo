@@ -11,6 +11,17 @@ SlashCo.Difficulty = {
 }
 
 SlashCo.Maps = {
+    [0] = {
+        ID = "sc_summercamp",
+        NAME = "Missing map!",
+        AUTHOR = "Steinman",
+        DEFAULT = true,
+        SIZE = 1,
+        MIN_PLAYERS = 1,
+        LEVELS = {
+            500
+        }
+    },
 
     {
         ID = "sc_summercamp",
