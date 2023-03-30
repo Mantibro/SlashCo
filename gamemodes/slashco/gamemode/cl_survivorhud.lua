@@ -397,10 +397,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
     parsed:Draw(ScrW() * 0.025 + 4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 end)
 
---register a new vgui panel in another file
---useful stuff to know:
---Panel:LocalCursorPos() returns the cursor position relative to the panel
-
 local voicePanel
 hook.Add("PlayerButtonDown", "OpenVoice", function(ply, button)
     if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SURVIVOR then
@@ -408,7 +404,7 @@ hook.Add("PlayerButtonDown", "OpenVoice", function(ply, button)
     end
     if button == KEY_T then
 
-        voicePanel = vgui.Create("sc_voiceselect") --the panel you made should replace DPanel here
+        voicePanel = vgui.Create("sc_voiceselect")
 
     elseif button == 109 then
         net.Start("mantislashcoSurvivorPreparePing")

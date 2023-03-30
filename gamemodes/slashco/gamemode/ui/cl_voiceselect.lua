@@ -1,24 +1,49 @@
 local PANEL = {}
 
-local voiceCursor
-
-local voices = {}
+local voiceText = {
+    {
+        prompt = "NO",
+        snd = "no"
+    },
+    {
+        prompt = "YES",
+        snd = "yes"
+    },
+    {
+        prompt = "FOLLOW ME",
+        snd = "follow"
+    },
+    {
+        prompt = "SLASHER HERE",
+        snd = "spot"
+    },
+    {
+        prompt = "RUN",
+        snd = "run"
+    },
+    {
+        prompt = "HELP ME",
+        snd = "help"
+    }
+}
 
 function PANEL:Init()
 
+    local voices = {}
+
     self:SetSize(ScrW() / 3, ScrH() / 3)
     self:MakePopup()
-    self:DockMargin(0, 0, 0, 0)
     self:SetKeyboardInputEnabled(true)
     self:Center()
     self:SetCursor("blank")
 
-    voiceSay = vgui.Create("DLabel", self)
-    voiceSay:Center()
+    local voiceSay = vgui.Create("DLabel", self)
     voiceSay:SetSize(100,50)
+    voiceSay:Center()
     voiceSay:SetFont("TVCD")
     voiceSay:SetText( "[SAY]" )
 
+    --[[
     voices[1] = vgui.Create("DLabel", self)
     voices[1]:SetSize(150,50)
     voices[1]:SetFont("TVCD")
@@ -78,32 +103,45 @@ function PANEL:Init()
     end
     voices[6].Prompt = "HELP ME"
     voices[6].snd = "help"
+    --]]
 
-    for num = 1, 6 do 
+    for k, v in ipairs(voiceText) do
+        local element = vgui.Create("DLabel", self)
+        table.insert(voices, element)
+        element:SetSize(250,50)
+        element:SetFont("TVCD")
+        element:SetContentAlignment(5)
+        element.Paint = function()
+            return
+        end
+        element.Prompt = v.prompt
+        element.snd = v.snd
 
         local rad = (6.28318531) / 6
-        local cur_rad = rad * num
+        local cur_rad = rad * k
 
-        if voices[num] ~= nil then
-            voices[num]:SetPos( (ScrW() / 6) + math.sin( cur_rad ) * 150,(ScrH() / 6) +  math.cos( cur_rad ) * 150 )
+        if voices[k] ~= nil then
+            voices[k]:SetPos((self:GetWide() / 2) + math.sin( cur_rad ) * 150 - (element:GetWide() / 2),
+                    (self:GetTall() / 2) + math.cos( cur_rad ) * 150 - (element:GetTall() / 2))
         end
-
     end
 
-    voiceCursor = vgui.Create("DLabel", self)
+    local voiceCursor = vgui.Create("DLabel", self)
     voiceCursor:SetSize(100,50)
     voiceCursor:SetFont("TVCD")
     voiceCursor:SetText( "[  ]" )
 
+    self.VoiceCursor = voiceCursor
+    self.Voices = voices
 end
 
 function PANEL:Think()
     local x, y = self:CursorPos()
-    voiceCursor:SetPos( x - 30, y - 25)
+    self.VoiceCursor:SetPos( x - 30, y - 25)
 
     local showCursor = true
 
-    for k ,v in ipairs( voices ) do
+    for k, v in ipairs( self.Voices ) do
 
         if v:DistanceFrom( x, y ) < 50 then
             v:SetText( "[ "..v.Prompt.." ]" )
@@ -115,9 +153,9 @@ function PANEL:Think()
     end
 
     if showCursor then 
-        voiceCursor:SetText( "[  ]" )
+        self.VoiceCursor:SetText( "[  ]" )
     else
-        voiceCursor:SetText( "" )
+        self.VoiceCursor:SetText( "" )
     end
 end
 
