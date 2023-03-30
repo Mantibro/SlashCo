@@ -20,6 +20,8 @@ include( "cl_spectator_hud.lua" )
 include( "cl_playermodel_picker.lua" )
 include( "cl_gameinfo.lua" )
 
+include( "ui/cl_voiceselect.lua" )
+
 function GM:HUDDrawTargetID()
 	return false
 end 

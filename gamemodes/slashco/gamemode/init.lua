@@ -1,5 +1,6 @@
 AddCSLuaFile( "cl_init.lua" )
 AddCSLuaFile( "shared.lua" )
+AddCSLuaFile( "ui/cl_voiceselect.lua" )
 
 include( "items/items_init.lua" )
 include( "slasher/slasher_init.lua" )

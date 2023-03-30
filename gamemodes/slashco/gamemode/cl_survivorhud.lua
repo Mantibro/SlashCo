@@ -142,7 +142,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
     --//voice prompts//--
 
-    if input.IsKeyDown(KEY_T) then
+    --[[if input.IsKeyDown(KEY_T) then
 
         draw.SimpleText("[SAY]", "TVCD", ScrW() / 2, ScrH() / 2 - 35, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
@@ -252,7 +252,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
     if voice_cooldown > 0 then
         voice_cooldown = voice_cooldown - RealFrameTime()
-    end
+    end]]
 
     --//prompts for items//--
 
@@ -406,18 +406,10 @@ hook.Add("PlayerButtonDown", "OpenVoice", function(ply, button)
     if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SURVIVOR then
         return
     end
-    if button == KEY_H then
-        voicePanel = vgui.Create("DPanel") --the panel you made should replace DPanel here
-        voicePanel:SetSize(600, 600)
-        voicePanel:MakePopup()
-        voicePanel:DockMargin(0, 0, 0, 0)
-        voicePanel:SetKeyboardInputEnabled(true)
-        voicePanel:Center()
-        function voicePanel:OnKeyCodeReleased(keyCode)
-            if keyCode == KEY_H then
-                self:Remove()
-            end
-        end
+    if button == KEY_T then
+
+        voicePanel = vgui.Create("sc_voiceselect") --the panel you made should replace DPanel here
+
     elseif button == 109 then
         net.Start("mantislashcoSurvivorPreparePing")
         net.SendToServer()
