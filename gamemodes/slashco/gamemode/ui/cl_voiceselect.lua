@@ -43,72 +43,10 @@ function PANEL:Init()
     voiceSay:SetFont("TVCD")
     voiceSay:SetText( "[SAY]" )
 
-    --[[
-    voices[1] = vgui.Create("DLabel", self)
-    voices[1]:SetSize(150,50)
-    voices[1]:SetFont("TVCD")
-    voices[1]:SetContentAlignment(5)
-    voices[1].Paint = function()
-        return
-    end
-    voices[1].Prompt = "YES"
-    voices[1].snd = "yes"
-
-    voices[2] = vgui.Create("DLabel", self)
-    voices[2]:SetSize(150,50)
-    voices[2]:SetFont("TVCD")
-    voices[2]:SetContentAlignment(5)
-    voices[2].Paint = function()
-        return
-    end
-    voices[2].Prompt = "NO"
-    voices[2].snd = "no"
-
-    voices[3] = vgui.Create("DLabel", self)
-    voices[3]:SetSize(250,50)
-    voices[3]:SetFont("TVCD")
-    voices[3]:SetContentAlignment(5)
-    voices[3].Paint = function()
-        return
-    end
-    voices[3].Prompt = "FOLLOW ME"
-    voices[3].snd = "follow"
-
-    voices[4] = vgui.Create("DLabel", self)
-    voices[4]:SetSize(250,50)
-    voices[4]:SetFont("TVCD")
-    voices[4]:SetContentAlignment(5)
-    voices[4].Paint = function()
-        return
-    end
-    voices[4].Prompt = "SLASHER HERE"
-    voices[4].snd = "spot"
-
-    voices[5] = vgui.Create("DLabel", self)
-    voices[5]:SetSize(250,50)
-    voices[5]:SetFont("TVCD")
-    voices[5]:SetContentAlignment(5)
-    voices[5].Paint = function()
-        return
-    end
-    voices[5].Prompt = "RUN"
-    voices[5].snd = "run"
-
-    voices[6] = vgui.Create("DLabel", self)
-    voices[6]:SetSize(250,50)
-    voices[6]:SetFont("TVCD")
-    voices[6]:SetContentAlignment(5)
-    voices[6].Paint = function()
-        return
-    end
-    voices[6].Prompt = "HELP ME"
-    voices[6].snd = "help"
-    --]]
-
     for k, v in ipairs(voiceText) do
         local element = vgui.Create("DLabel", self)
         table.insert(voices, element)
-        element:SetSize(250,50)
+        element:SetSize(300,50)
         element:SetFont("TVCD")
         element:SetContentAlignment(5)
         element.Paint = function()
@@ -135,24 +73,26 @@ function PANEL:Init()
     self.Voices = voices
 end
 
+local CursorSelect = false
+
 function PANEL:Think()
     local x, y = self:CursorPos()
     self.VoiceCursor:SetPos( x - 30, y - 25)
 
-    local showCursor = true
+    CursorSelect = false
 
     for k, v in ipairs( self.Voices ) do
 
         if v:DistanceFrom( x, y ) < 50 then
             v:SetText( "[ "..v.Prompt.." ]" )
-            showCursor = false
+            CursorSelect = v.snd
         else
             v:SetText( v.Prompt )
         end
 
     end
 
-    if showCursor then 
+    if not CursorSelect then 
         self.VoiceCursor:SetText( "[  ]" )
     else
         self.VoiceCursor:SetText( "" )
@@ -163,6 +103,12 @@ end
 function PANEL:OnKeyCodeReleased(keyCode)
     if keyCode == KEY_T then
         self:Remove()
+
+        if CursorSelect then
+            net.Start("mantislashcoSurvivorVoicePrompt")
+            net.WriteString(CursorSelect)
+            net.SendToServer()
+        end
     end
 end
 

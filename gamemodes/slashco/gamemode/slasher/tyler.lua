@@ -91,7 +91,7 @@ SlashCoSlasher.Tyler.OnTickBehaviour = function(slasher)
             PlayGlobalSound("slashco/slasher/tyler_song_"..slasher.TylerSongPickedID..".mp3",  98 , slasher,  0.8 - (slasher.SlasherValue3 * 0.12))
         end
 
-        if v2 > ( ms * 40) - (v4 * 4) then --Time ran out
+        if v2 > 20 + (( ms * 35) - (v4 * 4)) then --Time ran out
 
             local stop_song = slasher.TylerSongPickedID
 
@@ -285,7 +285,7 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
 
             local c = target:GetClass()
     
-            if not target:IsPlayer() and c ~= "prop_physics" and c ~= "sc_milkjug" and c ~= "sc_cookie" and c ~= "sc_stepdecoy" and c ~= "sc_baby" and c ~= "sc_devildie" and c ~= "sc_mayo" and c ~= "sc_soda" then return end
+            if not target:IsPlayer() and c ~= "sc_gascan" and c ~= "sc_milkjug" and c ~= "sc_cookie" and c ~= "sc_stepdecoy" and c ~= "sc_baby" and c ~= "sc_devildie" and c ~= "sc_mayo" and c ~= "sc_soda" then return end
     
             if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
     

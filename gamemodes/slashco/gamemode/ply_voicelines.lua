@@ -249,21 +249,16 @@ end
 
 net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
 
-    local prompt = net.ReadUInt(3)
+    local prompt = net.ReadString()
 
-    if prompt == 1 then
-        ply:EmitSound("slashco/survivor/voice/prompt_yes" .. math.random(1, 5) .. ".mp3")
-    elseif prompt == 2 then
-        ply:EmitSound("slashco/survivor/voice/prompt_no" .. math.random(1, 6) .. ".mp3")
-    elseif prompt == 3 then
-        ply:EmitSound("slashco/survivor/voice/prompt_follow" .. math.random(1, 6) .. ".mp3")
-    elseif prompt == 4 then
-        ply:EmitSound("slashco/survivor/voice/prompt_spot" .. math.random(1, 5) .. ".mp3")
-    elseif prompt == 5 then
-        ply:EmitSound("slashco/survivor/voice/prompt_help" .. math.random(1, 6) .. ".mp3")
-    elseif prompt == 6 then
-        ply:EmitSound("slashco/survivor/voice/prompt_run" .. math.random(1, 7) .. ".mp3")
-    end
+    if not ply.VoicePromptCooldown then ply.VoicePromptCooldown = CurTime() end
+
+    if (CurTime() - ply.VoicePromptCooldown) < 1.5 then return end
+
+    ply:EmitSound("slashco/survivor/voice/prompt_".. prompt .. math.random(1, 5) .. ".mp3")
+
+    ply.VoicePromptCooldown = CurTime()
+
 end)
 
 SlashCo.EscapeVoicePrompt = function()
