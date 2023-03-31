@@ -43,6 +43,7 @@ function PANEL:Init()
     voiceSay:SetFont("TVCD")
     voiceSay:SetText( "[SAY]" )
 
+    local rad = (6.28318531) / 6
     for k, v in ipairs(voiceText) do
         local element = vgui.Create("DLabel", self)
         table.insert(voices, element)
@@ -54,14 +55,8 @@ function PANEL:Init()
         end
         element.Prompt = v.prompt
         element.snd = v.snd
-
-        local rad = (6.28318531) / 6
-        local cur_rad = rad * k
-
-        if voices[k] ~= nil then
-            voices[k]:SetPos((self:GetWide() / 2) + math.sin( cur_rad ) * 150 - (element:GetWide() / 2),
-                    (self:GetTall() / 2) + math.cos( cur_rad ) * 150 - (element:GetTall() / 2))
-        end
+        element:SetPos((self:GetWide() / 2) + math.sin(rad * k) * 150 - (element:GetWide() / 2),
+                (self:GetTall() / 2) + math.cos(rad * k) * 150 - (element:GetTall() / 2))
     end
 
     local voiceCursor = vgui.Create("DLabel", self)
