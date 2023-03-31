@@ -6,16 +6,16 @@ local voiceText = {
         snd = "no"
     },
     {
-        prompt = "YES",
-        snd = "yes"
-    },
-    {
         prompt = "FOLLOW ME",
         snd = "follow"
     },
     {
         prompt = "SLASHER HERE",
         snd = "spot"
+    },
+    {
+        prompt = "YES",
+        snd = "yes"
     },
     {
         prompt = "RUN",
@@ -31,19 +31,21 @@ function PANEL:Init()
 
     local voices = {}
 
-    self:SetSize(ScrW() / 3, ScrH() / 3)
-    self:MakePopup()
-    self:SetKeyboardInputEnabled(true)
-    self:Center()
+    self:SetSize(ScrW(), ScrH())
     self:SetCursor("blank")
+    self:SetKeyboardInputEnabled(true)
+    self:MakePopup()
+    self:Center()
 
     local voiceSay = vgui.Create("DLabel", self)
-    voiceSay:SetSize(100,50)
+    voices.say = voiceSay
+    voiceSay:SetSize(300,50)
     voiceSay:Center()
+    voiceSay:SetContentAlignment(5)
     voiceSay:SetFont("TVCD")
-    voiceSay:SetText( "[SAY]" )
+    voiceSay.Prompt = "SAY"
 
-    local rad = (6.28318531) / 6
+    local rad = math.pi/3
     for k, v in ipairs(voiceText) do
         local element = vgui.Create("DLabel", self)
         table.insert(voices, element)
@@ -55,8 +57,10 @@ function PANEL:Init()
         end
         element.Prompt = v.prompt
         element.snd = v.snd
-        element:SetPos((self:GetWide() / 2) + math.sin(rad * k) * 150 - (element:GetWide() / 2),
-                (self:GetTall() / 2) + math.cos(rad * k) * 150 - (element:GetTall() / 2))
+
+        local angle = rad * (k+0.5)
+        element:SetPos((self:GetWide() / 2) + math.sin(angle) * 300 - (element:GetWide() / 2),
+                (self:GetTall() / 2) + math.cos(angle) * 150 - (element:GetTall() / 2))
     end
 
     local voiceCursor = vgui.Create("DLabel", self)
@@ -68,40 +72,52 @@ function PANEL:Init()
     self.Voices = voices
 end
 
-local CursorSelect = false
+local red = Color(255, 64, 64)
+local green = Color(64, 255, 64)
+local blue = Color(64, 64, 255)
 
 function PANEL:Think()
     local x, y = self:CursorPos()
     self.VoiceCursor:SetPos( x - 30, y - 25)
 
-    CursorSelect = false
+    self.CursorSelect = nil
 
-    for k, v in ipairs( self.Voices ) do
-
-        if v:DistanceFrom( x, y ) < 50 then
-            v:SetText( "[ "..v.Prompt.." ]" )
-            CursorSelect = v.snd
-        else
-            v:SetText( v.Prompt )
-        end
-
+    local say = self.Voices.say
+    if say:DistanceFrom(x, y) < 50 then
+        say:SetText( "[ "..say.Prompt.." ]" )
+        self.CursorSelect = false
+        say:SetTextColor(say.Prompt == "CANCEL" and red or blue)
+    else
+        say.Prompt = "CANCEL"
+        say:SetTextColor(color_white)
+        say:SetText("CANCEL")
     end
 
-    if not CursorSelect then 
+    for _, v in ipairs( self.Voices ) do
+        if v:DistanceFrom( x, y ) < 50 then
+            v:SetText( "[ "..v.Prompt.." ]" )
+            v:SetTextColor(green)
+            self.CursorSelect = v.snd
+        else
+            v:SetText( v.Prompt )
+            v:SetTextColor(color_white)
+        end
+    end
+
+    if self.CursorSelect == nil then
         self.VoiceCursor:SetText( "[  ]" )
     else
         self.VoiceCursor:SetText( "" )
     end
 end
 
-
 function PANEL:OnKeyCodeReleased(keyCode)
-    if keyCode == KEY_T then
+    if keyCode == KEY_G then
         self:Remove()
 
-        if CursorSelect then
+        if self.CursorSelect then
             net.Start("mantislashcoSurvivorVoicePrompt")
-            net.WriteString(CursorSelect)
+            net.WriteString(self.CursorSelect)
             net.SendToServer()
         end
     end

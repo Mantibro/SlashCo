@@ -12,8 +12,6 @@ local IsFueling
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 local global_pings = {}
 
-local GeneratorIcon = Material("slashco/ui/icons/slasher/progbar_icon")
-
 local function FindPos(search)
 
     if type(search) == "Entity" then
@@ -280,15 +278,12 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
     parsed:Draw(ScrW() * 0.025 + 4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 end)
 
-local voicePanel
-hook.Add("PlayerButtonDown", "OpenVoice", function(ply, button)
+hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)
     if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SURVIVOR then
         return
     end
-    if button == KEY_T then
-
-        voicePanel = vgui.Create("sc_voiceselect")
-
+    if button == KEY_G then
+        vgui.Create("sc_voiceselect")
     elseif button == 109 then
         net.Start("mantislashcoSurvivorPreparePing")
         net.SendToServer()
