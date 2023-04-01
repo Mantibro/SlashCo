@@ -5,6 +5,8 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, key)
 
     if ply:Team() ~= TEAM_SURVIVOR then return end
 
+    if game.GetMap() == "sc_lobby" then return end
+
     local lookent = ply:GetEyeTrace().Entity
 
     if key == 107 and ply:GetVelocity():Length() > 250 then

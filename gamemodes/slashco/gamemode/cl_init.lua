@@ -197,6 +197,12 @@ net.Receive("mantislashcoGlobalSound", function()
 
 end)
 
+local KillIcon = Material("slashco/ui/icons/slasher/s_0")
+local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
+
+local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
+local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
+
 hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
     if game.GetMap() == "sc_lobby" then return end
@@ -204,12 +210,6 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
     if LocalPlayer():Team() ~= TEAM_SPECTATOR then return end
 
     if GameProgress ~= -1 then return end
-
-    local KillIcon = Material("slashco/ui/icons/slasher/s_0")
-	local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
-
-	local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
-	local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
     surface.SetDrawColor(255,255,255,255)	
 
@@ -229,6 +229,10 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
             end
 
+        end
+
+        if LocalPlayer():SteamID64() == SurvivorTeam[i].id then
+            draw.SimpleText(SCInfo.Survivor , "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.7), Color( 255, 0, 0, slashershow_tick ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
         end
 
         surface.SetMaterial(SurvivorDeadIcon)
