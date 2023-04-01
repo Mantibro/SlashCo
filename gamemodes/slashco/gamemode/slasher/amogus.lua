@@ -66,11 +66,11 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
         for k, v in ipairs( team.GetPlayers( TEAM_SURVIVOR ) ) do
             if v:GetPos():Distance( slasher:GetPos() ) < 500 then
                 slasher.SlasherValue4 = v4 + FrameTime()
-                continue
+                break
             end
         end
 
-        if v4 > 25 then
+        if v4 > 30 then
             slasher.SlasherValue4 = 0
             slasher:EmitSound("slashco/slasher/amogus_speech"..math.random(1,7)..".mp3")
         end
@@ -98,7 +98,7 @@ SlashCoSlasher.Amogus.OnPrimaryFire = function(slasher)
 
         if slasher:GetVelocity():Length() > 1 then return end
 
-        if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+        if slasher:GetPos():Distance(target:GetPos()) < SlashCoSlasher.Amogus.KillDistance and not target:GetNWBool("SurvivorBeingJumpscared") then
 
             target:SetNWBool("SurvivorBeingJumpscared",true)
 
