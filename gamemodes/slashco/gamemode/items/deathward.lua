@@ -35,7 +35,7 @@ SlashCoItems.DeathWard.OnPickUp = function(ply)
         return
     end
 
-    timer.Create("deathWardDamage_"..ply:UserID(), 15, 0, function()
+    timer.Create("deathWardDamage_"..ply:UserID(), 45, 0, function()
         ply:SetHealth(ply:Health()-1)
     end)
 end
