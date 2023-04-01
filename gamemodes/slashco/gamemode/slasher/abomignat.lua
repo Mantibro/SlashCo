@@ -9,7 +9,7 @@ SlashCoSlasher.Abomignat.Model = "models/slashco/slashers/abomignat/abomignat.md
 SlashCoSlasher.Abomignat.GasCanMod = 0
 SlashCoSlasher.Abomignat.KillDelay = 5
 SlashCoSlasher.Abomignat.ProwlSpeed = 150
-SlashCoSlasher.Abomignat.ChaseSpeed = 305
+SlashCoSlasher.Abomignat.ChaseSpeed = 293
 SlashCoSlasher.Abomignat.Perception = 0.5
 SlashCoSlasher.Abomignat.Eyesight = 6
 SlashCoSlasher.Abomignat.KillDistance = 150
@@ -145,7 +145,7 @@ SlashCoSlasher.Abomignat.OnPrimaryFire = function(slasher)
     --slasher:Freeze(true)
     slasher:SetNWBool("AbomignatSlashing",true)
     slasher.SlasherValue1 = 6  - (SO * 3)
-    slasher.SlasherValue2 = 5
+    slasher.SlasherValue2 = 6
 
     slasher:EmitSound("slashco/slasher/abomignat_scream"..math.random(1,3)..".mp3")
 

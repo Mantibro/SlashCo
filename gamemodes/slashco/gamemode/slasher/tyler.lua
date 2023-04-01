@@ -287,7 +287,7 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
     
             if not target:IsPlayer() and c ~= "sc_gascan" and c ~= "sc_milkjug" and c ~= "sc_cookie" and c ~= "sc_stepdecoy" and c ~= "sc_baby" and c ~= "sc_devildie" and c ~= "sc_mayo" and c ~= "sc_soda" then return end
     
-            if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+            if slasher:GetPos():Distance(target:GetPos()) < SlashCoSlasher.Tyler.KillDistance and not target:GetNWBool("SurvivorBeingJumpscared") then
     
                 target:SetNWBool("SurvivorBeingJumpscared",true)
                 target:SetNWBool("SurvivorJumpscare_Tyler", true)
@@ -297,7 +297,7 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
                 if target:IsPlayer() then target:Freeze(true) end
                 slasher:Freeze(true)
     
-                slasher.KillDelayTick = slasher.KillDelay
+                slasher.KillDelayTick = SlashCoSlasher.Tyler.KillDelay
 
                 slasher.SlasherValue2 = 0
     

@@ -41,6 +41,7 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
     v1 = slasher.SlasherValue1 --Transformation type
     v2 = slasher.SlasherValue2 --Transform cooldown
     v3 = slasher.SlasherValue3 --Fuel Can EntIndex
+    v4 = slasher.SlasherValue4 --SUS!!!
 
     if IsValid(ents.GetByIndex(slasher.SlasherValue3)) then
         ents.GetByIndex(slasher.SlasherValue3):SetAngles(Angle(0,slasher:EyeAngles()[2],0))
@@ -58,6 +59,24 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
             slasher:SetNWBool("CanKill", false)
             slasher:SetNWBool("CanChase", false)
         end
+    end
+
+    if slasher:GetNWBool("AmogusSurvivorDisguise") then
+
+        for k, v in ipairs( team.GetPlayers( TEAM_SURVIVOR ) ) do
+            if v:GetPos():Distance( slasher:GetPos() ) < 500 then
+                slasher.SlasherValue4 = v4 + FrameTime()
+                break
+            end
+        end
+
+        if v4 > 30 then
+            slasher.SlasherValue4 = 0
+            slasher:EmitSound("slashco/slasher/amogus_speech"..math.random(1,7)..".mp3")
+        end
+        
+    else
+        slasher.SlasherValue4 = 0
     end
 
     slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Amogus.Eyesight)
@@ -79,7 +98,7 @@ SlashCoSlasher.Amogus.OnPrimaryFire = function(slasher)
 
         if slasher:GetVelocity():Length() > 1 then return end
 
-        if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+        if slasher:GetPos():Distance(target:GetPos()) < SlashCoSlasher.Amogus.KillDistance and not target:GetNWBool("SurvivorBeingJumpscared") then
 
             target:SetNWBool("SurvivorBeingJumpscared",true)
 
@@ -88,7 +107,7 @@ SlashCoSlasher.Amogus.OnPrimaryFire = function(slasher)
             target:Freeze(true)
             slasher:Freeze(true)
 
-            slasher.KillDelayTick = slasher.KillDelay
+            slasher.KillDelayTick = SlashCoSlasher.Amogus.KillDelay
 
             timer.Simple(1.25, function()
                 target:SetNWBool("SurvivorBeingJumpscared",false)
