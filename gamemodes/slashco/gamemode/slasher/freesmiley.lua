@@ -28,6 +28,8 @@ SlashCoSlasher.FreeSmiley.DiffRating = "★★☆☆☆"
 
 SlashCoSlasher.FreeSmiley.OnSpawn = function(slasher)
     SlashCoSlasher.FreeSmiley.SmileyIdle(slasher)
+    slasher:SetNWBool("CanKill", true)
+    slasher:SetNWBool("CanChase", true)
 end
 
 SlashCoSlasher.FreeSmiley.PickUpAttempt = function(ply)
