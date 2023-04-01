@@ -640,19 +640,18 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         local item_count = ((SlashCo.MAXPLAYERS + 1) - math.floor((diff+1) / 2) ) - #SlashCo.CurRound.SlasherData.AllSurvivors
 
-        if item_count < 1 then goto FULL end
+        local itemSpawns
+        if item_count >= 1 then
+            itemSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.ItemCount, #possibleItemSpawnpoints)
+            local random_itemSpawns = SlashCo.GetSpawnpoints(item_count, #possibleItemSpawnpoints)
 
-        local itemSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.ItemCount, #possibleItemSpawnpoints)
-        local random_itemSpawns = SlashCo.GetSpawnpoints(item_count, #possibleItemSpawnpoints)
-
-        if #random_itemSpawns < 1 then goto FULL end
-
-        for _ = 1, #random_itemSpawns do --Free items spawned during the round
-            local cls = SlashCo.SpawnableItems[math.random(1, #SlashCo.SpawnableItems)]
-            SlashCo.CreateItems({math.random(1,#SlashCo.CurConfig.Items.Spawnpoints)}, cls)
+            if #random_itemSpawns >= 1 then
+                for _ = 1, #random_itemSpawns do --Free items spawned during the round
+                    local cls = SlashCo.SpawnableItems[math.random(1, #SlashCo.SpawnableItems)]
+                    SlashCo.CreateItems({math.random(1,#SlashCo.CurConfig.Items.Spawnpoints)}, cls)
+                end
+            end
         end
-
-        ::FULL::
 
         --local item_class = ""
 
@@ -674,11 +673,11 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             if slashid == "Male07" then
 
-                local diff = SlashCo.CurRound.Difficulty
+                local diff1 = SlashCo.CurRound.Difficulty
 
-                for _ = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff  *  4  )     ) do
+                for _ = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff1  *  4  )     ) do
 
-                    SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0,0,0))
+                    SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), angle_zero)
 
                 end
 
