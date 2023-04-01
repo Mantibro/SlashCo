@@ -6,7 +6,7 @@ SlashCoItems.DeathWard.EntClass = "sc_deathward"
 SlashCoItems.DeathWard.Name = "Deathward"
 SlashCoItems.DeathWard.Icon = "slashco/ui/icons/items/item_2"
 SlashCoItems.DeathWard.Price = 50
-SlashCoItems.DeathWard.Description = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor damage while holding."
+SlashCoItems.DeathWard.Description = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
 SlashCoItems.DeathWard.CamPos = Vector(40,0,15)
 SlashCoItems.DeathWard.MaxAllowed = function()
     return 2
@@ -36,7 +36,11 @@ SlashCoItems.DeathWard.OnPickUp = function(ply)
     end
 
     timer.Create("deathWardDamage_"..ply:UserID(), 45, 0, function()
-        ply:SetHealth(ply:Health()-1)
+        local hp = ply:Health()
+        if hp >= 100 then
+            return
+        end
+        ply:SetHealth(hp+1)
     end)
 end
 SlashCoItems.DeathWard.ViewModel = {
