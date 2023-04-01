@@ -61,16 +61,22 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
         end
     end
 
-    for k, v in ipairs( team.GetPlayers( TEAM_SURVIVOR ) ) do
-        if v:GetPos():Distance( slasher:GetPos() ) < 500 then
-            slasher.SlasherValue4 = v4 + FrameTime()
-            continue
-        end
-    end
+    if slasher:GetNWBool("AmogusSurvivorDisguise") then
 
-    if v4 > 25 then
+        for k, v in ipairs( team.GetPlayers( TEAM_SURVIVOR ) ) do
+            if v:GetPos():Distance( slasher:GetPos() ) < 500 then
+                slasher.SlasherValue4 = v4 + FrameTime()
+                continue
+            end
+        end
+
+        if v4 > 25 then
+            slasher.SlasherValue4 = 0
+            slasher:EmitSound("slashco/slasher/amogus_speech"..math.random(1,7)..".mp3")
+        end
+        
+    else
         slasher.SlasherValue4 = 0
-        slasher:EmitSound("slashco/slasher/amogus_speech"..math.random(1,7)..".mp3")
     end
 
     slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Amogus.Eyesight)
