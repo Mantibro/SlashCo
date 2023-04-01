@@ -41,6 +41,7 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
     v1 = slasher.SlasherValue1 --Transformation type
     v2 = slasher.SlasherValue2 --Transform cooldown
     v3 = slasher.SlasherValue3 --Fuel Can EntIndex
+    v4 = slasher.SlasherValue4 --SUS!!!
 
     if IsValid(ents.GetByIndex(slasher.SlasherValue3)) then
         ents.GetByIndex(slasher.SlasherValue3):SetAngles(Angle(0,slasher:EyeAngles()[2],0))
@@ -58,6 +59,18 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
             slasher:SetNWBool("CanKill", false)
             slasher:SetNWBool("CanChase", false)
         end
+    end
+
+    for k, v in ipairs( team.GetPlayers( TEAM_SURVIVOR ) ) do
+        if v:GetPos():Distance( slasher:GetPos() ) < 500 then
+            slasher.SlasherValue4 = v4 + FrameTime()
+            continue
+        end
+    end
+
+    if v4 > 25 then
+        slasher.SlasherValue4 = 0
+        slasher:EmitSound("slashco/slasher/amogus_speech"..math.random(1,7)..".mp3")
     end
 
     slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Amogus.Eyesight)
