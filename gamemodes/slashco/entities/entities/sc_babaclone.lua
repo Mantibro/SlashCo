@@ -10,6 +10,7 @@ ENT.Author			= "Manti"
 ENT.Contact			= ""
 ENT.Purpose			= "A Bababooey clone."
 ENT.Instructions	= ""
+ENT.PingType = "SLASHER"
 
 ENT.AutomaticFrameAdvance = true 
 

@@ -561,7 +561,6 @@ net.Receive("mantislashcoPickItem", function(_, ply)
         return
     end
 
-    ply:Give("sc_survivorhands")
     local item = net.ReadString()
     local plyID = ply:SteamID64()
 
@@ -575,8 +574,9 @@ net.Receive("mantislashcoPickItem", function(_, ply)
     if SlashCoItems[item].MaxAllowed then
         local numAllowed = SlashCoItems[item].MaxAllowed()
         local itemCount = 0
+        local slot = SlashCoItems[item].IsSecondary and "item2" or "item"
         for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-            if v:GetNWString("item", "none") == item then
+            if v:GetNWString(slot, "none") == item then
                 itemCount = itemCount + 1
             end
         end
@@ -586,8 +586,8 @@ net.Receive("mantislashcoPickItem", function(_, ply)
         end
     end
 
+    ply:Give("sc_survivorhands")
     SlashCoDatabase.UpdateStats(plyID, "Points", -SlashCoItems[item].Price)
-
     lobbyChooseItem(plyID, item)
 
     timer.Simple(0.5, function()

@@ -52,10 +52,7 @@ local function setItemLabel()
 	itemSelectFrame.ItemLabel:SetText(string.upper(SlashCoItems[selectedItem].Name))
 	if (SlashCoItems[selectedItem].MaxAllowed) then
 		local numRemain = SlashCoItems[selectedItem].MaxAllowed()
-		local slot = "item"
-		if SlashCoItems[selectedItem].IsSecondary then
-			slot = "item2"
-		end
+		local slot = SlashCoItems[selectedItem].IsSecondary and "item2" or "item"
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if v:GetNWString(slot, "none") == selectedItem then
 				numRemain = numRemain - 1
