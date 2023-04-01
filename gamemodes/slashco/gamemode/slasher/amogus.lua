@@ -107,7 +107,7 @@ SlashCoSlasher.Amogus.OnPrimaryFire = function(slasher)
             target:Freeze(true)
             slasher:Freeze(true)
 
-            slasher.KillDelayTick = slasher.KillDelay
+            slasher.KillDelayTick = SlashCoSlasher.Amogus.KillDelay
 
             timer.Simple(1.25, function()
                 target:SetNWBool("SurvivorBeingJumpscared",false)
