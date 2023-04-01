@@ -638,8 +638,12 @@ SlashCo.SpawnCurConfig = function(isDebug)
             end
         end
 
+        local item_count = ((SlashCo.MAXPLAYERS + 1) - math.floor((diff+1) / 2) ) - #SlashCo.CurRound.SlasherData.AllSurvivors
+
+        if item_count < 1 then goto FULL end
+
         local itemSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.ItemCount, #possibleItemSpawnpoints)
-        local random_itemSpawns = SlashCo.GetSpawnpoints(((SlashCo.MAXPLAYERS + 4) - diff) - #SlashCo.CurRound.SlasherData.AllSurvivors, #possibleItemSpawnpoints)
+        local random_itemSpawns = SlashCo.GetSpawnpoints(item_count, #possibleItemSpawnpoints)
 
         if #random_itemSpawns < 1 then goto FULL end
 
