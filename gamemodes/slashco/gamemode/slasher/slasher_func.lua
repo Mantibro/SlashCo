@@ -256,13 +256,17 @@ end
 
 SlashCo.StopChase = function(slasher)
 
-    slasher:SetNWBool("InSlasherChaseMode", false) 
-
-    slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-    slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
+    slasher:SetNWBool("InSlasherChaseMode", false)
+    slasher:SetRunSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed)
+    slasher:SetWalkSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed)
     slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
 
-    timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
+    timer.Simple(0.25, function()
+        if not IsValid(slasher) then
+            return
+        end
+        slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
+    end)
 
 end
 
