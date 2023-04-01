@@ -20,8 +20,8 @@ SlashCoSlasher.Leuonard.ChaseCooldown = 4
 SlashCoSlasher.Leuonard.JumpscareDuration = 2
 SlashCoSlasher.Leuonard.ChaseMusic = "slashco/slasher/leuonard_chase.mp3"
 SlashCoSlasher.Leuonard.KillSound = "slashco/slasher/leuonard_yell1.mp3"
-SlashCoSlasher.Leuonard.Description = "The Horny Slasher which rapes.\n\n-Leuonard's Rape will increase over time.\n-He must fuck a dog to decrease Rape.\n-Reaching 100% Rape will cause Leuonard to become powerful, but hard to control."
-SlashCoSlasher.Leuonard.ProTip = "-This Slasher seems to have a fondness for dogs."
+SlashCoSlasher.Leuonard.Description = "The Unstable Slasher whose overwhleming power grows with time.\n\n-Leuonard's R██e will increase over time.\n-Wrestling a Plush Dog will cause R██e to decrease.\n-Reaching 100% R██e will cause Leuonard to become extremely lethal, but nearly uncontrollable."
+SlashCoSlasher.Leuonard.ProTip = "-This Slasher seems to have a fondness for plush dogs."
 SlashCoSlasher.Leuonard.SpeedRating = "★★★★☆"
 SlashCoSlasher.Leuonard.EyeRating = "★★★☆☆"
 SlashCoSlasher.Leuonard.DiffRating = "★★★★☆"
@@ -41,7 +41,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
-    v1 = slasher.SlasherValue1 --Rape
+    v1 = slasher.SlasherValue1 --Roid
     v2 = slasher.SlasherValue2 --Tick to change mouse drift
     v3 = slasher.SlasherValue3 --Tick to move mouse
 
@@ -52,7 +52,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
     end
 
     if v1 < 100 then
-        if not slasher:GetNWBool("LeuonardRaping") then
+        if not slasher:GetNWBool("LeuonardRoiding") then
 
             slasher.SlasherValue1 = v1 + ( FrameTime() * ( 0.5 + (SO*0.5)))
 
@@ -83,7 +83,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
                 if ent:GetClass() == "sc_dogg" then --I FOUND YOU........
                     slasher.soundon = 0
                     ent:Remove()
-                    slasher:SetNWBool("LeuonardRaping", true)
+                    slasher:SetNWBool("LeuonardRoiding", true)
                     slasher:EmitSound("slashco/slasher/leuonard_yell1.mp3")
                     slasher:Freeze(true)
                     timer.Simple(4, function() 
@@ -99,7 +99,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
                 slasher:SetBodygroup(1,1)
                 SlashCo.StopChase(slasher)
             else
-                slasher:SetNWBool("LeuonardRaping", false)
+                slasher:SetNWBool("LeuonardRoiding", false)
                 slasher:SetBodygroup(1,0)
                 slasher:Freeze(false)
 
@@ -113,7 +113,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
     else
 
         slasher.SlasherValue1 = 100.25
-        slasher:SetNWBool("LeuonardFullRape", true)
+        slasher:SetNWBool("LeuonardFullRoid", true)
 
         SlashCo.StopChase(slasher)
 
@@ -133,7 +133,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
             if ent:GetClass() == "sc_dogg" then --I FOUND YOU........
                 ent:Remove()
-                slasher:SetNWBool("LeuonardRaping", true)
+                slasher:SetNWBool("LeuonardRoiding", true)
                 slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.wav")
                 slasher:Freeze(true)
                 slasher:SetBodygroup(1,1)
@@ -141,7 +141,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
                 timer.Simple(math.random(15,30), function() 
                     slasher:StopSound("slashco/slasher/leuonard_grunt_loop.wav")
                     slasher:Freeze(false)
-                    slasher:SetNWBool("LeuonardRaping", false)
+                    slasher:SetNWBool("LeuonardRoiding", false)
                     slasher:SetBodygroup(1,0)
                 end)
             end
@@ -162,7 +162,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
         slasher:SetWalkSpeed(450)
         slasher:SetRunSpeed(450)
 
-        if not slasher:GetNWBool("LeuonardRaping") then
+        if not slasher:GetNWBool("LeuonardRoiding") then
 
             if v2 < 0 then
                 slasher.MouseDrift = Vector(math.random(-10,10),math.random(-10,10),0)
@@ -221,7 +221,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 
     end
 
-    slasher:SetNWInt("LeuonardRape", math.floor( v1 ))
+    slasher:SetNWInt("LeuonardRoid", math.floor( v1 ))
 
     slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Leuonard.Eyesight)
     slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Leuonard.Perception)
@@ -256,7 +256,7 @@ SlashCoSlasher.Leuonard.Animator = function(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("chase")
 	end
 
-	if ply:GetNWBool("LeuonardFullRape") then
+	if ply:GetNWBool("LeuonardFullRoid") then
 		ply.CalcIdeal = ACT_HL2MP_RUN 
 		ply.CalcSeqOverride = ply:LookupSequence("specialrun")
 	end
@@ -266,11 +266,11 @@ SlashCoSlasher.Leuonard.Animator = function(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("ragdoll")
 	end
 
-	if ply:GetNWBool("LeuonardRaping") then
+	if ply:GetNWBool("LeuonardRoiding") then
 		ply.CalcSeqOverride = ply:LookupSequence("mondaynightraw")
         ply.CalcIdeal = 0
 
-        if not ply:GetNWBool("LeuonardFullRape") then
+        if not ply:GetNWBool("LeuonardFullRoid") then
             ply:SetPlaybackRate(2)
         else
             ply:SetPlaybackRate(8)
@@ -328,13 +328,13 @@ if CLIENT then
 
         local b_pad = 6
 
-        local rape_val = LocalPlayer():GetNWInt("LeuonardRape")
+        local Roid_val = LocalPlayer():GetNWInt("LeuonardRoid")
 
         surface.SetDrawColor( 255, 0, 0)
-        surface.DrawRect( cx-200+(b_pad/2),(b_pad/2)+cy +ScrH()/4, (400-b_pad)*(rape_val/100), 25-b_pad )
+        surface.DrawRect( cx-200+(b_pad/2),(b_pad/2)+cy +ScrH()/4, (400-b_pad)*(Roid_val/100), 25-b_pad )
 
-        draw.SimpleText( "RAPE", "ItemFontTip", cx-300, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
-        draw.SimpleText( math.floor(rape_val).." %", "ItemFontTip", cx+220, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
+        draw.SimpleText( "R██E", "ItemFontTip", cx-300, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
+        draw.SimpleText( math.floor(Roid_val).." %", "ItemFontTip", cx+220, cy +ScrH()/4 , Color( 255, 0, 0, 255 ), TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT ) 
 
         return willdrawkill, willdrawchase, willdrawmain
 
@@ -350,7 +350,7 @@ if CLIENT then
     
             local slasher = team.GetPlayers(TEAM_SLASHER)[s]
     
-            if slasher:GetNWBool("LeuonardFullRape") then
+            if slasher:GetNWBool("LeuonardFullRoid") then
     
                 local tlight = DynamicLight( slasher:EntIndex() + 965 )
                    if ( tlight ) then
