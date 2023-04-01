@@ -304,6 +304,6 @@ end
 -----------------------------------------------------------]]
 function GM:HUDDrawScoreBoard()
 
-	--draw.SimpleText( "nutd!!!!.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.5), Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
+	--draw.SimpleText( "nutd!!!!.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.5), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP )
 
 end

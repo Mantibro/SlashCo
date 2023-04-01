@@ -382,7 +382,7 @@ if CLIENT then
 
                 if ply:SteamID64() ~= V1 then
                     ply:SetMaterial( "" )
-                    ply:SetColor( Color( 255, 255, 255, 255 ) )
+                    ply:SetColor( color_white )
                     ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
                 end
 
@@ -395,7 +395,7 @@ if CLIENT then
 
                 if ply:GetMaterial() == "lights/white" then
                     ply:SetMaterial( "" )
-                    ply:SetColor( Color( 255, 255, 255, 255 ) )
+                    ply:SetColor( color_white )
                     ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
                 end
 

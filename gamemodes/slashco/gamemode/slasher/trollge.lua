@@ -352,7 +352,7 @@ if CLIENT then
             else
 
                 ply:SetMaterial( "lights/white" )
-                ply:SetColor( Color( 255, 255, 255, 255 ) )
+                ply:SetColor( color_white )
                 ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
 
             end

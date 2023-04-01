@@ -172,7 +172,7 @@ function DrawTheSlasherSelectorBox()
 	SlasherSelectFrame:SetDraggable( false ) 
 	SlasherSelectFrame:ShowCloseButton( false )
 	SlasherSelectFrame.Paint = function( self, w, h )
-		draw.RoundedBox( 0, 0, 0, w, h, Color( 0, 0, 0, 255 ) ) 
+		draw.RoundedBox( 0, 0, 0, w, h, color_black )
 	end
 
 	local ILabel = vgui.Create( "DLabel", SlasherSelectFrame )

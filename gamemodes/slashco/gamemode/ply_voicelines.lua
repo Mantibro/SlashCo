@@ -248,17 +248,13 @@ SlashCo.LobbyBanter = function()
 end
 
 net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
-
-    local prompt = net.ReadString()
-
-    if not ply.VoicePromptCooldown then ply.VoicePromptCooldown = CurTime() end
-
-    if (CurTime() - ply.VoicePromptCooldown) < 1.5 then return end
-
-    ply:EmitSound("slashco/survivor/voice/prompt_".. prompt .. math.random(1, 5) .. ".mp3")
-
+    if ply.VoicePromptCooldown and CurTime() - ply.VoicePromptCooldown < 1 then
+        return
+    end
     ply.VoicePromptCooldown = CurTime()
 
+    local prompt = net.ReadString()
+    ply:EmitSound("slashco/survivor/voice/prompt_".. prompt .. math.random(1, 5) .. ".mp3")
 end)
 
 SlashCo.EscapeVoicePrompt = function()

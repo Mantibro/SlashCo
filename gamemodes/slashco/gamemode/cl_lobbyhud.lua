@@ -1,163 +1,155 @@
-include( "ui/fonts.lua" )
+include("ui/fonts.lua")
 
-net.Receive( "mantislashcoLobbyTimerTime", function( _, _ )
-	TimeLeft = net.ReadUInt(6)
+if game.GetMap() ~= "sc_lobby" then
+    return
+end
+
+--local TimeLeft, StateOfLobby, LobbyInfoTable, data_load
+local longest_name, plynum, lobby_music
+
+local grey = Color(128, 128, 128)
+local red = Color(255, 64, 64)
+local green = Color(64, 255, 64)
+
+net.Receive("mantislashcoLobbyTimerTime", function(_, _)
+    TimeLeft = net.ReadUInt(6)
 end)
 
-net.Receive( "mantislashcoGiveLobbyStatus", function( _, _ )
-	StateOfLobby = net.ReadUInt(3)	
+net.Receive("mantislashcoGiveLobbyStatus", function(_, _)
+    StateOfLobby = net.ReadUInt(3)
 end)
 
-net.Receive( "mantislashcoGiveLobbyInfo", function( _, _ )
-	LobbyInfoTable = net.ReadTable()
+net.Receive("mantislashcoGiveLobbyInfo", function(_, _)
+    LobbyInfoTable = net.ReadTable()
+end)
+
+net.Receive("mantislashcoGiveMasterDatabase", function(_, _)
+    local t = net.ReadTable()
+    data_load = t
 end)
 
 hook.Add("HUDPaint", "LobbyInfoText", function()
+    if stop_lobbymusic ~= true and (lobbymusic_antispam == nil or lobbymusic_antispam ~= true) then
+        lobby_music = CreateSound(LocalPlayer(), "slashco/music/slashco_lobby.wav")
+        lobby_music:Play()
+        lobby_music:ChangeVolume(0.5)
+        lobbymusic_antispam = true
+    end
 
-	net.Receive( "mantislashcoGiveMasterDatabase", function( _, _ )
-		local t = net.ReadTable()
-		if t[1].PlayerID ~= LocalPlayer():SteamID64() then return end
-		data_load = t
-	end)
+    if stop_lobbymusic then
+        lobby_music:Stop()
+    end
 
-	if game.GetMap() ~= "sc_lobby" then return end
+    local point_count = 0
+    local srvwin_count = 0
+    local slswin_count = 0
 
-	if stop_lobbymusic ~= true and (lobbymusic_antispam == nil or lobbymusic_antispam ~= true) then
-		lobby_music = CreateSound(LocalPlayer(), "slashco/music/slashco_lobby.wav")
-		lobby_music:Play()
-		lobby_music:ChangeVolume( 0.5 )
-		lobbymusic_antispam = true 
-	end
+    if data_load ~= nil and data_load ~= false then
 
-	if stop_lobbymusic then lobby_music:Stop() end
+        point_count = data_load[1].Points
+        srvwin_count = data_load[1].SurvivorRoundsWon
+        slswin_count = data_load[1].SlasherRoundsWon
 
-	local point_count = 0
-	local srvwin_count = 0
-	local slswin_count = 0
+    end
 
-	if data_load ~= nil and data_load ~= false then
+    local scrW, scrH = ScrW(), ScrH()
 
-		point_count = data_load[1].Points
-		srvwin_count = data_load[1].SurvivorRoundsWon
-		slswin_count = data_load[1].SlasherRoundsWon
+    --LobbyFont1
+    draw.SimpleText("[" .. point_count .. " POINTS]  [" .. srvwin_count .. " SURVIVOR WINS]  [" .. slswin_count .. " SLASHER WINS]", "TVCD", ScrW() * 0.025, (ScrH() * 0.05), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
-	end
+    if StateOfLobby == nil or StateOfLobby < 1 then
+        draw.SimpleText("[,] TOGGLE SPECTATE", "TVCD", scrW * 0.975, (scrH * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    end
 
-	local scrW, scrH = ScrW(), ScrH()
+    if LocalPlayer():Team() == TEAM_LOBBY then
+        draw.SimpleText("[R] SELECT PLAYERMODEL", "TVCD", scrW * 0.975, (scrH * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    end
 
-	--LobbyFont1
-	draw.SimpleText( "["..point_count.." POINTS]  ["..srvwin_count.." SURVIVOR WINS]  ["..slswin_count.." SLASHER WINS]", "TVCD", ScrW() * 0.025, (ScrH() * 0.05), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	--draw.SimpleText( "You have won "..srvwin_count.." Rounds as SURVIVOR.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.08), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-	--draw.SimpleText( "You have won "..slswin_count.." Rounds as SLASHER.", "LobbyFont1", ScrW() * 0.025, (ScrH() * 0.11), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+    if StateOfLobby ~= nil and StateOfLobby < 1 then
+        local ReadyCheck = Material("slashco/ui/lobby_ready")
+        local UnReadyCheck = Material("slashco/ui/lobby_unready")
 
-	if StateOfLobby == nil or StateOfLobby < 1 then 
-		draw.SimpleText( "[,] TOGGLE SPECTATE", "TVCD", scrW * 0.975, (scrH * 0.95)-50, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-	end
+        local Lobby_Players = {}
 
-	if LocalPlayer():Team() == TEAM_LOBBY then
+        local isClientinLobby = false
 
-		draw.SimpleText( "[R] SELECT PLAYERMODEL", "TVCD", scrW * 0.975, (scrH * 0.95)-80, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+        local clientReadiness
+        for _, v in ipairs(LobbyInfoTable) do
+            local ply = player.GetBySteamID64(v.steamid)
 
-	end
+            if not IsValid(ply) then
+                return
+            end
 
-if StateOfLobby ~= nil and StateOfLobby < 1 then --DISPLAY THE HUD BELOW ONLY IN THE LOBBY
+            if not table.HasValue(Lobby_Players, { ID = v.steamid }) then
+                table.insert(Lobby_Players, { ID = v.steamid, Name = ply:GetName(), Ready = v.readyState })
+            end
 
-	--local Tablet = Material("slashco/ui/lobby_backdrop")
-	local ReadyCheck = Material("slashco/ui/lobby_ready")
-	local UnReadyCheck = Material("slashco/ui/lobby_unready")
-	
-	clientname = LocalPlayer():GetName()
+            if v.steamid == LocalPlayer():SteamID64() then
+                clientReadiness = v.readyState
+                isClientinLobby = true
+            end
+        end
 
-	local Lobby_Players = {}
+        if isClientinLobby then
+            surface.SetDrawColor(255, 255, 255, 255)
 
-	local isClientinLobby = false
+            draw.SimpleText("[F1] READY AS SURVIVOR", "TVCD", scrW * 0.975, (scrH * 0.95) - 130, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+            draw.SimpleText("[F2] READY AS SLASHER", "TVCD", scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
-	for i = 1, #LobbyInfoTable do
+            if TimeLeft ~= nil and TimeLeft > 0 and TimeLeft < 61 then
+                draw.SimpleText("Starting in: " .. tostring(TimeLeft) .. " seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.65), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+            end
 
-		if not IsValid(player.GetBySteamID64( LobbyInfoTable[i].steamid )) then return end
+            local mul_y = 1
+            longest_name = longest_name or 0
+            if not plynum or plynum ~= #Lobby_Players then
+                longest_name = 0
+                plynum = #Lobby_Players
+            end
 
-		if not table.HasValue(Lobby_Players, {ID = LobbyInfoTable[i].steamid}) then 
-			table.insert(Lobby_Players, { ID = LobbyInfoTable[i].steamid, Name = player.GetBySteamID64( LobbyInfoTable[i].steamid ):GetName(), Ready = LobbyInfoTable[i].readyState })
-		end
+            draw.SimpleText("[" .. plynum .. "/7] ", "TVCD", scrW * 0.025, (scrH * 0.22), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
-		if Lobby_Players[i].Name == clientname then			
-			clientReadiness = LobbyInfoTable[i].readyState
-			isClientinLobby = true
-		end
+            for i = 1, #Lobby_Players do
+                local pos_y = 0.27
+                local x_pos = scrW * 0.025
+                local iconsize = ScrW() / 45
 
-	end
-	
-	if isClientinLobby then
+                surface.SetDrawColor(0, 0, 0)
+                surface.DrawRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18, (longest_name) + 65, 60)
+                surface.SetDrawColor(50, 50, 50)
+                surface.DrawOutlinedRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18, longest_name + 65, 60, 3)
 
-		surface.SetDrawColor(255,255,255,255)	
+                if string.len(Lobby_Players[i].Name) * 15 > longest_name then
+                    longest_name = string.len(Lobby_Players[i].Name) * 15
+                end
 
-		--surface.SetMaterial(Tablet)
-		--surface.DrawTexturedRect(-ScrW()/15, ScrH()/50, ScrW()/2.5, ScrW()/2.5)
-	
-		draw.SimpleText( "[F1] READY AS SURVIVOR", "TVCD", scrW * 0.975, (scrH * 0.95)-130, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-	
-		draw.SimpleText( "[F2] READY AS SLASHER", "TVCD", scrW * 0.975, (scrH * 0.95)-160, Color( 255, 255, 255, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
-	
-		if TimeLeft ~= nil and TimeLeft > 0 and TimeLeft < 61 then
-			draw.SimpleText( "Starting in: "..tostring( TimeLeft ).." seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.65), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-		end
+                draw.SimpleText(Lobby_Players[i].Name, "PlayersFont", scrW * 0.025, (scrH * (pos_y * mul_y)), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
-		local mul_y = 1
-		if longest_name == nil then longest_name = 0 end
-		if plynum == nil or plynum ~= #Lobby_Players then
-			longest_name = 0
-			plynum = #Lobby_Players 
-		end
+                local icon_pos_x = x_pos + longest_name
+                local icon_pos_y = (scrH * (pos_y * mul_y)) - 8
 
-		draw.SimpleText( "["..plynum.."/7] ", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+                surface.SetDrawColor(255, 255, 255, 255)
+                if Lobby_Players[i].Ready > 0 then
+                    surface.SetMaterial(ReadyCheck)
+                else
+                    surface.SetMaterial(UnReadyCheck)
+                end
 
-		for i = 1, #Lobby_Players do
+                surface.DrawTexturedRect(icon_pos_x, icon_pos_y, iconsize, iconsize)
 
-			local pos_y = 0.27
-			local x_pos = scrW * 0.025
-			local iconsize = ScrW()/45
+                mul_y = mul_y + 0.25
+            end
 
-			surface.SetDrawColor( 0, 0, 0 )
-			surface.DrawRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18,(longest_name) + 65, 60 )
-			surface.SetDrawColor( 50, 50, 50 )
-			surface.DrawOutlinedRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18, longest_name + 65, 60, 3 )
-
-			if string.len(Lobby_Players[i].Name)*15 > longest_name then 
-				longest_name = string.len(Lobby_Players[i].Name)*15 
-			end
-
-			draw.SimpleText( Lobby_Players[i].Name, "PlayersFont", scrW * 0.025, (scrH * (pos_y * mul_y)), Color( 255, 255, 255, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-			
-			local icon_pos_x = x_pos + longest_name
-			local icon_pos_y = (scrH * (pos_y * mul_y)) - 8
-
-			surface.SetDrawColor(255,255,255,255)
-			if Lobby_Players[i].Ready > 0 then
-				surface.SetMaterial(ReadyCheck)
-			else
-				surface.SetMaterial(UnReadyCheck)
-			end
-
-			surface.DrawTexturedRect(icon_pos_x, icon_pos_y, iconsize, iconsize)
-
-			mul_y = mul_y + 0.25
-
-		end
-
-		if clientReadiness ~= nil then
-
-			if clientReadiness < 1 then
-				draw.SimpleText( "       [NOT READY]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 128, 128, 128, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-			elseif clientReadiness == 1 then
-				draw.SimpleText( "       [READIED AS SURVIVOR]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 0, 255, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-			elseif clientReadiness == 2 then
-				draw.SimpleText( "       [READIED AS SLASHER]", "TVCD", scrW * 0.025, (scrH * 0.22), Color( 255, 0, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-			end
-
-		end
-
-	end
-
-end
-
+            if clientReadiness then
+                if clientReadiness < 1 then
+                    draw.SimpleText("       [NOT READY]", "TVCD", scrW * 0.025, (scrH * 0.22), grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                elseif clientReadiness == 1 then
+                    draw.SimpleText("       [READIED AS SURVIVOR]", "TVCD", scrW * 0.025, (scrH * 0.22), green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                elseif clientReadiness == 2 then
+                    draw.SimpleText("       [READIED AS SLASHER]", "TVCD", scrW * 0.025, (scrH * 0.22), red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                end
+            end
+        end
+    end
 end)

@@ -347,7 +347,7 @@ function GM:PlayerButtonDown(ply, button)
                     lobbyPlayerReadying(ply, 0)
                     broadcastLobbyInfo()
                 end
-                Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+                local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
                 Sndd:Play()
                 Sndd:ChangeVolume(0.5, 0)
                 Sndd:ChangePitch(100, 0)
@@ -359,7 +359,7 @@ function GM:PlayerButtonDown(ply, button)
                     --Check if the player has made an offering or agreed to one
                     if isPlyOfferer(ply) then
                         ply:ChatPrint("Cannot ready as Slasher as you have either made or agreed to an Offering.")
-                        Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+                        local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
                         Sndd:Play()
                         Sndd:ChangeVolume(0.5, 0)
                         Sndd:ChangePitch(65, 0)
@@ -369,7 +369,7 @@ function GM:PlayerButtonDown(ply, button)
                     ply:ChatPrint("Now ready as Slasher.")
                     lobbyPlayerReadying(ply, 2)
                     broadcastLobbyInfo()
-                    Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+                    local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
                     Sndd:Play()
                     Sndd:ChangeVolume(0.5, 0)
                     Sndd:ChangePitch(100, 0)
@@ -377,7 +377,7 @@ function GM:PlayerButtonDown(ply, button)
                     ply:ChatPrint("You are no longer ready.")
                     lobbyPlayerReadying(ply, 0)
                     broadcastLobbyInfo()
-                    Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+                    local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
                     Sndd:Play()
                     Sndd:ChangeVolume(0.5, 0)
                     Sndd:ChangePitch(100, 0)
@@ -395,35 +395,30 @@ function GM:PlayerButtonDown(ply, button)
         if button == 58 and SlashCo.LobbyData.LOBBYSTATE == 0 then
             if ply:Team() == TEAM_SPECTATOR then
                 if (#team.GetPlayers(TEAM_LOBBY) < SlashCo.MAXPLAYERS) then
-                    --Joining the Lobby team.
-
                     ply:SetTeam(TEAM_LOBBY)
                     ply:Spawn()
                     ply:ChatPrint("Now joining the Lobby...")
-                    Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+                    local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
                     Sndd:Play()
                     Sndd:ChangeVolume(0.5, 0)
                     Sndd:ChangePitch(80, 0)
-
                 else
                     ply:ChatPrint("The Lobby is currently full.")
-                    Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+                    local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
                     Sndd:Play()
                     Sndd:ChangeVolume(0.5, 0)
                     Sndd:ChangePitch(65, 0)
                 end
-
             elseif ply:Team() == TEAM_LOBBY then
                 ply:SetTeam(TEAM_SPECTATOR)
                 ply:Spawn()
                 ply:ChatPrint("Now joining Spectators...")
-                Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+                local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
                 Sndd:Play()
                 Sndd:ChangeVolume(0.5, 0)
                 Sndd:ChangePitch(80, 0)
             end
         end
-
     else
 
         --Usage of Items
@@ -758,7 +753,7 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 
         timer.Simple(2, function()
 
-            SlashCo.BroadcastMasterDatabaseForClient(pid)
+            SlashCo.BroadcastMasterDatabaseForClient(ply)
             SlashCo.BroadcastCurrentRoundData(false)
             SlashCo.BroadcastGlobalData()
 
@@ -775,7 +770,7 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 
     local pid = ply:SteamID64()
 
-    SlashCo.BroadcastMasterDatabaseForClient(pid)
+    SlashCo.BroadcastMasterDatabaseForClient(ply)
 
     if new == TEAM_SURVIVOR then
         SlashCo.PlayerData[pid].Lives = 1

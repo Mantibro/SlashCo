@@ -116,11 +116,11 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
         local offset = 0
         if SlashCoItems[HeldItem].OnUse then
-            draw.SimpleText("[R] USE", "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+            draw.SimpleText("[R] USE", "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
             offset = 30
         end
         if SlashCoItems[HeldItem].OnDrop then
-            draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset, Color(255, 255, 255, 255), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+            draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
         end
 
         --surface.SetDrawColor(255, 255, 255, 255)
@@ -154,11 +154,11 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
     --//prompts for items//--
 
-    if LocalPlayer():GetVelocity():Length() > 250 then
+    if LocalPlayer():GetVelocity():Length() > 250 and game.GetMap() ~= "sc_lobby" then
         local lookent = LocalPlayer():GetEyeTrace().Entity
         if lookent:GetClass() == "prop_door_rotating" and CheckDoorWL(lookent) then
             if lookent:GetPos():Distance(LocalPlayer():GetPos()) < 150 then
-                draw.SimpleText("[LMB] TO SLAM OPEN!", "TVCD", ScrW() / 2, ScrH() / 2, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                draw.SimpleText("[LMB] SLAM OPEN", "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             end
         end
     end
@@ -205,7 +205,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
                 draw.SimpleText("]", "Indicator", gasPos.x + centerDistance / 2 + 12, gasPos.y, Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
                 if realDistance < 200 and centerDistance < 25 then
-                    draw.SimpleText("[MMB] PING", "TVCD", ScrW() / 2, ScrH() / 2 + 100, Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+                    draw.SimpleText("[MMB] PING", "TVCD", ScrW() / 2, ScrH() / 2 + 100, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
                 end
             end
         end

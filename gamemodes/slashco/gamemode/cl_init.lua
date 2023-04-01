@@ -270,11 +270,11 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
     if GameReady == true then
 
-        draw.SimpleText( "The round will start soon.", "ItemFont", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+        draw.SimpleText( "The round will start soon.", "ItemFont", ScrW()/2, ScrH()/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
     else
 
-        draw.SimpleText( "Waiting for players. . .", "ItemFont", ScrW()/2, ScrH()/2, Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
+        draw.SimpleText( "Waiting for players. . .", "ItemFont", ScrW()/2, ScrH()/2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER )
 
     end
 
@@ -400,7 +400,7 @@ do
 
         local MainIcon = Material("slashco/ui/icons/slasher/s_"..icondrawid)
 
-        surface.SetDrawColor( 255, 255, 255, 255 )
+        surface.SetDrawColor(255, 255, 255, 255)
         surface.SetMaterial(MainIcon)
 		surface.DrawTexturedRect(150, 90, monitorsize/3, monitorsize/3)
 	cam.End3D2D()

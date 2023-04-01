@@ -68,9 +68,9 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 
 	if show_vote_screen ~= true then return end
 
-	draw.SimpleText( offeror_name.." would like to offer the "..offering_name.." Offering"..". Do you accept this Offering?", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.27), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	draw.SimpleText( offeror_name.." would like to offer the "..offering_name.." Offering"..". Do you accept this Offering?", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.27), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
-	draw.SimpleText( "F4 to accept.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.33), Color( 255, 255, 255, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	draw.SimpleText( "F4 to accept.", "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.33), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
 
 end)
