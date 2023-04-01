@@ -14,6 +14,32 @@ ENT.Instructions	= ""
 ENT.IsSelectable 	= true
 ENT.PingType = "ITEM"
 
+function ENT:Orient()
+	local selfPos = self:GetPos()
+	local canDist, canPos = math.huge
+	for _, v in ipairs(ents.FindByClass("sc_gascan")) do
+		local currentPos = v:GetPos()
+		local distSqr = selfPos:DistToSqr(currentPos)
+		if distSqr < canDist then
+			canDist = distSqr
+			canPos = currentPos
+		end
+	end
+
+	local phys = self:GetPhysicsObject()
+
+	if phys:IsValid() then
+		phys:AddVelocity((selfPos - canPos):GetNormalized())
+	end
+
+	timer.Simple(math.random(5)+5, function()
+		if not IsValid(self) or not self.Orient then
+			return
+		end
+		self:Orient()
+	end)
+end
+
 function ENT:Initialize()
 	if SERVER then
 		self:SetModel( SlashCoItems.Rock.Model )
@@ -27,6 +53,13 @@ function ENT:Initialize()
 	local phys = self:GetPhysicsObject()
 
 	if phys:IsValid() then phys:Wake() end
+
+	timer.Simple(math.random(5)+5, function()
+		if not IsValid(self) or not self.Orient then
+			return
+		end
+		self:Orient()
+	end)
 end
 
 function ENT:Use( activator )

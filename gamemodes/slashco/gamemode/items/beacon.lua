@@ -6,7 +6,7 @@ SlashCoItems.Beacon.EntClass = "sc_beacon"
 SlashCoItems.Beacon.Name = "Distress Beacon"
 SlashCoItems.Beacon.Icon = "slashco/ui/icons/items/item_9"
 SlashCoItems.Beacon.Price = 15
-SlashCoItems.Beacon.Description = "Alerts the SlashCo Headquarters to abort the mission. Only IMPORTANT circumstances get a fast response."
+SlashCoItems.Beacon.Description = "Alerts the SlashCo headquarters to abort the mission. Only IMPORTANT circumstances get a fast response."
 SlashCoItems.Beacon.CamPos = Vector(50,0,35)
 SlashCoItems.Beacon.MaxAllowed = function()
     return 1

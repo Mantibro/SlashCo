@@ -12,15 +12,32 @@ local IsFueling
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 local global_pings = {}
 
-local function FindPos(search)
+local red = Color(255, 64, 64)
+local green = Color(64, 255, 64)
+local blue = Color(64, 64, 255)
 
+local function FindPos(search)
     if type(search) == "Entity" then
         return search:GetPos()
     elseif type(search) == "Vector" then
         return search
     end
-
 end
+
+local pingType = {
+    ITEM = function(v)
+        return v.Name or "ITEM"
+    end,
+    SURVIVOR = function(v)
+        return v.SurvivorName, blue
+    end,
+    SLASHER = function()
+        return nil, red
+    end,
+    GENERATOR = function(v)
+        return nil, green, (FindPos(v.Entity:GetPos() + Vector(0, 0, 40))):ToScreen()
+    end
+}
 
 net.Receive("mantislashcoGasPourProgress", function()
 
@@ -146,7 +163,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
         end
     end
 
-    --(displaying them)
+    --ping display
     for k, v in pairs(global_pings) do
         if v.Entity == nil then
             continue
@@ -162,38 +179,15 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
             continue
         end
 
-        local pos = (FindPos(v.Entity)):ToScreen()
-
-        local showText = v.Type or "a"
-
-        local showName = true
-
-        local textColor = Color(255, 255, 255, 255)
-
-        if v.Type == "ITEM" then
-            showText = v.Name or "ITEM"
-        elseif v.Type == "SURVIVOR" then
-            showName = true
-            showText = v.SurvivorName
-            textColor = Color(50, 50, 255, 255)
-        elseif v.Type == "SLASHER" then
-            showName = true
-            textColor = Color(255, 50, 50, 255)
-        elseif v.Type == "GENERATOR" then
-            showName = true
-            textColor = Color(50, 255, 50, 255)
-
-            pos = (FindPos(v.Entity:GetPos() + Vector(0, 0, 40))):ToScreen()
-            --showName = false
-            --surface.SetMaterial(GeneratorIcon)
-            --surface.DrawTexturedRectRotated(pos.x, pos.y, ScrW() / 32, ScrW() / 32, 0)
-            --showText = "     "
+        local showText, textColor, pos
+        if pingType[v.Type] then
+            showText, textColor, pos = pingType[v.Type](v)
         end
+        showText = showText or v.Type or "INVALID"
+        textColor = textColor or color_white
+        pos = pos or (FindPos(v.Entity)):ToScreen()
 
-        if showName then
-            draw.SimpleText(v.Player:GetName(), "TVCD_small", pos.x, pos.y - 25, Color(255, 255, 255, 180), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-        end
-
+        draw.SimpleText(v.Player:GetName(), "TVCD_small", pos.x, pos.y - 25, Color(255, 255, 255, 180), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
         draw.SimpleText("[" .. showText .. "]", "TVCD", pos.x, pos.y, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
     end
 

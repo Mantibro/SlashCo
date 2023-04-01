@@ -49,7 +49,7 @@ end
 
 function GM:PlayerDeathThink(ply)
 	if ply:Team() == TEAM_SPECTATOR then
-		local pos = ply:GetPos()+Vector(0,0,64)
+		local pos = ply:EyePos()
 		local eyeang = ply:EyeAngles()
 
 		ply:Spawn()

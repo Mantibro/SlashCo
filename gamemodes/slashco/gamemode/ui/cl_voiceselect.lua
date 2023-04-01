@@ -74,7 +74,7 @@ end
 
 local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
-local blue = Color(64, 64, 255)
+--local blue = Color(64, 64, 255)
 
 function PANEL:Think()
     local x, y = self:CursorPos()
@@ -83,10 +83,10 @@ function PANEL:Think()
     self.CursorSelect = nil
 
     local say = self.Voices.say
-    if say:DistanceFrom(x, y) < 50 then
+    if say:DistanceFrom(x, y) < 100 then
         say:SetText( "[ "..say.Prompt.." ]" )
         self.CursorSelect = false
-        say:SetTextColor(say.Prompt == "CANCEL" and red or blue)
+        say:SetTextColor(say.Prompt == "CANCEL" and red or color_white)
     else
         say.Prompt = "CANCEL"
         say:SetTextColor(color_white)
@@ -94,7 +94,7 @@ function PANEL:Think()
     end
 
     for _, v in ipairs( self.Voices ) do
-        if v:DistanceFrom( x, y ) < 50 then
+        if v:DistanceFrom( x, y ) < 100 then
             v:SetText( "[ "..v.Prompt.." ]" )
             v:SetTextColor(green)
             self.CursorSelect = v.snd

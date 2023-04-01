@@ -6,7 +6,7 @@ SlashCoItems.Baby.EntClass = "sc_baby"
 SlashCoItems.Baby.Name = "The Baby"
 SlashCoItems.Baby.Icon = "slashco/ui/icons/items/item_7"
 SlashCoItems.Baby.Price = 35
-SlashCoItems.Baby.Description = "Halve your health to teleport to a random location. Using this item at low health increases the chance of randomly dying."
+SlashCoItems.Baby.Description = "Halve your health to teleport to a random location. At low health, using this item has a chance of killing you instantly. If you die to this item, the slasher will teleport instead."
 SlashCoItems.Baby.CamPos = Vector(50,0,0)
 SlashCoItems.Baby.DisplayColor = function(ply)
     local setcolor = 360-math.Clamp(ply:Health(),0,100)*1.2
@@ -30,16 +30,18 @@ SlashCoItems.Baby.OnUse = function(ply)
     ply:SetHealth( hpafter )
 
     timer.Simple(1, function()
-
-
         if ply:Health() < 51 then
-
-            if deathchance < 2 then ply:Kill() return end
-
+            if deathchance < 2 then
+                ply:Kill()
+                for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+                    v:SetPos(SlashCo.TraceHullLocator())
+                    v:EmitSound("slashco/survivor/baby_use.mp3")
+                end
+                return
+            end
         end
 
-        ply:SetPos( SlashCo.TraceHullLocator() )
-
+        ply:SetPos(SlashCo.TraceHullLocator())
     end)
 end
 SlashCoItems.Baby.OnDrop = function(ply)
