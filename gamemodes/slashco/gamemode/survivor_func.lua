@@ -9,7 +9,9 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, key)
 
     if key == 107 and ply:GetVelocity():Length() > 250 then
 
-        if lookent:GetClass() == "prop_door_rotating" or lookent:GetClass() == "func_door_rotating" then
+        if lookent:GetClass() == "prop_door_rotating" then
+
+            if not CheckDoorWL(lookent) then return end
 
             if lookent:GetPos():Distance( ply:GetPos() ) > 100 then return end
 
