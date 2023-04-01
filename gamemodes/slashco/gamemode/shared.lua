@@ -57,3 +57,21 @@ end
 --[[function GM:PlayerSelectTeamSpawn(team, ply)
 	
 end]]
+
+DoorSlamWhitelist = {
+	"models/props_c17/door03_left.mdl",
+	"models/props_doors/doormain_rural01_small.mdl",
+	"models/props_doors/doormainmetal01.mdl",
+	"models/props_c17/door01_left.mdl"
+}
+
+function CheckDoorWL(ent)
+	allow = false
+	for i = 1, #DoorSlamWhitelist do
+		if ent:GetModel() == DoorSlamWhitelist[i] then
+			allow = true
+			break
+		end
+	end
+	return allow
+end

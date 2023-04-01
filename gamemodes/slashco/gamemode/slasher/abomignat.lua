@@ -324,6 +324,9 @@ end
 
 if CLIENT then
 
+    local GenericSlashIcon = Material("slashco/ui/icons/slasher/s_slash")
+    local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
+
     SlashCoSlasher.Abomignat.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
 
         local willdrawkill = false
