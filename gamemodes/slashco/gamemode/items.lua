@@ -103,6 +103,10 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
     end
 
     if SlashCoItems[id] then
+        if SlashCoItems[id].OnPickUp then
+            SlashCoItems[id].OnPickUp(ply)
+        end
+
         if SlashCoItems[id].IsSecondary then
             local item = ply:GetNWString("item2", "none")
             if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
@@ -115,10 +119,6 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
                 SlashCoItems[item].OnSwitchFrom(ply)
             end
             ply:SetNWString("item", id)
-        end
-
-        if SlashCoItems[id].OnPickUp then
-            SlashCoItems[id].OnPickUp(ply)
         end
 
         if SlashCoItems[id].EquipSound then

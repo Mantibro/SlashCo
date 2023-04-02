@@ -10,20 +10,9 @@ SlashCoItems.Cookie.Description = "Gain a temporary bonus to fuel pouring on use
 SlashCoItems.Cookie.CamPos = Vector(50,0,20)
 SlashCoItems.Cookie.IsSpawnable = true
 SlashCoItems.Cookie.OnUse = function(ply)
-
-    ply:SetNWBool("CookieEaten", true)
-
     ply:EmitSound("slashco/survivor/eat_cookie.mp3")
-
-    timer.Simple(30, function()
-
-        ply:SetNWBool("CookieEaten", false)
-
-        ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
-    end)
-
     SlashCoSlasher.Sid.SidRage(ply)
+    ply:AddEffect("FuelSpeed", 30)
 end
 SlashCoItems.Cookie.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem(SlashCoItems.Cookie.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

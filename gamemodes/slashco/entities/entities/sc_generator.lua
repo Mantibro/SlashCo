@@ -87,13 +87,13 @@ function ENT:Touch(otherEnt)
     end
 end
 
-function ENT:MakeBattery()
+function ENT:MakeBattery(model)
     self.MakingItem = nil
 
     local battery = ents.Create("prop_physics")
     self.HasBattery = battery
 
-    battery:SetModel(SlashCoItems.Battery.Model)
+    battery:SetModel(model)
     battery:SetMoveType(MOVETYPE_NONE)
     battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
     battery:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
@@ -105,11 +105,11 @@ function ENT:MakeBattery()
     SlashCo.SpawnSlasher()
 end
 
-function ENT:MakeGasCan()
+function ENT:MakeGasCan(model)
     self.MakingItem = nil
     local gasCan = ents.Create("prop_physics")
 
-    gasCan:SetModel(SlashCoItems.GasCan.Model)
+    gasCan:SetModel(model)
     gasCan:SetMoveType(MOVETYPE_NONE)
     gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
     gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
@@ -135,7 +135,7 @@ function ENT:Use(activator, _, _)
 
         --shift TimeToFuel and TimeUntilFueled
         local unShift = DefaultTimeToFuel / TimeToFuel
-        TimeToFuel = DefaultTimeToFuel / (activator:GetNWBool("CookieEaten") and 2.5 or 1)
+        TimeToFuel = DefaultTimeToFuel / activator:ItemValue("FuelSpeed", 1)
         if self.FuelProgress then
             self.FuelProgress = self.FuelProgress * unShift * (TimeToFuel / DefaultTimeToFuel)
         end
@@ -148,16 +148,18 @@ function ENT:Use(activator, _, _)
     elseif not self.MakingItem then
         if activator:ItemValue("IsFuel", false, true) and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
             self.MakingItem = true
+            self.ItemModel = activator:ItemValue("Model", false, true)
             timer.Simple(0.25, function()
-                self:MakeGasCan()
+                self:MakeGasCan(self.ItemModel)
             end)
 
             activator:SecondaryItemFunction("OnFuel", self)
             SlashCo.RemoveItem(activator, true)
         elseif activator:ItemValue("IsBattery", false, true) and not self.HasBattery then
             self.MakingItem = true
+            self.ItemModel = activator:ItemValue("Model", false, true)
             timer.Simple(0.25, function()
-                self:MakeBattery()
+                self:MakeBattery(self.ItemModel)
             end)
 
             activator:SecondaryItemFunction("OnBattery", self)

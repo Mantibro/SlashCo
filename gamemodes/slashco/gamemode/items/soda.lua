@@ -10,21 +10,8 @@ SlashCoItems.Soda.Description = "Become invisible on use."
 SlashCoItems.Soda.CamPos = Vector(30,0,0)
 SlashCoItems.Soda.IsSpawnable = true
 SlashCoItems.Soda.OnUse = function(ply)
-    --When used, the survivor will become undetectable for 30 seconds.
-
     ply:EmitSound("slashco/survivor/soda_drink"..math.random(1,2)..".mp3")
-
-    ply:SetMaterial("Models/effects/vol_light001")
-    ply:SetColor(Color(0,0,0,0))
-    ply:SetNWBool("BGoneSoda", true)
-
-    timer.Simple(30, function()
-        ply:SetMaterial("")
-        ply:SetColor(color_white)
-        ply:SetNWBool("BGoneSoda", false)
-
-        ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-    end)
+    ply:AddEffect("Invisibility", 30)
 end
 SlashCoItems.Soda.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem(SlashCoItems.Soda.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

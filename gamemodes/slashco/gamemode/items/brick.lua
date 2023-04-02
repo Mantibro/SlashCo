@@ -18,6 +18,12 @@ ITEM.OnUse = function(ply)
     local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 1250)
     SlashCo.CurRound.Items[droppeditem] = true
+    timer.Simple(0.3, function()
+        if not IsValid(droppeditem) then
+            return
+        end
+        droppeditem:SetCollisionGroup(COLLISION_GROUP_NONE)
+    end)
 end
 ITEM.ViewModel = {
     model = ITEM.Model,

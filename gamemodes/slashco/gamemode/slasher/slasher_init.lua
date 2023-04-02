@@ -134,7 +134,7 @@ hook.Add("Think", "Slasher_Vision_Light", function()
 
         local survivor = v
 
-        if survivor:GetNWBool("BGoneSoda") or survivor:ItemFunction("OnFootstep") then
+        if survivor:ItemFunction("OnFootstep") then
             continue
         end
 

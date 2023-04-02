@@ -21,11 +21,7 @@ SlashCoItems.Rock.OnFootstep = function()
 end
 SlashCoItems.Rock.OnSwitchFrom = function(ply)
     timer.Simple(0.25, function()
-        local item = ply:GetNWString("item2", "none")
-        if item == "none" then
-            item = ply:GetNWString("item", "none")
-        end
-        if not SlashCoItems[item] or not SlashCoItems[item].ChangesSpeed then
+        if not ply:ItemValue2("ChangesSpeed") then
             ply:SetRunSpeed(300)
         end
     end)
