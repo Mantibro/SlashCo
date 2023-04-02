@@ -618,7 +618,7 @@ local Think = function()
 
         if SlashCo.CurRound.GameProgress == -1 then
             for _, v in ipairs( team.GetPlayers( TEAM_SPECTATOR ) ) do
-                if IsValid( SlashCo.CurRound.Slashers[v:SteamID64()] ) and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[plyid].SlasherID then
+                if SlashCo.CurRound.Slashers[v:SteamID64()] ~= nil and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
                     SlashCo.ApplySlasherToPlayer(v)
                 end
             end
