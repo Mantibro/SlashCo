@@ -16,6 +16,9 @@ SlashCoItems.Rock.OnDrop = function(ply)
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
     SlashCo.CurRound.Items[droppeditem] = true
 end
+SlashCoItems.Rock.OnFootstep = function()
+    return true
+end
 SlashCoItems.Rock.OnSwitchFrom = function(ply)
     timer.Simple(0.25, function()
         local item = ply:GetNWString("item2", "none")

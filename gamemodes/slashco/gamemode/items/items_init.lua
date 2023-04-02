@@ -13,6 +13,7 @@ AddCSLuaFile("deathward_used.lua")
 AddCSLuaFile("battery.lua")
 AddCSLuaFile("rock.lua")
 AddCSLuaFile("pocketsand.lua")
+AddCSLuaFile("brick.lua")
 
 if not SlashCoItems then SlashCoItems = {} end
 
@@ -30,6 +31,59 @@ include("deathward_used.lua")
 include("battery.lua")
 include("rock.lua")
 include("pocketsand.lua")
+include("brick.lua")
+
+local PLAYER = FindMetaTable("Player")
+
+--this doesn't include a team check because we assume that it's in a survivor-only context
+function PLAYER:ItemValue(value, fallback, isSecondary)
+    local slot = isSecondary and "item2" or "item"
+    local item = self:GetNWString(slot, "none")
+
+    if SlashCoItems[item] and SlashCoItems[item][value] then
+        return SlashCoItems[item][value]
+    end
+
+    return fallback
+end
+
+function PLAYER:ItemFunction(value, ...)
+    return self:ItemFunctionInternal(value, "item", ...)
+end
+
+function PLAYER:ItemFunctionOrElse(value, ...)
+    local val = self:ItemFunctionInternal(value, "item")
+    if val then
+        return val
+    end
+    return ...
+end
+
+function PLAYER:SecondaryItemFunction(value, ...)
+    return self:ItemFunctionInternal(value, "item2", ...)
+end
+
+function PLAYER:SecondaryItemFunctionOrElse(value, ...)
+    local val = self:ItemFunctionInternal(value, "item2")
+    if val then
+        return val
+    end
+    return ...
+end
+
+function PLAYER:ItemFunctionInternal(value, slot, ...)
+    local item = self:GetNWString(slot, "none")
+
+    if SlashCoItems[item] and SlashCoItems[item][value] then
+        return SlashCoItems[item][value](self,...)
+    end
+end
+
+function PLAYER:ItemFunction2(value, item, ...)
+    if SlashCoItems[item] and SlashCoItems[item][value] then
+        return SlashCoItems[item][value](self,...)
+    end
+end
 
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems

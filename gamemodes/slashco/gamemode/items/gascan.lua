@@ -11,6 +11,7 @@ SlashCoItems.GasCan.Description = "Take a gas can with you instead of having to 
 SlashCoItems.GasCan.CamPos = Vector(80,0,0)
 SlashCoItems.GasCan.ChangesSpeed = true
 SlashCoItems.GasCan.IsSpawnable = false
+SlashCoItems.GasCan.IsFuel = true
 SlashCoItems.GasCan.MaxAllowed = function()
     return 2
 end

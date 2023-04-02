@@ -146,20 +146,22 @@ function ENT:Use(activator, _, _)
         self:SendData(activator)
         self:EmitSound("slashco/generator_fill.wav")
     elseif not self.MakingItem then
-        if activator:GetNWString("item2", "none") == "GasCan" and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
-            SlashCo.RemoveItem(activator, true)
-
+        if activator:ItemValue("IsFuel", false, true) and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
             self.MakingItem = true
             timer.Simple(0.25, function()
                 self:MakeGasCan()
             end)
-        elseif activator:GetNWString("item2", "none") == "Battery" and not self.HasBattery then
-            SlashCo.RemoveItem(activator, true)
 
+            activator:SecondaryItemFunction("OnFuel", self)
+            SlashCo.RemoveItem(activator, true)
+        elseif activator:ItemValue("IsBattery", false, true) and not self.HasBattery then
             self.MakingItem = true
             timer.Simple(0.25, function()
                 self:MakeBattery()
             end)
+
+            activator:SecondaryItemFunction("OnBattery", self)
+            SlashCo.RemoveItem(activator, true)
         end
     end
 end

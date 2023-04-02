@@ -19,13 +19,11 @@ SlashCoItems.Soda.OnUse = function(ply)
     ply:SetNWBool("BGoneSoda", true)
 
     timer.Simple(30, function()
-
         ply:SetMaterial("")
-        ply:SetColor(Color(255,255,255,255))
+        ply:SetColor(color_white)
         ply:SetNWBool("BGoneSoda", false)
 
         ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
     end)
 end
 SlashCoItems.Soda.OnDrop = function(ply)

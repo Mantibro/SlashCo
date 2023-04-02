@@ -106,11 +106,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
     local HeldItem = ply:GetNWString("item", "none")
     if SlashCoItems[HeldItem or "none"] then
         local parsedItem = markup.Parse("<font=TVCD>---     " .. string.upper(SlashCoItems[HeldItem].Name) .. "     ---</font>")
-        if SlashCoItems[HeldItem].DisplayColor then
-            surface.SetDrawColor(SlashCoItems[HeldItem].DisplayColor(ply))
-        else
-            surface.SetDrawColor(0, 0, 128, 255)
-        end
+        surface.SetDrawColor(ply:ItemFunctionOrElse("DisplayColor", 0, 0, 128))
         surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
         parsedItem:Draw(ScrW() * 0.975 - 4, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
@@ -122,10 +118,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
         if SlashCoItems[HeldItem].OnDrop then
             draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
         end
-
-        --surface.SetDrawColor(255, 255, 255, 255)
-        --surface.SetMaterial(Material(SlashCoItems[HeldItem].Icon))
-        --surface.DrawTexturedRect(ScrW() * 0.975-100, ScrH() * 0.95-130, 100, 100)
     end
 
     --//gas fuel meter//--

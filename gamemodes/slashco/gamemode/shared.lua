@@ -30,6 +30,9 @@ AddCSLuaFile( "cl_offervote_hud.lua" )
 AddCSLuaFile( "cl_spectator_hud.lua" )
 AddCSLuaFile( "cl_playermodel_picker.lua" )
 AddCSLuaFile( "cl_gameinfo.lua" )
+AddCSLuaFile( "u1/slasher_stock/cl_slasher_stock.lua" )
+AddCSLuaFile( "u1/slasher_stock/cl_slasher_key.lua" )
+AddCSLuaFile( "u1/slasher_stock/cl_slasher_meter.lua" )
 
 CreateConVar( "slashco_player_cycle", "0", FCVAR_REPLICATED ) --local cycle_players =
 

@@ -8,6 +8,7 @@ SlashCoItems.Battery.EntClass = "sc_battery"
 SlashCoItems.Battery.Description = "A lead-acid battery that serves as a reusable source of electric current."
 SlashCoItems.Battery.CamPos = Vector(80,0,0)
 SlashCoItems.Battery.IsSpawnable = false
+SlashCoItems.Battery.IsBattery = true
 SlashCoItems.Battery.OnDrop = function(ply)
     local battery = SlashCo.CreateBattery(ply:LocalToWorld(Vector(0, 0, 55)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     battery:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)

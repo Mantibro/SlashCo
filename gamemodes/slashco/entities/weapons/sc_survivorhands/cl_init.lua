@@ -133,6 +133,7 @@ function SWEP:ViewModelDrawn()
 
     v.bone = "ValveBiped.Bip01_Spine4"
     self:RenderModel(v, self.heldEntity, vm, true, self.xPos)
+    self.Owner:ItemFunction2("OnRenderHand", item, self.heldEntity)
 end
 
 function SWEP:DrawWorldModel()
@@ -162,9 +163,11 @@ function SWEP:DrawWorldModel()
     self:SetHoldType(v.holdtype)
 
     self:RenderModel(v, self.heldEntityWorld, self.Owner)
+    self.Owner:ItemFunction2("OnRenderWorld", item, self.heldEntityWorld)
 
     if itemH and SlashCoItems[itemH] and SlashCoItems[itemH].WorldModelHolstered then
         self:RenderModel(SlashCoItems[itemH].WorldModelHolstered, self.heldEntityHolstered, self.Owner)
+        self.Owner:ItemFunction2("OnRenderHolstered", item, self.heldEntityHolstered)
     else
         self.heldEntityHolstered:SetNoDraw(true)
     end
