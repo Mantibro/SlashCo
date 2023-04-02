@@ -616,6 +616,14 @@ local Think = function()
             end
         end
 
+        if SlashCo.CurRound.GameProgress == -1 then
+            for _, v in ipairs( team.GetPlayers( TEAM_SPECTATOR ) ) do
+                if IsValid( SlashCo.CurRound.Slashers[v:SteamID64()] ) and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[plyid].SlasherID then
+                    SlashCo.ApplySlasherToPlayer(v)
+                end
+            end
+        end
+
         if SlashCo.CurRound.GameProgress >= 0 then
             for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
                 if ply:GetNWInt("GameProgressDisplay") ~= SlashCo.CurRound.GameProgress then
@@ -748,8 +756,6 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
         SlashCo.AwaitExpectedPlayers()
 
         SlashCo.BroadcastGlobalData()
-
-        SlashCo.ApplySlasherToPlayer(ply)
 
         timer.Simple(2, function()
 
