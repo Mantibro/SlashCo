@@ -7,7 +7,7 @@ ITEM.EntClass = "sc_brick"
 ITEM.Price = 5
 ITEM.Description = "Just some cinder block we found, nothing special. Can be thrown."
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.IsSpawnable = true
+ITEM.ReplacesWorldProps = true
 ITEM.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
@@ -22,7 +22,7 @@ ITEM.OnUse = function(ply)
         if not IsValid(droppeditem) then
             return
         end
-        droppeditem:SetCollisionGroup(COLLISION_GROUP_NONE)
+        Entity(droppeditem):SetCollisionGroup(COLLISION_GROUP_NONE)
     end)
 end
 ITEM.ViewModel = {

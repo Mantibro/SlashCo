@@ -154,6 +154,31 @@ function PLAYER:ItemFunction2(value, item, ...)
     end
 end
 
+if CLIENT then
+    return
+end
+
+local spawnableItems = {}
+for k, v in pairs(SlashCoItems) do
+    if v.ReplacesWorldProps then
+        spawnableItems[v.Model] = k
+    end
+end
+
+hook.Add("InitPostEntity", function()
+    for _, v in ipairs(ents.FindByClass("prop_physics")) do
+        local item = spawnableItems[v:GetModel()]
+        if item then
+            local pos = v:GetPos()
+            local ang = v:GetAngles()
+            v:Remove()
+            local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, pos, ang)
+            SlashCo.CurRound.Items[droppedItem] = true
+            Entity(droppedItem):SetCollisionGroup(COLLISION_GROUP_NONE)
+        end
+    end
+end)
+
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems
 
