@@ -82,23 +82,14 @@ SlashCo.DropItem = function(ply)
 end
 
 SlashCo.RemoveItem = function(ply, isSec)
-    if isSec then
-        local item = ply:GetNWString("item2", "none")
-        timer.Simple(0.25, function()
-            if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
-                SlashCoItems[item].OnSwitchFrom(ply)
-            end
-        end)
-        ply:SetNWString("item2", "none")
-    else
-        local item = ply:GetNWString("item", "none")
-        timer.Simple(0.18, function()
-            if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
-                SlashCoItems[item].OnSwitchFrom(ply)
-            end
-        end)
-        ply:SetNWString("item", "none")
-    end
+    local slot = isSec and "item2" or "item"
+    local item = ply:GetNWString(slot, "none")
+    timer.Simple(isSec and 0.25 or 0.18, function()
+        if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
+            SlashCoItems[item].OnSwitchFrom(ply)
+        end
+    end)
+    ply:SetNWString(slot, "none")
 end
 
 SlashCo.ChangeSurvivorItem = function(ply, id)
