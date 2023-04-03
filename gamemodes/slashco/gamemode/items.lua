@@ -31,7 +31,11 @@ SlashCo.UseItem = function(ply)
     end
 end
 
-SlashCo.DropAllItems = function(ply)
+SlashCo.DropAllItems = function(ply, noEffect)
+    if not noEffect then
+        ply:ClearEffect()
+    end
+
     if ply:GetNWString("item2", "none") ~= "none" then
         SlashCo.DropItem(ply)
     end

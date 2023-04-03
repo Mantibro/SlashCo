@@ -46,6 +46,9 @@ include("effect/speed.lua")
 local PLAYER = FindMetaTable("Player")
 
 function PLAYER:AddEffect(value, duration)
+    if not self:EffectFunction("OnRemoved") then
+        self:EffectFunction("OnExpired")
+    end
     self:SetNWString("itemEffect", value)
     self:EffectFunction("OnApplied")
     timer.Create("itemEffectExpire_"..self:UserID(), duration, 1, function()
@@ -100,11 +103,9 @@ function PLAYER:ItemValue2(value, fallback, noEffect)
     end
 
     item = ply:GetNWString("item2", "none")
-    if SlashCoItems[item] and SlashCoItems[item][value] then
-        return SlashCoItems[item][value]
+    if item == "none" then
+        item = ply:GetNWString("item", "none")
     end
-
-    item = ply:GetNWString("item", "none")
     if SlashCoItems[item] and SlashCoItems[item][value] then
         return SlashCoItems[item][value]
     end
