@@ -22,7 +22,7 @@ include( "cl_gameinfo.lua" )
 
 include( "ui/cl_voiceselect.lua" )
 include( "u1/slasher_stock/cl_slasher_stock.lua" )
-include( "u1/slasher_stock/cl_slasher_key.lua" )
+include( "u1/slasher_stock/cl_slasher_control.lua" )
 include( "u1/slasher_stock/cl_slasher_meter.lua" )
 
 function GM:HUDDrawTargetID()
