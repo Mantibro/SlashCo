@@ -18,6 +18,7 @@ AddCSLuaFile("effect/invisibility.lua")
 AddCSLuaFile("effect/fuelspeed.lua")
 AddCSLuaFile("effect/slowness.lua")
 AddCSLuaFile("effect/speed.lua")
+AddCSLuaFile("items_meta.lua")
 
 
 SlashCoItems = SlashCoItems or {}
@@ -42,6 +43,7 @@ include("effect/invisibility.lua")
 include("effect/fuelspeed.lua")
 include("effect/slowness.lua")
 include("effect/speed.lua")
+include("items_meta.lua")
 
 local PLAYER = FindMetaTable("Player")
 
