@@ -34,6 +34,7 @@ util.AddNetworkString("mantislashcoSurvivorVoicePrompt")
 util.AddNetworkString("mantislashcoSurvivorPings")
 util.AddNetworkString("mantislashcoSurvivorPreparePing")
 util.AddNetworkString("mantislashcoHelicopterVoice")
+util.AddNetworkString("mantislashcoMapAmbientPlay")
 
 function PlayGlobalSound(sound, level, ent, vol)
 

@@ -182,14 +182,13 @@ do
 
             slasher.ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseCooldown
 
-            timer.Simple(0.25, function() slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) end)
-        end
+            timer.Simple(0.25, function() 
+                slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) 
 
-        if not slasher:GetNWBool("InSlasherChaseMode") then
-            for p = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-                local ply = team.GetPlayers(TEAM_SURVIVOR)[p]
-                if ply:GetNWBool("SurvivorChased") then ply:SetNWBool("SurvivorChased",false) end
-            end
+                for _, pl in ipairs(player.GetAll()) do
+                    if pl:GetNWBool("SurvivorChased") then pl:SetNWBool("SurvivorChased",false) end
+                end
+            end)
         end
 end
         ::CONTINUE::
@@ -267,6 +266,10 @@ SlashCo.StopChase = function(slasher)
         end
         slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
     end)
+
+    for _, pl in ipairs(player.GetAll()) do
+        if pl:GetNWBool("SurvivorChased") then pl:SetNWBool("SurvivorChased",false) end
+    end
 
 end
 

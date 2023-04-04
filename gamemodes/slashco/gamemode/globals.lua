@@ -636,6 +636,9 @@ SlashCo.HelicopterLeaveForIntro = function()
 
             SlashCo.RemoveHelicopter()
 
+            net.Start("mantislashcoMapAmbientPlay")
+            net.Broadcast()
+
         end)
 
     end)
