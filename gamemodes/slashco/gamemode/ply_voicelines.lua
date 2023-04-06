@@ -187,6 +187,9 @@ SlashCo.LobbyConvos = {
 }
 
 local function sayPrompt(ply, input)
+
+    if game.GetMap() == "sc_lobby" and SlashCo.LobbyData.LOBBYSTATE == 2 then return end
+
     ply:EmitSound("slashco/survivor/voice/prompt_" .. input .. math.random(1, 3) .. ".mp3")
 end
 
@@ -208,16 +211,20 @@ SlashCo.LobbyBanter = function()
         return 5
     end
 
+    local predelay = math.random(2,4)
+
     local convo = math.random(1, ConvoCount)
 
-    local totalLength = SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2 + SlashCo.LobbyConvos[convo].Length3
+    local totalLength = SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2 + SlashCo.LobbyConvos[convo].Length3 + predelay
 
     local function playVocal(conv, id, plyid)
         survivors[plyid]:EmitSound("slashco/survivor/voice/maleconv_" .. conv .. "_" .. id .. ".mp3")
     end
 
     local firstid = math.random(1, #survivors)
-    playVocal(convo, 1, firstid)
+    timer.Simple(predelay function()
+        playVocal(convo, 1, firstid)
+    end)
 
     local secondid = math.random(1, #survivors)
     if secondid == firstid then
@@ -235,11 +242,11 @@ SlashCo.LobbyBanter = function()
         thirdid = 2
     end
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1, function()
+    timer.Simple(predelay + SlashCo.LobbyConvos[convo].Length1, function()
         playVocal(convo, 2, secondid)
     end)
 
-    timer.Simple(SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()
+    timer.Simple(predelay + SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()
         playVocal(convo, 3, thirdid)
     end)
 
@@ -248,6 +255,9 @@ SlashCo.LobbyBanter = function()
 end
 
 net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
+
+    if game.GetMap() == "sc_lobby" and SlashCo.LobbyData.LOBBYSTATE == 2 then return end
+
     if ply.VoicePromptCooldown and CurTime() - ply.VoicePromptCooldown < 1 then
         return
     end
