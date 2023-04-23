@@ -21,6 +21,7 @@ end
 local function mapForce(mapID)
 	net.Start("mantislashcoSendMapForce")
 	net.WriteUInt(mapID,4)
+	net.WriteEntity(LocalPlayer())
 	net.SendToServer()
 end
 

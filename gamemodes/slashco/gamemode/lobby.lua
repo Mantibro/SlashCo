@@ -3,11 +3,29 @@ local SlashCoItems = SlashCoItems
 
 --//actual real code//--
 
-net.Receive("mantislashcoSendMapForce", function() 
-    SlashCo.LobbyData.SelectedMapNum = net.ReadUInt(4)
+local MapForceCost = 50
 
-    for _, play in ipairs(player.GetAll()) do
-        play:ChatPrint("The map guarantee has beem set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
+net.Receive("mantislashcoSendMapForce", function() 
+    local haver = net.ReadEntity()
+
+    local balance = tonumber(SlashCoDatabase.GetStat(haver:SteamID64(), "Points"))
+
+    if balance >= MapForceCost then
+
+        SlashCo.LobbyData.SelectedMapNum = net.ReadUInt(4)
+
+        for _, play in ipairs(player.GetAll()) do
+            play:ChatPrint("The map guarantee has beem set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
+        end
+
+        SlashCoDatabase.UpdateStats(haver:SteamID64(), "Points", -MapForceCost)
+
+        MapForceCost = MapForceCost + 50
+
+    else
+
+        haver:ChatPrint("You don't have enough Points for a Map Guarantee.")
+
     end
 end)
 
