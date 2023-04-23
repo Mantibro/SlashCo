@@ -11,7 +11,7 @@ SlashCo.ApplySlasherToPlayer = function(ply)
     if SlashCo.CurRound.Slashers[ply:SteamID64()] ~= nil then
         --Set the correct Slasher
        print("Assinging the correct Slasher to the player.")
-       ply:SetNWBool("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
+       ply:SetNWString("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
 
    end
 

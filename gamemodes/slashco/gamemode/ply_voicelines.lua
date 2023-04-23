@@ -222,7 +222,7 @@ SlashCo.LobbyBanter = function()
     end
 
     local firstid = math.random(1, #survivors)
-    timer.Simple(predelay function()
+    timer.Simple(predelay, function()
         playVocal(convo, 1, firstid)
     end)
 

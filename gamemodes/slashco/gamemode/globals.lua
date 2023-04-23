@@ -109,6 +109,8 @@ end
 
 SlashCo.MAXPLAYERS = 7
 
+SlashCo.Debug = false
+
 SlashCo.LobbyData = {
 
     LOBBYSTATE = 0,

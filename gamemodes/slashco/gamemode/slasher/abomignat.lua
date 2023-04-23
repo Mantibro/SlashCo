@@ -142,6 +142,8 @@ SlashCoSlasher.Abomignat.OnPrimaryFire = function(slasher)
     local SO = SlashCo.CurRound.OfferingData.SO
 
     if slasher:GetNWBool("AbomignatCrawling") then return end
+    if slasher:GetNWBool("AbomignatSlashing") then return end
+    if slasher.SlasherValue1 > 0 then return end
     --slasher:Freeze(true)
     slasher:SetNWBool("AbomignatSlashing",true)
     slasher.SlasherValue1 = 6  - (SO * 3)
@@ -149,7 +151,7 @@ SlashCoSlasher.Abomignat.OnPrimaryFire = function(slasher)
 
     slasher:EmitSound("slashco/slasher/abomignat_scream"..math.random(1,3)..".mp3")
 
-    timer.Simple(1, function() 
+    local function SlashFinish()
 
         slasher:EmitSound("slashco/slasher/trollge_swing.wav")
         slasher:Freeze(true)
@@ -176,14 +178,16 @@ SlashCoSlasher.Abomignat.OnPrimaryFire = function(slasher)
 
         end
 
-    end)
+        timer.Simple(1.3, function() 
 
-    timer.Simple(2.3, function() 
+            slasher:SetNWBool("AbomignatSlashing",false)
+            slasher:Freeze(false)
+    
+        end)    
 
-        slasher:SetNWBool("AbomignatSlashing",false)
-        slasher:Freeze(false)
+    end
 
-    end)
+    timer.Create(slasher:EntIndex().."_AbomignatSlash", 1, 1, SlashFinish)
 
 end
 

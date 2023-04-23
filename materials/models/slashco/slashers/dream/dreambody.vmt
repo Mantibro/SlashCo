@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\dream\dreambody"
+	"$bumpmap" "models\slashco\slashers\dream\dreambody_nm"
+	"$halflambert" 1
+}
