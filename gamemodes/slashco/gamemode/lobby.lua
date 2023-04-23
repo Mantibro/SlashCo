@@ -3,6 +3,14 @@ local SlashCoItems = SlashCoItems
 
 --//actual real code//--
 
+net.Receive("mantislashcoSendMapForce", function() 
+    SlashCo.LobbyData.SelectedMapNum = net.ReadUInt(4)
+
+    for _, play in ipairs(player.GetAll()) do
+        play:ChatPrint("The map guarantee has beem set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
+    end
+end)
+
 local function lobbySaveCurData()
 
     local diff = SlashCo.LobbyData.SelectedDifficulty
@@ -156,7 +164,7 @@ local function lobbySaveCurData()
 
         print("DATA SAVED.")
 
-        SlashCo.ChangeMap(SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].ID)
+        SlashCo.ChangeMap(SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].ID)
 
     end
 
@@ -506,14 +514,14 @@ local function lobbyRoundSetup()
 
         --Assign the map randomly
         :: Map_reroll ::
-        SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
+        SlashCo.LobbyData.SelectedMapNum = math.random(1, #SCInfo.Maps)
 
-        if #SlashCo.LobbyData.AssignedSurvivors < SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then
+        if #SlashCo.LobbyData.AssignedSurvivors < SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then
             goto Map_reroll
         end
 
         if GetConVar("slashco_map_default"):GetInt() < 1 then
-            if SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].DEFAULT == false then
+            if SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].DEFAULT == false then
                 goto Map_reroll
             end
         end

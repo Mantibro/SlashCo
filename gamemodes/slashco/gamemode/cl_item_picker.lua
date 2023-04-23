@@ -18,6 +18,12 @@ local function ItemChosen(itemID)
 	net.SendToServer()
 end
 
+local function mapForce(mapID)
+	net.Start("mantislashcoSendMapForce")
+	net.WriteUInt(mapID,4)
+	net.SendToServer()
+end
+
 local function BlockConfirm()
 	itemSelectFrame.Confirm:SetText("XXXXXXX")
 	function itemSelectFrame.Confirm.Paint(_, w, h)

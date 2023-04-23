@@ -156,3 +156,86 @@ SCInfo.Survivor = [[As a Survivor, your objective is to fuel two Generators and 
 A Generator requires up to 4 Fuel Cans and a Battery to be activated.
 
 Survivors can use a variety of Items to help them.]]
+
+SCInfo.Maps = {
+    [0] = {
+        ID = "sc_summercamp",
+        NAME = "Missing map!",
+        AUTHOR = "Steinman",
+        DEFAULT = true,
+        SIZE = 1,
+        MIN_PLAYERS = 1,
+        LEVELS = {
+            500
+        }
+    },
+
+    {
+        ID = "sc_summercamp",
+        NAME = "Summer Camp",
+        AUTHOR = "Steinman",
+        DEFAULT = true,
+        SIZE = 1,
+        MIN_PLAYERS = 1,
+        LEVELS = {
+            500
+        }
+    },
+
+    {
+        ID = "sc_highschool",
+        NAME = "High School",
+        AUTHOR = "Steinman",
+        DEFAULT = true,
+        SIZE = 2,
+        MIN_PLAYERS = 2,
+        LEVELS = {
+            -160,
+            100,
+            600
+        }
+    },
+
+    {
+        ID = "sc_redforest",
+        NAME = "Red Forest",
+        AUTHOR = "NuclearGhost",
+        DEFAULT = true,
+        SIZE = 4,
+        MIN_PLAYERS = 3,
+        LEVELS = {
+            250,
+            350,
+            -630,
+            -650
+        }
+    },
+
+    {
+        ID = "sc_hospital",
+        NAME = "Hospital",
+        AUTHOR = "sparkz",
+        DEFAULT = true,
+        SIZE = 4,
+        MIN_PLAYERS = 5,
+        LEVELS = {
+            -1750,
+            -2100,
+            50
+        }
+    },
+
+    {
+        ID = "rp_deadcity",
+        NAME = "Dead City",
+        AUTHOR = "NuclearGhost",
+        DEFAULT = false,
+        SIZE = 3,
+        MIN_PLAYERS = 3,
+        LEVELS = {
+            150,
+            350
+        }
+    }
+
+}

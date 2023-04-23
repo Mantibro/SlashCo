@@ -10,96 +10,13 @@ SlashCo.Difficulty = {
     HARD = 3
 }
 
-SlashCo.Maps = {
-    [0] = {
-        ID = "sc_summercamp",
-        NAME = "Missing map!",
-        AUTHOR = "Steinman",
-        DEFAULT = true,
-        SIZE = 1,
-        MIN_PLAYERS = 1,
-        LEVELS = {
-            500
-        }
-    },
-
-    {
-        ID = "sc_summercamp",
-        NAME = "Summer Camp",
-        AUTHOR = "Steinman",
-        DEFAULT = true,
-        SIZE = 1,
-        MIN_PLAYERS = 1,
-        LEVELS = {
-            500
-        }
-    },
-
-    {
-        ID = "sc_highschool",
-        NAME = "High School",
-        AUTHOR = "Steinman",
-        DEFAULT = true,
-        SIZE = 2,
-        MIN_PLAYERS = 2,
-        LEVELS = {
-            -160,
-            100,
-            600
-        }
-    },
-
-    {
-        ID = "sc_redforest",
-        NAME = "Red Forest",
-        AUTHOR = "NuclearGhost",
-        DEFAULT = true,
-        SIZE = 4,
-        MIN_PLAYERS = 3,
-        LEVELS = {
-            250,
-            350,
-            -630,
-            -650
-        }
-    },
-
-    {
-        ID = "sc_hospital",
-        NAME = "Hospital",
-        AUTHOR = "sparkz",
-        DEFAULT = true,
-        SIZE = 4,
-        MIN_PLAYERS = 5,
-        LEVELS = {
-            -1750,
-            -2100,
-            50
-        }
-    },
-
-    {
-        ID = "rp_deadcity",
-        NAME = "Dead City",
-        AUTHOR = "NuclearGhost",
-        DEFAULT = false,
-        SIZE = 3,
-        MIN_PLAYERS = 3,
-        LEVELS = {
-            150,
-            350
-        }
-    }
-
-}
-
 SlashCo.ReturnMapIndex = function()
 
     local cur_map = game.GetMap()
 
-    for i = 1, #SlashCo.Maps do
+    for i = 1, #SCInfo.Maps do
 
-        if SlashCo.Maps[i].ID == cur_map then
+        if SCInfo.Maps[i].ID == cur_map then
             return i
         end
 
@@ -666,7 +583,7 @@ SlashCo.TraceHullLocator = function()
     --Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player or npc.
 
     local height_offset = 10
-    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local size = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
     local range = 3500*size
 
@@ -674,7 +591,7 @@ SlashCo.TraceHullLocator = function()
 
     ::RELOCATE::
 
-    local h = SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SlashCo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
+    local h = SCInfo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SCInfo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
 
     pos = Vector(math.random(-range,range),math.random(-range,range),h)
 
@@ -736,7 +653,7 @@ SlashCo.LocalizedTraceHullLocator = function(ent, input_range)
     --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
 
     local height_offset = 10
-    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local size = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
     local range = input_range
 
@@ -777,7 +694,7 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, input_range
     --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
 
     local height_offset = 10
-    local size = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local size = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
     local range = input_range
 

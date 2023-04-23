@@ -48,7 +48,7 @@ SlashCoSlasher.Speedrunner.OnTickBehaviour = function(slasher)
     v2 = slasher.SlasherValue2 --Speed Gain multiplier
     v3 = slasher.SlasherValue3 --max speed allowed
 
-    local ms = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local ms = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
     local size_multiplier = (5 - ms) / 10
 
