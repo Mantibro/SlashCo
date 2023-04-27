@@ -4,8 +4,8 @@ local metaMaker = {}
 
 local itemsMeta = {}
 local effectsMeta = {}
-setmetatable(itemsMeta, { _index = metaMaker })
-setmetatable(effectsMeta, { _index = metaMaker })
+setmetatable(itemsMeta, { __index = metaMaker })
+setmetatable(effectsMeta, { __index = metaMaker })
 
 local items = {}
 local effects = {}
@@ -20,7 +20,7 @@ doStuff.MakeItem = function(id, name, model, entClass, isSecondary, description,
     item.Description = description
     item.campos = camPos or Vector(30, 0, 0)
     item.IsSecondary = isSecondary or false
-    setmetatable(item, { _index = itemsMeta })
+    setmetatable(item, { __index = itemsMeta })
     return item
 end
 
@@ -28,7 +28,7 @@ doStuff.MakeEffect = function(id, name)
     local effect = {}
     effects[id] = effect
     effect.Name = name or "Item"
-    setmetatable(effect, { _index = effectsMeta })
+    setmetatable(effect, { __index = effectsMeta })
     return effect
 end
 
@@ -83,5 +83,5 @@ effectsMeta
         :MakeElement("OnApplied")
         :MakeElement("OnRemoved")
 
-hook.Call("SlashCo_ItemsMeta", nil, metaMaker, itemsMeta, effectsMeta)
-hook.Call("SlashCo_AddItems", nil, doStuff)
+SlashCoItems.Generator = doStuff
+SLASHCOITEMS_LOADED = true
