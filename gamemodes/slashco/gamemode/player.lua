@@ -91,6 +91,7 @@ hook.Add( "PlayerCanSeePlayersChat", "TeamChat", function( _, _, listener, speak
 
 	if listener:Team() == TEAM_SPECTATOR then return true end
 	if speaker:Team() == TEAM_SLASHER then return false end
+	if listener:Team() == TEAM_SLASHER then return false end
 	if speaker:Team() == TEAM_SPECTATOR and listener:Team() ~= TEAM_SPECTATOR then return false end
 
 	if listener:GetPos():DistToSqr( speaker:GetPos() ) > 1000000 then 

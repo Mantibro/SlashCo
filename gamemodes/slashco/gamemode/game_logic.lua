@@ -574,7 +574,7 @@ SlashCo.RoundHeadstart = function()
 
         local gens = ents.FindByClass("sc_generator")
         local random = math.random(#gens)
-        gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or SlashCo.GasCansPerGenerator)-1,0,SlashCo.GasCansPerGenerator)
+        --gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or SlashCo.GasCansPerGenerator)-1,0,SlashCo.GasCansPerGenerator)
 
     end
 
