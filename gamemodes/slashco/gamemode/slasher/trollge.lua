@@ -131,6 +131,7 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
         if not slasher:GetNWBool("TrollgeDashFinish") then
 
             slasher:StopSound("slashco/slasher/trollge_screech.mp3")
+            timer.Simple(0.25, function() slasher:StopSound("slashco/slasher/trollge_screech.mp3") end)
 
             slasher:EmitSound("slashco/slasher/trollge_exhaust.mp3")
 
@@ -259,7 +260,7 @@ SlashCoSlasher.Trollge.OnMainAbilityFire = function(slasher)
 
     if slasher.SlasherValue1 == 0 and not slasher:GetNWBool("TrollgeDashing") and slasher.SlasherValue2 == 0  then
         slasher:SetNWBool("TrollgeDashing", true)
-        slasher:EmitSound("slashco/slasher/trollge_screech.mp3")
+        PlayGlobalSound("slashco/slasher/trollge_screech.mp3",125,slasher)
         slasher:Freeze(true) 
         slasher.SlasherValue2 = 3
         slasher.SlasherValue4 = 0

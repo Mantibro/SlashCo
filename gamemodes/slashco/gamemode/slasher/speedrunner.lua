@@ -10,7 +10,7 @@ SlashCoSlasher.Speedrunner.GasCanMod = 0
 SlashCoSlasher.Speedrunner.KillDelay = 8
 SlashCoSlasher.Speedrunner.ProwlSpeed = 50
 SlashCoSlasher.Speedrunner.ChaseSpeed = 50
-SlashCoSlasher.Speedrunner.Perception = 1.0
+SlashCoSlasher.Speedrunner.Perception = 2.0
 SlashCoSlasher.Speedrunner.Eyesight = 5
 SlashCoSlasher.Speedrunner.KillDistance = 125
 SlashCoSlasher.Speedrunner.ChaseRange = 0
@@ -145,25 +145,26 @@ SlashCoSlasher.Speedrunner.OnSpecialAbilityFire = function(slasher)
 
 end
 
-SlashCoSlasher.Speedrunner.Animator = function(ply) 
+SlashCoSlasher.Speedrunner.Animator = function(ply, veloc) 
 
-    local move_vel = ply:WorldToLocal(ply:GetVelocity() + ply:GetPos())
+    local move_vel = ply:WorldToLocal(veloc + ply:GetPos())
+    local anim_vel = veloc:Length()
 
     if ply:IsOnGround() then
 
-        if ply:GetVelocity():Length() > 1 then
+        if anim_vel > 1 then
 
-            if ply:GetVelocity():Length() < 100 then
+            if anim_vel < 100 then
 		        ply.CalcSeqOverride = ply:LookupSequence("slow")
                 ply:SetPoseParameter( "runner_speed", move_vel[1]/200)
             end
 
-            if ply:GetVelocity():Length() >= 150 and ply:GetVelocity():Length() < 320 then
+            if anim_vel >= 150 and anim_vel < 320 then
                 ply.CalcSeqOverride = ply:LookupSequence("fast")
                 ply:SetPoseParameter( "runner_speed", move_vel[1]/250)
             end
 
-            if ply:GetVelocity():Length() >= 320 then
+            if anim_vel >= 320 then
                 ply.CalcSeqOverride = ply:LookupSequence("fastest")
                 ply:SetPoseParameter( "runner_speed", move_vel[1]/100)
             end

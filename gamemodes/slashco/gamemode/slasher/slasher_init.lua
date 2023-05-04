@@ -62,7 +62,7 @@ function GetRandomSlasher()
 end
 
 --Slasher Animation Controller
-hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
+hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, vel)
 
 	if ply:Team() ~= TEAM_SLASHER then
 		return
@@ -70,7 +70,7 @@ hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, _)
 
     if type( SlashCoSlasher[ply:GetNWString("Slasher")].Animator ) ~= "function" then return end
 
-	ply.CalcIdeal, ply.CalcSeqOverride = SlashCoSlasher[ply:GetNWString("Slasher")].Animator(ply)
+	ply.CalcIdeal, ply.CalcSeqOverride = SlashCoSlasher[ply:GetNWString("Slasher")].Animator(ply, vel)
 
    	return ply.CalcIdeal, ply.CalcSeqOverride
 end)
