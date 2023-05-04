@@ -25,8 +25,8 @@ SlashCoSlasher.Speedrunner.Description = [[The Speed Slasher whose speed grows a
 -Speedrunner will start out extremely slow.
 -After gaining enough speed, he will gain the ability to perform RNG sacrifice, resetting speed,
 but allowing him to regain it faster, and more of it.
--RNG Sacrifice will have additional effects on the round the more it is used.]]
-SlashCoSlasher.Speedrunner.ProTip = "-This Slasher grows expectionally faster with time."
+-RNG Sacrifice will have additional effects on the round when it is used.]]
+SlashCoSlasher.Speedrunner.ProTip = "-This Slasher grows exeptionally faster with time."
 SlashCoSlasher.Speedrunner.SpeedRating = "★★★★★"
 SlashCoSlasher.Speedrunner.EyeRating = "★★★☆☆"
 SlashCoSlasher.Speedrunner.DiffRating = "★★★★★"
