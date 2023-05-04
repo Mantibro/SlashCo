@@ -3,6 +3,7 @@ include("ui/fonts.lua")
 local selectedItem
 local itemSelectFrame
 local SlashCoItems = SlashCoItems
+local MGSelection = false
 
 local function HideItemSelection()
 	if IsValid(itemSelectFrame) then
@@ -20,8 +21,8 @@ end
 
 local function mapForce(mapID)
 	net.Start("mantislashcoSendMapForce")
-	net.WriteUInt(mapID,4)
 	net.WriteEntity(LocalPlayer())
+	net.WriteUInt(mapID,4)
 	net.SendToServer()
 end
 
@@ -51,8 +52,26 @@ local function SetConfirm()
 			ItemChosen(selectedItem)
 			HideItemSelection()
 		end
-		itemSelectFrame.Confirm:SetEnabled(true)
+		itemSelectFrame.Confirm:SetEnabled( not MGSelection )
 	end
+end
+
+local function SetMG()
+	itemSelectFrame.MapGuaranteeSelect:SetText("MAP GUARANTEE")
+	function itemSelectFrame.MapGuaranteeSelect.Paint(_, w, h)
+		if itemSelectFrame.MapGuaranteeSelect:IsHovered() then
+			surface.SetDrawColor(0, 0, 128)
+		else
+			surface.SetDrawColor(64, 64, 64)
+		end
+		surface.DrawRect(0, 0, w, h)
+	end
+	function itemSelectFrame.MapGuaranteeSelect.DoClick()
+		HideItemSelection()
+		MGSelection = not MGSelection
+		ReDrawItemSelecton()
+	end
+	itemSelectFrame.MapGuaranteeSelect:SetEnabled(true)
 end
 
 local function setItemLabel()
@@ -104,6 +123,12 @@ local function DrawItemSelectorBox()
 	confirmSelect:SetFont("TVCD")
 	confirmSelect:SetTextColor(color_white)
 
+	local MapGuaranteeSelect = vgui.Create("DButton", itemSelectFrame)
+	itemSelectFrame.MapGuaranteeSelect = MapGuaranteeSelect
+	MapGuaranteeSelect:SetSize(300, 30)
+	MapGuaranteeSelect:SetFont("TVCD")
+	MapGuaranteeSelect:SetTextColor(color_white)
+
 	local leftSide = vgui.Create("DScrollPanel", itemSelectFrame)
 	itemSelectFrame.Left = leftSide
 	leftSide:Dock(LEFT)
@@ -113,6 +138,9 @@ local function DrawItemSelectorBox()
 	leftSide.Items = {}
 	local width = 0
 	for k, p in SortedPairs(SlashCoItems) do
+
+		if MGSelection then break end
+
 		if not p.Price then continue end
 		local item = vgui.Create("DButton", leftSide)
 		function item.DoClick()
@@ -150,53 +178,103 @@ local function DrawItemSelectorBox()
 	end
 	leftSide:SetWidth(math.min(width+10, 250))
 
-	-- Model panel
-	local modelHolder = vgui.Create("Panel", itemSelectFrame)
-	itemSelectFrame.ModelHolder = modelHolder
-	modelHolder:Dock(TOP)
-	modelHolder:SetHeight(200)
-	function modelHolder.Paint(_, w, h)
-		surface.SetDrawColor(0, 0, 128)
-		surface.DrawRect(0, 0, w, h)
+	for k, p in SortedPairs(SCInfo.Maps) do
+
+		if not MGSelection then break end
+		if k == 0 then continue end
+
+		local item = vgui.Create("DButton", itemSelectFrame)
+		function item.DoClick()
+			HideItemSelection()
+			mapForce(k)
+		end
+		item:SetSize(300, 30)
+		item:SetPos(itemSelectFrame:GetWide() * 3, 180 + (k * 50))
+		item:SetText(string.upper(p.NAME))
+		item:SetFont("TVCD_small")
+		item:SetTextColor(color_white)
+		local wi = item:GetTextSize()
+		if wi > width then
+			width = wi
+		end
+
+		function item.Paint(_, w, h)
+			if not item:IsEnabled() then
+				surface.SetDrawColor(128, 0, 0)
+			else
+				if item:IsHovered() then
+					surface.SetDrawColor(0, 0, 128)
+				else
+					surface.SetDrawColor(64, 64, 64)
+				end
+			end
+			surface.DrawRect(0, 0, w, h)
+		end
+
 	end
 
-	local itemModel = vgui.Create("DModelPanel", modelHolder)
-	itemSelectFrame.ItemModel = itemModel
-	itemModel:SetLookAt(vector_origin)
-	itemModel:SetFOV(40)
-	itemModel:SetModel(SlashCoItems[selectedItem].Model)
-	itemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
+	if not MGSelection then 
 
-	function modelHolder.PerformLayout()
-		itemModel:SetSize(modelHolder:GetTall()*2, modelHolder:GetTall())
-		itemModel:Center()
+		-- Model panel
+		local modelHolder = vgui.Create("Panel", itemSelectFrame)
+		itemSelectFrame.ModelHolder = modelHolder
+		modelHolder:Dock(TOP)
+		modelHolder:SetHeight(200)
+		function modelHolder.Paint(_, w, h)
+			surface.SetDrawColor(0, 0, 128)
+			surface.DrawRect(0, 0, w, h)
+		end
+
+		local itemModel = vgui.Create("DModelPanel", modelHolder)
+		itemSelectFrame.ItemModel = itemModel
+		itemModel:SetLookAt(vector_origin)
+		itemModel:SetFOV(40)
+		itemModel:SetModel(SlashCoItems[selectedItem].Model)
+		itemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
+
+		function modelHolder.PerformLayout()
+			itemModel:SetSize(modelHolder:GetTall()*2, modelHolder:GetTall())
+			itemModel:Center()
+		end
+
+		local itemLabel = vgui.Create("DLabel", itemSelectFrame)
+		itemSelectFrame.ItemLabel = itemLabel
+		itemLabel:Dock(TOP)
+		itemLabel:DockMargin(0, 5, 0, 0)
+		itemLabel:SetContentAlignment(8)
+		itemLabel:SetFont("TVCD")
+		itemLabel:SetHeight(22)
+
+		local values = vgui.Create("DLabel", itemSelectFrame)
+		itemSelectFrame.ItemValues = values
+		values:Dock(TOP)
+		values:DockMargin(0, 0, 0, 5)
+		values:SetContentAlignment(8)
+		values:SetHeight(22)
+		values:SetFont("TVCD")
+
+		setItemLabel()
+
+		local itemDesc = vgui.Create("DLabel", itemSelectFrame)
+		itemSelectFrame.ItemDescription = itemDesc
+		itemDesc:Dock(FILL)
+		itemDesc:SetText(SlashCoItems[selectedItem].Description)
+		itemDesc:SetFont("TVCD_small")
+		itemDesc:SetWrap(true)
+		itemDesc:SetContentAlignment(7)
+
+	else
+
+		local mapLabel = vgui.Create("DLabel", itemSelectFrame)
+		mapLabel:SetFont("TVCD")
+		mapLabel:SetSize(1200, 300)
+		mapLabel:SetPos(0, 0)
+		mapLabel:SetText([[Guarantee the map for this assignment. 
+
+		[50 POINTS] [+50]
+		[PRICE INCREASES WITH CONSECUTIVE PURCHASE] ]])
+
 	end
-
-	local itemLabel = vgui.Create("DLabel", itemSelectFrame)
-	itemSelectFrame.ItemLabel = itemLabel
-	itemLabel:Dock(TOP)
-	itemLabel:DockMargin(0, 5, 0, 0)
-	itemLabel:SetContentAlignment(8)
-	itemLabel:SetFont("TVCD")
-	itemLabel:SetHeight(22)
-
-	local values = vgui.Create("DLabel", itemSelectFrame)
-	itemSelectFrame.ItemValues = values
-	values:Dock(TOP)
-	values:DockMargin(0, 0, 0, 5)
-	values:SetContentAlignment(8)
-	values:SetHeight(22)
-	values:SetFont("TVCD")
-
-	setItemLabel()
-
-	local itemDesc = vgui.Create("DLabel", itemSelectFrame)
-	itemSelectFrame.ItemDescription = itemDesc
-	itemDesc:Dock(FILL)
-	itemDesc:SetText(SlashCoItems[selectedItem].Description)
-	itemDesc:SetFont("TVCD_small")
-	itemDesc:SetWrap(true)
-	itemDesc:SetContentAlignment(7)
 
 	itemSelectFrame.btnMaxim:Hide()
 	itemSelectFrame.btnMinim:Hide()
@@ -225,6 +303,8 @@ local function DrawItemSelectorBox()
 		self.lblTitle:SetSize(self:GetWide() - 25, 20)
 
 		confirmSelect:SetPos(itemSelectFrame:GetWide()-160-5, itemSelectFrame:GetTall()-30-5)
+		MapGuaranteeSelect:SetPos(itemSelectFrame:GetWide()-550-5, itemSelectFrame:GetTall()-30-5)
+		SetMG()
 	end
 
 	itemSelectFrame:SetSize(800, 500)
@@ -237,3 +317,7 @@ end
 net.Receive("mantislashcoStartItemPicking", function()
 	DrawItemSelectorBox()
 end)
+
+function ReDrawItemSelecton()
+	DrawItemSelectorBox()
+end

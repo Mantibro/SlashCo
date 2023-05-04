@@ -50,7 +50,7 @@ SlashCoSlasher.Speedrunner.OnTickBehaviour = function(slasher)
 
     local ms = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
-    local size_multiplier = (5 - ms) / 10
+    local size_multiplier =  ( ((5 - ms) / 10) + ((ms-1) / 15) )
 
     if v1 < v3 then
 

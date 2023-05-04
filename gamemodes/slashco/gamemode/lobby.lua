@@ -15,7 +15,7 @@ net.Receive("mantislashcoSendMapForce", function()
         SlashCo.LobbyData.SelectedMapNum = net.ReadUInt(4)
 
         for _, play in ipairs(player.GetAll()) do
-            play:ChatPrint("The map guarantee has beem set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
+            play:ChatPrint("The map guarantee has been set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
         end
 
         SlashCoDatabase.UpdateStats(haver:SteamID64(), "Points", -MapForceCost)

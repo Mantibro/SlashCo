@@ -223,19 +223,6 @@ SCInfo.Maps = {
             -2100,
             50
         }
-    },
-
-    {
-        ID = "rp_deadcity",
-        NAME = "Dead City",
-        AUTHOR = "NuclearGhost",
-        DEFAULT = false,
-        SIZE = 3,
-        MIN_PLAYERS = 3,
-        LEVELS = {
-            150,
-            350
-        }
     }
 
 }
