@@ -44,6 +44,8 @@ end
 
 SlashCoSlasher.Speedrunner.OnTickBehaviour = function(slasher)
 
+    local SO = SlashCo.CurRound.OfferingData.SO
+
     v1 = slasher.SlasherValue1 --Speed
     v2 = slasher.SlasherValue2 --Speed Gain multiplier
     v3 = slasher.SlasherValue3 --max speed allowed
@@ -54,7 +56,7 @@ SlashCoSlasher.Speedrunner.OnTickBehaviour = function(slasher)
 
     if v1 < v3 then
 
-        slasher.SlasherValue1 = v1 + (( FrameTime() * (size_multiplier)) * (v2))
+        slasher.SlasherValue1 = v1 + ( (( FrameTime() * (size_multiplier)) * (v2)) ) * (1+SO)
 
     end
 

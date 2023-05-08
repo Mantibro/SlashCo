@@ -12,7 +12,7 @@ AddCSLuaFile("watcher.lua")
 AddCSLuaFile("abomignat.lua")
 AddCSLuaFile("criminal.lua")
 AddCSLuaFile("freesmiley.lua")
---AddCSLuaFile("leuonard.lua")
+AddCSLuaFile("leuonard.lua")
 AddCSLuaFile("speedrunner.lua")
 
 if not SlashCoSlasher then SlashCoSlasher = {} end
@@ -30,7 +30,7 @@ include("watcher.lua")
 include("abomignat.lua")
 include("criminal.lua")
 include("freesmiley.lua")
---include("leuonard.lua")
+include("leuonard.lua")
 include("speedrunner.lua")
 
 function TranslateSlasherClass(id)
