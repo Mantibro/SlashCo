@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\princess\princess"
+	"$bumpmap" "models\slashco\slashers\princess\princess_nm"
+	"$halflambert" 1
+}

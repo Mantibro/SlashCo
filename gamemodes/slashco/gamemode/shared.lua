@@ -140,6 +140,13 @@ SCInfo.Offering = {
         Rarity = 3,
         Description = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful.",
         GasCanMod = 6
+    },
+
+    {
+        Name = "Nightmare",
+        Rarity = 3,
+        Description = "The Helicopter will come rescue you regardless of Generators.\nFueling Generators will come with a massively increased Point bonus.\nBut\nSurvivors and Slasher will switch sides.",
+        GasCanMod = 0
     }
 
 }

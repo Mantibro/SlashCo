@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/princess/eyes"
+	"$halflambert" 1
+	"$selfillum" 1
+}
