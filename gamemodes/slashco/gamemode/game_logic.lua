@@ -32,6 +32,47 @@ SlashCo.LoadCurRoundData = function()
                 table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[e].Slashers })
             end
 
+            --Nightmare offering >>>>>>>>>>>>>>>>>>>>>
+
+            if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+
+                --All survivors will become slashers.
+
+                local query = sql.Query("SELECT * FROM slashco_table_survivordata; ")
+                for i = 1, #query do
+
+                    local id = query[s].Survivors
+    
+                    timer.Simple(1, function()
+
+                        local slasher_pick = GetRandomSlasher()
+
+                        SlashCo.SelectSlasher(slasher_pick, id)
+                        table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher_pick })
+    
+                    end)
+
+                end
+
+                --Slasher becomes the sole survivor
+
+                for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
+
+                    local sr_id = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[s].Slashers
+
+                    table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sr_id })
+                    --For the slasher's clientside view also
+                    table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sr_id, GameContribution = 0 })
+    
+                end
+
+                return
+
+            end
+
+            --Nightmare offering >>>>>>>>>>>>>>>>>>>>>>>>
+
+
             --Survivors don't necessarily have to join in time, as the game can continue with at least 1. (TODO)
             --TODO: timer which starts the game premature if some survivors don't join in time.
 
@@ -48,9 +89,6 @@ SlashCo.LoadCurRoundData = function()
                 end
 
             end
-
-            print("[SlashCo] First 2 Expected Players assigned: " .. SlashCo.CurRound.ExpectedPlayers[1].steamid .. SlashCo.CurRound.ExpectedPlayers[2].steamid)
-            print("[SlashCo] Expected Player table size: " .. #SlashCo.CurRound.ExpectedPlayers)
 
             for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
 

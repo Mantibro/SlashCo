@@ -53,9 +53,13 @@ end
 
 function GetRandomSlasher()
 
+    ::reroll::
+
     local keys = table.GetKeys( SlashCoSlasher )
 	local rand = math.random( 1, #keys)
 	local rand_name = keys[rand] --random id for this roll
+
+    if SlashCoSlasher[rand].IsSelectable ~= true then goto reroll end
 
     return rand_name
 
