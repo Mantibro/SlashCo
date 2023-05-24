@@ -14,6 +14,8 @@ AddCSLuaFile("criminal.lua")
 AddCSLuaFile("freesmiley.lua")
 AddCSLuaFile("leuonard.lua")
 AddCSLuaFile("speedrunner.lua")
+AddCSLuaFile("dolphinman.lua")
+AddCSLuaFile("princess.lua")
 
 if not SlashCoSlasher then SlashCoSlasher = {} end
 
@@ -32,6 +34,8 @@ include("criminal.lua")
 include("freesmiley.lua")
 include("leuonard.lua")
 include("speedrunner.lua")
+include("dolphinman.lua")
+include("princess.lua")
 
 function TranslateSlasherClass(id)
 
@@ -59,7 +63,7 @@ function GetRandomSlasher()
 	local rand = math.random( 1, #keys)
 	local rand_name = keys[rand] --random id for this roll
 
-    if SlashCoSlasher[rand].IsSelectable ~= true then goto reroll end
+    if SlashCoSlasher[rand_name].IsSelectable ~= true then goto reroll end
 
     return rand_name
 

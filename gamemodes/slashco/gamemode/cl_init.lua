@@ -22,6 +22,8 @@ include( "cl_gameinfo.lua" )
 
 include( "ui/cl_voiceselect.lua" )
 
+CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
+
 function GM:HUDDrawTargetID()
 	return false
 end 
@@ -46,6 +48,7 @@ local fx_t = 0
 
 hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
     if LocalPlayer():Team() ~= TEAM_SURVIVOR then return end
+    if GetConVar("slashcohud_disable_pp"):GetBool() then return end
 	DrawBloom( 0.5, 2, 9, 9, 1, 1, 1, 1, 1 )
 
     local blur_insensity = 0

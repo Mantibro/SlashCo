@@ -704,6 +704,8 @@ SlashCo.SpawnCurConfig = function(isDebug)
                 itemClass = "sc_cookie"
             elseif slashid == "Thirsty" then
                 itemClass = "sc_milkjug"
+            elseif slashid == "Princess" then
+                itemClass = "sc_baby"
             end
 
             if itemClass then SlashCo.CreateItems(itemSpawns, itemClass) print("[SlashCo] Spawning Items.") end
@@ -762,7 +764,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             SlashCo.HelicopterTakeOffIntro()
 
-            if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
+            --if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
 
         end)
 

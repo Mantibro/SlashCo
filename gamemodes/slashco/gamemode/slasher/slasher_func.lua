@@ -247,6 +247,8 @@ SlashCo.Jumpscare = function(slasher)
                 slasher:SetNWBool("CanChase", true)
         
             end)
+
+            return true
         end
 
     end
@@ -292,7 +294,10 @@ SlashCo.StartChaseMode = function(slasher)
 
     local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist, SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius )
 
-    local target = NULL
+    --local target = NULL
+    local target = slasher
+
+    goto FOUND
 
     if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist then
         target = slasher:GetEyeTrace().Entity
