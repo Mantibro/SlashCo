@@ -836,6 +836,9 @@ function GM:PlayerDeath(victim, _, _)
 
         local ragdoll = ents.Create("prop_ragdoll")
         ragdoll:SetModel(victim:GetModel())
+        ragdoll.PingType = "DEAD BODY"
+
+        victim.DeadBody = ragdoll
 
         if victim.Devastate ~= nil then
             ragdoll:SetModel("models/player/corpse1.mdl")
