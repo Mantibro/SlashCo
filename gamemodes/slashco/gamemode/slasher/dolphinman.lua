@@ -245,10 +245,18 @@ if CLIENT then
 
         if LocalPlayer():GetNWBool("SurvivorJumpscare_Dolphinman") == true  then
 
+        if LocalPlayer().dolf_f == nil then LocalPlayer().dolf_f = 0 end
+        LocalPlayer().dolf_f = LocalPlayer().dolf_f+(FrameTime()*20)
+        if LocalPlayer().dolf_f > 29 then LocalPlayer().dolf_f = 28 end
 
-            
-        end
+        local Overlay = Material("slashco/ui/overlays/jumpscare_16")
+        Overlay:SetInt( "$frame", math.floor(LocalPlayer().dolf_f) )
 
+        surface.SetDrawColor(255,255,255,255)	
+        surface.SetMaterial(Overlay)
+        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+    else
+        LocalPlayer().dolf_f = nil      
     end)
 
     SlashCoSlasher.Dolphinman.UserInterface = function(cx, cy, mainiconposx, mainiconposy)

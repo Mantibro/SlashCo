@@ -419,7 +419,9 @@ end
 SlashCoSlasher.Princess.Footstep = function(ply)
 
     if SERVER then
+        ply:EmitSound("slashco/slasher/princess_step"..math.random(1,3)..".mp3")
 
+        timer.Simple(0.15, function() ply:EmitSound("slashco/slasher/princess_step"..math.random(1,3)..".mp3") end)
 
         return true 
     end
