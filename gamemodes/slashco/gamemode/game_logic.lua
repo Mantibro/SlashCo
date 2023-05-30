@@ -770,7 +770,21 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         timer.Simple( math.random(2,4), function() SlashCo.HelicopterRadioVoice(1) end)
 
-        SlashCo.RoundHeadstart()
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+
+            timer.Simple( math.random(4,8), function() 
+            
+                local failed = SlashCo.SummonEscapeHelicopter()
+
+                if not failed then
+                    SlashCo.CurRound.DistressBeaconUsed = false
+                end
+            
+            end)
+            
+        else
+            SlashCo.RoundHeadstart()
+        end
     end
 end
 

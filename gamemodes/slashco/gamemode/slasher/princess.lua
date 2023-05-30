@@ -18,8 +18,8 @@ SlashCoSlasher.Princess.ChaseRadius = 0.91
 SlashCoSlasher.Princess.ChaseDuration = 10.0
 SlashCoSlasher.Princess.ChaseCooldown = 3
 SlashCoSlasher.Princess.JumpscareDuration = 1.5
-SlashCoSlasher.Princess.ChaseMusic = "slashco/slasher/"
-SlashCoSlasher.Princess.KillSound = "slashco/slasher/"
+SlashCoSlasher.Princess.ChaseMusic = "slashco/slasher/princess_chase.wav"
+SlashCoSlasher.Princess.KillSound = ""
 SlashCoSlasher.Princess.Description = [[The Feral Slasher who mauls children.
 
 -Princess can increase his aggression during chase, but up to a threshold.
@@ -116,12 +116,14 @@ SlashCoSlasher.Princess.OnTickBehaviour = function(slasher)
 
                 --baby in jaw
 
-                --v:Remove()
+                v:Remove()
 
                 local pos = slasher:LocalToWorld( Vector(0,10,-5) )
                 local ang = slasher:LocalToWorldAngles( Angle(90,0,0) )
 
                 local mauled_child = ents.Create( "prop_physics" )
+
+                slasher:EmitSound("slashco/survivor/baby_use.mp3")
 
                 mauled_child:SetMoveType( MOVETYPE_NONE )
                 mauled_child:SetCollisionGroup( COLLISION_GROUP_IN_VEHICLE )
@@ -229,7 +231,7 @@ SlashCoSlasher.Princess.OnPrimaryFire = function(slasher)
             
             local target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,30)), Vector(-15,-15,-60), Vector(15,15,60), math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1/4)), DMG_SLASH, 5, false )
 
-            if target:IsValid() and target:IsPlayer() then
+            if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
                 slasher:EmitSound("slashco/slasher/princess_bite.mp3")
 
                 local vPoint = target:GetPos()
@@ -246,11 +248,9 @@ SlashCoSlasher.Princess.OnPrimaryFire = function(slasher)
                     timer.Simple(FrameTime()*3, function() 
                         slasher:SetNWBool("PrincessMaulingSurvivor", true)
 
-                        if target:GetTeam() == TEAM_SURVIVOR then
-                            target:Kill()
-                        end
+                        target:Kill()
 
-                        timer.Simple(FrameTime(), function()
+                        timer.Simple(FrameTime()*3, function()
                             slasher.victimragdoll = target.DeadBody
                         end)
 

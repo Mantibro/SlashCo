@@ -27,11 +27,20 @@ SlashCoSlasher.Bababooey.EyeRating = "★★★☆☆"
 SlashCoSlasher.Bababooey.DiffRating = "★☆☆☆☆"
 
 SlashCoSlasher.Bababooey.OnSpawn = function(slasher)
-
+    SlashCoSlasher.Bababooey.DoSound(slasher)
 end
 
 SlashCoSlasher.Bababooey.PickUpAttempt = function(ply)
     return false
+end
+
+SlashCoSlasher.Bababooey.DoSound = function(slasher)
+
+    if slasher:GetNWBool("BababooeyInvisibility") then
+        slasher:EmitSound("slashco/slasher/baba_laugh"..math.random(2,4)..".mp3", 30+math.random(1,45))
+    end
+
+    timer.Simple(math.random(6,10), function() SlashCoSlasher.Bababooey.DoSound(slasher) end)
 end
 
 SlashCoSlasher.Bababooey.OnTickBehaviour = function(slasher)
@@ -100,8 +109,8 @@ SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
 
             PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130, slasher)
 
-            slasher:SetRunSpeed( 250 )
-            slasher:SetWalkSpeed( 250 )
+            slasher:SetRunSpeed( 200 )
+            slasher:SetWalkSpeed( 200 )
 
         end)
 

@@ -13,7 +13,7 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, key)
 
         if lookent:GetPos():Distance( ply:GetPos() ) > 120 then return end
 
-        if SlashCo.SlamDoor(lookent) then
+        if SlashCo.SlamDoor(lookent, ply) then
             ply:ViewPunch( Angle( 10, 0, 0 ) )
             timer.Simple(0.2, function() 
                 ply:ViewPunch( Angle( -20, 0, 0 ) )
