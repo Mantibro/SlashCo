@@ -54,7 +54,7 @@ SlashCoSlasher.Tyler.OnTickBehaviour = function(slasher)
     local final_eyesight = SlashCoSlasher.Tyler.Eyesight
     local final_perception = SlashCoSlasher.Tyler.Perception
 
-    local ms = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local ms = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
 
     if v1 == 0 then --Specter
 
@@ -287,7 +287,7 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
     
             if not target:IsPlayer() and c ~= "sc_gascan" and c ~= "sc_milkjug" and c ~= "sc_cookie" and c ~= "sc_stepdecoy" and c ~= "sc_baby" and c ~= "sc_devildie" and c ~= "sc_mayo" and c ~= "sc_soda" then return end
     
-            if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
+            if slasher:GetPos():Distance(target:GetPos()) < SlashCoSlasher.Tyler.KillDistance and not target:GetNWBool("SurvivorBeingJumpscared") then
     
                 target:SetNWBool("SurvivorBeingJumpscared",true)
                 target:SetNWBool("SurvivorJumpscare_Tyler", true)
@@ -297,7 +297,7 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
                 if target:IsPlayer() then target:Freeze(true) end
                 slasher:Freeze(true)
     
-                slasher.KillDelayTick = slasher.KillDelay
+                slasher.KillDelayTick = SlashCoSlasher.Tyler.KillDelay
 
                 slasher.SlasherValue2 = 0
     
@@ -360,10 +360,10 @@ SlashCoSlasher.Tyler.OnMainAbilityFire = function(slasher)
 		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		slasher:SetNoDraw(false)
 
-        --PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(slasher.SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)), slasher, 0.8 - (slasher.SlasherValue3 * 0.05))
+        --PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE)), slasher, 0.8 - (slasher.SlasherValue3 * 0.05))
 
         --slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..song..".mp3")
-        --slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(slasher.SlasherValue3) * (25 / SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
+        --slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
         --slasher.TylerSong:ChangeVolume( 0.8 - (slasher.SlasherValue3 * 0.05))
 
     end

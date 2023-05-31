@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\dolphinman\dolphin_body"
+	"$halflambert" 1
+}

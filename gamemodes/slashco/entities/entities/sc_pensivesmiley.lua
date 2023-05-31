@@ -6,6 +6,7 @@ ENT.Base 			= "base_nextbot"
 ENT.Type			= "nextbot"
 ENT.ClassName 		= "sc_pensivesmiley"
 ENT.Spawnable		= true
+ENT.PingType = "SLASHER"
 
 function ENT:Initialize()
 

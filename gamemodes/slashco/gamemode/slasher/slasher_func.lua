@@ -28,14 +28,11 @@ SlashCo.SelectSlasher = function(slasher_name, plyid)
 end
 
 SlashCo.ApplySlasherToPlayer = function(ply)
-
     if SlashCo.CurRound.Slashers[ply:SteamID64()] ~= nil then
         --Set the correct Slasher
-        print("Assinging the correct Slasher to the player.")
-        ply:SetNWBool("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
-
+        print("Assigning the correct Slasher to the player.")
+        ply:SetNWString("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
     end
-
 end
 
 SlashCo.PrepareSlasherForSpawning = function()
@@ -106,10 +103,6 @@ SlashCo.SpawnSlasher = function()
 end
 
 SlashCo.OnSlasherSpawned = function(ply)
-    if type(SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn) ~= "function" then
-        return
-    end
-
     ply:SetRunSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
     ply:SetWalkSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
 
@@ -123,6 +116,8 @@ SlashCo.OnSlasherSpawned = function(ply)
     ply.SlasherValue5 = 0
 
     ply:SlasherFunction("OnSpawn")
+
+    if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn ) ~= "function" then return end
 end
 
 
@@ -186,7 +181,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
             if IsValid(find_p) and not find_p:GetNWBool("SurvivorChased") then
                 find_p:SetNWBool("SurvivorChased", true)
             end
-
+        
             if slasher.CurrentChaseTick > slasher:SlasherValue("ChaseDuration", 10) then
                 SlashCo.StopChase(slasher)
             end
@@ -255,6 +250,8 @@ SlashCo.Jumpscare = function(slasher)
                 slasher.CurrentChaseTick = 0
                 slasher:SetNWBool("CanChase", true)
             end)
+
+            return true
         end
     end
 end
@@ -271,6 +268,10 @@ SlashCo.StopChase = function(slasher)
         end
         slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
     end)
+
+    for _, pl in ipairs(player.GetAll()) do
+        if pl:GetNWBool("SurvivorChased") then pl:SetNWBool("SurvivorChased",false) end
+    end
 end
 
 SlashCo.StartChaseMode = function(slasher)
@@ -294,7 +295,10 @@ SlashCo.StartChaseMode = function(slasher)
 
     local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, dist, slasher:SlasherValue("ChaseRadius", 0.91))
 
-    local target = NULL
+    --local target = NULL
+    local target = slasher
+
+    goto FOUND
 
     local isFound
     if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist then

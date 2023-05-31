@@ -34,6 +34,8 @@ util.AddNetworkString("mantislashcoSurvivorVoicePrompt")
 util.AddNetworkString("mantislashcoSurvivorPings")
 util.AddNetworkString("mantislashcoSurvivorPreparePing")
 util.AddNetworkString("mantislashcoHelicopterVoice")
+util.AddNetworkString("mantislashcoMapAmbientPlay")
+util.AddNetworkString("mantislashcoSendMapForce")
 
 function PlayGlobalSound(sound, level, ent, vol)
 
@@ -152,7 +154,7 @@ SlashCo.StartGameIntro = function()
 
     net.Start("mantislashcoGameIntro")
     net.WriteTable({
-        map = SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME,
+        map = SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME,
         diff = SlashCo.LobbyData.SelectedDifficulty,
         offer = offering,
         s_name = SlashCo.LobbyData.SelectedSlasherInfo.NAME,

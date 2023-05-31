@@ -13,6 +13,9 @@ AddCSLuaFile("abomignat.lua")
 AddCSLuaFile("criminal.lua")
 AddCSLuaFile("freesmiley.lua")
 AddCSLuaFile("leuonard.lua")
+AddCSLuaFile("speedrunner.lua")
+AddCSLuaFile("dolphinman.lua")
+AddCSLuaFile("princess.lua")
 
 if not SlashCoSlasher then
     SlashCoSlasher = {}
@@ -32,6 +35,9 @@ include("abomignat.lua")
 include("criminal.lua")
 include("freesmiley.lua")
 include("leuonard.lua")
+include("speedrunner.lua")
+include("dolphinman.lua")
+include("princess.lua")
 
 function TranslateSlasherClass(id)
     if id == 0 then
@@ -65,19 +71,22 @@ end
 
 function GetRandomSlasher()
     local keys = table.GetKeys(SlashCoSlasher)
-    local rand = math.random(1, #keys)
-    local rand_name = keys[rand] --random id for this roll
+    local rand, rand_name
+    repeat
+	      rand = math.random(1, #keys)
+	      rand_name = keys[rand] --random id for this roll
+    until SlashCoSlasher[rand_name].IsSelectable
 
     return rand_name
 end
 
 --Slasher Animation Controller
-hook.Add("CalcMainActivity", "SlasherAnimator", function(ply)
+hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, vel)
     if ply:Team() ~= TEAM_SLASHER then
         return
     end
 
-    return ply:SlasherFunction("Animator")
+    return ply:SlasherFunction("Animator", vel)
 end)
 
 hook.Add("PlayerFootstep", "SlasherFootstep", function(ply)

@@ -3,6 +3,32 @@ local SlashCoItems = SlashCoItems
 
 --//actual real code//--
 
+local MapForceCost = 50
+
+net.Receive("mantislashcoSendMapForce", function() 
+    local haver = net.ReadEntity()
+
+    local balance = tonumber(SlashCoDatabase.GetStat(haver:SteamID64(), "Points"))
+
+    if balance >= MapForceCost then
+
+        SlashCo.LobbyData.SelectedMapNum = net.ReadUInt(4)
+
+        for _, play in ipairs(player.GetAll()) do
+            play:ChatPrint("The map guarantee has been set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
+        end
+
+        SlashCoDatabase.UpdateStats(haver:SteamID64(), "Points", -MapForceCost)
+
+        MapForceCost = MapForceCost + 50
+
+    else
+
+        haver:ChatPrint("You don't have enough Points for a Map Guarantee.")
+
+    end
+end)
+
 local function lobbySaveCurData()
 
     local diff = SlashCo.LobbyData.SelectedDifficulty
@@ -156,7 +182,7 @@ local function lobbySaveCurData()
 
         print("DATA SAVED.")
 
-        SlashCo.ChangeMap(SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].ID)
+        SlashCo.ChangeMap(SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].ID)
 
     end
 
@@ -506,14 +532,14 @@ local function lobbyRoundSetup()
 
         --Assign the map randomly
         :: Map_reroll ::
-        SlashCo.LobbyData.SelectedMapNum = math.random(1, #SlashCo.Maps)
+        SlashCo.LobbyData.SelectedMapNum = math.random(1, #SCInfo.Maps)
 
-        if #SlashCo.LobbyData.AssignedSurvivors < SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then
+        if #SlashCo.LobbyData.AssignedSurvivors < SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then
             goto Map_reroll
         end
 
         if GetConVar("slashco_map_default"):GetInt() < 1 then
-            if SlashCo.Maps[SlashCo.LobbyData.SelectedMapNum].DEFAULT == false then
+            if SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].DEFAULT == false then
                 goto Map_reroll
             end
         end
@@ -561,7 +587,6 @@ net.Receive("mantislashcoPickItem", function(_, ply)
         return
     end
 
-    ply:Give("sc_survivorhands")
     local item = net.ReadString()
     local plyID = ply:SteamID64()
 
@@ -575,8 +600,9 @@ net.Receive("mantislashcoPickItem", function(_, ply)
     if SlashCoItems[item].MaxAllowed then
         local numAllowed = SlashCoItems[item].MaxAllowed()
         local itemCount = 0
+        local slot = SlashCoItems[item].IsSecondary and "item2" or "item"
         for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-            if v:GetNWString("item", "none") == item then
+            if v:GetNWString(slot, "none") == item then
                 itemCount = itemCount + 1
             end
         end
@@ -586,8 +612,8 @@ net.Receive("mantislashcoPickItem", function(_, ply)
         end
     end
 
+    ply:Give("sc_survivorhands")
     SlashCoDatabase.UpdateStats(plyID, "Points", -SlashCoItems[item].Price)
-
     lobbyChooseItem(plyID, item)
 
     timer.Simple(0.5, function()

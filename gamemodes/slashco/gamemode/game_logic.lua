@@ -32,6 +32,49 @@ SlashCo.LoadCurRoundData = function()
                 table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[e].Slashers })
             end
 
+            --Nightmare offering >>>>>>>>>>>>>>>>>>>>>
+
+            if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+
+                --All survivors will become slashers.
+
+                local query = sql.Query("SELECT * FROM slashco_table_survivordata; ")
+                for i = 1, #query do
+
+                    local id = query[i].Survivors
+    
+                    timer.Simple(1, function()
+
+                        local slasher_pick = GetRandomSlasher()
+
+                        SlashCo.SelectSlasher(slasher_pick, id)
+                        table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher_pick })
+
+                        table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = id })
+    
+                    end)
+
+                end
+
+                --Slasher becomes the sole survivor
+
+                for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
+
+                    local sr_id = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[s].Slashers
+
+                    --table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sr_id })
+                    --For the slasher's clientside view also
+                    table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sr_id, GameContribution = 0 })
+    
+                end
+
+                return
+
+            end
+
+            --Nightmare offering >>>>>>>>>>>>>>>>>>>>>>>>
+
+
             --Survivors don't necessarily have to join in time, as the game can continue with at least 1. (TODO)
             --TODO: timer which starts the game premature if some survivors don't join in time.
 
@@ -48,9 +91,6 @@ SlashCo.LoadCurRoundData = function()
                 end
 
             end
-
-            print("[SlashCo] First 2 Expected Players assigned: " .. SlashCo.CurRound.ExpectedPlayers[1].steamid .. SlashCo.CurRound.ExpectedPlayers[2].steamid)
-            print("[SlashCo] Expected Player table size: " .. #SlashCo.CurRound.ExpectedPlayers)
 
             for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
 
@@ -157,6 +197,16 @@ SlashCo.LoadCurRoundTeams = function()
 
         if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
 
+            timer.Simple(0.05, function()
+
+                print("[SlashCo] Now proceeding with Spawns...")
+
+                SlashCo.PrepareSlasherForSpawning()
+
+                SlashCo.SpawnPlayers()
+
+            end)
+
             print("[SlashCo] Teams database loaded...")
 
             local survivors = sql.Query("SELECT * FROM slashco_table_survivordata; ")
@@ -169,6 +219,58 @@ SlashCo.LoadCurRoundTeams = function()
                 local id = playercur:SteamID64()
 
                 print("name: " .. playercur:Name())
+
+                --Nightmare offering >>>>>>>>>>>>>>>>>>>>>
+
+                if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+
+                    for i = 1, #slashers do --Slasher becomes the sole survivor
+                        if id == slashers[i].Slashers then
+                            print(playercur:Name() .. " now Survivor for Nightmare.")
+                            playercur:SetTeam(TEAM_SURVIVOR)
+                            playercur:Spawn()
+                        end
+                    end
+
+                    for i = 1, #survivors do
+                        if id == survivors[i].Survivors then
+    
+                            playercur:SetTeam(TEAM_SPECTATOR)
+                            playercur:Spawn()
+                            print(playercur:Name() .. " now Slasher for Nightmare")
+
+                            table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
+    
+                            break
+    
+                        else
+    
+                            if slashers[1] ~= nil and id == slashers[1].Slashers then
+                                goto CONT_NGHT
+                            end
+    
+                            for k = 1, #survivors do
+                                if id == survivors[k].Survivors then
+                                    goto CONT_NGHT
+                                end
+                            end
+    
+                            playercur:SetTeam(TEAM_SPECTATOR)
+                            playercur:Spawn()
+                            print(playercur:Name() .. " now Spectator (Nightmare)")
+                        end
+                        :: CONT_NGHT ::
+                    end
+
+
+                    if play >= #player.GetAll() then 
+                        goto NIGHTMARE_SKIPALL 
+                    else
+                        goto NIGHTMARE_SKIPPART 
+                    end
+                end
+
+                --Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
                 local query = sql.Query("SELECT * FROM slashco_table_survivordata; ") --This table shouldn't be organized like this.
                 for i = 1, #survivors do
@@ -221,6 +323,8 @@ SlashCo.LoadCurRoundTeams = function()
                     end
                 end
 
+                ::NIGHTMARE_SKIPPART::
+
             end
 
             --local id1 = slashers[1].Slashers
@@ -229,16 +333,7 @@ SlashCo.LoadCurRoundTeams = function()
                 id2 = slashers[2].Slashers
             end
 
-            timer.Simple(0.05, function()
-
-                print("[SlashCo] Now proceeding with Spawns...")
-
-                SlashCo.PrepareSlasherForSpawning()
-
-                SlashCo.SpawnPlayers()
-
-            end)
-
+            ::NIGHTMARE_SKIPALL::
 
         else
 
@@ -422,7 +517,7 @@ SlashCo.ValidateMap = function(map)
         end
     end
 
-    gasCount = SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) - SlashCo.CurRound.SurvivorData.GasCanMod
+    gasCount = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) - SlashCo.CurRound.SurvivorData.GasCanMod
 
     if gasCount < 8 then gasCount = 8 end
 
@@ -514,16 +609,6 @@ SlashCo.EndRound = function()
 
         SlashCo.RemoveHelicopter()
 
-        for i = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
-            local man = SlashCo.CurRound.SlasherData.AllSurvivors[i].id
-
-            if IsValid(player.GetBySteamID64( man )) then
-                SlashCoDatabase.UpdateStats(man, "Points", SlashCo.PlayerData[man].PointsTotal)
-            end
-
-        end
-
-
         if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
             --Add to stats of the remaining survivors' wins.
             for i = 1, #SlashCo.CurRound.HelicopterRescuedPlayers do
@@ -533,6 +618,15 @@ SlashCo.EndRound = function()
                 SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal + 25
 
             end
+        end
+
+        for i = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
+            local man = SlashCo.CurRound.SlasherData.AllSurvivors[i].id
+
+            if IsValid(player.GetBySteamID64( man )) then
+                SlashCoDatabase.UpdateStats(man, "Points", SlashCo.PlayerData[man].PointsTotal)
+            end
+
         end
 
         local survivors = team.GetPlayers(TEAM_SURVIVOR)
@@ -667,6 +761,8 @@ SlashCo.SpawnCurConfig = function(isDebug)
                 itemClass = "sc_cookie"
             elseif slashid == "Thirsty" then
                 itemClass = "sc_milkjug"
+            elseif slashid == "Princess" then
+                itemClass = "sc_baby"
             end
 
             if itemClass then SlashCo.CreateItems(itemSpawns, itemClass) print("[SlashCo] Spawning Items.") end
@@ -675,7 +771,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
                 local diff1 = SlashCo.CurRound.Difficulty
 
-                for _ = 1, (  math.random(0, 6) + (10 * SlashCo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff1  *  4  )     ) do
+                for _ = 1, (  math.random(0, 6) + (10 * SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff1  *  4  )     ) do
 
                     SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), angle_zero)
 
@@ -711,7 +807,6 @@ SlashCo.SpawnCurConfig = function(isDebug)
         local id = SlashCo.CreateItem("sc_beacon", Vector(pickedpoint.pos[1],pickedpoint.pos[2],pickedpoint.pos[3]), Angle(pickedpoint.ang[1],pickedpoint.ang[2],pickedpoint.ang[3])) --Spawn one distress beacon
         SlashCo.CurRound.Items[id] = true
 
-        SlashCo.CurRound.roundOverToggle = true
         GAMEMODE.State = GAMEMODE.States.IN_GAME
         SlashCo.CurRound.GameProgress = 0
 
@@ -729,9 +824,26 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         end)
 
-        timer.Simple( math.random(2,4), function() SlashCo.HelicopterRadioVoice(1) end)
+        timer.Simple( math.random(2,4), function() 
+            SlashCo.HelicopterRadioVoice(1) 
+            SlashCo.CurRound.roundOverToggle = true
+        end)
 
-        SlashCo.RoundHeadstart()
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+
+            timer.Simple( 240, function() 
+            
+                local failed = SlashCo.SummonEscapeHelicopter()
+
+                if not failed then
+                    SlashCo.CurRound.DistressBeaconUsed = false
+                end
+            
+            end)
+            
+        else
+            SlashCo.RoundHeadstart()
+        end
     end
 end
 

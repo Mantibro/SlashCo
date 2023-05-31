@@ -40,6 +40,7 @@ net.Receive( "mantislashcoHelicopterMusic", function( _, _ )
 		heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
 		heli_music:Play()
 		helimusic_antispam = true 
+		AmbientStop = true
 	end
 
 end)

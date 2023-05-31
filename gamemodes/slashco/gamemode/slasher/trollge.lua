@@ -38,6 +38,7 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
     local v1 = slasher.SlasherValue1 --Stage
     local v2 = slasher.SlasherValue2 --Claw cooldown
     local v3 = slasher.SlasherValue3 --blood
+    local v4 = slasher.SlasherValue4 --dashing
 
     local final_eyesight = SlashCoSlasher.Trollge.Eyesight
     local final_perception = SlashCoSlasher.Trollge.Perception
@@ -125,6 +126,72 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
         slasher:SetNWInt("TrollgeStage", v1)
     end
 
+    local function stopDash()
+
+        if not slasher:GetNWBool("TrollgeDashFinish") then
+
+            slasher:StopSound("slashco/slasher/trollge_screech.mp3")
+            timer.Simple(0.25, function() slasher:StopSound("slashco/slasher/trollge_screech.mp3") end)
+
+            slasher:EmitSound("slashco/slasher/trollge_exhaust.mp3")
+
+            slasher.SlasherValue4 = 0
+            slasher:SetNWBool("TrollgeDashFinish",true) 
+
+            timer.Simple(8, function() 
+                slasher.SlasherValue4 = 0
+                slasher:Freeze(false) 
+                slasher:SetNWBool("TrollgeDashFinish",false)
+                slasher:SetNWBool("TrollgeDashing",false)
+                slasher.SlasherValue2 = 1.99
+            end)
+
+        end
+
+    end
+
+
+
+
+    if v1 == 0 and slasher:GetNWBool("TrollgeDashing") then 
+
+        local target = nil
+
+        if not slasher:GetNWBool("TrollgeDashFinish") then
+            target = slasher:TraceHullAttack( slasher:EyePos(), slasher:LocalToWorld(Vector(45,0,30)), Vector(-15,-15,-60), Vector(15,15,60), 50, DMG_SLASH, 5, false )
+            SlashCo.BustDoor(slasher, target, 25000)
+            slasher:SetVelocity(slasher:GetForward() * 100)
+
+            if v4 == 0 then timer.Simple(6, stopDash) end
+
+            slasher.SlasherValue4 = v4 + 1
+
+            if slasher.SlasherValue4 > 50 then 
+
+                if slasher:GetVelocity():Length() < 450 then stopDash() end
+
+                if target:IsValid() and target:IsPlayer() then 
+
+                    stopDash() 
+
+                    if target:Team() ~= TEAM_SURVIVOR then return end
+
+                    local vPoint = target:GetPos() + Vector(0,0,50)
+                    local bloodfx = EffectData()
+                    bloodfx:SetOrigin( vPoint )
+                    util.Effect( "BloodImpact", bloodfx )
+
+                    target:EmitSound("slashco/slasher/trollge_hit.wav")
+
+                    slasher.SlasherValue3 = slasher.SlasherValue3 + 1 + SO
+
+                end
+            end
+
+        end
+
+    end
+
     slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
     slasher:SetNWInt("Slasher_Perception", final_perception)
 
@@ -191,6 +258,15 @@ end
 
 SlashCoSlasher.Trollge.OnMainAbilityFire = function(slasher)
 
+    if slasher.SlasherValue1 == 0 and not slasher:GetNWBool("TrollgeDashing") and slasher.SlasherValue2 == 0  then
+        slasher:SetNWBool("TrollgeDashing", true)
+        PlayGlobalSound("slashco/slasher/trollge_screech.mp3",125,slasher)
+        slasher:Freeze(true) 
+        slasher.SlasherValue2 = 3
+        slasher.SlasherValue4 = 0
+        slasher:SetVelocity(slasher:GetForward() * 1000)
+    end
+
 end
 
 
@@ -243,6 +319,12 @@ SlashCoSlasher.Trollge.Animator = function(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("glide")
 
 	end
+
+    if ply:GetNWBool("TrollgeDashing") and not ply:GetNWBool("TrollgeDashFinish") then
+
+        ply.CalcSeqOverride = ply:LookupSequence("dash")
+
+    end
 
     return ply.CalcIdeal, ply.CalcSeqOverride
 
@@ -311,6 +393,10 @@ if CLIENT then
             surface.SetMaterial(TrollgeClaw)
             surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/4), ScrW()/16, ScrW()/16)
             draw.SimpleText( "M1 - Claw", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/4), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+            draw.SimpleText( "R - Trolle Dash", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+
+
         else
             willdrawkill = true
         end

@@ -25,6 +25,8 @@ include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/cl_slasher_control.lua")
 include("ui/slasher_stock/cl_slasher_meter.lua")
 
+CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
+
 function GM:HUDDrawTargetID()
     return false
 end
@@ -47,11 +49,10 @@ end
 
 local fx_t = 0
 
-hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
-    if LocalPlayer():Team() ~= TEAM_SURVIVOR then
-        return
-    end
-    DrawBloom(0.5, 2, 9, 9, 1, 1, 1, 1, 1)
+hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
+    if LocalPlayer():Team() ~= TEAM_SURVIVOR then return end
+    if GetConVar("slashcohud_disable_pp"):GetBool() then return end
+DrawBloom( 0.5, 2, 9, 9, 1, 1, 1, 1, 1 )
 
     local blur_insensity = 0
     local red_insensity = 0
@@ -472,6 +473,62 @@ net.Receive("mantislashcoHelicopterVoice", function()
     if t == 4 then
         LocalPlayer():EmitSound("slashco/helipilot/helipilot_beacon" .. math.random(1, 5) .. ".mp3", 100)
         return
+    end
+
+end)
+
+local AmbientMusic = nil
+local AmbientLength = nil
+local AmbientVol = 1
+local AmbientStop = false
+
+net.Receive("mantislashcoMapAmbientPlay", function()
+    timer.Simple(math.random(1,8), function()
+        SlashCoMapAmbience()
+    end)
+end)
+
+function SlashCoMapAmbience()
+
+    if LocalPlayer():Team() == TEAM_SLASHER then return end
+
+    local snd = "sound/slashco/maps/"..game.GetMap()..".mp3"
+
+    if not file.Exists( snd, "GAME" ) then return end
+
+    sound.PlayFile( snd, "noplay", function(music, errCode, errStr) 
+    
+        if ( IsValid( music ) ) then
+
+            AmbientMusic = music
+            AmbientMusic:Play()
+
+            AmbientLength = AmbientMusic:GetLength()
+
+            timer.Simple(AmbientLength +  math.random(15,100), function() SlashCoMapAmbience() end)
+
+        else
+            print( "[SlashCo] Error playing map ambient!", errCode, errStr )
+        end
+    
+    end)
+
+end
+
+hook.Add("Think","amb_vol", function() 
+
+    if AmbientStop then
+        AmbientVol = 0
+    end
+
+    if IsValid(AmbientMusic) then 
+        AmbientMusic:SetVolume(AmbientVol) 
+    end 
+
+    if LocalPlayer():GetNWBool("SurvivorChased") then
+        if AmbientVol > 0 then AmbientVol = AmbientVol - RealFrameTime() end
+    else
+        if AmbientVol < 1 then AmbientVol = AmbientVol + (RealFrameTime() / 100) end
     end
 
 end)

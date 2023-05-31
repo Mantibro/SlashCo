@@ -24,6 +24,8 @@ concommand.Add( "slashco_debug_run_curconfig", function( ply, _, _ )
 
     SlashCo.SpawnCurConfig(true)
 
+    SlashCo.Debug = true
+
 end, nil, "Start a debug round with current configs.", FCVAR_CHEAT+FCVAR_PROTECTED)
 
 concommand.Add( "slashco_debug_run_survivor", function( ply, _, _ )
@@ -55,6 +57,8 @@ concommand.Add( "slashco_debug_run_survivor", function( ply, _, _ )
 
     SlashCo.SpawnCurConfig(true)
 
+    SlashCo.Debug = true
+
 end, nil, "Start a debug round where everyone is a survivor.", FCVAR_CHEAT+FCVAR_PROTECTED)
 
 --//datatest//--
@@ -77,16 +81,17 @@ concommand.Add("slashco_debug_datatest_makedummy", function(ply, _, _)
             local diff = SlashCo.LobbyData.SelectedDifficulty
             local offer = SlashCo.LobbyData.Offering
             local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
-            local slasher1id = SlashCo.LobbyData.PickedSlasher
+            --local slasher1id = GetRandomSlasher()
+            local slasher1id = "Abomignat"
             local slasher2id = GetRandomSlasher()
 
-            sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary NUMBER , SlasherIDSecondary NUMBER , SurviorGasMod NUMBER);")
+            sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary TEXT , SlasherIDSecondary TEXT , SurviorGasMod NUMBER);")
             sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
             sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
 
-            sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( 90071996842377216 );")
+            sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( 76561198070087838 );")
             sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( 90071996842377216, " .. sql.SQLStr("none") .. " );")
-            sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", " .. slasher1id .. ", " .. slasher2id .. ", " .. survivorgasmod .. " );")
+            sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
             print("Dummy Database made.")
         else
             print("Database already exists.")

@@ -619,6 +619,14 @@ local Think = function()
             end
         end
 
+        if SlashCo.CurRound.GameProgress == -1 then
+            for _, v in ipairs( team.GetPlayers( TEAM_SPECTATOR ) ) do
+                if SlashCo.CurRound.Slashers[v:SteamID64()] ~= nil and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
+                    SlashCo.ApplySlasherToPlayer(v)
+                end
+            end
+        end
+
         if SlashCo.CurRound.GameProgress >= 0 then
             for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
                 if ply:GetNWInt("GameProgressDisplay") ~= SlashCo.CurRound.GameProgress then
@@ -695,7 +703,7 @@ local Think = function()
             --Go back to lobby if everyone dies.
             if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
-                --SlashCo.EndRound()
+                if not SlashCo.Debug then SlashCo.EndRound() end
 
                 SlashCo.CurRound.roundOverToggle = false
             end
@@ -751,8 +759,6 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
         SlashCo.AwaitExpectedPlayers()
 
         SlashCo.BroadcastGlobalData()
-
-        SlashCo.ApplySlasherToPlayer(ply)
 
         timer.Simple(2, function()
 
@@ -833,6 +839,9 @@ function GM:PlayerDeath(victim, _, _)
 
         local ragdoll = ents.Create("prop_ragdoll")
         ragdoll:SetModel(victim:GetModel())
+        ragdoll.PingType = "DEAD BODY"
+
+        victim.DeadBody = ragdoll
 
         if victim.Devastate ~= nil then
             ragdoll:SetModel("models/player/corpse1.mdl")

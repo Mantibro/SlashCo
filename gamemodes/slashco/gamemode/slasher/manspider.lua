@@ -56,8 +56,11 @@ SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
         slasher:SetNWBool("CanChase", false)
         slasher:SetNWBool("CanKill", false)
 
-        if #team.GetPlayers(TEAM_SURVIVOR) < 2 then
+        if #team.GetPlayers(TEAM_SURVIVOR) < 2 and #team.GetPlayers(TEAM_SURVIVOR) > 0 then
             v1 = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
+
+            slasher:SetNWBool("CanChase", true)
+            slasher:SetNWBool("CanKill", true)
         end
 
     else

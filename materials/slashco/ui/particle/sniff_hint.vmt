@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/particle/sniff_hint"
+	"$alphatest" 1
+	"$translucent" 1
+	"$ignorez" 1
+}

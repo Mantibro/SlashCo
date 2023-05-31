@@ -199,6 +199,13 @@ function ENT:Think()
     self.FuelingCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55 + fuelprog * 26)))
 
     if CurTime() >= self.TimeUntilFueled then
+
+        SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal = SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal + 5
+
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+            SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal = SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal + ( #team.GetPlayers( TEAM_SLASHER ) * 15 )
+        end
+
         self.IsFueling = false
         self.FuelProgress = nil
         TimeToFuel = DefaultTimeToFuel

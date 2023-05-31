@@ -236,3 +236,50 @@ function DrawTheSlasherSelectorBox()
 	ISDesc:SetFont( "MenuFont1" )
 
 end
+
+local Fun = {
+	CurInput = 1,
+	Sequence = {
+		88,
+		88,
+		90,
+		90,
+		89,
+		91,
+		89,
+		91,
+		12,
+		11,
+		64
+	}
+}
+
+hook.Add("PlayerButtonDown", "TheCoder", function(ply, key) 
+
+	if ply ~= LocalPlayer() then return end
+
+	if not IsFirstTimePredicted() then return end
+
+	if ( IsValid(SlasherSelectFrame) ) then
+
+		if key == Fun.Sequence[Fun.CurInput] then
+			Fun.CurInput = Fun.CurInput + 1
+			ply:EmitSound("slashco/blip.wav")
+			if Fun.CurInput > 11 then
+				ply:ChatPrint("You unleashed the Beast.")
+				ply:EmitSound("slashco/slasher/leuonard_yell1.mp3")
+				SlashCoSlasher.Leuonard.IsSelectable = true
+				if ( IsValid(SlasherSelectFrame) ) then
+					SlasherSelectFrame:Remove()
+					SlasherSelectFrame = nil
+				end
+				SelectedSlasher = "Leuonard"
+				DrawTheSlasherSelectorBox()
+			end
+		else
+			Fun.CurInput = 1
+		end
+
+	end
+
+end)
