@@ -1,6 +1,9 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("ui/cl_voiceselect.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
 
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
@@ -187,7 +190,7 @@ end
 
 SlashCo.SpawnableItems = {}
 
-for k, p in SortedPairs(SlashCoItems) do
+for _, p in SortedPairs(SlashCoItems) do
     if p.IsSpawnable then
         --table.insert(SlashCo.SpawnableItems, {p.EntClass})
         SlashCo.SpawnableItems[1 + #SlashCo.SpawnableItems] = p.EntClass
@@ -573,7 +576,7 @@ hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
 
 end)
 
-local setupPlayerData = false
+--local setupPlayerData = false
 local Think = function()
 
     if CLIENT then

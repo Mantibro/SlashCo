@@ -11,6 +11,7 @@ SlashCoItems.GasCan.Description = "Take a gas can with you instead of having to 
 SlashCoItems.GasCan.CamPos = Vector(80,0,0)
 SlashCoItems.GasCan.ChangesSpeed = true
 SlashCoItems.GasCan.IsSpawnable = false
+SlashCoItems.GasCan.IsFuel = true
 SlashCoItems.GasCan.MaxAllowed = function()
     return 2
 end
@@ -21,11 +22,7 @@ SlashCoItems.GasCan.OnDrop = function(ply)
 end
 SlashCoItems.GasCan.OnSwitchFrom = function(ply)
     timer.Simple(0.25, function()
-        local item = ply:GetNWString("item2", "none")
-        if item == "none" then
-            item = ply:GetNWString("item", "none")
-        end
-        if not SlashCoItems[item] or not SlashCoItems[item].ChangesSpeed then
+        if not ply:ItemValue2("ChangesSpeed") then
             ply:SetRunSpeed(300)
         end
     end)

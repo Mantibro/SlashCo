@@ -13,8 +13,16 @@ AddCSLuaFile("deathward_used.lua")
 AddCSLuaFile("battery.lua")
 AddCSLuaFile("rock.lua")
 AddCSLuaFile("pocketsand.lua")
+AddCSLuaFile("brick.lua")
+AddCSLuaFile("effect/invisibility.lua")
+AddCSLuaFile("effect/fuelspeed.lua")
+AddCSLuaFile("effect/slowness.lua")
+AddCSLuaFile("effect/speed.lua")
+AddCSLuaFile("items_meta.lua")
 
-if not SlashCoItems then SlashCoItems = {} end
+
+SlashCoItems = SlashCoItems or {}
+SlashCoEffects = SlashCoEffects or {}
 
 include("baby.lua")
 include("beacon.lua")
@@ -30,6 +38,149 @@ include("deathward_used.lua")
 include("battery.lua")
 include("rock.lua")
 include("pocketsand.lua")
+include("brick.lua")
+include("effect/invisibility.lua")
+include("effect/fuelspeed.lua")
+include("effect/slowness.lua")
+include("effect/speed.lua")
+include("items_meta.lua")
+
+local PLAYER = FindMetaTable("Player")
+
+function PLAYER:AddEffect(value, duration)
+    if not self:EffectFunction("OnRemoved") then
+        self:EffectFunction("OnExpired")
+    end
+    self:SetNWString("itemEffect", value)
+    self:EffectFunction("OnApplied")
+    timer.Create("itemEffectExpire_"..self:UserID(), duration, 1, function()
+        if not IsValid(self) then
+            return
+        end
+        self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+        self:EffectFunction("OnExpired")
+        self:SetNWString("itemEffect", "none")
+    end)
+end
+
+function PLAYER:EffectFunction(value, ...)
+    local effect = self:GetNWString("itemEffect", "none")
+    if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
+        return SlashCoEffects[effect][value](self, ...)
+    end
+end
+
+function PLAYER:ClearEffect()
+    if not self:EffectFunction("OnRemoved") then
+        self:EffectFunction("OnExpired")
+    end
+    self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+    self:SetNWString("itemEffect", "none")
+    timer.Remove("itemEffectExpire_"..self:UserID())
+end
+
+--this doesn't include a team check because we assume that it's in a survivor-only context
+function PLAYER:ItemValue(value, fallback, isSecondary)
+    local effect = self:GetNWString("itemEffect", "none")
+    if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
+        return SlashCoEffects[effect][value]
+    end
+
+    local slot = isSecondary and "item2" or "item"
+    local item = self:GetNWString(slot, "none")
+    if SlashCoItems[item] and SlashCoItems[item][value] then
+        return SlashCoItems[item][value]
+    end
+
+    return fallback
+end
+
+function PLAYER:ItemValue2(value, fallback, noEffect)
+    local item
+    if not noEffect then
+        item = ply:GetNWString("itemEffect", "none")
+        if SlashCoItems[item] and SlashCoItems[item][value] then
+            return SlashCoItems[item][value]
+        end
+    end
+
+    item = ply:GetNWString("item2", "none")
+    if item == "none" then
+        item = ply:GetNWString("item", "none")
+    end
+    if SlashCoItems[item] and SlashCoItems[item][value] then
+        return SlashCoItems[item][value]
+    end
+
+    return fallback
+end
+
+function PLAYER:ItemFunction(value, ...)
+    return self:ItemFunctionInternal(value, "item", ...)
+end
+
+function PLAYER:ItemFunctionOrElse(value, ...)
+    local val = self:ItemFunctionInternal(value, "item")
+    if val then
+        return val
+    end
+    return ...
+end
+
+function PLAYER:SecondaryItemFunction(value, ...)
+    return self:ItemFunctionInternal(value, "item2", ...)
+end
+
+function PLAYER:SecondaryItemFunctionOrElse(value, ...)
+    local val = self:ItemFunctionInternal(value, "item2")
+    if val then
+        return val
+    end
+    return ...
+end
+
+function PLAYER:ItemFunctionInternal(value, slot, ...)
+    local effect = self:GetNWString("itemEffect", "none")
+    if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
+        return SlashCoEffects[effect][value](self, ...)
+    end
+
+    local item = self:GetNWString(slot, "none")
+    if SlashCoItems[item] and SlashCoItems[item][value] then
+        return SlashCoItems[item][value](self, ...)
+    end
+end
+
+function PLAYER:ItemFunction2(value, item, ...)
+    if SlashCoItems[item] and SlashCoItems[item][value] then
+        return SlashCoItems[item][value](self,...)
+    end
+end
+
+if CLIENT then
+    return
+end
+
+local spawnableItems = {}
+for k, v in pairs(SlashCoItems) do
+    if v.ReplacesWorldProps then
+        spawnableItems[v.Model] = k
+    end
+end
+
+hook.Add("InitPostEntity", function()
+    for _, v in ipairs(ents.FindByClass("prop_physics")) do
+        local item = spawnableItems[v:GetModel()]
+        if item then
+            local pos = v:GetPos()
+            local ang = v:GetAngles()
+            v:Remove()
+            local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, pos, ang)
+            SlashCo.CurRound.Items[droppedItem] = true
+            Entity(droppedItem):SetCollisionGroup(COLLISION_GROUP_NONE)
+        end
+    end
+end)
 
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems

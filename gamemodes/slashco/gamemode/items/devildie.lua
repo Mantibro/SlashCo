@@ -26,34 +26,19 @@ SlashCoItems.DevilDie.OnUse = function(ply)
     ply:EmitSound("slashco/survivor/devildie_roll.mp3")
 
     timer.Simple(2, function()
-
         ply:EmitSound("slashco/survivor/devildie_break.mp3")
 
         local rand = math.random(1, 6)
 
         if rand == 1 then
-
             SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, 20, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
             SlashCo.CreateGasCan(ply:LocalToWorld(Vector(30, -20, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 
             ply:EmitSound("slashco/survivor/devildie_fuel.mp3")
-
         elseif rand == 2 then
-
-            ply:SetRunSpeed(450)
-
             ply:EmitSound("slashco/survivor/devildie_speed.mp3")
-
-            timer.Simple(45, function()
-
-                ply:SetRunSpeed(300)
-
-                ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-
-            end)
-
+            ply:AddEffect("Speed", 45)
         elseif rand == 3 then
-
             local hpd = math.random(-100, 100)
 
             if hpd + ply:Health() > 200 then
@@ -61,7 +46,6 @@ SlashCoItems.DevilDie.OnUse = function(ply)
             elseif hpd <= ply:Health() then
                 hpd = (-ply:Health()) + 1
             end
-
 
             ply:SetHealth(ply:Health() + hpd)
 
@@ -82,29 +66,18 @@ SlashCoItems.DevilDie.OnUse = function(ply)
                 healfx:SetOrigin(vPoint)
                 util.Effect("TeslaZap", healfx)
             end
-
         elseif rand == 4 then
-
-            if #team.GetPlayers(TEAM_SLASHER) < 1 then
+            if team.NumPlayers(TEAM_SLASHER) < 1 then
                 return
             end
 
             local slasher = team.GetPlayers(TEAM_SLASHER)[1]
 
             ply:SetPos(slasher:LocalToWorld(Vector(100, 0, 10)))
-            ply:SetRunSpeed(200)
-
-            timer.Simple(5, function()
-                ply:SetRunSpeed(300)
-                ply:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-            end)
-
+            ply:AddEffect("Slowness", 5)
         elseif rand == 5 then
-
             PlayGlobalSound("slashco/survivor/devildie_siren.mp3", 96, ply)
-
         elseif rand == 6 then
-
             ply:EmitSound("slashco/survivor/devildie_kill.mp3")
 
             timer.Simple(0.5, function()
@@ -115,11 +88,8 @@ SlashCoItems.DevilDie.OnUse = function(ply)
 
                 ply:Kill()
             end)
-
         end
-
     end)
-    
 end
 SlashCoItems.DevilDie.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem(SlashCoItems.DevilDie.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

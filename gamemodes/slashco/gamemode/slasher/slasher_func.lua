@@ -1,5 +1,26 @@
 local SlashCo = SlashCo
 
+local PLAYER = FindMetaTable("Player")
+
+--this doesn't include a team check because we assume that it's in a slasher-only context
+function PLAYER:SlasherValue(value, fallback)
+    local slasher = self:GetNWString("Slasher", "none")
+
+    if SlashCoSlasher[slasher] and SlashCoSlasher[slasher][value] then
+        return SlashCoSlasher[slasher][value]
+    end
+
+    return fallback
+end
+
+function PLAYER:SlasherFunction(value, ...)
+    local slasher = self:GetNWString("Slasher", "none")
+
+    if SlashCoSlasher[slasher] and SlashCoSlasher[slasher][value] then
+        return SlashCoSlasher[slasher][value](self, ...)
+    end
+end
+
 SlashCo.SelectSlasher = function(slasher_name, plyid)
     SlashCo.CurRound.Slashers[plyid] = {}
     SlashCo.CurRound.Slashers[plyid].SlasherID = slasher_name
@@ -7,14 +28,11 @@ SlashCo.SelectSlasher = function(slasher_name, plyid)
 end
 
 SlashCo.ApplySlasherToPlayer = function(ply)
-
     if SlashCo.CurRound.Slashers[ply:SteamID64()] ~= nil then
         --Set the correct Slasher
-       print("Assinging the correct Slasher to the player.")
-       ply:SetNWString("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
-
-   end
-
+        print("Assigning the correct Slasher to the player.")
+        ply:SetNWString("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
+    end
 end
 
 SlashCo.PrepareSlasherForSpawning = function()
@@ -28,19 +46,19 @@ SlashCo.PrepareSlasherForSpawning = function()
 
     ]]
 
-if SERVER then
+    if SERVER then
 
-    local delay = 1
+        local delay = 1
 
-    delay = 1 +( (4 - SlashCo.CurRound.Difficulty ) ) * 20
+        delay = 1 + ((4 - SlashCo.CurRound.Difficulty)) * 20
 
-    print("[SlashCo] Slasher set to spawn in "..delay.." seconds.")
+        print("[SlashCo] Slasher set to spawn in " .. delay .. " seconds.")
 
-    timer.Simple(delay, function()
-        SlashCo.SpawnSlasher()
-    end)
+        timer.Simple(delay, function()
+            SlashCo.SpawnSlasher()
+        end)
 
-end
+    end
 
 end
 
@@ -57,15 +75,15 @@ SlashCo.SpawnSlasher = function()
             if SlashCo.CurRound.SlashersToBeSpawned then
 
                 for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
-                    rand = math.random( 1, #SlashCo.CurConfig.Spawnpoints.Slasher)
+                    rand = math.random(1, #SlashCo.CurConfig.Spawnpoints.Slasher)
 
-                    local pos = Vector(SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[1],SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[2],SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[3])
-                    local ang = Angle( 0, SlashCo.CurConfig.Spawnpoints.Slasher[rand].ang ,0 )
+                    local pos = Vector(SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[1], SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[2], SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[3])
+                    local ang = Angle(0, SlashCo.CurConfig.Spawnpoints.Slasher[rand].ang, 0)
 
                     p:SetTeam(TEAM_SLASHER)
                     p:Spawn()
-                    p:SetPos( pos )
-                    p:SetAngles( ang )
+                    p:SetPos(pos)
+                    p:SetAngles(ang)
 
                     SlashCo.OnSlasherSpawned(p)
                 end
@@ -85,9 +103,6 @@ SlashCo.SpawnSlasher = function()
 end
 
 SlashCo.OnSlasherSpawned = function(ply)
-
-    local plyid = ply:SteamID64()
-
     ply:SetRunSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
     ply:SetWalkSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
 
@@ -100,10 +115,9 @@ SlashCo.OnSlasherSpawned = function(ply)
     ply.SlasherValue4 = 0
     ply.SlasherValue5 = 0
 
+    ply:SlasherFunction("OnSpawn")
+
     if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn ) ~= "function" then return end
-
-    SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn(ply)
-
 end
 
 
@@ -113,7 +127,9 @@ end
 hook.Add("Tick", "HandleSlasherAbilities", function()
 
     local gens = ents.FindByClass("sc_generator")
-    if #gens < 1 then return end
+    if #gens < 1 then
+        return
+    end
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
@@ -127,117 +143,105 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
         SlashCo.CurRound.GameProgress = totalProgress
     end
 
-for i = 1, #team.GetPlayers(TEAM_SLASHER) do
-
-        local slasher = team.GetPlayers(TEAM_SLASHER)[i]
-        local dist = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRange + (SO * 250)
-
-        local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+    for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+        local slasher = v
+        local dist = slasher:SlasherValue("ChaseRange", 600) + (SO * 250)
 
         --Handle The Chase Functions \/ \/ \/
-        SlashCoSlasher[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
-        if slasher:GetNWBool("CanChase") == false then slasher.CurrentChaseTick = 99 end
-
-        if slasher.ChaseActivationCooldown > 0 then 
-
-            slasher.ChaseActivationCooldown = slasher.ChaseActivationCooldown - FrameTime() 
-
+        --SlashCoSlasher[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
+        if slasher:GetNWBool("CanChase") == false then
+            slasher.CurrentChaseTick = 99
         end
 
-        if not slasher:GetNWBool("InSlasherChaseMode") then goto CONTINUE end
-do
-        slasher.CurrentChaseTick = slasher.CurrentChaseTick + FrameTime()
+        if slasher.ChaseActivationCooldown > 0 then
+            slasher.ChaseActivationCooldown = slasher.ChaseActivationCooldown - FrameTime()
+        end
 
-        --local inv = (1 - SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius) / 2
-        local inv = -0.2
+        if slasher:GetNWBool("InSlasherChaseMode") then
+            slasher.CurrentChaseTick = slasher.CurrentChaseTick + FrameTime()
 
-        local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2, SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius + inv )
-        local find_p = NULL
+            --local inv = (1 - SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius) / 2
+            local inv = -0.2
 
-        for p = 1, #find do
+            local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2, slasher:SlasherValue("ChaseRadius", 0.91) + inv)
+            local find_p = NULL
 
-            if find[p]:IsPlayer() and find[p]:Team() == TEAM_SURVIVOR then
-
-                slasher.CurrentChaseTick = 0
-                find_p = find[p]
-
+            for p = 1, #find do
+                if find[p]:IsPlayer() and find[p]:Team() == TEAM_SURVIVOR then
+                    slasher.CurrentChaseTick = 0
+                    find_p = find[p]
+                end
             end
 
-        end
+            if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist * 2 then
+                slasher.CurrentChaseTick = 0
+                find_p = slasher:GetEyeTrace().Entity
+            end
 
-        if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist * 2 then
-            slasher.CurrentChaseTick = 0
-            find_p = slasher:GetEyeTrace().Entity
-        end
+            if IsValid(find_p) and not find_p:GetNWBool("SurvivorChased") then
+                find_p:SetNWBool("SurvivorChased", true)
+            end
+        
+            if slasher.CurrentChaseTick > slasher:SlasherValue("ChaseDuration", 10) then
+                SlashCo.StopChase(slasher)
+            end
 
-        if IsValid( find_p ) and not find_p:GetNWBool("SurvivorChased") then find_p:SetNWBool("SurvivorChased",true) end
-
-        if slasher.CurrentChaseTick > SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseDuration then 
-
-            slasher:SetNWBool("InSlasherChaseMode", false) 
-
-            slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-            slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-            slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
-
-            slasher.ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseCooldown
-
-            timer.Simple(0.25, function() 
-                slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic) 
-
-                for _, pl in ipairs(player.GetAll()) do
-                    if pl:GetNWBool("SurvivorChased") then pl:SetNWBool("SurvivorChased",false) end
+            if not slasher:GetNWBool("InSlasherChaseMode") then
+                for p = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+                    local ply = team.GetPlayers(TEAM_SURVIVOR)[p]
+                    if ply:GetNWBool("SurvivorChased") then
+                        ply:SetNWBool("SurvivorChased", false)
+                    end
                 end
-            end)
+            end
         end
-end
-        ::CONTINUE::
 
         --Handle The Chase Functions /\ /\ /\
 
         --Other Shared Functionality:
 
-        if slasher.KillDelayTick > 0 then slasher.KillDelayTick = slasher.KillDelayTick - 0.01 end
+        if slasher.KillDelayTick > 0 then
+            slasher.KillDelayTick = slasher.KillDelayTick - 0.01
+        end
 
-        if type( SlashCoSlasher[slasher:GetNWString("Slasher")].OnTickBehaviour ) ~= "function" then return end
-
-        SlashCoSlasher[slasher:GetNWString("Slasher")].OnTickBehaviour(slasher)
-
-end
-
+        slasher:SlasherFunction("OnTickBehavior")
+    end
 end)
 
 SlashCo.Jumpscare = function(slasher)
+    if not slasher:GetNWBool("CanKill") then
+        return
+    end
 
-    if not slasher:GetNWBool("CanKill") then return end
+    if slasher.KillDelayTick > 0 then
+        return
+    end
 
-    if slasher.KillDelayTick > 0 then return end
+    local dist = slasher:SlasherValue("KillDistance", 135)
 
-    local dist = SlashCoSlasher[slasher:GetNWString("Slasher")].KillDistance
-    
     if slasher:GetEyeTrace().Entity:IsPlayer() then
-        local target = slasher:GetEyeTrace().Entity	
+        local target = slasher:GetEyeTrace().Entity
 
-        if target:Team() ~= TEAM_SURVIVOR then return end
+        if target:Team() ~= TEAM_SURVIVOR then
+            return
+        end
 
         if slasher:GetPos():Distance(target:GetPos()) < dist and not target:GetNWBool("SurvivorBeingJumpscared") then
-
-            target:SetNWBool("SurvivorBeingJumpscared",true)
-            target:SetNWBool("SurvivorJumpscare_"..slasher:GetNWString("Slasher"), true)
+            target:SetNWBool("SurvivorBeingJumpscared", true)
+            target:SetNWBool("SurvivorJumpscare_" .. slasher:GetNWString("Slasher"), true)
 
             slasher:SetNWBool("CanChase", false)
 
-            slasher:EmitSound(SlashCoSlasher[slasher:GetNWString("Slasher")].KillSound)
-                
+            slasher:EmitSound(slasher:SlasherValue("KillSound"))
+
             target:Freeze(true)
             slasher:Freeze(true)
 
-            slasher.KillDelayTick = SlashCoSlasher[slasher:GetNWString("Slasher")].KillDelay
+            slasher.KillDelayTick = slasher:SlasherValue("KillDelay", 3)
 
-            timer.Simple(SlashCoSlasher[slasher:GetNWString("Slasher")].JumpscareDuration, function()
-
-                target:SetNWBool("SurvivorBeingJumpscared",false)
-                target:SetNWBool("SurvivorJumpscare_"..slasher:GetNWString("Slasher"), false)
+            timer.Simple(slasher:SlasherValue("JumpscareDuration", 1.5), function()
+                target:SetNWBool("SurvivorBeingJumpscared", false)
+                target:SetNWBool("SurvivorJumpscare_" .. slasher:GetNWString("Slasher"), false)
                 target:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 
                 slasher:Freeze(false)
@@ -245,157 +249,149 @@ SlashCo.Jumpscare = function(slasher)
                 target:Kill()
                 slasher.CurrentChaseTick = 0
                 slasher:SetNWBool("CanChase", true)
-        
             end)
 
             return true
         end
-
     end
-
 end
 
 SlashCo.StopChase = function(slasher)
-
     slasher:SetNWBool("InSlasherChaseMode", false)
-    slasher:SetRunSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed)
-    slasher:SetWalkSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed)
-    slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
+    slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
+    slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
+    slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
 
     timer.Simple(0.25, function()
         if not IsValid(slasher) then
             return
         end
-        slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
+        slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
     end)
 
     for _, pl in ipairs(player.GetAll()) do
         if pl:GetNWBool("SurvivorChased") then pl:SetNWBool("SurvivorChased",false) end
     end
-
 end
 
 SlashCo.StartChaseMode = function(slasher)
-
-    if not slasher:GetNWBool("CanChase") then return end
-
-    if slasher.ChaseActivationCooldown > 0 then return end
-
-    slasher.ChaseActivationCooldown = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseCooldown
-
-    if slasher:GetNWBool("InSlasherChaseMode") then 
-
-        SlashCo.StopChase(slasher)
-
-        return 
+    if not slasher:GetNWBool("CanChase") then
+        return
     end
 
-    local dist = SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRange
+    if slasher.ChaseActivationCooldown > 0 then
+        return
+    end
 
-    local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, dist, SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius )
+    slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
+
+    if slasher:GetNWBool("InSlasherChaseMode") then
+        SlashCo.StopChase(slasher)
+
+        return
+    end
+
+    local dist = slasher:SlasherValue("ChaseRange", 600)
+
+    local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, dist, slasher:SlasherValue("ChaseRadius", 0.91))
 
     --local target = NULL
     local target = slasher
 
     goto FOUND
 
+    local isFound
     if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist then
         target = slasher:GetEyeTrace().Entity
-        goto FOUND
+        isFound = true
     end
 
-do
-
-    for i = 1, #find do
-
-        if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
-            target = find[i]
-            break 
+    if not isFound then
+        for i = 1, #find do
+            if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then
+                target = find[i]
+                break
+            end
         end
 
+        if not target:IsValid() then
+            return
+        end
+
+        local tr = util.TraceLine({
+            start = slasher:EyePos(),
+            endpos = target:GetPos() + Vector(0, 0, 50),
+            filter = slasher
+        })
+
+        if tr.Entity ~= target then
+            return
+        end
     end
-
-    if not target:IsValid() then 
-        return
-    end
-
-    local tr = util.TraceLine( {
-        start = slasher:EyePos(),
-        endpos = target:GetPos()+Vector(0,0,50),
-        filter = slasher
-    } )
-
-    if tr.Entity ~= target then return end
-end
-    ::FOUND::
 
     if slasher:GetPos():Distance(target:GetPos()) < dist then
-
         slasher:SetNWBool("InSlasherChaseMode", true)
         slasher.CurrentChaseTick = 0
-
     end
 
     local chase = slasher:GetNWBool("InSlasherChaseMode")
-
-    if chase then 
-
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed  )
-        PlayGlobalSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic,95,slasher)
-
+    if chase then
+        slasher:SetRunSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed)
+        slasher:SetWalkSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseSpeed)
+        PlayGlobalSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic, 95, slasher)
     else
         SlashCo.StopChase(slasher)
     end
-
 end
 
 SlashCo.BustDoor = function(slasher, target, force)
-
-    if !target:IsValid() then return end
+    if not target:IsValid() then
+        return
+    end
 
     if target:GetClass() == "prop_door_rotating" then
+        if SERVER then
+            target:Fire("Open")
+        end
 
-        if SERVER then target:Fire("Open") end
-
-        timer.Simple(0.05, function() 
-
-            local tr = util.TraceLine( {
+        timer.Simple(0.05, function()
+            local tr = util.TraceLine({
                 start = slasher:EyePos(),
                 endpos = slasher:EyePos() + slasher:GetForward() * 10000,
                 filter = slasher
-            } )
+            })
 
-            local trace = util.GetSurfaceData( tr.SurfaceProps ).name
+            local trace = util.GetSurfaceData(tr.SurfaceProps).name
 
-            if !target:IsValid() then return end
+            if not target:IsValid() then
+                return
+            end
 
-            local prop = ents.Create( "prop_physics" )
+            local prop = ents.Create("prop_physics")
             local model = target:GetModel()
             prop:SetModel(model)
-            prop:SetMoveType( MOVETYPE_NONE )
+            prop:SetMoveType(MOVETYPE_NONE)
             --prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
-            prop:SetPos( target:GetPos() + slasher:GetForward()*6 + Vector(0,0,1) )
-            prop:SetAngles( target:GetAngles() )
+            prop:SetPos(target:GetPos() + slasher:GetForward() * 6 + Vector(0, 0, 1))
+            prop:SetAngles(target:GetAngles())
             prop:Spawn()
             prop:Activate()
-            prop:SetSkin (target:GetSkin() )
+            prop:SetSkin(target:GetSkin())
             local phys = prop:GetPhysicsObject()
-            if phys:IsValid() then phys:Wake() end
-            phys:ApplyForceCenter( slasher:GetForward() * force )
+            if phys:IsValid() then
+                phys:Wake()
+            end
+            phys:ApplyForceCenter(slasher:GetForward() * force)
 
             if trace == "wood" then
-                target:EmitSound("physics/wood/wood_crate_break"..math.random(1,5)..".wav")
+                target:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
             end
 
             if trace == "metal" then
-                target:EmitSound("physics/metal/metal_box_break"..math.random(1,2)..".wav")
+                target:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
             end
 
             target:Remove()
-
         end)
-
     end
-
 end
