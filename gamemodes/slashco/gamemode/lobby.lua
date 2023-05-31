@@ -698,10 +698,10 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
     if SlashCo.LobbyData.LOBBYSTATE == 1 then
 
-        local minx = -1550
-        local maxx = -1320
-        local miny = -270
-        local maxy = -140
+        local minx = -60
+        local maxx = 60
+        local miny = 640
+        local maxy = 785
 
         local all_players_in = true
 
@@ -884,8 +884,9 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
 
         SlashCo.LobbyData.LOBBYSTATE = 1
 
-        SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_primary"))
-        SlashCo.LobbyData.ButtonDoorPrimary:Fire("Open")
+        local doors = ents.FindByName("Slashco_Elev_Shutter")
+        doors[1]:Fire("Open")
+        doors[2]:Fire("Open")
 
         for i = 1, #SlashCo.LobbyData.Players do
             --If someone is not ready, force them as ready survivor.
@@ -936,10 +937,18 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
 
         SlashCo.LobbyData.LOBBYSTATE = 2
 
-        SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_primary"))
-        SlashCo.LobbyData.ButtonDoorPrimary:Fire("Close")
+        local doors = ents.FindByName("Slashco_Elev_Shutter")
+        doors[1]:Fire("Close")
+        doors[2]:Fire("Close")
 
-        lobbyTransitionTimer()
+        timer.Simple(3, function()
+
+            local elevator = table.Random(ents.FindByName("Slashco_Elev"))
+            elevator:Fire("Open")
+
+            lobbyTransitionTimer()
+        end)
+
         if SERVER then
             net.Start("mantislashcoGiveLobbyStatus")
             net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
@@ -965,8 +974,9 @@ concommand.Add("lobby_debug_brief", function(ply, _, _)
 
         SlashCo.LobbyData.LOBBYSTATE = 3
 
-        SlashCo.LobbyData.ButtonDoorPrimary = table.Random(ents.FindByName("door_lobby_secondary"))
-        SlashCo.LobbyData.ButtonDoorPrimary:Fire("Open")
+        local doors = ents.FindByName("Slashco_Elev_Exit")
+        doors[1]:Fire("Open")
+        doors[2]:Fire("Open")
 
         if SERVER then
             net.Start("mantislashcoGiveLobbyStatus")

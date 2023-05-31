@@ -52,7 +52,12 @@ local fx_t = 0
 hook.Add( "RenderScreenspaceEffects", "BloomEffect", function()
     if LocalPlayer():Team() ~= TEAM_SURVIVOR then return end
     if GetConVar("slashcohud_disable_pp"):GetBool() then return end
+<<<<<<< Updated upstream
 DrawBloom( 0.5, 2, 9, 9, 1, 1, 1, 1, 1 )
+=======
+    if game.GetMap() == "sc_lobby" then return end
+	DrawBloom( 0.5, 2, 9, 9, 1, 1, 1, 1, 1 )
+>>>>>>> Stashed changes
 
     local blur_insensity = 0
     local red_insensity = 0
@@ -353,9 +358,15 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
     do
 
+<<<<<<< Updated upstream
         local angle = Angle(0, 90, 90)
 
         local pos = Vector(-1755.5, -425, 310)
+=======
+	local angle = Angle(0,-90,90)
+
+	local pos = Vector(-133, 400, 80)
+>>>>>>> Stashed changes
 
         if BriefingTable == nil then
             return
@@ -373,7 +384,11 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
         local pro_tip = BriefingTable.TIP
 
+<<<<<<< Updated upstream
         cam.Start3D2D(pos, angle, 0.12)
+=======
+	cam.Start3D2D( pos, angle, 0.09 )
+>>>>>>> Stashed changes
 
         local monitorsize = 1300
 
