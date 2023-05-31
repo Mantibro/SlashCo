@@ -88,8 +88,6 @@ SlashCo.OnSlasherSpawned = function(ply)
 
     local plyid = ply:SteamID64()
 
-    if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn ) ~= "function" then return end
-
     ply:SetRunSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
     ply:SetWalkSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
 
@@ -101,6 +99,8 @@ SlashCo.OnSlasherSpawned = function(ply)
     ply.SlasherValue3 = 0
     ply.SlasherValue4 = 0
     ply.SlasherValue5 = 0
+
+    if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn ) ~= "function" then return end
 
     SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn(ply)
 
