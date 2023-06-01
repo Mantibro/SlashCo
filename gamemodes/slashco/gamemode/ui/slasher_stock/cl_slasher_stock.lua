@@ -26,8 +26,10 @@ end
 
 vgui.Register("slashco_slasher_stockhud", PANEL, "Panel")
 
+--[[
 local frame = vgui.Create("DFrame")
 frame:Dock(FILL)
 frame.Paint = nil
 frame:MakePopup()
 local slashie = vgui.Create("slashco_slasher_stockhud", frame)
+--]]

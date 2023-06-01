@@ -21,9 +21,9 @@ include( "cl_playermodel_picker.lua" )
 include( "cl_gameinfo.lua" )
 
 include("ui/cl_voiceselect.lua")
-include("ui/slasher_stock/cl_slasher_stock.lua")
-include("ui/slasher_stock/cl_slasher_control.lua")
-include("ui/slasher_stock/cl_slasher_meter.lua")
+--include("ui/slasher_stock/cl_slasher_stock.lua")
+--include("ui/slasher_stock/cl_slasher_control.lua")
+--include("ui/slasher_stock/cl_slasher_meter.lua")
 
 CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
 
