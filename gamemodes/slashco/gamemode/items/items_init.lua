@@ -168,7 +168,7 @@ for k, v in pairs(SlashCoItems) do
     end
 end
 
-hook.Add("InitPostEntity", function()
+hook.Add("InitPostEntity", "SlashCo_ReplaceCinderBlocks", function()
     for _, v in ipairs(ents.FindByClass("prop_physics")) do
         local item = spawnableItems[v:GetModel()]
         if item then

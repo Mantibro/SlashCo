@@ -19,7 +19,7 @@ ITEM.OnUse = function(ply)
     Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 1250)
     SlashCo.CurRound.Items[droppeditem] = true
     timer.Simple(0.3, function()
-        if not IsValid(droppeditem) then
+        if not IsValid(Entity(droppeditem)) then
             return
         end
         Entity(droppeditem):SetCollisionGroup(COLLISION_GROUP_NONE)
