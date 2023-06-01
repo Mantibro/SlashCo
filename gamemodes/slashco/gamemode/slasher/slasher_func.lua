@@ -1,26 +1,5 @@
 local SlashCo = SlashCo
 
-local PLAYER = FindMetaTable("Player")
-
---this doesn't include a team check because we assume that it's in a slasher-only context
-function PLAYER:SlasherValue(value, fallback)
-    local slasher = self:GetNWString("Slasher", "none")
-
-    if SlashCoSlasher[slasher] and SlashCoSlasher[slasher][value] then
-        return SlashCoSlasher[slasher][value]
-    end
-
-    return fallback
-end
-
-function PLAYER:SlasherFunction(value, ...)
-    local slasher = self:GetNWString("Slasher", "none")
-
-    if SlashCoSlasher[slasher] and SlashCoSlasher[slasher][value] then
-        return SlashCoSlasher[slasher][value](self, ...)
-    end
-end
-
 SlashCo.SelectSlasher = function(slasher_name, plyid)
     SlashCo.CurRound.Slashers[plyid] = {}
     SlashCo.CurRound.Slashers[plyid].SlasherID = slasher_name
@@ -42,7 +21,7 @@ SlashCo.PrepareSlasherForSpawning = function()
     If the Difficulty is Hard, the Slasher immediately spawns with them. On other difficulties the Slasher has a spawn delay.
     (1,2 - 30 seconds), (0 - 60 seconds) 
     (The Delay is cancelled once the Survivors have performed any kind of action on a Generator). 
-    The Slasher will spawn at a spawn point furthest away from the Survivors.
+    The Slasher will spawn at a spawn powint furthest away from the Survivors.
 
     ]]
 
@@ -116,8 +95,6 @@ SlashCo.OnSlasherSpawned = function(ply)
     ply.SlasherValue5 = 0
 
     ply:SlasherFunction("OnSpawn")
-
-    if type( SlashCoSlasher[ply:GetNWString("Slasher")].OnSpawn ) ~= "function" then return end
 end
 
 
@@ -204,7 +181,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
             slasher.KillDelayTick = slasher.KillDelayTick - 0.01
         end
 
-        slasher:SlasherFunction("OnTickBehavior")
+        slasher:SlasherFunction("OnTickBehaviour")
     end
 end)
 

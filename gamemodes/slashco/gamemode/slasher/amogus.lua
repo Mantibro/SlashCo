@@ -35,20 +35,12 @@ SlashCoSlasher.Amogus.PickUpAttempt = function(ply)
 end
 
 SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
-
-    local SO = SlashCo.CurRound.OfferingData.SO
-
-    v1 = slasher.SlasherValue1 --Transformation type
-    v2 = slasher.SlasherValue2 --Transform cooldown
-    v3 = slasher.SlasherValue3 --Fuel Can EntIndex
-    v4 = slasher.SlasherValue4 --SUS!!!
-
     if IsValid(ents.GetByIndex(slasher.SlasherValue3)) then
         ents.GetByIndex(slasher.SlasherValue3):SetAngles(Angle(0,slasher:EyeAngles()[2],0))
     end
 
-    if v2 > 0 then 
-        slasher.SlasherValue2 = v2 - FrameTime() 
+    if slasher.SlasherValue2 > 0 then
+        slasher.SlasherValue2 = slasher.SlasherValue2 - FrameTime()
         slasher:SetNWBool("CanKill", false)
     else
         if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
@@ -65,12 +57,12 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
 
         for k, v in ipairs( team.GetPlayers( TEAM_SURVIVOR ) ) do
             if v:GetPos():Distance( slasher:GetPos() ) < 500 then
-                slasher.SlasherValue4 = v4 + FrameTime()
+                slasher.SlasherValue4 = slasher.SlasherValue1 + FrameTime()
                 break
             end
         end
 
-        if v4 > 30 then
+        if slasher.SlasherValue1 > 30 then
             slasher.SlasherValue4 = 0
             slasher:EmitSound("slashco/slasher/amogus_speech"..math.random(1,7)..".mp3")
         end
@@ -128,7 +120,7 @@ SlashCoSlasher.Amogus.OnMainAbilityFire = function(slasher)
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
-    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
+    if not slasher:GetNWBool("AmogusDisguising") and slasher.SlasherValue2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 
         slasher:SetNWBool("AmogusDisguising", true)
         slasher:Freeze(true)
@@ -159,7 +151,7 @@ SlashCoSlasher.Amogus.OnMainAbilityFire = function(slasher)
 
         end)
 
-    elseif not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and slasher:GetNWBool("AmogusDisguised") then
+    elseif not slasher:GetNWBool("AmogusDisguising") and slasher.SlasherValue2 < 0.01 and slasher:GetNWBool("AmogusDisguised") then
 
         slasher:Freeze(true)
         slasher:SetNWBool("AmogusSurvivorDisguise", false)
@@ -198,7 +190,7 @@ SlashCoSlasher.Amogus.OnSpecialAbilityFire = function(slasher)
 
     local SO = SlashCo.CurRound.OfferingData.SO
 
-    if not slasher:GetNWBool("AmogusDisguising") and v2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
+    if not slasher:GetNWBool("AmogusDisguising") and slasher.SlasherValue2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 
         slasher:SetNWBool("AmogusDisguising", true)
         slasher:Freeze(true)

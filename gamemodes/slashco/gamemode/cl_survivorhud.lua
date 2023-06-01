@@ -106,7 +106,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
     local HeldItem = ply:GetNWString("item", "none")
     if SlashCoItems[HeldItem or "none"] then
         local parsedItem = markup.Parse("<font=TVCD>---     " .. string.upper(SlashCoItems[HeldItem].Name) .. "     ---</font>")
-        surface.SetDrawColor(ply:ItemFunctionOrElse("DisplayColor", 0, 0, 128))
+        surface.SetDrawColor(ply:ItemFunctionOrElse("DisplayColor", {0, 0, 128}))
         surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
         parsedItem:Draw(ScrW() * 0.975 - 4, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 

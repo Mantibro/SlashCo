@@ -39,6 +39,27 @@ include("speedrunner.lua")
 include("dolphinman.lua")
 include("princess.lua")
 
+local PLAYER = FindMetaTable("Player")
+
+--this doesn't include a team check because we assume that it's in a slasher-only context
+function PLAYER:SlasherValue(value, fallback)
+    local slasher = self:GetNWString("Slasher", "none")
+
+    if SlashCoSlasher[slasher] and SlashCoSlasher[slasher][value] then
+        return SlashCoSlasher[slasher][value]
+    end
+
+    return fallback
+end
+
+function PLAYER:SlasherFunction(value, ...)
+    local slasher = self:GetNWString("Slasher", "none")
+
+    if SlashCoSlasher[slasher] and SlashCoSlasher[slasher][value] then
+        return SlashCoSlasher[slasher][value](self, ...)
+    end
+end
+
 function TranslateSlasherClass(id)
     if id == 0 then
         return "Unknown"

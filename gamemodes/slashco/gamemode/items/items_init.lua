@@ -119,24 +119,24 @@ function PLAYER:ItemFunction(value, ...)
     return self:ItemFunctionInternal(value, "item", ...)
 end
 
-function PLAYER:ItemFunctionOrElse(value, ...)
-    local val = self:ItemFunctionInternal(value, "item")
-    if val then
-        return val
+function PLAYER:ItemFunctionOrElse(value, default, ...)
+    local val = {self:ItemFunctionInternal(value, "item", ...)}
+    if val[1] then
+        return unpack(val)
     end
-    return ...
+    return unpack(default)
 end
 
 function PLAYER:SecondaryItemFunction(value, ...)
     return self:ItemFunctionInternal(value, "item2", ...)
 end
 
-function PLAYER:SecondaryItemFunctionOrElse(value, ...)
-    local val = self:ItemFunctionInternal(value, "item2")
+function PLAYER:SecondaryItemFunctionOrElse(value, default, ...)
+    local val = {self:ItemFunctionInternal(value, "item2", ...)}
     if val then
         return val
     end
-    return ...
+    return default
 end
 
 function PLAYER:ItemFunctionInternal(value, slot, ...)
@@ -156,6 +156,16 @@ function PLAYER:ItemFunction2(value, item, ...)
         return SlashCoItems[item][value](self,...)
     end
 end
+
+--might break physics idk
+hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
+    if ent1:GetClass() == "sc_brick" and ent2:IsPlayer() and ent2:Team() == TEAM_SURVIVOR then
+        return false
+    end
+    if ent2:GetClass() == "sc_brick" and ent1:IsPlayer() and ent1:Team() == TEAM_SURVIVOR then
+        return false
+    end
+end)
 
 if CLIENT then
     return
