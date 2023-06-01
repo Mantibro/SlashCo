@@ -133,6 +133,8 @@ SlashCoSlasher.FreeSmiley.Animator = function(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("summon")
 		if ply.anim_antispam == nil or ply.anim_antispam == false then ply:SetCycle( 0 ) ply.anim_antispam = true end
 
+    else
+        ply.anim_antispam = false
 	end
 
     return ply.CalcIdeal, ply.CalcSeqOverride

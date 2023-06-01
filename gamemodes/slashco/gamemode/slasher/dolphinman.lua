@@ -9,7 +9,7 @@ SlashCoSlasher.Dolphinman.Model = "models/slashco/slashers/dolphinman/dolphinman
 SlashCoSlasher.Dolphinman.GasCanMod = 0
 SlashCoSlasher.Dolphinman.KillDelay = 0.25
 SlashCoSlasher.Dolphinman.ProwlSpeed = 150
-SlashCoSlasher.Dolphinman.ChaseSpeed = 300
+SlashCoSlasher.Dolphinman.ChaseSpeed = 315
 SlashCoSlasher.Dolphinman.Perception = 1.0
 SlashCoSlasher.Dolphinman.Eyesight = 3
 SlashCoSlasher.Dolphinman.KillDistance = 135
@@ -56,6 +56,23 @@ SlashCoSlasher.Dolphinman.OnTickBehaviour = function(slasher)
         if v1 < 100 then slasher.SlasherValue1 = v1 + ( FrameTime() / (2 -  ( (SO-1) / 2) ) ) end
 
         --Survivore finderore
+
+        if SlashCo.CurRound.EscapeHelicopterSummoned then
+
+            slasher:SetNWBool("DolphinFound", true)
+
+            PlayGlobalSound("slashco/slasher/dolfin_call.wav",85,slasher)
+            PlayGlobalSound("slashco/slasher/dolfin_call_far.wav",145,slasher)
+
+            timer.Simple(10, function() 
+                slasher:SetNWBool("DolphinFound", false)
+                slasher:SetNWBool("DolphinInHiding", false)
+
+                slasher:SetNWBool("DolphinHunting", true)
+            
+            end)
+
+        end
 
         for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
 
