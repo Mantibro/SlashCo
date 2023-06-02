@@ -62,7 +62,12 @@ DoorSlamWhitelist = {
 	"models/props_c17/door03_left.mdl",
 	"models/props_doors/doormain_rural01_small.mdl",
 	"models/props_doors/doormainmetal01.mdl",
-	"models/props_c17/door01_left.mdl"
+	"models/props_c17/door01_left.mdl",
+    "models/props_c17/door_fg.mdl",
+    "models/props_doors/doormain01.mdl",
+    "models/props_doors/doorglassmain01.mdl",
+    "models/props_doors/door_rotate_112.mdl",
+    "models/props_doors/doormainmetalwindow01.mdl"
 }
 
 function CheckDoorWL(ent)
@@ -229,6 +234,19 @@ SCInfo.Maps = {
             -1750,
             -2100,
             50
+        }
+    },
+
+    {
+        ID = "sc_asylum",
+        NAME = "Asylum",
+        AUTHOR = "AidanTM145",
+        DEFAULT = true,
+        SIZE = 3,
+        MIN_PLAYERS = 3,
+        LEVELS = {
+            -400,
+            90
         }
     }
 
