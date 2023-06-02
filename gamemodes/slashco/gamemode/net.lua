@@ -438,6 +438,10 @@ SlashCo.BroadcastMasterDatabaseForClient = function(ply)
         return
     end
 
+    if not IsValid(ply) then
+        return
+    end
+
     if sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='" .. ply:SteamID64() .. "'; ") == nil
             or sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='" .. ply:SteamID64() .. "'; ") == false then
         return

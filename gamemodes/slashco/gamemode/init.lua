@@ -1,9 +1,9 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("ui/cl_voiceselect.lua")
---AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
---AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
---AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
 
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")

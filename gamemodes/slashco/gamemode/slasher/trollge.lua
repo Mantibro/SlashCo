@@ -183,7 +183,7 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
 
                     target:EmitSound("slashco/slasher/trollge_hit.wav")
 
-                    slasher.SlasherValue3 = slasher.SlasherValue3 + 1 + SO
+                    slasher.SlasherValue3 = slasher.SlasherValue3 + 1 + SlashCo.CurRound.OfferingData.SO
 
                 end
             end
