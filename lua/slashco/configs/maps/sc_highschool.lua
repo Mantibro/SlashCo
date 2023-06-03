@@ -1,4 +1,17 @@
 {
+	"Manifest": {
+		"Name": "High School",
+		"Author": "Steinman",
+		"Default": true,
+		"Size": 2,
+		"MinimumPlayers": 1,
+		"Levels": {
+			"1": -160,
+			"2": 100,
+			"3": 600
+		}
+	},
+
 	"Spawnpoints": {
 		"Slasher": {
 			"1": {

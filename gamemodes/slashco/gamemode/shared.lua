@@ -170,10 +170,8 @@ A Generator requires up to 4 Fuel Cans and a Battery to be activated.
 Survivors can use a variety of Items to help them.]]
 
 SCInfo.Maps = {
-    [0] = {
-        ID = "sc_summercamp",
+    ["error"] = {
         NAME = "Missing map!",
-        AUTHOR = "Steinman",
         DEFAULT = true,
         SIZE = 1,
         MIN_PLAYERS = 1,
@@ -181,73 +179,26 @@ SCInfo.Maps = {
             500
         }
     },
-
-    {
-        ID = "sc_summercamp",
-        NAME = "Summer Camp",
-        AUTHOR = "Steinman",
-        DEFAULT = true,
-        SIZE = 1,
-        MIN_PLAYERS = 1,
-        LEVELS = {
-            500
-        }
-    },
-
-    {
-        ID = "sc_highschool",
-        NAME = "High School",
-        AUTHOR = "Steinman",
-        DEFAULT = true,
-        SIZE = 2,
-        MIN_PLAYERS = 2,
-        LEVELS = {
-            -160,
-            100,
-            600
-        }
-    },
-
-    {
-        ID = "sc_redforest",
-        NAME = "Red Forest",
-        AUTHOR = "NuclearGhost",
-        DEFAULT = true,
-        SIZE = 4,
-        MIN_PLAYERS = 3,
-        LEVELS = {
-            250,
-            350,
-            -630,
-            -650
-        }
-    },
-
-    {
-        ID = "sc_hospital",
-        NAME = "Hospital",
-        AUTHOR = "sparkz",
-        DEFAULT = true,
-        SIZE = 4,
-        MIN_PLAYERS = 5,
-        LEVELS = {
-            -1750,
-            -2100,
-            50
-        }
-    },
-
-    {
-        ID = "sc_asylum",
-        NAME = "Asylum",
-        AUTHOR = "AidanTM145",
-        DEFAULT = true,
-        SIZE = 3,
-        MIN_PLAYERS = 3,
-        LEVELS = {
-            -400,
-            90
-        }
-    }
-
 }
+
+local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
+
+for _, v in ipairs(map_configs) do
+    if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
+        
+        local config_table = util.JSONToTable(file.Read("slashco/configs/maps/"..v, "LUA"))
+        local mapid = string.Replace( v, ".lua", "" )
+
+        SCInfo.Maps[mapid] = {}
+        SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
+        SCInfo.Maps[mapid].DEFAULT = config_table.Manifest.Default
+        SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
+        SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
+        SCInfo.Maps[mapid].LEVELS = {}
+
+        for ky, lvl in ipairs( config_table.Manifest.Levels ) do
+            SCInfo.Maps[mapid].LEVELS[ky] = lvl
+        end
+
+    end
+end

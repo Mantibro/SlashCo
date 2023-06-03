@@ -517,7 +517,7 @@ SlashCo.ValidateMap = function(map)
         end
     end
 
-    gasCount = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) - SlashCo.CurRound.SurvivorData.GasCanMod
+    gasCount = SCInfo.Maps[game.GetMap()].SIZE + json.GasCans.Count + (3-SlashCo.CurRound.Difficulty) + SlashCo.CurRound.OfferingData.GasCanMod + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors) - SlashCo.CurRound.SurvivorData.GasCanMod
 
     if gasCount < 8 then gasCount = 8 end
 
@@ -771,7 +771,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
                 local diff1 = SlashCo.CurRound.Difficulty
 
-                for _ = 1, (  math.random(0, 6) + (10 * SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE) + (  diff1  *  4  )     ) do
+                for _ = 1, (  math.random(0, 6) + (10 * SCInfo.Maps[game.GetMap()].SIZE) + (  diff1  *  4  )     ) do
 
                     SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), angle_zero)
 
@@ -781,6 +781,26 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
             slashergasmod = slashergasmod + SlashCo.CurRound.Slashers[p:SteamID64()].GasCanMod
 
+        end
+
+        local spawnableItems = {}
+        for k, v in pairs(SlashCoItems) do
+            if v.ReplacesWorldProps then
+                spawnableItems[v.Model] = k
+            end
+        end
+
+        --Repalce world props.
+        for _, v in ipairs(ents.FindByClass("prop_physics")) do
+            local item = spawnableItems[v:GetModel()]
+            if item then
+                local it_pos = v:GetPos()
+                local it_ang = v:GetAngles()
+                local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, it_pos, it_ang)
+                SlashCo.CurRound.Items[droppedItem] = true
+                Entity(droppedItem):SetCollisionGroup(COLLISION_GROUP_NONE)
+                v:Remove()
+            end
         end
 
         SlashCo.CurRound.GasCanCount = SlashCo.CurRound.GasCanCount + slashergasmod

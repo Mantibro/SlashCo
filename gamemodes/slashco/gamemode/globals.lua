@@ -583,7 +583,7 @@ SlashCo.TraceHullLocator = function()
     --Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player or npc.
 
     local height_offset = 10
-    local size = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local size = SCInfo.Maps[game.GetMap()].SIZE
 
     local range = 3500*size
 
@@ -591,7 +591,7 @@ SlashCo.TraceHullLocator = function()
 
     ::RELOCATE::
 
-    local h = SCInfo.Maps[SlashCo.ReturnMapIndex()].LEVELS[math.random(1, #SCInfo.Maps[SlashCo.ReturnMapIndex()].LEVELS)]
+    local h = SCInfo.Maps[game.GetMap()].LEVELS[math.random(1, #SCInfo.Maps[game.GetMap()].LEVELS)]
 
     pos = Vector(math.random(-range,range),math.random(-range,range),h)
 
@@ -653,7 +653,7 @@ SlashCo.LocalizedTraceHullLocator = function(ent, input_range)
     --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
 
     local height_offset = 10
-    local size = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local size = SCInfo.Maps[game.GetMap()].SIZE
 
     local range = input_range
 
@@ -694,7 +694,7 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, input_range
     --Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
 
     local height_offset = 10
-    local size = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local size = SCInfo.Maps[game.GetMap()].SIZE
 
     local range = input_range
 

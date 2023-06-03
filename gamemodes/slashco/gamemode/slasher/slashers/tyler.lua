@@ -54,7 +54,7 @@ SlashCoSlasher.Tyler.OnTickBehaviour = function(slasher)
     local final_eyesight = SlashCoSlasher.Tyler.Eyesight
     local final_perception = SlashCoSlasher.Tyler.Perception
 
-    local ms = SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE
+    local ms = SCInfo.Maps[game.GetMap()].SIZE
 
     if v1 == 0 then --Specter
 
@@ -360,10 +360,10 @@ SlashCoSlasher.Tyler.OnMainAbilityFire = function(slasher)
 		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		slasher:SetNoDraw(false)
 
-        --PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE)), slasher, 0.8 - (slasher.SlasherValue3 * 0.05))
+        --PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[game.GetMap()].SIZE)), slasher, 0.8 - (slasher.SlasherValue3 * 0.05))
 
         --slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..song..".mp3")
-        --slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[SlashCo.ReturnMapIndex()].SIZE)) )
+        --slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[game.GetMap()].SIZE)) )
         --slasher.TylerSong:ChangeVolume( 0.8 - (slasher.SlasherValue3 * 0.05))
 
     end

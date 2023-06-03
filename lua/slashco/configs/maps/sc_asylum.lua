@@ -1,4 +1,16 @@
 {
+	"Manifest": {
+		"Name": "Asylum",
+		"Author": "AidanTM145",
+		"Default": true,
+		"Size": 3,
+		"MinimumPlayers": 2,
+		"Levels": {
+			"1": -400,
+            "2": 90
+		}
+	},
+
 	"Spawnpoints": {
 		"Slasher": {
 			"1": {
