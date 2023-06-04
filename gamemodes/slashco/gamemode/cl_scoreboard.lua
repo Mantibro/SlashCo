@@ -58,9 +58,18 @@ local PLAYER_LINE = {
 
 		self.team_status = TEAM_SPECTATOR
 		self.teamcolor = Color(150,150,150,255)
-		self.teamorder = 500
+		self.teamorder = 1500
 
-		if PlayerData == nil then goto SKIP end
+		self.IsDead = self.Player:GetNWBool("ConfirmedDead")
+
+		if PlayerData == nil then goto SKIP end 
+
+		if self.IsDead then
+			self.team_status = TEAM_SURVIVOR
+			self.teamcolor = Color(0,0,0,255)
+			self.teamorder = 500
+			goto SKIP
+		end
 
 		for i = 1, #PlayerData.survivors do
 			local pot_s = player.GetBySteamID64(PlayerData.survivors[i].id)
@@ -99,7 +108,7 @@ local PLAYER_LINE = {
 
 	Think = function( self )
 
-		if ( not IsValid( self.Player ) ) then
+		if ( not IsValid( self.Player ) or self.Player:GetNWBool("ConfirmedDead") ~= self.IsDead ) then
 			self:SetZPos( 9999 ) -- Causes a rebuild
 			self:Remove()
 			return

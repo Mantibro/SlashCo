@@ -361,6 +361,10 @@ net.Receive("mantislashcoSurvivorPreparePing", function(_, ply)
         ping_info.ExpiryTime = 10
     end
 
+    if ping_info.Type == "DEAD BODY" then
+        player.GetBySteamID64( look.SurvivorSteamID ):SetNWBool("ConfirmedDead", true)
+    end
+
     if typeCheck[ping_info.Type] then
         sayPrompt(ply, typeCheck[ping_info.Type])
     elseif ping_info.Type == "ITEM" and type(look) == "Entity" then
