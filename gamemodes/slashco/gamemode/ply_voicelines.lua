@@ -184,6 +184,42 @@ SlashCo.LobbyConvos = {
         Length3 = 2
     }
 
+    {
+        Length1 = 5,
+        Length2 = 7,
+        Length3 = 3
+    },
+
+    {
+        Length1 = 2,
+        Length2 = 3,
+        Length3 = 3
+    },
+
+    {
+        Length1 = 3,
+        Length2 = 3,
+        Length3 = 6
+    },
+
+    {
+        Length1 = 4,
+        Length2 = 2,
+        Length3 = 3
+    },
+
+    {
+        Length1 = 13,
+        Length2 = 1.5,
+        Length3 = 1.5
+    },
+
+    {
+        Length1 = 5,
+        Length2 = 5,
+        Length3 = 4
+    },
+
 }
 
 local function sayPrompt(ply, input)
