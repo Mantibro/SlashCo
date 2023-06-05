@@ -22,7 +22,7 @@ end
 local function mapForce(mapID)
 	net.Start("mantislashcoSendMapForce")
 	net.WriteEntity(LocalPlayer())
-	net.WriteUInt(mapID,4)
+	net.WriteString(mapID)
 	net.SendToServer()
 end
 
@@ -181,7 +181,7 @@ local function DrawItemSelectorBox()
 	for k, p in SortedPairs(SCInfo.Maps) do
 
 		if not MGSelection then break end
-		if k == 0 then continue end
+		if k == "" then continue end
 
 		local item = vgui.Create("DButton", itemSelectFrame)
 		function item.DoClick()

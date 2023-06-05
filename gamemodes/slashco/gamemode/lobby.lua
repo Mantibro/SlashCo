@@ -12,10 +12,10 @@ net.Receive("mantislashcoSendMapForce", function()
 
     if balance >= MapForceCost then
 
-        SlashCo.LobbyData.SelectedMapNum = net.ReadUInt(4)
+        SlashCo.LobbyData.SelectedMap = net.ReadString()
 
         for _, play in ipairs(player.GetAll()) do
-            play:ChatPrint("The map guarantee has been set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
+            play:ChatPrint("The map guarantee has been set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME)
         end
 
         SlashCoDatabase.UpdateStats(haver:SteamID64(), "Points", -MapForceCost)
@@ -182,7 +182,7 @@ local function lobbySaveCurData()
 
         print("DATA SAVED.")
 
-        SlashCo.ChangeMap(SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].ID)
+        SlashCo.ChangeMap(SlashCo.LobbyData.SelectedMap)
 
     end
 
@@ -531,15 +531,11 @@ local function lobbyRoundSetup()
         end
 
         --Assign the map randomly
-        :: Map_reroll ::
-        SlashCo.LobbyData.SelectedMapNum = math.random(1, #SCInfo.Maps)
+        SlashCo.LobbyData.SelectedMap = GetRandomMap( #SlashCo.LobbyData.AssignedSurvivors )
 
-        if #SlashCo.LobbyData.AssignedSurvivors < SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then
-            goto Map_reroll
-        end
 
-        if GetConVar("slashco_map_default"):GetInt() < 1 then
-            if SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].DEFAULT == false then
+        if not GetConVar("slashco_map_default"):GetBool() then
+            if SCInfo.Maps[SlashCo.LobbyData.SelectedMap].DEFAULT == false then
                 goto Map_reroll
             end
         end

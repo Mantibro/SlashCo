@@ -1,5 +1,5 @@
 GM.Name = "SlashCo"
-GM.Author = "Octo, Manti"
+GM.Author = "Octo, Manti, Text"
 GM.Email = "N/A"
 GM.Website = "N/A"
 GM.TeamBased = true
@@ -8,6 +8,8 @@ GM.States = {
 	IN_GAME = 2
 }
 GM.State = GM.State or GM.States.LOBBY
+
+SlashCo.MinimumMapPlayers = 6
 
 include("player_class/player_survivor.lua")
 include("player_class/player_slasher_base.lua")
@@ -183,6 +185,8 @@ SCInfo.Maps = {
 
 local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
 
+local game_playable = false
+
 for _, v in ipairs(map_configs) do
     if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
         
@@ -194,11 +198,36 @@ for _, v in ipairs(map_configs) do
         SCInfo.Maps[mapid].DEFAULT = config_table.Manifest.Default
         SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
         SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
+
+        SlashCo.MinimumMapPlayers = math.min( SCInfo.Maps[mapid].MIN_PLAYERS, SlashCo.MinimumMapPlayers )
+
         SCInfo.Maps[mapid].LEVELS = {}
 
         for ky, lvl in ipairs( config_table.Manifest.Levels ) do
             SCInfo.Maps[mapid].LEVELS[ky] = lvl
         end
 
+        game_playable = true
+
     end
+end
+if SERVER then
+
+    if game_playable ~= true then
+
+        timer.Simple(30, function() 
+        
+            for _, play in ipairs(player.GetAll()) do
+                play:ChatPrint([[[SlashCo] WARNING! There are no maps mounted! The Gamemode is not playable! 
+                
+                Download the Maps at the Gamemode's workshop page:
+                https://steamcommunity.com/sharedfiles/filedetails/?id=2844428843 
+                
+                Under the "Required Items" section.]])
+            end
+        
+        end)
+
+    end
+
 end

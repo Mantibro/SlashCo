@@ -10,18 +10,15 @@ SlashCo.Difficulty = {
     HARD = 3
 }
 
-SlashCo.ReturnMapIndex = function()
+function GetRandomMap(ply_count)
+    local keys = table.GetKeys(SCInfo.Maps)
+    local rand, rand_name
+    repeat
+	      rand = math.random(1, #keys)
+	      rand_name = keys[rand] --random id for this roll
+    until SCInfo.Maps[rand_name].MIN_PLAYERS <= ( ply_count + ( SlashCo.MinimumMapPlayers - 1 ) )
 
-    local cur_map = game.GetMap()
-
-    for i = 1, #SCInfo.Maps do
-
-        if SCInfo.Maps[i].ID == cur_map then
-            return i
-        end
-
-    end
-
+    return rand_name
 end
 
 SlashCo.MAXPLAYERS = 7
@@ -56,7 +53,7 @@ SlashCo.LobbyData = {
         TIP = "--//--"
 
     },
-    SelectedMapNum = 0,
+    SelectedMap = "sc_summercamp",
     PickedSlasher = "None",
     --DeathwardsLeft = 0 --not used
 
