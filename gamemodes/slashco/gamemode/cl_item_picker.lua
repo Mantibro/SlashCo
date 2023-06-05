@@ -1,323 +1,320 @@
-include("ui/fonts.lua")
-
 local selectedItem
 local itemSelectFrame
 local SlashCoItems = SlashCoItems
 local MGSelection = false
 
-local function HideItemSelection()
-	if IsValid(itemSelectFrame) then
-		itemSelectFrame:Remove()
-		itemSelectFrame = nil
-		selectedItem = "Baby"
-	end
-end
-
 local function ItemChosen(itemID)
-	net.Start("mantislashcoPickItem")
-	net.WriteString(itemID)
-	net.SendToServer()
+    SlashCo.SendValue("pickItem", itemID)
 end
 
 local function mapForce(mapID)
-	net.Start("mantislashcoSendMapForce")
-	net.WriteEntity(LocalPlayer())
-	net.WriteUInt(mapID,4)
-	net.SendToServer()
+    SlashCo.SendValue("pickMap", mapID)
 end
 
 local function BlockConfirm()
-	itemSelectFrame.Confirm:SetText("XXXXXXX")
-	function itemSelectFrame.Confirm.Paint(_, w, h)
-		surface.SetDrawColor(128, 0, 0)
-		surface.DrawRect(0, 0, w, h)
-	end
-	itemSelectFrame.Confirm:SetEnabled(false)
+    itemSelectFrame.Confirm:SetText("XXXXXXX")
+    function itemSelectFrame.Confirm.Paint(_, w, h)
+        surface.SetDrawColor(128, 0, 0)
+        surface.DrawRect(0, 0, w, h)
+    end
+    itemSelectFrame.Confirm:SetEnabled(false)
 end
 
 local function SetConfirm()
-	if LocalPlayer():GetNWString("item", "none") ~= "none" or LocalPlayer():GetNWString("item2", "none") ~= "none" then
-		BlockConfirm()
-	else
-		itemSelectFrame.Confirm:SetText("CONFIRM")
-		function itemSelectFrame.Confirm.Paint(_, w, h)
-			if itemSelectFrame.Confirm:IsHovered() then
-				surface.SetDrawColor(0, 0, 128)
-			else
-				surface.SetDrawColor(64, 64, 64)
-			end
-			surface.DrawRect(0, 0, w, h)
-		end
-		function itemSelectFrame.Confirm.DoClick()
-			ItemChosen(selectedItem)
-			HideItemSelection()
-		end
-		itemSelectFrame.Confirm:SetEnabled( not MGSelection )
-	end
+    if LocalPlayer():GetNWString("item", "none") ~= "none" or LocalPlayer():GetNWString("item2", "none") ~= "none" then
+        BlockConfirm()
+    else
+        itemSelectFrame.Confirm:SetText("CONFIRM")
+        function itemSelectFrame.Confirm.Paint(_, w, h)
+            if itemSelectFrame.Confirm:IsHovered() then
+                surface.SetDrawColor(0, 0, 128)
+            else
+                surface.SetDrawColor(64, 64, 64)
+            end
+            surface.DrawRect(0, 0, w, h)
+        end
+        function itemSelectFrame.Confirm.DoClick()
+            ItemChosen(selectedItem)
+            itemSelectFrame:Remove()
+        end
+        itemSelectFrame.Confirm:SetEnabled(not MGSelection)
+    end
 end
 
 local function SetMG()
-	itemSelectFrame.MapGuaranteeSelect:SetText("MAP GUARANTEE")
-	function itemSelectFrame.MapGuaranteeSelect.Paint(_, w, h)
-		if itemSelectFrame.MapGuaranteeSelect:IsHovered() then
-			surface.SetDrawColor(0, 0, 128)
-		else
-			surface.SetDrawColor(64, 64, 64)
-		end
-		surface.DrawRect(0, 0, w, h)
-	end
-	function itemSelectFrame.MapGuaranteeSelect.DoClick()
-		HideItemSelection()
-		MGSelection = not MGSelection
-		ReDrawItemSelecton()
-	end
-	itemSelectFrame.MapGuaranteeSelect:SetEnabled(true)
+    itemSelectFrame.MapGuaranteeSelect:SetText("MAP GUARANTEE")
+    function itemSelectFrame.MapGuaranteeSelect.Paint(_, w, h)
+        if itemSelectFrame.MapGuaranteeSelect:IsHovered() then
+            surface.SetDrawColor(0, 0, 128)
+        else
+            surface.SetDrawColor(64, 64, 64)
+        end
+        surface.DrawRect(0, 0, w, h)
+    end
+    function itemSelectFrame.MapGuaranteeSelect.DoClick()
+        itemSelectFrame:Remove()
+        MGSelection = not MGSelection
+        ReDrawItemSelecton()
+    end
+    itemSelectFrame.MapGuaranteeSelect:SetEnabled(true)
 end
 
 local function setItemLabel()
-	itemSelectFrame.ItemLabel:SetText(string.upper(SlashCoItems[selectedItem].Name))
-	if (SlashCoItems[selectedItem].MaxAllowed) then
-		local numRemain = SlashCoItems[selectedItem].MaxAllowed()
-		local slot = SlashCoItems[selectedItem].IsSecondary and "item2" or "item"
-		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if v:GetNWString(slot, "none") == selectedItem then
-				numRemain = numRemain - 1
-			end
-		end
-		itemSelectFrame.ItemValues:SetText("["..SlashCoItems[selectedItem].Price.." POINTS] ["..numRemain.." REMAINING]")
-		if numRemain <= 0 then
-			BlockConfirm()
-		else
-			SetConfirm()
-		end
-	else
-		itemSelectFrame.ItemValues:SetText("["..SlashCoItems[selectedItem].Price.." POINTS]")
-		SetConfirm()
-	end
+    itemSelectFrame.ItemLabel:SetText(string.upper(SlashCoItems[selectedItem].Name))
+    if (SlashCoItems[selectedItem].MaxAllowed) then
+        local numRemain = SlashCoItems[selectedItem].MaxAllowed()
+        local slot = SlashCoItems[selectedItem].IsSecondary and "item2" or "item"
+        for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+            if v:GetNWString(slot, "none") == selectedItem then
+                numRemain = numRemain - 1
+            end
+        end
+        itemSelectFrame.ItemValues:SetText("[" .. SlashCoItems[selectedItem].Price .. " POINTS] [" .. numRemain .. " REMAINING]")
+        if numRemain <= 0 then
+            BlockConfirm()
+        else
+            SetConfirm()
+        end
+    else
+        itemSelectFrame.ItemValues:SetText("[" .. SlashCoItems[selectedItem].Price .. " POINTS]")
+        SetConfirm()
+    end
 end
 
 local function SelectThisItem(itemID)
-	itemSelectFrame.Left.Items[selectedItem]:SetEnabled(true)
+    itemSelectFrame.Left.Items[selectedItem]:SetEnabled(true)
 
-	selectedItem = itemID
-	itemSelectFrame.ItemModel:SetModel(SlashCoItems[selectedItem].Model)
-	itemSelectFrame.ItemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
-	itemSelectFrame.ItemDescription:SetText(SlashCoItems[selectedItem].Description)
-	setItemLabel()
+    selectedItem = itemID
+    itemSelectFrame.ItemModel:SetModel(SlashCoItems[selectedItem].Model)
+    itemSelectFrame.ItemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
+    itemSelectFrame.ItemDescription:SetText(SlashCoItems[selectedItem].Description)
+    setItemLabel()
 
-	itemSelectFrame.Left.Items[selectedItem]:SetEnabled(false)
+    itemSelectFrame.Left.Items[selectedItem]:SetEnabled(false)
 end
 
 local function DrawItemSelectorBox()
-	if IsValid(itemSelectFrame) then return end
+    if IsValid(itemSelectFrame) then
+        return
+    end
 
-	-- Slasher selectionBox
-	itemSelectFrame = vgui.Create("DFrame")
-	itemSelectFrame:SetTitle("[PICK YOUR ITEM...]")
+    -- Slasher selectionBox
+    itemSelectFrame = vgui.Create("DFrame")
+    itemSelectFrame:SetTitle("[PICK YOUR ITEM...]")
 
-	selectedItem = selectedItem or "Baby"
+    selectedItem = selectedItem or "Baby"
 
-	local confirmSelect = vgui.Create("DButton", itemSelectFrame)
-	itemSelectFrame.Confirm = confirmSelect
-	confirmSelect:SetSize(160, 30)
-	confirmSelect:SetFont("TVCD")
-	confirmSelect:SetTextColor(color_white)
+    local confirmSelect = vgui.Create("DButton", itemSelectFrame)
+    itemSelectFrame.Confirm = confirmSelect
+    confirmSelect:SetSize(160, 30)
+    confirmSelect:SetFont("TVCD")
+    confirmSelect:SetTextColor(color_white)
 
-	local MapGuaranteeSelect = vgui.Create("DButton", itemSelectFrame)
-	itemSelectFrame.MapGuaranteeSelect = MapGuaranteeSelect
-	MapGuaranteeSelect:SetSize(300, 30)
-	MapGuaranteeSelect:SetFont("TVCD")
-	MapGuaranteeSelect:SetTextColor(color_white)
+    local MapGuaranteeSelect = vgui.Create("DButton", itemSelectFrame)
+    itemSelectFrame.MapGuaranteeSelect = MapGuaranteeSelect
+    MapGuaranteeSelect:SetSize(300, 30)
+    MapGuaranteeSelect:SetFont("TVCD")
+    MapGuaranteeSelect:SetTextColor(color_white)
 
-	local leftSide = vgui.Create("DScrollPanel", itemSelectFrame)
-	itemSelectFrame.Left = leftSide
-	leftSide:Dock(LEFT)
-	leftSide:GetCanvas():DockPadding(0, -5, 0, 0)
-	leftSide:DockMargin(0, 0, 5, 0)
+    local leftSide = vgui.Create("DScrollPanel", itemSelectFrame)
+    itemSelectFrame.Left = leftSide
+    leftSide:Dock(LEFT)
+    leftSide:GetCanvas():DockPadding(0, -5, 0, 0)
+    leftSide:DockMargin(0, 0, 5, 0)
 
-	leftSide.Items = {}
-	local width = 0
-	for k, p in SortedPairs(SlashCoItems) do
+    leftSide.Items = {}
+    local width = 0
+    for k, p in SortedPairs(SlashCoItems) do
 
-		if MGSelection then break end
+        if MGSelection then
+            break
+        end
 
-		if not p.Price then continue end
-		local item = vgui.Create("DButton", leftSide)
-		function item.DoClick()
-			SelectThisItem(k)
-		end
-		item:Dock(TOP)
-		item:SetHeight(30)
-		item:DockMargin(0, 5, 0, 0)
-		item:SetText(string.upper(p.Name))
-		item:SetFont("TVCD_small")
-		item:SetTextColor(color_white)
-		local wi = item:GetTextSize()
-		if wi > width then
-			width = wi
-		end
+        if not p.Price then
+            continue
+        end
+        local item = vgui.Create("DButton", leftSide)
+        function item.DoClick()
+            SelectThisItem(k)
+        end
+        item:Dock(TOP)
+        item:SetHeight(30)
+        item:DockMargin(0, 5, 0, 0)
+        item:SetText(string.upper(p.Name))
+        item:SetFont("TVCD_small")
+        item:SetTextColor(color_white)
+        local wi = item:GetTextSize()
+        if wi > width then
+            width = wi
+        end
 
-		if selectedItem == k then
-			item:SetEnabled(false)
-		end
+        if selectedItem == k then
+            item:SetEnabled(false)
+        end
 
-		function item.Paint(_, w, h)
-			if not item:IsEnabled() then
-				surface.SetDrawColor(128, 0, 0)
-			else
-				if item:IsHovered() then
-					surface.SetDrawColor(0, 0, 128)
-				else
-					surface.SetDrawColor(64, 64, 64)
-				end
-			end
-			surface.DrawRect(0, 0, w, h)
-		end
+        function item.Paint(_, w, h)
+            if not item:IsEnabled() then
+                surface.SetDrawColor(128, 0, 0)
+            else
+                if item:IsHovered() then
+                    surface.SetDrawColor(0, 0, 128)
+                else
+                    surface.SetDrawColor(64, 64, 64)
+                end
+            end
+            surface.DrawRect(0, 0, w, h)
+        end
 
-		leftSide.Items[k] = item
-	end
-	leftSide:SetWidth(math.min(width+10, 250))
+        leftSide.Items[k] = item
+    end
+    leftSide:SetWidth(math.min(width + 10, 250))
 
-	for k, p in SortedPairs(SCInfo.Maps) do
+    for k, p in SortedPairs(SCInfo.Maps) do
 
-		if not MGSelection then break end
-		if k == 0 then continue end
+        if not MGSelection then
+            break
+        end
+        if k == 0 then
+            continue
+        end
 
-		local item = vgui.Create("DButton", itemSelectFrame)
-		function item.DoClick()
-			HideItemSelection()
-			mapForce(k)
-		end
-		item:SetSize(300, 30)
-		item:SetPos(itemSelectFrame:GetWide() * 3, 180 + (k * 50))
-		item:SetText(string.upper(p.NAME))
-		item:SetFont("TVCD_small")
-		item:SetTextColor(color_white)
-		local wi = item:GetTextSize()
-		if wi > width then
-			width = wi
-		end
+        local item = vgui.Create("DButton", itemSelectFrame)
+        function item.DoClick()
+            itemSelectFrame:Remove()
+            mapForce(k)
+        end
+        item:SetSize(300, 30)
+        item:SetPos(itemSelectFrame:GetWide() * 3, 180 + (k * 50))
+        item:SetText(string.upper(p.NAME))
+        item:SetFont("TVCD_small")
+        item:SetTextColor(color_white)
+        local wi = item:GetTextSize()
+        if wi > width then
+            width = wi
+        end
 
-		function item.Paint(_, w, h)
-			if not item:IsEnabled() then
-				surface.SetDrawColor(128, 0, 0)
-			else
-				if item:IsHovered() then
-					surface.SetDrawColor(0, 0, 128)
-				else
-					surface.SetDrawColor(64, 64, 64)
-				end
-			end
-			surface.DrawRect(0, 0, w, h)
-		end
+        function item.Paint(_, w, h)
+            if not item:IsEnabled() then
+                surface.SetDrawColor(128, 0, 0)
+            else
+                if item:IsHovered() then
+                    surface.SetDrawColor(0, 0, 128)
+                else
+                    surface.SetDrawColor(64, 64, 64)
+                end
+            end
+            surface.DrawRect(0, 0, w, h)
+        end
 
-	end
+    end
 
-	if not MGSelection then 
+    if not MGSelection then
 
-		-- Model panel
-		local modelHolder = vgui.Create("Panel", itemSelectFrame)
-		itemSelectFrame.ModelHolder = modelHolder
-		modelHolder:Dock(TOP)
-		modelHolder:SetHeight(200)
-		function modelHolder.Paint(_, w, h)
-			surface.SetDrawColor(0, 0, 128)
-			surface.DrawRect(0, 0, w, h)
-		end
+        -- Model panel
+        local modelHolder = vgui.Create("Panel", itemSelectFrame)
+        itemSelectFrame.ModelHolder = modelHolder
+        modelHolder:Dock(TOP)
+        modelHolder:SetHeight(200)
+        function modelHolder.Paint(_, w, h)
+            surface.SetDrawColor(0, 0, 128)
+            surface.DrawRect(0, 0, w, h)
+        end
 
-		local itemModel = vgui.Create("DModelPanel", modelHolder)
-		itemSelectFrame.ItemModel = itemModel
-		itemModel:SetLookAt(vector_origin)
-		itemModel:SetFOV(40)
-		itemModel:SetModel(SlashCoItems[selectedItem].Model)
-		itemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
+        local itemModel = vgui.Create("DModelPanel", modelHolder)
+        itemSelectFrame.ItemModel = itemModel
+        itemModel:SetLookAt(vector_origin)
+        itemModel:SetFOV(40)
+        itemModel:SetModel(SlashCoItems[selectedItem].Model)
+        itemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
 
-		function modelHolder.PerformLayout()
-			itemModel:SetSize(modelHolder:GetTall()*2, modelHolder:GetTall())
-			itemModel:Center()
-		end
+        function modelHolder.PerformLayout()
+            itemModel:SetSize(modelHolder:GetTall() * 2, modelHolder:GetTall())
+            itemModel:Center()
+        end
 
-		local itemLabel = vgui.Create("DLabel", itemSelectFrame)
-		itemSelectFrame.ItemLabel = itemLabel
-		itemLabel:Dock(TOP)
-		itemLabel:DockMargin(0, 5, 0, 0)
-		itemLabel:SetContentAlignment(8)
-		itemLabel:SetFont("TVCD")
-		itemLabel:SetHeight(22)
+        local itemLabel = vgui.Create("DLabel", itemSelectFrame)
+        itemSelectFrame.ItemLabel = itemLabel
+        itemLabel:Dock(TOP)
+        itemLabel:DockMargin(0, 5, 0, 0)
+        itemLabel:SetContentAlignment(8)
+        itemLabel:SetFont("TVCD")
+        itemLabel:SetHeight(22)
 
-		local values = vgui.Create("DLabel", itemSelectFrame)
-		itemSelectFrame.ItemValues = values
-		values:Dock(TOP)
-		values:DockMargin(0, 0, 0, 5)
-		values:SetContentAlignment(8)
-		values:SetHeight(22)
-		values:SetFont("TVCD")
+        local values = vgui.Create("DLabel", itemSelectFrame)
+        itemSelectFrame.ItemValues = values
+        values:Dock(TOP)
+        values:DockMargin(0, 0, 0, 5)
+        values:SetContentAlignment(8)
+        values:SetHeight(22)
+        values:SetFont("TVCD")
 
-		setItemLabel()
+        setItemLabel()
 
-		local itemDesc = vgui.Create("DLabel", itemSelectFrame)
-		itemSelectFrame.ItemDescription = itemDesc
-		itemDesc:Dock(FILL)
-		itemDesc:SetText(SlashCoItems[selectedItem].Description)
-		itemDesc:SetFont("TVCD_small")
-		itemDesc:SetWrap(true)
-		itemDesc:SetContentAlignment(7)
+        local itemDesc = vgui.Create("DLabel", itemSelectFrame)
+        itemSelectFrame.ItemDescription = itemDesc
+        itemDesc:Dock(FILL)
+        itemDesc:SetText(SlashCoItems[selectedItem].Description)
+        itemDesc:SetFont("TVCD_small")
+        itemDesc:SetWrap(true)
+        itemDesc:SetContentAlignment(7)
 
-	else
+    else
 
-		local mapLabel = vgui.Create("DLabel", itemSelectFrame)
-		mapLabel:SetFont("TVCD")
-		mapLabel:SetSize(1200, 300)
-		mapLabel:SetPos(0, 0)
-		mapLabel:SetText([[Guarantee the map for this assignment. 
+        local mapLabel = vgui.Create("DLabel", itemSelectFrame)
+        mapLabel:SetFont("TVCD")
+        mapLabel:SetSize(1200, 300)
+        mapLabel:SetPos(0, 0)
+        mapLabel:SetText([[Guarantee the map for this assignment.
 
 		[50 POINTS] [+50]
 		[PRICE INCREASES WITH CONSECUTIVE PURCHASE] ]])
 
-	end
+    end
 
-	itemSelectFrame.btnMaxim:Hide()
-	itemSelectFrame.btnMinim:Hide()
-	itemSelectFrame.lblTitle:SetFont("TVCD")
-	itemSelectFrame.lblTitle:SetTextColor(color_white)
-	function itemSelectFrame.Paint(_, w, h)
-		surface.SetDrawColor(0, 0, 0)
-		surface.DrawRect(0, 0, w, h)
-	end
-	function itemSelectFrame.btnClose.Paint()
-		if itemSelectFrame.btnClose:IsHovered() then
-			surface.SetTextColor(255, 0, 0)
-		else
-			surface.SetTextColor(255, 255, 255)
-		end
-		surface.SetFont("TVCD")
-		surface.SetTextPos(0, 0)
-		surface.DrawText("[X]")
-	end
+    itemSelectFrame.btnMaxim:Hide()
+    itemSelectFrame.btnMinim:Hide()
+    itemSelectFrame.lblTitle:SetFont("TVCD")
+    itemSelectFrame.lblTitle:SetTextColor(color_white)
+    function itemSelectFrame.Paint(_, w, h)
+        surface.SetDrawColor(0, 0, 0)
+        surface.DrawRect(0, 0, w, h)
+    end
+    function itemSelectFrame.btnClose.Paint()
+        if itemSelectFrame.btnClose:IsHovered() then
+            surface.SetTextColor(255, 0, 0)
+        else
+            surface.SetTextColor(255, 255, 255)
+        end
+        surface.SetFont("TVCD")
+        surface.SetTextPos(0, 0)
+        surface.DrawText("[X]")
+    end
 
-	function itemSelectFrame:PerformLayout()
-		self.btnClose:SetSize(48, 24)
-		self.btnClose:SetPos(self:GetWide() - 48 - 4, 1)
+    function itemSelectFrame:PerformLayout()
+        self.btnClose:SetSize(48, 24)
+        self.btnClose:SetPos(self:GetWide() - 48 - 4, 1)
 
-		self.lblTitle:SetPos(0, 2)
-		self.lblTitle:SetSize(self:GetWide() - 25, 20)
+        self.lblTitle:SetPos(0, 2)
+        self.lblTitle:SetSize(self:GetWide() - 25, 20)
 
-		confirmSelect:SetPos(itemSelectFrame:GetWide()-160-5, itemSelectFrame:GetTall()-30-5)
-		MapGuaranteeSelect:SetPos(itemSelectFrame:GetWide()-550-5, itemSelectFrame:GetTall()-30-5)
-		SetMG()
-	end
+        confirmSelect:SetPos(itemSelectFrame:GetWide() - 160 - 5, itemSelectFrame:GetTall() - 30 - 5)
+        MapGuaranteeSelect:SetPos(itemSelectFrame:GetWide() - 550 - 5, itemSelectFrame:GetTall() - 30 - 5)
+        SetMG()
+    end
 
-	itemSelectFrame:SetSize(800, 500)
-	itemSelectFrame:Center()
-	itemSelectFrame:MakePopup()
-	itemSelectFrame:SetSizable(true)
-	itemSelectFrame:SetKeyboardInputEnabled(false)
+    itemSelectFrame:SetSize(800, 500)
+    itemSelectFrame:Center()
+    itemSelectFrame:MakePopup()
+    itemSelectFrame:SetSizable(true)
+    itemSelectFrame:SetKeyboardInputEnabled(false)
 end
 
-net.Receive("mantislashcoStartItemPicking", function()
-	DrawItemSelectorBox()
+hook.Add("slashCoValue", "slashCo_ItemPicker", function(str)
+    if str == "openItemPicker" then
+        DrawItemSelectorBox()
+    end
 end)
 
 function ReDrawItemSelecton()
-	DrawItemSelectorBox()
+    DrawItemSelectorBox()
 end

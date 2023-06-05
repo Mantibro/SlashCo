@@ -1,134 +1,172 @@
-include( "ui/fonts.lua" )
+local offerBox, selectedOffer
 
-function SelectThisOffering(offerID)
-
-	if LocalPlayer():SteamID64() ~= readtable_offering.ply then return end
-
-	if ( IsValid(OfferSelectFrame) ) then
-		OfferSelectFrame:Remove()
-		OfferSelectFrame = nil
-	end
-
-	SelectedOffering = offerID
-
-	DrawTheOfferSelectorBox()
-
+local function OfferChosen()
+    SlashCo.SendValue("sendOffer", selectedOffer)
 end
 
-net.Receive("mantislashcoStartOfferingPicking", function()
+local function SetOfferLabel()
+    offerBox.OfferLabel:SetText(string.upper(SCInfo.Offering[selectedOffer].Name .. " Offering"))
+    offerBox.OfferModel:SetModel("models/slashco/other/offerings/o_" .. selectedOffer .. ".mdl")
+    offerBox.OfferDesc:SetText(SCInfo.Offering[selectedOffer].Description)
+end
 
-	readtable_offering = net.ReadTable()
+local function SelectThisOffering(offerID)
+    offerBox.Left.Offers[selectedOffer]:SetEnabled(true)
+    selectedOffer = offerID
+    SetOfferLabel()
+    offerBox.Left.Offers[selectedOffer]:SetEnabled(false)
+end
 
-	if LocalPlayer():SteamID64() ~= readtable_offering.ply then return end
+local function DrawOfferSelectorBox()
+    if IsValid(offerBox) then
+        return
+    end
 
-	DrawTheOfferSelectorBox()
+    selectedOffer = selectedOffer or 1
 
+    offerBox = vgui.Create("DFrame")
+    offerBox:SetTitle("[MAKE AN OFFERING...]")
+    offerBox:SetSize(800, 500)
+    offerBox:Center()
+    offerBox:MakePopup()
+    offerBox:SetSizable(true)
+    offerBox:SetKeyboardInputEnabled(false)
+    offerBox.btnMaxim:Hide()
+    offerBox.btnMinim:Hide()
+    offerBox.lblTitle:SetFont("TVCD")
+    offerBox.lblTitle:SetTextColor(color_white)
+
+    local confirmSelect = vgui.Create("DButton", offerBox)
+    offerBox.Confirm = confirmSelect
+    confirmSelect:SetSize(160, 30)
+    confirmSelect:SetFont("TVCD")
+    confirmSelect:SetTextColor(color_white)
+    confirmSelect:SetText("CONFIRM")
+    function confirmSelect.DoClick()
+        OfferChosen(selectedOffer)
+        offerBox:Remove()
+    end
+    function confirmSelect.Paint(_, w, h)
+        if confirmSelect:IsHovered() then
+            surface.SetDrawColor(0, 0, 128)
+        else
+            surface.SetDrawColor(64, 64, 64)
+        end
+        surface.DrawRect(0, 0, w, h)
+    end
+
+    local leftSide = vgui.Create("DScrollPanel", offerBox)
+    offerBox.Left = leftSide
+    leftSide:Dock(LEFT)
+    leftSide:GetCanvas():DockPadding(0, -5, 0, 0)
+    leftSide:DockMargin(0, 0, 5, 0)
+
+    leftSide.Offers = {}
+    local width = 0
+    for k, p in SortedPairs(SCInfo.Offering) do
+        local offer = vgui.Create("DButton", leftSide)
+        function offer.DoClick()
+            SelectThisOffering(k)
+        end
+        offer:Dock(TOP)
+        offer:SetHeight(30)
+        offer:DockMargin(0, 5, 0, 0)
+        offer:SetText(string.upper(p.Name))
+        offer:SetFont("TVCD_small")
+        offer:SetTextColor(color_white)
+        local wi = offer:GetTextSize()
+        if wi > width then
+            width = wi
+        end
+
+        if selectedOffer == k then
+            offer:SetEnabled(false)
+        end
+
+        function offer.Paint(_, w, h)
+            if not offer:IsEnabled() then
+                surface.SetDrawColor(128, 0, 0)
+            else
+                if offer:IsHovered() then
+                    surface.SetDrawColor(0, 0, 128)
+                else
+                    surface.SetDrawColor(64, 64, 64)
+                end
+            end
+            surface.DrawRect(0, 0, w, h)
+        end
+
+        leftSide.Offers[k] = offer
+    end
+    leftSide:SetWidth(math.min(width + 10, 250))
+
+    -- Model panel
+    local modelHolder = vgui.Create("Panel", offerBox)
+    offerBox.ModelHolder = modelHolder
+    modelHolder:Dock(TOP)
+    modelHolder:SetHeight(200)
+    function modelHolder.Paint(_, w, h)
+        surface.SetDrawColor(0, 0, 128)
+        surface.DrawRect(0, 0, w, h)
+    end
+
+    local offerModel = vgui.Create("DModelPanel", modelHolder)
+    offerBox.OfferModel = offerModel
+    offerModel:SetPos(200, 30)
+    offerModel:SetSize(350, 200)
+    offerModel:SetLookAt(Vector(0, 0, 10))
+    offerModel:SetFOV(40)
+    offerModel:SetCamPos(Vector(60, 0, 0))
+
+    function modelHolder.PerformLayout()
+        offerModel:SetSize(modelHolder:GetTall() * 2, modelHolder:GetTall())
+        offerModel:Center()
+    end
+
+    local offerLabel = vgui.Create("DLabel", offerBox)
+    offerBox.OfferLabel = offerLabel
+    offerLabel:Dock(TOP)
+    offerLabel:DockMargin(0, 5, 0, 5)
+    offerLabel:SetContentAlignment(8)
+    offerLabel:SetFont("TVCD")
+    offerLabel:SetHeight(22)
+
+    local offerDesc = vgui.Create("DLabel", offerBox)
+    offerBox.OfferDesc = offerDesc
+    offerDesc:Dock(FILL)
+    offerDesc:SetFont("TVCD_small")
+    offerDesc:SetWrap(true)
+    offerDesc:SetContentAlignment(7)
+
+    SetOfferLabel()
+
+    function offerBox.Paint(_, w, h)
+        surface.SetDrawColor(0, 0, 0)
+        surface.DrawRect(0, 0, w, h)
+    end
+    function offerBox.btnClose.Paint()
+        if offerBox.btnClose:IsHovered() then
+            surface.SetTextColor(255, 0, 0)
+        else
+            surface.SetTextColor(255, 255, 255)
+        end
+        surface.SetFont("TVCD")
+        surface.SetTextPos(0, 0)
+        surface.DrawText("[X]")
+    end
+    function offerBox:PerformLayout()
+        self.btnClose:SetSize(48, 24)
+        self.btnClose:SetPos(self:GetWide() - 48 - 4, 1)
+
+        self.lblTitle:SetPos(0, 2)
+        self.lblTitle:SetSize(self:GetWide() - 25, 20)
+
+        confirmSelect:SetPos(offerBox:GetWide() - 160 - 5, offerBox:GetTall() - 30 - 5)
+    end
+end
+
+hook.Add("slashCoValue", "slashCo_OfferingPicker", function(str)
+    if str == "openOfferingPicker" then
+        DrawOfferSelectorBox()
+    end
 end)
-
-function DrawTheOfferSelectorBox()
-
-	if ( IsValid( OfferSelectFrame ) ) then return end
-
-	if LocalPlayer():SteamID64() ~= readtable_offering.ply then return end
-	
-	-- Slasher selectionBox
-	OfferSelectFrame = vgui.Create( "DFrame" )
-	OfferSelectFrame:SetTitle( "Make an Offering" )
-
-	if SelectedOffering == nil then SelectedOffering = 1 end
-
-	local y = 30
-	for i = 1, #SCInfo.Offering do
-	
-		local Item = vgui.Create( "DButton", OfferSelectFrame )
-		function Item.DoClick() SelectThisOffering(i) end
-		Item:SetPos( 10, y )
-		Item:SetSize( 200, 30 )
-		Item:SetText( SCInfo.Offering[i].Name.." Offering" )
-		Item:SetFont( "MenuFont1" )
-
-		if SelectedOffering == i  then
-			Item:SetDisabled( true )
-		end
-			
-		y = y + 40
-		
-	end
-
-	local confirmselect = vgui.Create( "DButton", OfferSelectFrame )
-	function confirmselect.DoClick() OfferingChosen(SelectedOffering) HideOfferingSelection() end
-	confirmselect:SetPos( 440, y + 150 )
-	confirmselect:SetSize( 150, 40 )
-	confirmselect:SetText( "Confirm" )
-	confirmselect:SetFont( "MenuFont1" )
-
-	if SelectedOffering == 0  then
-		confirmselect:SetDisabled( true )
-	end
-
-
-	-- Model panel
-	local mdl = vgui.Create("DModelPanel", OfferSelectFrame)
-	mdl:SetPos(200, 30)
-	mdl:SetSize(350, 200)
-	mdl:SetLookAt(Vector(0, 0, 10))
-	mdl:SetFOV(40)
-
-	local ILabel = vgui.Create( "DLabel", OfferSelectFrame )
-	ILabel:SetPos( 230, 230 )
-	ILabel:SetSize(450, 100)
-	ILabel:SetText( " " )
-	ILabel:SetFont( "MenuFont2" )
-	ILabel:SetAutoStretchVertical( true )
-
-	local IDesc = vgui.Create( "DLabel", OfferSelectFrame )
-	IDesc:SetPos( 230, 260 )
-	IDesc:SetSize(450, 100)
-	IDesc:SetText(  " " )
-	IDesc:SetFont( "MenuFont1" )
-	IDesc:SetAutoStretchVertical( true )
-
-
-	mdl:SetModel("models/slashco/other/offerings/o_"..SelectedOffering..".mdl")
-	mdl:SetCamPos(Vector(60, 0, 0))
-
-	if SelectedOffering ~= nil and SelectedOffering > 0 then
-		ILabel:SetText( SCInfo.Offering[SelectedOffering].Name.." Offering" )
-		IDesc:SetText( SCInfo.Offering[SelectedOffering].Description )
-	end
-
-
-	OfferSelectFrame:SetSize( 600, y + 200 )
-	OfferSelectFrame:Center()
-	OfferSelectFrame:MakePopup()
-	OfferSelectFrame:SetKeyboardInputEnabled( false )
-
-end
-
-function HideOfferingSelection()
-
-	if ( IsValid(OfferSelectFrame) ) then
-		OfferSelectFrame:Remove()
-		OfferSelectFrame = nil
-		SelectedOffering = 1
-	end
-
-end
-
-function OfferingChosen(offerID)
-
-	if offerID == 4 and #team.GetPlayers(TEAM_SPECTATOR) < 1 then
-
-		LocalPlayer():ChatPrint("This Offering is currently unavailable.")
-
-		return
-	end
-
-	net.Start("mantislashcoBeginOfferingVote")
-	net.WriteTable({ply = LocalPlayer():SteamID64(), id = offerID})
-	net.SendToServer()
-
-	DrawTheOfferSelectorBox()
-
-end
-

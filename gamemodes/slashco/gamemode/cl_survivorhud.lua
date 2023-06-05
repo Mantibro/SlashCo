@@ -1,7 +1,3 @@
---include( "globals.lua" )
-include("ui/fonts.lua")
---include( "ui/data_info.lua" )
-
 CreateClientConVar("slashcohud_show_lowhealth", 1, true, false, "Whether to display the survivor's hud as blinking yellow when at low health.", 0, 1)
 CreateClientConVar("slashcohud_show_healthvalue", 0, true, false, "Whether to display the value of the survivor's health on their hud.", 0, 1)
 
@@ -82,7 +78,6 @@ net.Receive("mantislashcoSurvivorPings", function()
 end)
 
 hook.Add("HUDPaint", "SurvivorHUD", function()
-
     local ply = LocalPlayer()
 
     if ply:Team() ~= TEAM_SURVIVOR then
@@ -297,7 +292,6 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
     for s = 1, #team.GetPlayers(TEAM_SLASHER) do
         local slasher = team.GetPlayers(TEAM_SLASHER)[s]
         if slasher:GetNWBool("TrollgeStage2") then
-
             local tlight = DynamicLight(slasher:EntIndex() + 1)
             if (tlight) then
                 tlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
@@ -309,11 +303,9 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
                 tlight.Size = 2500
                 tlight.DieTime = CurTime() + 1
             end
-
         end
 
         if slasher:GetNWBool("TylerFlash") then
-
             local dlight = DynamicLight(slasher:EntIndex())
             if (dlight) then
                 dlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
@@ -325,7 +317,6 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
                 dlight.Size = 300
                 dlight.DieTime = CurTime() + 1
             end
-
         end
 
         if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage") then
@@ -343,7 +334,5 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
             dlight.Size = 250
             dlight.DieTime = CurTime() + 1
         end
-
     end
-
 end)
