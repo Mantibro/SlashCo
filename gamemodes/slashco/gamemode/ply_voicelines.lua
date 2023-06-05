@@ -182,7 +182,7 @@ SlashCo.LobbyConvos = {
         Length1 = 5,
         Length2 = 5,
         Length3 = 2
-    }
+    },
 
     {
         Length1 = 5,
@@ -218,7 +218,7 @@ SlashCo.LobbyConvos = {
         Length1 = 5,
         Length2 = 5,
         Length3 = 4
-    },
+    }
 
 }
 
