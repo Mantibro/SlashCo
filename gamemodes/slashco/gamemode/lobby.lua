@@ -531,6 +531,7 @@ local function lobbyRoundSetup()
         end
 
         --Assign the map randomly
+        ::Map_reroll::
         SlashCo.LobbyData.SelectedMap = GetRandomMap( #SlashCo.LobbyData.AssignedSurvivors )
 
 

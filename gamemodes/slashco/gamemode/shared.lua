@@ -9,8 +9,6 @@ GM.States = {
 }
 GM.State = GM.State or GM.States.LOBBY
 
-SlashCo.MinimumMapPlayers = 6
-
 include("player_class/player_survivor.lua")
 include("player_class/player_slasher_base.lua")
 include("player_class/player_lobby.lua")
@@ -187,6 +185,8 @@ local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
 
 local game_playable = false
 
+if SERVER then SlashCo.MinimumMapPlayers = 6 end
+
 for _, v in ipairs(map_configs) do
     if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
         
@@ -199,7 +199,9 @@ for _, v in ipairs(map_configs) do
         SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
         SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
 
-        SlashCo.MinimumMapPlayers = math.min( SCInfo.Maps[mapid].MIN_PLAYERS, SlashCo.MinimumMapPlayers )
+        if SERVER then 
+            SlashCo.MinimumMapPlayers = math.min( SCInfo.Maps[mapid].MIN_PLAYERS, SlashCo.MinimumMapPlayers )
+        end
 
         SCInfo.Maps[mapid].LEVELS = {}
 
@@ -211,6 +213,7 @@ for _, v in ipairs(map_configs) do
 
     end
 end
+
 if SERVER then
 
     if game_playable ~= true then
