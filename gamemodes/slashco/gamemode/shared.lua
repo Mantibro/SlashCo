@@ -223,10 +223,7 @@ if SERVER then
             for _, play in ipairs(player.GetAll()) do
                 play:ChatPrint([[[SlashCo] WARNING! There are no maps mounted! The Gamemode is not playable! 
                 
-                Download the Maps at the Gamemode's workshop page:
-                https://steamcommunity.com/sharedfiles/filedetails/?id=2844428843 
-                
-                Under the "Required Items" section.]])
+Download the Maps at the Gamemode's workshop page under the "Required Items" section.]])
             end
         
         end)
