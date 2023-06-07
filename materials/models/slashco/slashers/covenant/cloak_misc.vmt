@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\covenant\cloak_misc"
+	"$halflambert" 1
+	"$nocull" 1
+}

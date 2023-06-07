@@ -1,7 +1,7 @@
 local ITEM = SlashCoItems.Brick or {}
 SlashCoItems.Brick = ITEM
 
-ITEM.Model = "models/props_junk/CinderBlock01a.mdl"
+ITEM.Model = "models/props_junk/cinderblock01a.mdl"
 ITEM.Name = "Cinder Block"
 ITEM.EntClass = "sc_brick"
 ITEM.Price = 5

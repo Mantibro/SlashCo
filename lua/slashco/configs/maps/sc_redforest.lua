@@ -1,4 +1,18 @@
 {
+	"Manifest": {
+		"Name": "Red Forest",
+		"Autor": "NuclearGhost",
+		"Default": true,
+		"Size": 4,
+		"MinimumPlayers": 3,
+		"Levels": {
+			"1": 250,
+            "2": 350,
+            "3": -630,
+            "4": -650
+		}
+	},
+
 	"Spawnpoints": {
 		"Slasher": {
 			"1": {

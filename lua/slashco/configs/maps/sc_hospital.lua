@@ -1,4 +1,17 @@
 {
+	"Manifest": {
+		"Name": "Hospital",
+		"Author": "sparkz",
+		"Default": true,
+		"Size": 4,
+		"MinimumPlayers": 5,
+		"Levels": {
+			"1": -1750,
+            "2": -2100,
+            "3": 50
+		}
+	},
+
 	"Spawnpoints": {
 		"Slasher": {
 			"1": {

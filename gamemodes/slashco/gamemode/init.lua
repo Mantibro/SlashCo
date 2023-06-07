@@ -838,6 +838,7 @@ function GM:PlayerDeath(victim, _, _)
         local ragdoll = ents.Create("prop_ragdoll")
         ragdoll:SetModel(victim:GetModel())
         ragdoll.PingType = "DEAD BODY"
+        ragdoll.SurvivorSteamID = victim:SteamID64()
 
         victim.DeadBody = ragdoll
 

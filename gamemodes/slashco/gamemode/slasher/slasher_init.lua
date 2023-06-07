@@ -1,43 +1,19 @@
 AddCSLuaFile()
-AddCSLuaFile("bababooey.lua")
-AddCSLuaFile("sid.lua")
-AddCSLuaFile("trollge.lua")
-AddCSLuaFile("amogus.lua")
-AddCSLuaFile("thirsty.lua")
-AddCSLuaFile("male07.lua")
-AddCSLuaFile("tyler.lua")
-AddCSLuaFile("borgmire.lua")
-AddCSLuaFile("manspider.lua")
-AddCSLuaFile("watcher.lua")
-AddCSLuaFile("abomignat.lua")
-AddCSLuaFile("criminal.lua")
-AddCSLuaFile("freesmiley.lua")
-AddCSLuaFile("leuonard.lua")
-AddCSLuaFile("speedrunner.lua")
-AddCSLuaFile("dolphinman.lua")
-AddCSLuaFile("princess.lua")
 
 if not SlashCoSlasher then
     SlashCoSlasher = {}
 end
 
-include("bababooey.lua")
-include("sid.lua")
-include("trollge.lua")
-include("amogus.lua")
-include("thirsty.lua")
-include("male07.lua")
-include("tyler.lua")
-include("borgmire.lua")
-include("manspider.lua")
-include("watcher.lua")
-include("abomignat.lua")
-include("criminal.lua")
-include("freesmiley.lua")
-include("leuonard.lua")
-include("speedrunner.lua")
-include("dolphinman.lua")
-include("princess.lua")
+local slasher_files, _ = file.Find("slashco/gamemode/slasher/slashers/*", "LUA")
+
+for _, v in ipairs(slasher_files) do
+    if v ~= "template.lua" then
+        
+        AddCSLuaFile("slashers/"..v)
+        include("slashers/"..v)
+
+    end
+end
 
 local PLAYER = FindMetaTable("Player")
 

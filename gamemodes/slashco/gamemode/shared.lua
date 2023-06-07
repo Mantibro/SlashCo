@@ -1,5 +1,5 @@
 GM.Name = "SlashCo"
-GM.Author = "Octo, Manti"
+GM.Author = "Octo, Manti, Text"
 GM.Email = "N/A"
 GM.Website = "N/A"
 GM.TeamBased = true
@@ -62,7 +62,12 @@ DoorSlamWhitelist = {
 	"models/props_c17/door03_left.mdl",
 	"models/props_doors/doormain_rural01_small.mdl",
 	"models/props_doors/doormainmetal01.mdl",
-	"models/props_c17/door01_left.mdl"
+	"models/props_c17/door01_left.mdl",
+    "models/props_c17/door_fg.mdl",
+    "models/props_doors/doormain01.mdl",
+    "models/props_doors/doorglassmain01.mdl",
+    "models/props_doors/door_rotate_112.mdl",
+    "models/props_doors/doormainmetalwindow01.mdl"
 }
 
 function CheckDoorWL(ent)
@@ -165,10 +170,8 @@ A Generator requires up to 4 Fuel Cans and a Battery to be activated.
 Survivors can use a variety of Items to help them.]]
 
 SCInfo.Maps = {
-    [0] = {
-        ID = "sc_summercamp",
+    ["error"] = {
         NAME = "Missing map!",
-        AUTHOR = "Steinman",
         DEFAULT = true,
         SIZE = 1,
         MIN_PLAYERS = 1,
@@ -176,60 +179,55 @@ SCInfo.Maps = {
             500
         }
     },
-
-    {
-        ID = "sc_summercamp",
-        NAME = "Summer Camp",
-        AUTHOR = "Steinman",
-        DEFAULT = true,
-        SIZE = 1,
-        MIN_PLAYERS = 1,
-        LEVELS = {
-            500
-        }
-    },
-
-    {
-        ID = "sc_highschool",
-        NAME = "High School",
-        AUTHOR = "Steinman",
-        DEFAULT = true,
-        SIZE = 2,
-        MIN_PLAYERS = 2,
-        LEVELS = {
-            -160,
-            100,
-            600
-        }
-    },
-
-    {
-        ID = "sc_redforest",
-        NAME = "Red Forest",
-        AUTHOR = "NuclearGhost",
-        DEFAULT = true,
-        SIZE = 4,
-        MIN_PLAYERS = 3,
-        LEVELS = {
-            250,
-            350,
-            -630,
-            -650
-        }
-    },
-
-    {
-        ID = "sc_hospital",
-        NAME = "Hospital",
-        AUTHOR = "sparkz",
-        DEFAULT = true,
-        SIZE = 4,
-        MIN_PLAYERS = 5,
-        LEVELS = {
-            -1750,
-            -2100,
-            50
-        }
-    }
-
 }
+
+local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
+
+local game_playable = false
+
+if SERVER then SlashCo.MinimumMapPlayers = 6 end
+
+for _, v in ipairs(map_configs) do
+    if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
+        
+        local config_table = util.JSONToTable(file.Read("slashco/configs/maps/"..v, "LUA"))
+        local mapid = string.Replace( v, ".lua", "" )
+
+        SCInfo.Maps[mapid] = {}
+        SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
+        SCInfo.Maps[mapid].DEFAULT = config_table.Manifest.Default
+        SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
+        SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
+
+        if SERVER then 
+            SlashCo.MinimumMapPlayers = math.min( SCInfo.Maps[mapid].MIN_PLAYERS, SlashCo.MinimumMapPlayers )
+        end
+
+        SCInfo.Maps[mapid].LEVELS = {}
+
+        for ky, lvl in ipairs( config_table.Manifest.Levels ) do
+            SCInfo.Maps[mapid].LEVELS[ky] = lvl
+        end
+
+        game_playable = true
+
+    end
+end
+
+if SERVER then
+
+    if game_playable ~= true then
+
+        timer.Simple(30, function() 
+        
+            for _, play in ipairs(player.GetAll()) do
+                play:ChatPrint([[[SlashCo] WARNING! There are no maps mounted! The Gamemode is not playable! 
+                
+Download the Maps at the Gamemode's workshop page under the "Required Items" section.]])
+            end
+        
+        end)
+
+    end
+
+end

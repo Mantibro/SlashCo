@@ -1,4 +1,15 @@
 {
+	"Manifest": {
+		"Name": "Summer Camp",
+		"Author": "Steinman",
+		"Default": true,
+		"Size": 1,
+		"MinimumPlayers": 1,
+		"Levels": {
+			"1": 500
+		}
+	},
+
 	"Spawnpoints": {
 		"Slasher": {
 			"1": {

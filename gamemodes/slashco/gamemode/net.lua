@@ -135,7 +135,7 @@ SlashCo.StartGameIntro = function()
 
     net.Start("mantislashcoGameIntro")
     net.WriteTable({
-        map = SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME,
+        map = SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME,
         diff = SlashCo.LobbyData.SelectedDifficulty,
         offer = offering,
         s_name = SlashCo.LobbyData.SelectedSlasherInfo.NAME,

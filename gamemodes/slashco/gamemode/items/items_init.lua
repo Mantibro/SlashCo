@@ -171,7 +171,7 @@ if CLIENT then
     return
 end
 
-local spawnableItems = {}
+--[[local spawnableItems = {}
 for k, v in pairs(SlashCoItems) do
     if v.ReplacesWorldProps then
         spawnableItems[v.Model] = k
@@ -182,15 +182,15 @@ hook.Add("InitPostEntity", "SlashCo_ReplaceCinderBlocks", function()
     for _, v in ipairs(ents.FindByClass("prop_physics")) do
         local item = spawnableItems[v:GetModel()]
         if item then
-            local pos = v:GetPos()
-            local ang = v:GetAngles()
-            v:Remove()
-            local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, pos, ang)
+            local it_pos = v:GetPos()
+            local it_ang = v:GetAngles()
+            local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, it_pos, it_ang)
             SlashCo.CurRound.Items[droppedItem] = true
             Entity(droppedItem):SetCollisionGroup(COLLISION_GROUP_NONE)
+            v:Remove()
         end
     end
-end)
+end)]]
 
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems

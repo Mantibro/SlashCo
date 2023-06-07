@@ -156,7 +156,7 @@ local function lobbySaveCurData()
 
         print("DATA SAVED.")
 
-        SlashCo.ChangeMap(SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].ID)
+        SlashCo.ChangeMap(SlashCo.LobbyData.SelectedMap)
 
     end
 
@@ -505,15 +505,12 @@ local function lobbyRoundSetup()
         end
 
         --Assign the map randomly
-        :: Map_reroll ::
-        SlashCo.LobbyData.SelectedMapNum = math.random(1, #SCInfo.Maps)
+        ::Map_reroll::
+        SlashCo.LobbyData.SelectedMap = GetRandomMap( #SlashCo.LobbyData.AssignedSurvivors )
 
-        if #SlashCo.LobbyData.AssignedSurvivors < SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].MIN_PLAYERS then
-            goto Map_reroll
-        end
 
-        if GetConVar("slashco_map_default"):GetInt() < 1 then
-            if SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].DEFAULT == false then
+        if not GetConVar("slashco_map_default"):GetBool() then
+            if SCInfo.Maps[SlashCo.LobbyData.SelectedMap].DEFAULT == false then
                 goto Map_reroll
             end
         end
@@ -595,17 +592,17 @@ local function pickMap(ply, vals)
     local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
     if balance >= MapForceCost then
-        SlashCo.LobbyData.SelectedMapNum = vals[1]
+        SlashCo.LobbyData.SelectedMap = vals[1]
 
         for _, play in ipairs(player.GetAll()) do
-            play:ChatPrint("The map guarantee has been set to " .. SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME)
+            play:ChatPrint("The map guarantee has been set to " .. SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME)
         end
 
         SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -MapForceCost)
 
         MapForceCost = MapForceCost + 50
 
-        SlashCo.SendValue(nil, "mapGuar", SCInfo.Maps[SlashCo.LobbyData.SelectedMapNum].NAME, MapForceCost)
+        SlashCo.SendValue(nil, "mapGuar", SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME, MapForceCost)
     else
         ply:ChatPrint("You don't have enough points for a map guarantee.")
     end
