@@ -1,19 +1,4 @@
 AddCSLuaFile()
-AddCSLuaFile("baby.lua")
-AddCSLuaFile("beacon.lua")
-AddCSLuaFile("cookie.lua")
-AddCSLuaFile("deathward.lua")
-AddCSLuaFile("devildie.lua")
-AddCSLuaFile("gascan.lua")
-AddCSLuaFile("mayo.lua")
-AddCSLuaFile("milkjug.lua")
-AddCSLuaFile("soda.lua")
-AddCSLuaFile("stepdecoy.lua")
-AddCSLuaFile("deathward_used.lua")
-AddCSLuaFile("battery.lua")
-AddCSLuaFile("rock.lua")
-AddCSLuaFile("pocketsand.lua")
-AddCSLuaFile("brick.lua")
 AddCSLuaFile("effect/invisibility.lua")
 AddCSLuaFile("effect/fuelspeed.lua")
 AddCSLuaFile("effect/slowness.lua")
@@ -24,26 +9,20 @@ AddCSLuaFile("items_meta.lua")
 SlashCoItems = SlashCoItems or {}
 SlashCoEffects = SlashCoEffects or {}
 
-include("baby.lua")
-include("beacon.lua")
-include("cookie.lua")
-include("deathward.lua")
-include("devildie.lua")
-include("gascan.lua")
-include("mayo.lua")
-include("milkjug.lua")
-include("soda.lua")
-include("stepdecoy.lua")
-include("deathward_used.lua")
-include("battery.lua")
-include("rock.lua")
-include("pocketsand.lua")
-include("brick.lua")
 include("effect/invisibility.lua")
 include("effect/fuelspeed.lua")
 include("effect/slowness.lua")
 include("effect/speed.lua")
 include("items_meta.lua")
+
+local item_files, _ = file.Find("slashco/gamemode/items/item/*", "LUA")
+
+for _, v in ipairs(item_files) do
+        
+    AddCSLuaFile("item/"..v)
+    include("item/"..v)
+
+end
 
 local PLAYER = FindMetaTable("Player")
 
