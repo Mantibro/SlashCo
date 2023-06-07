@@ -6,7 +6,7 @@ concommand.Add("slashco_run_curconfig", function(_, _, _)
     SlashCo.SpawnCurConfig()
 end, nil, "Start a normal round with current configs.", FCVAR_PROTECTED)
 
-concommand.Add("slachco_debug_itempicker", function(ply)
+concommand.Add("slashco_debug_itempicker", function(ply)
     if not IsValid(ply) then
         return
     end

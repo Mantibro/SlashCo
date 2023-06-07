@@ -505,9 +505,8 @@ local function lobbyRoundSetup()
         end
 
         --Assign the map randomly
-        ::Map_reroll::
-        SlashCo.LobbyData.SelectedMap = GetRandomMap( #SlashCo.LobbyData.AssignedSurvivors )
-
+        :: Map_reroll ::
+        SlashCo.LobbyData.SelectedMap = GetRandomMap(#SlashCo.LobbyData.AssignedSurvivors)
 
         if not GetConVar("slashco_map_default"):GetBool() then
             if SCInfo.Maps[SlashCo.LobbyData.SelectedMap].DEFAULT == false then
@@ -591,21 +590,27 @@ local MapForceCost = 50
 local function pickMap(ply, vals)
     local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
-    if balance >= MapForceCost then
-        SlashCo.LobbyData.SelectedMap = vals[1]
-
-        for _, play in ipairs(player.GetAll()) do
-            play:ChatPrint("The map guarantee has been set to " .. SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME)
-        end
-
-        SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -MapForceCost)
-
-        MapForceCost = MapForceCost + 50
-
-        SlashCo.SendValue(nil, "mapGuar", SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME, MapForceCost)
-    else
-        ply:ChatPrint("You don't have enough points for a map guarantee.")
+    if SlashCo.LobbyData.SelectedMap == vals[1] then
+        ply:ChatPrint("That map has already been selected.")
+        return
     end
+
+    if balance < MapForceCost then
+        ply:ChatPrint("You don't have enough points for a map guarantee.")
+        return
+    end
+
+    for _, play in ipairs(player.GetAll()) do
+        play:ChatPrint(string.format("%s spent %s points to set the mission to be on %s.",
+                ply:Nick(),
+                MapForceCost,
+                SCInfo.Maps[vals[1]].NAME))
+    end
+
+    SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -MapForceCost)
+    SlashCo.LobbyData.SelectedMap = vals[1]
+    MapForceCost = MapForceCost + 50
+    SlashCo.SendValue(nil, "mapGuar", SlashCo.LobbyData.SelectedMap, MapForceCost)
 end
 
 hook.Add("slashCoValue", "slashCo_PickItem", function(ply, msg, vals)
