@@ -190,7 +190,7 @@ if SERVER then SCInfo.MinimumMapPlayers = 6 end
 for _, v in ipairs(map_configs) do
     if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
         
-        local config_table = util.JSONToTable(file.Read("SCInfo/configs/maps/"..v, "LUA"))
+        local config_table = util.JSONToTable(file.Read("slashco/configs/maps/"..v, "LUA"))
         local mapid = string.Replace( v, ".lua", "" )
 
         SCInfo.Maps[mapid] = {}

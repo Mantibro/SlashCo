@@ -178,6 +178,8 @@ local function DrawItemSelectorBox()
 	end
 	leftSide:SetWidth(math.min(width+10, 250))
 
+	local height = 1
+
 	for k, p in SortedPairs(SCInfo.Maps) do
 
 		if not MGSelection then break end
@@ -189,7 +191,7 @@ local function DrawItemSelectorBox()
 			mapForce(k)
 		end
 		item:SetSize(300, 30)
-		item:SetPos(itemSelectFrame:GetWide() * 3, 180 + (k * 50))
+		item:SetPos(itemSelectFrame:GetWide() * 3, 180 + (height * 50))
 		item:SetText(string.upper(p.NAME))
 		item:SetFont("TVCD_small")
 		item:SetTextColor(color_white)
@@ -210,6 +212,8 @@ local function DrawItemSelectorBox()
 			end
 			surface.DrawRect(0, 0, w, h)
 		end
+
+		height = height + 1
 
 	end
 
