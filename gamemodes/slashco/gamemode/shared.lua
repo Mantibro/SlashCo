@@ -188,7 +188,7 @@ local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
 local game_playable = false
 
 if SERVER then
-    SlashCo.MinimumMapPlayers = 6
+    SCInfo.MinimumMapPlayers = 6
 end
 
 for _, v in ipairs(map_configs) do
@@ -203,7 +203,7 @@ for _, v in ipairs(map_configs) do
         SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
 
         if SERVER then
-            SlashCo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SlashCo.MinimumMapPlayers)
+            SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
         end
 
         SCInfo.Maps[mapid].LEVELS = {}

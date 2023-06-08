@@ -1,5 +1,3 @@
-include("ui/fonts.lua")
-
 if game.GetMap() ~= "sc_lobby" then
     return
 end
@@ -10,6 +8,8 @@ local longest_name, plynum, lobby_music
 local grey = Color(128, 128, 128)
 local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
+
+local TimeLeft, StateOfLobby, LobbyInfoTable, data_load
 
 net.Receive("mantislashcoLobbyTimerTime", function(_, _)
     TimeLeft = net.ReadUInt(6)
