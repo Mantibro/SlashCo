@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\covenant\saturn_stick"
+	"$halflambert" 1
+	"$nocull" 1
+}

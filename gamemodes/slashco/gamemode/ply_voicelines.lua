@@ -236,6 +236,7 @@ local typeCheck = {
     ["GENERATOR"] = "generator",
     ["PLUSH DOG"] = "dogg",
     ["BASKETBALL"] = "ballin",
+    ["DEAD BODY"] = "deadbody",
     ["SLASHER"] = "slasher"
 }
 

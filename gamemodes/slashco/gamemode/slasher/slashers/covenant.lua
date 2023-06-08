@@ -15,10 +15,10 @@ SlashCoSlasher.Covenant.Eyesight = 3
 SlashCoSlasher.Covenant.KillDistance = 135
 SlashCoSlasher.Covenant.ChaseRange = 1000
 SlashCoSlasher.Covenant.ChaseRadius = 0.7
-SlashCoSlasher.Covenant.ChaseDuration = 16.0
+SlashCoSlasher.Covenant.ChaseDuration = 160.0
 SlashCoSlasher.Covenant.ChaseCooldown = 7
 SlashCoSlasher.Covenant.JumpscareDuration = 1.5
-SlashCoSlasher.Covenant.ChaseMusic = "slashco/slasher/"
+SlashCoSlasher.Covenant.ChaseMusic = "slashco/slasher/covenant_chase.wav"
 SlashCoSlasher.Covenant.KillSound = "slashco/slasher/"
 SlashCoSlasher.Covenant.Description = [[The Leader Slasher who commands his trusted Cloaks.
 
