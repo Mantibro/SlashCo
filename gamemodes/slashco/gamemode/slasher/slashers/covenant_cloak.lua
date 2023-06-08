@@ -1,7 +1,7 @@
 SlashCoSlasher.CovenantCloak = {}
 
 SlashCoSlasher.CovenantCloak.Name = "Covenant Cloak"
-SlashCoSlasher.CovenantCloak.ID = 18.1
+SlashCoSlasher.CovenantCloak.ID = "covenantcloak"
 SlashCoSlasher.CovenantCloak.Class = 1
 SlashCoSlasher.CovenantCloak.DangerLevel = 1
 SlashCoSlasher.CovenantCloak.IsSelectable = false
