@@ -4,8 +4,8 @@ GM.Email = "N/A"
 GM.Website = "N/A"
 GM.TeamBased = true
 GM.States = {
-	LOBBY = 1,
-	IN_GAME = 2
+    LOBBY = 1,
+    IN_GAME = 2
 }
 GM.State = GM.State or GM.States.LOBBY
 
@@ -13,44 +13,46 @@ include("player_class/player_survivor.lua")
 include("player_class/player_slasher_base.lua")
 include("player_class/player_lobby.lua")
 
-AddCSLuaFile( "ui/fonts.lua" )
+AddCSLuaFile("ui/fonts.lua")
 
-AddCSLuaFile( "cl_scoreboard.lua" )
-AddCSLuaFile( "cl_headbob.lua" )
-AddCSLuaFile( "cl_lobbyhud.lua" )
-AddCSLuaFile( "cl_survivorhud.lua" )
-AddCSLuaFile( "slasher/cl_slasher_ui.lua" )
-AddCSLuaFile( "slasher/cl_slasher_picker.lua" )
-AddCSLuaFile( "cl_item_picker.lua" )
-AddCSLuaFile( "cl_offering_picker.lua" )
-AddCSLuaFile( "cl_intro_hud.lua" )
-AddCSLuaFile( "cl_roundend_hud.lua" )
-AddCSLuaFile( "cl_jumpscare.lua" )
-AddCSLuaFile( "cl_offervote_hud.lua" )
-AddCSLuaFile( "cl_spectator_hud.lua" )
-AddCSLuaFile( "cl_playermodel_picker.lua" )
-AddCSLuaFile( "cl_gameinfo.lua" )
+AddCSLuaFile("cl_scoreboard.lua")
+AddCSLuaFile("cl_headbob.lua")
+AddCSLuaFile("cl_lobbyhud.lua")
+AddCSLuaFile("cl_survivorhud.lua")
+AddCSLuaFile("slasher/cl_slasher_ui.lua")
+AddCSLuaFile("slasher/cl_slasher_picker.lua")
+AddCSLuaFile("cl_item_picker.lua")
+AddCSLuaFile("cl_offering_picker.lua")
+AddCSLuaFile("cl_intro_hud.lua")
+AddCSLuaFile("cl_roundend_hud.lua")
+AddCSLuaFile("cl_jumpscare.lua")
+AddCSLuaFile("cl_offervote_hud.lua")
+AddCSLuaFile("cl_spectator_hud.lua")
+AddCSLuaFile("cl_playermodel_picker.lua")
+AddCSLuaFile("cl_gameinfo.lua")
 
-CreateConVar( "slashco_player_cycle", "0", FCVAR_REPLICATED ) --local cycle_players =
+CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_players =
 
 function GM:Initialize()
-	-- Do stuff
+    -- Do stuff
 end
 
 function GM:CreateTeams()
 
-	if ( not GAMEMODE.TeamBased ) then return end
+    if (not GAMEMODE.TeamBased) then
+        return
+    end
 
-	TEAM_SURVIVOR = 1
-	team.SetUp( TEAM_SURVIVOR, "Survivor", Color( 255, 255, 255 ) )
+    TEAM_SURVIVOR = 1
+    team.SetUp(TEAM_SURVIVOR, "Survivor", Color(255, 255, 255))
 
-	TEAM_SLASHER = 2
-	team.SetUp( TEAM_SLASHER, "Slasher", Color( 255, 0, 0 ) )
+    TEAM_SLASHER = 2
+    team.SetUp(TEAM_SLASHER, "Slasher", Color(255, 0, 0))
 
-	TEAM_LOBBY = 3
-	team.SetUp( TEAM_LOBBY, "Lobby", Color( 230, 255, 230 ) )
+    TEAM_LOBBY = 3
+    team.SetUp(TEAM_LOBBY, "Lobby", Color(230, 255, 230))
 
-	team.SetUp( TEAM_SPECTATOR, "Spectator", Color( 135, 206, 235 ) )
+    team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235))
 
 end
 
@@ -59,10 +61,10 @@ end
 end]]
 
 DoorSlamWhitelist = {
-	"models/props_c17/door03_left.mdl",
-	"models/props_doors/doormain_rural01_small.mdl",
-	"models/props_doors/doormainmetal01.mdl",
-	"models/props_c17/door01_left.mdl",
+    "models/props_c17/door03_left.mdl",
+    "models/props_doors/doormain_rural01_small.mdl",
+    "models/props_doors/doormainmetal01.mdl",
+    "models/props_c17/door01_left.mdl",
     "models/props_c17/door_fg.mdl",
     "models/props_doors/doormain01.mdl",
     "models/props_doors/doorglassmain01.mdl",
@@ -71,14 +73,14 @@ DoorSlamWhitelist = {
 }
 
 function CheckDoorWL(ent)
-	allow = false
-	for i = 1, #DoorSlamWhitelist do
-		if ent:GetModel() == DoorSlamWhitelist[i] then
-			allow = true
-			break
-		end
-	end
-	return allow
+    allow = false
+    for i = 1, #DoorSlamWhitelist do
+        if ent:GetModel() == DoorSlamWhitelist[i] then
+            allow = true
+            break
+        end
+    end
+    return allow
 end
 
 SCInfo = {}
@@ -87,7 +89,7 @@ SCInfo.RoundEnd = {
 
     {
         On = "The assignment was successful.",
-        Off = "The assignment was unsuccessful." ,
+        Off = "The assignment was unsuccessful.",
         DB = "The assignment was only partially successful."
     },
 
@@ -102,9 +104,9 @@ SCInfo.RoundEnd = {
     },
 
     {
-        Loss =  " are now presumed either dead or missing in action.",
-        LossOnlyOne =  " is now presumed either dead or missing in action.",
-        LossComplete =  "The Dispatched SlashCo Workers are now presumed either dead or missing in action.",
+        Loss = " are now presumed either dead or missing in action.",
+        LossOnlyOne = " is now presumed either dead or missing in action.",
+        LossComplete = "The Dispatched SlashCo Workers are now presumed either dead or missing in action.",
         DBWin = " had to be rescued before the assignment could be completed."
     }
 
@@ -118,7 +120,7 @@ SCInfo.Offering = {
         Description = "Will make Gas Cans easier to find,\nBut\nYou will not find more than you need.",
         GasCanMod = 0
     },
-        
+
     {
         Name = "Satiation",
         Rarity = 1,
@@ -185,13 +187,14 @@ local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
 
 local game_playable = false
 
-if SERVER then SCInfo.MinimumMapPlayers = 6 end
+if SERVER then
+    SCInfo.MinimumMapPlayers = 6
+end
 
 for _, v in ipairs(map_configs) do
     if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
-        
-        local config_table = util.JSONToTable(file.Read("slashco/configs/maps/"..v, "LUA"))
-        local mapid = string.Replace( v, ".lua", "" )
+        local config_table = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
+        local mapid = string.Replace(v, ".lua", "")
 
         SCInfo.Maps[mapid] = {}
         SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
@@ -199,35 +202,26 @@ for _, v in ipairs(map_configs) do
         SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
         SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
 
-        if SERVER then 
-            SCInfo.MinimumMapPlayers = math.min( SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers )
+        if SERVER then
+            SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
         end
 
         SCInfo.Maps[mapid].LEVELS = {}
 
-        for ky, lvl in ipairs( config_table.Manifest.Levels ) do
+        for ky, lvl in ipairs(config_table.Manifest.Levels) do
             SCInfo.Maps[mapid].LEVELS[ky] = lvl
         end
 
         game_playable = true
-
     end
 end
 
-if SERVER then
-
-    if game_playable ~= true then
-
-        timer.Simple(30, function() 
-        
-            for _, play in ipairs(player.GetAll()) do
-                play:ChatPrint([[[SlashCo] WARNING! There are no maps mounted! The Gamemode is not playable! 
+if SERVER and not game_playable then
+    timer.Simple(30, function()
+        for _, play in ipairs(player.GetAll()) do
+            play:ChatPrint([[[SlashCo] WARNING! There are no maps mounted! The Gamemode is not playable!
                 
 Download the Maps at the Gamemode's workshop page under the "Required Items" section.]])
-            end
-        
-        end)
-
-    end
-
+        end
+    end)
 end

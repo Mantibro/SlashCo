@@ -1,4 +1,3 @@
-include("ui/fonts.lua")
 local pmSelectFrame
 
 local function HidePlayermodelSelection()

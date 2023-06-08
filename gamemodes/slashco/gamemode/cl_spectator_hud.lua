@@ -1,5 +1,3 @@
-include("ui/fonts.lua")
-
 net.Receive("mantislashcoLobbySlasherInformation", function()
 
     LobbySlasherInfo = net.ReadTable()

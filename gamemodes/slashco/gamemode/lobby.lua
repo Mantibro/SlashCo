@@ -3,32 +3,6 @@ local SlashCoItems = SlashCoItems
 
 --//actual real code//--
 
-local MapForceCost = 50
-
-net.Receive("mantislashcoSendMapForce", function() 
-    local haver = net.ReadEntity()
-
-    local balance = tonumber(SlashCoDatabase.GetStat(haver:SteamID64(), "Points"))
-
-    if balance >= MapForceCost then
-
-        SlashCo.LobbyData.SelectedMap = net.ReadString()
-
-        for _, play in ipairs(player.GetAll()) do
-            play:ChatPrint("The map guarantee has been set to "..SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME)
-        end
-
-        SlashCoDatabase.UpdateStats(haver:SteamID64(), "Points", -MapForceCost)
-
-        MapForceCost = MapForceCost + 50
-
-    else
-
-        haver:ChatPrint("You don't have enough Points for a Map Guarantee.")
-
-    end
-end)
-
 local function lobbySaveCurData()
 
     local diff = SlashCo.LobbyData.SelectedDifficulty
@@ -531,9 +505,8 @@ local function lobbyRoundSetup()
         end
 
         --Assign the map randomly
-        ::Map_reroll::
-        SlashCo.LobbyData.SelectedMap = GetRandomMap( #SlashCo.LobbyData.AssignedSurvivors )
-
+        :: Map_reroll ::
+        SlashCo.LobbyData.SelectedMap = GetRandomMap(#SlashCo.LobbyData.AssignedSurvivors)
 
         if not GetConVar("slashco_map_default"):GetBool() then
             if SCInfo.Maps[SlashCo.LobbyData.SelectedMap].DEFAULT == false then
@@ -564,17 +537,15 @@ net.Receive("mantiSlashCoSelectSlasher", function()
 
 end)
 SlashCo.ChooseTheSlasherLobby = function(id)
-
     if SERVER then
         SlashCo.LobbyData.PickedSlasher = id
         print("[SlashCo] Slasher Picked. (" .. id .. ")")
     end
 
     SlashCo.BroadcastLobbySlasherInformation()
-
 end
 
-net.Receive("mantislashcoPickItem", function(_, ply)
+local function pickItem(ply, vals)
     if ply:Team() ~= TEAM_SURVIVOR then
         return
     end
@@ -584,10 +555,7 @@ net.Receive("mantislashcoPickItem", function(_, ply)
         return
     end
 
-    local item = net.ReadString()
-    local plyID = ply:SteamID64()
-
-    local balance = tonumber(SlashCoDatabase.GetStat(plyID, "Points"))
+    local item = vals[1]
 
     if SlashCoItems[item].Price > balance then
         ply:ChatPrint("You cannot afford this item.")
@@ -610,12 +578,51 @@ net.Receive("mantislashcoPickItem", function(_, ply)
     end
 
     ply:Give("sc_survivorhands")
-    SlashCoDatabase.UpdateStats(plyID, "Points", -SlashCoItems[item].Price)
-    lobbyChooseItem(plyID, item)
+    SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -SlashCoItems[item].Price)
+    lobbyChooseItem(ply:SteamID64(), item)
 
     timer.Simple(0.5, function()
         SlashCo.BroadcastMasterDatabaseForClient(ply)
     end)
+end
+
+local MapForceCost = 50
+local function pickMap(ply, vals)
+    local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
+
+    if SlashCo.LobbyData.SelectedMap == vals[1] then
+        ply:ChatPrint("That map has already been selected.")
+        return
+    end
+
+    if balance < MapForceCost then
+        ply:ChatPrint("You don't have enough points for a map guarantee.")
+        return
+    end
+
+    for _, play in ipairs(player.GetAll()) do
+        play:ChatPrint(string.format("%s spent %s points to set the mission to be on %s.",
+                ply:Nick(),
+                MapForceCost,
+                SCInfo.Maps[vals[1]].NAME))
+    end
+
+    SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -MapForceCost)
+    SlashCo.LobbyData.SelectedMap = vals[1]
+    MapForceCost = MapForceCost + 50
+    SlashCo.SendValue(nil, "mapGuar", SlashCo.LobbyData.SelectedMap, MapForceCost)
+end
+
+hook.Add("slashCoValue", "slashCo_PickItem", function(ply, msg, vals)
+    if msg == "pickItem" then
+        pickItem(ply, vals)
+        return
+    end
+
+    if msg == "pickMap" then
+        pickMap(ply, vals)
+        return
+    end
 end)
 
 local lobby_tick

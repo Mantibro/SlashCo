@@ -1,3 +1,5 @@
+include("sh_values.lua")
+
 local SlashCo = SlashCo
 
 util.AddNetworkString("octoSlashCoTestConfigHalos")
@@ -12,16 +14,14 @@ util.AddNetworkString("mantislashcoSlasherChaseMode")
 util.AddNetworkString("mantislashcoSlasherKillPlayer")
 util.AddNetworkString("mantiSlashCoPickingSlasher")
 util.AddNetworkString("mantiSlashCoSelectSlasher")
-util.AddNetworkString("mantislashcoStartItemPicking")
-util.AddNetworkString("mantislashcoPickItem")
+--util.AddNetworkString("mantislashcoPickItem")
 util.AddNetworkString("mantislashcoSendLobbyItemGlobal")
 util.AddNetworkString("mantislashcoSendGlobalInfoTable")
 util.AddNetworkString("mantislashcoGlobalSound")
 util.AddNetworkString("mantislashcoGameIntro")
 util.AddNetworkString("mantislashcoRoundEnd")
 util.AddNetworkString("mantislashcoBriefing")
-util.AddNetworkString("mantislashcoStartOfferingPicking")
-util.AddNetworkString("mantislashcoBeginOfferingVote")
+--util.AddNetworkString("mantislashcoBeginOfferingVote")
 util.AddNetworkString("mantislashcoOfferingVoteOut")
 util.AddNetworkString("mantislashcoVoteForOffering")
 util.AddNetworkString("mantislashcoOfferingEndVote")
@@ -35,7 +35,7 @@ util.AddNetworkString("mantislashcoSurvivorPings")
 util.AddNetworkString("mantislashcoSurvivorPreparePing")
 util.AddNetworkString("mantislashcoHelicopterVoice")
 util.AddNetworkString("mantislashcoMapAmbientPlay")
-util.AddNetworkString("mantislashcoSendMapForce")
+--util.AddNetworkString("mantislashcoSendMapForce")
 
 function PlayGlobalSound(sound, level, ent, vol)
 
@@ -51,19 +51,15 @@ function PlayGlobalSound(sound, level, ent, vol)
         net.WriteTable({ SoundPath = sound, SndLevel = level, Entity = ent, Volume = vol })
         net.Broadcast()
     end
-
 end
 
 SlashCo.BroadcastLobbySlasherInformation = function()
-
     net.Start("mantislashcoLobbySlasherInformation")
     net.WriteTable({ player = SlashCo.LobbyData.AssignedSlasher, slasher = SlashCoSlasher[SlashCo.LobbyData.PickedSlasher].Name })
     net.Broadcast()
-
 end
 
 SlashCo.BroadcastCurrentRoundData = function(readygame)
-
     net.Start("mantislashcoSendRoundData")
     net.WriteTable({ survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData.OfferingName })
     net.Broadcast()
@@ -78,74 +74,59 @@ SlashCo.BroadcastCurrentRoundData = function(readygame)
 
     net.WriteTable(send_t)
     net.Broadcast()
-
-
 end
 
 SlashCo.EndOfferingVote = function(play)
-
     net.Start("mantislashcoOfferingEndVote")
     net.WriteTable({ ply = play:SteamID64() })
     net.Broadcast()
-
 end
 
 SlashCo.OfferingVoteFinished = function(result)
-
     net.Start("mantislashcoOfferingVoteFinished")
     net.WriteTable({ r = result })
     net.Broadcast()
-
 end
 
-net.Receive("mantislashcoBeginOfferingVote", function()
+hook.Add("slashCoValue", "slashCo_StartOfferingVote", function(ply, msg, vals)
+    if msg ~= "sendOffer" then
+        return
+    end
 
-    t = net.ReadTable()
-
-    table.insert(SlashCo.LobbyData.Offerors, { steamid = t.ply })
-    SlashCo.BroadcastOfferingVote(t.ply, t.id)
-    SlashCo.LobbyData.VotedOffering = t.id
+    table.insert(SlashCo.LobbyData.Offerors, ply:SteamID64())
+    SlashCo.BroadcastOfferingVote(ply:SteamID64(), vals[1])
+    SlashCo.LobbyData.VotedOffering = vals[1]
 
     timer.Create("OfferingVoteTimer", 20, 1, function()
         SlashCo.OfferingVoteFail()
     end)
 
     for _, play in ipairs(player.GetAll()) do
-        play:ChatPrint(player.GetBySteamID64(t.ply):GetName() .. " would like to offer " .. SCInfo.Offering[t.id].Name)
+        play:ChatPrint(ply:GetName() .. " would like to offer " .. SCInfo.Offering[vals[1]].Name)
     end
-
 end)
 
 SlashCo.OfferingVote = function(ply, agreement)
-
     if agreement ~= true then
         return
     end
 
     table.insert(SlashCo.LobbyData.Offerors, { steamid = ply:SteamID64() })
-
-    --if getReadyState(ply) == 2 then lobbyPlayerReadying(ply, 1) end
-
 end
 
 SlashCo.BroadcastOfferingVote = function(offeror, o_id)
-
     net.Start("mantislashcoOfferingVoteOut")
     net.WriteTable({ ply = offeror, name = SCInfo.Offering[o_id].Name })
     net.Broadcast()
-
 end
 
 SlashCo.LobbyPlayerBriefing = function()
-
     net.Start("mantislashcoBriefing")
     net.WriteTable(SlashCo.LobbyData.SelectedSlasherInfo)
     net.Broadcast()
-
 end
 
 SlashCo.StartGameIntro = function()
-
     local offering = "Regular"
 
     if SlashCo.LobbyData.Offering > 0 then
@@ -162,32 +143,9 @@ SlashCo.StartGameIntro = function()
         s_danger = SlashCo.LobbyData.SelectedSlasherInfo.DNG
     })
     net.Broadcast()
-
-end
-
-SlashCo.PlayerItemStashRequest = function(id)
-
-    local ply = player.GetBySteamID64(id)
-
-    net.Start("mantislashcoStartItemPicking")
-    net.Send(ply)
-end
-
-SlashCo.PlayerOfferingTableRequest = function(id)
-
-    if SlashCo.LobbyData.Offering > 0 or #SlashCo.LobbyData.Offerors > 0 then
-        player.GetBySteamID64(id):ChatPrint("An Offering has already been made.")
-        return
-    end
-
-    net.Start("mantislashcoStartOfferingPicking")
-    net.WriteTable({ ply = id })
-    net.Broadcast()
-
 end
 
 SlashCo.RoundOverScreen = function(state)
-
     local heli = table.Random(ents.FindByClass("sc_helicopter"))
 
     if IsValid(heli) then
@@ -420,7 +378,6 @@ SlashCo.RoundOverScreen = function(state)
     })
 
     net.Broadcast()
-
 end
 
 SlashCo.BroadcastGlobalData = function()
@@ -438,6 +395,10 @@ SlashCo.BroadcastMasterDatabaseForClient = function(ply)
         return
     end
 
+    if not IsValid(ply) then
+        return
+    end
+
     if sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='" .. ply:SteamID64() .. "'; ") == nil
             or sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='" .. ply:SteamID64() .. "'; ") == false then
         return
@@ -449,10 +410,8 @@ SlashCo.BroadcastMasterDatabaseForClient = function(ply)
 end
 
 SlashCo.HelicopterRadioVoice = function(type)
-
     net.Start("mantislashcoHelicopterVoice")
     net.WriteUInt(type, 4)
     net.Broadcast()
-
 end
 

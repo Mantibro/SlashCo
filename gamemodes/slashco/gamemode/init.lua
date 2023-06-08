@@ -1,16 +1,15 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 AddCSLuaFile("ui/cl_voiceselect.lua")
---AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
---AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
---AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
 
+include("globals.lua")
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
-
 include("shared.lua")
 include("player.lua")
-include("globals.lua")
 include("game_logic.lua")
 include("master_database.lua")
 include("lobby.lua")
@@ -20,6 +19,9 @@ include("slasher/slasher_func.lua")
 include("concommands.lua")
 include("ply_voicelines.lua")
 include("survivor_func.lua")
+
+local SlashCo = SlashCo
+local SlashCoItems = SlashCoItems
 
 --[[
 
@@ -33,8 +35,6 @@ Extra credits: undo, Jim, DarkGrey
 
 ]]
 
-local SlashCo = SlashCo
-local SlashCoItems = SlashCoItems
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
 CreateConVar("slashco_map_default", 0, FCVAR_NONE, "Allow the gamemode to access all conifgured maps.", 0, 1)
