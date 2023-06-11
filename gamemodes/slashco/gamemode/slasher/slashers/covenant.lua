@@ -1,5 +1,7 @@
 SlashCoSlasher.Covenant = {}
 
+SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant = {}
+
 SlashCoSlasher.Covenant.Name = "The Covenant"
 SlashCoSlasher.Covenant.ID = 18
 SlashCoSlasher.Covenant.Class = 1
@@ -24,22 +26,53 @@ SlashCoSlasher.Covenant.Description = [[The Leader Slasher who commands his trus
 
 -Catching a Survivor will sacrifice their soul, making them become your Covenant Cloak.
 -The first Survivor you catch will be handed the Saturn Stick, becoming your most powerful ally, Rocks.
--Without the Saturn Stick, must must rely on your Cloaks to catch Survivors.]]
+-Without the power of the Saturn Stick, must must rely on your Cloaks to catch Survivors.]]
 SlashCoSlasher.Covenant.ProTip = "-This Slasher can enlist others into its ranks."
 SlashCoSlasher.Covenant.SpeedRating = "★★★★★"
 SlashCoSlasher.Covenant.EyeRating = "★★☆☆☆"
 SlashCoSlasher.Covenant.DiffRating = "★★★☆☆"
 
 SlashCoSlasher.Covenant.OnSpawn = function(slasher)
-
+    slasher:SetNWBool("CanChase", true)
 end
 
 SlashCoSlasher.Covenant.PickUpAttempt = function(ply)
     return false
 end
 
+SlashCoSlasher.Covenant.SummonCovenantMembers = function()
+
+    for _, v in ipairs(SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant) do
+        
+        local clk = player.GetBySteamID64( v.steamid )
+        SlashCo.SelectSlasher("CovenantCloak", v.steamid)
+        clk:SetTeam(TEAM_SLASHER)
+        clk:Spawn()
+    end
+
+end
+
 SlashCoSlasher.Covenant.OnTickBehaviour = function(slasher)
 
+    for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do --Sync the chase for every slasher, meaning every covenant member
+
+        if slasher:GetNWBool("InSlasherChaseMode") do
+
+            if not cloak:GetNWBool("InSlasherChaseMode") then
+                SlashCo.StartChaseMode(cloak)
+            end
+
+            cloak.CurrentChaseTick = 0
+
+        else
+
+            if cloak:GetNWBool("InSlasherChaseMode") then
+                SlashCo.StopChase(cloak)
+            end
+
+        end
+
+    end
 
     slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Covenant.Eyesight)
     slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Covenant.Perception)

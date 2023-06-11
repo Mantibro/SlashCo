@@ -16,7 +16,7 @@ SlashCoSlasher.CovenantCloak.KillDistance = 135
 SlashCoSlasher.CovenantCloak.ChaseRange = 1000
 SlashCoSlasher.CovenantCloak.ChaseRadius = 0.91
 SlashCoSlasher.CovenantCloak.ChaseDuration = 10.0
-SlashCoSlasher.CovenantCloak.ChaseCooldown = 3
+SlashCoSlasher.CovenantCloak.ChaseCooldown = 1
 SlashCoSlasher.CovenantCloak.JumpscareDuration = 1.5
 SlashCoSlasher.CovenantCloak.ChaseMusic = ""
 SlashCoSlasher.CovenantCloak.KillSound = ""
@@ -46,7 +46,7 @@ SlashCoSlasher.CovenantCloak.OnPrimaryFire = function(slasher)
 end
 
 SlashCoSlasher.CovenantCloak.OnSecondaryFire = function(slasher)
-    SlashCo.StartChaseMode(slasher)
+    --SlashCo.StartChaseMode(slasher)
 end
 
 SlashCoSlasher.CovenantCloak.OnMainAbilityFire = function(slasher)
