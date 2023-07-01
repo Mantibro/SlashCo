@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_slashco/items/benadryl/benadryl"
+	"$bumpmap" "models/props_slashco/items/benadryl/benadryl"
+	"$halflambert" 1
+}

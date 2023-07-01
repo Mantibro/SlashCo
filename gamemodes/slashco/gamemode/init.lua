@@ -559,10 +559,6 @@ hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
         print("[SlashCo] InitPostEntity Started.")
         RunConsoleCommand("sv_alltalk", "2")
 
-        if game.GetMap() == "rp_deadcity" then
-            Entity(176):Fire("Press")
-        end
-
         if game.GetMap() ~= "sc_lobby" then
             GAMEMODE.State = GAMEMODE.States.IN_GAME
 

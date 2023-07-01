@@ -54,9 +54,64 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
     if LocalPlayer():Team() ~= TEAM_SURVIVOR then
         return
     end
+
+    --Benadryl
+
+    if LocalPlayer():GetNWBool("SurvivorBenadryl") then 
+
+        if not LocalPlayer().BenadrylIntensity then
+            LocalPlayer().BenadrylIntensity = RealFrameTime()
+        end
+
+        LocalPlayer().BenadrylIntensity = LocalPlayer().BenadrylIntensity + ( RealFrameTime() / 277 )
+
+        if LocalPlayer().BenadrylIntensity > 1 then
+            LocalPlayer().BenadrylIntensity = -1
+        end
+
+        local fuck = math.min( math.abs(LocalPlayer().BenadrylIntensity) * 2, 1 )
+
+        local rand = rand or 0
+
+        rand = rand + (math.random() / 3)
+
+        local contrast = 3.5 + math.sin( (CurTime() + rand) / 10 ) * 3
+        local bloom = 3 + math.cos( (CurTime() + rand) / 2 ) * 1
+        local bloom2 = 3 + math.cos( (CurTime() + rand) / 4 ) * 1
+
+        local bokeh = -3 + math.cos( (CurTime() + rand) / 20 ) * 4
+
+        DrawBloom(0.5,fuck*bloom*1.5, fuck*bloom2*9, fuck*bloom2*9, 1, 8, 2, 2, 2)
+
+        DrawBokehDOF(12*fuck, fuck*bokeh, 4*fuck)
+
+        local tab = {
+            ["$pp_colour_addr"] = 0,
+            ["$pp_colour_addg"] = 0,
+            ["$pp_colour_addb"] = 0,
+            ["$pp_colour_brightness"] = 0,
+            ["$pp_colour_contrast"] = 1+(fuck*contrast),
+            ["$pp_colour_colour"] = 1-fuck,
+            ["$pp_colour_mulr"] = 0,
+            ["$pp_colour_mulg"] = 0,
+            ["$pp_colour_mulb"] = 0
+        }
+
+        DrawColorModify(tab)
+
+        DrawMotionBlur( fuck*0.75 + (contrast*0.08), fuck*0.8, fuck*0.07 )
+
+        DrawSharpen( fuck * bloom, fuck * bloom )
+
+    else
+        LocalPlayer().BenadrylIntensity = 0
+    end
+
+
     if GetConVar("slashcohud_disable_pp"):GetBool() then
         return
     end
+
     if game.GetMap() == "sc_lobby" then
         return
     end
@@ -522,6 +577,8 @@ function SlashCoMapAmbience()
     end)
 end
 
+local BenadrylSound = nil
+
 hook.Add("Think", "amb_vol", function()
     if AmbientStop then
         AmbientVol = 0
@@ -540,4 +597,104 @@ hook.Add("Think", "amb_vol", function()
             AmbientVol = AmbientVol + (RealFrameTime() / 100)
         end
     end
+
+    --Benadryl
+
+    if LocalPlayer():GetNWBool("SurvivorBenadryl") then 
+        if not BenadrylSound then
+            sound.PlayFile("sound/slashco/benadryl_base.mp3", "noplay", function(music, errCode, errStr)
+                if IsValid(music) then
+                    BenadrylSound = music
+
+                    timer.Simple(0.01, function()
+                        BenadrylSound:Play()
+                    end)
+
+                end
+            end)
+        else
+            local vol = 0
+            if LocalPlayer().BenadrylIntensity then
+                vol = math.abs(LocalPlayer().BenadrylIntensity)
+            end
+            BenadrylSound:SetVolume(vol)
+        end
+
+        if not LocalPlayer().ShadowManTick then LocalPlayer().ShadowManTick = CurTime() end
+
+        local frequency = 0
+
+        if LocalPlayer().BenadrylIntensity then
+            frequency = math.abs(LocalPlayer().BenadrylIntensity)
+        end
+
+        if CurTime() - LocalPlayer().ShadowManTick > 3 - (frequency * 2) then
+            CreateShadowPerson(LocalPlayer():GetPos() + Vector(math.random(-750,750),math.random(-750,750),math.random(50,50)), Angle(0,math.random(1,360),0))
+            LocalPlayer().ShadowManTick = CurTime()
+        end
+
+
+    elseif IsValid(BenadrylSound) then
+        BenadrylSound:Stop()
+        BenadrylSound = nil
+    end
+
+end)
+
+CreateShadowPerson = function(pos, ang)
+    if not LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
+        return
+    end
+
+    local Ent = ents.CreateClientside( "sc_shadowman" )
+
+    if not IsValid(Ent) then
+        MsgC( Color( 255, 50, 50 ), "[SlashCo] Something went wrong when trying to create a "..class.." at ("..tostring(pos).."), entity was NULL.\n")
+        return nil
+    end
+
+    Ent:SetPos( pos )
+    Ent:SetAngles( ang )
+    Ent:Spawn()
+    Ent:Activate()
+
+    local id = Ent:EntIndex()
+
+    return id
+end
+
+hook.Add("HUDPaint", "BenadrylVisions", function()
+
+    if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
+
+        if not LocalPlayer().BenadrylVisionTick then
+            LocalPlayer().BenadrylVisionTick = 10
+        end
+
+        if not LocalPlayer().BenadrylVision then
+            LocalPlayer().BenadrylVision = math.random(0,30)
+        end
+
+        if LocalPlayer().BenadrylVisionTick < 1 then
+
+            local Overlay = Material("slashco/ui/overlays/benadryl_visions")
+            Overlay:SetInt( "$frame", math.floor(LocalPlayer().BenadrylVision) )
+
+            Overlay:SetFloat( "$alpha", LocalPlayer().BenadrylVisionTick / 8 )
+
+            surface.SetDrawColor(255,255,255, 255 )	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
+        end
+
+        if LocalPlayer().BenadrylVisionTick < 0 then
+            LocalPlayer().BenadrylVision = math.random(0,30)
+            LocalPlayer().BenadrylVisionTick = 1 + (math.random() * 5)
+        end
+
+        LocalPlayer().BenadrylVisionTick = LocalPlayer().BenadrylVisionTick - ( RealFrameTime() * 1)
+
+    end
+
 end)

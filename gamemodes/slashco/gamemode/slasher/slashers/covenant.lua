@@ -48,7 +48,10 @@ SlashCoSlasher.Covenant.SummonCovenantMembers = function()
         SlashCo.SelectSlasher("CovenantCloak", v.steamid)
         clk:SetTeam(TEAM_SLASHER)
         clk:Spawn()
+
     end
+
+
 
 end
 
@@ -56,7 +59,7 @@ SlashCoSlasher.Covenant.OnTickBehaviour = function(slasher)
 
     for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do --Sync the chase for every slasher, meaning every covenant member
 
-        if slasher:GetNWBool("InSlasherChaseMode") do
+        if slasher:GetNWBool("InSlasherChaseMode") then
 
             if not cloak:GetNWBool("InSlasherChaseMode") then
                 SlashCo.StartChaseMode(cloak)
@@ -79,7 +82,83 @@ SlashCoSlasher.Covenant.OnTickBehaviour = function(slasher)
 end
 
 SlashCoSlasher.Covenant.OnPrimaryFire = function(slasher)
-    --SlashCo.Jumpscare(slasher)
+    
+    if not slasher:GetNWBool("CovenantSummoned") then
+
+        if not slasher:GetNWBool("CovenantSummoning") then
+
+            local dist = slasher:SlasherValue("KillDistance", 135)
+
+            slasher:LagCompensation( true )
+            timer.Simple(0, function() 
+                slasher:LagCompensation( false )
+            end)
+
+            --if slasher:GetEyeTrace().Entity:IsPlayer() then
+                --local target = slasher:GetEyeTrace().Entity
+
+                --if target:Team() ~= TEAM_SURVIVOR then
+                --    return
+               -- end
+
+                --target:Kill()
+
+                local ragdoll = ents.Create("prop_ragdoll")
+                ragdoll:SetModel("models/player/corpse1.mdl")
+                ragdoll:SetPos(slasher:LocalToWorld( Vector(20,0,5) ))
+                ragdoll:SetNoDraw(false)
+                ragdoll:Spawn()
+
+                local physCount = ragdoll:GetPhysicsObjectCount()
+
+                timer.Simple(2, function() 
+                    for i = 0, (physCount - 1) do
+                        local PhysBone = ragdoll:GetPhysicsObjectNum(i)
+
+                        if PhysBone:IsValid() then
+                            PhysBone:EnableGravity( false )
+                        end
+                    end
+                end)
+
+                timer.Simple(6, function() 
+
+                    local Dissolver = ents.Create( "env_entity_dissolver" )
+                    timer.Simple(1, function()
+                        if IsValid(Dissolver) then
+                            Dissolver:Remove() -- backup edict save on error
+                        end
+                    end)
+
+                    Dissolver.Target = "dissolve"..ragdoll:EntIndex()
+                    Dissolver:SetKeyValue( "dissolvetype", 0)
+                    Dissolver:SetKeyValue( "magnitude", 0 )
+                    Dissolver:SetPos( ragdoll:GetPos() )
+                    Dissolver:SetPhysicsAttacker( slasher )
+                    Dissolver:Spawn()
+
+                    ragdoll:SetName( Dissolver.Target )
+
+                    Dissolver:Fire( "Dissolve", Dissolver.Target, 0 )
+                    Dissolver:Fire( "Kill", "", 0.1 )
+
+                    slasher:SetNWBool("CovenantSummoning", false) 
+
+                    slasher:Freeze(false)
+                end)
+
+                slasher:EmitSound("slashco/slasher/ltg_summoning.mp3")
+
+                --slasher.PlayerToBecomeRocks = target
+
+                slasher:SetNWBool("CovenantSummoning", true) 
+                slasher:Freeze(true)
+
+            --end
+
+        end
+
+    end
 end
 
 SlashCoSlasher.Covenant.OnSecondaryFire = function(slasher)
