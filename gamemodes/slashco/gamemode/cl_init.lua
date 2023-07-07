@@ -663,7 +663,7 @@ CreateShadowPerson = function(pos, ang)
     return id
 end
 
-hook.Add("HUDPaint", "BenadrylVisions", function()
+hook.Add("HUDPaint", "MiscItemVisions", function()
 
     if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
 
@@ -695,6 +695,35 @@ hook.Add("HUDPaint", "BenadrylVisions", function()
 
         LocalPlayer().BenadrylVisionTick = LocalPlayer().BenadrylVisionTick - ( RealFrameTime() * 1)
 
+    end
+
+    if LocalPlayer():GetNWBool("JugCurseActivate") then
+
+        local Overlay = Material("slashco/ui/overlays/jug_freeze")
+
+        if LocalPlayer().JugFrame < 61 then
+            Overlay:SetInt( "$frame", math.floor(LocalPlayer().JugFrame) )
+            Overlay:SetFloat( "$alpha", 1 )
+        else
+            Overlay:SetInt( "$frame", 60 )
+            Overlay:SetFloat( "$alpha", ( 1 - ( (LocalPlayer().JugFrame-61) / 60) ) )
+
+            if math.floor(LocalPlayer().JugFrame) == 61 then
+                LocalPlayer():EmitSound("slashco/jug_curse.mp3")
+            end
+
+        end
+
+        LocalPlayer().JugFrame = LocalPlayer().JugFrame + RealFrameTime()*30
+
+        if LocalPlayer().JugFrame < 120 then
+            surface.SetDrawColor(255,255,255, 255 )	
+            surface.SetMaterial(Overlay)
+            surface.DrawTexturedRect(0, 0 - ( ScrW() / 6), ScrW(), ScrW())
+        end
+
+    else
+        LocalPlayer().JugFrame = 0
     end
 
 end)
