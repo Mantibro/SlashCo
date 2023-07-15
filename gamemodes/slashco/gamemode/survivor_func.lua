@@ -7,6 +7,19 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, key)
 
     if game.GetMap() == "sc_lobby" then return end
 
+    --Covenant Tackle
+
+
+    if ply:GetNWBool("SurvivorTackled") then
+           
+        if key == 14 or key == 11 and ply.LastTackleStruggleKey ~= key then
+            ply.LastTackleStruggleKey = key
+            ply.TackleStruggle = ply.TackleStruggle or 0
+            ply.TackleStruggle = ply.TackleStruggle + 1
+        end
+
+    end
+
     local lookent = ply:GetEyeTrace().Entity
 
     if key == 107 and ply:GetVelocity():Length() > 250 then

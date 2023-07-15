@@ -35,6 +35,22 @@ function ENT:Use( activator )
 
         if activator:Team() == TEAM_SURVIVOR then
 
+            if activator:GetNWBool("CurseOfTheJug") and self:GetNWBool("JugCursed") then
+                self:SetPos(SlashCo.TraceHullLocator() + Vector(0,0,50))
+                self:SetNWBool("JugCursed", false)
+
+                activator:SetNWBool("JugCurseActivate", true)
+
+                timer.Simple(6, function()
+                    if IsValid( activator ) then
+                        activator:SetNWBool("JugCurseActivate", false)
+                    end
+                end)
+
+                return
+
+            end
+
             local index = self:EntIndex()
             SlashCo.ItemPickUp(activator, index, "GasCan")
 

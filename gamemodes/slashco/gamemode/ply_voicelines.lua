@@ -398,6 +398,12 @@ net.Receive("mantislashcoSurvivorPreparePing", function(_, ply)
         ping_info.ExpiryTime = 10
     end
 
+    if ply:GetNWBool("SurvivorBenadrylFull") then
+        ping_info.Type = "SLASHER"
+        look = ply:GetEyeTrace().HitPos
+        ping_info.ExpiryTime = 5
+    end
+
     if ping_info.Type == "DEAD BODY" then
         player.GetBySteamID64( look.SurvivorSteamID ):SetNWBool("ConfirmedDead", true)
     end

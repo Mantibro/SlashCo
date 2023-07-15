@@ -145,6 +145,11 @@ SlashCo.CreateGasCan = function(pos, ang, test)
     Ent:SetAngles( ang )
     Ent:Spawn()
 
+    --The JUG
+    if math.random() > 0.35 then
+        Ent:SetNWBool("JugCursed", true)
+    end
+
     return Ent
 end
 

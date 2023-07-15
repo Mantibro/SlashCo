@@ -72,7 +72,7 @@ function GetRandomSlasher()
     repeat
 	      rand = math.random(1, #keys)
 	      rand_name = keys[rand] --random id for this roll
-    until SlashCoSlasher[rand_name].IsSelectable
+    until SlashCoSlasher[rand_name].IsSelectable and rand_name ~= "Covenant"
 
     return rand_name
 end

@@ -196,6 +196,11 @@ SlashCo.Jumpscare = function(slasher)
 
     local dist = slasher:SlasherValue("KillDistance", 135)
 
+    slasher:LagCompensation( true )
+    timer.Simple(0, function() 
+        slasher:LagCompensation( false )
+    end)
+
     if slasher:GetEyeTrace().Entity:IsPlayer() then
         local target = slasher:GetEyeTrace().Entity
 

@@ -100,15 +100,19 @@ SlashCo.LoadCurRoundData = function()
                 end
 
                 timer.Simple(1, function()
-
-                    print("[SlashCo] Selecting Slasher for player with id: " .. id)
                     if s == 1 then
+                        if slasher1id == "Covenant" then SlashCo.PresentCovenant = id end
                         SlashCo.SelectSlasher(slasher1id, id)
                         table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher1id })
                     end
                     if s == 2 then
-                        SlashCo.SelectSlasher(slasher2id, id)
-                        table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher2id })
+                        if SlashCo.PresentCovenant == nil then
+                            SlashCo.SelectSlasher(slasher2id, id)
+                            table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher2id })
+                        else
+                            table.insert(SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
+                        end
+
                     end
 
                 end)
@@ -194,6 +198,8 @@ end
 SlashCo.LoadCurRoundTeams = function()
 
     if SERVER then
+
+        local becameCovenant = 0
 
         if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
 
@@ -306,12 +312,29 @@ SlashCo.LoadCurRoundTeams = function()
                         playercur:SetTeam(TEAM_SPECTATOR)
                         playercur:Spawn()
                         print(playercur:Name() .. " now Spectator")
+
+                        if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
+                            table.insert(SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
+                            becameCovenant = becameCovenant + 1
+                        end
                     end
                     :: CONTINUE ::
                 end
 
                 for i = 1, #slashers do
                     if id == slashers[i].Slashers then
+
+                        for _, v in ipairs(SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant) do
+                            if v.steamid == id then
+                                print(playercur:Name() .. " will become part of the Covenant.")
+                                playercur:SetTeam(TEAM_SPECTATOR)
+                                playercur:Spawn()
+
+                                goto covenant_member
+                            end
+                        end
+
+
                         print(playercur:Name() .. " now Slasher (Memorized)")
                         playercur:SetTeam(TEAM_SPECTATOR)
                         playercur:Spawn()
@@ -319,6 +342,7 @@ SlashCo.LoadCurRoundTeams = function()
                         table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
 
                         --table.insert(SlashCo.CurRound.SlasherData.AllSlashers, {s_id = playercur:SteamID64()})
+                        ::covenant_member::
 
                     end
                 end
