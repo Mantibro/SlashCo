@@ -546,6 +546,8 @@ SlashCo.ChooseTheSlasherLobby = function(id)
 end
 
 local function pickItem(ply, vals)
+    local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
+
     if ply:Team() ~= TEAM_SURVIVOR then
         return
     end

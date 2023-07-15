@@ -53,6 +53,15 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 
 	if ply:Team() == TEAM_SURVIVOR then
 
+		if ply:GetNWBool("SurvivorTackled") then
+
+			ply.CalcIdeal = ACT_DIESIMPLE
+			ply.CalcSeqOverride = ply:LookupSequence("zombie_slump_idle_01")
+
+			return ply.CalcIdeal, ply.CalcSeqOverride
+
+		end
+
 		if not ply:GetNWBool("SurvivorSidExecution") and not ply:GetNWBool("Taunt_MNR") then ply.surv_anim_antispam = false end
 
 		if ply:GetNWBool("SurvivorSidExecution") then

@@ -44,7 +44,7 @@ hook.Add("Think", "JugFunc", function()
 
             if surv:GetNWString("item") ~= "Jug" then continue end
 
-            local find = ents.FindInSphere(surv:GetPos(), 80)
+            local find = ents.FindInSphere(surv:GetPos(), 120)
 
             for i = 1, #find do
                 local ent = find[i]
@@ -52,7 +52,7 @@ hook.Add("Think", "JugFunc", function()
                 if ent:IsPlayer() and ent:Team() == TEAM_SLASHER then
                     surv:SetPos(SlashCo.TraceHullLocator())
                     surv:EmitSound("slashco/jug_curse.mp3")
-                    surv:GetNWString("item", "")
+                    SlashCo.RemoveItem(surv)
                     surv:SetNWBool("CurseOfTheJug", true)
                 end
 

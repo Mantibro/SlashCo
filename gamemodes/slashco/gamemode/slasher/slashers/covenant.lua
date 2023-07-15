@@ -55,6 +55,12 @@ SlashCoSlasher.Covenant.SummonCovenantMembers = function()
 
 end
 
+SlashCoSlasher.Covenant.SummonRocks = function(vic)
+    SlashCo.SelectSlasher("CovenantRocks", vic:SteamID64())
+    vic:SetTeam(TEAM_SLASHER)
+    vic:Spawn()
+end
+
 SlashCoSlasher.Covenant.OnTickBehaviour = function(slasher)
 
     for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do --Sync the chase for every slasher, meaning every covenant member
@@ -90,71 +96,87 @@ SlashCoSlasher.Covenant.OnPrimaryFire = function(slasher)
             local dist = slasher:SlasherValue("KillDistance", 135)
 
             slasher:LagCompensation( true )
-            timer.Simple(0, function() 
-                slasher:LagCompensation( false )
-            end)
 
-            --if slasher:GetEyeTrace().Entity:IsPlayer() then
-                --local target = slasher:GetEyeTrace().Entity
+            if slasher:GetEyeTrace().Entity:IsPlayer() then
+                local target = slasher:GetEyeTrace().Entity
 
-                --if target:Team() ~= TEAM_SURVIVOR then
-                --    return
-               -- end
+                if not target:IsPlayer() or target:Team() ~= TEAM_SURVIVOR then
+                    slasher:LagCompensation( false )
+                    return
+                end
 
-                --target:Kill()
+                target:Kill()
 
-                local ragdoll = ents.Create("prop_ragdoll")
-                ragdoll:SetModel("models/player/corpse1.mdl")
-                ragdoll:SetPos(slasher:LocalToWorld( Vector(20,0,5) ))
-                ragdoll:SetNoDraw(false)
-                ragdoll:Spawn()
+                timer.Simple(FrameTime(), function() 
+                    local ragdoll = target.DeadBody
+                    --[[ragdoll:SetModel("models/player/corpse1.mdl")
+                    ragdoll:SetPos(slasher:LocalToWorld( Vector(20,0,5) ))
+                    ragdoll:SetNoDraw(false)
+                    ragdoll:Spawn()]]
 
-                local physCount = ragdoll:GetPhysicsObjectCount()
+                    local physCount = ragdoll:GetPhysicsObjectCount()
 
-                timer.Simple(2, function() 
-                    for i = 0, (physCount - 1) do
-                        local PhysBone = ragdoll:GetPhysicsObjectNum(i)
+                    timer.Simple(2, function() 
+                        for i = 0, (physCount - 1) do
+                            local PhysBone = ragdoll:GetPhysicsObjectNum(i)
 
-                        if PhysBone:IsValid() then
-                            PhysBone:EnableGravity( false )
-                        end
-                    end
-                end)
-
-                timer.Simple(6, function() 
-
-                    local Dissolver = ents.Create( "env_entity_dissolver" )
-                    timer.Simple(1, function()
-                        if IsValid(Dissolver) then
-                            Dissolver:Remove() -- backup edict save on error
+                            if PhysBone:IsValid() then
+                                PhysBone:EnableGravity( false )
+                            end
                         end
                     end)
 
-                    Dissolver.Target = "dissolve"..ragdoll:EntIndex()
-                    Dissolver:SetKeyValue( "dissolvetype", 0)
-                    Dissolver:SetKeyValue( "magnitude", 0 )
-                    Dissolver:SetPos( ragdoll:GetPos() )
-                    Dissolver:SetPhysicsAttacker( slasher )
-                    Dissolver:Spawn()
+                    timer.Simple(4, function()              
+                        SlashCoSlasher.Covenant.SummonRocks(slasher.PlayerToBecomeRocks) 
+                        slasher.PlayerToBecomeRocks:Freeze(true)
+                        
+                        timer.Simple(3, function()              
+                            slasher.PlayerToBecomeRocks:Freeze(false)
+                            slasher.PlayerToBecomeRocks:SetNWBool("RocksBeingSummoned", false)
+                        end)
+                        
+                    end)
 
-                    ragdoll:SetName( Dissolver.Target )
+                    timer.Simple(6, function() 
 
-                    Dissolver:Fire( "Dissolve", Dissolver.Target, 0 )
-                    Dissolver:Fire( "Kill", "", 0.1 )
+                        local Dissolver = ents.Create( "env_entity_dissolver" )
+                        timer.Simple(1, function()
+                            if IsValid(Dissolver) then
+                                Dissolver:Remove() -- backup edict save on error
+                            end
+                        end)
 
-                    slasher:SetNWBool("CovenantSummoning", false) 
+                        Dissolver.Target = "dissolve"..ragdoll:EntIndex()
+                        Dissolver:SetKeyValue( "dissolvetype", 0)
+                        Dissolver:SetKeyValue( "magnitude", 0 )
+                        Dissolver:SetPos( ragdoll:GetPos() )
+                        Dissolver:SetPhysicsAttacker( slasher )
+                        Dissolver:Spawn()
 
-                    slasher:Freeze(false)
+                        ragdoll:SetName( Dissolver.Target )
+
+                        Dissolver:Fire( "Dissolve", Dissolver.Target, 0 )
+                        Dissolver:Fire( "Kill", "", 0.1 )
+
+                        slasher:SetNWBool("CovenantSummoning", false) 
+
+                        slasher:Freeze(false)
+                    end)
+
+                    slasher:EmitSound("slashco/slasher/ltg_summoning.mp3")
+
+                    slasher.PlayerToBecomeRocks = target
+                    target:SetNWBool("RocksBeingSummoned", true)
+                    
+
+
+                    slasher:SetNWBool("CovenantSummoning", true) 
+                    slasher:Freeze(true)
+
+                    slasher:LagCompensation( false )
+
                 end)
-
-                slasher:EmitSound("slashco/slasher/ltg_summoning.mp3")
-
-                --slasher.PlayerToBecomeRocks = target
-
-                slasher:SetNWBool("CovenantSummoning", true) 
-                slasher:Freeze(true)
-
-            --end
+            end
 
         end
 
