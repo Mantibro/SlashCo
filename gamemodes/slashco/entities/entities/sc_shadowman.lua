@@ -46,7 +46,7 @@ function ENT:Think()
 
 	self:SetColor(Color(0,0,0,math.abs(LocalPlayer().BenadrylIntensity) * 255))
 
-	if not self.TargetThing then
+	if not IsValid(self.TargetThing) then
 		self.TargetThing = ents.FindByClass( "sc_gascan" )[math.random(1,#ents.FindByClass( "sc_gascan" ))]
 	else
 		if not self.Speed then self.Speed = 1 end
