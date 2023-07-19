@@ -52,10 +52,10 @@ surface.CreateFont("HalfCutTitle", {
     outline = true
 })
 
-surface.CreateFont("HalfCut", {
+surface.CreateFont("HalfCutSubTitle", {
     font = "Half Cut Gothic",
     extended = false,
-    size = 22,
+    size = 40,
     weight = 500,
     blursize = 1,
     antialias = false,

@@ -1,5 +1,3 @@
-include("sh_values.lua")
-
 local SlashCo = SlashCo
 
 util.AddNetworkString("octoSlashCoTestConfigHalos")
@@ -88,21 +86,17 @@ SlashCo.OfferingVoteFinished = function(result)
     net.Broadcast()
 end
 
-hook.Add("slashCoValue", "slashCo_StartOfferingVote", function(ply, msg, vals)
-    if msg ~= "sendOffer" then
-        return
-    end
-
+hook.Add("scValue_sendOffer", "slashCo_StartOfferingVote", function(ply, offer)
     table.insert(SlashCo.LobbyData.Offerors, ply:SteamID64())
-    SlashCo.BroadcastOfferingVote(ply:SteamID64(), vals[1])
-    SlashCo.LobbyData.VotedOffering = vals[1]
+    SlashCo.BroadcastOfferingVote(ply:SteamID64(), offer)
+    SlashCo.LobbyData.VotedOffering = offer
 
     timer.Create("OfferingVoteTimer", 20, 1, function()
         SlashCo.OfferingVoteFail()
     end)
 
     for _, play in ipairs(player.GetAll()) do
-        play:ChatPrint(ply:GetName() .. " would like to offer " .. SCInfo.Offering[vals[1]].Name)
+        play:ChatPrint(ply:GetName() .. " would like to offer " .. SCInfo.Offering[offer].Name)
     end
 end)
 

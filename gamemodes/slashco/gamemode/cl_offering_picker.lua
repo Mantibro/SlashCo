@@ -165,8 +165,6 @@ local function DrawOfferSelectorBox()
     end
 end
 
-hook.Add("slashCoValue", "slashCo_OfferingPicker", function(str)
-    if str == "openOfferingPicker" then
-        DrawOfferSelectorBox()
-    end
+hook.Add("scValue_openOfferingPicker", "slashCo_OfferingPicker", function()
+    DrawOfferSelectorBox()
 end)

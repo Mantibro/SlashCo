@@ -4,6 +4,8 @@ AddCSLuaFile("ui/cl_voiceselect.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
+AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
+AddCSLuaFile("ui/cl_projector.lua")
 
 include("globals.lua")
 include("items/items_init.lua")
@@ -19,6 +21,7 @@ include("slasher/slasher_func.lua")
 include("concommands.lua")
 include("ply_voicelines.lua")
 include("survivor_func.lua")
+include("sh_values.lua")
 
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems

@@ -329,19 +329,16 @@ function DrawItemSelectorBox()
     SetupItems()
 end
 
-hook.Add("slashCoValue", "slashCo_ItemPicker", function(str, vals)
-    if str == "openItemPicker" then
-        DrawItemSelectorBox()
-        return
-    end
+hook.Add("scValue_openItemPicker", "slashCo_ItemPicker", function()
+    DrawItemSelectorBox()
+end)
 
-    if str == "mapGuar" then
-        mapForce = vals[1]
-        mapPrice = vals[2]
+hook.Add("scValue_mapGuar", "slashCo_MapGuar", function(mapForce1, mapPrice1)
+    mapForce = mapForce1
+    mapPrice = mapPrice1
 
-        if IsValid(itemSelectFrame) and MGSelection then
-            SetConfirm()
-            itemSelectFrame.ItemValues:SetText("[" .. mapPrice .. " POINTS]")
-        end
+    if IsValid(itemSelectFrame) and MGSelection then
+        SetConfirm()
+        itemSelectFrame.ItemValues:SetText("[" .. mapPrice .. " POINTS]")
     end
 end)

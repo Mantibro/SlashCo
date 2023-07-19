@@ -50,7 +50,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		local CanKill = LocalPlayer():GetNWBool("CanKill")
 		local CanChase = LocalPlayer():GetNWBool("CanChase")
 
-		surface.SetDrawColor(255,255,255,255)	
+		surface.SetDrawColor(255,255,255,255)
 
 		if blinded then
 
