@@ -2,7 +2,7 @@ local ITEM = SlashCoItems.LabMeat or {}
 SlashCoItems.LabMeat = ITEM
 
 ITEM.Model = "models/slashco/items/labmeat.mdl"
-ITEM.Name = "Lab Grown Meat"
+ITEM.Name = "Lab-Grown Meat"
 ITEM.EntClass = "sc_labmeat"
 ITEM.Price = 35
 ITEM.Description = "Now cleared for sale in the United States! Is it worth it?"
@@ -12,9 +12,9 @@ ITEM.IsSpawnable = true
 ITEM.OnDrop = function(ply)
     local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 
-    local physCount = Entity(droppeditem):GetPhysicsObjectCount()
+    local physCount = Entity(droppeditem).ragdoll:GetPhysicsObjectCount()
     for i = 0, (physCount - 1) do
-        local PhysBone = Entity(droppeditem):GetPhysicsObjectNum(i)
+        local PhysBone = Entity(droppeditem).ragdoll:GetPhysicsObjectNum(i)
 
         if PhysBone:IsValid() then
             PhysBone:SetVelocity( ply:GetAimVector() * 150 )

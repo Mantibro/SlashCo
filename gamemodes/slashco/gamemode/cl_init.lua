@@ -28,6 +28,16 @@ include("ui/slasher_stock/cl_slasher_meter.lua")
 
 CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
 
+CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel")
+
+cvars.AddChangeCallback("cl_slashco_playermodel", function(_, _, newVal)
+
+    if newVal ~= "models/slashco/survivor/male_0*.mdl" then
+        --print("[SlashCo] Bad Playermodel. It will be randomized instead.")
+    end
+
+end)
+
 function GM:HUDDrawTargetID()
     return false
 end
@@ -664,6 +674,8 @@ CreateShadowPerson = function(pos, ang)
 end
 
 hook.Add("HUDPaint", "MiscItemVisions", function()
+
+    if LocalPlayer():Team() ~= TEAM_SURVIVOR then return end
 
     if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
 

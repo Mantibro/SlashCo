@@ -199,20 +199,6 @@ end
 
 function GM:Initialize()
 
-    --if CLIENT then
-
-    CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel")
-
-    cvars.AddChangeCallback("cl_slashco_playermodel", function(_, _, newVal)
-
-        if newVal ~= "models/slashco/survivor/male_0*.mdl" then
-            --print("[SlashCo] Bad Playermodel. It will be randomized instead.")
-        end
-
-    end)
-
-    --end
-
     --If there is no data folder then make one.
     if not file.Exists("slashco", "DATA") then
         print("[SlashCo] The data folder for this gamemode doesn't appear to exist, creating it now.")
@@ -700,6 +686,23 @@ local Think = function()
                 if not SlashCo.Debug then SlashCo.EndRound() end
 
                 SlashCo.CurRound.roundOverToggle = false
+            end
+
+            --Benadryl
+            for _, plr in ipairs( player.GetAll() ) do
+
+                if plr:Team() ~= TEMA_SURVIVOR then
+
+                    if plr:GetNWBool("SurvivorBenadryl") then
+                        plr:SetNWBool("SurvivorBenadryl", false)
+                    end
+
+                    if plr:GetNWBool("SurvivorBenadrylFull") then
+                        plr:SetNWBool("SurvivorBenadrylFull", false)
+                    end
+
+                end
+
             end
         end
     end
