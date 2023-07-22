@@ -110,7 +110,7 @@ end
 SlashCo.ResetCurRoundData()
 
 --SlashCo.GasCanModel = "models/props_junk/metalgascan.mdl" --Model path for the gas cans
-SlashCo.GeneratorModel = "models/props_vehicles/generatortrailer01.mdl" --Model path for the generators
+SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
 --SlashCo.BatteryModel = "models/items/car_battery01.mdl" --Model path for the batteries
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
 SlashCo.GasCansPerGenerator = 4 --Number of gas cans required to fill up a generator
