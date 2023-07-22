@@ -6,7 +6,7 @@ local red = Color(255, 0, 0)
 local darkRed = Color(128, 32, 32)
 local lightRed = Color(255, 128, 128)
 local grey = Color(50, 50, 50)
-local dark = Color(6, 6, 6)
+local dark = Color(10, 0, 0)
 local survivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
 local survivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
@@ -150,6 +150,13 @@ function PANEL:SetControlKey(key, newKey)
 	self.Controls[key], self.Controls[newKey] = self.Controls[newKey], self.Controls[key]
 end
 
+function PANEL:ShakeControl(key)
+	if not self.Controls[key] then
+		return
+	end
+	self.Controls[key]:Shake()
+end
+
 ---internal: shows the slasher's name and avatar
 function PANEL:MakeTitleCard()
 	local card = vgui.Create("Panel", self)
@@ -289,10 +296,19 @@ function PANEL:MakeGenEntry(gen, i, model)
 	entry.XShake = 0
 	entry.YShake = 0
 	entry.ZShake = 0
-	entry.Anim = Derma_Anim("DieShake", survivor, function(pnl, _, delta)
+	entry.Shake = Derma_Anim("Shake", nil, function(_, _, delta)
 		entry.XShake = (math.random() - 0.5) * (1 - delta) * 5
 		entry.YShake = (math.random() - 0.5) * (1 - delta) * 35
 		entry.ZShake = (math.random() - 0.5) * (1 - delta) * 35
+	end)
+
+	entry.YSpin = 0
+	entry.Spin = Derma_Anim("Spin", nil, function(_, _, delta)
+		if delta < 0.5 then
+			entry.YSpin = (2 * (delta ^ 2)) * 360
+		else
+			entry.YSpin = (1 - ((-2 * delta + 2) ^ 2) / 2) * 360
+		end
 	end)
 
 	local angle = math.pi / ((gasCansPerGenerator + 1) / 2) * i
@@ -300,13 +316,17 @@ function PANEL:MakeGenEntry(gen, i, model)
 
 	function entry.Think()
 		entry:SetCamPos(Vector(80 + entry.XShake, entry.YShake, entry.ZShake))
-		if entry.Anim:Active() then
-			entry.Anim:Run()
+		if entry.Shake:Active() then
+			entry.Shake:Run()
+		end
+		if entry.Spin:Active() then
+			entry.Spin:Run()
 		end
 	end
 
 	function entry.LayoutEntity(_, ent)
-		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5, (i * 360 / (gasCansPerGenerator + 1)) % 360, 5))
+		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5,
+				(entry.YSpin + (i * 360 / (gasCansPerGenerator + 1))) % 360, 5))
 	end
 	entry.DefaultPos = {
 		x + (gen:GetWide() / 2) - math.cos(angle) * 50 - (entry:GetWide() / 2),
@@ -381,7 +401,7 @@ end
 
 vgui.Register("slashco_slasher_stockhud", PANEL, "Panel")
 
-hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansRemaining)
+local function findGenPanel(gen)
 	if not g_SlasherHud then
 		return
 	end
@@ -392,6 +412,24 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 			panel = v
 		end
 	end
+
+	return panel
+end
+
+hook.Add("scValue_genHint", "slashCoGenHint", function(gen)
+	local panel = findGenPanel(gen)
+
+	if not panel then
+		return
+	end
+
+	for _, v in ipairs(panel.Entries) do
+		v.Shake:Start(1)
+	end
+end)
+
+hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansRemaining)
+	local panel = findGenPanel(gen)
 
 	if not panel then
 		return
@@ -412,9 +450,9 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 			playSound = true
 
 			panel.Entries[1]:SetAmbientLight(grey)
-			panel.Entries[1]:SetDirectionalLight(BOX_TOP, color_white)
-			panel.Entries[1]:SetDirectionalLight(BOX_FRONT, color_white)
-			panel.Entries[1].Anim:Start(1)
+			panel.Entries[1]:SetDirectionalLight(BOX_TOP, lightRed)
+			panel.Entries[1]:SetDirectionalLight(BOX_FRONT, lightRed)
+			panel.Entries[1].Spin:Start(1)
 			panel.HasBattery = panel.HasBatteryNew
 			panel.HasBatteryNew = nil
 		end
@@ -424,12 +462,12 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 
 			for i = 2, 1 + gasCansPerGenerator - panel.CansRemainingNew do
 				if 5 - i < panel.CansRemaining then
-					panel.Entries[i].Anim:Start(1)
+					panel.Entries[i].Spin:Start(1)
 				end
 
 				panel.Entries[i]:SetAmbientLight(grey)
-				panel.Entries[i]:SetDirectionalLight(BOX_TOP, color_white)
-				panel.Entries[i]:SetDirectionalLight(BOX_FRONT, color_white)
+				panel.Entries[i]:SetDirectionalLight(BOX_TOP, lightRed)
+				panel.Entries[i]:SetDirectionalLight(BOX_FRONT, lightRed)
 			end
 
 			panel.CansRemaining = panel.CansRemainingNew
@@ -466,5 +504,6 @@ g_SlasherHud:AddControl("K", "le chase", iconTable)
 g_SlasherHud:AddControl("G", "cungus", iconTable, 2)
 g_SlasherHud:AddControl("H", "adw", iconTable)
 g_SlasherHud:SetControlEnabled("G", false)
+g_SlasherHud:ShakeControl("G")
 
 --]]

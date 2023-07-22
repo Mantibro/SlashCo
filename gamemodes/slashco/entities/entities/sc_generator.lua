@@ -147,6 +147,7 @@ function ENT:Use(activator, _, _)
 		self:SendData(activator)
 		self:EmitSound("slashco/generator_fill.wav")
 	elseif not self.MakingItem then
+		self:SlasherHint()
 		if activator:ItemValue("IsFuel", false,
 				true) and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
 			self.MakingItem = true
@@ -170,10 +171,20 @@ function ENT:Use(activator, _, _)
 	end
 end
 
+function ENT:SlasherHint()
+	for _, v in ipairs(player.GetAll()) do
+		---team.GetPlayers(TEAM_SLASHER)
+		timer.Create(self:GetCreationID() .. "_slasherHint_" .. v:UserID(), 30, 0, function()
+			SlashCo.SendValue(v, "genHint", self)
+		end)
+	end
+end
+
 function ENT:SlasherObserve()
 	for _, v in ipairs(player.GetAll()) do
 		---team.GetPlayers(TEAM_SLASHER)
 		if v:GetEyeTrace().Entity == self and (not v.GenCooldown or CurTime() - v.GenCooldown > 3) then
+			timer.Remove(self:GetCreationID() .. "_slasherHint_" .. v:UserID())
 			SlashCo.SendValue(v, "genProg", self, self.HasBattery, self.CansRemaining or SlashCo.GasCansPerGenerator)
 			v.GenCooldown = CurTime()
 		end

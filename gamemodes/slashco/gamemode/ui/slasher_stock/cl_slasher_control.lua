@@ -6,6 +6,8 @@ local darkRed = Color(128, 0, 0)
 function PANEL:Init()
 	self.Enabled = true
 	self.Icon = Material("slashco/ui/icons/slasher/s_7_s1")
+	self.dX = 0
+	self.dY = 0
 
 	local icon = vgui.Create("Panel", self)
 	self.IconPanel = icon
@@ -15,7 +17,7 @@ function PANEL:Init()
 	function icon.Paint(_, w, h)
 		surface.SetMaterial(self.Icon)
 		surface.SetDrawColor(255, 255, 255, 255)
-		surface.DrawTexturedRectRotated(w / 2, h / 2, 80, 80, icon.Rotate)
+		surface.DrawTexturedRectRotated(w / 2 + self.dX, h / 2 + self.dY, 80, 80, icon.Rotate)
 	end
 
 	local label = vgui.Create("DLabel", self)
@@ -34,6 +36,11 @@ function PANEL:Init()
 	keyLabel:SetFont("TVCD")
 	keyLabel:SetText("[LMB]")
 	keyLabel:SetTextColor(red)
+
+	self.Anim = Derma_Anim("Shake", self, function(pnl, _, delta)
+		pnl.dX = (math.random() - 0.5) * (1 - delta) * 8
+		pnl.dY = (math.random() - 0.5) * (1 - delta) * 8
+	end)
 end
 
 ---convenience function to set all of the control's properties in one function
@@ -110,6 +117,18 @@ function PANEL:SetText(text, dontSetIcon)
 
 	if not dontSetIcon then
 		self:SetIcon(text)
+	end
+end
+
+---plays a shake animation
+function PANEL:Shake()
+	self.Anim:Start(1)
+end
+
+---internal: runs the shake animation
+function PANEL:Think()
+	if self.Anim:Active() then
+		self.Anim:Run()
 	end
 end
 
