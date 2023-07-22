@@ -22,6 +22,7 @@ include("concommands.lua")
 include("ply_voicelines.lua")
 include("survivor_func.lua")
 include("sh_values.lua")
+include("items/sv_playerspeed.lua")
 
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems

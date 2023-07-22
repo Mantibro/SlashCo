@@ -22,16 +22,14 @@ SlashCoItems.GasCan.OnDrop = function(ply)
 end
 SlashCoItems.GasCan.OnSwitchFrom = function(ply)
     timer.Simple(0.25, function()
-        if not ply:ItemValue2("ChangesSpeed") then
-            ply:SetRunSpeed(300)
-        end
+        ply:RemoveSpeedEffect("gas")
     end)
 end
 SlashCoItems.GasCan.OnBuy = function(_)
     SlashCo.LobbyData.SurvivorGasMod = SlashCo.LobbyData.SurvivorGasMod + 1
 end
 SlashCoItems.GasCan.OnPickUp = function(ply)
-    ply:SetRunSpeed(200)
+    ply:AddSpeedEffect("gas", 200, 10)
 end
 SlashCoItems.GasCan.EquipSound = function()
     return "slashco/survivor/gascan_pickup"..math.random(1, 3)..".wav"

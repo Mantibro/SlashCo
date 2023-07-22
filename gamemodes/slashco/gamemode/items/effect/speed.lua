@@ -4,10 +4,8 @@ SlashCoEffects.Speed = EFFECT
 EFFECT.Name = "Speed"
 EFFECT.ChangesSpeed = true
 EFFECT.OnApplied = function(ply)
-    ply:SetRunSpeed(400)
+    ply:AddSpeedEffect("speedEffect", 400, 4)
 end
 EFFECT.OnExpired = function(ply)
-    if not ply:ItemValue2("ChangesSpeed", nil, true) then
-        ply:SetRunSpeed(300)
-    end
+    ply:RemoveSpeedEffect("speedEffect")
 end

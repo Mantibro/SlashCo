@@ -22,19 +22,19 @@ typeWrite = {
         net.WriteUInt(1, 4)
         net.WriteDouble(val)
     end,
-    vector = function(val)
+    Vector = function(val)
         net.WriteUInt(2, 4)
         net.WriteVector(val)
     end,
-    color = function(val)
+    Color = function(val)
         net.WriteUInt(3, 4)
         net.WriteColor(val)
     end,
-    angle = function(val)
+    Angle = function(val)
         net.WriteUInt(4, 4)
         net.WriteAngle(val)
     end,
-    entity = function(val)
+    Entity = function(val)
         net.WriteUInt(5, 4)
         net.WriteEntity(val)
     end,

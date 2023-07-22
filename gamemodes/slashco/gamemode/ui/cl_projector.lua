@@ -1,6 +1,6 @@
 local PANEL = {}
 
-local defaultCam = Vector(40, 0, 0)
+local defaultCam = Vector(0, 0, 0)
 
 ---this panel displays an in-world entity
 ---the view angle is identical to the player's angle relative to the entity,
@@ -35,6 +35,11 @@ end
 ---overall light
 function PANEL:SetAmbientLight(color)
 	self.colAmbientLight = color
+end
+
+---whether to also render the model's children
+function PANEL:SetNoKids(value)
+	self.NoKids = value
 end
 
 ---directional light from six positions
@@ -72,6 +77,10 @@ function PANEL:InsertExtraEntity(key, entity)
 	self.ExtraEntities[key] = entity
 end
 
+function PANEL:OnRender()
+	--override this!
+end
+
 ---internal: renders an entity and its children recursively
 function PANEL:Render(ent)
 	if not IsValid(ent) then
@@ -82,8 +91,10 @@ function PANEL:Render(ent)
 		ent:DrawModel()
 	end
 
-	for _, v in pairs(ent:GetChildren()) do
-		self:Render(v)
+	if not self.NoKids then
+		for _, v in pairs(ent:GetChildren()) do
+			self:Render(v)
+		end
 	end
 
 	if pac then
@@ -98,20 +109,23 @@ function PANEL:Paint(w, h)
 		return
 	end
 
-	local vec = Vector(self.Distance * self.Entity:GetModelScale(), 0, 0)
-	vec:Rotate(EyeAngles())
-	local x, y = self:LocalToScreen(0, 0)
-
 	local pos
 	if self.Entity:IsPlayer() and self.CamPos == defaultCam then
 		pos = LerpVector(0.5, self.Entity:GetPos(), self.Entity:EyePos())
 	else
-		pos = self.Entity:GetPos() + self.CamPos
+		pos = self.Entity:WorldSpaceCenter() + self.CamPos
 	end
 
-	cam.Start3D(pos - vec, EyeAngles() + self.Rotate, self.FOV, x, y, w, h)
+	local eyeAng = LocalPlayer():LocalEyeAngles() --EyeAngles()
+	local vec = Vector(self.Distance * self.Entity:GetModelScale(), 0, 0)
+	vec:Rotate(eyeAng)
+	local x, y = self:LocalToScreen(0, 0)
+
+	cam.Start3D(pos - vec, eyeAng + self.Rotate, self.FOV, x, y, w, h)
 	render.SuppressEngineLighting(true)
 	render.SetLightingOrigin(pos)
+
+	self:OnRender()
 
 	render.ResetModelLighting(self.colAmbientLight.r / 255, self.colAmbientLight.g / 255, self.colAmbientLight.b / 255)
 	for i = 0, 6 do

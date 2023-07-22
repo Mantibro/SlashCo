@@ -19,10 +19,7 @@ end
 
 ITEM.OnSwitchFrom = function(ply)
     timer.Simple(0.18, function()
-        if not ply:ItemValue2("ChangesSpeed") then
-            ply:SetRunSpeed(300)
-            ply:ViewPunch( Angle( -40, 0, 0 ) )
-        end
+        ply:RemoveSpeedEffect("jug")
     end)
 end
 ITEM.OnPickUp = function(ply)
@@ -34,7 +31,7 @@ ITEM.OnPickUp = function(ply)
         end)
     end
 
-    ply:SetRunSpeed(310)
+    ply:AddSpeedEffect("jug", 310, 3)
 end
 
 hook.Add("Think", "JugFunc", function()

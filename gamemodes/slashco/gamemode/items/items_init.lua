@@ -1,153 +1,147 @@
 AddCSLuaFile()
-AddCSLuaFile("effect/invisibility.lua")
-AddCSLuaFile("effect/fuelspeed.lua")
-AddCSLuaFile("effect/slowness.lua")
-AddCSLuaFile("effect/speed.lua")
 AddCSLuaFile("items_meta.lua")
-
 
 SlashCoItems = SlashCoItems or {}
 SlashCoEffects = SlashCoEffects or {}
 
-include("effect/invisibility.lua")
-include("effect/fuelspeed.lua")
-include("effect/slowness.lua")
-include("effect/speed.lua")
 include("items_meta.lua")
 
-local item_files, _ = file.Find("slashco/gamemode/items/item/*", "LUA")
+local effect_files = file.Find("slashco/gamemode/items/effect/*", "LUA")
+for _, v in ipairs(effect_files) do
+	AddCSLuaFile("effect/" .. v)
+	include("effect/" .. v)
+end
 
+local item_files = file.Find("slashco/gamemode/items/item/*", "LUA")
 for _, v in ipairs(item_files) do
-        
-    AddCSLuaFile("item/"..v)
-    include("item/"..v)
-
+	AddCSLuaFile("item/" .. v)
+	include("item/" .. v)
 end
 
 local PLAYER = FindMetaTable("Player")
 
 function PLAYER:AddEffect(value, duration)
-    if not self:EffectFunction("OnRemoved") then
-        self:EffectFunction("OnExpired")
-    end
-    self:SetNWString("itemEffect", value)
-    self:EffectFunction("OnApplied")
-    timer.Create("itemEffectExpire_"..self:UserID(), duration, 1, function()
-        if not IsValid(self) then
-            return
-        end
-        self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-        self:EffectFunction("OnExpired")
-        self:SetNWString("itemEffect", "none")
-    end)
+	if not self:EffectFunction("OnRemoved") then
+		self:EffectFunction("OnExpired")
+	end
+	self:SetNWString("itemEffect", value)
+	self:EffectFunction("OnApplied")
+	timer.Create("itemEffectExpire_" .. self:UserID(), duration, 1, function()
+		if not IsValid(self) then
+			return
+		end
+		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+		self:EffectFunction("OnExpired")
+		self:SetNWString("itemEffect", "none")
+	end)
 end
 
 function PLAYER:EffectFunction(value, ...)
-    local effect = self:GetNWString("itemEffect", "none")
-    if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
-        return SlashCoEffects[effect][value](self, ...)
-    end
+	local effect = self:GetNWString("itemEffect", "none")
+	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
+		return SlashCoEffects[effect][value](self, ...)
+	end
 end
 
 function PLAYER:ClearEffect()
-    if not self:EffectFunction("OnRemoved") then
-        self:EffectFunction("OnExpired")
-    end
-    self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-    self:SetNWString("itemEffect", "none")
-    timer.Remove("itemEffectExpire_"..self:UserID())
+	if not self:EffectFunction("OnRemoved") then
+		self:EffectFunction("OnExpired")
+	end
+	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+	self:SetNWString("itemEffect", "none")
+	timer.Remove("itemEffectExpire_" .. self:UserID())
 end
 
 --this doesn't include a team check because we assume that it's in a survivor-only context
 function PLAYER:ItemValue(value, fallback, isSecondary)
-    local effect = self:GetNWString("itemEffect", "none")
-    if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
-        return SlashCoEffects[effect][value]
-    end
+	local effect = self:GetNWString("itemEffect", "none")
+	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
+		return SlashCoEffects[effect][value]
+	end
 
-    local slot = isSecondary and "item2" or "item"
-    local item = self:GetNWString(slot, "none")
-    if SlashCoItems[item] and SlashCoItems[item][value] then
-        return SlashCoItems[item][value]
-    end
+	local slot = isSecondary and "item2" or "item"
+	local item = self:GetNWString(slot, "none")
+	if SlashCoItems[item] and SlashCoItems[item][value] then
+		return SlashCoItems[item][value]
+	end
 
-    return fallback
+	return fallback
 end
 
 function PLAYER:ItemValue2(value, fallback, noEffect)
-    local item
-    if not noEffect then
-        item = ply:GetNWString("itemEffect", "none")
-        if SlashCoItems[item] and SlashCoItems[item][value] then
-            return SlashCoItems[item][value]
-        end
-    end
+	local item
+	if not noEffect then
+		item = ply:GetNWString("itemEffect", "none")
+		if SlashCoItems[item] and SlashCoItems[item][value] then
+			return SlashCoItems[item][value]
+		end
+	end
 
-    item = ply:GetNWString("item2", "none")
-    if item == "none" then
-        item = ply:GetNWString("item", "none")
-    end
-    if SlashCoItems[item] and SlashCoItems[item][value] then
-        return SlashCoItems[item][value]
-    end
+	item = ply:GetNWString("item2", "none")
+	if item == "none" then
+		item = ply:GetNWString("item", "none")
+	end
+	if SlashCoItems[item] and SlashCoItems[item][value] then
+		return SlashCoItems[item][value]
+	end
 
-    return fallback
+	return fallback
 end
 
 function PLAYER:ItemFunction(value, ...)
-    return self:ItemFunctionInternal(value, "item", ...)
+	return self:ItemFunctionInternal(value, "item", ...)
 end
 
 function PLAYER:ItemFunctionOrElse(value, default, ...)
-    local val = {self:ItemFunctionInternal(value, "item", ...)}
-    if val[1] then
-        return unpack(val)
-    end
-    return unpack(default)
+	local val = { self:ItemFunctionInternal(value, "item", ...) }
+	if val[1] then
+		return unpack(val)
+	end
+	return unpack(default)
 end
 
 function PLAYER:SecondaryItemFunction(value, ...)
-    return self:ItemFunctionInternal(value, "item2", ...)
+	return self:ItemFunctionInternal(value, "item2", ...)
 end
 
 function PLAYER:SecondaryItemFunctionOrElse(value, default, ...)
-    local val = {self:ItemFunctionInternal(value, "item2", ...)}
-    if val then
-        return val
-    end
-    return default
+	local val = { self:ItemFunctionInternal(value, "item2", ...) }
+	if val then
+		return val
+	end
+	return default
 end
 
 function PLAYER:ItemFunctionInternal(value, slot, ...)
-    local effect = self:GetNWString("itemEffect", "none")
-    if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
-        return SlashCoEffects[effect][value](self, ...)
-    end
+	local effect = self:GetNWString("itemEffect", "none")
+	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
+		return SlashCoEffects[effect][value](self, ...)
+	end
 
-    local item = self:GetNWString(slot, "none")
-    if SlashCoItems[item] and SlashCoItems[item][value] then
-        return SlashCoItems[item][value](self, ...)
-    end
+	local item = self:GetNWString(slot, "none")
+	if SlashCoItems[item] and SlashCoItems[item][value] then
+		return SlashCoItems[item][value](self, ...)
+	end
 end
 
 function PLAYER:ItemFunction2(value, item, ...)
-    if SlashCoItems[item] and SlashCoItems[item][value] then
-        return SlashCoItems[item][value](self,...)
-    end
+	if SlashCoItems[item] and SlashCoItems[item][value] then
+		return SlashCoItems[item][value](self, ...)
+	end
 end
 
 --might break physics idk
 hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
-    if ent1:GetClass() == "sc_brick" and ent2:IsPlayer() and ent2:Team() == TEAM_SURVIVOR then
-        return false
-    end
-    if ent2:GetClass() == "sc_brick" and ent1:IsPlayer() and ent1:Team() == TEAM_SURVIVOR then
-        return false
-    end
+	if ent1:GetClass() == "sc_brick" and ent2:IsPlayer() and ent2:Team() == TEAM_SURVIVOR then
+		return false
+	end
+	if ent2:GetClass() == "sc_brick" and ent1:IsPlayer() and ent1:Team() == TEAM_SURVIVOR then
+		return false
+	end
 end)
 
 if CLIENT then
-    return
+	return
 end
 
 --[[local spawnableItems = {}

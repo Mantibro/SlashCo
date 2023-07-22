@@ -143,7 +143,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
     if LocalPlayer():GetVelocity():Length() > 250 and game.GetMap() ~= "sc_lobby" then
         local lookent = LocalPlayer():GetEyeTrace().Entity
-        if lookent:GetClass() == "prop_door_rotating" and CheckDoorWL(lookent) then
+        if IsValid(lookent) and lookent:GetClass() == "prop_door_rotating" and CheckDoorWL(lookent) then
             if lookent:GetPos():Distance(LocalPlayer():GetPos()) < 150 then
                 draw.SimpleText("[LMB] SLAM OPEN", "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             end

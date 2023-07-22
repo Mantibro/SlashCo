@@ -21,13 +21,11 @@ SlashCoItems.Rock.OnFootstep = function()
 end
 SlashCoItems.Rock.OnSwitchFrom = function(ply)
     timer.Simple(0.18, function()
-        if not ply:ItemValue2("ChangesSpeed") then
-            ply:SetRunSpeed(300)
-        end
+        ply:RemoveSpeedEffect("rock")
     end)
 end
 SlashCoItems.Rock.OnPickUp = function(ply)
-    ply:SetRunSpeed(200)
+    ply:AddSpeedEffect("rock", 200, 10)
 end
 SlashCoItems.Rock.ViewModel = {
     model = "models/slashco/items/rock.mdl",
