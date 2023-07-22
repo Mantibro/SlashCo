@@ -691,7 +691,7 @@ local Think = function()
             --Benadryl
             for _, plr in ipairs( player.GetAll() ) do
 
-                if plr:Team() ~= TEMA_SURVIVOR then
+                if plr:Team() ~= TEAM_SURVIVOR then
 
                     if plr:GetNWBool("SurvivorBenadryl") then
                         plr:SetNWBool("SurvivorBenadryl", false)
