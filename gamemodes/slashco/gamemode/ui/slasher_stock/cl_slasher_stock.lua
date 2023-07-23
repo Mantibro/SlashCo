@@ -27,10 +27,12 @@ function PANEL:Init()
 	self:MakeSurvivorsCard()
 	self:MakeGeneratorsCard()
 
+	--[[
 	local left = vgui.Create("Panel", self)
 	self.Left = left
 	left:SetWide(420)
 	left:Dock(LEFT)
+	--]]
 end
 
 ---sets the slasher title
@@ -52,9 +54,20 @@ function PANEL:SetAvatar(avatar)
 	end
 end
 
+---makes a new meter on the right side
+function PANEL:AddMeter(key, zPos)
+	local meter = self.Right:Add("slashco_slasher_meter")
+	self.Meters[key] = meter
+	meter:SetTall(95)
+	meter:Dock(BOTTOM)
+	meter:SetZPos(zPos or -100)
+	meter:DockMargin(0, 0, 8, 8)
+	self.Right:InvalidateChildren()
+end
+
 ---add a new control to the right side
 function PANEL:AddControl(key, text, icon, zPos)
-	local control = vgui.Create("slashco_slasher_control", self.Right)
+	local control = self.Right:Add("slashco_slasher_control") --vgui.Create("slashco_slasher_control", self.Right)
 	self.Controls[key] = control
 	control:SetTall(100)
 	control:Dock(BOTTOM)
@@ -94,8 +107,8 @@ function PANEL:SetControlEnabled(key, state, dontSetIcon)
 	self.Controls[key]:SetEnabled(state, dontSetIcon)
 end
 
----sets whether on-hud models always have their "look-at"/model fog behavior or not
----doesn't affect updates to generator stats
+---sets whether on-hud models always show children
+---this lets the slasher see player's items and generator objects at all times
 function PANEL:SetAllSeeing(value)
 	self.AllSeeing = value
 end
@@ -200,17 +213,10 @@ function PANEL:ModelFog(modelPanel)
 			modelPanel:SetNoKids(false)
 			modelPanel.Seen = true
 		else
-			if self.AllSeeing then
-				modelPanel:SetAmbientLight(grey)
-				modelPanel:SetDirectionalLight(BOX_TOP, color_white)
-				modelPanel:SetDirectionalLight(BOX_FRONT, color_white)
-				modelPanel:SetNoKids(false)
-			else
-				modelPanel:SetAmbientLight(darkRed)
-				modelPanel:SetDirectionalLight(BOX_TOP, lightRed)
-				modelPanel:SetDirectionalLight(BOX_FRONT, lightRed)
-				modelPanel:SetNoKids(true)
-			end
+			modelPanel:SetAmbientLight(darkRed)
+			modelPanel:SetDirectionalLight(BOX_TOP, lightRed)
+			modelPanel:SetDirectionalLight(BOX_FRONT, lightRed)
+			modelPanel:SetNoKids(not self.AllSeeing)
 			modelPanel.Seen = false
 		end
 
@@ -362,7 +368,7 @@ function PANEL:MakeGeneratorsCard()
 		gen.Entries = {}
 		PANEL:MakeGenEntry(gen, 0, "models/items/car_battery01.mdl")
 
-		for i = 1, 4 do
+		for i = 1, gasCansPerGenerator do
 			PANEL:MakeGenEntry(gen, i)
 		end
 
@@ -418,7 +424,6 @@ end
 
 hook.Add("scValue_genHint", "slashCoGenHint", function(gen)
 	local panel = findGenPanel(gen)
-
 	if not panel then
 		return
 	end
@@ -430,7 +435,6 @@ end)
 
 hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansRemaining)
 	local panel = findGenPanel(gen)
-
 	if not panel then
 		return
 	end
@@ -505,5 +509,8 @@ g_SlasherHud:AddControl("G", "cungus", iconTable, 2)
 g_SlasherHud:AddControl("H", "adw", iconTable)
 g_SlasherHud:SetControlEnabled("G", false)
 g_SlasherHud:ShakeControl("G")
+g_SlasherHud:AddMeter("Swigga")
+g_SlasherHud:AddMeter("keppuku")
+--g_SlasherHud:SetAllSeeing(true)
 
 --]]
