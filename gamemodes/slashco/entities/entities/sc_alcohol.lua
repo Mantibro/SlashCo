@@ -5,18 +5,18 @@ local SlashCoItems = SlashCoItems
 
 ENT.Type = "anim"
 
-ENT.ClassName = "sc_soda"
-ENT.PrintName = "soda"
-ENT.Author = "Manti"
+ENT.ClassName = "sc_alcohol"
+ENT.PrintName = "alcohol"
+ENT.Author = "textstack"
 ENT.Contact = ""
-ENT.Purpose = "A can of sweet tasting soda."
+ENT.Purpose = "ungo bungo"
 ENT.Instructions = ""
 ENT.IsSelectable = true
 ENT.PingType = "ITEM"
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel(SlashCoItems.Soda.Model)
+		self:SetModel(SlashCoItems.Alcohol.Model)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)
@@ -32,22 +32,16 @@ function ENT:Initialize()
 end
 
 function ENT:Use(activator)
-
 	if SERVER then
-
 		if activator:Team() == TEAM_SURVIVOR then
+			SlashCo.ItemPickUp(activator, self:EntIndex(), "Alcohol")
 
-			SlashCo.ItemPickUp(activator, self:EntIndex(), "Soda")
-
-			if (self:IsPlayerHolding()) then
+			if self:IsPlayerHolding() then
 				return
 			end
 			activator:PickupObject(self)
-
 		end
-
 	end
-
 end
 
 function ENT:UpdateTransmitState()

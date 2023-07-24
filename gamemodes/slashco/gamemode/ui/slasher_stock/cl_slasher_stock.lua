@@ -424,7 +424,7 @@ end
 
 hook.Add("scValue_genHint", "slashCoGenHint", function(gen)
 	local panel = findGenPanel(gen)
-	if not panel then
+	if not IsValid(panel) then
 		return
 	end
 
@@ -435,7 +435,7 @@ end)
 
 hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansRemaining)
 	local panel = findGenPanel(gen)
-	if not panel then
+	if not IsValid(panel) then
 		return
 	end
 

@@ -4,7 +4,7 @@ local red = Color(255, 0, 0)
 
 function PANEL:Init()
 	self.Max = 100
-	self.Current = 100
+	self.Current = 0
 	self.LabelText = "Meter"
 	self.ValueLabelText = "%"
 	self.ShowMax = false

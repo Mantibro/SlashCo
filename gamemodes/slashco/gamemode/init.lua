@@ -196,8 +196,8 @@ SlashCo.SpawnableItems = {}
 
 for _, p in SortedPairs(SlashCoItems) do
     if p.IsSpawnable then
-        --table.insert(SlashCo.SpawnableItems, {p.EntClass})
-        SlashCo.SpawnableItems[1 + #SlashCo.SpawnableItems] = p.EntClass
+        table.insert(SlashCo.SpawnableItems, p.EntClass)
+        --SlashCo.SpawnableItems[1 + #SlashCo.SpawnableItems] = p.EntClass
     end
 end
 

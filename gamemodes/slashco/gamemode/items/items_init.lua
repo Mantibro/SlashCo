@@ -20,6 +20,7 @@ end
 
 local PLAYER = FindMetaTable("Player")
 
+---gives a player an effect
 function PLAYER:AddEffect(value, duration)
 	if not self:EffectFunction("OnRemoved") then
 		self:EffectFunction("OnExpired")
@@ -36,13 +37,15 @@ function PLAYER:AddEffect(value, duration)
 	end)
 end
 
-function PLAYER:EffectFunction(value, ...)
+---calls the <funcName> function of a player's effect with passed args
+function PLAYER:EffectFunction(funcName, ...)
 	local effect = self:GetNWString("itemEffect", "none")
-	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
-		return SlashCoEffects[effect][value](self, ...)
+	if SlashCoEffects[effect] and SlashCoEffects[effect][funcName] then
+		return SlashCoEffects[effect][funcName](self, ...)
 	end
 end
 
+---removes a player's effect
 function PLAYER:ClearEffect()
 	if not self:EffectFunction("OnRemoved") then
 		self:EffectFunction("OnExpired")
@@ -52,22 +55,24 @@ function PLAYER:ClearEffect()
 	timer.Remove("itemEffectExpire_" .. self:UserID())
 end
 
+---check the <valueName> value of a player's item in a specific slot
 --this doesn't include a team check because we assume that it's in a survivor-only context
-function PLAYER:ItemValue(value, fallback, isSecondary)
+function PLAYER:ItemValue(valueName, fallback, isSecondary)
 	local effect = self:GetNWString("itemEffect", "none")
-	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
-		return SlashCoEffects[effect][value]
+	if SlashCoEffects[effect] and SlashCoEffects[effect][valueName] then
+		return SlashCoEffects[effect][valueName]
 	end
 
 	local slot = isSecondary and "item2" or "item"
 	local item = self:GetNWString(slot, "none")
-	if SlashCoItems[item] and SlashCoItems[item][value] then
-		return SlashCoItems[item][value]
+	if SlashCoItems[item] and SlashCoItems[item][valueName] then
+		return SlashCoItems[item][valueName]
 	end
 
 	return fallback
 end
 
+---check the <valueName> value across a player's entire 'inventory' (effect first, then item2, then item1)
 function PLAYER:ItemValue2(value, fallback, noEffect)
 	local item
 	if not noEffect then
@@ -88,30 +93,49 @@ function PLAYER:ItemValue2(value, fallback, noEffect)
 	return fallback
 end
 
-function PLAYER:ItemFunction(value, ...)
-	return self:ItemFunctionInternal(value, "item", ...)
+---calls the <funcName> function of a player's item1 with passed args
+---checks the player's effect slot first!
+function PLAYER:ItemFunction(funcName, ...)
+	return self:ItemFunctionInternal(funcName, "item", ...)
 end
 
-function PLAYER:ItemFunctionOrElse(value, default, ...)
-	local val = { self:ItemFunctionInternal(value, "item", ...) }
+---calls the <funcName> function of a player's item1 with passed args, or a fallback if it doesn't return anything
+---function and fallback must both return tables
+---checks the player's effect slot first!
+function PLAYER:ItemFunctionOrElse(funcName, fallback, ...)
+	local val = { self:ItemFunctionInternal(funcName, "item", ...) }
 	if val[1] then
 		return unpack(val)
 	end
-	return unpack(default)
+	return unpack(fallback)
 end
 
-function PLAYER:SecondaryItemFunction(value, ...)
-	return self:ItemFunctionInternal(value, "item2", ...)
+---calls the <funcName> function of a player's item2 with passed args
+---checks the player's effect slot first!
+function PLAYER:SecondaryItemFunction(funcName, ...)
+	return self:ItemFunctionInternal(funcName, "item2", ...)
 end
 
-function PLAYER:SecondaryItemFunctionOrElse(value, default, ...)
-	local val = { self:ItemFunctionInternal(value, "item2", ...) }
-	if val then
-		return val
+---calls the <funcName> function of a player's item2 with passed args, or a fallback if it doesn't return anything
+---function and fallback must both return tables
+---checks the player's effect slot first!
+function PLAYER:SecondaryItemFunctionOrElse(funcName, fallback, ...)
+	local val = { self:ItemFunctionInternal(funcName, "item2", ...) }
+	if val[1] then
+		return unpack(val)
 	end
-	return default
+	return unpack(fallback)
 end
 
+---calls the <funcName> function of a specific item; ignores the player's 'inventory' entirely
+---good for situations where you already know the player's item
+function PLAYER:ItemFunction2(funcName, item, ...)
+	if SlashCoItems[item] and SlashCoItems[item][funcName] then
+		return SlashCoItems[item][funcName](self, ...)
+	end
+end
+
+---internal: checks effect function first before checking the specified slot
 function PLAYER:ItemFunctionInternal(value, slot, ...)
 	local effect = self:GetNWString("itemEffect", "none")
 	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
@@ -119,12 +143,6 @@ function PLAYER:ItemFunctionInternal(value, slot, ...)
 	end
 
 	local item = self:GetNWString(slot, "none")
-	if SlashCoItems[item] and SlashCoItems[item][value] then
-		return SlashCoItems[item][value](self, ...)
-	end
-end
-
-function PLAYER:ItemFunction2(value, item, ...)
 	if SlashCoItems[item] and SlashCoItems[item][value] then
 		return SlashCoItems[item][value](self, ...)
 	end
@@ -141,6 +159,10 @@ hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
 end)
 
 if CLIENT then
+	hook.Add("RenderScreenspaceEffects", "PostProcessingExample", function()
+		LocalPlayer():ItemFunction("Screenspace")
+	end)
+
 	return
 end
 
