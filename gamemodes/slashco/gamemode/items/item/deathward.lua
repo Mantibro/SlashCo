@@ -13,11 +13,6 @@ SlashCoItems.DeathWard.MaxAllowed = function()
 end
 SlashCoItems.DeathWard.IsSpawnable = true
 SlashCoItems.DeathWard.OnDrop = function(ply)
-	SlashCoItems.DeathWard.OnSwitchFrom(ply)
-	local droppeditem = SlashCo.CreateItem(SlashCoItems.DeathWard.EntClass, ply:LocalToWorld(Vector(0, 0, 60)),
-			ply:LocalToWorldAngles(Angle(0, 0, 0)))
-	Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-	SlashCo.CurRound.Items[droppeditem] = true
 end
 SlashCoItems.DeathWard.OnDie = function(ply)
 	ply:EmitSound("slashco/survivor/deathward.mp3")

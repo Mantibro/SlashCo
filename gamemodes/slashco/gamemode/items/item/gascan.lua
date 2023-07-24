@@ -16,9 +16,7 @@ SlashCoItems.GasCan.MaxAllowed = function()
     return 2
 end
 SlashCoItems.GasCan.OnDrop = function(ply)
-    SlashCoItems.GasCan.OnSwitchFrom(ply)
-    local gasCan = SlashCo.CreateGasCan(ply:LocalToWorld(Vector(0, 0, 45)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    gasCan:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
+    return 45
 end
 SlashCoItems.GasCan.OnSwitchFrom = function(ply)
     timer.Simple(0.25, function()

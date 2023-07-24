@@ -10,8 +10,7 @@ SlashCoItems.Battery.CamPos = Vector(80,0,0)
 SlashCoItems.Battery.IsSpawnable = false
 SlashCoItems.Battery.IsBattery = true
 SlashCoItems.Battery.OnDrop = function(ply)
-    local battery = SlashCo.CreateBattery(ply:LocalToWorld(Vector(0, 0, 55)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    battery:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
+    return 55
 end
 SlashCoItems.Battery.ViewModel = {
     model = "models/items/car_battery01.mdl",

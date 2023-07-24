@@ -53,9 +53,6 @@ SlashCoItems.PocketSand.OnUse = function(ply)
     end)
 end
 SlashCoItems.PocketSand.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem(SlashCoItems.PocketSand.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
 end
 SlashCoItems.PocketSand.ViewModel = {
     model = "models/slashco/items/pocketsand.mdl",

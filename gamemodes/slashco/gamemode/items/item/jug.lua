@@ -11,10 +11,6 @@ ITEM.ReplacesWorldProps = true
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true
 ITEM.OnDrop = function(ply)
-    ITEM.OnSwitchFrom(ply)
-    local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
 end
 
 ITEM.OnSwitchFrom = function(ply)

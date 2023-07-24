@@ -111,19 +111,19 @@ function SWEP:ViewModelDrawn()
     --PrintTable(v or {"none"})
 
     if not v then
-        self.xPos = Lerp(0.03,self.xPos or 55,55)
+        self.xPos = Lerp(0.06,self.xPos or 55,55)
 
         if (self.xPos-55) <= 1 then
             self.lastEquip = nil
         end
     elseif not self.lastEquip or self.lastEquip ~= v then
-        self.xPos = Lerp(0.03,self.xPos or v.pos.x,55)
+        self.xPos = Lerp(0.06,self.xPos or v.pos.x,55)
 
         if (self.xPos-55) <= 1 then
             self.lastEquip = v
         end
     else
-        self.xPos = Lerp(0.05,self.xPos or 55,v.pos.x)
+        self.xPos = Lerp(0.06,self.xPos or 55,v.pos.x)
     end
 
     --PrintTable(self.lastEquip)

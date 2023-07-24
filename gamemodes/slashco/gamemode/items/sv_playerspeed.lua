@@ -3,7 +3,7 @@ local PLAYER = FindMetaTable("Player")
 PLAYER.SpeedEffects = {}
 
 function PLAYER:AddSpeedEffect(key, speed, priority)
-	self.SpeedEffects[key] = {speed, priority}
+	self.SpeedEffects[key] = { speed, priority }
 	self:UpdateSpeed()
 end
 
@@ -28,3 +28,11 @@ function PLAYER:UpdateSpeed()
 		self:SetRunSpeed(highestPrioritySpeed)
 	end
 end
+
+hook.Add("PlayerDeath", "slashCoResetSpeedEffects", function(victim)
+	victim.SpeedEffects = {}
+end)
+
+hook.Add("PlayerSilentDeath", "slashCoResetSpeedEffectsSilent", function(victim)
+	victim.SpeedEffects = {}
+end)
