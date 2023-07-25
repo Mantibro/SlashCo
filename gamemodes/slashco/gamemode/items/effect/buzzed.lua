@@ -5,6 +5,7 @@ SlashCoEffects.Buzzed = EFFECT
 
 EFFECT.Name = "Buzzed"
 EFFECT.ChangesSpeed = true
+EFFECT.FuelSpeed = 0.75
 EFFECT.OnApplied = function(ply)
 	ply:AddSpeedEffect("buzzEffect", 275, 12)
 end

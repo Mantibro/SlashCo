@@ -3,11 +3,23 @@ local PANEL = {}
 local red = Color(255, 0, 0)
 local darkRed = Color(128, 0, 0)
 
+local defaultIcon = Material("slashco/ui/icons/slasher/s_0")
+local defaultIconDisabled = Material("slashco/ui/icons/slasher/kill_disabled")
+
+local chaseTable = {
+	default = Material("slashco/ui/icons/slasher/s_chase"),
+	["d/"] = Material("slashco/ui/icons/slasher/chase_disabled")
+}
+
 function PANEL:Init()
 	self.Enabled = true
-	self.Icon = Material("slashco/ui/icons/slasher/s_7_s1")
+	self.Icon = defaultIcon
 	self.dX = 0
 	self.dY = 0
+	self.IconTable = {
+		default = defaultIcon,
+		["d/"] = defaultIconDisabled
+	}
 
 	local icon = vgui.Create("Panel", self)
 	self.IconPanel = icon
@@ -26,7 +38,7 @@ function PANEL:Init()
 	label:SetTall(60)
 	label:SetContentAlignment(6)
 	label:SetFont("HalfCutTitle")
-	label:SetText("chase")
+	label:SetText("control")
 	label:SetTextColor(red)
 
 	local keyLabel = vgui.Create("DLabel", self)
@@ -45,21 +57,27 @@ end
 
 ---convenience function to set all of the control's properties in one function
 ---icon can be either the icon table or just one icon
+---setting the icon to "chase" will set the icon table to the default chase icons
 function PANEL:Setup(key, text, icon)
 	if type(icon) == "table" then
 		self:SetIconTable(icon)
-
-		self.Icon = select(2, next(self.IconTable))
 	elseif type(icon) == "IMaterial" then
 		self.Icon = icon
+		self.IconTable = nil
+	elseif icon == "chase" then
+		self:SetIconTable(chaseTable)
 	end
 
-	self:SetKey(key)
-	self:SetText(text)
+	if key then
+		self:SetKey(key)
+	end
+	if text then
+		self:SetText(text)
+	end
 end
 
 ---sets whether the control displays as enabled or disabled
----if enabled, the control will set its icon to "<text>" as long asdontSetIcon is nil/false
+---if enabled, the control will set its icon to "<text>" as long as dontSetIcon is nil/false
 ---if disabled, the control will set its icon to "d/<text>" as long as dontSetIcon is nil/false
 function PANEL:SetEnabled(state, dontSetIcon)
 	if state then
@@ -83,6 +101,11 @@ end
 
 ---sets a new icon table
 ---updates the icon if allowed
+---icons are automatically set to the control's text and disabled state
+---index = "<control text>" -> icon for when the control has that text
+---= "d/<control text>" -> icon for when the control has that text and is disabled
+---= "default" -> the default icon, as a fallback
+---= "d/" -> the default icon when the control is disabled
 function PANEL:SetIconTable(icons, dontSetIcon)
 	self.IconTable = icons
 
@@ -99,8 +122,14 @@ end
 function PANEL:SetIcon(icon)
 	if type(icon) == "IMaterial" then
 		self.Icon = icon
-	elseif self.IconTable and self.IconTable[icon] then
-		self.Icon = self.IconTable[icon]
+	elseif type(icon) == "string" and self.IconTable then
+		if self.IconTable[icon] then
+			self.Icon = self.IconTable[icon]
+		elseif string.match(icon, "^d/") then
+			self.Icon = self.IconTable["d/"] or defaultIconDisabled
+		else
+			self.Icon = self.IconTable["default"] or defaultIcon
+		end
 	end
 end
 
@@ -113,7 +142,7 @@ end
 ---sets the text for the control and updates the icon
 function PANEL:SetText(text, dontSetIcon)
 	self.Text = text
-	self.Label:SetText(text)
+	self.Label:SetText(text.." ")
 
 	if not dontSetIcon then
 		self:SetIcon(text)

@@ -182,7 +182,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
     for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
         if v.IsSelectable and not (IsFueling and FuelingCan == v) then
-            local gasPos = v:GetPos()
+            local gasPos = v:WorldSpaceCenter()
             local trace = util.QuickTrace(hitPos, gasPos - hitPos, ply)
             if not trace.Hit or trace.Entity == v then
                 local realDistance = hitPos:Distance(gasPos)

@@ -814,7 +814,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
             end
         end
 
-        --Repalce world props.
+        --Replace world props.
         for _, v in ipairs(ents.FindByClass("prop_physics")) do
             local item = spawnableItems[v:GetModel()]
             if item then

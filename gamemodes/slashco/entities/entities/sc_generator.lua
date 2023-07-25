@@ -172,8 +172,7 @@ function ENT:Use(activator, _, _)
 end
 
 function ENT:SlasherHint()
-	for _, v in ipairs(player.GetAll()) do
-		---team.GetPlayers(TEAM_SLASHER)
+	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		timer.Create(self:GetCreationID() .. "_slasherHint_" .. v:UserID(), 30, 0, function()
 			SlashCo.SendValue(v, "genHint", self)
 		end)
@@ -181,8 +180,7 @@ function ENT:SlasherHint()
 end
 
 function ENT:SlasherObserve()
-	for _, v in ipairs(player.GetAll()) do
-		---team.GetPlayers(TEAM_SLASHER)
+	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if v:GetEyeTrace().Entity == self and (not v.GenCooldown or CurTime() - v.GenCooldown > 3) then
 			timer.Remove(self:GetCreationID() .. "_slasherHint_" .. v:UserID())
 			SlashCo.SendValue(v, "genProg", self, self.HasBattery, self.CansRemaining or SlashCo.GasCansPerGenerator)

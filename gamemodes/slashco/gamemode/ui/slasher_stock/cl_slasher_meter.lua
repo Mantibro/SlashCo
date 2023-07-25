@@ -4,22 +4,109 @@ local red = Color(255, 0, 0)
 
 function PANEL:Init()
 	self.Max = 100
-	self.Current = 0
+	self.Current = 100
 	self.LabelText = "Meter"
 	self.ValueLabelText = "%"
 	self.ShowMax = false
 	self.Prefix = false
 
+	self.pDCurrent = 0
+	self.nDCurrent = 0
+	self.FlashAmt = 0
+
 	self:MakeMeter()
 	self:MakeLabels()
 	self:UpdateValueLabel()
+
+	self.Anim = Derma_Anim("Flash", self, function(pnl, _, delta)
+		pnl.FlashAmt = (1 - delta^2) * 128
+	end)
+end
+
+---convenience function to set all the meter values at once
+function PANEL:Setup(name, max, component, componentIsPrefix, showMax)
+	if name then
+		self:SetName(name)
+	end
+	if max then
+		self:SetMax(max)
+	end
+	if component then
+		self:SetComponent(component, componentIsPrefix)
+	end
+	if showMax then
+		self:SetShowMax(showMax)
+	end
+end
+
+---set the label for the meter
+function PANEL:SetName(value)
+	self.LabelText = value
+	self.Label:SetText(" "..self.LabelText)
+end
+
+---set the value of the meter
+function PANEL:SetValue(value)
+	self.Current = math.Clamp(value, 0, self.Max)
+	self:UpdateValueLabel()
+end
+
+---set the max value the meter can reach
+function PANEL:SetMax(value)
+	self.Max = value
+	self.Current = math.Clamp(value, 0, self.Current)
+	self:UpdateValueLabel()
+end
+
+---set the "component" of the value display (ie. the % sign or maybe a $ sign)
+---if isPrefix is true, the component goes before the number
+function PANEL:SetComponent(component, isPrefix)
+	self.ValueLabelText = component
+	self.Prefix = isPrefix
+end
+
+---set whether the number display shows the max value
+function PANEL:SetShowMax(showMax)
+	self.ShowMax = showMax
+	self:UpdateValueLabel()
+end
+
+---plays a flash animation
+function PANEL:Flash()
+	self.Anim:Start(1)
+end
+
+---internal: runs the flash animation
+function PANEL:Think()
+	if self.Anim:Active() then
+		self.Anim:Run()
+	end
 end
 
 ---internal: makes the meter (crazy)
 function PANEL:MakeMeter()
-	local meter = self:Add("DPanel")
+	local meter = self:Add("Panel")
 	meter:Dock(BOTTOM)
 	meter:SetTall(40)
+
+	function meter.Paint(_, w, h)
+		surface.SetDrawColor(255, 0, 0)
+		surface.DrawRect(0, 0, w, h)
+
+		surface.SetDrawColor(0, 0, 0)
+		surface.DrawRect(3, 3, w - 6, h - 6)
+
+		self.nDCurrent = Lerp(0.08, self.pDCurrent, self.Current / self.Max)
+		self.pDCurrent = self.nDCurrent
+
+		if self.nDCurrent > 0.997 then
+			surface.SetDrawColor(255, 0, 0)
+		else
+			surface.SetDrawColor(128 + self.FlashAmt, 0, 0)
+		end
+
+		surface.DrawRect(5, 5, (w - 10) * self.nDCurrent, h - 10)
+	end
 end
 
 ---internal: sets the right-side label to the correct value
@@ -70,7 +157,7 @@ function PANEL:MakeLabels()
 	label:SetTextColor(red)
 	label:SetContentAlignment(1)
 	label:DockMargin(4, 0, 0, -8)
-	label:SetText(self.LabelText)
+	label:SetText(" "..self.LabelText)
 end
 
 vgui.Register("slashco_slasher_meter", PANEL, "Panel")

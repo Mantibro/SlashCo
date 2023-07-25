@@ -25,4 +25,15 @@ function PLAYER:SetModel()
 
 end
 
+function PLAYER:Init()
+	self.SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
+	self:SlasherFunction("InitHud")
+end
+
+function PLAYER:ClassChanged()
+	if IsValid(self.SlasherHud) then
+		self.SlasherHud:Remove()
+	end
+end
+
 player_manager.RegisterClass("player_slasher_base", PLAYER, "player_default")

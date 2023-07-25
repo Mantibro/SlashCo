@@ -12,6 +12,7 @@ local survivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
 function PANEL:Init()
 	self:SetMouseInputEnabled(false)
+	self:SetKeyboardInputEnabled(false)
 
 	self:Dock(FILL)
 	self.Controls = {}
@@ -35,9 +36,11 @@ function PANEL:Init()
 	--]]
 end
 
+---[SLASHER DISPLAY]---
+
 ---sets the slasher title
 function PANEL:SetTitle(name)
-	self.TitleCard.Label:SetText(name)
+	self.TitleCard.Label:SetText(" "..name)
 end
 
 ---sets up the slasher avatar table to simplify setting avatars
@@ -54,20 +57,84 @@ function PANEL:SetAvatar(avatar)
 	end
 end
 
+---[METERS]---
+
 ---makes a new meter on the right side
-function PANEL:AddMeter(key, zPos)
+function PANEL:AddMeter(name, max, component, componentIsPrefix, showMax, zPos)
 	local meter = self.Right:Add("slashco_slasher_meter")
-	self.Meters[key] = meter
+	self.Meters[name] = meter
 	meter:SetTall(95)
 	meter:Dock(BOTTOM)
 	meter:SetZPos(zPos or -100)
 	meter:DockMargin(0, 0, 8, 8)
+	meter:Setup(name, max, component, componentIsPrefix, showMax)
 	self.Right:InvalidateChildren()
 end
 
+---sets the value of a meter
+function PANEL:SetMeterValue(name, value)
+	if not self.Meters[name] then
+		return
+	end
+
+	self.Meters[name]:SetValue(value)
+end
+
+---sets the name of a meter
+---returns true and fails if a meter is already named as such
+function PANEL:SetMeterName(name, newName)
+	if not self.Meters[name] or self.Meters[newName] then
+		return true
+	end
+
+	self.Meters[name]:SetName(newName)
+	self.Meters[newName] = self.Meters[name]
+	self.Meters[name] = nil
+end
+
+---sets the max value of a meter
+function PANEL:SetMeterMax(name, max)
+	if not self.Meters[name] then
+		return
+	end
+
+	self.Meters[name]:SetMax(max)
+end
+
+---set the "component" of the value display (ie. the % sign or maybe a $ sign)
+---if isPrefix is true, the component goes before the number
+function PANEL:SetMeterComponent(name, component, isPrefix)
+	if not self.Meters[name] then
+		return
+	end
+
+	self.Meters[name]:SetComponent(component, isPrefix)
+end
+
+---whether the meter shows its max value
+function PANEL:SetMeterShowMax(name, showMax)
+	if not self.Meters[name] then
+		return
+	end
+
+	self.Meters[name]:ShowMax(showMax)
+end
+
+---flashes a meter
+function PANEL:FlashMeter(name)
+	if not self.Meters[name] then
+		return
+	end
+	self.Meters[name]:Flash()
+end
+
+---[CONTROLS]---
+
 ---add a new control to the right side
+---icon can be either the icon table or just one icon
+---setting the icon to "chase" will set the icon table to the default chase icons
 function PANEL:AddControl(key, text, icon, zPos)
-	local control = self.Right:Add("slashco_slasher_control") --vgui.Create("slashco_slasher_control", self.Right)
+	local control = self.Right:Add("slashco_slasher_control")
 	self.Controls[key] = control
 	control:SetTall(100)
 	control:Dock(BOTTOM)
@@ -130,7 +197,11 @@ end
 
 ---sets a new icon table for a control
 ---this is already done when a control is made
----updates the icon if allowed
+---icons are automatically set to the control's text and disabled state
+---index = "<control text>" -> icon for when the control has that text
+---= "d/<control text>" -> icon for when the control has that text and is disabled
+---= "default" -> the default icon, as a fallback
+---= "d/" -> the default icon when the control is disabled
 function PANEL:SetControlIconTable(key, icons, dontSetIcon)
 	if not self.Controls[key] then
 		return
@@ -163,12 +234,15 @@ function PANEL:SetControlKey(key, newKey)
 	self.Controls[key], self.Controls[newKey] = self.Controls[newKey], self.Controls[key]
 end
 
+---shakes a control's icon a little
 function PANEL:ShakeControl(key)
 	if not self.Controls[key] then
 		return
 	end
 	self.Controls[key]:Shake()
 end
+
+---[INTERNAL]---
 
 ---internal: shows the slasher's name and avatar
 function PANEL:MakeTitleCard()
@@ -179,7 +253,7 @@ function PANEL:MakeTitleCard()
 
 	local icon = vgui.Create("Panel", card)
 	card.Icon = icon
-	icon.Mat = Material("slashco/ui/icons/slasher/s_7_s1")
+	icon.Mat = Material("slashco/ui/icons/slasher/s_0")
 	icon:SetWide(card:GetTall())
 	icon:Dock(LEFT)
 	function icon.Paint(_, w, h)
@@ -193,7 +267,7 @@ function PANEL:MakeTitleCard()
 	label:Dock(FILL)
 	label:SetContentAlignment(1)
 	label:SetFont("HalfCutTitle")
-	label:SetText("tyler")
+	label:SetText(" slasher")
 	label:SetTextColor(red)
 end
 
@@ -487,30 +561,3 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 		end
 	end)
 end)
-
-if IsValid(g_SlasherHud) then
-	g_SlasherHud:Remove()
-end
-
--- [[
-g_SlasherHud = vgui.Create("slashco_slasher_stockhud")
-
-local iconTable = {
-	["cungus"] = Material("slashco/ui/icons/slasher/s_7"),
-	["d/cungus"] = Material("slashco/ui/icons/slasher/s_7_s1"),
-	["bugnus"] = Material("slashco/ui/icons/slasher/s_17"),
-	["le chase"] = Material("slashco/ui/icons/slasher/s_4"),
-}
-
-g_SlasherHud:SetTitle("AMONG US")
-g_SlasherHud:SetAvatar(Material("slashco/ui/icons/slasher/s_4"))
-g_SlasherHud:AddControl("K", "le chase", iconTable)
-g_SlasherHud:AddControl("G", "cungus", iconTable, 2)
-g_SlasherHud:AddControl("H", "adw", iconTable)
-g_SlasherHud:SetControlEnabled("G", false)
-g_SlasherHud:ShakeControl("G")
-g_SlasherHud:AddMeter("Swigga")
-g_SlasherHud:AddMeter("keppuku")
---g_SlasherHud:SetAllSeeing(true)
-
---]]
