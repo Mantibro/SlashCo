@@ -240,8 +240,9 @@ if CLIENT then
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-			--else
-			--f = nil --????? leftover code maybe?
+
+		else
+			LocalPlayer().baba_f = nil
 		end
 	end)
 
