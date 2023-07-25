@@ -94,7 +94,7 @@ function PANEL:SetEnabled(state, dontSetIcon)
 		self.KeyLabel:SetTextColor(darkRed)
 
 		if not dontSetIcon then
-			self:SetIcon("d/"..self.Text)
+			self:SetIcon("d/" .. self.Text)
 		end
 	end
 end
@@ -113,7 +113,7 @@ function PANEL:SetIconTable(icons, dontSetIcon)
 		if self.Enabled then
 			self:SetIcon(self.Text)
 		else
-			self:SetIcon("//"..self.Text)
+			self:SetIcon("//" .. self.Text)
 		end
 	end
 end
@@ -125,12 +125,32 @@ function PANEL:SetIcon(icon)
 	elseif type(icon) == "string" and self.IconTable then
 		if self.IconTable[icon] then
 			self.Icon = self.IconTable[icon]
-		elseif string.match(icon, "^d/") then
-			self.Icon = self.IconTable["d/"] or defaultIconDisabled
-		else
-			self.Icon = self.IconTable["default"] or defaultIcon
+		elseif string.match(icon, "^d/") and self.IconTable["d/"] then
+			self.Icon = self.IconTable["d/"]
+		elseif self.IconTable["default"] then
+			self.Icon = self.IconTable["default"]
 		end
 	end
+end
+
+---Makes the enabled state of the control tied to a net variable
+function PANEL:Tie(netvar, isInverse)
+	local start = LocalPlayer():GetNWBool(netvar, not isInverse)
+	self.PrevVal = isInverse and (not start) or start
+	self:SetEnabled(self.PrevVal)
+	function self.TieCheck()
+		local val = LocalPlayer():GetNWBool(netvar, not isInverse)
+		if val ~= self.PrevVal then
+			local newVal = isInverse and (not val) or val
+			self:SetEnabled(newVal)
+			self.PrevVal = newVal
+		end
+	end
+end
+
+---Removes the current netvar tie
+function PANEL:Untie()
+	self.AlsoThink = nil
 end
 
 ---sets a new key to display
@@ -142,7 +162,7 @@ end
 ---sets the text for the control and updates the icon
 function PANEL:SetText(text, dontSetIcon)
 	self.Text = text
-	self.Label:SetText(text.." ")
+	self.Label:SetText(text .. " ")
 
 	if not dontSetIcon then
 		self:SetIcon(text)
@@ -158,6 +178,14 @@ end
 function PANEL:Think()
 	if self.Anim:Active() then
 		self.Anim:Run()
+	end
+
+	if self.AlsoThink then
+		self:AlsoThink()
+	end
+
+	if self.TieCheck then
+		self:TieCheck()
 	end
 end
 

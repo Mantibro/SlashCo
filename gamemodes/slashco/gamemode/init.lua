@@ -4,7 +4,7 @@ AddCSLuaFile("ui/cl_voiceselect.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
-AddCSLuaFile("ui/slasher_stock/cl_slasher_hudfunctions.lua")
+AddCSLuaFile("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 AddCSLuaFile("ui/cl_projector.lua")
 
 include("globals.lua")
@@ -23,6 +23,7 @@ include("ply_voicelines.lua")
 include("survivor_func.lua")
 include("sh_values.lua")
 include("items/sv_playerspeed.lua")
+include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
@@ -80,6 +81,10 @@ concommand.Add("slashco_add_survivor", function(ply, _, args)
 
     end
 
+    if args[1] == "^" then
+        theman = ply:SteamID64()
+    end
+
     if theman == "" then
         ply:ChatPrint("Player not found.")
         return
@@ -104,7 +109,7 @@ concommand.Add("slashco_add_survivor", function(ply, _, args)
 
     ply:ChatPrint("New Survivor successfully assigned.")
 
-    ply:SetTean(TEAM_SURVIVOR)
+    ply:SetTeam(TEAM_SURVIVOR)
     ply:Spawn()
 
 end)
@@ -132,13 +137,16 @@ concommand.Add("slashco_add_slasher", function(ply, _, args)
         return
     end
 
+    --[[
     if tonumber(args[2]) > table.Count(SlashCoSlasher) or tonumber(args[2]) < 1 then
         ply:ChatPrint("Incorrect Slasher ID")
 
         return
     end
+    --]]
 
     local theman = ""
+    local plyFound
 
     for i = 1, #player.GetAll() do
 
@@ -146,9 +154,15 @@ concommand.Add("slashco_add_slasher", function(ply, _, args)
 
         if p:GetName() == args[1] then
             theman = p:SteamID64()
+            plyFound = p
             break
         end
 
+    end
+
+    if args[1] == "^" then
+        theman = ply:SteamID64()
+        plyFound = ply
     end
 
     if theman == "" then
@@ -156,10 +170,12 @@ concommand.Add("slashco_add_slasher", function(ply, _, args)
         return
     end
 
-    if player.GetBySteamID64(theman):Team() ~= TEAM_SPECTATOR then
+    --[[
+    if plyFound:Team() ~= TEAM_SPECTATOR then
         ply:ChatPrint("Player must be Spectator.")
         return
     end
+    --]]
 
     for s = 1, #SlashCo.CurRound.SlasherData do
 
@@ -169,7 +185,10 @@ concommand.Add("slashco_add_slasher", function(ply, _, args)
 
     end
 
-    SlashCo.InsertSlasherToTable(theman)
+    SlashCo.SelectSlasher(args[2], theman)
+    SlashCo.ApplySlasherToPlayer(plyFound)
+    SlashCo.OnSlasherSpawned(plyFound)
+    --SlashCo.InsertSlasherToTable(theman)
 
     :: ALREADYIN ::
 
@@ -177,7 +196,7 @@ concommand.Add("slashco_add_slasher", function(ply, _, args)
 
     ply:ChatPrint("New Slasher successfully assigned.")
 
-    ply:SetTean(TEAM_SLASHER)
+    ply:SetTeam(TEAM_SLASHER)
     ply:Spawn()
 end)
 

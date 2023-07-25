@@ -27,255 +27,294 @@ SlashCoSlasher.Bababooey.EyeRating = "★★★☆☆"
 SlashCoSlasher.Bababooey.DiffRating = "★☆☆☆☆"
 
 SlashCoSlasher.Bababooey.OnSpawn = function(slasher)
-    SlashCoSlasher.Bababooey.DoSound(slasher)
+	SlashCoSlasher.Bababooey.DoSound(slasher)
 end
 
 SlashCoSlasher.Bababooey.PickUpAttempt = function(ply)
-    return false
+	return false
 end
 
 SlashCoSlasher.Bababooey.DoSound = function(slasher)
+	if slasher:GetNWBool("BababooeyInvisibility") then
+		slasher:EmitSound("slashco/slasher/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))
+	end
 
-    if slasher:GetNWBool("BababooeyInvisibility") then
-        slasher:EmitSound("slashco/slasher/baba_laugh"..math.random(2,4)..".mp3", 30+math.random(1,45))
-    end
-
-    timer.Simple(math.random(6,10), function() SlashCoSlasher.Bababooey.DoSound(slasher) end)
+	timer.Simple(math.random(6, 10), function()
+		SlashCoSlasher.Bababooey.DoSound(slasher)
+	end)
 end
 
 SlashCoSlasher.Bababooey.OnTickBehaviour = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
 
-    local SO = SlashCo.CurRound.OfferingData.SO
+	local v1 = slasher.SlasherValue1 --Cooldown for being able to trigger
+	local v2 = slasher.SlasherValue2 --Cooldown for being able to kill
+	local v3 = slasher.SlasherValue3 --Cooldown for spook animation
 
-    local v1 = slasher.SlasherValue1 --Cooldown for being able to trigger
-    local v2 = slasher.SlasherValue2 --Cooldown for being able to kill
-    local v3 = slasher.SlasherValue3 --Cooldown for spook animation
+	if v1 > 0 then
+		slasher.SlasherValue1 = v1 - (FrameTime() + (SO * 0.04))
+	end
 
-    if v1 > 0 then 
-        slasher.SlasherValue1 = v1 - (FrameTime() + (SO * 0.04)) 
-    end
+	if v2 > 0 then
+		slasher:SetNWBool("CanKill", false)
+	elseif not slasher:GetNWBool("BababooeyInvisibility") then
+		slasher:SetNWBool("CanKill", true)
+	else
+		slasher:SetNWBool("CanKill", false)
+	end
 
-    if v2 > 0 then 
-        slasher:SetNWBool("CanKill", false)
-    elseif not slasher:GetNWBool("BababooeyInvisibility") then 
-        slasher:SetNWBool("CanKill", true)
-    else 
-        slasher:SetNWBool("CanKill", false)
-    end
+	slasher:SetNWBool("CanChase", not slasher:GetNWBool("BababooeyInvisibility"))
 
-    slasher:SetNWBool("CanChase", not slasher:GetNWBool("BababooeyInvisibility"))
+	if v3 < 0.01 then
+		slasher:SetNWBool("BababooeySpooking", false)
+	end
 
-    if v3 < 0.01 then slasher:SetNWBool("BababooeySpooking", false) end
+	if v2 > 0 then
+		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
+	end
+	if v3 > 0 then
+		slasher.SlasherValue3 = v3 - (FrameTime() + (SO * 0.04))
+	end
 
-    if v2 > 0 then slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04)) end
-    if v3 > 0 then slasher.SlasherValue3 = v3 - (FrameTime() + (SO * 0.04)) end
-
-
-
-    
-    slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Bababooey.Eyesight)
-    slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Bababooey.Perception)
-
+	slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Bababooey.Eyesight)
+	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Bababooey.Perception)
 end
 
 SlashCoSlasher.Bababooey.OnPrimaryFire = function(slasher)
-    SlashCo.Jumpscare(slasher)
+	SlashCo.Jumpscare(slasher)
 end
 
 SlashCoSlasher.Bababooey.OnSecondaryFire = function(slasher)
-    SlashCo.StartChaseMode(slasher)
+	SlashCo.StartChaseMode(slasher)
 end
 
 SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
 
-    local SO = SlashCo.CurRound.OfferingData.SO
+	local cooldown = slasher.SlasherValue1
 
-    local cooldown = slasher.SlasherValue1
+	if cooldown > 0 then
+		return
+	end
+	if slasher:GetNWBool("InSlasherChaseMode") then
+		return
+	end
 
-    if cooldown > 0 then return end
-    if slasher:GetNWBool("InSlasherChaseMode") then return end
+	slasher:SetNWBool("BababooeyInvisibility", not slasher:GetNWBool("BababooeyInvisibility"))
 
-    slasher:SetNWBool("BababooeyInvisibility", not slasher:GetNWBool("BababooeyInvisibility")) 
+	if slasher:GetNWBool("BababooeyInvisibility") then
+		--Turning invisible
 
-    if slasher:GetNWBool("BababooeyInvisibility") then --Turning invisible
+		slasher:SlasherHudFunc("SetAvatar", "invisible")
+		slasher:SlasherHudFunc("SetControlVisible", "LMB", false)
+		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
+		slasher:SlasherHudFunc("SetControlIcon", "R", "invisible")
+		slasher:SlasherHudFunc("ShakeControl", "R")
 
-        slasher.SlasherValue1 = 4
-        slasher:EmitSound("slashco/slasher/baba_hide.mp3")
+		slasher.SlasherValue1 = 4
+		slasher:EmitSound("slashco/slasher/baba_hide.mp3")
 
-        timer.Simple(1, function() --Delay for entering invisibility
+		timer.Simple(1, function()
+			--Delay for entering invisibility
 
 			slasher:SetMaterial("Models/effects/vol_light001")
-		    slasher:SetColor(Color(0,0,0,0))
+			slasher:SetColor(Color(0, 0, 0, 0))
 
-            PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130, slasher)
+			PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130, slasher)
 
-            slasher:SetRunSpeed( 200 )
-            slasher:SetWalkSpeed( 200 )
+			slasher:SetRunSpeed(200)
+			slasher:SetWalkSpeed(200)
+		end)
+	else
+		slasher:EmitSound("slashco/slasher/baba_reveal.mp3")
 
-        end)
+		slasher:SlasherHudFunc("SetAvatar", "default")
+		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
+		slasher:SlasherHudFunc("SetControlVisible", "RMB", true)
+		slasher:SlasherHudFunc("SetControlIcon", "R", "default")
+		slasher:SlasherHudFunc("ShakeControl", "R")
 
-    else
+		--Spook Appear
+		if slasher:GetEyeTrace().Entity:IsPlayer() then
+			local target = slasher:GetEyeTrace().Entity
 
-        slasher:EmitSound("slashco/slasher/baba_reveal.mp3")
-
-        --Spook Appear
-        if slasher:GetEyeTrace().Entity:IsPlayer() then
-
-            target = slasher:GetEyeTrace().Entity	
-
-            if target:Team() ~= TEAM_SURVIVOR then goto SKIP end
-
-            if slasher:GetPos():Distance(target:GetPos()) < 150 then
-  
-                slasher:SetNWBool("BababooeySpooking", true)
-                slasher.SlasherValue2 = 2
-                slasher.SlasherValue3 = 2
-                slasher:EmitSound("slashco/slasher/baba_scare.mp3",100)
-                slasher:Freeze(true)
-                timer.Simple(2.5, function() slasher:Freeze(false) end)
-
-                goto SPOOKAPPEAR
-            else 
-                goto SKIP
-            end
-        else 
-            goto SKIP  
-        end
-        ::SKIP::
-
-        --Quiet appear
-        slasher.SlasherValue2 = math.random(3,(13 - (SO * 6)))
-        slasher.SlasherValue1 = 8
-
-        ::SPOOKAPPEAR::
-
-        slasher:SetMaterial("")
-		slasher:SetColor(Color(255,255,255,255))
-
-        slasher:SetRunSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-        slasher:SetWalkSpeed( SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed )
-
-    end
-
-end
-
-
-SlashCoSlasher.Bababooey.OnSpecialAbilityFire = function(slasher)
-
-    local SO = SlashCo.CurRound.OfferingData.SO
-
-    if #ents.FindByClass( "sc_babaclone") > SO then return end
-    local clone = SlashCo.CreateItem("sc_babaclone",slasher:GetPos(), slasher:GetAngles())
-
-end
-
-SlashCoSlasher.Bababooey.Animator = function(ply) 
-
-    local chase = ply:GetNWBool("InSlasherChaseMode")
-    local spook = ply:GetNWBool("BababooeySpooking")
-
-	if ply:IsOnGround() then
-
-		if not spook then
-
-			if not chase then 
-				ply.CalcIdeal = ACT_HL2MP_WALK 
-				ply.CalcSeqOverride = ply:LookupSequence("prowl")
-			else
-				ply.CalcIdeal = ACT_HL2MP_RUN 
-				ply.CalcSeqOverride = ply:LookupSequence("chase")
+			if target:Team() ~= TEAM_SURVIVOR then
+				goto SKIP
 			end
 
+			if slasher:GetPos():Distance(target:GetPos()) < 150 then
+
+				slasher:SetNWBool("BababooeySpooking", true)
+				slasher.SlasherValue2 = 2
+				slasher.SlasherValue3 = 2
+				slasher:EmitSound("slashco/slasher/baba_scare.mp3", 100)
+				slasher:Freeze(true)
+				timer.Simple(2.5, function()
+					slasher:Freeze(false)
+				end)
+
+				goto SPOOKAPPEAR
+			else
+				goto SKIP
+			end
+		else
+			goto SKIP
+		end
+		:: SKIP ::
+
+		--Quiet appear
+		slasher.SlasherValue2 = math.random(3, (13 - (SO * 6)))
+		slasher.SlasherValue1 = 8
+
+		:: SPOOKAPPEAR ::
+
+		slasher:SetMaterial("")
+		slasher:SetColor(Color(255, 255, 255, 255))
+
+		slasher:SetRunSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed)
+		slasher:SetWalkSpeed(SlashCoSlasher[slasher:GetNWString("Slasher")].ProwlSpeed)
+	end
+end
+
+SlashCoSlasher.Bababooey.OnSpecialAbilityFire = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
+
+	if #ents.FindByClass("sc_babaclone") > SO then
+		return
+	end
+	SlashCo.CreateItem("sc_babaclone", slasher:GetPos(), slasher:GetAngles())
+end
+
+SlashCoSlasher.Bababooey.Animator = function(ply)
+	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local spook = ply:GetNWBool("BababooeySpooking")
+
+	if ply:IsOnGround() then
+		if not spook then
+			if not chase then
+				ply.CalcIdeal = ACT_HL2MP_WALK
+				ply.CalcSeqOverride = ply:LookupSequence("prowl")
+			else
+				ply.CalcIdeal = ACT_HL2MP_RUN
+				ply.CalcSeqOverride = ply:LookupSequence("chase")
+			end
 		else
 			ply.CalcSeqOverride = ply:LookupSequence("spook")
 		end
-
 	else
-
 		ply.CalcSeqOverride = ply:LookupSequence("float")
-
 	end
 
-    return ply.CalcIdeal, ply.CalcSeqOverride
-
+	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
 SlashCoSlasher.Bababooey.Footstep = function(ply)
+	if SERVER then
+		if ply:GetNWBool("BababooeyInvisibility") then
+			return true
+		end
 
-    if SERVER then
+		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
+		return true
+	end
 
-        if ply:GetNWBool("BababooeyInvisibility") then return true end
-
-        ply:EmitSound( "slashco/slasher/babastep_0"..math.random(1,3)..".mp3") 
-        return true 
-    end
-
-    if CLIENT then
-		return true 
-    end
-
+	if CLIENT then
+		return true
+	end
 end
 
 if CLIENT then
+	hook.Add("HUDPaint", SlashCoSlasher.Bababooey.Name .. "_Jumpscare", function()
+		if LocalPlayer():GetNWBool("SurvivorJumpscare_Bababooey") == true then
+			if LocalPlayer().baba_f == nil then
+				LocalPlayer().baba_f = 0
+			end
+			LocalPlayer().baba_f = LocalPlayer().baba_f + (FrameTime() * 20)
+			if LocalPlayer().baba_f > 45 then
+				return
+			end
 
-    hook.Add("HUDPaint", SlashCoSlasher.Bababooey.Name.."_Jumpscare", function()
+			local Overlay = Material("slashco/ui/overlays/jumpscare_1")
+			Overlay:SetInt("$frame", math.floor(LocalPlayer().baba_f))
 
-        if LocalPlayer():GetNWBool("SurvivorJumpscare_Bababooey") == true  then
+			surface.SetDrawColor(255, 255, 255, 255)
+			surface.SetMaterial(Overlay)
+			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+			--else
+			--f = nil --????? leftover code maybe?
+		end
+	end)
 
-            if LocalPlayer().baba_f == nil then LocalPlayer().baba_f = 0 end
-            LocalPlayer().baba_f = LocalPlayer().baba_f+(FrameTime()*20)
-            if LocalPlayer().baba_f > 45 then return end
+	local avatarTable = {
+		default = Material("slashco/ui/icons/slasher/s_1"),
+		invisible = Material("slashco/ui/icons/slasher/s_1_a1")
+	}
 
-            local Overlay = Material("slashco/ui/overlays/jumpscare_1")
-            Overlay:SetInt( "$frame", math.floor(LocalPlayer().baba_f) )
+	local cloneTable = {
+		["set clone"] = Material("slashco/ui/icons/slasher/s_1_a2"),
+		["d/set clone"] = Material("slashco/ui/icons/slasher/s_1_a2_1")
+	}
 
-            surface.SetDrawColor(255,255,255,255)	
-            surface.SetMaterial(Overlay)
-            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-        --else
-            --f = nil --????? leftover code maybe?
-        end
+	SlashCoSlasher.Bababooey.InitHud = function(_, hud)
+		hud:SetAvatarTable(avatarTable)
+		hud:SetAvatar("default")
+		hud:SetTitle("bababooey")
 
-    end)
+		hud:AddControl("R", "toggle invisibilty", avatarTable)
+		hud:ChaseAndKill()
+		hud:AddControl("F", "set clone", cloneTable)
 
-    local BababooeyInvisible = Material("slashco/ui/icons/slasher/s_1_a1")
-    local BababooeyInactiveClone = Material("slashco/ui/icons/slasher/s_1_a2_1")
-    local BababooeyActiveClone = Material("slashco/ui/icons/slasher/s_1_a2")
+		local control = hud:GetControl("F")
+		control.PrevClone = -1
+		function control.AlsoThink()
+			local val = #ents.FindByClass("sc_babaclone")
+			if val ~= control.PrevClone then
+				control:Shake()
+				control.PrevClone = val
 
-    SlashCoSlasher.Bababooey.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+				control:SetEnabled(val == 0)
+			end
+		end
+	end
 
-        local willdrawkill = true
-        local willdrawchase = true
-        local willdrawmain = true
+	--[[
+	local BababooeyInvisible = Material("slashco/ui/icons/slasher/s_1_a1")
+	local BababooeyInactiveClone = Material("slashco/ui/icons/slasher/s_1_a2_1")
+	local BababooeyActiveClone = Material("slashco/ui/icons/slasher/s_1_a2")
 
-        local invis =  LocalPlayer():GetNWBool("BababooeyInvisibility")
+	SlashCoSlasher.Bababooey.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+		local willdrawkill = true
+		local willdrawchase = true
+		local willdrawmain = true
 
-        if #ents.FindByClass( "sc_babaclone") > 0 then
-            surface.SetMaterial(BababooeyInactiveClone)
-            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-            draw.SimpleText( "Clone Set", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-        else
-            surface.SetMaterial(BababooeyActiveClone)
-            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.33), ScrW()/16, ScrW()/16)
-            draw.SimpleText( "F - Set Clone", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-        end
-            
+		local invis = LocalPlayer():GetNWBool("BababooeyInvisibility")
 
-        if invis then 
-            surface.SetMaterial(BababooeyInvisible)
-            surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW()/8, ScrW()/8) 
-        end
+		if #ents.FindByClass("sc_babaclone") > 0 then
+			surface.SetMaterial(BababooeyInactiveClone)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
+			draw.SimpleText("Clone Set", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
+					Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+		else
+			surface.SetMaterial(BababooeyActiveClone)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.33), ScrW() / 16, ScrW() / 16)
+			draw.SimpleText("F - Set Clone", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
+					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+		end
 
-        willdrawmain = not invis
+		if invis then
+			surface.SetMaterial(BababooeyInvisible)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW() / 8, ScrW() / 8)
+		end
 
-        draw.SimpleText( "R - Toggle Invisibility", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+		willdrawmain = not invis
 
-        return willdrawkill, willdrawchase, willdrawmain
+		draw.SimpleText("R - Toggle Invisibility", "ItemFontTip", mainiconposx + (cx / 4),
+				mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
 
-    end
+		return willdrawkill, willdrawchase, willdrawmain
+	end
+	--]]
 
-    SlashCoSlasher.Bababooey.ClientSideEffect = function()
-
-    end
-
+	SlashCoSlasher.Bababooey.ClientSideEffect = function()
+	end
 end

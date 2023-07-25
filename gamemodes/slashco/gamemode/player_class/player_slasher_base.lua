@@ -17,22 +17,23 @@ function PLAYER:Loadout()
 end
 
 function PLAYER:SetModel()
-
 	local modelname = SlashCoSlasher[self.Player:GetNWBool("Slasher")].Model
-	util.PrecacheModel( modelname )
-	self.Player:SetModel( modelname ) 
-	self.Player:SetCanWalk( false )
-
+	util.PrecacheModel(modelname)
+	self.Player:SetModel(modelname)
+	self.Player:SetCanWalk(false)
 end
 
-function PLAYER:Init()
-	self.SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
-	self:SlasherFunction("InitHud")
-end
+if CLIENT then
+	function PLAYER:Init()
+		timer.Simple(0, function()
+			SlashCo.InitSlasherHud()
+		end)
+	end
 
-function PLAYER:ClassChanged()
-	if IsValid(self.SlasherHud) then
-		self.SlasherHud:Remove()
+	function PLAYER:ClassChanged()
+		if IsValid(LocalPlayer().SlasherHud) then
+			LocalPlayer().SlasherHud:Remove()
+		end
 	end
 end
 

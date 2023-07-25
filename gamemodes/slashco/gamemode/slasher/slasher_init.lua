@@ -210,7 +210,7 @@ hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
         ["$pp_colour_addr"] = 0.01,
         ["$pp_colour_addg"] = 0,
         ["$pp_colour_addb"] = 0,
-        ["$pp_colour_brightness"] = 0.1,
+        ["$pp_colour_brightness"] = 0,
         ["$pp_colour_contrast"] = 1 + Eyesight / 5,
         ["$pp_colour_colour"] = Eyesight / 5,
         ["$pp_colour_mulr"] = 0,

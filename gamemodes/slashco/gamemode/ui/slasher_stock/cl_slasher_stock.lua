@@ -40,7 +40,7 @@ end
 
 ---sets the slasher title
 function PANEL:SetTitle(name)
-	self.TitleCard.Label:SetText(" "..name)
+	self.TitleCard.Label:SetText(" " .. name)
 end
 
 ---sets up the slasher avatar table to simplify setting avatars
@@ -126,6 +126,11 @@ function PANEL:FlashMeter(name)
 		return
 	end
 	self.Meters[name]:Flash()
+end
+
+---gets the specified meter
+function PANEL:GetMeter(key)
+	return self.Meters[key]
 end
 
 ---[CONTROLS]---
@@ -234,12 +239,83 @@ function PANEL:SetControlKey(key, newKey)
 	self.Controls[key], self.Controls[newKey] = self.Controls[newKey], self.Controls[key]
 end
 
+---Makes the enabled state of the control tied to a net variable
+function PANEL:TieControl(key, netvar, isInverse)
+	if not self.Controls[key] then
+		return
+	end
+
+	self.Controls[key]:Tie(netvar, isInverse)
+end
+
+---Makes the visibility state of the control tied to a net variable
+function PANEL:TieControlVisible(key, netvar, isInverse)
+	if not self.Controls[key] then
+		return
+	end
+
+	local control = self.Controls[key]
+
+	local start = LocalPlayer():GetNWBool(netvar, not isInverse)
+	control.PrevVal = isInverse and (not start) or start
+	self:SetControlVisible(key, control.PrevVal)
+	function control.TieCheck()
+		local val = LocalPlayer():GetNWBool(netvar, not isInverse)
+		if val ~= control.PrevVal then
+			local newVal = isInverse and (not val) or val
+			self:SetControlVisible(key, newVal)
+			control.PrevVal = newVal
+		end
+	end
+end
+
+---Removes the current netvar tie of a control
+function PANEL:UntieControl(key)
+	if not self.Controls[key] then
+		return
+	end
+
+	self.Controls[key]:Untie()
+end
+
+---Makes the standard chase and kill controls automagically
+function PANEL:ChaseAndKill(noChase, noKill)
+	if not noKill then
+		self:AddControl("LMB", "kill survivor")
+		self:TieControl("LMB", "CanKill")
+	end
+
+	if noChase then
+		return
+	end
+
+	self:AddControl("RMB", "start chasing", "chase")
+	self:TieControl("RMB", "CanChase")
+
+	local control = self.Controls["RMB"]
+	control.PrevChase = LocalPlayer():GetNWBool("InSlasherChaseMode")
+	self:SetControlText("RMB", control.PrevChase and "stop chasing" or "start chasing")
+	function control.AlsoThink()
+		local val = LocalPlayer():GetNWBool("InSlasherChaseMode")
+		if val ~= control.PrevChase then
+			control:Shake()
+			self:SetControlText("RMB", val and "stop chasing" or "start chasing")
+			control.PrevChase = val
+		end
+	end
+end
+
 ---shakes a control's icon a little
 function PANEL:ShakeControl(key)
 	if not self.Controls[key] then
 		return
 	end
 	self.Controls[key]:Shake()
+end
+
+---gets the specified control panel
+function PANEL:GetControl(key)
+	return self.Controls[key]
 end
 
 ---[INTERNAL]---
