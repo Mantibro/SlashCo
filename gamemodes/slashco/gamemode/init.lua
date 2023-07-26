@@ -798,7 +798,7 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 
     SlashCo.BroadcastMasterDatabaseForClient(ply)
 
-    if new == TEAM_SURVIVOR then
+    if new == TEAM_SURVIVOR and SlashCo.PlayerData then
         SlashCo.PlayerData[pid].Lives = 1
     end
 

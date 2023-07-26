@@ -27,410 +27,461 @@ SlashCoSlasher.Manspider.EyeRating = "★★★☆☆"
 SlashCoSlasher.Manspider.DiffRating = "★☆☆☆☆"
 
 SlashCoSlasher.Manspider.OnSpawn = function(slasher)
-
-    slasher:SetViewOffset( Vector(0,0,20) )
-    slasher:SetCurrentViewOffset( Vector(0,0,20) )
-    PlayGlobalSound("slashco/slasher/manspider_idle.wav",50,slasher)
-
+	slasher:SetViewOffset(Vector(0, 0, 20))
+	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
+	PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50, slasher)
 end
 
 SlashCoSlasher.Manspider.PickUpAttempt = function(ply)
-    return false
+	return false
 end
 
 SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
 
-    local SO = SlashCo.CurRound.OfferingData.SO
+	local v1 = slasher.SlasherValue1 --Target SteamID
+	local v2 = slasher.SlasherValue2 --Leap Cooldown
+	local v3 = slasher.SlasherValue3 --Time spend nested
+	local v4 = slasher.SlasherValue4 --Aggression
 
-    v1 = slasher.SlasherValue1 --Target SteamID
-    v2 = slasher.SlasherValue2 --Leap Cooldown
-    v3 = slasher.SlasherValue3 --Time spend nested
-    v4 = slasher.SlasherValue4 --Aggression
+	if v2 > 0 then
+		slasher.SlasherValue2 = v2 - FrameTime()
+	end
 
-    if v2 > 0 then slasher.SlasherValue2 = v2 - FrameTime() end
+	if not isstring(v1) or v1 == 0 then
+		slasher.SlasherValue1 = ""
+	end
 
-    if not isstring(v1) or v1 == 0 then slasher.SlasherValue1 = "" end
+	if v1 == "" then
+		slasher:SetNWBool("CanChase", false)
+		slasher:SetNWBool("CanKill", false)
 
-    if v1 == "" then
+		if #team.GetPlayers(TEAM_SURVIVOR) < 2 and #team.GetPlayers(TEAM_SURVIVOR) > 0 then
+			v1 = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
 
-        slasher:SetNWBool("CanChase", false)
-        slasher:SetNWBool("CanKill", false)
+			slasher:SetNWBool("CanChase", true)
+			slasher:SetNWBool("CanKill", true)
+		end
+	else
+		slasher:SetNWBool("CanChase", true)
+		slasher:SetNWBool("CanKill", true)
 
-        if #team.GetPlayers(TEAM_SURVIVOR) < 2 and #team.GetPlayers(TEAM_SURVIVOR) > 0 then
-            v1 = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
+		if not IsValid(player.GetBySteamID64(v1)) or player.GetBySteamID64(v1):Team() ~= TEAM_SURVIVOR then
+			slasher.SlasherValue1 = ""
+		end
+	end
 
-            slasher:SetNWBool("CanChase", true)
-            slasher:SetNWBool("CanKill", true)
-        end
+	for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		--Switch Target if too close
 
-    else
+		local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-        slasher:SetNWBool("CanChase", true)
-        slasher:SetNWBool("CanKill", true)
+		local d = s:GetPos():Distance(slasher:GetPos())
 
-        if not IsValid(  player.GetBySteamID64( v1 ) ) or player.GetBySteamID64( v1 ):Team() ~= TEAM_SURVIVOR then slasher.SlasherValue1 = "" end
+		if d < (150) then
+			local tr = util.TraceLine({
+				start = slasher:EyePos(),
+				endpos = s:GetPos() + Vector(0, 0, 40),
+				filter = slasher
+			})
 
-    end
+			if tr.Entity == s then
+				if slasher.SlasherValue1 ~= s:SteamID64() then
+					slasher.SlasherValue1 = s:SteamID64()
+					slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
+				end
+			end
+		end
+	end
 
-    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do --Switch Target if too close
+	if slasher:GetNWBool("ManspiderNested") then
+		--Find a survivor
+		slasher.SlasherValue3 = v3 + FrameTime()
 
-        local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
 
-        local d = s:GetPos():Distance( slasher:GetPos() )
+			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-        if d < (150) then
+			if s:GetPos():Distance(slasher:GetPos()) < (1000 + (v3 * 3) + (SO * 750)) then
+				local tr = util.TraceLine({
+					start = slasher:EyePos(),
+					endpos = s:GetPos() + Vector(0, 0, 40),
+					filter = slasher
+				})
 
-            local tr = util.TraceLine( {
-                start = slasher:EyePos(),
-                endpos = s:GetPos()+Vector(0,0,40),
-                filter = slasher
-            } )
+				if tr.Entity == s then
+					slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
+					slasher.SlasherValue1 = s:SteamID64()
+					slasher:SetNWBool("ManspiderNested", false)
 
-            if tr.Entity == s then
+					slasher:SetRunSpeed(SlashCoSlasher.Manspider.ProwlSpeed)
+					slasher:SetWalkSpeed(SlashCoSlasher.Manspider.ProwlSpeed)
+					slasher:SetSlowWalkSpeed(SlashCoSlasher.Manspider.ProwlSpeed)
+				end
+			end
+		end
 
-                if slasher.SlasherValue1 ~= s:SteamID64() then
+		slasher.SlasherValue4 = 0
+	else
+		--Not nested
+		slasher.SlasherValue3 = 0
 
-                    slasher.SlasherValue1 = s:SteamID64()
-                    slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
+		if v1 == "" then
+			for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+				local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-                end
+				local d = s:GetPos():Distance(slasher:GetPos())
 
-            end
+				if d < (1000) then
+					local tr = util.TraceLine({
+						start = slasher:EyePos(),
+						endpos = s:GetPos() + Vector(0, 0, 40),
+						filter = slasher
+					})
 
-        end
+					if tr.Entity == s then
+						slasher.SlasherValue4 = v4 + (FrameTime() + ((1000 - d) / 10000)) + (SO * FrameTime())
 
-    end
+						if v4 > 100 then
+							slasher.SlasherValue1 = s:SteamID64()
+							slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
+						end
+					end
+				end
+			end
+		else
+			slasher.SlasherValue4 = 0
+		end
+	end
 
-    if slasher:GetNWBool("ManspiderNested") then
+	if slasher:GetNWString("ManspiderTarget") ~= v1 then
+		slasher:SetNWString("ManspiderTarget", v1)
+	end
 
-        --Find a survivor
-        slasher.SlasherValue3 = v3 + FrameTime()
+	if v3 > 100 then
+		if slasher:GetNWBool("ManspiderCanLeaveNest") ~= true then
+			slasher:SetNWBool("ManspiderCanLeaveNest", true)
+		end
+	else
+		if slasher:GetNWBool("ManspiderCanLeaveNest") ~= false then
+			slasher:SetNWBool("ManspiderCanLeaveNest", false)
+		end
+	end
 
-        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-
-            local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-            if s:GetPos():Distance( slasher:GetPos() ) < (1000 + (v3 * 3) + (SO * 750)) then
-
-                local tr = util.TraceLine( {
-                    start = slasher:EyePos(),
-                    endpos = s:GetPos()+Vector(0,0,40),
-                    filter = slasher
-                } )
-
-                if tr.Entity == s then
-                    slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
-                    slasher.SlasherValue1 = s:SteamID64()
-                    slasher:SetNWBool("ManspiderNested", false)
-
-                    slasher:SetRunSpeed( SlashCoSlasher.Manspider.ProwlSpeed )
-                    slasher:SetWalkSpeed( SlashCoSlasher.Manspider.ProwlSpeed )
-                    slasher:SetSlowWalkSpeed( SlashCoSlasher.Manspider.ProwlSpeed )
-                end
-
-            end
-
-        end
-
-        slasher.SlasherValue4 = 0
-
-    else
-
-        --Not nested
-        slasher.SlasherValue3 = 0
-
-        if v1 == "" then
-
-            for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-
-                local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-                local d = s:GetPos():Distance( slasher:GetPos() )
-    
-                if d < (1000) then
-    
-                    local tr = util.TraceLine( {
-                        start = slasher:EyePos(),
-                        endpos = s:GetPos()+Vector(0,0,40),
-                        filter = slasher
-                    } )
-    
-                    if tr.Entity == s then
-
-                        slasher.SlasherValue4 = v4 + ( FrameTime() + (  (1000-d)  / 10000  )   )  + (SO * FrameTime())
-
-                        if v4 > 100 then
-                            slasher.SlasherValue1 = s:SteamID64()
-                            slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
-                        end
-
-                    end
-    
-                end
-    
-            end
-
-        else
-
-            slasher.SlasherValue4 = 0
-
-        end
-
-    end
-
-    if slasher:GetNWString("ManspiderTarget") ~= v1 then
-        slasher:SetNWString("ManspiderTarget", v1)
-    end
-    
-    if v3 > 100 then
-        if slasher:GetNWBool("ManspiderCanLeaveNest") ~= true then slasher:SetNWBool("ManspiderCanLeaveNest", true) end
-    else
-        if slasher:GetNWBool("ManspiderCanLeaveNest") ~= false then slasher:SetNWBool("ManspiderCanLeaveNest", false) end
-    end
-
-    slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Manspider.Eyesight)
-    slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Manspider.Perception)
+	slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Manspider.Eyesight)
+	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Manspider.Perception)
 end
 
 SlashCoSlasher.Manspider.OnPrimaryFire = function(slasher)
-    local target = slasher:GetEyeTrace().Entity	
+	local target = slasher:GetEyeTrace().Entity
 
-    if not target:IsPlayer() then return end
+	if not target:IsPlayer() then
+		return
+	end
 
-    if target:SteamID64() ~= slasher.SlasherValue1 then
-        slasher:ChatPrint("You can only kill your Prey.")
-        return 
-    else
-        SlashCo.Jumpscare(slasher)
-    end
-
+	if target:SteamID64() ~= slasher.SlasherValue1 then
+		slasher:ChatPrint("You can only kill your Prey.")
+		return
+	else
+		SlashCo.Jumpscare(slasher)
+	end
 end
 
 SlashCoSlasher.Manspider.OnSecondaryFire = function(slasher)
+	local target = slasher:GetEyeTrace().Entity
 
-    local target = slasher:GetEyeTrace().Entity	
+	if not target:IsPlayer() then
+		return
+	end
 
-    if not target:IsPlayer() then return end
+	if target:SteamID64() ~= slasher.SlasherValue1 then
+		return
+	end
 
-    if target:SteamID64() ~= slasher.SlasherValue1 then return end
-
-    SlashCo.StartChaseMode(slasher)
-
+	SlashCo.StartChaseMode(slasher)
 end
 
 SlashCoSlasher.Manspider.OnMainAbilityFire = function(slasher)
+	if slasher.SlasherValue1 ~= "" then
+		return
+	end
 
-    if slasher.SlasherValue1 ~= "" then return end
+	if not slasher:GetNWBool("ManspiderNested") then
+		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+			if s:GetPos():Distance(slasher:GetPos()) < 1600 then
 
-    if not slasher:GetNWBool("ManspiderNested") then
+				slasher:ChatPrint("Cannot Nest here, a Survivor is too close. . .")
+				return
+			end
+		end
 
-        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		slasher:SetNWBool("ManspiderNested", true)
 
-            local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-    
-            if s:GetPos():Distance( slasher:GetPos() ) < 1600 then
-    
-                slasher:ChatPrint("Cannot Nest here, a Survivor is too close. . .")
-                return
-    
-            end
-    
-        end
+		slasher:SetRunSpeed(1)
+		slasher:SetWalkSpeed(1)
+		slasher:SetSlowWalkSpeed(1)
+	else
+		if slasher.SlasherValue3 > 100 then
+			slasher:SetNWBool("ManspiderNested", false)
 
-        slasher:SetNWBool("ManspiderNested", true)
-
-        slasher:SetRunSpeed( 1 )
-        slasher:SetWalkSpeed( 1 )
-        slasher:SetSlowWalkSpeed( 1 )
-
-    else
-
-        if slasher.SlasherValue3 > 100 then
-
-            slasher:SetNWBool("ManspiderNested", false)
-
-            slasher:SetRunSpeed( SlashCoSlasher.Manspider.ProwlSpeed )
-            slasher:SetWalkSpeed( SlashCoSlasher.Manspider.ProwlSpeed )
-            slasher:SetSlowWalkSpeed( SlashCoSlasher.Manspider.ProwlSpeed )
-
-        end
-
-    end
-
+			slasher:SetRunSpeed(SlashCoSlasher.Manspider.ProwlSpeed)
+			slasher:SetWalkSpeed(SlashCoSlasher.Manspider.ProwlSpeed)
+			slasher:SetSlowWalkSpeed(SlashCoSlasher.Manspider.ProwlSpeed)
+		end
+	end
 end
-
 
 SlashCoSlasher.Manspider.OnSpecialAbilityFire = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
 
-    local SO = SlashCo.CurRound.OfferingData.SO
+	if slasher.SlasherValue2 > 0 then
+		return
+	end
 
-    if slasher.SlasherValue2 > 0 then return end
+	if not slasher:IsOnGround() then
+		return
+	end
 
-    if not slasher:IsOnGround() then return end
+	if not slasher:GetNWBool("InSlasherChaseMode") then
+		return
+	end
 
-    if not slasher:GetNWBool("InSlasherChaseMode") then return end
+	slasher.SlasherValue2 = 4
 
-    slasher.SlasherValue2 = 4
+	slasher:Freeze(true)
+	slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
 
-    slasher:Freeze(true)
-    slasher:EmitSound("slashco/slasher/manspider_scream"..math.random(1,4)..".mp3")
+	timer.Simple(1, function()
+		if not IsValid(slasher) then
+			return
+		end
 
-    timer.Simple(1, function()  
+		local strength_forward = 800 + (SO * 500)
+		local strength_up = 200 + (SO * 100)
 
-        local strength_forward = 800 + (SO * 500)
-        local strength_up = 200 + (SO * 100)
-    
-        slasher:SetVelocity(  (slasher:EyeAngles():Forward() * strength_forward) + Vector(0,0,strength_up)  )
-        slasher:Freeze(false)
-
-    end)
-
+		slasher:SetVelocity((slasher:EyeAngles():Forward() * strength_forward) + Vector(0, 0, strength_up))
+		slasher:Freeze(false)
+	end)
 end
 
-SlashCoSlasher.Manspider.Animator = function(ply) 
+SlashCoSlasher.Manspider.Animator = function(ply)
+	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local manspider_nest = ply:GetNWBool("ManspiderNested")
 
-    local chase = ply:GetNWBool("InSlasherChaseMode")
-    local manspider_nest = ply:GetNWBool("ManspiderNested")
-
-    if ply:IsOnGround() then
-
-		if not chase then 
-			ply.CalcIdeal = ACT_WALK 
+	if ply:IsOnGround() then
+		if not chase then
+			ply.CalcIdeal = ACT_WALK
 			ply.CalcSeqOverride = ply:LookupSequence("prowl")
 		else
 			ply.CalcIdeal = ACT_WALK
 			ply.CalcSeqOverride = ply:LookupSequence("chase")
 		end
-
 	else
-
 		ply.CalcSeqOverride = ply:LookupSequence("float")
-
 	end
 
 	if manspider_nest then
-
 		ply.CalcSeqOverride = ply:LookupSequence("nest")
-
 	end
 
-    return ply.CalcIdeal, ply.CalcSeqOverride
-
+	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
 SlashCoSlasher.Manspider.Footstep = function(ply)
+	if SERVER then
+		ply:EmitSound("slashco/slasher/manspider_step.mp3")
+		return true
+	end
 
-    if SERVER then
-        ply:EmitSound( "slashco/slasher/manspider_step.mp3")
-        return true 
-    end
-
-    if CLIENT then
-		return true 
-    end
-
+	if CLIENT then
+		return true
+	end
 end
 
 if CLIENT then
+	hook.Add("HUDPaint", SlashCoSlasher.Manspider.Name .. "_Jumpscare", function()
+		if LocalPlayer():GetNWBool("SurvivorJumpscare_Manspider") == true then
+			if LocalPlayer().mans_f == nil then
+				LocalPlayer().mans_f = 0
+			end
+			LocalPlayer().mans_f = LocalPlayer().mans_f + (FrameTime() * 20)
+			if LocalPlayer().mans_f > 59 then
+				LocalPlayer().mans_f = 58
+			end
 
-    hook.Add("HUDPaint", SlashCoSlasher.Manspider.Name.."_Jumpscare", function()
+			local Overlay = Material("slashco/ui/overlays/jumpscare_9")
+			Overlay:SetInt("$frame", math.floor(LocalPlayer().mans_f))
 
-        if LocalPlayer():GetNWBool("SurvivorJumpscare_Manspider") == true  then
+			surface.SetDrawColor(255, 255, 255, 255)
+			surface.SetMaterial(Overlay)
+			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+		else
+			LocalPlayer().mans_f = nil
+		end
+	end)
 
-            if LocalPlayer().mans_f == nil then LocalPlayer().mans_f = 0 end
-            LocalPlayer().mans_f = LocalPlayer().mans_f+(FrameTime()*20)
-            if LocalPlayer().mans_f > 59 then LocalPlayer().mans_f = 58 end
+	local nestTable = {
+		default = Material("slashco/ui/icons/slasher/s_9"),
+		["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
+	}
 
-            local Overlay = Material("slashco/ui/overlays/jumpscare_9")
-            Overlay:SetInt( "$frame", math.floor(LocalPlayer().mans_f) )
+	SlashCoSlasher.Manspider.InitHud = function(_, hud)
+		hud:SetAvatar(Material("slashco/ui/icons/slasher/s_9"))
+		hud:SetTitle("manspider")
 
-            surface.SetDrawColor(255,255,255,255)	
-            surface.SetMaterial(Overlay)
-            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+		hud:AddControl("R", "nest", nestTable)
+		hud:ChaseAndKill()
+		hud:UntieControl("LMB")
+		hud:UntieControl("RMB")
+		hud:TieControlVisible("LMB", "CanKill")
+		hud:TieControlVisible("RMB", "CanChase")
+		hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/s_punch"))
+		hud:TieControlVisible("F", "InSlasherChaseMode", true, true, true)
 
-        else
-            LocalPlayer().mans_f = nil
-        end
+		hud.prevTarget = not LocalPlayer():GetNWString("ManspiderTarget")
+		hud.prevNested = not LocalPlayer():GetNWBool("ManspiderNested")
+		hud.prevLeave = not LocalPlayer():GetNWBool("ManspiderCanLeaveNest")
+		function hud.AlsoThink()
+			local target = LocalPlayer():GetNWString("ManspiderTarget")
+			if target ~= hud.prevTarget then
+				if target == "" then
+					for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+						ply:SetMaterial("")
+						ply:SetColor(color_white)
+						ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
+					end
+					hook.Remove("HUDPaint", "SlashCoPreyReal")
+				else
+					local targetEnt
+					for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+						if ply:SteamID64() == target then
+							targetEnt = ply
+							ply:SetMaterial("lights/white")
+							ply:SetColor(Color(255, 0, 0, 255))
+							ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
 
-    end)
+							continue
+						end
 
-    local LeapIcon = Material("slashco/ui/icons/slasher/s_punch")
+						ply:SetMaterial("")
+						ply:SetColor(color_white)
+						ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
+					end
 
-    SlashCoSlasher.Manspider.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+					hook.Add("HUDPaint", "SlashCoPreyReal", function()
+						if not IsValid(targetEnt) then
+							hook.Remove("HUDPaint", "SlashCoPreyReal")
+						end
 
-        local willdrawkill = true
-        local willdrawchase = true
-        local willdrawmain = true
+						local distColor = math.Clamp(LocalPlayer():GetPos():Distance(Entity(51):GetPos()), 0, 2048) / 16
+						draw.SimpleText("Your Prey: " .. targetEnt:Name(), "ItemFontTip",
+								ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
+								TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+					end)
+				end
+				hud.prevTarget = target
+			end
 
-        local is_nested = LocalPlayer():GetNWBool("ManspiderNested")
-        local V1 = LocalPlayer():GetNWString("ManspiderTarget")
+			local nested = LocalPlayer():GetNWBool("ManspiderNested")
+			if nested ~= hud.prevNested then
+				hud:ShakeControl("R")
+				if nested then
+					hud:SetControlText("R", "waiting for prey")
+					hud:SetControlEnabled("R", false)
+				else
+					hud:SetControlText("R", "nest")
+					hud:SetControlEnabled("R", true)
+				end
 
-        if V1 ~= "" then
+				hud.prevNested = nested
+			end
 
-            if IsValid( player.GetBySteamID64( V1 ) ) then
+			local canLeave = LocalPlayer():GetNWBool("ManspiderCanLeaveNest")
+			if canLeave ~= hud.prevLeave then
+				if nested and canLeave then
+					hud:SetControlText("R", "abandon nest")
+					hud:SetControlEnabled("R", true)
+					hud:ShakeControl("R")
+				end
 
-                draw.SimpleText( "Your Prey: "..player.GetBySteamID64( V1 ):Name(), "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/6), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
+				hud.prevLeave = canLeave
+			end
+		end
+	end
 
-            end
+	--[[
+	local LeapIcon = Material("slashco/ui/icons/slasher/s_punch")
 
-            for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+	SlashCoSlasher.Manspider.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+		local willdrawkill = true
+		local willdrawchase = true
+		local willdrawmain = true
 
-                local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+		local is_nested = LocalPlayer():GetNWBool("ManspiderNested")
+		local V1 = LocalPlayer():GetNWString("ManspiderTarget")
 
-                if ply:SteamID64() == V1 and not ply:GetNWBool("BGoneSoda") then
-                    ply:SetMaterial( "lights/white" )
-                    ply:SetColor( Color( 255, 0, 0, 255 ) )
-                    ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
-                end
+		if V1 ~= "" then
+			if IsValid(player.GetBySteamID64(V1)) then
+				draw.SimpleText("Your Prey: " .. player.GetBySteamID64(V1):Name(), "ItemFontTip",
+						mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 6), Color(255, 0, 0, 255),
+						TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+			end
 
-                if ply:SteamID64() ~= V1 then
-                    ply:SetMaterial( "" )
-                    ply:SetColor( color_white )
-                    ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
-                end
+			for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+				local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-            end
+				if ply:SteamID64() == V1 and not ply:GetNWBool("BGoneSoda") then
+					ply:SetMaterial("lights/white")
+					ply:SetColor(Color(255, 0, 0, 255))
+					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
+				end
 
-        else
-            for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+				if ply:SteamID64() ~= V1 then
+					ply:SetMaterial("")
+					ply:SetColor(color_white)
+					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
+				end
+			end
+		else
+			for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
 
-                local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+				local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+				if ply:GetMaterial() == "lights/white" then
+					ply:SetMaterial("")
+					ply:SetColor(color_white)
+					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
+				end
+			end
+		end
 
-                if ply:GetMaterial() == "lights/white" then
-                    ply:SetMaterial( "" )
-                    ply:SetColor( color_white )
-                    ply:SetRenderMode( RENDERMODE_TRANSCOLOR )
-                end
+		if not is_nested then
+			if V1 == "" then
+				draw.SimpleText("R - Nest", "ItemFontTip", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 10),
+						Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+			end
+		else
+			if not LocalPlayer():GetNWBool("ManspiderCanLeaveNest") then
+				draw.SimpleText("(Wait for prey to come)", "ItemFontTip", mainiconposx + (cx / 4),
+						mainiconposy + (mainiconposy / 10), Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+			else
+				draw.SimpleText("R - Abandon Nest", "ItemFontTip", mainiconposx + (cx / 4),
+						mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+			end
+		end
 
-            end
-        end
+		if inchase then
+			surface.SetMaterial(LeapIcon)
+			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
+			draw.SimpleText("F - Leap", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
+					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
+		end
 
-        if not is_nested then
-            if V1 == "" then draw.SimpleText( "R - Nest", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) end
-        else
+		return willdrawkill, willdrawchase, willdrawmain
+	end
+	--]]
 
-            if not LocalPlayer():GetNWBool("ManspiderCanLeaveNest") then
-                draw.SimpleText( "(Wait for prey to come)", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-            else
-                draw.SimpleText( "R - Abandon Nest", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-            end
+	SlashCoSlasher.Manspider.ClientSideEffect = function()
 
-        end
-
-        if inchase then
-
-            surface.SetMaterial(LeapIcon)
-            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-            draw.SimpleText( "F - Leap", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-
-        end
-
-        return willdrawkill, willdrawchase, willdrawmain
-
-    end
-
-    SlashCoSlasher.Manspider.ClientSideEffect = function()
-
-    end
-
+	end
 end

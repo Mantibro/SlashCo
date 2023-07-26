@@ -173,7 +173,7 @@ end
 
 function ENT:SlasherHint()
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		timer.Create(self:GetCreationID() .. "_slasherHint_" .. v:UserID(), 30, 0, function()
+		timer.Create(self:GetCreationID() .. "_slasherHint_" .. v:UserID(), 20, 0, function()
 			SlashCo.SendValue(v, "genHint", self)
 		end)
 	end

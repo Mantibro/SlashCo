@@ -237,13 +237,17 @@ if CLIENT then
 			end
 
 			local progress = LocalPlayer():GetNWInt("GameProgressDisplay")
-			if not hud.RageEnabled and progress > 6 then
-				hud:SetControlVisible("F", true)
-				hud:ShakeControl("F")
-				hud.RageEnabled = true
-			elseif hud.RageEnabled and progress < 7 then
-				hud:SetControlVisible("F", false)
-				hud.RageEnabled = false
+			if progress > 6 then
+				if not hud.RageEnabled then
+					hud:SetControlVisible("F", true)
+					hud:ShakeControl("F")
+					hud.RageEnabled = true
+				end
+			elseif progress < 7 then
+				if hud.RageEnabled then
+					hud:SetControlVisible("F", false)
+					hud.RageEnabled = false
+				end
 			end
 		end
 	end

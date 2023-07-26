@@ -174,6 +174,11 @@ end
 function ENT:HandleStuck()
 	local lim = 1
 	while true do
+		if not self.loco:IsStuck() then
+			self.loco:ClearStuck()
+			return
+		end
+
 		local pos = VectorRand(-lim, lim)
 		pos.z = pos.z / 5
 		local mins, maxs = self:WorldSpaceAABB()
@@ -205,6 +210,7 @@ function ENT:HandleStuck()
 		lim = math.Clamp(lim + 0.5, 1, 100)
 	end
 
+	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
 	self.loco:ClearStuck()
 end
 
@@ -298,6 +304,6 @@ function ENT:Use(activator)
 		return
 	end
 
-	self:EmitSound("physics/body/body_medium_break"..math.random(2,4)..".wav")
+	self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 	self:Remove()
 end

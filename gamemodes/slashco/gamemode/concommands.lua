@@ -24,7 +24,6 @@ concommand.Add("slashco_debug_run_curconfig", function(ply)
 	end
 
 	g_SlashCoDebug = true
-	--SlashCo.Debug = true
 	SlashCo.LoadCurRoundTeams()
 	SlashCo.SpawnCurConfig(true)
 end, nil, "Start a debug round with current configs.", FCVAR_CHEAT + FCVAR_PROTECTED)
@@ -40,7 +39,6 @@ concommand.Add("slashco_debug_run_survivor", function(ply, _, _)
 	end
 
 	g_SlashCoDebug = true
-	--SlashCo.Debug = true
 	for _, k in ipairs(player.GetAll()) do
 		k:SetTeam(TEAM_SURVIVOR)
 		k:Spawn()

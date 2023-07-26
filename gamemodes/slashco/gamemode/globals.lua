@@ -112,7 +112,7 @@ SlashCo.GeneratorModel = "models/props_vehicles/generatortrailer01.mdl" --Model 
 --SlashCo.BatteryModel = "models/items/car_battery01.mdl" --Model path for the batteries
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
 SlashCo.GasCansPerGenerator = 4 --Number of gas cans required to fill up a generator
-SlashCo.PlayerData = {} --Holds all loaded playerdata
+SlashCo.PlayerData = SlashCo.PlayerData or {} --Holds all loaded playerdata
 
 --Spawn a generator
 SlashCo.CreateGenerator = function(pos, ang)
