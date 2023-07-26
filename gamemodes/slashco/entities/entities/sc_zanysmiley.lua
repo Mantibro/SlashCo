@@ -9,14 +9,12 @@ ENT.Spawnable = true
 ENT.PingType = "SLASHER"
 
 function ENT:Initialize()
-
     self:SetModel("models/slashco/slashers/freesmiley/zanysmiley.mdl")
 
     self.CollideSwitch = 3
 
     self.LoseTargetDist = 1500    -- How far the enemy has to be before we lose them
     self.SearchRadius = 2000    -- How far to search for enemies
-
 end
 
 ----------------------------------------------------
@@ -88,7 +86,6 @@ function ENT:FindEnemy()
 end
 
 function ENT:RunBehaviour()
-
     while (true) do
         -- Lets use the above mentioned functions to see if we have/can find a enemy
         self:StartActivity(ACT_IDLE)
@@ -113,19 +110,21 @@ function ENT:RunBehaviour()
             self:EmitSound("slashco/slasher/zany_breath" .. math.random(1, 3) .. ".mp3")
             --self:StartActivity( ACT_WALK )			-- Walk anmimation
             self.loco:SetDesiredSpeed(50)        -- Walk speed
-            self:MoveToPos(SlashCo.LocalizedTraceHullLocatorAdvanced(self, 50, 150, 150)) -- Walk to a random place
+            local pos = SlashCo.LocalizedTraceHullLocatorAdvanced(self, 50, 150, 150)
+            if pos then
+                self:MoveToPos(pos) -- Walk to a random place
+            else
+                coroutine.wait(1)
+            end -- Walk to a random place
             --self:StartActivity( ACT_IDLE )
         end
         -- At this point in the code the bot has stopped chasing the player or finished walking to a random spot
         -- Using this next function we are going to wait 2 seconds until we go ahead and repeat it
         --coroutine.wait(math.Rand( 0, 1 ))
-
     end
-
 end
 
 function ENT:ChaseEnemy(options)
-
     local options1 = options or {}
     local path = Path("Follow")
     path:SetMinLookAheadDistance(options1.lookahead or 300)
@@ -158,11 +157,46 @@ function ENT:ChaseEnemy(options)
     end
 
     return "ok"
+end
 
+function ENT:HandleStuck()
+    local lim = 1
+    while true do
+        local pos = VectorRand(-lim, lim)
+        pos.z = pos.z / 5
+        local mins, maxs = self:WorldSpaceAABB()
+
+        local hullTrace = util.TraceHull({
+            start = pos + self:GetPos(),
+            endpos = pos + self:GetPos(),
+            mins = mins,
+            maxs = maxs
+        })
+
+        if g_SlashCoDebug then
+            debugoverlay.Box(pos, mins, maxs, 1, Color(255, 0, 0))
+            debugoverlay.Cross(pos + self:GetPos(), 40, 1, color_white, true)
+        end
+
+        if not hullTrace.Hit then
+            self:SetPos(pos + self:GetPos())
+            break
+        end
+
+        --be less specific if it's not working out
+        if lim == 40 and not hullTrace.HitNonWorld then
+            self:SetPos(pos + self:GetPos())
+            break
+        end
+
+        coroutine.wait(0.05)
+        lim = math.Clamp(lim + 0.5, 1, 100)
+    end
+
+    self.loco:ClearStuck()
 end
 
 function ENT:Think()
-
     if CLIENT then
         return
     end
@@ -181,13 +215,11 @@ function ENT:Think()
     })
 
     if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" then
-
         if self:GetPos():Distance(tr.Entity:GetPos()) > 150 then
             return
         end
 
         tr.Entity:Fire("Open")
-
     end
 
     local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
@@ -198,7 +230,6 @@ function ENT:Think()
             end
 
             if v:GetPos():Distance(self:GetPos()) < 50 then
-
                 self:Remove()
                 v:TakeDamage(50, self, self)
                 v:SetNWBool("MarkedBySmiley", false)
@@ -206,19 +237,9 @@ function ENT:Think()
                     v:SetNWBool("MarkedBySmiley", false)
                 end)
                 self:StopSound("slashco/slasher/zany_attack.mp3")
-
             end
         end
     end
-end
-
-function ENT:Use(activator)
-
-    if SERVER then
-
-
-    end
-
 end
 
 function ENT:UpdateTransmitState()
@@ -229,4 +250,15 @@ if CLIENT then
     function ENT:Draw()
         self:DrawModel()
     end
+
+    return
+end
+
+function ENT:Use(activator)
+    if activator:Team() ~= TEAM_SLASHER then
+        return
+    end
+
+    self:EmitSound("physics/body/body_medium_break"..math.random(2,4)..".wav")
+    self:Remove()
 end

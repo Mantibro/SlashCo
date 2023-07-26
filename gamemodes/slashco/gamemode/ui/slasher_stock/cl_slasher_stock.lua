@@ -19,6 +19,8 @@ function PANEL:Init()
 	self.Meters = {}
 	self.Gens = {}
 
+	self.ControlTies = {}
+
 	local right = vgui.Create("Panel", self)
 	self.Right = right
 	right:SetWide(420)
@@ -46,6 +48,10 @@ end
 ---sets up the slasher avatar table to simplify setting avatars
 function PANEL:SetAvatarTable(avatars)
 	self.AvatarTable = avatars
+
+	if self.AvatarTable["default"] then
+		self:SetAvatar("default")
+	end
 end
 
 ---sets the slasher avatar to a new material or index of the avatar table
@@ -118,6 +124,24 @@ function PANEL:SetMeterShowMax(name, showMax)
 	end
 
 	self.Meters[name]:ShowMax(showMax)
+end
+
+---ties the value of the meter to a netvar
+function PANEL:TieMeterInt(name, netvar, doFlash, fallback)
+	if not self.Meters[name] then
+		return
+	end
+
+	self.Meters[name]:TieInt(netvar, doFlash, fallback)
+end
+
+---removes the meter's current tie
+function PANEL:UntieMeter(name)
+	if not self.Meters[name] then
+		return
+	end
+
+	self.Meters[name]:Untie()
 end
 
 ---flashes a meter
@@ -240,33 +264,56 @@ function PANEL:SetControlKey(key, newKey)
 end
 
 ---Makes the enabled state of the control tied to a net variable
-function PANEL:TieControl(key, netvar, isInverse)
+function PANEL:TieControl(key, netvar, isInverse, doShake, fallback)
 	if not self.Controls[key] then
 		return
 	end
 
-	self.Controls[key]:Tie(netvar, isInverse)
+	self.Controls[key]:Tie(netvar, isInverse, doShake, fallback)
+end
+
+---Tie the message of the control to a net variable
+function PANEL:TieControlText(key, netvar, enabledText, disabledText, doShake, fallback)
+	if not self.Controls[key] then
+		return
+	end
+
+	self.Controls[key]:TieText(netvar, enabledText, disabledText, doShake, fallback)
 end
 
 ---Makes the visibility state of the control tied to a net variable
-function PANEL:TieControlVisible(key, netvar, isInverse)
+function PANEL:TieControlVisible(key, netvar, isInverse, doShake, fallback)
 	if not self.Controls[key] then
 		return
 	end
 
-	local control = self.Controls[key]
-
-	local start = LocalPlayer():GetNWBool(netvar, not isInverse)
-	control.PrevVal = isInverse and (not start) or start
-	self:SetControlVisible(key, control.PrevVal)
-	function control.TieCheck()
-		local val = LocalPlayer():GetNWBool(netvar, not isInverse)
-		if val ~= control.PrevVal then
-			local newVal = isInverse and (not val) or val
-			self:SetControlVisible(key, newVal)
-			control.PrevVal = newVal
-		end
+	if fallback == nil then
+		fallback = true
 	end
+	isInverse = isInverse or false
+
+	local state = true
+	if type(netvar) == "table" then
+		for _, v in ipairs(netvar) do
+			if not LocalPlayer():GetNWBool(v, fallback) then
+				state = false
+				break
+			end
+		end
+	else
+		state = LocalPlayer():GetNWBool(netvar, fallback)
+	end
+
+	self.ControlTies[key] = {
+		netvar = netvar,
+		prevVal = state,
+		func = function(val)
+			self:SetControlVisible(key, val ~= isInverse)
+		end,
+		doShake = doShake,
+		fallback = fallback
+	}
+	self:SetControlVisible(key, state ~= isInverse)
 end
 
 ---Removes the current netvar tie of a control
@@ -276,6 +323,7 @@ function PANEL:UntieControl(key)
 	end
 
 	self.Controls[key]:Untie()
+	self.ControlTies[key] = nil
 end
 
 ---Makes the standard chase and kill controls automagically
@@ -291,18 +339,7 @@ function PANEL:ChaseAndKill(noChase, noKill)
 
 	self:AddControl("RMB", "start chasing", "chase")
 	self:TieControl("RMB", "CanChase")
-
-	local control = self.Controls["RMB"]
-	control.PrevChase = LocalPlayer():GetNWBool("InSlasherChaseMode")
-	self:SetControlText("RMB", control.PrevChase and "stop chasing" or "start chasing")
-	function control.AlsoThink()
-		local val = LocalPlayer():GetNWBool("InSlasherChaseMode")
-		if val ~= control.PrevChase then
-			control:Shake()
-			self:SetControlText("RMB", val and "stop chasing" or "start chasing")
-			control.PrevChase = val
-		end
-	end
+	self:TieControlText("RMB", "InSlasherChaseMode", "stop chasing", "start chasing", true, false)
 end
 
 ---shakes a control's icon a little
@@ -438,7 +475,7 @@ end
 
 ---internal: makes the can/battery display
 function PANEL:MakeGenEntry(gen, i, model)
-	local entry = vgui.Create("DModelPanel", self)
+	local entry = vgui.Create("DModelPanel", GetHUDPanel())
 	table.insert(gen.Entries, entry)
 
 	entry:SetSize(50, 50)
@@ -546,6 +583,41 @@ function PANEL:MakeGeneratorsCard()
 	end
 end
 
+---internal: handles visibility ties
+function PANEL:Think()
+	for k, v in pairs(self.ControlTies) do
+		if not IsValid(self.Controls[k]) then
+			self.ControlTies[k] = nil
+			continue
+		end
+
+		local val = true
+		if type(v.netvar) == "table" then
+			for _, v1 in ipairs(v.netvar) do
+				if LocalPlayer():GetNWBool(v1, v.fallback) then
+					val = false
+					break
+				end
+			end
+		else
+			val = LocalPlayer():GetNWBool(v.netvar, v.fallback)
+		end
+
+		if val ~= v.prevVal then
+			v.func(val)
+			v.prevVal = val
+
+			if v.doShake then
+				self.Controls[k]:Shake()
+			end
+		end
+	end
+
+	if self.AlsoThink then
+		self:AlsoThink()
+	end
+end
+
 ---internal: removes panels that don't get removed automatically
 function PANEL:OnRemove()
 	for _, v in ipairs(self.Gens) do
@@ -558,12 +630,12 @@ end
 vgui.Register("slashco_slasher_stockhud", PANEL, "Panel")
 
 local function findGenPanel(gen)
-	if not g_SlasherHud then
+	if not SlashCo.SlasherHud() then
 		return
 	end
 
 	local panel
-	for _, v in ipairs(g_SlasherHud.Gens) do
+	for _, v in ipairs(SlashCo.SlasherHud().Gens) do
 		if v.Entity == gen then
 			panel = v
 		end

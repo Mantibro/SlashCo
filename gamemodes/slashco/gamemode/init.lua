@@ -720,7 +720,7 @@ local Think = function()
             --Go back to lobby if everyone dies.
             if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
-                if not SlashCo.Debug then SlashCo.EndRound() end
+                SlashCo.EndRound()
 
                 SlashCo.CurRound.roundOverToggle = false
             end

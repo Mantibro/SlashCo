@@ -579,6 +579,10 @@ SlashCo.ValidateMap = function(map)
 end
 
 SlashCo.EndRound = function()
+    if g_SlashCoDebug then
+        return
+    end
+
     local delay = 20
 
     local survivorsWon = true

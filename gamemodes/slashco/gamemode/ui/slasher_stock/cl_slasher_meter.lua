@@ -4,7 +4,7 @@ local red = Color(255, 0, 0)
 
 function PANEL:Init()
 	self.Max = 100
-	self.Current = 100
+	self.Current = 0
 	self.LabelText = "Meter"
 	self.ValueLabelText = "%"
 	self.ShowMax = false
@@ -19,7 +19,7 @@ function PANEL:Init()
 	self:UpdateValueLabel()
 
 	self.Anim = Derma_Anim("Flash", self, function(pnl, _, delta)
-		pnl.FlashAmt = (1 - delta^2) * 128
+		pnl.FlashAmt = (1 - delta ^ 2) * 128
 	end)
 end
 
@@ -42,7 +42,7 @@ end
 ---set the label for the meter
 function PANEL:SetName(value)
 	self.LabelText = value
-	self.Label:SetText(" "..self.LabelText)
+	self.Label:SetText(" " .. self.LabelText)
 end
 
 ---set the value of the meter
@@ -71,6 +71,28 @@ function PANEL:SetShowMax(showMax)
 	self:UpdateValueLabel()
 end
 
+---ties the value of the meter to a netvar
+function PANEL:TieInt(netvar, doFlash, fallback)
+	fallback = fallback or 0
+	self:SetValue(LocalPlayer():GetNWInt(netvar, fallback))
+
+	function self.TieCheck()
+		local val = math.Clamp(LocalPlayer():GetNWInt(netvar, fallback), 0, self.Max)
+		if val ~= self.Current then
+			self:SetValue(LocalPlayer():GetNWInt(netvar, fallback))
+
+			if doFlash then
+				self:Flash()
+			end
+		end
+	end
+end
+
+---removes any ties
+function PANEL:Untie()
+	self.TieCheck = nil
+end
+
 ---plays a flash animation
 function PANEL:Flash()
 	self.Anim:Start(1)
@@ -80,6 +102,10 @@ end
 function PANEL:Think()
 	if self.Anim:Active() then
 		self.Anim:Run()
+	end
+
+	if self.TieCheck then
+		self.TieCheck()
 	end
 end
 
@@ -157,7 +183,7 @@ function PANEL:MakeLabels()
 	label:SetTextColor(red)
 	label:SetContentAlignment(1)
 	label:DockMargin(4, 0, 0, -8)
-	label:SetText(" "..self.LabelText)
+	label:SetText(" " .. self.LabelText)
 end
 
 vgui.Register("slashco_slasher_meter", PANEL, "Panel")

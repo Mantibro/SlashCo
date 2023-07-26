@@ -18,8 +18,11 @@ function PANEL:Init()
 	self.dY = 0
 	self.IconTable = {
 		default = defaultIcon,
-		["d/"] = defaultIconDisabled
+		["d/"] = defaultIconDisabled,
+		slash = Material("slashco/ui/icons/slasher/s_slash")
 	}
+
+	self.Ties = {}
 
 	local icon = vgui.Create("Panel", self)
 	self.IconPanel = icon
@@ -113,7 +116,7 @@ function PANEL:SetIconTable(icons, dontSetIcon)
 		if self.Enabled then
 			self:SetIcon(self.Text)
 		else
-			self:SetIcon("//" .. self.Text)
+			self:SetIcon("d/" .. self.Text)
 		end
 	end
 end
@@ -134,18 +137,45 @@ function PANEL:SetIcon(icon)
 end
 
 ---Makes the enabled state of the control tied to a net variable
-function PANEL:Tie(netvar, isInverse)
-	local start = LocalPlayer():GetNWBool(netvar, not isInverse)
-	self.PrevVal = isInverse and (not start) or start
-	self:SetEnabled(self.PrevVal)
-	function self.TieCheck()
-		local val = LocalPlayer():GetNWBool(netvar, not isInverse)
-		if val ~= self.PrevVal then
-			local newVal = isInverse and (not val) or val
-			self:SetEnabled(newVal)
-			self.PrevVal = newVal
+function PANEL:Tie(netvar, isInverse, doShake, fallback)
+	isInverse = isInverse or false
+	self:TieFunc(netvar, function(pnl, state)
+		pnl:SetEnabled(state ~= isInverse)
+	end, doShake, fallback)
+end
+
+---Tie the message of the control to a net variable
+function PANEL:TieText(netvar, enabledText, disabledText, doShake, fallback)
+	self:TieFunc(netvar, function(pnl, state)
+		if state then
+			pnl:SetText(enabledText)
+		else
+			pnl:SetText(disabledText)
 		end
+	end, doShake, fallback)
+end
+
+---runs a function when a netvar is changed
+function PANEL:TieFunc(netvar, func, doShake, fallback)
+	if fallback == nil then
+		fallback = true
 	end
+
+	timer.Simple(0, function()
+		if not IsValid(self) then
+			return
+		end
+
+		local state = LocalPlayer():GetNWBool(netvar, fallback)
+		func(self, state)
+		table.insert(self.Ties, {
+			netvar = netvar,
+			prevVal = state,
+			func = func,
+			doShake = doShake,
+			fallback = fallback
+		})
+	end)
 end
 
 ---Removes the current netvar tie
@@ -165,7 +195,11 @@ function PANEL:SetText(text, dontSetIcon)
 	self.Label:SetText(text .. " ")
 
 	if not dontSetIcon then
-		self:SetIcon(text)
+		if self.Enabled then
+			self:SetIcon(self.Text)
+		else
+			self:SetIcon("d/" .. self.Text)
+		end
 	end
 end
 
@@ -184,8 +218,16 @@ function PANEL:Think()
 		self:AlsoThink()
 	end
 
-	if self.TieCheck then
-		self:TieCheck()
+	for _, v in ipairs(self.Ties) do
+		local state = LocalPlayer():GetNWBool(v.netvar, v.fallback)
+		if state ~= v.prevVal then
+			v.func(self, state)
+			v.prevVal = state
+
+			if v.doShake then
+				self:Shake()
+			end
+		end
 	end
 end
 

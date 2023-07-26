@@ -60,8 +60,8 @@ end
 
 SlashCoSlasher.Princess.OnTickBehaviour = function(slasher)
 
-    v1 = slasher.SlasherValue1 --aggression
-    v2 = slasher.SlasherValue2 --aggression threshold
+    local v1 = slasher.SlasherValue1 --aggression  --please stop using globals like this
+    local v2 = slasher.SlasherValue2 --aggression threshold
 
     local eyesight = SlashCoSlasher.Princess.Eyesight
     local perception = SlashCoSlasher.Princess.Perception

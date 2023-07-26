@@ -9,7 +9,6 @@ ENT.Spawnable = true
 ENT.PingType = "SLASHER"
 
 function ENT:Initialize()
-
 	self:SetModel("models/slashco/slashers/freesmiley/pensivesmiley.mdl")
 
 	self.CollideSwitch = 3
@@ -20,7 +19,6 @@ function ENT:Initialize()
 
 	self.LoseTargetDist = 1000    -- How far the enemy has to be before we lose them
 	self.SearchRadius = 700    -- How far to search for enemies
-
 end
 
 ----------------------------------------------------
@@ -62,7 +60,6 @@ end
 -- Returns true and sets our enemy if we find one
 ----------------------------------------------------
 function ENT:FindEnemy()
-
 	if self.AttackedPlayer ~= "" then
 		return false
 	end
@@ -96,12 +93,11 @@ function ENT:FindEnemy()
 end
 
 function ENT:RunBehaviour()
-
 	while (true) do
 		-- Lets use the above mentioned functions to see if we have/can find a enemy
 		self:StartActivity(ACT_IDLE)
 		if self.AttackedPlayer == "" then
-			if (self:HaveEnemy()) then
+			if self:HaveEnemy() then
 				-- Now that we have a enemy, the code in this block will run
 				self:SetSequence(self:LookupSequence("attack"))
 				self.loco:FaceTowards(self:GetEnemy():GetPos())    -- Face our enemy
@@ -119,38 +115,37 @@ function ENT:RunBehaviour()
 				self:SetSequence(self:LookupSequence("idle"))
 				--self:StartActivity( ACT_WALK )			-- Walk anmimation
 				self.loco:SetDesiredSpeed(100)        -- Walk speed
-				self:MoveToPos(SlashCo.LocalizedTraceHullLocatorAdvanced(self, 50, 150, 150)) -- Walk to a random place
+				local pos = SlashCo.LocalizedTraceHullLocatorAdvanced(self, 50, 150, 150)
+				if pos then
+					self:MoveToPos(pos) -- Walk to a random place
+				else
+					coroutine.wait(1)
+				end -- Walk to a random place
 				--self:StartActivity( ACT_IDLE )
 			end
 		else
-
 			self:SetSequence(self:LookupSequence("attack"))
 			self.loco:FaceTowards(player.GetBySteamID64(self.AttackedPlayer):GetPos())    -- Face our enemy
 			coroutine.wait(math.Rand(12))
-
 		end
 		-- At this point in the code the bot has stopped chasing the player or finished walking to a random spot
 		-- Using this next function we are going to wait 2 seconds until we go ahead and repeat it 
 		--coroutine.wait(math.Rand( 0, 1 ))
-
 	end
-
 end
 
 function ENT:ChaseEnemy(options)
-
 	local options1 = options or {}
 	local path = Path("Follow")
 	path:SetMinLookAheadDistance(options1.lookahead or 300)
 	path:SetGoalTolerance(options1.tolerance or 20)
 	path:Compute(self, self:GetEnemy():GetPos())        -- Compute the path towards the enemy's position
 
-	if (not path:IsValid()) then
+	if not path:IsValid() then
 		return "failed"
 	end
 
 	while (path:IsValid() and self:HaveEnemy()) do
-
 		if (path:GetAge() > 0.1) then
 			-- Since we are following the player we have to constantly remake the path
 			path:Compute(self, self:GetEnemy():GetPos())-- Compute the path towards the enemy's position again
@@ -161,13 +156,12 @@ function ENT:ChaseEnemy(options)
 			path:Draw()
 		end
 		-- If we're stuck then call the HandleStuck function and abandon
-		if (self.loco:IsStuck()) then
+		if self.loco:IsStuck() then
 			self:HandleStuck()
 			return "stuck"
 		end
 
 		coroutine.yield()
-
 	end
 
 	if self.AttackedPlayer ~= "" then
@@ -175,13 +169,47 @@ function ENT:ChaseEnemy(options)
 	end
 
 	return "ok"
+end
 
+function ENT:HandleStuck()
+	local lim = 1
+	while true do
+		local pos = VectorRand(-lim, lim)
+		pos.z = pos.z / 5
+		local mins, maxs = self:WorldSpaceAABB()
+
+		local hullTrace = util.TraceHull({
+			start = pos + self:GetPos(),
+			endpos = pos + self:GetPos(),
+			mins = mins,
+			maxs = maxs
+		})
+
+		if g_SlashCoDebug then
+			debugoverlay.Box(pos, mins, maxs, 1, Color(255, 0, 0))
+			debugoverlay.Cross(pos + self:GetPos(), 40, 1, color_white, true)
+		end
+
+		if not hullTrace.Hit then
+			self:SetPos(pos + self:GetPos())
+			break
+		end
+
+		--be less specific if it's not working out
+		if lim == 40 and not hullTrace.HitNonWorld then
+			self:SetPos(pos + self:GetPos())
+			break
+		end
+
+		coroutine.wait(0.05)
+		lim = math.Clamp(lim + 0.5, 1, 100)
+	end
+
+	self.loco:ClearStuck()
 end
 
 function ENT:Think()
-
 	if SERVER then
-
 		if self.CollideSwitch > 0 then
 			self:SetNotSolid(true)
 			self.CollideSwitch = self.CollideSwitch - FrameTime()
@@ -196,16 +224,13 @@ function ENT:Think()
 		})
 
 		if tr.Entity:GetClass() == "prop_door_rotating" then
-
 			if self:GetPos():Distance(tr.Entity:GetPos()) > 150 then
 				return
 			end
 
 			tr.Entity:Fire("Open")
-
 		end
 		if self.AttackedPlayer == "" then
-
 			local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
 
 			for _, v in ipairs(_ents) do
@@ -215,16 +240,12 @@ function ENT:Think()
 					end
 
 					if v:GetPos():Distance(self:GetPos()) < 150 then
-
 						self.AttackedPlayer = v:SteamID64()
 						self.Enemy = nil
-
 					end
 				end
 			end
-
 		else
-
 			if not IsValid(player.GetBySteamID64(self.AttackedPlayer)) then
 				self.AttackedPlayer = ""
 				self.Enemy = nil
@@ -238,7 +259,6 @@ function ENT:Think()
 			attacked:SetNWBool("MarkedBySmiley", true)
 
 			if self.AttackEngage == false then
-
 				self:EmitSound("slashco/slasher/pensive_attack" .. math.random(1, 2) .. ".mp3")
 
 				timer.Simple(10, function()
@@ -253,25 +273,12 @@ function ENT:Think()
 					attacked:SetNWBool("MarkedBySmiley", false)
 
 					self:Remove()
-
 				end)
 
 				self.AttackEngage = true
 			end
-
 		end
-
 	end
-
-end
-
-function ENT:Use(activator)
-
-	if SERVER then
-
-
-	end
-
 end
 
 function ENT:UpdateTransmitState()
@@ -282,4 +289,15 @@ if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
 	end
+
+	return
+end
+
+function ENT:Use(activator)
+	if activator:Team() ~= TEAM_SLASHER then
+		return
+	end
+
+	self:EmitSound("physics/body/body_medium_break"..math.random(2,4)..".wav")
+	self:Remove()
 end

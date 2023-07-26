@@ -258,7 +258,6 @@ if CLIENT then
 
 	SlashCoSlasher.Bababooey.InitHud = function(_, hud)
 		hud:SetAvatarTable(avatarTable)
-		hud:SetAvatar("default")
 		hud:SetTitle("bababooey")
 
 		hud:AddControl("R", "toggle invisibilty", avatarTable)
