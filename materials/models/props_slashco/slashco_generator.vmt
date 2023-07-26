@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_slashco/slashco_generator"
+	"$bumpmap" "models/props_slashco/slashco_generator_nm"
+	"$halflambert" 1
+}

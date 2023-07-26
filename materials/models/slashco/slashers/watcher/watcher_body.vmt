@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/watcher/watcher_body"
+	"$bumpmap" "models/slashco/slashers/watcher/watcher_body_nm"
+	"$halflambert" 1
+	"$nocull" 1
+}

@@ -48,31 +48,30 @@ function ENT:Touch(otherEnt)
 
 		local gasCan = ents.Create("prop_physics")
 
-		gasCan:SetModel(SlashCoItems.GasCan.Model)
-		gasCan:SetMoveType(MOVETYPE_NONE)
-		gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-		gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
-		gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
-		gasCan:SetParent(self)
+        gasCan:SetModel(SlashCoItems.GasCan.Model)
+        gasCan:SetMoveType(MOVETYPE_NONE)
+        gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+        gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
+        gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
+        gasCan:SetParent(self)
 
 		self.FuelingCan = gasCan
 
-		SlashCo.SpawnSlasher()
-	elseif not self.MakingItem and not self.HasBattery and class == "sc_battery" and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-7,
-			25, 50))) < 18 then
-		otherEnt:Remove()
+        SlashCo.SpawnSlasher()
+    elseif not self.MakingItem and not self.HasBattery and class == "sc_battery" and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-33.59, 13.2, 53.7))) < 26 then
+        otherEnt:Remove()
 
 		local battery = ents.Create("prop_physics")
 		self.HasBattery = battery
 
-		battery:SetModel(SlashCoItems.Battery.Model)
-		battery:SetMoveType(MOVETYPE_NONE)
-		battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-		battery:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
-		battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
-		battery:SetParent(self)
-		battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-		battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+        battery:SetModel(SlashCoItems.Battery.Model)
+        battery:SetMoveType(MOVETYPE_NONE)
+        battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+        battery:SetPos(self:LocalToWorld(Vector(-33.59, 13.2, 53.7)))
+        battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+        battery:SetParent(self)
+        battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
+        battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
 
 		SlashCo.SpawnSlasher()
 	end
@@ -94,14 +93,14 @@ function ENT:MakeBattery(model)
 	local battery = ents.Create("prop_physics")
 	self.HasBattery = IsValid(battery)
 
-	battery:SetModel(model)
-	battery:SetMoveType(MOVETYPE_NONE)
-	battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-	battery:SetPos(self:LocalToWorld(Vector(-7, 25, 50)))
-	battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
-	battery:SetParent(self)
-	battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-	battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+    battery:SetModel(model)
+    battery:SetMoveType(MOVETYPE_NONE)
+    battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+    battery:SetPos(self:LocalToWorld(Vector(-33.59, 13.2, 53.7)))
+    battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+    battery:SetParent(self)
+    battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
+    battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
 
 	SlashCo.SpawnSlasher()
 end
@@ -110,12 +109,12 @@ function ENT:MakeGasCan(model)
 	self.MakingItem = nil
 	local gasCan = ents.Create("prop_physics")
 
-	gasCan:SetModel(model)
-	gasCan:SetMoveType(MOVETYPE_NONE)
-	gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-	gasCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55)))
-	gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45)))
-	gasCan:SetParent(self)
+    gasCan:SetModel(model)
+    gasCan:SetMoveType(MOVETYPE_NONE)
+    gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+    gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
+    gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
+    gasCan:SetParent(self)
 
 	self.FuelingCan = gasCan
 
@@ -218,10 +217,9 @@ function ENT:Think()
 		self:StopSound("slashco/generator_fill.wav")
 		return
 	end
-
-	local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
-	self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 45 + fuelprog * 80)))
-	self.FuelingCan:SetPos(self:LocalToWorld(Vector(-18, 30, 55 + fuelprog * 26)))
+    local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
+    self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25 + fuelprog * 40)))
+    self.FuelingCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035 + fuelprog * 10)))
 
 	if CurTime() >= self.TimeUntilFueled then
 

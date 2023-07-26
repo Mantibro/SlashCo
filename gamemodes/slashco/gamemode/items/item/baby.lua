@@ -30,18 +30,28 @@ SlashCoItems.Baby.OnUse = function(ply)
     ply:SetHealth( hpafter )
 
     timer.Simple(1, function()
-        if ply:Health() < 51 then
-            if deathchance < 2 then
-                ply:Kill()
-                for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-                    v:SetPos(SlashCo.TraceHullLocator())
-                    v:EmitSound("slashco/survivor/baby_use.mp3")
-                end
-                return
-            end
-        end
 
-        ply:SetPos(SlashCo.TraceHullLocator())
+        if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+
+            if ply:Health() < 51 then
+                if deathchance < 2 then
+                    ply:Kill()
+                    ply:EmitSound("slashco/survivor/devildie_kill.mp3")
+
+                    local slasher = team.GetPlayers(TEAM_SLASHER)[#team.GetPlayers(TEAM_SLASHER)]
+
+                    if IsValid(slasher) then
+                        slasher:SetPos(SlashCo.TraceHullLocator())
+                        slasher:EmitSound("slashco/survivor/baby_use.mp3")
+                    end
+                    
+                    return
+                end
+            end
+
+            ply:SetPos(SlashCo.TraceHullLocator())
+
+        end
     end)
 end
 SlashCoItems.Baby.OnDrop = function(ply)

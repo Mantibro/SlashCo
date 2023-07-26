@@ -1,6 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture" "slashco/ui/health_top_low"
-	"$translucent" 1
-	"$halflambert" 1
-}

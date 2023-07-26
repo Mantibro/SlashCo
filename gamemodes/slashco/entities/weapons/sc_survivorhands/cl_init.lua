@@ -9,6 +9,7 @@ function SWEP:Initialize()
         self.heldEntity:SetAngles(self:GetAngles())
         self.heldEntity:SetParent(self)
         self.heldEntity:SetNoDraw(true)
+        self.heldEntity:ResetSequence( 0 )
     end
 
     self.heldEntityWorld = ClientsideModel("models/props_junk/metalgascan.mdl", RENDER_GROUP_VIEW_MODEL_OPAQUE)
@@ -17,6 +18,7 @@ function SWEP:Initialize()
         self.heldEntityWorld:SetAngles(self:GetAngles())
         self.heldEntityWorld:SetParent(self)
         self.heldEntityWorld:SetNoDraw(true)
+        self.heldEntityWorld:ResetSequence( 0 )
     end
 
     self.heldEntityHolstered = ClientsideModel("models/props_junk/metalgascan.mdl", RENDER_GROUP_VIEW_MODEL_OPAQUE)
@@ -25,6 +27,7 @@ function SWEP:Initialize()
         self.heldEntityHolstered:SetAngles(self:GetAngles())
         self.heldEntityHolstered:SetParent(self)
         self.heldEntityHolstered:SetNoDraw(true)
+        self.heldEntityHolstered:ResetSequence( 0 )
     end
 end
 
