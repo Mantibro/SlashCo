@@ -546,7 +546,7 @@ function PANEL:MakeGeneratorsCard()
 		gen:SetSize(160, 160)
 		gen:SetPos(ScrW() / 2 + 160 * k - 80 * genCount - 160)
 		gen:SetEntity(v)
-		gen:SetFOV(20)
+		gen:SetFOV(22)
 		gen:SetDistance(400)
 		self:ModelFog(gen)
 

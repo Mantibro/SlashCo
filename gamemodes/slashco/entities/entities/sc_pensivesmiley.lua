@@ -38,13 +38,13 @@ end
 ----------------------------------------------------
 function ENT:HaveEnemy()
 	-- If our current enemy is valid
-	if (self:GetEnemy() and IsValid(self:GetEnemy())) then
+	if self:GetEnemy() and IsValid(self:GetEnemy()) then
 		-- If the enemy is too far
-		if (self:GetRangeTo(self:GetEnemy():GetPos()) > self.LoseTargetDist) then
+		if self:GetRangeTo(self:GetEnemy():GetPos()) > self.LoseTargetDist then
 			-- FindEnemy() will return true if an enemy is found, making this function return true
 			return self:FindEnemy()
 			-- If the enemy is dead( we have to check if its a player before we use Alive() )
-		elseif (self:GetEnemy():IsPlayer() and not self:GetEnemy():Alive()) then
+		elseif self:GetEnemy():IsPlayer() and not self:GetEnemy():Alive() then
 			return self:FindEnemy()        -- Return false if the search finds nothing
 		end
 		-- The enemy is neither too far nor too dead so we can return true
@@ -69,7 +69,7 @@ function ENT:FindEnemy()
 	local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
 	-- Here we loop through every entity the above search finds and see if it's the one we want
 	for _, v in ipairs(_ents) do
-		if (v:IsPlayer() and v:Team() == TEAM_SURVIVOR) then
+		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR then
 			-- We found one so lets set it as our enemy and return true
 
 			local tr = util.TraceLine({
@@ -93,7 +93,7 @@ function ENT:FindEnemy()
 end
 
 function ENT:RunBehaviour()
-	while (true) do
+	while true do
 		-- Lets use the above mentioned functions to see if we have/can find a enemy
 		self:StartActivity(ACT_IDLE)
 		if self.AttackedPlayer == "" then
@@ -115,9 +115,16 @@ function ENT:RunBehaviour()
 				self:SetSequence(self:LookupSequence("idle"))
 				--self:StartActivity( ACT_WALK )			-- Walk anmimation
 				self.loco:SetDesiredSpeed(100)        -- Walk speed
-				local pos = SlashCo.LocalizedTraceHullLocatorAdvanced(self, 50, 150, 150)
+
+				local pos = SlashCo.LocalizedTraceHullLocatorAdvanced(self, 100, 200, self.GotStuck and -20 or 150)
+				self.GotStuck = nil
 				if pos then
-					self:MoveToPos(pos) -- Walk to a random place
+					self:MoveToPos(pos, {
+						draw = g_SlashCoDebug,
+						maxage = 10,
+						tolerance = 50,
+						lookahead = 600
+					}) -- Walk to a random place
 				else
 					coroutine.wait(1)
 				end -- Walk to a random place
@@ -145,14 +152,14 @@ function ENT:ChaseEnemy(options)
 		return "failed"
 	end
 
-	while (path:IsValid() and self:HaveEnemy()) do
-		if (path:GetAge() > 0.1) then
+	while path:IsValid() and self:HaveEnemy() do
+		if path:GetAge() > 0.1 then
 			-- Since we are following the player we have to constantly remake the path
 			path:Compute(self, self:GetEnemy():GetPos())-- Compute the path towards the enemy's position again
 		end
 		path:Update(self)                                -- This function moves the bot along the path
 
-		if (options1.draw) then
+		if options1.draw then
 			path:Draw()
 		end
 		-- If we're stuck then call the HandleStuck function and abandon
@@ -172,6 +179,7 @@ function ENT:ChaseEnemy(options)
 end
 
 function ENT:HandleStuck()
+	self.GotStuck = true
 	local lim = 1
 	while true do
 		if not self.loco:IsStuck() then
@@ -229,13 +237,13 @@ function ENT:Think()
 			filter = self
 		})
 
-		if tr.Entity:GetClass() == "prop_door_rotating" then
-			if self:GetPos():Distance(tr.Entity:GetPos()) > 150 then
-				return
-			end
+		if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+				not tr.Entity.IsOpen and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
-			tr.Entity:Fire("Open")
+			tr.Entity:Use(self)
+			self.UseCooldown = CurTime()
 		end
+
 		if self.AttackedPlayer == "" then
 			local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
 

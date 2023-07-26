@@ -108,8 +108,8 @@ SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
 		slasher:SlasherHudFunc("SetAvatar", "invisible")
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", false)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
-		slasher:SlasherHudFunc("SetControlIcon", "R", "invisible")
-		slasher:SlasherHudFunc("ShakeControl", "R")
+		--slasher:SlasherHudFunc("SetControlIcon", "R", "invisible")
+		--slasher:SlasherHudFunc("ShakeControl", "R")
 
 		slasher.SlasherValue1 = 4
 		slasher:EmitSound("slashco/slasher/baba_hide.mp3")
@@ -131,8 +131,8 @@ SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
 		slasher:SlasherHudFunc("SetAvatar", "default")
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", true)
-		slasher:SlasherHudFunc("SetControlIcon", "R", "default")
-		slasher:SlasherHudFunc("ShakeControl", "R")
+		--slasher:SlasherHudFunc("SetControlIcon", "R", "default")
+		--slasher:SlasherHudFunc("ShakeControl", "R")
 
 		--Spook Appear
 		if slasher:GetEyeTrace().Entity:IsPlayer() then
@@ -251,6 +251,11 @@ if CLIENT then
 		invisible = Material("slashco/ui/icons/slasher/s_1_a1")
 	}
 
+	local invisTable = {
+		["disable invisibility"] = Material("slashco/ui/icons/slasher/s_1"),
+		["enable invisibility"] = Material("slashco/ui/icons/slasher/s_1_a1")
+	}
+
 	local cloneTable = {
 		["set clone"] = Material("slashco/ui/icons/slasher/s_1_a2"),
 		["d/set clone"] = Material("slashco/ui/icons/slasher/s_1_a2_1")
@@ -260,7 +265,8 @@ if CLIENT then
 		hud:SetAvatarTable(avatarTable)
 		hud:SetTitle("bababooey")
 
-		hud:AddControl("R", "toggle invisibilty", avatarTable)
+		hud:AddControl("R", "enable invisibilty", invisTable)
+		hud:TieControlText("R", "BababooeyInvisibility", "disable invisibility", "enable invisibility", true)
 		hud:ChaseAndKill()
 		hud:AddControl("F", "set clone", cloneTable)
 

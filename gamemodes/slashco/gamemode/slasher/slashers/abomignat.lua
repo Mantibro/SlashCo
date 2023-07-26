@@ -204,7 +204,7 @@ SlashCoSlasher.Abomignat.OnMainAbilityFire = function(slasher)
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", true)
 		slasher:SlasherHudFunc("SetControlVisible", "F", true)
-		slasher:SlasherHudFunc("ShakeControl", "R")
+		--slasher:SlasherHudFunc("ShakeControl", "R")
 		return
 	end
 
@@ -230,7 +230,7 @@ SlashCoSlasher.Abomignat.OnMainAbilityFire = function(slasher)
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", false)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
 		slasher:SlasherHudFunc("SetControlVisible", "F", false)
-		slasher:SlasherHudFunc("ShakeControl", "R")
+		--slasher:SlasherHudFunc("ShakeControl", "R")
 	end
 end
 
@@ -355,7 +355,8 @@ if CLIENT then
 		hud:SetAvatar(Material("slashco/ui/icons/slasher/s_11"))
 		hud:SetTitle("abomignat")
 
-		hud:AddControl("R", "toggle crawling")
+		hud:AddControl("R", "enable crawling")
+		hud:TieControlText("R", "AbomignatCrawling", "disable crawling", "enable crawling", true)
 		hud:AddControl("LMB", "slash charge", controlTable)
 		hud:ChaseAndKill(nil, true)
 		hud:AddControl("F", "lunge", controlTable)

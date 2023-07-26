@@ -7,7 +7,6 @@ ITEM.EntClass = "sc_jug"
 ITEM.Price = 7
 ITEM.Description = "We have no idea what is this."
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.ReplacesWorldProps = true
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true
 ITEM.OnDrop = function(ply)

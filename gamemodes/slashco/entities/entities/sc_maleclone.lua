@@ -21,10 +21,22 @@ function ENT:RunBehaviour()
 		-- Here is the loop, it will run forever
 		self:StartActivity(ACT_WALK)            -- Walk animation
 		self.loco:SetDesiredSpeed(100)        -- Walk speed
-		self:MoveToPos(SlashCo.TraceHullLocator()) -- Walk to a random place
+
+		local pos = SlashCo.TraceHullLocator()
+		if g_SlashCoDebug then
+			debugoverlay.Cross(pos, 40, 30, Color(0, 255, 255), true)
+		end
+		self:MoveToPos(pos, {
+			draw = g_SlashCoDebug,
+			repath = 6,
+			lookahead = 600
+		}) -- Walk to a random place
 		self:StartActivity(ACT_IDLE)
 
-		coroutine.wait(math.Rand(0, 35))
+		if not self.GotStuck then
+			coroutine.wait(math.Rand(0, 35))
+		end
+		self.GotStuck = nil
 
 		coroutine.yield()
 		-- The function is done here, but will start back at the top of the loop and make the bot walk somewhere else
@@ -39,6 +51,7 @@ end
 --make sure the hull is player-size
 local mins, maxs = Vector(-16, -16, 0), Vector(16, 16, 71)
 function ENT:HandleStuck()
+	self.GotStuck = true
 	local lim = 1
 	while true do
 		if not self.loco:IsStuck() then
@@ -103,15 +116,11 @@ function ENT:Think()
 			filter = self
 		})
 
-		if not IsValid(tr.Entity) then
-			return
-		end
+		if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+				not tr.Entity.IsOpen and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
-		if tr.Entity:GetClass() == "prop_door_rotating" then
-			if self:GetPos():Distance(tr.Entity:GetPos()) > 150 then
-				return
-			end
-			tr.Entity:Fire("Open")
+			tr.Entity:Use(self)
+			self.UseCooldown = CurTime()
 		end
 	end
 end
