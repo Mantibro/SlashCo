@@ -95,7 +95,18 @@ end
 
 ---plays a flash animation
 function PANEL:Flash()
+	if self.CustomColors then
+		return
+	end
+
 	self.Anim:Start(1)
+end
+
+---set custom colors (disables flashing)
+function PANEL:SetColors(empty, full)
+	self.CustomColors = true
+	self.EmptyColor = empty or Color(128, 0, 0)
+	self.FullColor = full or red
 end
 
 ---internal: runs the flash animation
@@ -122,13 +133,21 @@ function PANEL:MakeMeter()
 		surface.SetDrawColor(0, 0, 0)
 		surface.DrawRect(3, 3, w - 6, h - 6)
 
-		self.nDCurrent = Lerp(0.08, self.pDCurrent, self.Current / self.Max)
+		self.nDCurrent = math.Clamp(Lerp(0.08, self.pDCurrent, self.Current / self.Max), 0, self.Max)
 		self.pDCurrent = self.nDCurrent
 
-		if self.nDCurrent > 0.997 then
-			surface.SetDrawColor(255, 0, 0)
+		if self.nDCurrent > 0.998 then
+			if self.CustomColors then
+				surface.SetDrawColor(self.FullColor.r, self.FullColor.g, self.FullColor.b)
+			else
+				surface.SetDrawColor(255, 0, 0)
+			end
 		else
-			surface.SetDrawColor(128 + self.FlashAmt, 0, 0)
+			if self.CustomColors then
+				surface.SetDrawColor(self.EmptyColor.r, self.EmptyColor.g, self.EmptyColor.b)
+			else
+				surface.SetDrawColor(128 + self.FlashAmt, 0, 0)
+			end
 		end
 
 		surface.DrawRect(5, 5, (w - 10) * self.nDCurrent, h - 10)
@@ -139,18 +158,16 @@ end
 function PANEL:UpdateValueLabel()
 	if self.ShowMax then
 		if self.Prefix then
-			self.ValueLabel:SetText(string.format("%s%s/%s%s",
+			self.ValueLabel:SetText(string.format("%s%s/%s",
 					self.ValueLabelText,
 					self.Current,
-					self.ValueLabelText,
 					self.Max))
 
 			return
 		end
 
-		self.ValueLabel:SetText(string.format("%s%s/%s%s",
+		self.ValueLabel:SetText(string.format("%s/%s%s",
 				self.Current,
-				self.ValueLabelText,
 				self.Max,
 				self.ValueLabelText))
 

@@ -171,7 +171,7 @@ function ENT:Use(activator, _, _, _)
 
 			activator:EnterVehicle(vehicle)
 
-			if #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3 and SlashCo.LobbyData.LOBBYSTATE < 5 and GAMEMODE.State == GAMEMODE.States.LOBBY then
+			if #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3 and SlashCo.LobbyData.LOBBYSTATE < 5 and GAMEMODE.State == GAMEMODE.States.LOBBY then
 
 				lobbyFinish()
 
@@ -274,7 +274,7 @@ function ENT:Think()
 
 	end
 
-	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == #team.GetPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch_full == nil then 
+	if team.NumPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch_full == nil then
 
 		SlashCo.SurvivorWinFinish()
 
@@ -284,7 +284,7 @@ function ENT:Think()
 
 	end
 
-	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers >= (#team.GetPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then 
+	if team.NumPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers >= (team.NumPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then
 
 		if SlashCo.CurRound.Difficulty ~= 1 then return end
 		self.switch = true
@@ -303,7 +303,7 @@ function ENT:Think()
 
 	end
 
-	if #team.GetPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then 
+	if team.NumPlayers(TEAM_SURVIVOR) > 0 and #SatPlayers > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then
 
 		if SlashCo.CurRound.Difficulty ~= 2 then return end
 		self.switch = true 

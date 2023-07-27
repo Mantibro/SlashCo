@@ -92,7 +92,7 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 					slasher:EmitSound("slashco/slasher/leuonard_yell1.mp3")
 					slasher:Freeze(true)
 					timer.Simple(4, function()
-						if not slasher:GetNWBool("LeuonardRoiding", false) then
+						if not IsValid(slasher) or not slasher:GetNWBool("LeuonardRoiding", false) then
 							return
 						end
 						slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.wav")
@@ -144,6 +144,10 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 				slasher:SetBodygroup(1, 1)
 
 				timer.Simple(math.random(15, 30), function()
+					if not IsValid(slasher) then
+						return
+					end
+
 					slasher:StopSound("slashco/slasher/leuonard_grunt_loop.wav")
 					slasher:Freeze(false)
 					slasher:SetNWBool("LeuonardRoiding", false)
@@ -370,32 +374,6 @@ if CLIENT then
 			hook.Remove("CreateMove", "SlashCoDisorient")
 		end
 	end
-
-	--[[
-	SlashCoSlasher.Leuonard.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-		local willdrawkill = true
-		local willdrawchase = true
-		local willdrawmain = true
-
-		surface.SetDrawColor(0, 0, 0)
-		surface.DrawRect(cx - 200, cy + ScrH() / 4, 400, 25)
-
-		local b_pad = 6
-
-		local Roid_val = LocalPlayer():GetNWInt("LeuonardRoid")
-
-		surface.SetDrawColor(255, 0, 0)
-		surface.DrawRect(cx - 200 + (b_pad / 2), (b_pad / 2) + cy + ScrH() / 4, (400 - b_pad) * (Roid_val / 100),
-				25 - b_pad)
-
-		draw.SimpleText("R██E", "ItemFontTip", cx - 300, cy + ScrH() / 4, Color(255, 0, 0, 255), TEXT_ALIGN_TOP,
-				TEXT_ALIGN_RIGHT)
-		draw.SimpleText(math.floor(Roid_val) .. " %", "ItemFontTip", cx + 220, cy + ScrH() / 4, Color(255, 0, 0, 255),
-				TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT)
-
-		return willdrawkill, willdrawchase, willdrawmain
-	end
-	--]]
 
 	SlashCoSlasher.Leuonard.ClientSideEffect = function()
 	end

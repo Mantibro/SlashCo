@@ -373,7 +373,7 @@ end
 
 SlashCo.SpawnPlayers = function()
 
-    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+    for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 
         ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
@@ -586,7 +586,7 @@ SlashCo.EndRound = function()
     local delay = 20
 
     local survivorsWon = true
-    local SurvivorCount = #team.GetPlayers(TEAM_SURVIVOR)
+    local SurvivorCount = team.NumPlayers(TEAM_SURVIVOR)
     if SurvivorCount == 0 then --All Survivors are Dead
 
         survivorsWon = false
@@ -736,7 +736,10 @@ SlashCo.SpawnCurConfig = function(isDebug)
             SlashCo.CurRound.OfferingData.ItemMod = -2
         end
 
-        if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then SlashCo.CurRound.OfferingData.SatO = 1 end
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
+            SlashCo.CurRound.OfferingData.SatO = 1
+            SetGlobalInt("SatO", 1)
+        end
 
         if SlashCo.CurRound.OfferingData.CurrentOffering == 4 then SlashCo.CurRound.OfferingData.DO = true end
 

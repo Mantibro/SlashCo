@@ -244,62 +244,6 @@ if CLIENT then
 		end)
 	end
 
-	--[[
-	local ZanyIcon = Material("slashco/ui/icons/slasher/s_13_a1")
-	local PensiveIcon = Material("slashco/ui/icons/slasher/s_13_a2")
-	local SurveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
-
-	SlashCoSlasher.FreeSmiley.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-		local willdrawkill = true
-		local willdrawchase = true
-		local willdrawmain = true
-
-		local V1 = LocalPlayer():GetNWInt("SmileySummonCooldown")
-		local V2 = LocalPlayer():GetNWInt("SmileySummonSelect")
-
-		if V1 < 0.1 then
-			draw.SimpleText("R - Switch your Deal", "ItemFontTip", mainiconposx + (cx / 4),
-					mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-			if V2 == 0 then
-				surface.SetMaterial(ZanyIcon)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-				draw.SimpleText("F - Deal a Zany", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
-						Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-			else
-				surface.SetMaterial(PensiveIcon)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-				draw.SimpleText("F - Deal a Pensive", "ItemFontTip", mainiconposx + (cx / 8),
-						mainiconposy - (cy / 1.33), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-			end
-		else
-			surface.SetMaterial(KillDisabledIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-			draw.SimpleText("-Unavailable-", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
-					Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-			draw.SimpleText("-Unavailable-", "ItemFontTip", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 10),
-					Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		end
-
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-			local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-			if survivor:GetNWBool("MarkedBySmiley") then
-				local pos = (survivor:GetPos() + Vector(0, 0, 60)):ToScreen()
-
-				if pos.visible then
-					surface.SetMaterial(SurveyNoticeIcon)
-					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
-				end
-			end
-		end
-
-		return willdrawkill, willdrawchase, willdrawmain
-	end
-	--]]
-
 	SlashCoSlasher.FreeSmiley.ClientSideEffect = function()
 
 	end

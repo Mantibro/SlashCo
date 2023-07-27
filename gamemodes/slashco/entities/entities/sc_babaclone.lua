@@ -111,7 +111,7 @@ function ENT:Think()
 
 		end
 
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
 			if ply:GetPos():Distance( self:GetPos() ) < 150 then 

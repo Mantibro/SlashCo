@@ -71,7 +71,7 @@ SlashCoSlasher.Dolphinman.OnTickBehaviour = function(slasher)
 			end)
 		end
 
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
 			if s:GetPos():Distance(slasher:GetPos()) < 500 then
@@ -162,7 +162,7 @@ end
 
 SlashCoSlasher.Dolphinman.OnMainAbilityFire = function(slasher)
 	if not slasher:GetNWBool("DolphinHunting") and not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 			if s:GetPos():Distance(slasher:GetPos()) < 1000 then
 				slasher:ChatPrint("You cannot hide here. A survivor is too close.")
@@ -258,43 +258,6 @@ if CLIENT then
 		hud:AddMeter("hunt")
 		hud:TieMeterInt("hunt", "DolphinHunt")
 	end
-
-	--[[
-	SlashCoSlasher.Dolphinman.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-		local willdrawkill = true
-		local willdrawchase = false
-		local willdrawmain = true
-
-		local hiding = LocalPlayer():GetNWBool("DolphinInHiding")
-		local hunting = LocalPlayer():GetNWBool("DolphinHunting")
-
-		surface.SetDrawColor(0, 0, 0)
-		surface.DrawRect(cx - 200, cy + ScrH() / 4, 400, 25)
-
-		local b_pad = 6
-
-		local hunt_val = LocalPlayer():GetNWInt("DolphinHunt")
-
-		surface.SetDrawColor(255, 0, 0)
-		surface.DrawRect(cx - 200 + (b_pad / 2), (b_pad / 2) + cy + ScrH() / 4, (400 - b_pad) * (hunt_val / 100),
-				25 - b_pad)
-
-		draw.SimpleText("HUNT", "ItemFontTip", cx - 300, cy + ScrH() / 4, Color(255, 0, 0, 255), TEXT_ALIGN_TOP,
-				TEXT_ALIGN_RIGHT)
-		draw.SimpleText(math.floor(hunt_val) .. " %", "ItemFontTip", cx + 220, cy + ScrH() / 4, Color(255, 0, 0, 255),
-				TEXT_ALIGN_TOP, TEXT_ALIGN_RIGHT)
-
-		if not hiding and not hunting then
-			draw.SimpleText("R - Hide", "ItemFontTip", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 10),
-					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		else
-			draw.SimpleText("-Unavailable-", "ItemFontTip", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 10),
-					Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		end
-
-		return willdrawkill, willdrawchase, willdrawmain
-	end
-	--]]
 
 	SlashCoSlasher.Dolphinman.ClientSideEffect = function()
 	end

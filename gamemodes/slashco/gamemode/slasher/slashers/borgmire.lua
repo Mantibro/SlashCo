@@ -288,29 +288,6 @@ if CLIENT then
 		hud:AddControl("F", "throw", Material("slashco/ui/icons/slasher/s_punch"))
 	end
 
-	--[[
-	local PunchIcon = Material("slashco/ui/icons/slasher/s_punch")
-	local ThrowIcon = Material("slashco/ui/icons/slasher/s_punch")
-
-	SlashCoSlasher.Borgmire.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-		local willdrawkill = false
-		local willdrawchase = true
-		local willdrawmain = true
-
-		surface.SetMaterial(PunchIcon)
-		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 4), ScrW() / 16, ScrW() / 16)
-		draw.SimpleText("M1 - Punch", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 4),
-				Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-		surface.SetMaterial(ThrowIcon)
-		surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-		draw.SimpleText("F - Throw", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
-				Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-		return willdrawkill, willdrawchase, willdrawmain
-	end
-	--]]
-
 	SlashCoSlasher.Borgmire.ClientSideEffect = function()
 	end
 end

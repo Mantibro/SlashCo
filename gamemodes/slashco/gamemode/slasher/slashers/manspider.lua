@@ -56,7 +56,7 @@ SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("CanChase", false)
 		slasher:SetNWBool("CanKill", false)
 
-		if #team.GetPlayers(TEAM_SURVIVOR) < 2 and #team.GetPlayers(TEAM_SURVIVOR) > 0 then
+		if team.NumPlayers(TEAM_SURVIVOR) < 2 and team.NumPlayers(TEAM_SURVIVOR) > 0 then
 			v1 = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
 
 			slasher:SetNWBool("CanChase", true)
@@ -71,7 +71,7 @@ SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
 		end
 	end
 
-	for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+	for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 		--Switch Target if too close
 
 		local s = team.GetPlayers(TEAM_SURVIVOR)[i]
@@ -98,7 +98,7 @@ SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
 		--Find a survivor
 		slasher.SlasherValue3 = v3 + FrameTime()
 
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 
 			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
@@ -127,7 +127,7 @@ SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
 		slasher.SlasherValue3 = 0
 
 		if v1 == "" then
-			for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+			for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 				local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
 				local d = s:GetPos():Distance(slasher:GetPos())
@@ -207,7 +207,7 @@ SlashCoSlasher.Manspider.OnMainAbilityFire = function(slasher)
 	end
 
 	if not slasher:GetNWBool("ManspiderNested") then
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 			if s:GetPos():Distance(slasher:GetPos()) < 1600 then
 
@@ -370,7 +370,7 @@ if CLIENT then
 					end
 
 					hook.Add("HUDPaint", "SlashCoPreyReal", function()
-						if not IsValid(targetEnt) then
+						if LocalPlayer():Team() ~= TEAM_SLASHER or not IsValid(targetEnt) then
 							hook.Remove("HUDPaint", "SlashCoPreyReal")
 						end
 
@@ -409,77 +409,6 @@ if CLIENT then
 			end
 		end
 	end
-
-	--[[
-	local LeapIcon = Material("slashco/ui/icons/slasher/s_punch")
-
-	SlashCoSlasher.Manspider.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-		local willdrawkill = true
-		local willdrawchase = true
-		local willdrawmain = true
-
-		local is_nested = LocalPlayer():GetNWBool("ManspiderNested")
-		local V1 = LocalPlayer():GetNWString("ManspiderTarget")
-
-		if V1 ~= "" then
-			if IsValid(player.GetBySteamID64(V1)) then
-				draw.SimpleText("Your Prey: " .. player.GetBySteamID64(V1):Name(), "ItemFontTip",
-						mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 6), Color(255, 0, 0, 255),
-						TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-			end
-
-			for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-				local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-				if ply:SteamID64() == V1 and not ply:GetNWBool("BGoneSoda") then
-					ply:SetMaterial("lights/white")
-					ply:SetColor(Color(255, 0, 0, 255))
-					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
-				end
-
-				if ply:SteamID64() ~= V1 then
-					ply:SetMaterial("")
-					ply:SetColor(color_white)
-					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
-				end
-			end
-		else
-			for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-
-				local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
-				if ply:GetMaterial() == "lights/white" then
-					ply:SetMaterial("")
-					ply:SetColor(color_white)
-					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
-				end
-			end
-		end
-
-		if not is_nested then
-			if V1 == "" then
-				draw.SimpleText("R - Nest", "ItemFontTip", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 10),
-						Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-			end
-		else
-			if not LocalPlayer():GetNWBool("ManspiderCanLeaveNest") then
-				draw.SimpleText("(Wait for prey to come)", "ItemFontTip", mainiconposx + (cx / 4),
-						mainiconposy + (mainiconposy / 10), Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-			else
-				draw.SimpleText("R - Abandon Nest", "ItemFontTip", mainiconposx + (cx / 4),
-						mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-			end
-		end
-
-		if inchase then
-			surface.SetMaterial(LeapIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-			draw.SimpleText("F - Leap", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
-					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		end
-
-		return willdrawkill, willdrawchase, willdrawmain
-	end
-	--]]
 
 	SlashCoSlasher.Manspider.ClientSideEffect = function()
 

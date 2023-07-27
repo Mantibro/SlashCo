@@ -117,6 +117,21 @@ function PANEL:SetMeterComponent(name, component, isPrefix)
 	self.Meters[name]:SetComponent(component, isPrefix)
 end
 
+---show or hide a meter entirely
+function PANEL:SetMeterVisible(key, value)
+	if not self.Meters[key] then
+		return
+	end
+
+	if value then
+		self.Meters[key]:Show()
+	else
+		self.Meters[key]:Hide()
+	end
+
+	self.Right:InvalidateChildren()
+end
+
 ---whether the meter shows its max value
 function PANEL:SetMeterShowMax(name, showMax)
 	if not self.Meters[name] then
@@ -149,12 +164,22 @@ function PANEL:FlashMeter(name)
 	if not self.Meters[name] then
 		return
 	end
+
 	self.Meters[name]:Flash()
 end
 
+---set custom colors (disables flashing)
+function PANEL:SetMeterColors(name, empty, full)
+	if not self.Meters[name] then
+		return
+	end
+
+	self.Meters[name]:SetColors(empty, full)
+end
+
 ---gets the specified meter
-function PANEL:GetMeter(key)
-	return self.Meters[key]
+function PANEL:GetMeter(name)
+	return self.Meters[name]
 end
 
 ---[CONTROLS]---

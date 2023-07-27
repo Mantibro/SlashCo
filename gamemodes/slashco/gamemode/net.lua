@@ -36,14 +36,14 @@ util.AddNetworkString("mantislashcoMapAmbientPlay")
 --util.AddNetworkString("mantislashcoSendMapForce")
 
 function PlayGlobalSound(sound, level, ent, vol)
-
     if vol == nil then
         vol = 1
     end
 
     if SERVER then
         ent:EmitSound(sound, 1, 1, 0)
-        --"Sounds must be precached serverside manually before they can be played. util.PrecacheSound does not work for this purpose, Entity:EmitSound does the trick"
+        --"Sounds must be precached serverside manually before they can be played.
+        --util.PrecacheSound does not work for this purpose, Entity:EmitSound does the trick"
 
         net.Start("mantislashcoGlobalSound")
         net.WriteTable({ SoundPath = sound, SndLevel = level, Entity = ent, Volume = vol })
@@ -246,7 +246,7 @@ SlashCo.RoundOverScreen = function(state)
     local absurv_table = {}
     local abandoned_survivors = ""
 
-    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+    for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 
         local a_ply = team.GetPlayers(TEAM_SURVIVOR)[i]:SteamID64()
 

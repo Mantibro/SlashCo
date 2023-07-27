@@ -7,12 +7,13 @@ ENT.Type = "nextbot"
 ENT.ClassName = "sc_zanysmiley"
 ENT.Spawnable = true
 ENT.PingType = "SLASHER"
+ENT.Smiley = true
 
 function ENT:Initialize()
 	self:SetModel("models/slashco/slashers/freesmiley/zanysmiley.mdl")
+	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 
 	self.CollideSwitch = 3
-
 	self.LoseTargetDist = 1500    -- How far the enemy has to be before we lose them
 	self.SearchRadius = 2000    -- How far to search for enemies
 end
@@ -113,12 +114,20 @@ function ENT:RunBehaviour()
 			local pos = SlashCo.LocalizedTraceHullLocatorAdvanced(self, 100, 200, self.GotStuck and -20 or 150)
 			self.GotStuck = nil
 			if pos then
-				self:MoveToPos(pos, {
+				local result = self:MoveToPos(pos, {
 					draw = g_SlashCoDebug,
 					maxage = 10,
 					tolerance = 50,
 					lookahead = 600
 				}) -- Walk to a random place
+				if result == "failed" then
+					self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+					self:Remove()
+				elseif result == "timeout" then
+					self.GotStuck = true
+				end
+
+				coroutine.wait(0.05)
 			else
 				coroutine.wait(1)
 			end -- Walk to a random place
@@ -173,7 +182,7 @@ function ENT:HandleStuck()
 		end
 
 		local pos = VectorRand(-lim, lim)
-		pos.z = pos.z / 5
+		pos.z = math.random(45)
 		local mins, maxs = self:WorldSpaceAABB()
 
 		local hullTrace = util.TraceHull({
@@ -190,17 +199,27 @@ function ENT:HandleStuck()
 
 		if not hullTrace.Hit then
 			self:SetPos(pos + self:GetPos())
-			break
+			if self:IsInWorld() then
+				break
+			end
+			lim = 0
 		end
 
 		--be less specific if it's not working out
 		if lim == 40 and not hullTrace.HitNonWorld then
 			self:SetPos(pos + self:GetPos())
-			break
+			if self:IsInWorld() then
+				break
+			end
+		end
+
+		if lim == 120 then
+			self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+			self:Remove()
 		end
 
 		coroutine.wait(0.05)
-		lim = math.Clamp(lim + 0.5, 1, 100)
+		lim = math.Clamp(lim + 0.5, 1, 120)
 	end
 
 	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
@@ -215,8 +234,16 @@ function ENT:Think()
 	if self.CollideSwitch > 0 then
 		self:SetNotSolid(true)
 		self.CollideSwitch = self.CollideSwitch - FrameTime()
-	else
-		self:SetNotSolid(false)
+	elseif not self.SolidCooldown or CurTime() - self.SolidCooldown > 0.5 then
+		local notSolid = false
+		for _, v in ipairs(ents.FindInSphere(self:WorldSpaceCenter(), 40)) do
+			if v ~= self and v.Smiley then
+				notSolid = true
+				break
+			end
+		end
+		self:SetNotSolid(notSolid)
+		self.SolidCooldown = CurTime()
 	end
 
 	local tr = util.TraceLine({

@@ -357,60 +357,6 @@ if CLIENT then
 		end
 	end
 
-	--[[
-	local AmogusSurvivor = Material("slashco/ui/icons/slasher/s_4_a1")
-	local AmogusFuel = Material("slashco/ui/icons/slasher/s_4_a2")
-
-	SlashCoSlasher.Amogus.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-		local willdrawkill = true
-		local willdrawchase = true
-		local willdrawmain = true
-
-		local is_survivor = LocalPlayer():GetNWBool("AmogusSurvivorDisguise")
-		local is_fuel = LocalPlayer():GetNWBool("AmogusFuelDisguise")
-		local is_disguised = LocalPlayer():GetNWBool("AmogusDisguised")
-
-		willdrawmain = true
-
-		if is_survivor then
-			surface.SetMaterial(AmogusSurvivor)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW() / 8, ScrW() / 8)
-			willdrawmain = false
-			if LocalPlayer():GetVelocity():Length() < 1 then
-				surface.SetMaterial(AmogusSurvivor)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 4), ScrW() / 16, ScrW() / 16)
-				draw.SimpleText("M1 - Kill (Sneak)", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 4),
-						Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-				willdrawkill = false
-			else
-				willdrawkill = true
-			end
-		end
-
-		if is_fuel then
-			surface.SetMaterial(AmogusFuel)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW() / 8, ScrW() / 8)
-			willdrawmain = false
-		end
-
-		if not is_disguised then
-			draw.SimpleText("R - Disguise as Survivor", "ItemFontTip", mainiconposx + (cx / 4),
-					mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-			surface.SetMaterial(AmogusFuel)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-			draw.SimpleText("F - Disguise as Fuel", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
-					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		else
-			draw.SimpleText("R - Reveal yourself", "ItemFontTip", mainiconposx + (cx / 4),
-					mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		end
-
-		return willdrawkill, willdrawchase, willdrawmain
-	end
-	--]]
-
 	SlashCoSlasher.Amogus.ClientSideEffect = function()
 
 	end

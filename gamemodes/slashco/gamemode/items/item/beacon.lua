@@ -37,7 +37,7 @@ SlashCoItems.Beacon.OnUse = function(ply)
 
         if not SlashCo.CurRound.DistressBeaconUsed then
 
-            if #team.GetPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
+            if team.NumPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
 
                 if not ply.BeaconWarning then
                     ply:ChatPrint("Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm.")

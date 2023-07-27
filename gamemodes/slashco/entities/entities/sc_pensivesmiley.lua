@@ -7,16 +7,15 @@ ENT.Type = "nextbot"
 ENT.ClassName = "sc_pensivesmiley"
 ENT.Spawnable = true
 ENT.PingType = "SLASHER"
+ENT.Smiley = true
 
 function ENT:Initialize()
 	self:SetModel("models/slashco/slashers/freesmiley/pensivesmiley.mdl")
+	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 
 	self.CollideSwitch = 3
-
 	self.AttackedPlayer = ""
-
 	self.AttackEngage = false
-
 	self.LoseTargetDist = 1000    -- How far the enemy has to be before we lose them
 	self.SearchRadius = 700    -- How far to search for enemies
 end
@@ -119,12 +118,20 @@ function ENT:RunBehaviour()
 				local pos = SlashCo.LocalizedTraceHullLocatorAdvanced(self, 100, 200, self.GotStuck and -20 or 150)
 				self.GotStuck = nil
 				if pos then
-					self:MoveToPos(pos, {
+					local result = self:MoveToPos(pos, {
 						draw = g_SlashCoDebug,
 						maxage = 10,
 						tolerance = 50,
 						lookahead = 600
 					}) -- Walk to a random place
+					if result == "failed" then
+						self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+						self:Remove()
+					elseif result == "timeout" then
+						self.GotStuck = true
+					end
+
+					coroutine.wait(0.05)
 				else
 					coroutine.wait(1)
 				end -- Walk to a random place
@@ -188,7 +195,7 @@ function ENT:HandleStuck()
 		end
 
 		local pos = VectorRand(-lim, lim)
-		pos.z = pos.z / 5
+		pos.z = math.random(45)
 		local mins, maxs = self:WorldSpaceAABB()
 
 		local hullTrace = util.TraceHull({
@@ -205,17 +212,27 @@ function ENT:HandleStuck()
 
 		if not hullTrace.Hit then
 			self:SetPos(pos + self:GetPos())
-			break
+			if self:IsInWorld() then
+				break
+			end
+			lim = 0
 		end
 
 		--be less specific if it's not working out
 		if lim == 40 and not hullTrace.HitNonWorld then
 			self:SetPos(pos + self:GetPos())
-			break
+			if self:IsInWorld() then
+				break
+			end
+		end
+
+		if lim == 120 then
+			self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+			self:Remove()
 		end
 
 		coroutine.wait(0.05)
-		lim = math.Clamp(lim + 0.5, 1, 100)
+		lim = math.Clamp(lim + 0.5, 1, 120)
 	end
 
 	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
@@ -223,74 +240,84 @@ function ENT:HandleStuck()
 end
 
 function ENT:Think()
-	if SERVER then
-		if self.CollideSwitch > 0 then
-			self:SetNotSolid(true)
-			self.CollideSwitch = self.CollideSwitch - FrameTime()
-		else
-			self:SetNotSolid(false)
+	if CLIENT then
+		return
+	end
+
+	if self.CollideSwitch > 0 then
+		self:SetNotSolid(true)
+		self.CollideSwitch = self.CollideSwitch - FrameTime()
+	elseif not self.SolidCooldown or CurTime() - self.SolidCooldown > 0.5 then
+		local notSolid = false
+		for _, v in ipairs(ents.FindInSphere(self:WorldSpaceCenter(), 40)) do
+			if v ~= self and v.Smiley then
+				notSolid = true
+				break
+			end
 		end
+		self:SetNotSolid(notSolid)
+		self.SolidCooldown = CurTime()
+	end
 
-		local tr = util.TraceLine({
-			start = self:GetPos() + Vector(0, 0, 50),
-			endpos = self:GetPos() + self:GetForward() * 10000,
-			filter = self
-		})
+	local tr = util.TraceLine({
+		start = self:GetPos() + Vector(0, 0, 50),
+		endpos = self:GetPos() + self:GetForward() * 10000,
+		filter = self
+	})
 
-		if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
-				not tr.Entity.IsOpen and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
+	if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+			not tr.Entity.IsOpen and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
-			tr.Entity:Use(self)
-			self.UseCooldown = CurTime()
-		end
+		tr.Entity:Use(self)
+		self.UseCooldown = CurTime()
+	end
 
-		if self.AttackedPlayer == "" then
-			local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
+	if self.AttackedPlayer == "" then
+		local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
 
-			for _, v in ipairs(_ents) do
-				if (v:IsPlayer() and v:Team() == TEAM_SURVIVOR) then
-					if not self:HaveEnemy() then
-						self:FindEnemy()
-					end
+		for _, v in ipairs(_ents) do
+			if (v:IsPlayer() and v:Team() == TEAM_SURVIVOR) then
+				if not self:HaveEnemy() then
+					self:FindEnemy()
+				end
 
-					if v:GetPos():Distance(self:GetPos()) < 150 then
-						self.AttackedPlayer = v:SteamID64()
-						self.Enemy = nil
-					end
+				if v:GetPos():Distance(self:GetPos()) < 150 then
+					self.AttackedPlayer = v:SteamID64()
+					self.Enemy = nil
 				end
 			end
-		else
-			if not IsValid(player.GetBySteamID64(self.AttackedPlayer)) then
-				self.AttackedPlayer = ""
-				self.Enemy = nil
-			end
+		end
+	else
+		if not IsValid(player.GetBySteamID64(self.AttackedPlayer)) then
+			self.AttackedPlayer = ""
+			self.Enemy = nil
+		end
 
-			local attacked = player.GetBySteamID64(self.AttackedPlayer)
-			attacked:SetSlowWalkSpeed(50)
-			attacked:SetWalkSpeed(50)
-			attacked:AddSpeedEffect("smiley", 50, 15)
+		local attacked = player.GetBySteamID64(self.AttackedPlayer)
+		attacked:SetSlowWalkSpeed(50)
+		attacked:SetWalkSpeed(50)
+		attacked:AddSpeedEffect("smiley", 50, 15)
 
-			attacked:SetNWBool("MarkedBySmiley", true)
+		attacked:SetNWBool("MarkedBySmiley", true)
 
-			if self.AttackEngage == false then
-				self:EmitSound("slashco/slasher/pensive_attack" .. math.random(1, 2) .. ".mp3")
+		if self.AttackEngage == false then
+			self:EmitSound("slashco/slasher/pensive_attack" .. math.random(1, 2) .. ".mp3")
 
-				timer.Simple(10, function()
-					if not IsValid(attacked) then
-						return
-					end
+			timer.Simple(10, function()
+				if not IsValid(attacked) then
+					return
+				end
 
-					attacked:SetSlowWalkSpeed(200)
-					attacked:SetWalkSpeed(200)
-					attacked:RemoveSpeedEffect("smiley")
+				attacked:SetSlowWalkSpeed(200)
+				attacked:SetWalkSpeed(200)
+				attacked:RemoveSpeedEffect("smiley")
 
-					attacked:SetNWBool("MarkedBySmiley", false)
+				attacked:SetNWBool("MarkedBySmiley", false)
 
-					self:Remove()
-				end)
+				self:Remove()
+			end)
 
-				self.AttackEngage = true
-			end
+			self.AttackEngage = true
 		end
 	end
 end

@@ -437,53 +437,6 @@ if CLIENT then
 		end
 	end
 
-	--[[
-	local MaleSpecter = Material("slashco/ui/icons/slasher/s_6_s0")
-	local MaleMonster = Material("slashco/ui/icons/slasher/s_6_s2")
-	local GenericSlashIcon = Material("slashco/ui/icons/slasher/s_slash")
-
-	SlashCoSlasher.Male07.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-		local willdrawkill = true
-		local willdrawchase = true
-		local willdrawmain = true
-
-		local V1 = LocalPlayer():GetNWInt("Male07State")
-
-		if V1 ~= 0 then
-			draw.SimpleText("R - Unpossess Vessel", "ItemFontTip", mainiconposx + (cx / 4),
-					mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		else
-			draw.SimpleText("R - Possess Vessel", "ItemFontTip", mainiconposx + (cx / 4),
-					mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		end
-
-		if V1 ~= 1 then
-			willdrawmain = false
-
-			if V1 == 0 then
-				surface.SetMaterial(MaleSpecter)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW() / 8, ScrW() / 8)
-			end
-
-			if V1 == 2 then
-				surface.SetMaterial(MaleMonster)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy, ScrW() / 8, ScrW() / 8)
-
-				willdrawkill = false
-
-				surface.SetMaterial(GenericSlashIcon)
-				surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 4), ScrW() / 16, ScrW() / 16)
-				draw.SimpleText("M1 - Slash", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 4),
-						Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-			end
-		else
-			willdrawmain = true
-		end
-
-		return willdrawkill, willdrawchase, willdrawmain
-	end
-	--]]
-
 	SlashCoSlasher.Male07.ClientSideEffect = function()
 
 	end

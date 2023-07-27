@@ -164,7 +164,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
             end
 
             if not slasher:GetNWBool("InSlasherChaseMode") then
-                for p = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+                for p = 1, team.NumPlayers(TEAM_SURVIVOR) do
                     local ply = team.GetPlayers(TEAM_SURVIVOR)[p]
                     if ply:GetNWBool("SurvivorChased") then
                         ply:SetNWBool("SurvivorChased", false)

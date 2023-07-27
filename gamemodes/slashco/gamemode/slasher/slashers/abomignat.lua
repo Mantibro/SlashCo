@@ -365,53 +365,6 @@ if CLIENT then
 		hud:TieControl("F", "AbomignatCanMainSlash")
 	end
 
-	--[[
-	local GenericSlashIcon = Material("slashco/ui/icons/slasher/s_slash")
-	local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
-
-	SlashCoSlasher.Abomignat.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
-
-		local willdrawkill = false
-		local willdrawchase = true
-		local willdrawmain = true
-
-		local is_crawling = LocalPlayer():GetNWBool("AbomignatCrawling")
-
-		if not is_crawling and LocalPlayer():GetNWBool("AbomignatCanMainSlash") then
-			surface.SetMaterial(GenericSlashIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 4), ScrW() / 16, ScrW() / 16)
-			draw.SimpleText("M1 - Slash Charge", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 4),
-					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-			surface.SetMaterial(GenericSlashIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-			draw.SimpleText("F - Lunge", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
-					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		else
-			surface.SetMaterial(KillDisabledIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 4), ScrW() / 16, ScrW() / 16)
-			draw.SimpleText("-Unavailable-", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 4),
-					Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-			surface.SetMaterial(KillDisabledIcon)
-			surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy / 1.333), ScrW() / 16, ScrW() / 16)
-			draw.SimpleText("-Unavailable-", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 1.33),
-					Color(100, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		end
-
-		if not is_crawling then
-			draw.SimpleText("R - Start Crawling", "ItemFontTip", mainiconposx + (cx / 4),
-					mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		else
-			draw.SimpleText("R - Stop Crawling", "ItemFontTip", mainiconposx + (cx / 4),
-					mainiconposy + (mainiconposy / 10), Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-		end
-
-		return willdrawkill, willdrawchase, willdrawmain
-
-	end
-	--]]
-
 	SlashCoSlasher.Abomignat.ClientSideEffect = function()
 
 	end

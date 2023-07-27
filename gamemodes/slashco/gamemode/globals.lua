@@ -752,7 +752,7 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, range, offs
 	for i = 0, 250 do
 		local randPos = vector_up * math.random(min_range, range)
 		randPos:Rotate(AngleRand())
-		randPos.z = randPos.z / 2 + height_offset
+		randPos.z = randPos.z / 2 + height_offset * 2
 
 		--[[
 		local randPos = VectorRand(-range, range)
@@ -779,6 +779,7 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, range, offs
 		pos = tr_l.HitPos + Vector(0, 0, height_offset)
 
 		local mins, maxs = ent:WorldSpaceAABB()
+		mins.z = 0
 		local tr = util.TraceHull({
 			start = pos,
 			endpos = pos, -- + Vector(0,0,tr_l.HitPos[3] - height_offset)

@@ -1,25 +1,18 @@
-local MainIcon
-
-local ProgressBarBack = Material("slashco/ui/icons/slasher/progbar_back")
-local ProgressBarBase = Material("slashco/ui/icons/slasher/progbar_base")
-local ProgressBarIcon = Material("slashco/ui/icons/slasher/progbar_icon")
-local ProgressBarIconTop = Material("slashco/ui/icons/slasher/progbar_icon2")
-
-local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
-local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
-
-local KillIcon = Material("slashco/ui/icons/slasher/s_0")
-local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
-
-local ChaseIcon = Material("slashco/ui/icons/slasher/s_chase")
-local ChaseDisabledIcon = Material("slashco/ui/icons/slasher/chase_disabled")
+--local MainIcon
+--local ProgressBarBack = Material("slashco/ui/icons/slasher/progbar_back")
+--local ProgressBarBase = Material("slashco/ui/icons/slasher/progbar_base")
+--local ProgressBarIcon = Material("slashco/ui/icons/slasher/progbar_icon")
+--local ProgressBarIconTop = Material("slashco/ui/icons/slasher/progbar_icon2")
+--local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
+--local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
+--local KillIcon = Material("slashco/ui/icons/slasher/s_0")
+--local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
+--local ChaseIcon = Material("slashco/ui/icons/slasher/s_chase")
+--local ChaseDisabledIcon = Material("slashco/ui/icons/slasher/chase_disabled")
+--local SlashID = 0
 
 local BeaconIcon = Material("slashco/ui/slasher_beacon")
-
-local SlashID = 0
-
 hook.Add("HUDPaint", "BaseSlasherHUD", function()
-
 	local ply = LocalPlayer()
 
 	if ply:Team() ~= TEAM_SLASHER then
@@ -36,10 +29,28 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	if pacified then
-		draw.SimpleText("(DEMON) You have been pacified by consuming an item. You cannot chase or kill and your senses are dulled.",
+		draw.SimpleText("You have been pacified by consuming an item.",
 				"ItemFontTip", ScrW() / 2, ScrH() / 4, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
+	--Activating the Beacon
+	for _, v in ipairs(ents.FindByClass("sc_activebeacon")) do
+		if v:GetNWBool("ArmingBeacon") then
+			local pos = (v:GetPos()):ToScreen()
+
+			if pos.visible then
+				surface.SetMaterial(BeaconIcon)
+				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
+			end
+
+			draw.SimpleText("The Survivors are attempting to call emergency escape.", "ItemFontTip", ScrW() / 2,
+					ScrH() / 1.5, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			draw.SimpleText("DESTROY THE BEACON.", "ItemFontTip", ScrW() / 2, ScrH() / 1.45, Color(255, 0, 0, 255),
+					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		end
+	end
+
+	--[[ kept for reference
 	if not SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].UserInterface then
 		return
 	end
@@ -79,13 +90,11 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	if g_monitor < g then
-
 		if g < 1 then
 			surface.PlaySound("slashco/slashco_progress.mp3")
 		else
 			surface.PlaySound("slashco/slashco_progress_full.mp3")
 		end
-
 	end
 	local gp = g
 
@@ -117,7 +126,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	for i = 1, #SurvivorTeam do
 		--Survivor team visualization
 
-		for x = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for x = 1, team.NumPlayers(TEAM_SURVIVOR) do
 			if team.GetPlayers(TEAM_SURVIVOR)[x]:SteamID64() == SurvivorTeam[i].id then
 				--The survivor is alive (is the Survivors Team)
 				surface.SetMaterial(SurvivorIcon)
@@ -184,11 +193,6 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		else
 			draw.SimpleText("M2 - Stop Chasing", "ItemFontTip", mainiconposx + (cx / 8), mainiconposy - (cy / 2),
 					Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
-
-			--[[if ChaseTick > (ChaseDur / 2) then
-				draw.SimpleText( "Look at a Survivor to maintain the chase!", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/2.5), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-			end]]
-
 		end
 
 	else
@@ -199,28 +203,5 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	:: skipchase ::
-
-
-	--Activating the Beacon
-
-	for k, v in ipairs(ents.FindByClass("sc_activebeacon")) do
-
-		if v:GetNWBool("ArmingBeacon") then
-
-			local pos = (v:GetPos()):ToScreen()
-
-			if pos.visible then
-				surface.SetMaterial(BeaconIcon)
-				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
-			end
-
-			draw.SimpleText("The Survivors are attempting to call emergency escape.", "ItemFontTip", ScrW() / 2,
-					ScrH() / 1.5, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText("DESTROY THE BEACON.", "ItemFontTip", ScrW() / 2, ScrH() / 1.45, Color(255, 0, 0, 255),
-					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-
-		end
-
-	end
-
+	--]]
 end)

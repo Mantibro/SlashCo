@@ -310,7 +310,7 @@ function GM:PlayerButtonDown(ply, button)
                 for k, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 
                     if ply:GetObserverTarget() == v then
-                        if (k + 1) >= #team.GetPlayers(TEAM_SURVIVOR) then
+                        if (k + 1) >= team.NumPlayers(TEAM_SURVIVOR) then
                             ent = team.GetPlayers(TEAM_SURVIVOR)[1]
                         else
                             ent = team.GetPlayers(TEAM_SURVIVOR)[k + 1]
@@ -704,7 +704,7 @@ local Think = function()
             end
 
             --Go back to lobby if everyone dies.
-            if #team.GetPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
+            if team.NumPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
 
                 SlashCo.EndRound()
 
