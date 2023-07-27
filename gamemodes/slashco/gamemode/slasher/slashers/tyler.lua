@@ -33,6 +33,22 @@ SlashCoSlasher.Tyler.OnSpawn = function(slasher)
 	slasher:DrawShadow(false)
 	slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 	slasher:SetNoDraw(true)
+
+	local userid = slasher:UserID()
+	hook.Add("ShouldCollide", "SlashCoTylerSpecter_" .. userid, function(ent1, ent2)
+		if not IsValid(slasher) or slasher:Team() ~= TEAM_SLASHER then
+			hook.Remove("ShouldCollide", "SlashCoTylerSpecter_" .. userid)
+			return
+		end
+
+		if ent1 == slasher and ent2:IsPlayer() then
+			return false
+		end
+
+		if ent2 == slasher and ent1:IsPlayer() then
+			return false
+		end
+	end)
 end
 
 SlashCoSlasher.Tyler.PickUpAttempt = function(ply)
@@ -67,10 +83,12 @@ SlashCoSlasher.Tyler.OnTickBehaviour = function(slasher)
 		slasher:SetBodygroup(0, 0)
 		slasher.SlasherValue2 = 0
 		slasher:SetNWBool("CanKill", false)
+		slasher:SetCustomCollisionCheck(true)
 		final_perception = 6.0
 	elseif v1 == 1 then
 		--Creator
 
+		slasher:SetCustomCollisionCheck(false)
 		slasher:SetNWBool("TylerFlash", false)
 
 		slasher:SetSlowWalkSpeed(1)
@@ -339,15 +357,50 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
 				if IsValid(target) then
 					target:SetNWBool("SurvivorBeingJumpscared", false)
 					target:SetNWBool("SurvivorJumpscare_Tyler", false)
+
 					if target:IsPlayer() then
 						target:Freeze(false)
 						target:Kill()
-					else
-						target:Remove()
-						if IsValid(slasher) then
-							slasher.SlasherValue4 = slasher.SlasherValue4 + 0.5
-						end
 					end
+
+					timer.Simple(FrameTime(), function()
+						if not IsValid(target) or not IsValid(slasher) then
+							print("how")
+							return
+						end
+
+						local corpse
+						if target:IsPlayer() then
+							corpse = target.DeadBody
+						else
+							corpse = target
+							if IsValid(slasher) then
+								slasher.SlasherValue4 = slasher.SlasherValue4 + 0.5
+							end
+						end
+
+						if not IsValid(corpse) then
+							return
+						end
+
+						local dissolver = ents.Create("env_entity_dissolver")
+						timer.Simple(2, function()
+							if IsValid(dissolver) then
+								dissolver:Remove() -- backup edict save on error
+							end
+						end)
+
+						dissolver.Target = "dissolve" .. corpse:EntIndex()
+						dissolver:SetKeyValue("dissolvetype", 0)
+						dissolver:SetKeyValue("magnitude", 1)
+						dissolver:SetPos(corpse:GetPos())
+						dissolver:SetPhysicsAttacker(slasher)
+						dissolver:Spawn()
+
+						corpse:SetName(dissolver.Target)
+						dissolver:Fire("Dissolve", dissolver.Target, 0)
+						dissolver:Fire("Kill", "", 1)
+					end)
 				end
 			end)
 		end

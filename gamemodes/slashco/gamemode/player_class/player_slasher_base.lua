@@ -25,12 +25,20 @@ end
 
 if CLIENT then
 	function PLAYER:Init()
+		if LocalPlayer() ~= self.Player then
+			return
+		end
+
 		timer.Simple(0, function()
 			SlashCo.InitSlasherHud()
 		end)
 	end
 
 	function PLAYER:ClassChanged()
+		if LocalPlayer() ~= self.Player then
+			return
+		end
+
 		if IsValid(LocalPlayer().SlasherHud) then
 			LocalPlayer().SlasherHud:Remove()
 		end

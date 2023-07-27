@@ -6,36 +6,6 @@ if CLIENT then
 	LoadedSounds = {} -- this table caches existing CSoundPatches
 end
 
-function SlashCo.PlaySoundEverywhere(fileName)
-	local sound
-	local filter
-	if SERVER then
-		filter = RecipientFilter()
-		filter:AddAllPlayers()
-	end
-	if SERVER or not LoadedSounds[fileName] then
-		-- The sound is always re-created serverside because of the RecipientFilter.
-		sound = CreateSound(game.GetWorld(), fileName,
-				filter) -- create the new sound, parented to the worldspawn (which always exists)
-		if sound then
-			sound:SetSoundLevel(0) -- play everywhere
-			if CLIENT then
-				LoadedSounds[fileName] = { sound, filter } -- cache the CSoundPatch
-			end
-		end
-	else
-		sound = LoadedSounds[fileName][1]
-		filter = LoadedSounds[fileName][2]
-	end
-	if sound then
-		if CLIENT then
-			sound:Stop() -- it won't play again otherwise
-		end
-		sound:Play()
-	end
-	return sound -- useful if you want to stop the sound yourself
-end
-
 local typeMap = {
 	[0] = "string",
 	"number",

@@ -543,8 +543,9 @@ function PANEL:MakeGenEntry(gen, i, model)
 	end
 
 	function entry.LayoutEntity(_, ent)
+		local YWiggle = math.sin(CurTime()) * 10
 		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5,
-				(entry.YSpin + (i * 360 / (gasCansPerGenerator + 1))) % 360, 5))
+				(YWiggle + entry.YSpin + (i * 360 / (gasCansPerGenerator + 1))) % 360, 5))
 	end
 	entry.DefaultPos = {
 		x + (gen:GetWide() / 2) - math.cos(angle) * 50 - (entry:GetWide() / 2),
@@ -694,7 +695,12 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 		panel.CansRemainingNew = cansRemaining
 	end
 
-	timer.Simple(0.25, function()
+	--this timer was formerly just to add a 0.25 second delay, nothing special
+	timer.Simple(0, function()
+		if not IsValid(panel) then
+			return
+		end
+
 		local playSound
 
 		if panel.HasBatteryNew then

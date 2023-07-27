@@ -37,10 +37,10 @@ end
 SlashCoSlasher.Male07.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 
-	v1 = slasher.SlasherValue1 --State
-	v2 = slasher.SlasherValue2 --Time Spent Human Chasing
-	v3 = slasher.SlasherValue3 --Cooldown
-	v4 = slasher.SlasherValue4 --Slash Cooldown
+	local v1 = slasher.SlasherValue1 --State
+	local v2 = slasher.SlasherValue2 --Time Spent Human Chasing
+	local v3 = slasher.SlasherValue3 --Cooldown
+	local v4 = slasher.SlasherValue4 --Slash Cooldown
 
 	local prowl_final = SlashCoSlasher.Male07.ProwlSpeed
 	local chase_final = SlashCoSlasher.Male07.ChaseSpeed
@@ -64,7 +64,6 @@ SlashCoSlasher.Male07.OnTickBehaviour = function(slasher)
 
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
-
 	elseif v1 == 1 then
 		--Human mode
 

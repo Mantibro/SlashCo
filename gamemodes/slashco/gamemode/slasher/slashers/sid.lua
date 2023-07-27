@@ -113,12 +113,8 @@ SlashCoSlasher.Sid.OnTickBehaviour = function(slasher)
 		slasher:SetNWInt("SidGunUses", v1)
 	end
 
-	if not slasher.CanUseGun and SlashCo.CurRound.GameProgress > 4 then
+	if not slasher.CanUseGun and SlashCo.CurRound.GameProgress > 5 then
 		slasher:SetNWBool("SidCanUseGun", true)
-		local sound = SlashCo.PlaySoundEverywhere("slashco/slasher/sid_slideback.wav")
-		sound:SetDSP(24)
-		sound:ChangeVolume(0.15)
-		slasher:EmitSound("slashco/slasher/sid_slideback.wav", SNDLVL_60dB)
 		slasher.CanUseGun = true
 	end
 
@@ -126,10 +122,6 @@ SlashCoSlasher.Sid.OnTickBehaviour = function(slasher)
 	--let sid use his gun early if he gets enough saturation
 	if not slasher.CanUseGun and v1 >= 5 then
 		slasher:SetNWBool("SidCanUseGun", true)
-		local sound = SlashCo.PlaySoundEverywhere("slashco/slasher/sid_slideback.wav")
-		sound:SetDSP(24)
-		sound:ChangeVolume(0.15)
-		slasher:EmitSound("slashco/slasher/sid_slideback.wav", SNDLVL_60dB)
 		slasher.CanUseGun = true
 	end
 	--]]

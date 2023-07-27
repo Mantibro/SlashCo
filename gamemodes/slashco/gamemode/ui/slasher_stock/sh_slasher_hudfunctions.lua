@@ -21,6 +21,7 @@ if CLIENT then
 	-- [[
 	if IsValid(LocalPlayer().SlasherHud) then
 		LocalPlayer().SlasherHud:Remove()
+		--end
 		LocalPlayer().SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
 		LocalPlayer():SlasherFunction("InitHud", LocalPlayer().SlasherHud)
 	end

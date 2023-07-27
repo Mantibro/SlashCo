@@ -81,13 +81,16 @@ function PANEL:OnRender()
 	--override this!
 end
 
+local blue = Color(0, 0, 255)
 ---internal: renders an entity and its children recursively
 function PANEL:Render(ent)
 	if not IsValid(ent) then
 		return
 	end
 
-	if not ent:GetNoDraw() then
+	if IsValid(ent.ProjectedModel) then
+		ent.ProjectedModel:DrawModel()
+	elseif not ent:GetNoDraw() then
 		ent:DrawModel()
 	end
 

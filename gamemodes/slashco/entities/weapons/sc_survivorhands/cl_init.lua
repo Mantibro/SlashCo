@@ -2,7 +2,6 @@ include('shared.lua')
 include('slashco/gamemode/items/items_init.lua')
 
 function SWEP:Initialize()
-
     self.heldEntity = ClientsideModel("models/props_junk/metalgascan.mdl", RENDER_GROUP_VIEW_MODEL_OPAQUE)
     if (IsValid(self.heldEntity)) then
         self.heldEntity:SetPos(self:GetPos())

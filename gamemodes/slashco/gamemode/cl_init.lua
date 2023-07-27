@@ -210,59 +210,57 @@ hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
 	end
 end)
 
-if CLIENT then
-	local cache = {}
-	local function UpdateCache(entity, state)
-		if not entity:IsPlayer() then
-			return
-		end
+g_FlashlightCache = g_FlashlightCache or {}
+local cache = g_FlashlightCache
 
-		if state then
-			table.insert(cache, entity)
-		else
-			for i = 1, #cache do
-				if cache[i] == entity then
-					table.remove(cache, i)
-				end
+local function UpdateCache(entity, state)
+	if not entity:IsPlayer() then
+		return
+	end
+
+	if state then
+		table.insert(cache, entity)
+	else
+		for i = 1, #cache do
+			if cache[i] == entity then
+				table.remove(cache, i)
 			end
 		end
 	end
+end
 
-	hook.Add("NotifyShouldTransmit", "DynamicFlashlight.PVS_Cache", function(entity, state)
-		UpdateCache(entity, state)
-	end)
+hook.Add("NotifyShouldTransmit", "DynamicFlashlight.PVS_Cache", function(entity, state)
+	UpdateCache(entity, state)
+end)
 
-	hook.Add("EntityRemoved", "DynamicFlashlight.PVS_Cache", function(entity)
-		UpdateCache(entity, false)
-	end)
+hook.Add("EntityRemoved", "DynamicFlashlight.PVS_Cache", function(entity)
+	UpdateCache(entity, false)
+end)
 
-	hook.Add("Think", "DynamicFlashlight.Rendering", function()
-		for i = 1, #cache do
-			local target = cache[i]
+hook.Add("Think", "DynamicFlashlight.Rendering", function()
+	for _, target in ipairs(cache) do
+		if target:GetNWBool("DynamicFlashlight") then
+			if target.DynamicFlashlight then
+				local position = target:GetPos()
+				local newposition = Vector(position[1], position[2], position[3] + 40) + target:GetForward() * 20
 
-			if target:GetNWBool("DynamicFlashlight") then
-				if target.DynamicFlashlight then
-					local position = target:GetPos()
-					local newposition = Vector(position[1], position[2], position[3] + 40) + target:GetForward() * 20
-
-					target.DynamicFlashlight:SetPos(newposition)
-					target.DynamicFlashlight:SetAngles(target:EyeAngles())
-					target.DynamicFlashlight:Update()
-				else
-					target.DynamicFlashlight = ProjectedTexture()
-					target.DynamicFlashlight:SetTexture("effects/flashlight001")
-					target.DynamicFlashlight:SetFarZ(900)
-					target.DynamicFlashlight:SetFOV(70)
-				end
+				target.DynamicFlashlight:SetPos(newposition)
+				target.DynamicFlashlight:SetAngles(target:EyeAngles())
+				target.DynamicFlashlight:Update()
 			else
-				if target.DynamicFlashlight then
-					target.DynamicFlashlight:Remove()
-					target.DynamicFlashlight = nil
-				end
+				target.DynamicFlashlight = ProjectedTexture()
+				target.DynamicFlashlight:SetTexture("effects/flashlight001")
+				target.DynamicFlashlight:SetFarZ(900)
+				target.DynamicFlashlight:SetFOV(70)
+			end
+		else
+			if target.DynamicFlashlight then
+				target.DynamicFlashlight:Remove()
+				target.DynamicFlashlight = nil
 			end
 		end
-	end)
-end
+	end
+end)
 
 net.Receive("mantislashcoGiveSlasherData", function()
 
