@@ -39,6 +39,7 @@ cvars.AddChangeCallback("cl_slashco_playermodel", function(_, _, newVal)
 		--print("[SlashCo] Bad Playermodel. It will be randomized instead.")
 	end
 
+
 end)
 
 function GM:HUDDrawTargetID()
@@ -688,7 +689,6 @@ CreateShadowPerson = function(pos, ang)
 end
 
 hook.Add("HUDPaint", "MiscItemVisions", function()
-
 	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
 		return
 	end
@@ -753,5 +753,4 @@ hook.Add("HUDPaint", "MiscItemVisions", function()
 	else
 		LocalPlayer().JugFrame = 0
 	end
-
 end)

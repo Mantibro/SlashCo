@@ -18,7 +18,6 @@ ITEM.OnSwitchFrom = function(ply)
     end)
 end
 ITEM.OnPickUp = function(ply)
-
     if ply:GetNWBool("CurseOfTheJug") then
         ply:EmitSound("slashco/jug_reject.mp3")
         timer.Simple(0, function()
@@ -31,7 +30,6 @@ end
 
 hook.Add("Think", "JugFunc", function()
     if SERVER then
-
         for _, surv in ipairs( team.GetPlayers(TEAM_SURVIVOR) ) do
 
             if surv:GetNWString("item") ~= "Jug" then continue end
@@ -47,9 +45,7 @@ hook.Add("Think", "JugFunc", function()
                     SlashCo.RemoveItem(surv)
                     surv:SetNWBool("CurseOfTheJug", true)
                 end
-
             end
-
         end
     end
 end)
