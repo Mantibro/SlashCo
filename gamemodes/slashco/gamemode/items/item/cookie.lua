@@ -15,9 +15,6 @@ SlashCoItems.Cookie.OnUse = function(ply)
     ply:AddEffect("FuelSpeed", 30)
 end
 SlashCoItems.Cookie.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem(SlashCoItems.Cookie.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
 end
 SlashCoItems.Cookie.ViewModel = {
     model = "models/slashco/items/cookie.mdl",

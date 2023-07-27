@@ -42,7 +42,7 @@ SlashCo.LoadCurRoundData = function()
                 for i = 1, #query do
 
                     local id = query[i].Survivors
-    
+
                     timer.Simple(1, function()
 
                         local slasher_pick = GetRandomSlasher()
@@ -51,7 +51,7 @@ SlashCo.LoadCurRoundData = function()
                         table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher_pick })
 
                         table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = id })
-    
+
                     end)
 
                 end
@@ -65,7 +65,7 @@ SlashCo.LoadCurRoundData = function()
                     --table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sr_id })
                     --For the slasher's clientside view also
                     table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sr_id, GameContribution = 0 })
-    
+
                 end
 
                 return
@@ -240,27 +240,27 @@ SlashCo.LoadCurRoundTeams = function()
 
                     for i = 1, #survivors do
                         if id == survivors[i].Survivors then
-    
+
                             playercur:SetTeam(TEAM_SPECTATOR)
                             playercur:Spawn()
                             print(playercur:Name() .. " now Slasher for Nightmare")
 
                             table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
-    
+
                             break
-    
+
                         else
-    
+
                             if slashers[1] ~= nil and id == slashers[1].Slashers then
                                 goto CONT_NGHT
                             end
-    
+
                             for k = 1, #survivors do
                                 if id == survivors[k].Survivors then
                                     goto CONT_NGHT
                                 end
                             end
-    
+
                             playercur:SetTeam(TEAM_SPECTATOR)
                             playercur:Spawn()
                             print(playercur:Name() .. " now Spectator (Nightmare)")
@@ -269,10 +269,10 @@ SlashCo.LoadCurRoundTeams = function()
                     end
 
 
-                    if play >= #player.GetAll() then 
-                        goto NIGHTMARE_SKIPALL 
+                    if play >= #player.GetAll() then
+                        goto NIGHTMARE_SKIPALL
                     else
-                        goto NIGHTMARE_SKIPPART 
+                        goto NIGHTMARE_SKIPPART
                     end
                 end
 
@@ -373,7 +373,7 @@ end
 
 SlashCo.SpawnPlayers = function()
 
-    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+    for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 
         ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
@@ -579,10 +579,14 @@ SlashCo.ValidateMap = function(map)
 end
 
 SlashCo.EndRound = function()
+    if g_SlashCoDebug then
+        return
+    end
+
     local delay = 20
 
     local survivorsWon = true
-    local SurvivorCount = #team.GetPlayers(TEAM_SURVIVOR)
+    local SurvivorCount = team.NumPlayers(TEAM_SURVIVOR)
     if SurvivorCount == 0 then --All Survivors are Dead
 
         survivorsWon = false
@@ -732,7 +736,10 @@ SlashCo.SpawnCurConfig = function(isDebug)
             SlashCo.CurRound.OfferingData.ItemMod = -2
         end
 
-        if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then SlashCo.CurRound.OfferingData.SatO = 1 end
+        if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
+            SlashCo.CurRound.OfferingData.SatO = 1
+            SetGlobalInt("SatO", 1)
+        end
 
         if SlashCo.CurRound.OfferingData.CurrentOffering == 4 then SlashCo.CurRound.OfferingData.DO = true end
 
@@ -814,7 +821,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
             end
         end
 
-        --Repalce world props.
+        --Replace world props.
         for _, v in ipairs(ents.FindByClass("prop_physics")) do
             local item = spawnableItems[v:GetModel()]
             if item then
@@ -868,23 +875,23 @@ SlashCo.SpawnCurConfig = function(isDebug)
 
         end)
 
-        timer.Simple( math.random(2,4), function() 
-            SlashCo.HelicopterRadioVoice(1) 
+        timer.Simple( math.random(2,4), function()
+            SlashCo.HelicopterRadioVoice(1)
             SlashCo.CurRound.roundOverToggle = true
         end)
 
         if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
 
-            timer.Simple( 240, function() 
-            
+            timer.Simple( 240, function()
+
                 local failed = SlashCo.SummonEscapeHelicopter()
 
                 if not failed then
                     SlashCo.CurRound.DistressBeaconUsed = false
                 end
-            
+
             end)
-            
+
         else
             SlashCo.RoundHeadstart()
         end
@@ -944,8 +951,27 @@ SlashCo.TestConfig = function()
         SlashCo.CreateItems(itemSpawns, "sc_milkjug", true)
         print("[SlashCo] TESTCONFIG: Creating Items.")
     end)
-    
+
     net.Start("octoSlashCoTestConfigHalos")
     --net.WriteTable(send) --I'm so sorry for using this, I'm just too lazy.
     net.Broadcast()
 end
+
+local function SetupMapLua()
+    local mapLua = ents.Create("lua_run")
+    mapLua:SetName("triggerhook")
+    mapLua:Spawn()
+
+    for _, v in ipairs(ents.FindByClass("prop_door_rotating")) do
+        v:Fire("AddOutput", "OnOpen triggerhook:RunPassedCode:hook.Run( 'DoorOpen' ):0:-1")
+		v:Fire("AddOutput", "OnClose triggerhook:RunPassedCode:hook.Run( 'DoorClose' ):0:-1")
+    end
+end
+
+hook.Add("InitPostEntity", "SetupMapLua", SetupMapLua)
+hook.Add("DoorOpen", "SlashCoDoors", function()
+	CALLER.IsOpen = true
+end)
+hook.Add("DoorClose", "SlashCoDoors", function()
+	CALLER.IsOpen = nil
+end)

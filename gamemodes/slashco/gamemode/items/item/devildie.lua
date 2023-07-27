@@ -92,13 +92,6 @@ SlashCoItems.DevilDie.OnUse = function(ply)
     end)
 end
 SlashCoItems.DevilDie.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem(SlashCoItems.DevilDie.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    local physics = Entity(droppeditem):GetPhysicsObject()
-    physics:SetVelocity(ply:GetAimVector() * 250)
-    local randomvec = Vector(0, 0, 0)
-    randomvec:Random(-1000, 1000)
-    physics:SetAngleVelocity(randomvec)
-    SlashCo.CurRound.Items[droppeditem] = true
 end
 SlashCoItems.DevilDie.ViewModel = {
     model = "models/slashco/items/devildie.mdl",

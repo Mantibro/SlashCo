@@ -50,7 +50,7 @@ if SERVER then
 		if self.DoArming and not self.TimersStarted then
 			local ms = SCInfo.Maps[game.GetMap()].SIZE
 
-			local fin_time = ( #team.GetPlayers(TEAM_SURVIVOR)*15) + math.random(5,25) + (ms * 10)
+			local fin_time = ( team.NumPlayers(TEAM_SURVIVOR)*15) + math.random(5,25) + (ms * 10)
 
 			print("[SlashCo] Beacon set to arm in "..fin_time.." seconds.")
 
@@ -62,7 +62,7 @@ if SERVER then
 
 		if self:GetNWBool("ArmingBeacon") then 
 		
-			if #team.GetPlayers(TEAM_SURVIVOR) < 2 then
+			if team.NumPlayers(TEAM_SURVIVOR) < 2 then
 				timer.Remove(self:EntIndex().."_BeaconArming")
 				ArmBeacon(self)
 			end

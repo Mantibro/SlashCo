@@ -11,23 +11,17 @@ SlashCoItems.Rock.CamPos = Vector(50,0,0)
 SlashCoItems.Rock.ChangesSpeed = true
 SlashCoItems.Rock.IsSpawnable = true
 SlashCoItems.Rock.OnDrop = function(ply)
-    SlashCoItems.Rock.OnSwitchFrom(ply)
-    local droppeditem = SlashCo.CreateItem(SlashCoItems.Rock.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
 end
 SlashCoItems.Rock.OnFootstep = function()
     return true
 end
 SlashCoItems.Rock.OnSwitchFrom = function(ply)
     timer.Simple(0.18, function()
-        if not ply:ItemValue2("ChangesSpeed") then
-            ply:SetRunSpeed(300)
-        end
+        ply:RemoveSpeedEffect("rock")
     end)
 end
 SlashCoItems.Rock.OnPickUp = function(ply)
-    ply:SetRunSpeed(200)
+    ply:AddSpeedEffect("rock", 200, 10)
 end
 SlashCoItems.Rock.ViewModel = {
     model = "models/slashco/items/rock.mdl",

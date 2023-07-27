@@ -7,11 +7,10 @@ ITEM.EntClass = "sc_benadryl"
 ITEM.Price = 60
 ITEM.Description = "All new 25 gram Benadryl, made from 1200 pills."
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.ReplacesWorldProps = true
 ITEM.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
+end
+ITEM.DisplayColor = function()
+    return 128, 48, 0, 255
 end
 ITEM.OnUse = function(ply)
 

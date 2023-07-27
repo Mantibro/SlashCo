@@ -27,340 +27,344 @@ SlashCoSlasher.Watcher.EyeRating = "★★★★☆"
 SlashCoSlasher.Watcher.DiffRating = "★★☆☆☆"
 
 SlashCoSlasher.Watcher.OnSpawn = function(slasher)
-    slasher:SetViewOffset( Vector(0,0,100) )
-    slasher:SetCurrentViewOffset( Vector(0,0,100) )
-    slasher:SetNWBool("CanChase", true)
-    slasher:SetNWBool("CanKill", true)
+	slasher:SetViewOffset(Vector(0, 0, 100))
+	slasher:SetCurrentViewOffset(Vector(0, 0, 100))
+	slasher:SetNWBool("CanChase", true)
+	slasher:SetNWBool("CanKill", true)
 end
 
-SlashCoSlasher.Watcher.PickUpAttempt = function(ply)
-    return false
+SlashCoSlasher.Watcher.PickUpAttempt = function()
+	return false
 end
 
 SlashCoSlasher.Watcher.OnTickBehaviour = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
 
-    local SO = SlashCo.CurRound.OfferingData.SO
+	local v1 = slasher.SlasherValue1 --Survey Length
+	local v2 = slasher.SlasherValue2 --Survey Cooldown
+	local v3 = slasher.SlasherValue3 --Watched
+	local v4 = slasher.SlasherValue4 --Stalk time
 
-    v1 = slasher.SlasherValue1 --Survey Length
-    v2 = slasher.SlasherValue2 --Survey Cooldown
-    v3 = slasher.SlasherValue3 --Watched
-    v4 = slasher.SlasherValue4 --Stalk time
+	slasher.SlasherValue3 = BoolToNumber(slasher:GetNWBool("WatcherWatched"))
 
-    slasher.SlasherValue3 = BoolToNumber( slasher:GetNWBool("WatcherWatched") )
+	if not slasher:GetNWBool("WatcherRage") then
+		if v1 > 0 then
+			slasher.SlasherValue1 = v1 - FrameTime()
+		end
+	else
+		slasher.SlasherValue1 = 1
+		slasher.SlasherValue3 = 0.65
+		SlashCoSlasher[slasher:GetNWString("Slasher")].CanChase = false
+	end
 
-    if not slasher:GetNWBool("WatcherRage") then
-        if v1 > 0 then slasher.SlasherValue1 = v1 - FrameTime() end
-    else
-        slasher.SlasherValue1 = 1
-        slasher.SlasherValue3 = 0.65 
-        SlashCoSlasher[slasher:GetNWString("Slasher")].CanChase = false
-    end
+	if slasher:GetNWBool("InSlasherChaseMode") or slasher:GetNWBool("WatcherRage") then
+		slasher:SetSlowWalkSpeed(SlashCoSlasher.Watcher.ChaseSpeed - (v3 * 80))
+		slasher:SetWalkSpeed(SlashCoSlasher.Watcher.ChaseSpeed - (v3 * 80))
+		slasher:SetRunSpeed(SlashCoSlasher.Watcher.ChaseSpeed - (v3 * 80))
+	else
+		slasher:SetSlowWalkSpeed(SlashCoSlasher.Watcher.ProwlSpeed - (v3 * 120))
+		slasher:SetWalkSpeed(SlashCoSlasher.Watcher.ProwlSpeed - (v3 * 120))
+		slasher:SetRunSpeed(SlashCoSlasher.Watcher.ProwlSpeed - (v3 * 120))
+	end
 
-    if slasher:GetNWBool("InSlasherChaseMode") or slasher:GetNWBool("WatcherRage") then
+	if v2 > 0 then
+		slasher.SlasherValue2 = v2 - FrameTime()
+	end
 
-        slasher:SetSlowWalkSpeed( SlashCoSlasher.Watcher.ChaseSpeed - (v3 * 80) )
-        slasher:SetWalkSpeed( SlashCoSlasher.Watcher.ChaseSpeed - (v3 * 80) )
-        slasher:SetRunSpeed( SlashCoSlasher.Watcher.ChaseSpeed - (v3 * 80) )
+	local isSeen = false
 
-    else
+	for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 
-        slasher:SetSlowWalkSpeed( SlashCoSlasher.Watcher.ProwlSpeed - (v3 * 120) )
-        slasher:SetWalkSpeed( SlashCoSlasher.Watcher.ProwlSpeed - (v3 * 120) )
-        slasher:SetRunSpeed( SlashCoSlasher.Watcher.ProwlSpeed - (v3 * 120) )
+		if v1 > 0 then
+			if not surv:GetNWBool("SurvivorWatcherSurveyed") then
+				surv:SetNWBool("SurvivorWatcherSurveyed", true)
+			end
+		else
+			if surv:GetNWBool("SurvivorWatcherSurveyed") then
+				surv:SetNWBool("SurvivorWatcherSurveyed", false)
+			end
 
-    end
+			local find = ents.FindInCone(surv:GetPos(), surv:GetEyeTrace().Normal, 3000, 0.5)
 
-    if v2 > 0 then slasher.SlasherValue2 = v2 - FrameTime() end
+			local target
 
-    local isSeen = false
+			if surv:GetEyeTrace().Entity == slasher then
+				target = slasher
+				goto FOUND
+			end
 
-    for s = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+			do
+				for i = 1, #find do
+					if find[i] == slasher then
+						target = find[i]
+						break
+					end
+				end
 
-        local surv = team.GetPlayers(TEAM_SURVIVOR)[s]
+				if IsValid(target) then
+					local tr = util.TraceLine({
+						start = surv:EyePos(),
+						endpos = target:GetPos() + Vector(0, 0, 50),
+						filter = surv
+					})
 
-        if v1 > 0 then
+					if tr.Entity ~= target then
+						target = nil
+					end
+				end
+			end
+			:: FOUND ::
 
-            if not surv:GetNWBool("SurvivorWatcherSurveyed") then surv:SetNWBool("SurvivorWatcherSurveyed", true) end
+			if IsValid(target) and target == slasher then
+				surv:SetNWBool("SurvivorWatcherSurveyed", true)
+				isSeen = true
+			else
+				if surv:GetNWBool("SurvivorWatcherSurveyed") then
+					surv:SetNWBool("SurvivorWatcherSurveyed", false)
+				end
+			end
+		end
+	end
 
-        else
+	slasher:SetNWBool("WatcherWatched", isSeen)
 
-            if surv:GetNWBool("SurvivorWatcherSurveyed") then surv:SetNWBool("SurvivorWatcherSurveyed", false) end
+	--Stalk Survivors
 
-            local find = ents.FindInCone( surv:GetPos(), surv:GetEyeTrace().Normal, 3000, 0.5 )
+	local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, 1500, 0.85)
+	local target
 
-            local target = NULL
+	if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR then
+		target = slasher:GetEyeTrace().Entity
+		goto FOUND
+	end
 
-            if surv:GetEyeTrace().Entity == slasher then
-                target = slasher
-                goto FOUND
-            end
+	do
+		for i = 1, #find do
+			if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then
+				target = find[i]
+				break
+			end
+		end
 
-            do
-                for i = 1, #find do
-                    if find[i] == slasher then 
-                        target = find[i]
-                        break 
-                    end
-                end
+		if IsValid(target) then
+			local tr = util.TraceLine({
+				start = slasher:EyePos(),
+				endpos = target:GetPos() + Vector(0, 0, 50),
+				filter = slasher
+			})
 
-                if IsValid(target) then
-                    local tr = util.TraceLine( {
-                        start = surv:EyePos(),
-                        endpos = target:GetPos()+Vector(0,0,50),
-                        filter = surv
-                    } )
+			if tr.Entity ~= target then
+				target = nil
+			end
+		end
+	end
+	:: FOUND ::
 
-                    if tr.Entity ~= target then target = NULL end
-                end
+	if IsValid(target) and isSeen == false and not slasher:GetNWBool("InSlasherChaseMode") then
+		slasher.SlasherValue4 = v4 + FrameTime()
+		if not slasher:GetNWBool("WatcherStalking") then
+			slasher:SetNWBool("WatcherStalking", true)
+		end
+	else
+		if slasher:GetNWBool("WatcherStalking") then
+			slasher:SetNWBool("WatcherStalking", false)
+		end
+	end
 
-            end
-            ::FOUND::
+	if v2 < 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= true then
+		slasher:SetNWBool("WatcherCanSurvey", true)
+	end
 
-            if IsValid(target) and target == slasher then 
-                surv:SetNWBool("SurvivorWatcherSurveyed", true) 
-                isSeen = true
-            else
-                if surv:GetNWBool("SurvivorWatcherSurveyed") then surv:SetNWBool("SurvivorWatcherSurveyed", false) end
-            end
+	if v2 >= 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= false then
+		slasher:SetNWBool("WatcherCanSurvey", false)
+	end
 
-        end
-
-    end
-
-    slasher:SetNWBool("WatcherWatched", isSeen) 
-
-    --Stalk Survivors
-
-    local find = ents.FindInCone( slasher:GetPos(), slasher:GetEyeTrace().Normal, 1500, 0.85 )
-
-    local target = NULL
-
-    if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR then
-        target = slasher:GetEyeTrace().Entity
-        goto FOUND
-    end
-
-    do
-         for i = 1, #find do
-            if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then 
-                target = find[i]
-                break 
-            end
-        end
-
-        if IsValid(target) then
-            local tr = util.TraceLine( {
-                start = slasher:EyePos(),
-                endpos = target:GetPos()+Vector(0,0,50),
-                filter = slasher
-            } )
-
-            if tr.Entity ~= target then target = NULL end
-        end
-
-    end
-    ::FOUND::
-
-    if IsValid( target ) and isSeen == false and not slasher:GetNWBool("InSlasherChaseMode") then
-        slasher.SlasherValue4 = v4 + FrameTime()
-        if not slasher:GetNWBool("WatcherStalking") then slasher:SetNWBool("WatcherStalking", true) end
-    else
-        if slasher:GetNWBool("WatcherStalking") then slasher:SetNWBool("WatcherStalking", false) end
-    end
-
-    if v2 < 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= true then
-        slasher:SetNWBool("WatcherCanSurvey", true)
-    end
-
-    if v2 >= 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= false then
-        slasher:SetNWBool("WatcherCanSurvey", false)
-    end
-
-    slasher:SetNWInt("WatcherStalkTime", v4)
-
-    slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Watcher.Eyesight)
-    slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Watcher.Perception)
+	slasher:SetNWInt("WatcherStalkTime", v4)
+	slasher:SetNWFloat("Slasher_Eyesight", SlashCoSlasher.Watcher.Eyesight)
+	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Watcher.Perception)
 end
 
 SlashCoSlasher.Watcher.OnPrimaryFire = function(slasher)
-    SlashCo.Jumpscare(slasher)
+	SlashCo.Jumpscare(slasher)
 end
 
 SlashCoSlasher.Watcher.OnSecondaryFire = function(slasher)
-    SlashCo.StartChaseMode(slasher)
+	SlashCo.StartChaseMode(slasher)
 end
 
 SlashCoSlasher.Watcher.OnMainAbilityFire = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
 
-    local SO = SlashCo.CurRound.OfferingData.SO
+	if slasher.SlasherValue2 > 0 then
+		return
+	end
+	if slasher:GetNWBool("WatcherRage") then
+		return
+	end
 
-    if slasher.SlasherValue2 > 0 then return end
-    if slasher:GetNWBool("WatcherRage") then return end
+	slasher.SlasherValue1 = 10 + (SO * 10)
+	slasher.SlasherValue2 = 100 - (SO * 35)
 
-    slasher.SlasherValue1 = 10 + (SO * 10)
-    slasher.SlasherValue2 = 100 - (SO * 35)
+	PlayGlobalSound("slashco/slasher/watcher_locate.mp3", 100, slasher, 1)
 
-    PlayGlobalSound("slashco/slasher/watcher_locate.mp3", 100, slasher, 1)
+	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		p:SetNWBool("WatcherSurveyed", true)
+		p:EmitSound("slashco/slasher/watcher_see.mp3")
+	end
 
-    for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-        local p = team.GetPlayers(TEAM_SURVIVOR)[i]
-        p:SetNWBool("WatcherSurveyed", true)
-        p:EmitSound("slashco/slasher/watcher_see.mp3")
-    end
-
-    timer.Simple(5 + (SO*5), function() 
-    
-        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
-            local p = team.GetPlayers(TEAM_SURVIVOR)[i]
-            p:SetNWBool("WatcherSurveyed", false)
-        end
-    
-    end)
-
+	timer.Simple(5 + (SO * 5), function()
+		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			p:SetNWBool("WatcherSurveyed", false)
+		end
+	end)
 end
-
 
 SlashCoSlasher.Watcher.OnSpecialAbilityFire = function(slasher)
+	local SO = SlashCo.CurRound.OfferingData.SO
 
-    local SO = SlashCo.CurRound.OfferingData.SO
+	if SlashCo.CurRound.GameProgress < (10 - (slasher.SlasherValue4 / 25)) then
+		return
+	end
+	if slasher:GetNWBool("WatcherRage") then
+		return
+	end
+	if team.NumPlayers(TEAM_SURVIVOR) < 2 then
+		return
+	end
 
-    if SlashCo.CurRound.GameProgress < (10 - (slasher.SlasherValue4/25)) then return end
-    if slasher:GetNWBool("WatcherRage") then return end
-    if #team.GetPlayers(TEAM_SURVIVOR) < 2 then return end
-
-    slasher:SetNWBool("WatcherRage", true)
-    PlayGlobalSound("slashco/slasher/watcher_rage.wav", 100, slasher, 1)
-
+	slasher:SetNWBool("WatcherRage", true)
+	PlayGlobalSound("slashco/slasher/watcher_rage.wav", 100, slasher, 1)
 end
 
-SlashCoSlasher.Watcher.Animator = function(ply) 
+SlashCoSlasher.Watcher.Animator = function(ply)
+	local chase = ply:GetNWBool("InSlasherChaseMode")
 
-    local chase = ply:GetNWBool("InSlasherChaseMode")
-
-    if ply:IsOnGround() then
-
-		if not chase then 
-			ply.CalcIdeal = ACT_WALK 
+	if ply:IsOnGround() then
+		if not chase then
+			ply.CalcIdeal = ACT_WALK
 			ply.CalcSeqOverride = ply:LookupSequence("prowl")
 		else
 			ply.CalcIdeal = ACT_WALK
 			ply.CalcSeqOverride = ply:LookupSequence("chase")
 		end
-
 	else
-
 		ply.CalcSeqOverride = ply:LookupSequence("float")
-
 	end
 
-    return ply.CalcIdeal, ply.CalcSeqOverride
-
+	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
 SlashCoSlasher.Watcher.Footstep = function(ply)
-
-    if SERVER then
-        ply:EmitSound( "npc/footsteps/hardboot_generic"..math.random(1,6)..".wav",50,90,0.75)
-        return false
-    end
-
-    if CLIENT then
+	if SERVER then
+		ply:EmitSound("npc/footsteps/hardboot_generic" .. math.random(1, 6) .. ".wav", 50, 90, 0.75)
 		return false
-    end
+	end
 
+	if CLIENT then
+		return false
+	end
 end
 
 if CLIENT then
+	hook.Add("HUDPaint", SlashCoSlasher.Watcher.Name .. "_Jumpscare", function()
+		if LocalPlayer():GetNWBool("SurvivorJumpscare_Watcher") == true then
+			local Overlay = Material("slashco/ui/overlays/watcher_see")
 
-    hook.Add("HUDPaint", SlashCoSlasher.Watcher.Name.."_Jumpscare", function()
+			Overlay:SetFloat("$alpha", 1)
 
-        if LocalPlayer():GetNWBool("SurvivorJumpscare_Watcher") == true  then
+			surface.SetDrawColor(255, 255, 255, 255)
+			surface.SetMaterial(Overlay)
+			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+		end
 
-            local Overlay = Material("slashco/ui/overlays/watcher_see")
+		if LocalPlayer():GetNWBool("WatcherSurveyed") == true then
+			if LocalPlayer().al_watch == nil then
+				LocalPlayer().al_watch = 0
+			end
+			if LocalPlayer().al_watch < 100 then
+				LocalPlayer().al_watch = LocalPlayer().al_watch + (FrameTime() * 100)
+			end
 
-            Overlay:SetFloat( "$alpha", 1 )
+			local Overlay = Material("slashco/ui/overlays/watcher_see")
 
-            surface.SetDrawColor(255,255,255,255)	
-            surface.SetMaterial(Overlay)
-            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-            
-        end
+			Overlay:SetFloat("$alpha", 1 - (LocalPlayer().al_watch / 100))
 
-        if LocalPlayer():GetNWBool("WatcherSurveyed") == true  then
-            if LocalPlayer().al_watch == nil then LocalPlayer().al_watch = 0 end
-            if LocalPlayer().al_watch < 100 then LocalPlayer().al_watch = LocalPlayer().al_watch+(FrameTime()*100) end
-    
-            local Overlay = Material("slashco/ui/overlays/watcher_see")
-    
-            Overlay:SetFloat( "$alpha", 1 - (LocalPlayer().al_watch/100) )
-    
-            surface.SetDrawColor(255,255,255,60)	
-            surface.SetMaterial(Overlay)
-            surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-        else
-            LocalPlayer().al_watch = nil
-        end
+			surface.SetDrawColor(255, 255, 255, 60)
+			surface.SetMaterial(Overlay)
+			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+		else
+			LocalPlayer().al_watch = nil
+		end
+	end)
 
-    end)
+	local surveyTable = {
+		default = Material("slashco/ui/icons/slasher/s_10_a1"),
+		["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
+	}
 
-    local SurveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
-    local SurveyIcon = Material("slashco/ui/icons/slasher/s_10_a1")
+	local function canSurveil()
+		return LocalPlayer():GetNWInt("GameProgressDisplay") > (10 - (LocalPlayer():GetNWInt("WatcherStalkTime") / 25))
+				and not LocalPlayer():GetNWBool("WatcherRage") and team.NumPlayers(TEAM_SURVIVOR) > 1
+	end
 
-    SlashCoSlasher.Watcher.UserInterface = function(cx, cy, mainiconposx, mainiconposy)
+	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+	local red = Color(255, 0, 0)
+	SlashCoSlasher.Watcher.InitHud = function(_, hud)
+		hud:SetAvatar(Material("slashco/ui/icons/slasher/s_10"))
+		hud:SetTitle("the watcher")
 
-        local willdrawkill = true
-        local willdrawchase = true
-        local willdrawmain = true
+		hud:AddControl("R", "survey", surveyTable)
+		hud:ChaseAndKill()
+		hud:AddControl("F", "full surveillance", surveyTable)
+		hud:TieControl("R", "WatcherCanSurvey")
+		hud:TieControlVisible("R", "WatcherRage", true, true, false)
+		hud:SetAllSeeing(true)
 
-        local GameProgress = LocalPlayer():GetNWInt("GameProgressDisplay")
+		hud.prevSurveil = not canSurveil()
+		function hud.AlsoThink()
+			local surveil = canSurveil()
+			if surveil ~= hud.prevSurveil then
+				hud:SetControlVisible("F", surveil)
+				hud.prevSurveil = surveil
+			end
+		end
 
-        if LocalPlayer():GetNWBool("WatcherWatched") then
-            draw.SimpleText( "YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW()/2, ScrH()/4, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-        end
+		function hud.TitleCard.Label:PaintOver()
+			draw.SimpleText("STALK TIME: " .. LocalPlayer():GetNWInt("WatcherStalkTime"), "TVCD", 4, 18, red)
+		end
 
-        if LocalPlayer():GetNWBool("WatcherStalking") then
-            draw.SimpleText( "OBSERVING A SURVIVOR. . .", "ItemFontTip", ScrW()/2, ScrH()/4, Color( 255, 0, 0, 255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-        end
+		hook.Add("HUDPaint", "SlashCoWatcher", function()
+			if LocalPlayer():Team() ~= TEAM_SLASHER then
+				hook.Remove("HUDPaint", "SlashCoWatcher")
+				return
+			end
 
-        for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+			if LocalPlayer():GetNWBool("WatcherWatched") then
+				draw.SimpleText("YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+						Color(255, 0, 0, 255),
+						TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
 
-            local survivor = team.GetPlayers(TEAM_SURVIVOR)[i]
+			if LocalPlayer():GetNWBool("WatcherStalking") then
+				draw.SimpleText("OBSERVING A SURVIVOR. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+						Color(255, 0, 0, 255),
+						TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
 
-            if survivor:GetNWBool("SurvivorWatcherSurveyed") then
+			for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+				if not survivor:GetNWBool("SurvivorWatcherSurveyed") then
+					return
+				end
 
-                local pos = (survivor:GetPos()+Vector(0,0,60)):ToScreen()
+				local pos = (survivor:GetPos() + Vector(0, 0, 60)):ToScreen()
+				if pos.visible then
+					surface.SetMaterial(surveyNoticeIcon)
+					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
+				end
+			end
+		end)
+	end
 
-                if pos.visible then
-                    surface.SetMaterial(SurveyNoticeIcon)
-                    surface.DrawTexturedRect(pos.x - ScrW()/32, pos.y - ScrW()/32, ScrW()/16, ScrW()/16)
-                end
-
-            end
-
-        end
-
-        if LocalPlayer():GetNWBool("WatcherCanSurvey") and not LocalPlayer():GetNWBool("WatcherRage") then 
-            draw.SimpleText( "R - Survey", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
-        else
-            draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/4), mainiconposy+(mainiconposy/10), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT ) 
-        end
-
-        if GameProgress > (10 - ( LocalPlayer():GetNWInt("WatcherStalkTime") /25)) and not LocalPlayer():GetNWBool("WatcherRage") and #team.GetPlayers(TEAM_SURVIVOR) > 1 then
-            surface.SetMaterial(SurveyIcon)
-            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-            draw.SimpleText( "F - Full Surveillance", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 255, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-        else
-            surface.SetMaterial(SurveyIcon)
-            surface.DrawTexturedRect(mainiconposx, mainiconposy - (cy/1.333), ScrW()/16, ScrW()/16)
-            draw.SimpleText( "-Unavailable-", "ItemFontTip", mainiconposx+(cx/8), mainiconposy - (cy/1.33), Color( 100, 0, 0, 255 ), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT )
-        end
-
-        return willdrawkill, willdrawchase, willdrawmain
-
-    end
-
-    SlashCoSlasher.Watcher.ClientSideEffect = function()
-
-    end
-
+	SlashCoSlasher.Watcher.ClientSideEffect = function()
+	end
 end

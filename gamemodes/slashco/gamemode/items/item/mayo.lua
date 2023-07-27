@@ -17,9 +17,6 @@ SlashCoItems.Mayonnaise.OnUse = function(ply)
     ply:EmitSound("slashco/survivor/eat_mayo.mp3")
 end
 SlashCoItems.Mayonnaise.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem(SlashCoItems.Mayonnaise.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
 end
 SlashCoItems.Mayonnaise.ViewModel = {
     model = "models/props_lab/jar01a.mdl",

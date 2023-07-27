@@ -545,7 +545,7 @@ SlashCo.ChooseTheSlasherLobby = function(id)
     SlashCo.BroadcastLobbySlasherInformation()
 end
 
-local function pickItem(ply, vals)
+local function pickItem(ply, item)
     local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
     if ply:Team() ~= TEAM_SURVIVOR then
@@ -556,8 +556,6 @@ local function pickItem(ply, vals)
         ply:ChatPrint("You have already chosen an item.")
         return
     end
-
-    local item = vals[1]
 
     if SlashCoItems[item].Price > balance then
         ply:ChatPrint("You cannot afford this item.")
@@ -589,10 +587,10 @@ local function pickItem(ply, vals)
 end
 
 local MapForceCost = 50
-local function pickMap(ply, vals)
+local function pickMap(ply, map)
     local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
-    if SlashCo.LobbyData.SelectedMap == vals[1] then
+    if SlashCo.LobbyData.SelectedMap == map then
         ply:ChatPrint("That map has already been selected.")
         return
     end
@@ -606,25 +604,21 @@ local function pickMap(ply, vals)
         play:ChatPrint(string.format("%s spent %s points to set the mission to be on %s.",
                 ply:Nick(),
                 MapForceCost,
-                SCInfo.Maps[vals[1]].NAME))
+                SCInfo.Maps[map].NAME))
     end
 
     SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -MapForceCost)
-    SlashCo.LobbyData.SelectedMap = vals[1]
+    SlashCo.LobbyData.SelectedMap = map
     MapForceCost = MapForceCost + 50
     SlashCo.SendValue(nil, "mapGuar", SlashCo.LobbyData.SelectedMap, MapForceCost)
 end
 
-hook.Add("slashCoValue", "slashCo_PickItem", function(ply, msg, vals)
-    if msg == "pickItem" then
-        pickItem(ply, vals)
-        return
-    end
+hook.Add("scValue_pickItem", "slashCo_PickItem", function(ply, item)
+    pickItem(ply, item)
+end)
 
-    if msg == "pickMap" then
-        pickMap(ply, vals)
-        return
-    end
+hook.Add("scValue_pickMap", "slashCo_PickMap", function(ply, map)
+    pickMap(ply, map)
 end)
 
 local lobby_tick

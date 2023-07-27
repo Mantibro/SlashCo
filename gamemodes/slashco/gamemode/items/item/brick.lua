@@ -9,29 +9,31 @@ ITEM.Description = "Just some cinder block we found, nothing special. Can be thr
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ReplacesWorldProps = true
 ITEM.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
+end
+ITEM.DisplayColor = function()
+    return 128, 48, 0, 255
 end
 ITEM.OnUse = function(ply)
     ply:EmitSound("Weapon_Crowbar.Miss")
+    ply:ViewPunch(Angle(-10, 0, 0))
     local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 1400)
+    local ent = Entity(droppeditem)
+    ent:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 1400)
     SlashCo.CurRound.Items[droppeditem] = true
 
-    Entity(droppeditem):SetCollisionGroup(COLLISION_GROUP_NONE)
-    Entity(droppeditem):SetCustomCollisionCheck(true)
+    ent:SetCollisionGroup(COLLISION_GROUP_NONE)
+    ent:SetCustomCollisionCheck(true)
     timer.Simple(0.3, function()
-        if not IsValid(Entity(droppeditem)) then
+        if not IsValid(ent) then
             return
         end
-        Entity(droppeditem):SetCustomCollisionCheck(false)
+        ent:SetCustomCollisionCheck(false)
     end)
     timer.Simple(3, function()
-        if not IsValid(Entity(droppeditem)) then
+        if not IsValid(ent) then
             return
         end
-        Entity(droppeditem):SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+        ent:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
     end)
 end
 ITEM.ViewModel = {

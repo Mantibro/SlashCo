@@ -54,7 +54,7 @@ SlashCo.SpawnSlasher = function()
             if SlashCo.CurRound.SlashersToBeSpawned then
 
                 for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
-                    rand = math.random(1, #SlashCo.CurConfig.Spawnpoints.Slasher)
+                    local rand = math.random(1, #SlashCo.CurConfig.Spawnpoints.Slasher)
 
                     local pos = Vector(SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[1], SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[2], SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[3])
                     local ang = Angle(0, SlashCo.CurConfig.Spawnpoints.Slasher[rand].ang, 0)
@@ -164,7 +164,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
             end
 
             if not slasher:GetNWBool("InSlasherChaseMode") then
-                for p = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+                for p = 1, team.NumPlayers(TEAM_SURVIVOR) do
                     local ply = team.GetPlayers(TEAM_SURVIVOR)[p]
                     if ply:GetNWBool("SurvivorChased") then
                         ply:SetNWBool("SurvivorChased", false)

@@ -143,7 +143,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
     if LocalPlayer():GetVelocity():Length() > 250 and game.GetMap() ~= "sc_lobby" then
         local lookent = LocalPlayer():GetEyeTrace().Entity
-        if lookent:GetClass() == "prop_door_rotating" and CheckDoorWL(lookent) then
+        if IsValid(lookent) and lookent:GetClass() == "prop_door_rotating" and CheckDoorWL(lookent) then
             if lookent:GetPos():Distance(LocalPlayer():GetPos()) < 150 then
                 draw.SimpleText("[LMB] SLAM OPEN", "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
             end
@@ -182,7 +182,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
     for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
         if v.IsSelectable and not (IsFueling and FuelingCan == v) then
-            local gasPos = v:GetPos()
+            local gasPos = v:WorldSpaceCenter()
             local trace = util.QuickTrace(hitPos, gasPos - hitPos, ply)
             if not trace.Hit or trace.Entity == v then
                 local realDistance = hitPos:Distance(gasPos)

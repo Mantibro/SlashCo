@@ -37,7 +37,7 @@ SlashCoItems.Beacon.OnUse = function(ply)
 
         if not SlashCo.CurRound.DistressBeaconUsed then
 
-            if #team.GetPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
+            if team.NumPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
 
                 if not ply.BeaconWarning then
                     ply:ChatPrint("Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm.")
@@ -70,9 +70,6 @@ SlashCoItems.Beacon.OnUse = function(ply)
     end
 end
 SlashCoItems.Beacon.OnDrop = function(ply)
-    local droppeditem = SlashCo.CreateItem("sc_beacon", ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-    Entity(droppeditem):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 250)
-    SlashCo.CurRound.Items[droppeditem] = true
 end
 SlashCoItems.Beacon.ViewModel = {
     type = "Model",
