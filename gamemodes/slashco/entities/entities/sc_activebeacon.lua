@@ -6,7 +6,7 @@ local SlashCoItems = SlashCoItems
 ENT.Type = "anim"
 
 ENT.ClassName 		= "sc_activebeacon"
-ENT.PrintName		= "baby"
+ENT.PrintName		= "active beacon"
 ENT.Author			= "Manti"
 ENT.Contact			= ""
 ENT.Purpose			= "Rescue."

@@ -62,3 +62,4 @@ ITEM.WorldModel = {
 	material = "",
 	skin = 0,
 	bodygroup = {}
+}
