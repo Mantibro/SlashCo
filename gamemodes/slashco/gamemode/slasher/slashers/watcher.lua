@@ -318,6 +318,7 @@ if CLIENT then
 		hud:AddControl("F", "full surveillance", surveyTable)
 		hud:TieControl("R", "WatcherCanSurvey")
 		hud:TieControlVisible("R", "WatcherRage", true, true, false)
+		hud:SetAllSeeing(true)
 
 		hud.prevSurveil = not canSurveil()
 		function hud.AlsoThink()

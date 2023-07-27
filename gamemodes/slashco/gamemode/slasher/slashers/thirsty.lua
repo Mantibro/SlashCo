@@ -343,10 +343,7 @@ end
 SlashCoSlasher.Thirsty.ThirstyRage = function(ply)
 	local pos = ply:GetPos()
 
-	for i = 1, #team.GetPlayers(TEAM_SLASHER) do
-		local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
-		local slasher = team.GetPlayers(TEAM_SLASHER)[i]
-
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if SlashCoSlasher[slasher:GetNWString("Slasher")].SlasherID ~= 5 then
 			return
 		end
@@ -358,14 +355,12 @@ SlashCoSlasher.Thirsty.ThirstyRage = function(ply)
 		slasher.SlasherValue1 = 6
 		slasher:SetNWBool("ThirstyBigMlik", true)
 
-		for i = 1, #player.GetAll() do
-			local ply = player.GetAll()[i]
+		for _, ply in ipairs(player.GetAll()) do
 			ply:SetNWBool("ThirstyFuck", true)
 		end
 
 		timer.Simple(3, function()
-			for i = 1, #player.GetAll() do
-				local ply = player.GetAll()[i]
+			for _, ply in ipairs(player.GetAll()) do
 				ply:SetNWBool("ThirstyFuck", false)
 			end
 		end)
