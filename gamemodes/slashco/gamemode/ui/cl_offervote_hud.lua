@@ -1,5 +1,3 @@
-include( "ui/fonts.lua" )
-
 net.Receive( "mantislashcoOfferingVoteOut", function( _, _ )
 	local t = net.ReadTable()
 

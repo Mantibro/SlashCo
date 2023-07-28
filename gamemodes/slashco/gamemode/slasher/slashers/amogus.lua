@@ -26,11 +26,10 @@ SlashCoSlasher.Amogus.SpeedRating = "★★☆☆☆"
 SlashCoSlasher.Amogus.EyeRating = "★★★☆☆"
 SlashCoSlasher.Amogus.DiffRating = "★★★☆☆"
 
-SlashCoSlasher.Amogus.OnSpawn = function(slasher)
-
+SlashCoSlasher.Amogus.OnSpawn = function()
 end
 
-SlashCoSlasher.Amogus.PickUpAttempt = function(ply)
+SlashCoSlasher.Amogus.PickUpAttempt = function()
 	return false
 end
 
@@ -74,44 +73,49 @@ SlashCoSlasher.Amogus.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Amogus.Perception)
 end
 
-SlashCoSlasher.Amogus.OnPrimaryFire = function(slasher)
+SlashCoSlasher.Amogus.OnPrimaryFire = function(slasher, target)
 	if not slasher:GetNWBool("AmogusSurvivorDisguise") then
-		SlashCo.Jumpscare(slasher)
+		SlashCo.Jumpscare(slasher, target)
 	end
 
-	if slasher:GetEyeTrace().Entity:IsPlayer() then
-		local target = slasher:GetEyeTrace().Entity
-
-		if target:Team() ~= TEAM_SURVIVOR then
-			return
-		end
-
-		if slasher.KillDelayTick > 0 then
-			return
-		end
-
-		if slasher:GetVelocity():Length() > 1 then
-			return
-		end
-
-		if slasher:GetPos():Distance(target:GetPos()) < SlashCoSlasher.Amogus.KillDistance and not target:GetNWBool("SurvivorBeingJumpscared") then
-			target:SetNWBool("SurvivorBeingJumpscared", true)
-
-			slasher:EmitSound("slashco/slasher/amogus_stealthkill.mp3", 60)
-
-			target:Freeze(true)
-			slasher:Freeze(true)
-
-			slasher.KillDelayTick = SlashCoSlasher.Amogus.KillDelay
-
-			timer.Simple(1.25, function()
-				target:SetNWBool("SurvivorBeingJumpscared", false)
-				slasher:Freeze(false)
-				target:Freeze(false)
-				target:Kill()
-			end)
-		end
+	if not IsValid(target) or not target:IsPlayer() then
+		return
 	end
+
+	if target:Team() ~= TEAM_SURVIVOR then
+		return
+	end
+
+	if slasher.KillDelayTick > 0 then
+		return
+	end
+
+	if slasher:GetVelocity():Length() > 1 then
+		return
+	end
+
+	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlasher.Tyler.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then
+		return
+	end
+
+	target:SetNWBool("SurvivorBeingJumpscared", true)
+	target:Freeze(true)
+
+	slasher:EmitSound("slashco/slasher/amogus_stealthkill.mp3", 60)
+	slasher:Freeze(true)
+	slasher.KillDelayTick = SlashCoSlasher.Amogus.KillDelay
+
+	timer.Simple(1.25, function()
+		if IsValid(target) then
+			target:SetNWBool("SurvivorBeingJumpscared", false)
+			target:Freeze(false)
+			target:Kill()
+		end
+
+		if IsValid(slasher) then
+			slasher:Freeze(false)
+		end
+	end)
 end
 
 SlashCoSlasher.Amogus.OnSecondaryFire = function(slasher)
@@ -137,7 +141,7 @@ SlashCoSlasher.Amogus.OnMainAbilityFire = function(slasher)
 			slasher:SetNWBool("AmogusDisguised", true)
 
 			slasher:SlasherHudFunc("SetAvatar", "survivor")
-			slasher:SlasherHudFunc("SetTitle", "regular survivor")
+			slasher:SlasherHudFunc("SetTitle", "inconspicuous survivor")
 
 			slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 

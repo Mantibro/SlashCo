@@ -41,8 +41,8 @@ SlashCoSlasher.Rocks.OnTickBehaviour = function(slasher)
     slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Rocks.Perception)
 end
 
-SlashCoSlasher.Rocks.OnPrimaryFire = function(slasher)
-    --SlashCo.Jumpscare(slasher)
+SlashCoSlasher.Rocks.OnPrimaryFire = function(slasher, target)
+    --SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.Rocks.OnSecondaryFire = function(slasher)

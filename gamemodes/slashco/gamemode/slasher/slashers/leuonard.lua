@@ -252,8 +252,8 @@ SlashCoSlasher.Leuonard.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Leuonard.Perception)
 end
 
-SlashCoSlasher.Leuonard.OnPrimaryFire = function(slasher)
-	SlashCo.Jumpscare(slasher)
+SlashCoSlasher.Leuonard.OnPrimaryFire = function(slasher, target)
+	SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.Leuonard.OnSecondaryFire = function(slasher)

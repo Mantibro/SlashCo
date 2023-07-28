@@ -130,9 +130,9 @@ SlashCoSlasher.Sid.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
 
-SlashCoSlasher.Sid.OnPrimaryFire = function(slasher)
+SlashCoSlasher.Sid.OnPrimaryFire = function(slasher, target)
 	if not slasher:GetNWBool("SidGun") then
-		SlashCo.Jumpscare(slasher)
+		SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
@@ -192,119 +192,119 @@ SlashCoSlasher.Sid.OnPrimaryFire = function(slasher)
 	else
 		--Executing a Survivor
 
-		if slasher:GetEyeTrace().Entity:IsPlayer() then
-			local target = slasher:GetEyeTrace().Entity
-
+		if IsValid(target) and target:IsPlayer() then
 			if target:Team() ~= TEAM_SURVIVOR then
 				return
 			end
 
-			if slasher:GetPos():Distance(target:GetPos()) < dist * 1.4 and not target:GetNWBool("SurvivorBeingJumpscared") then
-				local pick_ang = SlashCo.RadialTester(slasher, 600, target)
+			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then
+				return
+			end
 
-				slasher:SetEyeAngles(Angle(0, pick_ang, 0))
+			local pick_ang = SlashCo.RadialTester(slasher, 600, target)
+
+			slasher:SetEyeAngles(Angle(0, pick_ang, 0))
+			target:SetEyeAngles(Angle(0, pick_ang, 0))
+			slasher:Freeze(true)
+
+			timer.Simple(0.1, function()
+				if not IsValid(slasher) or not IsValid(target) then
+					return
+				end
+
+				target:SetPos(slasher:GetPos())
+
+				target:Freeze(true)
+
+				target:SetNWBool("SurvivorBeingJumpscared", true)
+				slasher:SetNWBool("CanChase", false)
+
+				PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 85, slasher, 1)
+
+				slasher:SetNWBool("SidExecuting", true)
+
+				target:SetNWBool("SurvivorDecapitate", true)
+				target:SetNWBool("SurvivorSidExecution", true)
+
+				target:SetPos(slasher:GetPos())
 				target:SetEyeAngles(Angle(0, pick_ang, 0))
-				slasher:Freeze(true)
 
-				timer.Simple(0.1, function()
+				slasher.KillDelayTick = SlashCoSlasher[slasher:GetNWString("Slasher")].KillDelay
+
+				timer.Simple(1, function()
+					if not IsValid(target) then
+						return
+					end
+
+					target:EmitSound("ambient/voices/citizen_beaten4.wav")
+				end)
+
+				timer.Simple(3, function()
+					if not IsValid(target) then
+						return
+					end
+
+					target:EmitSound("ambient/voices/citizen_beaten3.wav")
+				end)
+
+				timer.Simple(3.95, function()
+					if not IsValid(target) then
+						return
+					end
+
+					target:SetEyeAngles(Angle(0, 180 + pick_ang, 0))
+				end)
+
+				timer.Simple(4.1, function()
 					if not IsValid(slasher) or not IsValid(target) then
 						return
 					end
 
-					target:SetPos(slasher:GetPos())
+					target:SetNWBool("SurvivorBeingJumpscared", false)
 
-					target:Freeze(true)
+					PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
 
-					target:SetNWBool("SurvivorBeingJumpscared", true)
-					slasher:SetNWBool("CanChase", false)
+					slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
+					slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
 
-					PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 85, slasher, 1)
+					local vec, ang = slasher:GetBonePosition(slasher:LookupBone("HandL"))
+					local vPoint = vec
+					local muzzle = EffectData()
+					muzzle:SetOrigin(vPoint + slasher:GetForward() * 8 + Vector(0, 0, 2))
+					muzzle:SetStart(Vector(255, 0, 0))
+					muzzle:SetAttachment(0)
+					util.Effect("sid_muzzle", muzzle)
 
-					slasher:SetNWBool("SidExecuting", true)
+					local shell = EffectData()
+					shell:SetOrigin(vPoint)
+					shell:SetAngles(ang)
+					util.Effect("ShellEject", shell)
 
-					target:SetNWBool("SurvivorDecapitate", true)
-					target:SetNWBool("SurvivorSidExecution", true)
+					target:SetNWBool("SurvivorSidExecution", false)
+					target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
 
-					target:SetPos(slasher:GetPos())
-					target:SetEyeAngles(Angle(0, pick_ang, 0))
-
-					slasher.KillDelayTick = SlashCoSlasher[slasher:GetNWString("Slasher")].KillDelay
-
-					timer.Simple(1, function()
+					target:Freeze(false)
+					target:SetVelocity(slasher:GetForward() * 300)
+					target:SetNotSolid(false)
+					timer.Simple(0.05, function()
 						if not IsValid(target) then
 							return
 						end
 
-						target:EmitSound("ambient/voices/citizen_beaten4.wav")
-					end)
-
-					timer.Simple(3, function()
-						if not IsValid(target) then
-							return
-						end
-
-						target:EmitSound("ambient/voices/citizen_beaten3.wav")
-					end)
-
-					timer.Simple(3.95, function()
-						if not IsValid(target) then
-							return
-						end
-
-						target:SetEyeAngles(Angle(0, 180 + pick_ang, 0))
-					end)
-
-					timer.Simple(4.1, function()
-						if not IsValid(slasher) or not IsValid(target) then
-							return
-						end
-
-						target:SetNWBool("SurvivorBeingJumpscared", false)
-
-						PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
-
-						slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
-						slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
-
-						local vec, ang = slasher:GetBonePosition(slasher:LookupBone("HandL"))
-						local vPoint = vec
-						local muzzle = EffectData()
-						muzzle:SetOrigin(vPoint + slasher:GetForward() * 8 + Vector(0, 0, 2))
-						muzzle:SetStart(Vector(255, 0, 0))
-						muzzle:SetAttachment(0)
-						util.Effect("sid_muzzle", muzzle)
-
-						local shell = EffectData()
-						shell:SetOrigin(vPoint)
-						shell:SetAngles(ang)
-						util.Effect("ShellEject", shell)
-
-						target:SetNWBool("SurvivorSidExecution", false)
-						target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
-
-						target:Freeze(false)
-						target:SetVelocity(slasher:GetForward() * 300)
-						target:SetNotSolid(false)
-						timer.Simple(0.05, function()
-							if not IsValid(target) then
-								return
-							end
-
-							target:Kill()
-						end)
-					end)
-
-					timer.Simple(8, function()
-						if not IsValid(slasher) or not IsValid(target) then
-							return
-						end
-
-						slasher:Freeze(false)
-						slasher:SetNWBool("SidExecuting", false)
-						target:SetNWBool("SurvivorDecapitate", false)
+						target:Kill()
 					end)
 				end)
-			end
+
+				timer.Simple(8, function()
+					if not IsValid(slasher) or not IsValid(target) then
+						return
+					end
+
+					slasher:Freeze(false)
+					slasher:SetNWBool("SidExecuting", false)
+					target:SetNWBool("SurvivorDecapitate", false)
+				end)
+			end)
 		end
 	end
 end
@@ -350,43 +350,45 @@ SlashCoSlasher.Sid.OnSecondaryFire = function(slasher)
 	end
 end
 
-SlashCoSlasher.Sid.OnMainAbilityFire = function(slasher)
+SlashCoSlasher.Sid.OnMainAbilityFire = function(slasher, target)
 	local SO = SlashCo.CurRound.OfferingData.SO
 	local SatO = SlashCo.CurRound.OfferingData.SatO
 
-	if slasher:GetEyeTrace().Entity:GetClass() == "sc_cookie" then
-		local target = slasher:GetEyeTrace().Entity
-
-		if slasher:GetPos():Distance(target:GetPos()) < 150 and not slasher:GetNWBool("SidEating") and not slasher:GetNWBool("SidGun") then
-			slasher:SetNWBool("SidEating", true)
-			slasher.SlasherValue2 = 99
-			slasher:EmitSound("slashco/slasher/sid_cookie" .. math.random(1, 2) .. ".mp3")
-
-			target:SetNWBool("BeingEaten", true)
-
-			timer.Simple(1.3, function()
-				slasher:EmitSound("slashco/slasher/sid_eating.mp3")
-			end)
-
-			slasher:Freeze(true)
-
-			timer.Simple(10, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				slasher:Freeze(false)
-				slasher:SetNWBool("SidEating", false)
-				slasher:SetNWBool("DemonPacified", true)
-				slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
-				slasher.SlasherValue2 = math.random(15, 25)
-
-				if IsValid(target) then
-					target:Remove()
-				end
-			end)
-		end
+	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then
+		return
 	end
+
+	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("SidEating") or slasher:GetNWBool("SidGun") then
+		return
+	end
+
+	slasher:SetNWBool("SidEating", true)
+	slasher.SlasherValue2 = 99
+	slasher:EmitSound("slashco/slasher/sid_cookie" .. math.random(1, 2) .. ".mp3")
+
+	target:SetNWBool("BeingEaten", true)
+
+	timer.Simple(1.3, function()
+		slasher:EmitSound("slashco/slasher/sid_eating.mp3")
+	end)
+
+	slasher:Freeze(true)
+
+	timer.Simple(10, function()
+		if not IsValid(slasher) then
+			return
+		end
+
+		slasher:Freeze(false)
+		slasher:SetNWBool("SidEating", false)
+		slasher:SetNWBool("DemonPacified", true)
+		slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
+		slasher.SlasherValue2 = math.random(15, 25)
+
+		if IsValid(target) then
+			target:Remove()
+		end
+	end)
 end
 
 SlashCoSlasher.Sid.OnSpecialAbilityFire = function(slasher)
@@ -716,7 +718,7 @@ if CLIENT then
 				hud:SetControlVisible("F", true)
 				hud:SetMeterName("satiation", "gun uses")
 				hud:FlashMeter("gun uses")
-				hud:SetTitle("sid with a gun")
+				hud:SetTitle("sid (with a gun)")
 				hud:ShakeControl("F")
 				hud:FlashMeter("gun uses")
 				hud.gunMode = true
@@ -725,7 +727,6 @@ if CLIENT then
 	end
 
 	SlashCoSlasher.Sid.ClientSideEffect = function()
-
 	end
 
 	return

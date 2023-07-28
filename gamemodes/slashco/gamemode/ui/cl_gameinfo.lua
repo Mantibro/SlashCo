@@ -1,5 +1,3 @@
-include( "ui/fonts.lua" )
-
 hook.Add("HUDPaint", "GameInfo_Info", function()
 
 	if LocalPlayer():Team() ~= TEAM_LOBBY then return end

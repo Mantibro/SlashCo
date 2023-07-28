@@ -1,5 +1,3 @@
-include( "ui/fonts.lua" )
-
 net.Receive( "mantislashcoGameIntro", function( _, _ )
 	local introtable = net.ReadTable()
 

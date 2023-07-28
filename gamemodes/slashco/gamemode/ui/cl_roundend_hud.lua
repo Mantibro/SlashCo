@@ -1,5 +1,3 @@
-include( "ui/fonts.lua" )
-
 net.Receive( "mantislashcoRoundEnd", function( _, _ )
 	local retable = net.ReadTable()
 

@@ -28,30 +28,13 @@ SlashCoSlasher.Tyler.DiffRating = "★★★★☆"
 
 SlashCoSlasher.Tyler.OnSpawn = function(slasher)
 	slasher.SlasherValue1 = 0
-
 	slasher:SetColor(Color(0, 0, 0, 0))
 	slasher:DrawShadow(false)
 	slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 	slasher:SetNoDraw(true)
-
-	local userid = slasher:UserID()
-	hook.Add("ShouldCollide", "SlashCoTylerSpecter_" .. userid, function(ent1, ent2)
-		if not IsValid(slasher) or slasher:Team() ~= TEAM_SLASHER then
-			hook.Remove("ShouldCollide", "SlashCoTylerSpecter_" .. userid)
-			return
-		end
-
-		if ent1 == slasher and ent2:IsPlayer() then
-			return false
-		end
-
-		if ent2 == slasher and ent1:IsPlayer() then
-			return false
-		end
-	end)
 end
 
-SlashCoSlasher.Tyler.PickUpAttempt = function(ply)
+SlashCoSlasher.Tyler.PickUpAttempt = function()
 	return false
 end
 
@@ -83,12 +66,12 @@ SlashCoSlasher.Tyler.OnTickBehaviour = function(slasher)
 		slasher:SetBodygroup(0, 0)
 		slasher.SlasherValue2 = 0
 		slasher:SetNWBool("CanKill", false)
-		slasher:SetCustomCollisionCheck(true)
+		slasher:SetImpervious(true)
 		final_perception = 6.0
 	elseif v1 == 1 then
 		--Creator
 
-		slasher:SetCustomCollisionCheck(false)
+		slasher:SetImpervious(false)
 		slasher:SetNWBool("TylerFlash", false)
 
 		slasher:SetSlowWalkSpeed(1)
@@ -291,7 +274,7 @@ SlashCoSlasher.Tyler.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
 
-SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
+SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher, target)
 	if slasher.SlasherValue1 ~= 3 then
 		return
 	end
@@ -304,129 +287,133 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher)
 		return
 	end
 
-	if slasher:GetEyeTrace().Entity then
-		local target = slasher:GetEyeTrace().Entity
+	if not IsValid(target) then
+		return
+	end
 
-		if (not target:IsPlayer() and target.PingType ~= "ITEM") or target:GetClass() == "sc_beacon" then
-			return
+	if (not target:IsPlayer() and target.PingType ~= "ITEM") or target:GetClass() == "sc_beacon" then
+		return
+	end
+
+	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlasher.Tyler.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then
+		return
+	end
+
+	target:SetNWBool("SurvivorBeingJumpscared", true)
+	target:SetNWBool("SurvivorJumpscare_Tyler", true)
+
+	slasher:EmitSound(SlashCoSlasher[slasher:GetNWString("Slasher")].KillSound)
+
+	if target:IsPlayer() then
+		target:Freeze(true)
+	end
+	slasher:Freeze(true)
+
+	slasher.KillDelayTick = SlashCoSlasher.Tyler.KillDelay
+	slasher.SlasherValue2 = 0
+
+	timer.Simple(SlashCoSlasher[slasher:GetNWString("Slasher")].JumpscareDuration, function()
+		for i = 1, #player.GetAll() do
+			local ply = player.GetAll()[i]
+			ply:SetNWBool("DisplayTylerTheDestroyerEffects", false)
 		end
 
-		if slasher:GetPos():Distance(target:GetPos()) < SlashCoSlasher.Tyler.KillDistance and not target:GetNWBool("SurvivorBeingJumpscared") then
-			target:SetNWBool("SurvivorBeingJumpscared", true)
-			target:SetNWBool("SurvivorJumpscare_Tyler", true)
+		if IsValid(slasher) then
+			slasher:Freeze(false)
+			slasher.SlasherValue4 = slasher.SlasherValue4 + 1
+			slasher.SlasherValue1 = 0
 
-			slasher:EmitSound(SlashCoSlasher[slasher:GetNWString("Slasher")].KillSound)
+			slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
+			slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
+			timer.Simple(0.1, function()
+				if not IsValid(slasher) then
+					return
+				end
+
+				slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
+				slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
+			end)
+
+			slasher:SetColor(Color(0, 0, 0, 0))
+			slasher:DrawShadow(false)
+			slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
+			slasher:SetNoDraw(true)
+			slasher:SetNWBool("TylerFlash", false)
+		end
+
+		if IsValid(target) then
+			target:SetNWBool("SurvivorBeingJumpscared", false)
+			target:SetNWBool("SurvivorJumpscare_Tyler", false)
 
 			if target:IsPlayer() then
-				target:Freeze(true)
+				target:Freeze(false)
+				target:Kill()
 			end
-			slasher:Freeze(true)
 
-			slasher.KillDelayTick = SlashCoSlasher.Tyler.KillDelay
-			slasher.SlasherValue2 = 0
-
-			timer.Simple(SlashCoSlasher[slasher:GetNWString("Slasher")].JumpscareDuration, function()
-				for i = 1, #player.GetAll() do
-					local ply = player.GetAll()[i]
-					ply:SetNWBool("DisplayTylerTheDestroyerEffects", false)
+			timer.Simple(FrameTime(), function()
+				if not IsValid(target) then
+					print("how")
+					return
 				end
 
-				if IsValid(slasher) then
-					slasher:Freeze(false)
-					slasher.SlasherValue4 = slasher.SlasherValue4 + 1
-					slasher.SlasherValue1 = 0
-
-					slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
-					slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
-					timer.Simple(0.1, function()
-						if not IsValid(slasher) then
-							return
-						end
-
-						slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
-						slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
-					end)
-
-					slasher:SetColor(Color(0, 0, 0, 0))
-					slasher:DrawShadow(false)
-					slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
-					slasher:SetNoDraw(true)
-					slasher:SetNWBool("TylerFlash", false)
-				end
-
-				if IsValid(target) then
-					target:SetNWBool("SurvivorBeingJumpscared", false)
-					target:SetNWBool("SurvivorJumpscare_Tyler", false)
-
-					if target:IsPlayer() then
-						target:Freeze(false)
-						target:Kill()
+				local corpse
+				if target:IsPlayer() then
+					corpse = target.DeadBody
+				else
+					corpse = target
+					if IsValid(slasher) then
+						slasher.SlasherValue4 = slasher.SlasherValue4 + 0.5
 					end
-
-					timer.Simple(FrameTime(), function()
-						if not IsValid(target) or not IsValid(slasher) then
-							print("how")
-							return
-						end
-
-						local corpse
-						if target:IsPlayer() then
-							corpse = target.DeadBody
-						else
-							corpse = target
-							if IsValid(slasher) then
-								slasher.SlasherValue4 = slasher.SlasherValue4 + 0.5
-							end
-						end
-
-						if not IsValid(corpse) then
-							return
-						end
-
-						local dissolver = ents.Create("env_entity_dissolver")
-						timer.Simple(2, function()
-							if IsValid(dissolver) then
-								dissolver:Remove() -- backup edict save on error
-							end
-						end)
-
-						dissolver.Target = "dissolve" .. corpse:EntIndex()
-						dissolver:SetKeyValue("dissolvetype", 0)
-						dissolver:SetKeyValue("magnitude", 1)
-						dissolver:SetPos(corpse:GetPos())
-						dissolver:SetPhysicsAttacker(slasher)
-						dissolver:Spawn()
-
-						corpse:SetName(dissolver.Target)
-						dissolver:Fire("Dissolve", dissolver.Target, 0)
-						dissolver:Fire("Kill", "", 1)
-					end)
 				end
+
+				if not IsValid(corpse) then
+					return
+				end
+
+				local dissolver = ents.Create("env_entity_dissolver")
+				timer.Simple(2, function()
+					if IsValid(dissolver) then
+						dissolver:Remove() -- backup edict save on error
+					end
+				end)
+
+				dissolver.Target = "dissolve" .. corpse:EntIndex()
+				dissolver:SetKeyValue("dissolvetype", 0)
+				dissolver:SetKeyValue("magnitude", 1)
+				dissolver:SetPos(corpse:GetPos())
+				dissolver:SetPhysicsAttacker(slasher)
+				dissolver:Spawn()
+
+				corpse:SetName(dissolver.Target)
+				dissolver:Fire("Dissolve", dissolver.Target, 0)
+				dissolver:Fire("Kill", "", 1)
 			end)
 		end
-	end
+	end)
 end
 
 SlashCoSlasher.Tyler.OnSecondaryFire = function()
 end
 
 SlashCoSlasher.Tyler.OnMainAbilityFire = function(slasher)
-	if slasher.SlasherValue1 == 0 then
-		slasher.SlasherValue1 = 1
-
-		--local song = math.random(1,6)
-
-		slasher:SetColor(Color(255, 255, 255, 255))
-		slasher:DrawShadow(true)
-		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
-		slasher:SetNoDraw(false)
-
-		--PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[game.GetMap()].SIZE)), slasher, 0.8 - (slasher.SlasherValue3 * 0.05))
-
-		--slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..song..".mp3")
-		--slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[game.GetMap()].SIZE)) )
-		--slasher.TylerSong:ChangeVolume( 0.8 - (slasher.SlasherValue3 * 0.05))
+	if slasher.SlasherValue1 ~= 0 then
+		return
 	end
+
+	slasher.SlasherValue1 = 1
+
+	--local song = math.random(1,6)
+
+	slasher:SetColor(Color(255, 255, 255, 255))
+	slasher:DrawShadow(true)
+	slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
+	slasher:SetNoDraw(false)
+
+	--PlayGlobalSound("slashco/slasher/tyler_song_"..song..".mp3", 90 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[game.GetMap()].SIZE)), slasher, 0.8 - (slasher.SlasherValue3 * 0.05))
+
+	--slasher.TylerSong = CreateSound( slasher, "slashco/slasher/tyler_song_"..song..".mp3")
+	--slasher.TylerSong:SetSoundLevel( 85 - (math.sqrt(slasher.SlasherValue3) * (25 / SCInfo.Maps[game.GetMap()].SIZE)) )
+	--slasher.TylerSong:ChangeVolume( 0.8 - (slasher.SlasherValue3 * 0.05))
 end
 
 SlashCoSlasher.Tyler.OnSpecialAbilityFire = function()

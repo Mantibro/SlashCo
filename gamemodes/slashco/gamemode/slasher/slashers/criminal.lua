@@ -93,8 +93,8 @@ SlashCoSlasher.Criminal.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
 
-SlashCoSlasher.Criminal.OnPrimaryFire = function(slasher)
-	SlashCo.Jumpscare(slasher)
+SlashCoSlasher.Criminal.OnPrimaryFire = function(slasher, target)
+	SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.Criminal.OnSecondaryFire = function(slasher)

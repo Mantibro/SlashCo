@@ -213,9 +213,9 @@ SlashCoSlasher.Trollge.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
 
-SlashCoSlasher.Trollge.OnPrimaryFire = function(slasher)
+SlashCoSlasher.Trollge.OnPrimaryFire = function(slasher, target)
 	if slasher.SlasherValue1 ~= 0 then
-		SlashCo.Jumpscare(slasher)
+		SlashCo.Jumpscare(slasher, target)
 		return
 	end
 

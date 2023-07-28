@@ -172,10 +172,8 @@ SlashCoSlasher.Manspider.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Manspider.Perception)
 end
 
-SlashCoSlasher.Manspider.OnPrimaryFire = function(slasher)
-	local target = slasher:GetEyeTrace().Entity
-
-	if not target:IsPlayer() then
+SlashCoSlasher.Manspider.OnPrimaryFire = function(slasher, target)
+	if not IsValid(target) or not target:IsPlayer() then
 		return
 	end
 
@@ -183,7 +181,7 @@ SlashCoSlasher.Manspider.OnPrimaryFire = function(slasher)
 		slasher:ChatPrint("You can only kill your Prey.")
 		return
 	else
-		SlashCo.Jumpscare(slasher)
+		SlashCo.Jumpscare(slasher, target)
 	end
 end
 

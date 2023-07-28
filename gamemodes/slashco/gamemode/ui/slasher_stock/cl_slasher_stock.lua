@@ -594,6 +594,14 @@ function PANEL:MakeGeneratorsCard()
 						v1:SizeTo(100, 100, 0.25, 0, 0.5)
 					end
 					gen.HasCenter = true
+
+					timer.Create("SlashCoOrientEntries", 0.26, 1, function()
+						for _, v1 in ipairs(gen.Entries) do
+							local x, y = unpack(v1.CenteredPos)
+							v1:SetPos(x, y)
+							v1:SetSize(100, 100)
+						end
+					end)
 				end
 			else
 				if gen.HasCenter then
@@ -603,6 +611,14 @@ function PANEL:MakeGeneratorsCard()
 						v1:SizeTo(50, 50, 0.25, 0, 1.5)
 					end
 					gen.HasCenter = false
+
+					timer.Create("SlashCoOrientEntries", 0.26, 1, function()
+						for _, v1 in ipairs(gen.Entries) do
+							local x, y = unpack(v1.DefaultPos)
+							v1:SetPos(x, y)
+							v1:SetSize(50, 50)
+						end
+					end)
 				end
 			end
 		end

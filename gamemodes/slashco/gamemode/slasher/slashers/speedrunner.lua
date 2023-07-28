@@ -69,8 +69,8 @@ SlashCoSlasher.Speedrunner.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Speedrunner.Perception)
 end
 
-SlashCoSlasher.Speedrunner.OnPrimaryFire = function(slasher)
-	SlashCo.Jumpscare(slasher)
+SlashCoSlasher.Speedrunner.OnPrimaryFire = function(slasher, target)
+	SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.Speedrunner.OnSecondaryFire = function(slasher)

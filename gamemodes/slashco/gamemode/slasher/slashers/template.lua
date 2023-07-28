@@ -41,8 +41,8 @@ SlashCoSlasher.ZYZZ.OnTickBehaviour = function(slasher)
     slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.ZYZZ.Perception)
 end
 
-SlashCoSlasher.ZYZZ.OnPrimaryFire = function(slasher)
-    --SlashCo.Jumpscare(slasher)
+SlashCoSlasher.ZYZZ.OnPrimaryFire = function(slasher, target)
+    --SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.ZYZZ.OnSecondaryFire = function(slasher)

@@ -74,7 +74,6 @@ SlashCoSlasher.Watcher.OnTickBehaviour = function(slasher)
 	local isSeen = false
 
 	for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-
 		if v1 > 0 then
 			if not surv:GetNWBool("SurvivorWatcherSurveyed") then
 				surv:SetNWBool("SurvivorWatcherSurveyed", true)
@@ -84,11 +83,11 @@ SlashCoSlasher.Watcher.OnTickBehaviour = function(slasher)
 				surv:SetNWBool("SurvivorWatcherSurveyed", false)
 			end
 
-			local find = ents.FindInCone(surv:GetPos(), surv:GetEyeTrace().Normal, 3000, 0.5)
-
+			local trace = surv:GetEyeTrace()
+			local find = ents.FindInCone(surv:GetPos(), trace.Normal, 3000, 0.5)
 			local target
 
-			if surv:GetEyeTrace().Entity == slasher then
+			if trace.Entity == slasher then
 				target = slasher
 				goto FOUND
 			end
@@ -130,11 +129,12 @@ SlashCoSlasher.Watcher.OnTickBehaviour = function(slasher)
 
 	--Stalk Survivors
 
-	local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, 1500, 0.85)
+	local trace = slasher:GetEyeTrace()
+	local find = ents.FindInCone(slasher:GetPos(), trace.Normal, 1500, 0.85)
 	local target
 
-	if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR then
-		target = slasher:GetEyeTrace().Entity
+	if trace.Entity:IsPlayer() and trace.Entity:Team() == TEAM_SURVIVOR then
+		target = trace.Entity
 		goto FOUND
 	end
 
@@ -184,8 +184,8 @@ SlashCoSlasher.Watcher.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Watcher.Perception)
 end
 
-SlashCoSlasher.Watcher.OnPrimaryFire = function(slasher)
-	SlashCo.Jumpscare(slasher)
+SlashCoSlasher.Watcher.OnPrimaryFire = function(slasher, target)
+	SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.Watcher.OnSecondaryFire = function(slasher)

@@ -80,15 +80,15 @@ SlashCoSlasher.Bababooey.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Bababooey.Perception)
 end
 
-SlashCoSlasher.Bababooey.OnPrimaryFire = function(slasher)
-	SlashCo.Jumpscare(slasher)
+SlashCoSlasher.Bababooey.OnPrimaryFire = function(slasher, target)
+	SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.Bababooey.OnSecondaryFire = function(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
+SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher, target)
 	local SO = SlashCo.CurRound.OfferingData.SO
 
 	local cooldown = slasher.SlasherValue1
@@ -135,9 +135,7 @@ SlashCoSlasher.Bababooey.OnMainAbilityFire = function(slasher)
 		--slasher:SlasherHudFunc("ShakeControl", "R")
 
 		--Spook Appear
-		if slasher:GetEyeTrace().Entity:IsPlayer() then
-			local target = slasher:GetEyeTrace().Entity
-
+		if IsValid(target) and target:IsPlayer() then
 			if target:Team() ~= TEAM_SURVIVOR then
 				goto SKIP
 			end

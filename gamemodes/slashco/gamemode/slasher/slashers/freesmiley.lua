@@ -51,8 +51,8 @@ SlashCoSlasher.FreeSmiley.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.FreeSmiley.Perception)
 end
 
-SlashCoSlasher.FreeSmiley.OnPrimaryFire = function(slasher)
-	SlashCo.Jumpscare(slasher)
+SlashCoSlasher.FreeSmiley.OnPrimaryFire = function(slasher, target)
+	SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.FreeSmiley.OnSecondaryFire = function(slasher)

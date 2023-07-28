@@ -92,7 +92,7 @@ SlashCoSlasher.Princess.OnTickBehaviour = function(slasher)
 			if v1 >= 95 then
 				SlashCo.BustDoor(slasher, lookent, 50000)
 			elseif v1 >= 50 then
-				SlashCo.SlamDoor(lookent, slasher)
+				slasher:SlamDoor(lookent)
 			end
 
 			if lookent:GetClass() == "func_breakable" or lookent:GetClass() == "func_breakable_surf" then

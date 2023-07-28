@@ -161,24 +161,24 @@ SlashCoSlasher.Abomignat.OnPrimaryFire = function(slasher)
 		slasher:Freeze(true)
 		slasher.SlasherValue2 = 0
 
-		if SERVER then
-			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
-					Vector(-30, -30, -60), Vector(30, 30, 60), 35, DMG_SLASH, 5, false)
+		slasher:LagCompensation(true)
+		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
+				Vector(-30, -30, -60), Vector(30, 30, 60), 35, DMG_SLASH, 5, false)
+		slasher:LagCompensation(false)
 
-			SlashCo.BustDoor(slasher, target, 20000)
+		SlashCo.BustDoor(slasher, target, 20000)
 
-			if target:IsPlayer() then
-				if target:Team() ~= TEAM_SURVIVOR then
-					return
-				end
-
-				local vPoint = target:GetPos() + Vector(0, 0, 50)
-				local bloodfx = EffectData()
-				bloodfx:SetOrigin(vPoint)
-				util.Effect("BloodImpact", bloodfx)
-
-				target:EmitSound("slashco/slasher/trollge_hit.wav")
+		if not IsValid(target) or target:IsPlayer() then
+			if target:Team() ~= TEAM_SURVIVOR then
+				return
 			end
+
+			local vPoint = target:GetPos() + Vector(0, 0, 50)
+			local bloodfx = EffectData()
+			bloodfx:SetOrigin(vPoint)
+			util.Effect("BloodImpact", bloodfx)
+
+			target:EmitSound("slashco/slasher/trollge_hit.wav")
 		end
 
 		timer.Simple(1.3, function()

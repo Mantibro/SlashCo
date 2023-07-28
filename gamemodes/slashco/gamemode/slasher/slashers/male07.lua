@@ -141,9 +141,9 @@ SlashCoSlasher.Male07.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", perception_final)
 end
 
-SlashCoSlasher.Male07.OnPrimaryFire = function(slasher)
+SlashCoSlasher.Male07.OnPrimaryFire = function(slasher, target)
 	if slasher.SlasherValue1 == 1 then
-		SlashCo.Jumpscare(slasher)
+		SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
@@ -200,40 +200,36 @@ SlashCoSlasher.Male07.OnSecondaryFire = function(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SlashCoSlasher.Male07.OnMainAbilityFire = function(slasher)
+SlashCoSlasher.Male07.OnMainAbilityFire = function(slasher, target)
 	if slasher.SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then
 		return
 	end
 
-	if slasher.SlasherValue1 == 0 and slasher:GetEyeTrace().Entity:GetClass() == "sc_maleclone" then
-		local target = slasher:GetEyeTrace().Entity
+	if IsValid(target) and target:GetClass() == "sc_maleclone" and slasher:GetPos():Distance(target:GetPos()) < 150 then
+		slasher:EmitSound("slashco/slasher/male07_possess.mp3")
 
-		if slasher:GetPos():Distance(target:GetPos()) < 150 then
-			slasher:EmitSound("slashco/slasher/male07_possess.mp3")
+		slasher:SetPos(target:GetPos())
+		slasher:SetEyeAngles(target:EyeAngles())
+		target:Remove()
 
-			slasher:SetPos(target:GetPos())
-			slasher:SetEyeAngles(target:EyeAngles())
-			target:Remove()
+		local modelname = "models/Humans/Group01/male_07.mdl"
+		util.PrecacheModel(modelname)
+		slasher:SetModel(modelname)
 
-			local modelname = "models/Humans/Group01/male_07.mdl"
-			util.PrecacheModel(modelname)
-			slasher:SetModel(modelname)
+		slasher:SetColor(Color(255, 255, 255, 255))
+		slasher:DrawShadow(true)
+		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
+		slasher:SetNoDraw(false)
+		slasher:SetMoveType(MOVETYPE_WALK)
 
-			slasher:SetColor(Color(255, 255, 255, 255))
-			slasher:DrawShadow(true)
-			slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
-			slasher:SetNoDraw(false)
-			slasher:SetMoveType(MOVETYPE_WALK)
+		slasher.SlasherValue1 = 1
+		slasher.CurrentChaseTick = 0
+		slasher.SlasherValue3 = 3
 
-			slasher.SlasherValue1 = 1
-			slasher.CurrentChaseTick = 0
-			slasher.SlasherValue3 = 3
+		slasher:SetWalkSpeed(100)
+		slasher:SetRunSpeed(100)
 
-			slasher:SetWalkSpeed(100)
-			slasher:SetRunSpeed(100)
-
-			return
-		end
+		return
 	end
 
 	if slasher.SlasherValue1 > 0 then

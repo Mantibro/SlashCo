@@ -151,8 +151,8 @@ SlashCoSlasher.Dolphinman.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Dolphinman.Perception + (hunt_boost * 3))
 end
 
-SlashCoSlasher.Dolphinman.OnPrimaryFire = function(slasher)
-	if SlashCo.Jumpscare(slasher) then
+SlashCoSlasher.Dolphinman.OnPrimaryFire = function(slasher, target)
+	if SlashCo.Jumpscare(slasher, target) then
 		slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 25)
 	end
 end

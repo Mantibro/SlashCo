@@ -1,5 +1,21 @@
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
+
+AddCSLuaFile("ui/fonts.lua")
+AddCSLuaFile("ui/cl_scoreboard.lua")
+AddCSLuaFile("cl_headbob.lua")
+AddCSLuaFile("ui/cl_lobbyhud.lua")
+AddCSLuaFile("ui/cl_survivor_hud.lua")
+AddCSLuaFile("ui/cl_slasher_ui.lua")
+AddCSLuaFile("slasher/cl_slasher_picker.lua")
+AddCSLuaFile("ui/cl_item_picker.lua")
+AddCSLuaFile("ui/cl_offering_picker.lua")
+AddCSLuaFile("ui/cl_intro_hud.lua")
+AddCSLuaFile("ui/cl_roundend_hud.lua")
+AddCSLuaFile("ui/cl_offervote_hud.lua")
+AddCSLuaFile("ui/cl_spectator_hud.lua")
+AddCSLuaFile("ui/cl_playermodel_picker.lua")
+AddCSLuaFile("ui/cl_gameinfo.lua")
 AddCSLuaFile("ui/cl_voiceselect.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_stock.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
@@ -22,6 +38,7 @@ include("concommands.lua")
 include("ply_voicelines.lua")
 include("survivor_func.lua")
 include("sh_values.lua")
+include("sh_doors.lua")
 include("items/sv_playerspeed.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 
@@ -251,229 +268,203 @@ function GM:Initialize()
 	end
 end
 
-hook.Add("AllowPlayerPickup", "PickupNotSpectator", function(ply, _)
+hook.Add("AllowPlayerPickup", "PickupNotSpectator", function(ply, ent)
 	if ply:Team() == TEAM_SLASHER then
-		if type(SlashCoSlasher[ply:GetNWString("Slasher")].PickUpAttempt) == "function" then
-			return SlashCoSlasher[ply:GetNWString("Slasher")].PickUpAttempt(ply)
-		end
+		return ply:SlasherFunction("PickUpAttempt", ent)
 	end
 
 	return (ply:Team() ~= TEAM_SPECTATOR)
 end)
 
-function GM:PlayerButtonDown(ply, button)
-	if ply:Team() == TEAM_SPECTATOR then
-		if button == 107 then
-			--Spectator Left Clicks
-			if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then
-				--Stop spectating if already spectating a player.
-				local pos = ply:GetPos()
-				local eyeang = ply:EyeAngles()
+--lag-compensated eye trace for use in slasher functions
+local function lagTrace(ply)
+	ply:LagCompensation(true)
+	local tr = util.GetPlayerTrace(ply)
+	ply:LagCompensation(false)
 
-				ply:UnSpectate()
-				ply:Spawn()
-				ply:SetPos(pos)
-				ply:SetEyeAngles(eyeang)
+	return tr.Entity
+end
+
+local function lobbyButtons(ply, button)
+	if SlashCo.LobbyData.LOBBYSTATE == 0 then
+		if ply:Team() == TEAM_LOBBY and button == 92 then
+			if getReadyState(ply) ~= 1 then
+				ply:ChatPrint("Now ready as Survivor.")
+				lobbyPlayerReadying(ply, 1)
+				broadcastLobbyInfo()
 			else
-				--Spectate the player aimed at
-				local ent = ply:GetEyeTrace().Entity
-
-				if ent:IsPlayer() then
-					--Only allow spectators to spectate other players.
-					ply:SpectateEntity(ent)
-					ply:SetObserverMode(OBS_MODE_CHASE)
-				end
+				ply:ChatPrint("You are no longer ready.")
+				lobbyPlayerReadying(ply, 0)
+				broadcastLobbyInfo()
 			end
+			local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+			Sndd:Play()
+			Sndd:ChangeVolume(0.5, 0)
+			Sndd:ChangePitch(100, 0)
 		end
 
-		if button == 108 then
-			--Spectator Right Clicks
-			if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then
-
-				local ent = ply:GetObserverTarget()
-
-				for k, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-
-					if ply:GetObserverTarget() == v then
-						if (k + 1) >= team.NumPlayers(TEAM_SURVIVOR) then
-							ent = team.GetPlayers(TEAM_SURVIVOR)[1]
-						else
-							ent = team.GetPlayers(TEAM_SURVIVOR)[k + 1]
-						end
-
-					end
-
+		if ply:Team() == TEAM_LOBBY and button == 93 then
+			if getReadyState(ply) ~= 2 then
+				--Check if the player has made an offering or agreed to one
+				if isPlyOfferer(ply) then
+					ply:ChatPrint("Cannot ready as Slasher as you have either made or agreed to an Offering.")
+					local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+					Sndd:Play()
+					Sndd:ChangeVolume(0.5, 0)
+					Sndd:ChangePitch(65, 0)
+					return
 				end
 
-				if ent:IsPlayer() then
-					ply:SpectateEntity(ent)
-					--ply:SetObserverMode( OBS_MODE_CHASE )
-				end
+				ply:ChatPrint("Now ready as Slasher.")
+				lobbyPlayerReadying(ply, 2)
+				broadcastLobbyInfo()
+				local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+				Sndd:Play()
+				Sndd:ChangeVolume(0.5, 0)
+				Sndd:ChangePitch(100, 0)
 			else
-				if IsValid(team.GetPlayers(TEAM_SURVIVOR)[1]) then
-					ply:SpectateEntity(team.GetPlayers(TEAM_SURVIVOR)[1])
-					ply:SetObserverMode(OBS_MODE_CHASE)
-				end
-			end
-		end
-
-		if button == 65 then
-			--Spectator presses Space, cycles camera modes.
-			if ply:GetObserverMode() == OBS_MODE_CHASE then
-				ply:SetObserverMode(OBS_MODE_IN_EYE)
-			elseif ply:GetObserverMode() == OBS_MODE_IN_EYE then
-				ply:SetObserverMode(OBS_MODE_CHASE)
-			end
-		end
-	end
-
-	if game.GetMap() == "sc_lobby" then
-		--Lobby-Specific binds
-
-		--Ready States
-		if SlashCo.LobbyData.LOBBYSTATE == 0 then
-			if ply:Team() == TEAM_LOBBY and button == 92 then
-				if getReadyState(ply) ~= 1 then
-					ply:ChatPrint("Now ready as Survivor.")
-					lobbyPlayerReadying(ply, 1)
-					broadcastLobbyInfo()
-				else
-					ply:ChatPrint("You are no longer ready.")
-					lobbyPlayerReadying(ply, 0)
-					broadcastLobbyInfo()
-				end
+				ply:ChatPrint("You are no longer ready.")
+				lobbyPlayerReadying(ply, 0)
+				broadcastLobbyInfo()
 				local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 				Sndd:Play()
 				Sndd:ChangeVolume(0.5, 0)
 				Sndd:ChangePitch(100, 0)
 			end
-
-			if ply:Team() == TEAM_LOBBY and button == 93 then
-				if getReadyState(ply) ~= 2 then
-
-					--Check if the player has made an offering or agreed to one
-					if isPlyOfferer(ply) then
-						ply:ChatPrint("Cannot ready as Slasher as you have either made or agreed to an Offering.")
-						local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
-						Sndd:Play()
-						Sndd:ChangeVolume(0.5, 0)
-						Sndd:ChangePitch(65, 0)
-						return
-					end
-
-					ply:ChatPrint("Now ready as Slasher.")
-					lobbyPlayerReadying(ply, 2)
-					broadcastLobbyInfo()
-					local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
-					Sndd:Play()
-					Sndd:ChangeVolume(0.5, 0)
-					Sndd:ChangePitch(100, 0)
-				else
-					ply:ChatPrint("You are no longer ready.")
-					lobbyPlayerReadying(ply, 0)
-					broadcastLobbyInfo()
-					local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
-					Sndd:Play()
-					Sndd:ChangeVolume(0.5, 0)
-					Sndd:ChangePitch(100, 0)
-				end
-			end
-
-			if ply:Team() == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferer(ply) then
-				SlashCo.OfferingVote(ply, true)
-				SlashCo.EndOfferingVote(ply)
-				ply:ChatPrint("You agree to the Offering.")
-			end
 		end
 
-		--Switching Teams
-		if button == 58 and SlashCo.LobbyData.LOBBYSTATE == 0 then
-			if ply:Team() == TEAM_SPECTATOR then
-				if (#team.GetPlayers(TEAM_LOBBY) < SlashCo.MAXPLAYERS) then
-					ply:SetTeam(TEAM_LOBBY)
-					ply:Spawn()
-					ply:ChatPrint("Now joining the Lobby...")
-					local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
-					Sndd:Play()
-					Sndd:ChangeVolume(0.5, 0)
-					Sndd:ChangePitch(80, 0)
-				else
-					ply:ChatPrint("The Lobby is currently full.")
-					local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
-					Sndd:Play()
-					Sndd:ChangeVolume(0.5, 0)
-					Sndd:ChangePitch(65, 0)
-				end
-			elseif ply:Team() == TEAM_LOBBY then
-				ply:SetTeam(TEAM_SPECTATOR)
+		if ply:Team() == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferer(ply) then
+			SlashCo.OfferingVote(ply, true)
+			SlashCo.EndOfferingVote(ply)
+			ply:ChatPrint("You agree to the Offering.")
+		end
+	end
+
+	--Switching Teams
+	if button == 58 and SlashCo.LobbyData.LOBBYSTATE == 0 then
+		if ply:Team() == TEAM_SPECTATOR then
+			if (#team.GetPlayers(TEAM_LOBBY) < SlashCo.MAXPLAYERS) then
+				ply:SetTeam(TEAM_LOBBY)
 				ply:Spawn()
-				ply:ChatPrint("Now joining Spectators...")
+				ply:ChatPrint("Now joining the Lobby...")
 				local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 				Sndd:Play()
 				Sndd:ChangeVolume(0.5, 0)
 				Sndd:ChangePitch(80, 0)
+			else
+				ply:ChatPrint("The Lobby is currently full.")
+				local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+				Sndd:Play()
+				Sndd:ChangeVolume(0.5, 0)
+				Sndd:ChangePitch(65, 0)
 			end
-		end
-	else
-		--Usage of Items
-
-		if ply:Team() == TEAM_SURVIVOR then
-			if button == 28 then
-				SlashCo.UseItem(ply)
-			end --Using their Item
-			if button == 27 then
-				SlashCo.DropItem(ply)
-			end --Dropping their Item
-		end
-
-		--Slasher General Binds
-
-		if ply:Team() == TEAM_SLASHER then
-			if button == 107 then
-				if type(SlashCoSlasher[ply:GetNWString("Slasher")].OnPrimaryFire) ~= "function" then
-					return
-				end
-				SlashCoSlasher[ply:GetNWString("Slasher")].OnPrimaryFire(ply)
-			end --Killing / Damaging
-			if button == 108 then
-				if type(SlashCoSlasher[ply:GetNWString("Slasher")].OnSecondaryFire) ~= "function" then
-					return
-				end
-				SlashCoSlasher[ply:GetNWString("Slasher")].OnSecondaryFire(ply)
-			end --Activate Chase Mode
-			if button == 28 then
-				if type(SlashCoSlasher[ply:GetNWString("Slasher")].OnMainAbilityFire) ~= "function" then
-					return
-				end
-				SlashCoSlasher[ply:GetNWString("Slasher")].OnMainAbilityFire(ply)
-			end --Main Ability
-			if button == 16 then
-				if type(SlashCoSlasher[ply:GetNWString("Slasher")].OnSpecialAbilityFire) ~= "function" then
-					return
-				end
-				SlashCoSlasher[ply:GetNWString("Slasher")].OnSpecialAbilityFire(ply)
-			end --Special
+		elseif ply:Team() == TEAM_LOBBY then
+			ply:SetTeam(TEAM_SPECTATOR)
+			ply:Spawn()
+			ply:ChatPrint("Now joining Spectators...")
+			local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+			Sndd:Play()
+			Sndd:ChangeVolume(0.5, 0)
+			Sndd:ChangePitch(80, 0)
 		end
 	end
+end
+local function spectatorButtons(ply, button)
+	if button == 107 then
+		--Spectator Left Clicks
+		if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then
+			--Stop spectating if already spectating a player.
+			local pos = ply:GetPos()
+			local eyeang = ply:EyeAngles()
 
-	if ply:Team() == TEAM_SURVIVOR then
-		--Taunts
+			ply:UnSpectate()
+			ply:Spawn()
+			ply:SetPos(pos)
+			ply:SetEyeAngles(eyeang)
+		else
+			--Spectate the player aimed at
+			local ent = ply:GetEyeTrace().Entity
 
-		if button == 1 then
-			ply:SetNWBool("Taunt_Cali", true) --California girls
-			return
-		elseif button == 2 then
-			ply:SetNWBool("Taunt_MNR", true) --Monday Night
-			return
-		elseif button == 3 then
-			ply:SetNWBool("Taunt_Griddy", true) --Hittin the griddy
-			return
-		elseif ply:GetNWBool("Taunt_MNR") or ply:GetNWBool("Taunt_Griddy") then
-			ply:SetNWBool("Taunt_MNR", false)
-			if button ~= 33 then
-				ply:SetNWBool("Taunt_Griddy", false)
+			if ent:IsPlayer() then
+				--Only allow spectators to spectate other players.
+				ply:SpectateEntity(ent)
+				ply:SetObserverMode(OBS_MODE_CHASE)
 			end
 		end
+
+		return
+	end
+
+	if button == 108 then
+		--Spectator Right Clicks
+		if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then
+			local ent = ply:GetObserverTarget()
+			for k, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+				if ply:GetObserverTarget() == v then
+					if (k + 1) >= team.NumPlayers(TEAM_SURVIVOR) then
+						ent = team.GetPlayers(TEAM_SURVIVOR)[1]
+					else
+						ent = team.GetPlayers(TEAM_SURVIVOR)[k + 1]
+					end
+				end
+			end
+
+			if ent:IsPlayer() then
+				ply:SpectateEntity(ent)
+				--ply:SetObserverMode( OBS_MODE_CHASE )
+			end
+		else
+			if IsValid(team.GetPlayers(TEAM_SURVIVOR)[1]) then
+				ply:SpectateEntity(team.GetPlayers(TEAM_SURVIVOR)[1])
+				ply:SetObserverMode(OBS_MODE_CHASE)
+			end
+		end
+
+		return
+	end
+
+	if button == 65 then
+		--Spectator presses Space, cycles camera modes.
+		if ply:GetObserverMode() == OBS_MODE_CHASE then
+			ply:SetObserverMode(OBS_MODE_IN_EYE)
+		elseif ply:GetObserverMode() == OBS_MODE_IN_EYE then
+			ply:SetObserverMode(OBS_MODE_CHASE)
+		end
+
+		return
+	end
+end
+local function slasherButtons(ply, button)
+	if button == 107 then
+		ply:SlasherFunction("OnPrimaryFire", lagTrace(ply))
+		return
+	end --Killing / Damaging
+	if button == 108 then
+		ply:SlasherFunction("OnSecondaryFire", lagTrace(ply))
+		return
+	end --Activate Chase Mode
+	if button == 28 then
+		ply:SlasherFunction("OnMainAbilityFire", lagTrace(ply))
+		return
+	end --Main Ability
+	if button == 16 then
+		ply:SlasherFunction("OnSpecialAbilityFire", lagTrace(ply))
+		return
+	end --Special
+end
+function GM:PlayerButtonDown(ply, button)
+	if game.GetMap() == "sc_lobby" then
+		lobbyButtons(ply, button)
+	end
+
+	if ply:Team() == TEAM_SPECTATOR then
+		spectatorButtons(ply, button)
+		return
+	end
+
+	if ply:Team() == TEAM_SLASHER then
+		slasherButtons(ply, button)
+		return
 	end
 end
 

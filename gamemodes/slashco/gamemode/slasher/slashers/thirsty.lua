@@ -99,107 +99,109 @@ SlashCoSlasher.Thirsty.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", perception_final)
 end
 
-SlashCoSlasher.Thirsty.OnPrimaryFire = function(slasher)
-	SlashCo.Jumpscare(slasher)
+SlashCoSlasher.Thirsty.OnPrimaryFire = function(slasher, target)
+	SlashCo.Jumpscare(slasher, target)
 end
 
 SlashCoSlasher.Thirsty.OnSecondaryFire = function(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SlashCoSlasher.Thirsty.OnMainAbilityFire = function(slasher)
+SlashCoSlasher.Thirsty.OnMainAbilityFire = function(slasher, target)
 	local SO = SlashCo.CurRound.OfferingData.SO
 	local SatO = SlashCo.CurRound.OfferingData.SatO
 
-	if slasher:GetEyeTrace().Entity:GetClass() == "sc_milkjug" then
-		local target = slasher:GetEyeTrace().Entity
-
-		if slasher:GetPos():Distance(target:GetPos()) < 150 and not slasher:GetNWBool("ThirstyDrinking") then
-			slasher:SetNWBool("ThirstyDrinking", true)
-			slasher:SetNWBool("InSlasherChaseMode", false)
-			slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
-			slasher:SetRunSpeed(slasher.SlasherValue4)
-			slasher:SetWalkSpeed(slasher.SlasherValue4)
-			slasher.SlasherValue2 = 99
-			slasher:Freeze(true)
-
-			target:Remove()
-
-			local matrix = slasher:GetBoneMatrix(slasher:LookupBone("HandR"))
-			local pos = matrix:GetTranslation()
-			local ang = matrix:GetAngles()
-
-			local chugjug = ents.Create("prop_physics")
-
-			chugjug:SetMoveType(MOVETYPE_NONE)
-			chugjug:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-			chugjug:SetModel(SlashCoItems.MilkJug.Model)
-			chugjug:SetPos(pos)
-			chugjug:SetAngles(ang)
-
-			chugjug:FollowBone(slasher, slasher:LookupBone("HandR"))
-
-			timer.Simple(1, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				slasher:EmitSound("slashco/slasher/thirsty_drink.mp3")
-			end)
-
-			timer.Simple(4.5, function()
-				if not IsValid(chugjug) then
-					return
-				end
-
-				chugjug:Remove()
-
-				local emptyjug = ents.Create("prop_physics")
-				emptyjug:SetSolid(SOLID_VPHYSICS)
-				emptyjug:PhysicsInit(SOLID_VPHYSICS)
-				emptyjug:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
-				emptyjug:SetMoveType(MOVETYPE_VPHYSICS)
-				emptyjug:SetModel(SlashCoItems.MilkJug.Model)
-				emptyjug:SetPos(pos)
-				emptyjug:SetAngles(ang)
-				emptyjug:Spawn()
-				emptyjug:Activate()
-				local phys = emptyjug:GetPhysicsObject()
-				if phys:IsValid() then
-					phys:Wake()
-				end
-				phys:ApplyForceCenter(slasher:GetAimVector() * 450)
-
-				timer.Simple(4.5, function()
-					if not IsValid(emptyjug) then
-						return
-					end
-
-					emptyjug:Remove()
-				end)
-			end)
-
-			timer.Simple(8, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				slasher:Freeze(false)
-				slasher:SetNWBool("ThirstyDrinking", false)
-				slasher:SetNWBool("DemonPacified", true)
-
-				if slasher.SlasherValue1 < (4 + SatO) then
-					slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
-				end
-
-				slasher.SlasherValue2 = math.random(20, 35)
-
-				if slasher.SlasherValue1 > 2 then
-					slasher:SetNWBool("ThirstyBigMlik", true)
-				end
-			end)
-		end
+	if not IsValid(target) or target:GetClass() ~= "sc_milkjug" then
+		return
 	end
+
+	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("ThirstyDrinking") then
+		return
+	end
+
+	slasher:SetNWBool("ThirstyDrinking", true)
+	slasher:SetNWBool("InSlasherChaseMode", false)
+	slasher:StopSound(SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseMusic)
+	slasher:SetRunSpeed(slasher.SlasherValue4)
+	slasher:SetWalkSpeed(slasher.SlasherValue4)
+	slasher.SlasherValue2 = 99
+	slasher:Freeze(true)
+
+	target:Remove()
+
+	local matrix = slasher:GetBoneMatrix(slasher:LookupBone("HandR"))
+	local pos = matrix:GetTranslation()
+	local ang = matrix:GetAngles()
+
+	local chugjug = ents.Create("prop_physics")
+
+	chugjug:SetMoveType(MOVETYPE_NONE)
+	chugjug:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+	chugjug:SetModel(SlashCoItems.MilkJug.Model)
+	chugjug:SetPos(pos)
+	chugjug:SetAngles(ang)
+
+	chugjug:FollowBone(slasher, slasher:LookupBone("HandR"))
+
+	timer.Simple(1, function()
+		if not IsValid(slasher) then
+			return
+		end
+
+		slasher:EmitSound("slashco/slasher/thirsty_drink.mp3")
+	end)
+
+	timer.Simple(4.5, function()
+		if not IsValid(chugjug) then
+			return
+		end
+
+		chugjug:Remove()
+
+		local emptyjug = ents.Create("prop_physics")
+		emptyjug:SetSolid(SOLID_VPHYSICS)
+		emptyjug:PhysicsInit(SOLID_VPHYSICS)
+		emptyjug:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
+		emptyjug:SetMoveType(MOVETYPE_VPHYSICS)
+		emptyjug:SetModel(SlashCoItems.MilkJug.Model)
+		emptyjug:SetPos(pos)
+		emptyjug:SetAngles(ang)
+		emptyjug:Spawn()
+		emptyjug:Activate()
+		local phys = emptyjug:GetPhysicsObject()
+		if phys:IsValid() then
+			phys:Wake()
+		end
+		phys:ApplyForceCenter(slasher:GetAimVector() * 450)
+
+		timer.Simple(4.5, function()
+			if not IsValid(emptyjug) then
+				return
+			end
+
+			emptyjug:Remove()
+		end)
+	end)
+
+	timer.Simple(8, function()
+		if not IsValid(slasher) then
+			return
+		end
+
+		slasher:Freeze(false)
+		slasher:SetNWBool("ThirstyDrinking", false)
+		slasher:SetNWBool("DemonPacified", true)
+
+		if slasher.SlasherValue1 < (4 + SatO) then
+			slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
+		end
+
+		slasher.SlasherValue2 = math.random(20, 35)
+
+		if slasher.SlasherValue1 > 2 then
+			slasher:SetNWBool("ThirstyBigMlik", true)
+		end
+	end)
 end
 
 SlashCoSlasher.Thirsty.OnSpecialAbilityFire = function()

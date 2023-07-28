@@ -52,7 +52,7 @@ SlashCoSlasher.CovenantCloak.TackleFail = function(slasher)
 
 end
 
-SlashCoSlasher.CovenantCloak.OnTickBehaviour = function(slasher)
+SlashCoSlasher.CovenantCloak.OnTickBehaviour = function(slasher, target)
 
     if IsValid( slasher.TackledPlayer ) then
         if not slasher:IsFrozen() then
@@ -79,18 +79,16 @@ SlashCoSlasher.CovenantCloak.OnTickBehaviour = function(slasher)
             slasher:SetVelocity(slasher:GetForward() * 70) 
         end
 
-        local lookent = slasher:GetEyeTrace().Entity
-
-        if lookent:IsPlayer() and lookent:Team() == TEAM_SURVIVOR and lookent:GetPos():Distance( slasher:GetPos() ) < 100 then
-            slasher.TackledPlayer = lookent
+        if IsValid(target) and target:IsPlayer() and target:Team() == TEAM_SURVIVOR and target:GetPos():Distance( slasher:GetPos() ) < 100 then
+            slasher.TackledPlayer = target
             slasher:SetNWBool("CloakTackling", false)
 
             slasher.TackledPlayer:SetNWBool("SurvivorTackled", true)
             slasher:SetNWInt("CloakTacklePosition", 1)
         end
 
-        if lookent:GetPos():Distance( slasher:GetPos() ) < 120 then 
-            SlashCo.SlamDoor(lookent, slasher) 
+        if IsValid(target) and target:GetPos():Distance( slasher:GetPos() ) < 120 then
+            slasher:SlamDoor(target)
         end
 
     elseif slasher:GetNWBool("CloakTackle") and slasher.TackledPlayer == nil and not slasher:GetNWBool("CloakTackleFail") then

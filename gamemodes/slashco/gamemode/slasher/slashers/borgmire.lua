@@ -161,59 +161,59 @@ end
 SlashCoSlasher.Borgmire.OnMainAbilityFire = function(slasher)
 end
 
-SlashCoSlasher.Borgmire.OnSpecialAbilityFire = function(slasher)
+SlashCoSlasher.Borgmire.OnSpecialAbilityFire = function(slasher, target)
 	local SO = SlashCo.CurRound.OfferingData.SO
 
-	if slasher:GetEyeTrace().Entity:IsPlayer() and not slasher:GetNWBool("BorgmireThrow") then
-		local target = slasher:GetEyeTrace().Entity
-
-		if target:Team() ~= TEAM_SURVIVOR then
-			return
-		end
-
-		if slasher:GetPos():Distance(target:GetPos()) < 200 and not target:GetNWBool("SurvivorBeingJumpscared") then
-			slasher:SetNWBool("BorgmireThrow", true)
-
-			local pick_ang = SlashCo.RadialTester(slasher, 200, target)
-
-			--slasher:SetEyeAngles( Angle(0,pick_ang,0) )
-
-			slasher.ChaseActivationCooldown = 99
-
-			slasher:EmitSound("slashco/slasher/borgmire_throw.mp3")
-
-			target:Freeze(true)
-			slasher:Freeze(true)
-
-			target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
-
-			for i = 1, 13 do
-				timer.Simple(0.1 + (i / 10), function()
-					target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
-				end)
-			end
-
-			timer.Simple(1.5, function()
-				target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
-
-				local strength_forward = 1600 + (SO * 450)
-				local strength_up = 800 + (SO * 150)
-
-				target:SetVelocity((slasher:GetForward() * strength_forward) + Vector(0, 0, strength_up))
-
-				target:Freeze(false)
-				if target:Health() > 1 then
-					target:SetHealth(target:Health() - (target:Health() / 4))
-				end
-			end)
-
-			timer.Simple(2, function()
-				slasher:Freeze(false)
-				slasher:SetNWBool("BorgmireThrow", false)
-				slasher.ChaseActivationCooldown = 2
-			end)
-		end
+	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then
+		return
 	end
+
+	if target:Team() ~= TEAM_SURVIVOR then
+		return
+	end
+
+	if slasher:GetPos():Distance(target:GetPos()) >= 200 or target:GetNWBool("SurvivorBeingJumpscared") then
+		return
+	end
+
+	slasher:SetNWBool("BorgmireThrow", true)
+
+	--local pick_ang = SlashCo.RadialTester(slasher, 200, target)
+	--slasher:SetEyeAngles( Angle(0,pick_ang,0) )
+
+	slasher.ChaseActivationCooldown = 99
+	slasher:EmitSound("slashco/slasher/borgmire_throw.mp3")
+
+	target:Freeze(true)
+	slasher:Freeze(true)
+
+	target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
+
+	for i = 1, 13 do
+		timer.Simple(0.1 + (i / 10), function()
+			target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
+		end)
+	end
+
+	timer.Simple(1.5, function()
+		target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
+
+		local strength_forward = 1600 + (SO * 450)
+		local strength_up = 800 + (SO * 150)
+
+		target:SetVelocity((slasher:GetForward() * strength_forward) + Vector(0, 0, strength_up))
+
+		target:Freeze(false)
+		if target:Health() > 1 then
+			target:SetHealth(target:Health() - (target:Health() / 4))
+		end
+	end)
+
+	timer.Simple(2, function()
+		slasher:Freeze(false)
+		slasher:SetNWBool("BorgmireThrow", false)
+		slasher.ChaseActivationCooldown = 2
+	end)
 end
 
 SlashCoSlasher.Borgmire.Animator = function(ply)

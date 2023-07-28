@@ -12,7 +12,7 @@ function PANEL:Init()
 	self.DirectionalLight = {}
 
 	self:SetDistance(250)
-	self:SetFOV(45)
+	self:SetFOV(22)
 	self:SetRotation(0)
 	self:SetCamPos(defaultCam)
 	self:SetAmbientLight(Color(50, 50, 50))
@@ -23,13 +23,13 @@ end
 --- setters -->
 
 ---entity to project
-function PANEL:SetEntity(entity)
-	self.Entity = entity
+function PANEL:SetEntity(ent)
+	self.Entity = ent
 end
 
 ---table of extra entities to also draw
-function PANEL:ExtraEntities(entities)
-	self.ExtraEntities = entities
+function PANEL:ExtraEntities(ents)
+	self.ExtraEntities = ents
 end
 
 ---overall light
@@ -81,22 +81,80 @@ function PANEL:OnRender()
 	--override this!
 end
 
-local blue = Color(0, 0, 255)
+---Creates a parented copy of a model
+function PANEL:ApplyProjectedModel(ent)
+	if IsValid(ent.ProjectedModel) then
+		ent.ProjectedModel:Remove()
+		ent.ProjectedModel = nil
+	end
+
+	ent.ProjectedModel = ClientsideModel(ent:GetModel())
+	ent.ProjectedModel:SetPos(ent:GetPos())
+	ent.ProjectedModel:SetAngles(ent:GetAngles())
+	ent.ProjectedModel:SetNoDraw(true)
+	ent.ProjectedModel:SetParent(ent)
+	ent.ProjectedModel.CreationTime = CurTime()
+	if ent:IsPlayer() then
+		ent.ProjectedModel:AddEffects(EF_BONEMERGE)
+		ent.ProjectedModel:AddEffects(EF_BONEMERGE_FASTCULL)
+	end
+end
+
+---internal: renders the first entity
+function PANEL:RenderTop(ent)
+	if not IsValid(ent) then
+		return
+	end
+
+	if not IsValid(ent.ProjectedModel) then
+		self:ApplyProjectedModel(ent)
+	end
+
+	if not ent:GetNoDraw() then
+		if IsValid(ent.ProjectedModel) and not ent.RenderOverride then
+			ent.ProjectedModel:DrawModel()
+
+			if ent:GetModel() ~= ent.ProjectedModel:GetModel() then
+				ent:ApplyProjectedModel(ent)
+			end
+		else
+			ent:DrawModel()
+		end
+	end
+
+	if not self.NoKids then
+		for _, v in pairs(ent:GetChildren()) do
+			if v ~= ent.ProjectedModel then
+				self:Render(v)
+			end
+		end
+	end
+
+	if pac then
+		pac.RenderOverride(ent, "opaque")
+		pac.RenderOverride(ent, "translucent")
+	end
+end
+
 ---internal: renders an entity and its children recursively
 function PANEL:Render(ent)
 	if not IsValid(ent) then
 		return
 	end
 
-	if IsValid(ent.ProjectedModel) then
-		ent.ProjectedModel:DrawModel()
-	elseif not ent:GetNoDraw() then
-		ent:DrawModel()
+	if not ent:GetNoDraw() then
+		if IsValid(ent.ProjectedModel) and not ent.RenderOverride then
+			ent.ProjectedModel:DrawModel()
+		else
+			ent:DrawModel()
+		end
 	end
 
 	if not self.NoKids then
 		for _, v in pairs(ent:GetChildren()) do
-			self:Render(v)
+			if v ~= ent.ProjectedModel then
+				self:Render(v)
+			end
 		end
 	end
 
@@ -138,10 +196,10 @@ function PANEL:Paint(w, h)
 		end
 	end
 
-	self:Render(self.Entity)
+	self:RenderTop(self.Entity)
 	if self.ExtraEntities then
 		for _, v in pairs(self.ExtraEntities) do
-			self:Render(v)
+			self:RenderTop(v)
 		end
 	end
 
@@ -152,23 +210,10 @@ end
 vgui.Register("slashco_projector", PANEL, "Panel")
 
 --[[
-hook.Add("HUDPaint", "3d_camera_example", function()
-	local vec = Vector(250, 0, 0)
-	vec:Rotate(EyeAngles())
+local frame = vgui.Create("DFrame")
+frame:SetSize(500, 500)
 
-	cam.Start3D(LerpVector(0.5, Player(3):GetPos(), Player(3):EyePos()) - vec, nil, 45)
-	Player(3):DrawModel()
-	for _, v in pairs(Player(3):GetChildren()) do
-		if IsValid(v) and not v:GetNoDraw() then
-			v:DrawModel()
-		end
-	end
-
-	if pac then
-		pac.RenderOverride(Player(3), "opaque")
-		pac.RenderOverride(Player(3), "translucent")
-		pac.RenderOverride(Player(3), "update_legacy_bones")
-	end
-	cam.End3D()
-end)
+local project = frame:Add("slashco_projector")
+project:SetEntity(LocalPlayer())
+project:Dock(FILL)
 --]]

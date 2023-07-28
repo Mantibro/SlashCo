@@ -87,7 +87,7 @@ SlashCoSlasher.Covenant.OnTickBehaviour = function(slasher)
     slasher:SetNWInt("Slasher_Perception", SlashCoSlasher.Covenant.Perception)
 end
 
-SlashCoSlasher.Covenant.OnPrimaryFire = function(slasher)
+SlashCoSlasher.Covenant.OnPrimaryFire = function(slasher, target)
     
     if not slasher:GetNWBool("CovenantSummoned") then
 
@@ -95,16 +95,7 @@ SlashCoSlasher.Covenant.OnPrimaryFire = function(slasher)
 
             local dist = slasher:SlasherValue("KillDistance", 135)
 
-            slasher:LagCompensation( true )
-
-            if slasher:GetEyeTrace().Entity:IsPlayer() then
-                local target = slasher:GetEyeTrace().Entity
-
-                if not target:IsPlayer() or target:Team() ~= TEAM_SURVIVOR then
-                    slasher:LagCompensation( false )
-                    return
-                end
-
+            if IsValid(target) and target:IsPlayer() then
                 target:Kill()
 
                 timer.Simple(FrameTime(), function() 
@@ -172,9 +163,6 @@ SlashCoSlasher.Covenant.OnPrimaryFire = function(slasher)
 
                     slasher:SetNWBool("CovenantSummoning", true) 
                     slasher:Freeze(true)
-
-                    slasher:LagCompensation( false )
-
                 end)
             end
 
