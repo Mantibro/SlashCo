@@ -579,7 +579,6 @@ if CLIENT then
 		end
 
 		if ply:GetNWBool("SurvivorSidExecution") then
-
 			pos = ply:LocalToWorld(Vector(120, 120, 60))
 			angles = ply:LocalToWorldAngles(Angle(0, -135, 0))
 
@@ -626,6 +625,8 @@ if CLIENT then
 		hud:AddControl("F", "equip gun", gunTable)
 		hud:TieControlVisible("F", "SidGunAimed", true, false, false)
 		hud:TieControlText("F", "SidGun", "unequip gun", "equip gun", false, false)
+		hud:SetCrosshairEnabled(true)
+		hud:TieCrosshairEntity("sc_cookie", 150, "R", true, "SidGun", "SidEating")
 
 		timer.Simple(0, function()
 			if LocalPlayer():GetNWBool("SidCanUseGun") then
@@ -640,7 +641,7 @@ if CLIENT then
 		hud.prevGun = not LocalPlayer():GetNWBool("SidGun")
 		hud.prevGunEquipped = not LocalPlayer():GetNWBool("SidGunEquipped")
 		hud.prevGunUses = -1
-		hud.cookieEnabled = true
+		--hud.cookieEnabled = LocalPlayer():GetNWBool("SidEating") or LocalPlayer():GetNWBool("SidGun")
 		function hud.AlsoThink()
 			local gun = LocalPlayer():GetNWBool("SidGun")
 			local gunUses = LocalPlayer():GetNWInt("SidGunUses")
@@ -652,6 +653,9 @@ if CLIENT then
 					hud:ShakeControl("F")
 					hud:SetControlEnabled("F", false)
 					hud:SetControlText("LMB", "shoot")
+					hud:TieCrosshairToggle(true)
+					hud:SetCrosshairProngs(4)
+					hud:TieCrosshairTighten("SidGunAimed", true, false)
 					timer.Simple(0, function()
 						hud:SetControlEnabled("LMB", true)
 						hud:SetControlEnabled("RMB", false)
@@ -663,6 +667,8 @@ if CLIENT then
 					else
 						hud:SetControlEnabled("F", true)
 					end
+					hud.CrosshairTie = nil
+					hud:TieCrosshairToggle(true, true)
 					hud:UntieControl("LMB")
 					hud:UntieControl("RMB")
 					hud:SetControlVisible("LMB", true)
@@ -688,22 +694,6 @@ if CLIENT then
 				hud.prevGunEquipped = gunEquip
 			end
 
-			local ent = LocalPlayer():GetEyeTrace().Entity
-			if ent:GetClass() == "sc_cookie" and LocalPlayer():GetPos():Distance(ent:GetPos()) < 150
-					and not LocalPlayer():GetNWBool("SidEating") and not gun then
-
-				if not hud.cookieEnabled then
-					hud:SetControlEnabled("R", true)
-					hud:ShakeControl("R")
-					hud.cookieEnabled = true
-				end
-			else
-				if hud.cookieEnabled then
-					hud:SetControlEnabled("R", false)
-					hud.cookieEnabled = nil
-				end
-			end
-
 			if gunUses ~= hud.prevGunUses then
 				if gunUses <= 0 then
 					hud:SetControlEnabled("F", false)
@@ -724,6 +714,19 @@ if CLIENT then
 				hud.gunMode = true
 			end
 		end
+	end
+
+	SlashCoSlasher.Sid.PreDrawHalos = function()
+		SlashCo.DrawHalo(ents.FindByClass("sc_cookie"), nil, 2, false)
+
+		local plyWithItem = {}
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if v:HasItem("Cookie") then
+				table.Insert(plyWithItem, v)
+			end
+		end
+
+		SlashCo.DrawHalo(plyWithItem, nil, 2, false)
 	end
 
 	SlashCoSlasher.Sid.ClientSideEffect = function()

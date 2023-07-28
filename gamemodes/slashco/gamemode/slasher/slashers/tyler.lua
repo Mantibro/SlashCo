@@ -291,7 +291,8 @@ SlashCoSlasher.Tyler.OnPrimaryFire = function(slasher, target)
 		return
 	end
 
-	if (not target:IsPlayer() and target.PingType ~= "ITEM") or target:GetClass() == "sc_beacon" then
+	local class = target:GetClass()
+	if (not target:IsPlayer() and target.PingType ~= "ITEM") or class == "sc_beacon" or class == "sc_battery" then
 		return
 	end
 
@@ -537,22 +538,36 @@ if CLIENT then
 					hud:SetAvatar("destroyer")
 				end
 
+				if state == 3 then
+					hud:SetCrosshairEnabled(true)
+				else
+					hud:SetCrosshairEnabled(false)
+				end
+
 				hud.prevState = state
 			end
 
 			local target = LocalPlayer():GetEyeTrace().Entity
-			if target:IsPlayer() or (target.PingType == "ITEM" and target:GetClass() ~= "sc_beacon") and
-					not target:GetNWBool("SurvivorBeingJumpscared") and
+			local class = target:GetClass()
+			if IsValid(target) and target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon")
+					and class ~= "sc_battery" and not target:GetNWBool("SurvivorBeingJumpscared") and
 					LocalPlayer():GetPos():Distance(target:GetPos()) < SlashCoSlasher.Tyler.KillDistance then
 
 				if not hud.destroyEnabled then
 					hud:SetControlEnabled("LMB", true)
 					hud:ShakeControl("LMB")
+					hud:SetCrosshairSpin(50)
+					hud:SetCrosshairTighten(4)
+					hud:SetCrosshairProngs(4)
 					hud.destroyEnabled = true
 				end
 			else
 				if hud.destroyEnabled then
 					hud:SetControlEnabled("LMB", false)
+					hud:ShakeControl("LMB")
+					hud:SetCrosshairSpin(0)
+					hud:SetCrosshairTighten(0)
+					hud:SetCrosshairProngs(3)
 					hud.destroyEnabled = nil
 				end
 			end

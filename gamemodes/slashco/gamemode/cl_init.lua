@@ -28,6 +28,8 @@ include("ui/slasher_stock/cl_slasher_meter.lua")
 include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 
+SlashCo = SlashCo or {}
+
 CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
 
 CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
@@ -72,7 +74,6 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 	--Benadryl
 
 	if LocalPlayer():GetNWBool("SurvivorBenadryl") then
-
 		if not LocalPlayer().BenadrylIntensity then
 			LocalPlayer().BenadrylIntensity = RealFrameTime()
 		end
@@ -116,7 +117,6 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 		DrawMotionBlur(fuck * 0.75 + (contrast * 0.08), fuck * 0.8, fuck * 0.07)
 
 		DrawSharpen(fuck * bloom, fuck * bloom)
-
 	else
 		LocalPlayer().BenadrylIntensity = 0
 	end
@@ -157,7 +157,6 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 end)
 
 hook.Add("KeyPress", "PlayerSelect", function(ply, key)
-
 	if ply ~= LocalPlayer() or ply:Team() ~= TEAM_LOBBY then
 		return
 	end
@@ -165,7 +164,6 @@ hook.Add("KeyPress", "PlayerSelect", function(ply, key)
 	if key == 8192 then
 		DrawThePlayermodelSelectorBox()
 	end
-
 end)
 
 net.Receive("octoSlashCoTestConfigHalos", function()
@@ -179,35 +177,69 @@ end)
 showHalos = true
 showGasCanHalos = false
 
+local colors = {
+	red = Color(255, 0, 0),
+	blue = Color(0, 0, 255),
+	yellow = Color(255, 255, 0),
+	gray = Color(200, 200, 200)
+}
+
+---draw halos; can only be used in the below function
+function SlashCo.DrawHalo(ents, color, passes, noZ)
+	if not g_SlashCoDrawingHalos then
+		print("You're using SlashCo.DrawHalo where it's not allowed!!!!!")
+		return
+	end
+
+	local haloColor = colors.red
+	if colors[color] then
+		haloColor = colors[color]
+	elseif type(colors) == "Color" then
+		haloColor = color
+	end
+
+	if noZ == nil then
+		noZ = true
+	end
+	halo.Add(ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil,
+			noZ)
+end
+
 hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
+	g_SlashCoDrawingHalos = true
 
 	if LocalPlayer():Team() == TEAM_SLASHER then
-		halo.Add(ents.FindByClass("sc_generator"), Color(255, 255, 0), math.abs(math.sin(CurTime())) * 2,
-				math.abs(math.sin(CurTime())) * 2, 5, true, true)
-		halo.Add(ents.FindByClass("sc_babaclone"), Color(255, 0, 0), math.abs(math.sin(CurTime())) * 2,
-				math.abs(math.sin(CurTime())) * 2, 5, true, true)
-		halo.Add(ents.FindByClass("sc_maleclone"), Color(255, 0, 0), math.abs(math.sin(CurTime())) * 2,
-				math.abs(math.sin(CurTime())) * 2, 5, true, true)
+		SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
+		SlashCo.DrawHalo(ents.FindByClass("sc_babaclone"))
+		SlashCo.DrawHalo(ents.FindByClass("sc_maleclone"))
+		LocalPlayer():SlasherFunction("PreDrawHalos")
+
+		g_SlashCoDrawingHalos = false
+		return
 	end
 
 	if LocalPlayer():Team() == TEAM_SPECTATOR then
-
 		if showHalos then
-
-			halo.Add(ents.FindByClass("sc_generator"), Color(255, 255, 0), math.abs(math.sin(CurTime())) * 2,
-					math.abs(math.sin(CurTime())) * 2, 5, true, true)
-			halo.Add(team.GetPlayers(TEAM_SURVIVOR), Color(0, 0, 255), math.abs(math.sin(CurTime())) * 2,
-					math.abs(math.sin(CurTime())) * 2, 5, true, true)
-			halo.Add(team.GetPlayers(TEAM_SLASHER), Color(255, 0, 0), math.abs(math.sin(CurTime())) * 2,
-					math.abs(math.sin(CurTime())) * 2, 5, true, true)
-
+			SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
+			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
+			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER))
 			if showGasCanHalos then
-				halo.Add(ents.FindByClass("sc_gascan"), Color(200, 200, 200), math.abs(math.sin(CurTime())) * 2,
-						math.abs(math.sin(CurTime())) * 2, 5, true, true)
+				SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "gray")
 			end
-
 		end
+
+		g_SlashCoDrawingHalos = false
+		return
 	end
+
+	if LocalPlayer():Team() == TEAM_SURVIVOR then
+		LocalPlayer():ItemFunction("PreDrawHalos")
+
+		g_SlashCoDrawingHalos = false
+		return
+	end
+
+	g_SlashCoDrawingHalos = false
 end)
 
 g_FlashlightCache = g_FlashlightCache or {}

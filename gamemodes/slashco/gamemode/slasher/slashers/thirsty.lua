@@ -309,31 +309,21 @@ if CLIENT then
 		hud:TieMeterInt("thirst", "ThirstyThirst")
 		hud:SetMeterColors("thirst", gray, color_white)
 
-		--[[
-		function hud.TitleCard.Label:PaintOver()
-			local amount = LocalPlayer():GetNWInt("ThirstyMilkDrank")
-			draw.SimpleText(string.format("%d milkie%s", amount, amount == 1 and "" or "s"), "TVCD", 4, 18, gray)
-		end
-		--]]
+		hud:SetCrosshairEnabled(true)
+		hud:TieCrosshairEntity("sc_milkjug", 150, "R", true, "ThirstyDrinking")
+	end
 
-		hud.milkEnabled = true
-		function hud.AlsoThink()
-			local ent = LocalPlayer():GetEyeTrace().Entity
-			if ent:GetClass() == "sc_milkjug" and LocalPlayer():GetPos():Distance(ent:GetPos()) < 150 and
-					not LocalPlayer():GetNWBool("ThirstyDrinking") then
+	SlashCoSlasher.Thirsty.PreDrawHalos = function()
+		SlashCo.DrawHalo(ents.FindByClass("sc_milkjug"), "gray", 2, false)
 
-				if not hud.milkEnabled then
-					hud:SetControlEnabled("R", true)
-					hud:ShakeControl("R")
-					hud.milkEnabled = true
-				end
-			else
-				if hud.milkEnabled then
-					hud:SetControlEnabled("R", false)
-					hud.milkEnabled = nil
-				end
+		local plyWithItem = {}
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if v:HasItem("MilkJug") then
+				table.Insert(plyWithItem, v)
 			end
 		end
+
+		SlashCo.DrawHalo(plyWithItem, "gray", 2, false)
 	end
 
 	SlashCoSlasher.Thirsty.ClientSideEffect = function()

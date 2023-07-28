@@ -279,10 +279,10 @@ end)
 --lag-compensated eye trace for use in slasher functions
 local function lagTrace(ply)
 	ply:LagCompensation(true)
-	local tr = util.GetPlayerTrace(ply)
+	local tr = ply:GetEyeTrace()
 	ply:LagCompensation(false)
 
-	return tr.Entity
+	return tr.Entity, tr
 end
 
 local function lobbyButtons(ply, button)

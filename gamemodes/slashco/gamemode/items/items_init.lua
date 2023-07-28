@@ -76,21 +76,26 @@ end
 function PLAYER:ItemValue2(value, fallback, noEffect)
 	local item
 	if not noEffect then
-		item = ply:GetNWString("itemEffect", "none")
+		item = self:GetNWString("itemEffect", "none")
 		if SlashCoItems[item] and SlashCoItems[item][value] then
 			return SlashCoItems[item][value]
 		end
 	end
 
-	item = ply:GetNWString("item2", "none")
+	item = self:GetNWString("item2", "none")
 	if item == "none" then
-		item = ply:GetNWString("item", "none")
+		item = self:GetNWString("item", "none")
 	end
 	if SlashCoItems[item] and SlashCoItems[item][value] then
 		return SlashCoItems[item][value]
 	end
 
 	return fallback
+end
+
+---returns whether a player has a specific item
+function PLAYER:HasItem(item, isSecondary)
+	return self:GetNWString(isSecondary and "item2" or "item", "none") == item
 end
 
 ---calls the <funcName> function of a player's item1 with passed args

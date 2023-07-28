@@ -18,8 +18,11 @@ function PANEL:Init()
 	self.Controls = {}
 	self.Meters = {}
 	self.Gens = {}
-
 	self.ControlTies = {}
+	self.CrosshairSpin = 0
+	self.CrosshairTight = 0
+	self.CrosshairProngs = 3
+	self.CrosshairAngles = 120
 
 	local right = vgui.Create("Panel", self)
 	self.Right = right
@@ -29,6 +32,7 @@ function PANEL:Init()
 	self:MakeTitleCard()
 	self:MakeSurvivorsCard()
 	self:MakeGeneratorsCard()
+	self:MakeCrosshair()
 
 	--[[
 	local left = vgui.Create("Panel", self)
@@ -380,7 +384,160 @@ function PANEL:GetControl(key)
 	return self.Controls[key]
 end
 
+---[CROSSHAIR]---
+
+---make the crosshair spin
+function PANEL:SetCrosshairSpin(amount)
+	self.CrosshairSpin = amount
+end
+
+---make the crosshair smaller on the inside
+function PANEL:SetCrosshairTighten(amount)
+	self.CrosshairTight = amount
+end
+
+---enable crosshair or not
+function PANEL:SetCrosshairEnabled(state)
+	if state then
+		self.Crosshair:Show()
+	else
+		self.Crosshair:Hide()
+	end
+end
+
+---make the crosshair tighten and spin when you're looking at an entity
+---can also specify a control to be driven
+---vararg is networked booleans to check for
+function PANEL:TieCrosshairEntity(entity, distance, control, invertNetVars, ...)
+	local checkVars = #{ ... } > 0
+	local varArg = { ... }
+	self.GoCrosshair = true
+	function self.CrosshairTieEntity()
+		local varCheck = true
+		if checkVars then
+			varCheck = self:CheckNetVars(false, invertNetVars, unpack(varArg))
+		end
+
+		local ent = LocalPlayer():GetEyeTrace().Entity
+		if IsValid(ent) and ent:GetClass() == entity and LocalPlayer():GetPos():Distance(ent:GetPos()) < distance
+				and varCheck then
+
+			if not self.GoCrosshair then
+				if control then
+					self:SetControlEnabled(control, true)
+					self:ShakeControl(control)
+				end
+				self:SetCrosshairSpin(50)
+				self:SetCrosshairTighten(4)
+				self:SetCrosshairProngs(4)
+
+				self.GoCrosshair = true
+			end
+		else
+			if self.GoCrosshair then
+				if control then
+					self:SetControlEnabled(control, false)
+					self:ShakeControl(control)
+				end
+				self:SetCrosshairSpin(0)
+				self:SetCrosshairTighten(0)
+				self:SetCrosshairProngs(3)
+
+				self.GoCrosshair = nil
+			end
+		end
+	end
+end
+
+function PANEL:TieCrosshairTighten(netVar, isInverse, fallback)
+	self.GoCrosshair2 = LocalPlayer():GetNWBool(netVar, fallback) == isInverse
+	self:SetCrosshairTighten(self.GoCrosshair2 and 4 or 0)
+	function self.CrosshairTie()
+		local check = LocalPlayer():GetNWBool(netVar, fallback) ~= isInverse
+		if check ~= self.GoCrosshair2 then
+			self:SetCrosshairTighten(self.GoCrosshair2 and 4 or 0)
+			self.GoCrosshair2 = check
+		end
+	end
+end
+
+---make the crosshair no longer tied to anything
+function PANEL:UntieCrosshair()
+	self.CrosshairTie = nil
+	self.CrosshairTieEntity = nil
+	self:SetCrosshairSpin(0)
+	self:SetCrosshairTighten(0)
+	self:SetCrosshairProngs(3)
+end
+
+---toggles whether the current crosshair tie should be used
+function PANEL:TieCrosshairToggle(isEntity, value)
+	if isEntity then
+		self.DoNotTieCrosshairEntity = not value
+	else
+		self.DoNotTieCrosshair = not value
+	end
+	self:SetCrosshairSpin(0)
+	self:SetCrosshairTighten(0)
+	self:SetCrosshairProngs(3)
+end
+
+---set the amount of prongs the crosshair has
+function PANEL:SetCrosshairProngs(amount)
+	self.CrosshairProngs = math.max(amount, 1)
+	self.CrosshairAngles = 360 / amount
+end
+
+---[UTILITY]---
+
+---Checks multiple netvars at once
+---if isOr is true, a single netvar being true makes the whole thing true, otherwise all must be true
+---if invert is set, the entire result is flipped
+function PANEL:CheckNetVars(invertInput, invertOutput, ...)
+	local result = false
+	for _, v in pairs({ ... }) do
+		if (LocalPlayer():GetNWBool(v, invertInput) or false) ~= invertInput then
+			result = not result
+			break
+		end
+	end
+
+	return result ~= invertOutput
+end
+
 ---[INTERNAL]---
+
+---internal: draws the crosshair
+local dir = Vector(0, -1, 0)
+local nSpin, nTight, nAng = 0, 0, 0
+function PANEL:MakeCrosshair()
+	local crosshair = self:Add("Panel")
+	self.Crosshair = crosshair
+	crosshair:SetSize(120, 120)
+	crosshair:SetPos(ScrW() / 2 - 60, ScrH() / 2 - 60)
+
+	function crosshair.PaintOver(_, w, h)
+		surface.SetDrawColor(255, 0, 0)
+
+		nSpin = math.Clamp(Lerp(0.04, nSpin, self.CrosshairSpin), 0, 1000)
+		nTight = math.Clamp(Lerp(0.08, nTight, self.CrosshairTight), 0, 1000)
+		nAng = math.Clamp(Lerp(0.08, nAng, self.CrosshairAngles), 0, 1000)
+
+		local vel = LocalPlayer():EyeAngles():Right():Dot(LocalPlayer():GetVelocity())
+		local ang = Angle(0, nAng, 0)
+		for i = 1, math.max(self.CrosshairProngs, 1) do
+			surface.DrawLine(
+					w / 2 + dir.x * w / (4 + nTight / 2),
+					h / 2 + dir.y * h / (4 + nTight / 2),
+					w / 2 + dir.x * w / (8 + nTight * 2),
+					h / 2 + dir.y * h / (8 + nTight * 2))
+			dir:Rotate(ang + Angle(0, (vel + nSpin) * 0.0015, 0))
+		end
+	end
+
+	--this element is mainly for demons
+	crosshair:Hide()
+end
 
 ---internal: shows the slasher's name and avatar
 function PANEL:MakeTitleCard()
@@ -657,6 +814,14 @@ function PANEL:Think()
 
 	if self.AlsoThink then
 		self:AlsoThink()
+	end
+
+	if self.CrosshairTie and not self.DoNotTieCrosshair then
+		self.CrosshairTie()
+	end
+
+	if self.CrosshairTieEntity and not self.DoNotTieCrosshairEntity then
+		self.CrosshairTieEntity()
 	end
 end
 

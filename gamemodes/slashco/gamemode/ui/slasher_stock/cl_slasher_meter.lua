@@ -10,7 +10,6 @@ function PANEL:Init()
 	self.ShowMax = false
 	self.Prefix = false
 
-	self.pDCurrent = 0
 	self.nDCurrent = 0
 	self.FlashAmt = 0
 
@@ -133,8 +132,7 @@ function PANEL:MakeMeter()
 		surface.SetDrawColor(0, 0, 0)
 		surface.DrawRect(3, 3, w - 6, h - 6)
 
-		self.nDCurrent = math.Clamp(Lerp(0.08, self.pDCurrent, self.Current / self.Max), 0, self.Max)
-		self.pDCurrent = self.nDCurrent
+		self.nDCurrent = math.Clamp(Lerp(0.08, self.nDCurrent, self.Current / self.Max), 0, self.Max)
 
 		if self.nDCurrent > 0.998 then
 			if self.CustomColors then
