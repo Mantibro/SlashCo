@@ -96,7 +96,7 @@ function PANEL:ApplyProjectedModel(ent)
 	ent.ProjectedModel.CreationTime = CurTime()
 	if ent:IsPlayer() then
 		ent.ProjectedModel:AddEffects(EF_BONEMERGE)
-		ent.ProjectedModel:AddEffects(EF_BONEMERGE_FASTCULL)
+		--ent.ProjectedModel:AddEffects(EF_BONEMERGE_FASTCULL)
 	end
 end
 

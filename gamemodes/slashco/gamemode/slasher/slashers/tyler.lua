@@ -541,7 +541,10 @@ if CLIENT then
 				if state == 3 then
 					hud:SetCrosshairEnabled(true)
 				else
-					hud:SetCrosshairEnabled(false)
+					hud:SetCrosshairAlpha(0)
+					timer.Simple(1, function()
+						hud:SetCrosshairEnabled(false)
+					end)
 				end
 
 				hud.prevState = state
@@ -558,7 +561,8 @@ if CLIENT then
 					hud:ShakeControl("LMB")
 					hud:SetCrosshairSpin(50)
 					hud:SetCrosshairTighten(4)
-					hud:SetCrosshairProngs(4)
+					hud:SetCrosshairProngs(5)
+					hud:SetCrosshairAlpha(255)
 					hud.destroyEnabled = true
 				end
 			else
@@ -568,6 +572,7 @@ if CLIENT then
 					hud:SetCrosshairSpin(0)
 					hud:SetCrosshairTighten(0)
 					hud:SetCrosshairProngs(3)
+					hud:SetCrosshairAlpha(0)
 					hud.destroyEnabled = nil
 				end
 			end

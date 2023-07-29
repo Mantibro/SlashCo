@@ -13,10 +13,12 @@ function GM:PlayerInitialSpawn(ply, _)
 	end
 end
 
-function GM:PlayerSpawn(player, _)
+function GM:PlayerSpawn(player, transition)
 	if not IsValid(player) then
 		return
 	end
+
+	player:CrosshairDisable()
 
 	if player:Team() == TEAM_SURVIVOR then
 		player_manager.SetPlayerClass(player, "player_survivor")
@@ -33,14 +35,13 @@ function GM:PlayerSpawn(player, _)
 
 	-- Stop observer mode
 	player:UnSpectate()
-
 	player:SetupHands()
 
-	player_manager.OnPlayerSpawn(player, transiton)
+	player_manager.OnPlayerSpawn(player, transition)
 	player_manager.RunClass(player, "Spawn")
 
 	-- If we are in transition, do not touch player's weapons
-	if (not transiton) then
+	if not transition then
 		-- Call item loadout function
 		hook.Call("PlayerLoadout", GAMEMODE, player)
 	end

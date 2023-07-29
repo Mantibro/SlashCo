@@ -310,7 +310,16 @@ if CLIENT then
 		hud:SetMeterColors("thirst", gray, color_white)
 
 		hud:SetCrosshairEnabled(true)
-		hud:TieCrosshairEntity("sc_milkjug", 150, "R", true, "ThirstyDrinking")
+		hud:TieCrosshairEntity("sc_milkjug", 150, "R", {InvertOutput = false, "ThirstyDrinking"}, {
+			SpinOn = 50,
+			TightenOn = 4,
+			ProngsOn = 4,
+			AlphaOn = 255,
+			SpinOff = 0,
+			TightenOff = 0,
+			ProngsOff = 3,
+			AlphaOff = 0
+		})
 	end
 
 	SlashCoSlasher.Thirsty.PreDrawHalos = function()

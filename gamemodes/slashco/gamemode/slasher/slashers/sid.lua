@@ -417,6 +417,7 @@ SlashCoSlasher.Sid.OnSpecialAbilityFire = function(slasher)
 		timer.Simple(2.25, function()
 			--sound
 			slasher:EmitSound("slashco/slasher/sid_slideback.wav", 75, 75)
+			slasher:SlasherHudFunc("SetCrosshairProngs", 4)
 		end)
 
 		timer.Simple(4.5, function()
@@ -626,7 +627,9 @@ if CLIENT then
 		hud:TieControlVisible("F", "SidGunAimed", true, false, false)
 		hud:TieControlText("F", "SidGun", "unequip gun", "equip gun", false, false)
 		hud:SetCrosshairEnabled(true)
-		hud:TieCrosshairEntity("sc_cookie", 150, "R", true, "SidGun", "SidEating")
+		hud:SetCrosshairAlpha(255)
+		hud:TieCrosshair("SidGunAimed")
+		hud:TieCrosshairEntity("sc_cookie", 150, "R", {"SidGun", "SidEating", IsOr = true})
 
 		timer.Simple(0, function()
 			if LocalPlayer():GetNWBool("SidCanUseGun") then
@@ -641,7 +644,6 @@ if CLIENT then
 		hud.prevGun = not LocalPlayer():GetNWBool("SidGun")
 		hud.prevGunEquipped = not LocalPlayer():GetNWBool("SidGunEquipped")
 		hud.prevGunUses = -1
-		--hud.cookieEnabled = LocalPlayer():GetNWBool("SidEating") or LocalPlayer():GetNWBool("SidGun")
 		function hud.AlsoThink()
 			local gun = LocalPlayer():GetNWBool("SidGun")
 			local gunUses = LocalPlayer():GetNWInt("SidGunUses")
@@ -653,9 +655,6 @@ if CLIENT then
 					hud:ShakeControl("F")
 					hud:SetControlEnabled("F", false)
 					hud:SetControlText("LMB", "shoot")
-					hud:TieCrosshairToggle(true)
-					hud:SetCrosshairProngs(4)
-					hud:TieCrosshairTighten("SidGunAimed", true, false)
 					timer.Simple(0, function()
 						hud:SetControlEnabled("LMB", true)
 						hud:SetControlEnabled("RMB", false)
@@ -667,8 +666,6 @@ if CLIENT then
 					else
 						hud:SetControlEnabled("F", true)
 					end
-					hud.CrosshairTie = nil
-					hud:TieCrosshairToggle(true, true)
 					hud:UntieControl("LMB")
 					hud:UntieControl("RMB")
 					hud:SetControlVisible("LMB", true)

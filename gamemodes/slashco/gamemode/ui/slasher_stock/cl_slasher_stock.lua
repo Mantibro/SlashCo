@@ -23,6 +23,7 @@ function PANEL:Init()
 	self.CrosshairTight = 0
 	self.CrosshairProngs = 3
 	self.CrosshairAngles = 120
+	self.CrosshairAlpha = 0
 
 	local right = vgui.Create("Panel", self)
 	self.Right = right
@@ -408,14 +409,29 @@ end
 ---make the crosshair tighten and spin when you're looking at an entity
 ---can also specify a control to be driven
 ---vararg is networked booleans to check for
-function PANEL:TieCrosshairEntity(entity, distance, control, invertNetVars, ...)
-	local checkVars = #{ ... } > 0
-	local varArg = { ... }
+function PANEL:TieCrosshairEntity(entity, distance, control, netVars, settings)
+	if not settings then
+		settings = {
+			SpinOn = 50,
+			TightenOn = 4,
+			ProngsOn = 4,
+			SpinOff = 0,
+			TightenOff = 0,
+			ProngsOff = 3
+		}
+	end
+	local checkVars = type(netVars)
+	if checkVars == "table" then
+		netVars.InvertOutput = netVars.InvertOutput or false
+	end
+
 	self.GoCrosshair = true
 	function self.CrosshairTieEntity()
 		local varCheck = true
-		if checkVars then
-			varCheck = self:CheckNetVars(false, invertNetVars, unpack(varArg))
+		if checkVars == "string" then
+			varCheck = self:CheckNetVars(false, false, netVars)
+		elseif checkVars == "table" then
+			varCheck = self:CheckNetVars(netVars.IsOr, netVars.InvertInput, unpack(netVars)) ~= netVars.InvertOutput
 		end
 
 		local ent = LocalPlayer():GetEyeTrace().Entity
@@ -427,9 +443,18 @@ function PANEL:TieCrosshairEntity(entity, distance, control, invertNetVars, ...)
 					self:SetControlEnabled(control, true)
 					self:ShakeControl(control)
 				end
-				self:SetCrosshairSpin(50)
-				self:SetCrosshairTighten(4)
-				self:SetCrosshairProngs(4)
+				if settings.SpinOn then
+					self:SetCrosshairSpin(settings.SpinOn)
+				end
+				if settings.TightenOn then
+					self:SetCrosshairTighten(settings.TightenOn)
+				end
+				if settings.ProngsOn then
+					self:SetCrosshairProngs(settings.ProngsOn)
+				end
+				if settings.AlphaOn then
+					self:SetCrosshairAlpha(settings.AlphaOn)
+				end
 
 				self.GoCrosshair = true
 			end
@@ -439,9 +464,18 @@ function PANEL:TieCrosshairEntity(entity, distance, control, invertNetVars, ...)
 					self:SetControlEnabled(control, false)
 					self:ShakeControl(control)
 				end
-				self:SetCrosshairSpin(0)
-				self:SetCrosshairTighten(0)
-				self:SetCrosshairProngs(3)
+				if settings.SpinOff then
+					self:SetCrosshairSpin(settings.SpinOff)
+				end
+				if settings.TightenOff then
+					self:SetCrosshairTighten(settings.TightenOff)
+				end
+				if settings.ProngsOff then
+					self:SetCrosshairProngs(settings.ProngsOff)
+				end
+				if settings.AlphaOff then
+					self:SetCrosshairAlpha(settings.AlphaOff)
+				end
 
 				self.GoCrosshair = nil
 			end
@@ -449,37 +483,108 @@ function PANEL:TieCrosshairEntity(entity, distance, control, invertNetVars, ...)
 	end
 end
 
-function PANEL:TieCrosshairTighten(netVar, isInverse, fallback)
-	self.GoCrosshair2 = LocalPlayer():GetNWBool(netVar, fallback) == isInverse
-	self:SetCrosshairTighten(self.GoCrosshair2 and 4 or 0)
+---tie the settings of the crosshair to a set of netvars
+function PANEL:TieCrosshair(netVars, settings, control)
+	if not settings then
+		settings = {
+			TightenOn = 4,
+			TightenOff = 0
+		}
+	end
+	local checkVars = type(netVars)
+	if checkVars == "table" then
+		netVars.InvertOutput = netVars.InvertOutput or false
+	end
+
+	local varCheckPre = true
+	if checkVars == "string" then
+		varCheckPre = self:CheckNetVars(false, false, netVars)
+	elseif checkVars == "table" then
+		varCheckPre = self:CheckNetVars(netVars.IsOr, netVars.InvertInput, unpack(netVars)) ~= netVars.InvertOutput
+	end
+	self.GoCrosshair2 = not varCheckPre
 	function self.CrosshairTie()
-		local check = LocalPlayer():GetNWBool(netVar, fallback) ~= isInverse
-		if check ~= self.GoCrosshair2 then
-			self:SetCrosshairTighten(self.GoCrosshair2 and 4 or 0)
-			self.GoCrosshair2 = check
+		local varCheck = true
+		if checkVars == "string" then
+			varCheck = self:CheckNetVars(false, false, netVars)
+		elseif checkVars == "table" then
+			varCheck = self:CheckNetVars(netVars.IsOr, netVars.InvertInput, unpack(netVars)) ~= netVars.InvertOutput
+		end
+
+		if varCheck then
+			if not self.GoCrosshair2 then
+				if control then
+					self:SetControlEnabled(control, true)
+					self:ShakeControl(control)
+				end
+				if settings.SpinOn then
+					self:SetCrosshairSpin(settings.SpinOn)
+				end
+				if settings.TightenOn then
+					self:SetCrosshairTighten(settings.TightenOn)
+				end
+				if settings.ProngsOn then
+					self:SetCrosshairProngs(settings.ProngsOn)
+				end
+				if settings.AlphaOn then
+					self:SetCrosshairAlpha(settings.AlphaOn)
+				end
+
+				self.GoCrosshair2 = true
+			end
+		else
+			if self.GoCrosshair2 then
+				if control then
+					self:SetControlEnabled(control, false)
+					self:ShakeControl(control)
+				end
+				if settings.SpinOff then
+					self:SetCrosshairSpin(settings.SpinOff)
+				end
+				if settings.TightenOff then
+					self:SetCrosshairTighten(settings.TightenOff)
+				end
+				if settings.ProngsOff then
+					self:SetCrosshairProngs(settings.ProngsOff)
+				end
+				if settings.AlphaOff then
+					self:SetCrosshairAlpha(settings.AlphaOff)
+				end
+
+				self.GoCrosshair2 = nil
+			end
 		end
 	end
 end
 
 ---make the crosshair no longer tied to anything
-function PANEL:UntieCrosshair()
-	self.CrosshairTie = nil
-	self.CrosshairTieEntity = nil
-	self:SetCrosshairSpin(0)
-	self:SetCrosshairTighten(0)
-	self:SetCrosshairProngs(3)
-end
-
----toggles whether the current crosshair tie should be used
-function PANEL:TieCrosshairToggle(isEntity, value)
-	if isEntity then
-		self.DoNotTieCrosshairEntity = not value
-	else
-		self.DoNotTieCrosshair = not value
+function PANEL:UntieCrosshair(doTie, doEntity, settings)
+	if doTie then
+		self.CrosshairTie = nil
 	end
-	self:SetCrosshairSpin(0)
-	self:SetCrosshairTighten(0)
-	self:SetCrosshairProngs(3)
+	if doEntity then
+		self.CrosshairTieEntity = nil
+	end
+	if not settings then
+		settings = {
+			Spin = 0,
+			Tighten = 0,
+			Prongs = 3,
+			Alpha = 255
+		}
+	end
+	if settings.Spin then
+		self:SetCrosshairSpin(settings.Spin)
+	end
+	if settings.Tighten then
+		self:SetCrosshairTighten(settings.Tighten)
+	end
+	if settings.Prongs then
+		self:SetCrosshairProngs(settings.Prongs)
+	end
+	if settings.Alpha then
+		self:SetCrosshairAlpha(settings.Alpha)
+	end
 end
 
 ---set the amount of prongs the crosshair has
@@ -488,28 +593,34 @@ function PANEL:SetCrosshairProngs(amount)
 	self.CrosshairAngles = 360 / amount
 end
 
+function PANEL:SetCrosshairAlpha(amount)
+	self.CrosshairAlpha = amount
+end
+
 ---[UTILITY]---
 
 ---Checks multiple netvars at once
 ---if isOr is true, a single netvar being true makes the whole thing true, otherwise all must be true
 ---if invert is set, the entire result is flipped
-function PANEL:CheckNetVars(invertInput, invertOutput, ...)
-	local result = false
+function PANEL:CheckNetVars(isOr, invertInput, ...)
+	invertInput = invertInput or false
+
+	local result = isOr
 	for _, v in pairs({ ... }) do
-		if (LocalPlayer():GetNWBool(v, invertInput) or false) ~= invertInput then
+		if LocalPlayer():GetNWBool(v, not invertInput) ~= invertInput then
 			result = not result
 			break
 		end
 	end
 
-	return result ~= invertOutput
+	return result
 end
 
 ---[INTERNAL]---
 
 ---internal: draws the crosshair
 local dir = Vector(0, -1, 0)
-local nSpin, nTight, nAng = 0, 0, 0
+local nSpin, nTight, nAng, nAlpha = 0, 0, 0, 0
 function PANEL:MakeCrosshair()
 	local crosshair = self:Add("Panel")
 	self.Crosshair = crosshair
@@ -517,12 +628,12 @@ function PANEL:MakeCrosshair()
 	crosshair:SetPos(ScrW() / 2 - 60, ScrH() / 2 - 60)
 
 	function crosshair.PaintOver(_, w, h)
-		surface.SetDrawColor(255, 0, 0)
-
 		nSpin = math.Clamp(Lerp(0.04, nSpin, self.CrosshairSpin), 0, 1000)
 		nTight = math.Clamp(Lerp(0.08, nTight, self.CrosshairTight), 0, 1000)
 		nAng = math.Clamp(Lerp(0.08, nAng, self.CrosshairAngles), 0, 1000)
+		nAlpha = math.Clamp(Lerp(0.04, nAlpha, self.CrosshairAlpha), 0, 255)
 
+		surface.SetDrawColor(255, 0, 0, nAlpha)
 		local vel = LocalPlayer():EyeAngles():Right():Dot(LocalPlayer():GetVelocity())
 		local ang = Angle(0, nAng, 0)
 		for i = 1, math.max(self.CrosshairProngs, 1) do
@@ -531,7 +642,7 @@ function PANEL:MakeCrosshair()
 					h / 2 + dir.y * h / (4 + nTight / 2),
 					w / 2 + dir.x * w / (8 + nTight * 2),
 					h / 2 + dir.y * h / (8 + nTight * 2))
-			dir:Rotate(ang + Angle(0, (vel + nSpin) * 0.0015, 0))
+			dir:Rotate(ang + Angle(0, (vel + nSpin) * (0.0045 / math.max(self.CrosshairProngs, 1)), 0))
 		end
 	end
 

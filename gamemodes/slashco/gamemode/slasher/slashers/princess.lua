@@ -498,6 +498,19 @@ if CLIENT then
 		end
 	end
 
+	SlashCoSlasher.Princess.PreDrawHalos = function()
+		SlashCo.DrawHalo(ents.FindByClass("sc_baby"), nil, 2, false)
+
+		local plyWithItem = {}
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if v:HasItem("Baby") then
+				table.Insert(plyWithItem, v)
+			end
+		end
+
+		SlashCo.DrawHalo(plyWithItem, nil, 2, false)
+	end
+
 	SlashCoSlasher.Princess.ClientSideEffect = function()
 	end
 end
