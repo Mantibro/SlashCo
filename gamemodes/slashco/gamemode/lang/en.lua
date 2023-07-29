@@ -112,9 +112,6 @@ SlashCoLang["Deathward_desc"] = "Survive death once, but become unable to hold a
 SlashCoLang["DevilDie"] = "Devil's Gamble"
 SlashCoLang["DevilDie_desc"] = "Gain a random effect on use; either good or horrible."
 
-SlashCoLang["DevilDie"] = "Devil's Gamble"
-SlashCoLang["DevilDie_desc"] = "Gain a random effect on use; either good or horrible."
-
 SlashCoLang["GasCan"] = "Fuel Can"
 SlashCoLang["GasCan_desc"] = "Take a gas can with you instead of having to find one. There will be less gas cans to find if you do this."
 
@@ -206,16 +203,311 @@ SlashCoLang["surv_ping"] = "PING"
 
 --Spectator
 SlashCoLang["spectating"] = "YOU ARE SPECTATING"
-SlashCoLang["hide_info"] = "HOLD TO HIDE INFO"
-SlashCoLang["toggle_halo"] = "TOGGLE HALOS"
-SlashCoLang["toggle_halo_gas"] = "TOGGLE GAS CAN HALOS"
-SlashCoLang["player_follow"] = "FOLLOW PLAYER"
-SlashCoLang["player_cycle"] = "CYCLE SURVIVORS"
-SlashCoLang["switch_view"] = "SWITCH VIEW"
-SlashCoLang["toggle_light"] = "TOGGLE LIGHT"
+SlashCoLang["hide_info"] = "[%s] HOLD TO HIDE INFO"
+SlashCoLang["toggle_halo"] = "[%s] TOGGLE HALOS"
+SlashCoLang["toggle_halo_gas"] = "[%s] TOGGLE GAS CAN HALOS"
+SlashCoLang["player_follow"] = "[%s] FOLLOW PLAYER"
+SlashCoLang["player_cycle"] = "[%s] CYCLE SURVIVORS"
+SlashCoLang["switch_view"] = "[%s] SWITCH VIEW"
+SlashCoLang["toggle_light"] = "[%s] TOGGLE LIGHT"
 
 --Slasher
 SlashCoLang["demon_pacified"] = "You have been pacified by consuming an item."
 SlashCoLang["beacon_call"] = "The Survivors are attempting to call emergency escape."
 SlashCoLang["beacon_destroy"] = "DESTROY THE BEACON."
 SlashCoLang["slasher_anticipation"] = "You will soon spawn as "
+SlashCoLang["slasher_unavailable"] = "unavailable"
+SlashCoLang["slasher_killsurvivor"] = "kill survivor"
+SlashCoLang["slasher_startchase"] = "start chasing"
+SlashCoLang["slasher_stopchase"] = "stop chasing"
+SlashCoLang["slasher_speedrate"] = "Speed"
+SlashCoLang["slasher_eyerate"] = "Eyesight"
+SlashCoLang["slasher_diffrate"] = "Difficulty"
+
+--Every Slasher:
+
+--Abomignat
+SlashCoLang["Abomignat"] = "Abomignat"
+SlashCoLang["Abomignat_desc"] = [[The Monstrous Slasher which uses basic abilities to achieve quick kills.
+
+-Abomignat can use its sharp claws to quickly damage Survivors.
+-It can perform a short-range high-speed lunge to finish off its victims.
+-Its Crawling Mode can enable swift map traversal.]]
+SlashCoLang["Abomignat_tip"] = "-This Slasher enters bursts of speed while attacking."
+
+SlashCoLang["Abomignat_enablecrawling"] = "enable crawling"
+SlashCoLang["Abomignat_disablecrawling"] = "disable crawling"
+SlashCoLang["Abomignat_slashcharge"] = "slash charge"
+SlashCoLang["Abomignat_lunge"] = "lunge"
+
+
+--Amogus
+SlashCoLang["Amogus"] = "Amogus"
+SlashCoLang["Amogus_desc"] = [[The Imposter Slasher who is the master of deception and hiding in plain sight.
+
+-Amogus can assume the form of a Survivor.
+-He can assume the form of a Fuel Can.
+-Amogus is really loud while running.]]
+SlashCoLang["Amogus_tip"] = "-This Slasher can disguise itself as a human."
+
+SlashCoLang["Amogus_survivor_disguised_title"] = "inconspicuous survivor"
+SlashCoLang["Amogus_gas_disguised_title"] = "regular fuel can"
+SlashCoLang["Amogus_survivor_disguise"] = "disguise as survivor"
+SlashCoLang["Amogus_gas_disguise"] = "disguise as fuel"
+SlashCoLang["Amogus_un_disguise"] = "reveal yourself"
+
+
+
+--Bababooey
+SlashCoLang["Bababooey"] = "Bababooey"
+SlashCoLang["Bababooey_desc"] = [[The Phantom Slasher which specialises in illusion abilities to catch \nsurvivors off-guard.
+
+-Bababooey can turn himself invisible.
+-He can create a phantom clone of himself to scare and locate Survivors.]]
+SlashCoLang["Bababooey_tip"] = "-This Slasher has the ability to vanish into thin air."
+
+SlashCoLang["Bababooey_enableinvis"] = "enable invisibility"
+SlashCoLang["Bababooey_disableinvis"] = "disable invisibility"
+SlashCoLang["Bababooey_setclone"] = "set clone"
+
+
+
+--Borgmire
+SlashCoLang["Borgmire"] = "Borgmire"
+SlashCoLang["Borgmire_desc"] = [[The Brute Slasher who can overpower survivors with overwhelming strength.
+
+-Borgmire is most effective in short chases.
+-He can pick up and throw nearby Survivors for heavy damage.]]
+SlashCoLang["Borgmire_tip"] = "-This Slasher seems to suffer from exhaustion during long chases."
+
+SlashCoLang["Borgmire_punch"] = "punch"
+SlashCoLang["Borgmire_throw"] = "throw"
+
+
+
+
+--The Covenant (WIP)
+SlashCoLang["Covenant"] = "The Covenant"
+SlashCoLang["Covenant_desc"] = [[The Leader Slasher who commands his trusted Cloaks.
+
+-Catching a Survivor will sacrifice their soul, making them become your Covenant Cloak.
+-The first Survivor you catch will be handed the Saturn Stick, becoming your most powerful ally, Rocks.
+-Without the power of the Saturn Stick, must must rely on your Cloaks to catch Survivors.]]
+SlashCoLang["Covenant_tip"] = "-This Slasher can enlist others into its ranks."
+
+
+SlashCoLang["CovenantCloak"] = "Covenant Cloak"
+
+
+SlashCoLang["Rocks"] = "LTG Rocks"
+
+--Criminal
+SlashCoLang["Criminal"] = "Criminal"
+SlashCoLang["Criminal_desc"] = [[The Tormented Slasher which relies on confusion and\nentrapment to catch his victims.
+
+-Criminal is only able to attack while standing still.
+-He can summon clones around himself as a tool of confusion.]]
+SlashCoLang["Criminal_tip"] = "-This Slasher was seen surrounded by fake copies of itself."
+
+SlashCoLang["Criminal_summonclones"] = "summon clones"
+SlashCoLang["Criminal_unsummonclones"] = "unsummon clones"
+SlashCoLang["Criminal_rage"] = "rage"
+
+
+
+
+--Dolphinman
+SlashCoLang["Dolphinman"] = "Dolphinman"
+SlashCoLang["Dolphinman_desc"] = [[The Patient Slasher who waits for survivors to come to him.
+
+-Dolphinman must hide away from survivors, to build up Hunt.
+-Upon being found, his power will activate, and stay active until he runs out of Hunt.
+-Killing Survivors increases Hunt.]]
+SlashCoLang["Dolphinman_tip"] = "-This Slasher does not appear to approach victims on its own."
+
+SlashCoLang["Dolphinman_cannothide"] = "You cannot hide here. A survivor is too close."
+SlashCoLang["Dolphinman_hide"] = "hide"
+SlashCoLang["Dolphinman_hunt"] = "hunt"
+
+
+
+
+--FreeSmiley
+SlashCoLang["FreeSmiley"] = "Free Smiley Dealer"
+SlashCoLang["FreeSmiley_desc"] = [[The Summoner Slasher which uses his minions to take control of the map.
+
+-Free Smiley Dealer can summon two types of minions, Pensive and Zany.
+Both will alert him when a Survivor is detected.
+-Pensive can stun a Survivor for a short while.
+-Zany will charge at Survivors and damage them.]]
+SlashCoLang["FreeSmiley_tip"] = "-This Slasher does not work alone."
+
+SlashCoLang["FreeSmiley_switchdeal"] = "switch deal"
+SlashCoLang["FreeSmiley_zanydeal"] = "deal a zany"
+SlashCoLang["FreeSmiley_pensivedeal"] = "deal a pensive"
+SlashCoLang["FreeSmiley_nodeal"] = "no deal"
+
+
+
+
+--Leuonard
+SlashCoLang["Leuonard"] = "Leuonard"
+SlashCoLang["Leuonard_desc"] = [[The Unstable Slasher whose overwhleming power grows with time.
+
+-Leuonard's R██e will increase over time.
+-Wrestling a Plush Dog will cause R██e to decrease.
+-Reaching 100% R██e will cause Leuonard to become extremely lethal, but nearly uncontrollable.]]
+SlashCoLang["Leuonard_tip"] = "-This Slasher seems to have a fondness for plush dogs."
+
+SlashCoLang["Leuonard_roid"] = "r**e"
+
+
+
+--Male_07
+SlashCoLang["Male07"] = "Male_07"
+SlashCoLang["Male07_desc"] = [[The Omniscient Slasher which can possess one of his many clones.
+
+-Male_07 will turn into a monstrous entity after a long enough chase.
+-He can keep his deadlier human form for longer as the game progresses.]]
+SlashCoLang["Male07_tip"] = "-This Slasher is incorporeal and can possess vessels."
+
+SlashCoLang["Male07_possess"] = "possess vessel"
+SlashCoLang["Male07_unpossess"] = "unpossess vessel"
+SlashCoLang["Male07_slash"] = "slash"
+
+
+
+--Manspider
+SlashCoLang["Manspider"] = "Manspider"
+SlashCoLang["Manspider_desc"] = [[The Huntsman Slasher which is picky with its victims.
+
+-Manspider can only target one Survivor at a time.
+-He will slowly gather aggression while close to Survivors.
+-He can nest somewhere for a chance to instantly find Prey.]]
+SlashCoLang["Manspider_tip"] = "-This Slasher is a very selective hunter."
+
+SlashCoLang["Manspider_nest"] = "nest"
+SlashCoLang["Manspider_yourprey"] = "your prey: "
+SlashCoLang["Manspider_awaitprey"] = "waiting for prey"
+SlashCoLang["Manspider_abandonnest"] = "abandon nest"
+
+
+
+
+--Princess
+SlashCoLang["Princess"] = "Princess"
+SlashCoLang["Princess_desc"] = [[The Feral Slasher who mauls children.
+
+-Princess can increase his aggression during chase, but up to a threshold.
+-The Agression Threshold can be increased by mauling Babies, which will reset your Aggression.
+-The higher your aggression, the faster and more brutal your chase is.]]
+SlashCoLang["Princess_tip"] = "-This Slasher can be distracted with Babies."
+
+SlashCoLang["Princess_sniff"] = "sniff"
+SlashCoLang["Princess_maul"] = "maul"
+SlashCoLang["Princess_aggro"] = "aggro"
+
+
+
+
+--Sid
+SlashCoLang["Sid"] = "Sid"
+SlashCoLang["Sid_desc"] = [[The Psychotic Slasher which keeps his rage in check with Cookies.
+
+-Sid gains speed while chasing over time, but starts out slow.
+-Cookies will pacify him for a while.
+-Sid's special ability allows him to devastate Survivors at long range.]]
+SlashCoLang["Sid_tip"] = "-Loud gunshots have been heard in zones where this Slasher was present."
+
+SlashCoLang["Sid_gun_title"] = "Sid (with a gun)"
+SlashCoLang["Sid_gunuses"] = "gun uses"
+SlashCoLang["Sid_shoot"] = "shoot"
+SlashCoLang["Sid_eatcookie"] = "eat cookie"
+SlashCoLang["Sid_equipgun"] = "equip gun"
+SlashCoLang["Sid_unequipgun"] = "unequip gun"
+
+
+
+
+--Speedrunner
+SlashCoLang["Speedrunner"] = "Speedrunner"
+SlashCoLang["Speedrunner_desc"] = [[The Speed Slasher whose speed grows at a constant rate over time.
+
+-Speedrunner will start out extremely slow.
+-After gaining enough speed, he will gain the ability to perform RNG sacrifice, resetting speed,
+but allowing him to regain it faster, and more of it.
+-RNG Sacrifice will have additional effects on the round when it is used.]]
+SlashCoLang["Speedrunner_tip"] = "-This Slasher grows exeptionally faster with time."
+
+SlashCoLang["Speedrunner_speed"] = "speed"
+SlashCoLang["Speedrunner_sacrifice"] = "rng sacrifice"
+
+
+
+
+--Thirsty
+SlashCoLang["Thirsty"] = "Thirsty"
+SlashCoLang["Thirsty_desc"] = [[The Milk Slasher whose abilities depend on his level of Thirst.
+
+-Thirsty must drink Jugs of Milk to reset his thirst.
+-The Thirstier he is, the slower he is, but can sense the position of players.
+-Thirsty is really quiet.]]
+SlashCoLang["Thirsty_tip"] = "-This Slasher is heavily linked with Milk Jugs."
+
+SlashCoLang["Thirsty_drinkmilk"] = "drink milk"
+SlashCoLang["Thirsty_milkies"] = "milkies"
+SlashCoLang["Thirsty_thirst"] = "thirst"
+
+
+
+
+--Trollge
+SlashCoLang["Trollge"] = "Trollge"
+SlashCoLang["Trollge_desc"] = [[The Bloodthirsty Slasher whose power grows with the amount of
+blood he has collected.
+
+-Trollge cannot see Survivors who stand still.
+-He must collect enough blood to unlock his true form.
+-He can not collect blood after the round has progressed enough.]]
+SlashCoLang["Trollge_tip"] = "-Its eyesight seems to be limited to moving objects."
+
+SlashCoLang["Trollge_dash"] = "dash"
+SlashCoLang["Trollge_claw"] = "claw"
+SlashCoLang["Trollge_blood"] = "blood"
+
+
+
+
+--Tyler
+SlashCoLang["Tyler"] = "Tyler"
+SlashCoLang["Tyler_desc"] = [[The Balance Slasher who controls the progress of the round.
+
+-Tyler has two forms. Creator, and Destroyer.
+-Tyler, the Creator will create gas cans for survivors upon being found.
+Tyler, the Destroyer will destroy anything in its path.]]
+SlashCoLang["Tyler_tip"] = "-Noticeably fewer Fuel Cans were spotted in this Slasher's Zone."
+SlashCoLang["Tyler_creator"] = "Tyler, The Creator"
+SlashCoLang["Tyler_destroyer"] = "Tyler, The Destroyer"
+
+SlashCoLang["Tyler_manifest"] = "manifest"
+SlashCoLang["Tyler_hiding"] = "(hiding)"
+SlashCoLang["Tyler_manifest"] = "manifest"
+SlashCoLang["Tyler_destroy"] = "destroy"
+
+
+
+
+--Watcher
+SlashCoLang["Watcher"] = "Watcher"
+SlashCoLang["Watcher_desc"] = [[The Observing Slasher whose power relies on sight.
+
+-The Watcher can Survey the map every once in a while to locate all survivors.
+-He will be slowed down if he is looked at, but anyone who does so will be located.
+-The Watcher can stalk Survivors to build up his special ability, Full Surveillance.]]
+SlashCoLang["Watcher_tip"] = "-This Slasher suffers from a loss of speed while observed."
+
+SlashCoLang["Watcher_survey"] = "survey"
+SlashCoLang["Watcher_fullsurveillance"] = "full surveillance"
+SlashCoLang["Watcher_watched"] = "YOU ARE BEING WATCHED"
+SlashCoLang["Watcher_observe"] = "OBSERVING A SURVIVOR. . ."
+SlashCoLang["Watcher_stalktime"] = "STALK TIME: "

@@ -20,13 +20,8 @@ SlashCoSlasher.Speedrunner.ChaseCooldown = 1
 SlashCoSlasher.Speedrunner.JumpscareDuration = 1.5
 SlashCoSlasher.Speedrunner.ChaseMusic = ""
 SlashCoSlasher.Speedrunner.KillSound = "slashco/slasher/speedrunner_kill.mp3"
-SlashCoSlasher.Speedrunner.Description = [[The Speed Slasher whose speed grows at a constant rate over time.
-
--Speedrunner will start out extremely slow.
--After gaining enough speed, he will gain the ability to perform RNG sacrifice, resetting speed,
-but allowing him to regain it faster, and more of it.
--RNG Sacrifice will have additional effects on the round when it is used.]]
-SlashCoSlasher.Speedrunner.ProTip = "-This Slasher grows exeptionally faster with time."
+SlashCoSlasher.Speedrunner.Description = "Speedrunner_desc"
+SlashCoSlasher.Speedrunner.ProTip = "Speedrunner_tip"
 SlashCoSlasher.Speedrunner.SpeedRating = "★★★★★"
 SlashCoSlasher.Speedrunner.EyeRating = "★★★☆☆"
 SlashCoSlasher.Speedrunner.DiffRating = "★★★★★"

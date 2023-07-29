@@ -22,12 +22,8 @@ SlashCoSlasher.Covenant.ChaseCooldown = 7
 SlashCoSlasher.Covenant.JumpscareDuration = 1.5
 SlashCoSlasher.Covenant.ChaseMusic = "slashco/slasher/covenant_chase.wav"
 SlashCoSlasher.Covenant.KillSound = "slashco/slasher/"
-SlashCoSlasher.Covenant.Description = [[The Leader Slasher who commands his trusted Cloaks.
-
--Catching a Survivor will sacrifice their soul, making them become your Covenant Cloak.
--The first Survivor you catch will be handed the Saturn Stick, becoming your most powerful ally, Rocks.
--Without the power of the Saturn Stick, must must rely on your Cloaks to catch Survivors.]]
-SlashCoSlasher.Covenant.ProTip = "-This Slasher can enlist others into its ranks."
+SlashCoSlasher.Covenant.Description = "Covenant_desc"
+SlashCoSlasher.Covenant.ProTip = "Covenant_tip"
 SlashCoSlasher.Covenant.SpeedRating = "★★★★★"
 SlashCoSlasher.Covenant.EyeRating = "★★☆☆☆"
 SlashCoSlasher.Covenant.DiffRating = "★★★☆☆"

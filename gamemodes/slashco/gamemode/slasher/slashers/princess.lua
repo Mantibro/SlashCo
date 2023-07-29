@@ -20,12 +20,8 @@ SlashCoSlasher.Princess.ChaseCooldown = 3
 SlashCoSlasher.Princess.JumpscareDuration = 1.5
 SlashCoSlasher.Princess.ChaseMusic = "slashco/slasher/princess_chase.wav"
 SlashCoSlasher.Princess.KillSound = ""
-SlashCoSlasher.Princess.Description = [[The Feral Slasher who mauls children.
-
--Princess can increase his aggression during chase, but up to a threshold.
--The Agression Threshold can be increased by mauling Babies, which will reset your Aggression.
--The higher your aggression, the faster and more brutal your chase is.]]
-SlashCoSlasher.Princess.ProTip = "-This Slasher can be distracted with Babies."
+SlashCoSlasher.Princess.Description = "Princess_desc"
+SlashCoSlasher.Princess.ProTip = "Princess_tip"
 SlashCoSlasher.Princess.SpeedRating = "★★★★☆"
 SlashCoSlasher.Princess.EyeRating = "★★☆☆☆"
 SlashCoSlasher.Princess.DiffRating = "★★☆☆☆"

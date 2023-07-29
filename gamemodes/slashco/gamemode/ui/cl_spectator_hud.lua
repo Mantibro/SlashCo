@@ -77,13 +77,13 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
     draw.SimpleText("["..SlashCoLanguage("spectating").."]", "TVCD", ScrW() * 0.5, (ScrH() * 0.05), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-    draw.SimpleText("[Q] "..SlashCoLanguage("hide_info"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 260, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[ALT] "..SlashCoLanguage("toggle_halo"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[E] "..SlashCoLanguage("toggle_halo_gas"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[LMB] "..SlashCoLanguage("player_follow"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[RMB] "..SlashCoLanguage("player_cycle"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[SPACE] "..SlashCoLanguage("switch_view"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[R] "..SlashCoLanguage("toggle_light"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText(SlashCoLanguage("hide_info", "Q"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 260, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText(SlashCoLanguage("toggle_halo", "ALT"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText(SlashCoLanguage("toggle_halo_gas", "E"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText(SlashCoLanguage("player_follow", "LMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText(SlashCoLanguage("player_cycle", "RMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText(SlashCoLanguage("switch_view", "SPACE"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText(SlashCoLanguage("toggle_light", "R"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
 end)
 

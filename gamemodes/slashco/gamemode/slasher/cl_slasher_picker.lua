@@ -74,7 +74,7 @@ function DrawTheSlasherSelectorBox()
 	
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create( "DFrame" )
-	SlasherSelectFrame:SetTitle( "Pick Your Slasher" )
+	SlasherSelectFrame:SetTitle( "" )
 
 	local x = ScrW()/50
 	local y = ScrH()/25
@@ -148,7 +148,7 @@ function DrawTheSlasherSelectorBox()
 	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() LocalPlayer():EmitSound("slashco/slasher_select.mp3") end
 	confirmselect:SetPos( ScrW()/2, ScrH()/1.1 )
 	confirmselect:SetSize( ScrW()/4, 40 )
-	confirmselect:SetText( "SELECT" )
+	confirmselect:SetText( SlashCoLanguage("ItemConfirm") )
 	confirmselect:SetFont( "MenuFont2" )
 	confirmselect.Paint = function( self, w, h )
 		draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 0, 0, 255 ) )
@@ -192,10 +192,10 @@ function DrawTheSlasherSelectorBox()
 	ISDesc:SetSize(ScrW()/2, 100)
 
 	if SelectedSlasher ~= "None" then 
-		ILabel:SetText( SlashCoSlasher[SelectedSlasher].Name ) 
-		ISDesc:SetText(SlashCoSlasher[SelectedSlasher].Description.."\n\nSpeed: "..SlashCoSlasher[SelectedSlasher].SpeedRating.."\nEyesight: "..SlashCoSlasher[SelectedSlasher].EyeRating.."\nDifficulty: "..SlashCoSlasher[SelectedSlasher].DiffRating ) 
-		ISClass:SetText( TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class) ) 
-		ISDanger:SetText( TranslateDangerLevel(SlashCoSlasher[SelectedSlasher].DangerLevel)) 
+		ILabel:SetText( SlashCoLanguage(SelectedSlasher) ) 
+		ISDesc:SetText(SlashCoLanguage(SelectedSlasher.."_desc").."\n\n"..SlashCoLanguage("slasher_speedrate")..": "..SlashCoSlasher[SelectedSlasher].SpeedRating.."\n"..SlashCoLanguage("slasher_eyerate")..": "..SlashCoSlasher[SelectedSlasher].EyeRating.."\n"..SlashCoLanguage("slasher_diffrate")..": "..SlashCoSlasher[SelectedSlasher].DiffRating ) 
+		ISClass:SetText( SlashCoLanguage(TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class)) ) 
+		ISDanger:SetText( SlashCoLanguage(TranslateDangerLevel(SlashCoSlasher[SelectedSlasher].DangerLevel))) 
 
 		if SlashCoSlasher[SelectedSlasher].DangerLevel == 1 then
 			ISDanger:SetTextColor( Color( 255, 200, 0) )
@@ -212,11 +212,11 @@ function DrawTheSlasherSelectorBox()
 		local Descriptor = vgui.Create( "DLabel", SlasherSelectFrame )
 		Descriptor:SetPos( ScrW()/2, ScrH()/1.75 )
 		Descriptor:SetSize(1024, 600)
-		Descriptor:SetText([[SLASHER CLASS:
+		Descriptor:SetText(SlashCoLanguage("Class")..[[:
 		
 
 		
-		DANGER LEVEL:]])
+		]]..SlashCoLanguage("DangelLevel")..[[:]])
 		Descriptor:SetFont( "MenuFont1" )
 		Descriptor:SetAutoStretchVertical( true )
 	else

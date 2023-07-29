@@ -20,12 +20,8 @@ SlashCoSlasher.Dolphinman.ChaseCooldown = 3
 SlashCoSlasher.Dolphinman.JumpscareDuration = 0.5
 SlashCoSlasher.Dolphinman.ChaseMusic = ""
 SlashCoSlasher.Dolphinman.KillSound = "slashco/slasher/dolfin_kill.mp3"
-SlashCoSlasher.Dolphinman.Description = [[The Patient Slasher who waits for survivors to come to him.
-
--Dolphinman must hide away from survivors, to build up Hunt.
--Upon being found, his power will activate, and stay active until he runs out of Hunt.
--Killing Survivors increases Hunt.]]
-SlashCoSlasher.Dolphinman.ProTip = "-This Slasher does not appear to approach victims on its own."
+SlashCoSlasher.Dolphinman.Description = "Dolphinman_desc"
+SlashCoSlasher.Dolphinman.ProTip = "Dolphinman_tip"
 SlashCoSlasher.Dolphinman.SpeedRating = "★★☆☆☆"
 SlashCoSlasher.Dolphinman.EyeRating = "★★★☆☆"
 SlashCoSlasher.Dolphinman.DiffRating = "★★★★☆"

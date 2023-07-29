@@ -31,22 +31,23 @@ for _, v in ipairs(lang_files) do
     include("lang/"..v)
 end]]
 
-function SlashCoLanguage(key)
-
-    if SlashCoLang[key] then
-
-        return SlashCoLang[key]
-
-    elseif SlashCoLangFallback[key] then
-
-        return SlashCoLangFallback[key]
-
-    else
-
-        return "?"
-
+function SlashCoLanguage(key, ...)
+    local vars = {}
+    for _, v in ipairs({...}) do
+        if type(v) == "string" then
+            table.insert(vars, SlashCoLanguage(v))
+        else
+            table.insert(vars, v)
+        end
     end
 
+    if SlashCoLang[key] then
+        return string.format(SlashCoLang[key], unpack(vars))
+    elseif SlashCoLangFallback[key] then
+        return string.format(SlashCoLangFallback[key], unpack(vars))
+    else
+        return string.format(key, unpack(vars))
+    end
 end
 
 function GetOfferingName(key)
