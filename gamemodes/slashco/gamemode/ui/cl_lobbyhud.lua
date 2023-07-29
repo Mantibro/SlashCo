@@ -55,14 +55,14 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
     local scrW, scrH = ScrW(), ScrH()
 
     --LobbyFont1
-    draw.SimpleText("[" .. point_count .. " POINTS]  [" .. srvwin_count .. " SURVIVOR WINS]  [" .. slswin_count .. " SLASHER WINS]", "TVCD", ScrW() * 0.025, (ScrH() * 0.05), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+    draw.SimpleText("[" .. point_count .. " "..SlashCoLanguage("PointCount").."]  [" .. srvwin_count .. " "..SlashCoLanguage("SurvivorWins").."]  [" .. slswin_count .. " "..SlashCoLanguage("SlasherWins").."]", "TVCD", ScrW() * 0.025, (ScrH() * 0.05), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
     if StateOfLobby == nil or StateOfLobby < 1 then
-        draw.SimpleText("[,] TOGGLE SPECTATE", "TVCD", scrW * 0.975, (scrH * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+        draw.SimpleText("[,] "..SlashCoLanguage("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
     end
 
     if LocalPlayer():Team() == TEAM_LOBBY then
-        draw.SimpleText("[R] SELECT PLAYERMODEL", "TVCD", scrW * 0.975, (scrH * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+        draw.SimpleText("[R] "..SlashCoLanguage("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
     end
 
     if StateOfLobby ~= nil and StateOfLobby < 1 then
@@ -94,11 +94,11 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
         if isClientinLobby then
             surface.SetDrawColor(255, 255, 255, 255)
 
-            draw.SimpleText("[F1] READY AS SURVIVOR", "TVCD", scrW * 0.975, (scrH * 0.95) - 130, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-            draw.SimpleText("[F2] READY AS SLASHER", "TVCD", scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+            draw.SimpleText("[F1] "..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Survivor") ), "TVCD", scrW * 0.975, (scrH * 0.95) - 130, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+            draw.SimpleText("[F2] "..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Slasher") ), "TVCD", scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
             if TimeLeft ~= nil and TimeLeft > 0 and TimeLeft < 61 then
-                draw.SimpleText("Starting in: " .. tostring(TimeLeft) .. " seconds. . .", "LobbyFont2", scrW * 0.5, (scrH * 0.65), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+                draw.SimpleText(tostring(TimeLeft), "LobbyFont2", scrW * 0.5, (scrH * 0.65), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
             end
 
             local mul_y = 1
@@ -143,11 +143,11 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
             if clientReadiness then
                 if clientReadiness < 1 then
-                    draw.SimpleText("       [NOT READY]", "TVCD", scrW * 0.025, (scrH * 0.22), grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                    draw.SimpleText("       ["..SlashCoLanguage("NotReady").."]", "TVCD", scrW * 0.025, (scrH * 0.22), grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
                 elseif clientReadiness == 1 then
-                    draw.SimpleText("       [READIED AS SURVIVOR]", "TVCD", scrW * 0.025, (scrH * 0.22), green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                    draw.SimpleText("       ["..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Survivor")).."]", "TVCD", scrW * 0.025, (scrH * 0.22), green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
                 elseif clientReadiness == 2 then
-                    draw.SimpleText("       [READIED AS SLASHER]", "TVCD", scrW * 0.025, (scrH * 0.22), red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                    draw.SimpleText("       ["..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Slasher")).."]", "TVCD", scrW * 0.025, (scrH * 0.22), red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
                 end
             end
         end

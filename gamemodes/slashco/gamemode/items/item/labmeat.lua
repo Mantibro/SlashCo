@@ -2,10 +2,10 @@ local ITEM = SlashCoItems.LabMeat or {}
 SlashCoItems.LabMeat = ITEM
 
 ITEM.Model = "models/slashco/items/labmeat.mdl"
-ITEM.Name = "Lab-Grown Meat"
+ITEM.Name = "LabMeat"
 ITEM.EntClass = "sc_labmeat"
 ITEM.Price = 35
-ITEM.Description = "Now cleared for sale in the United States! Is it worth it?\nConsuming grants a temporary awareness of any nearby slashers."
+ITEM.Description = "LabMeat_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
 ITEM.OnDrop = function(ply)

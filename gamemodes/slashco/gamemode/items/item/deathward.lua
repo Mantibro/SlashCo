@@ -6,7 +6,7 @@ SlashCoItems.DeathWard.EntClass = "sc_deathward"
 SlashCoItems.DeathWard.Name = "Deathward"
 SlashCoItems.DeathWard.Icon = "slashco/ui/icons/items/item_2"
 SlashCoItems.DeathWard.Price = 50
-SlashCoItems.DeathWard.Description = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
+SlashCoItems.DeathWard.Description = "Deathward_desc"
 SlashCoItems.DeathWard.CamPos = Vector(40, 0, 15)
 SlashCoItems.DeathWard.MaxAllowed = function()
 	return 2

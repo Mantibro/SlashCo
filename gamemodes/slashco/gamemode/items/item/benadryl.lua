@@ -2,10 +2,10 @@ local ITEM = SlashCoItems.Benadryl or {}
 SlashCoItems.Benadryl = ITEM
 
 ITEM.Model = "models/slashco/items/benadryl.mdl"
-ITEM.Name = "25 gram Benadryl"
+ITEM.Name = "Benadryl"
 ITEM.EntClass = "sc_benadryl"
 ITEM.Price = 60
-ITEM.Description = "All new 25 gram Benadryl, made from 1200 pills."
+ITEM.Description = "Benadryl_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.OnDrop = function(ply)
 end

@@ -2,10 +2,10 @@ local ITEM = SlashCoItems.Jug or {}
 SlashCoItems.Jug = ITEM
 
 ITEM.Model = "models/slashco/items/jug.mdl"
-ITEM.Name = "The Jug"
+ITEM.Name = "Jug"
 ITEM.EntClass = "sc_jug"
 ITEM.Price = 7
-ITEM.Description = "We have no idea what is this."
+ITEM.Description = "Jug_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true

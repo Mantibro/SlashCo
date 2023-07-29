@@ -2,11 +2,11 @@ local SlashCoItems = SlashCoItems
 
 SlashCoItems.Soda = SlashCoItems.Soda or {}
 SlashCoItems.Soda.Model = "models/props_junk/PopCan01a.mdl"
-SlashCoItems.Soda.Name = "B-Gone Soda"
+SlashCoItems.Soda.Name = "Soda"
 SlashCoItems.Soda.EntClass = "sc_soda"
 SlashCoItems.Soda.Icon = "slashco/ui/icons/items/item_8"
 SlashCoItems.Soda.Price = 20
-SlashCoItems.Soda.Description = "Become invisible on use."
+SlashCoItems.Soda.Description = "Soda_desc"
 SlashCoItems.Soda.CamPos = Vector(30,0,0)
 SlashCoItems.Soda.IsSpawnable = true
 SlashCoItems.Soda.OnUse = function(ply)

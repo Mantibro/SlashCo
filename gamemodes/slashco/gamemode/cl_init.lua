@@ -401,12 +401,12 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
 	if GameReady == true then
 
-		draw.SimpleText("The round will start soon.", "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
+		draw.SimpleText(SlashCoLanguage("player_ready"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 	else
 
-		draw.SimpleText("Waiting for players. . .", "ItemFont", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER,
+		draw.SimpleText(SlashCoLanguage("player_await"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
 
 	end
@@ -442,10 +442,10 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		cam.Start3D2D(pos, angle, 0.15)
 		-- Get the size of the text we are about to draw
 
-		local text = "Make an Offering"
+		local text = SlashCoLanguage("offering_idle")
 
 		if offering_name ~= nil then
-			text = offering_name .. " Offering"
+			text = GetOfferingName(offering_name)
 		end
 
 		surface.SetFont("LobbyFont1")
@@ -490,26 +490,26 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
 		local txtcolor = color_white
 
-		local s_cls_t = TranslateSlasherClass(s_cls)
-		local s_dng_t = TranslateDangerLevel(s_dng)
+		local s_cls_t = SlashCoLanguage(TranslateSlasherClass(s_cls))
+		local s_dng_t = SlashCoLanguage(TranslateDangerLevel(s_dng))
 
 		surface.SetDrawColor(0, 0, 0, 255)
 		surface.DrawRect(-monitorsize / 2, -monitorsize / 2, monitorsize, monitorsize)
 
 		surface.SetDrawColor(0, 0, 0, 255)
-		draw.SimpleText("BRIEFING:", "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2, color_white)
 
-		draw.SimpleText("Name:", "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Name")..":", "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2, color_white)
 		if s_n == "Unknown" then
 			txtcolor = Color(200, 0, 0, (b_tick - 0))
 		else
 			txtcolor = Color(255, 255, 255, (b_tick - 0))
 		end
 
-		draw.SimpleText(s_n, "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor, TEXT_ALIGN_CENTER,
+		draw.SimpleText(SlashCoLanguage(s_n), "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_TOP)
 
-		draw.SimpleText("Class:", "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Class")..":", "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2, color_white)
 		if s_cls == 0 then
 			txtcolor = Color(200, 0, 0, (b_tick - 255))
 		else
@@ -519,7 +519,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_cls_t, "BriefingFont", 900 - monitorsize / 2, 350 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText("Danger Level:", "BriefingFont", 25 - monitorsize / 2, 450 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Danger Level")..":", "BriefingFont", 25 - monitorsize / 2, 450 - monitorsize / 2, color_white)
 
 		if s_dng == 1 then
 			txtcolor = Color(255, 255, 0, (b_tick - (255 * 2)))
@@ -534,7 +534,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_dng_t, "BriefingFont", 900 - monitorsize / 2, 450 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText("Notes:", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Notes")..":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2, color_white)
 
 		local icondrawid = 0
 

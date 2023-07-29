@@ -67,7 +67,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
     end
 
     if show_slasher_anticipation ~= false then
-        draw.SimpleText("You will spawn as " .. show_slasher_anticipation .. " soon. . .", "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color(255, 50, 50, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        draw.SimpleText(SlashCoLanguage("slasher_anticipatiuon") .. show_slasher_anticipation, "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color(255, 50, 50, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
         return
     end
 
@@ -75,15 +75,15 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
         return
     end
 
-    draw.SimpleText("[YOU ARE SPECTATING]", "TVCD", ScrW() * 0.5, (ScrH() * 0.05), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+    draw.SimpleText("["..SlashCoLanguage("spectating").."]", "TVCD", ScrW() * 0.5, (ScrH() * 0.05), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-    draw.SimpleText("[Q] HOLD TO HIDE INFO", "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 260, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[ALT] TOGGLE HALOS", "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[E] TOGGLE GAS CAN HALOS", "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[LMB] FOLLOW PLAYER", "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[RMB] CYCLE SURVIVORS", "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[SPACE] SWITCH VIEW", "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-    draw.SimpleText("[R] TOGGLE LIGHT", "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText("[Q] "..SlashCoLanguage("hide_info"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 260, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText("[ALT] "..SlashCoLanguage("toggle_halo"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText("[E] "..SlashCoLanguage("toggle_halo_gas"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText("[LMB] "..SlashCoLanguage("player_follow"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText("[RMB] "..SlashCoLanguage("player_cycle"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText("[SPACE] "..SlashCoLanguage("switch_view"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+    draw.SimpleText("[R] "..SlashCoLanguage("toggle_light"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
 end)
 

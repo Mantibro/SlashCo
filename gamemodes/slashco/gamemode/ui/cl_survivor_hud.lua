@@ -99,19 +99,19 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	local HeldItem = ply:GetNWString("item", "none")
 	if SlashCoItems[HeldItem or "none"] then
-		local parsedItem = markup.Parse("<font=TVCD>---     " .. string.upper(SlashCoItems[HeldItem].Name) .. "     ---</font>")
+		local parsedItem = markup.Parse("<font=TVCD>---     " .. string.upper(SlashCoLanguage(SlashCoItems[HeldItem].Name)) .. "     ---</font>")
 		surface.SetDrawColor(ply:ItemFunctionOrElse("DisplayColor", { 0, 0, 128 }))
 		surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
 		parsedItem:Draw(ScrW() * 0.975 - 4, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
 		local offset = 0
 		if SlashCoItems[HeldItem].OnUse then
-			draw.SimpleText("[R] USE", "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30, color_white, TEXT_ALIGN_RIGHT,
+			draw.SimpleText("[R] "..SlashCoLanguage("item_use"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30, color_white, TEXT_ALIGN_RIGHT,
 					TEXT_ALIGN_BOTTOM)
 			offset = 30
 		end
 		if SlashCoItems[HeldItem].OnDrop then
-			draw.SimpleText("[Q] DROP", "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset, color_white,
+			draw.SimpleText("[Q] "..SlashCoLanguage("item_drop"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset, color_white,
 					TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 	end
@@ -135,7 +135,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			surface.DrawRect(xClamp - width / 2, yClamp - 13, width, 27)
 			draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + 205 - width / 2, yClamp,
 					Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-			draw.SimpleText("FUEL " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2,
+			draw.SimpleText("--> " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2,
 					yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 		else
 			IsFueling = false
@@ -148,7 +148,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		local lookent = LocalPlayer():GetEyeTrace().Entity
 		if IsValid(lookent) and lookent:GetClass() == "prop_door_rotating" and g_CheckDoorWL(lookent) then
 			if lookent:GetPos():Distance(LocalPlayer():GetPos()) < 150 and not lookent.IsOpen then
-				draw.SimpleText("[LMB] SLAM OPEN", "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER,
+				draw.SimpleText("[LMB] "..SlashCoLanguage("door_slam"), "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER,
 						TEXT_ALIGN_CENTER)
 			end
 		end
@@ -201,7 +201,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 						TEXT_ALIGN_CENTER)
 
 				if realDistance < 200 and centerDistance < 25 then
-					draw.SimpleText("[MMB] PING", "TVCD", ScrW() / 2, ScrH() / 2 + 100, color_white, TEXT_ALIGN_CENTER,
+					draw.SimpleText("[MMB] "..SlashCoLanguage("surv_ping"), "TVCD", ScrW() / 2, ScrH() / 2 + 100, color_white, TEXT_ALIGN_CENTER,
 							TEXT_ALIGN_CENTER)
 				end
 			end

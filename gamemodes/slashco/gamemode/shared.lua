@@ -15,6 +15,54 @@ include("player_class/player_lobby.lua")
 
 CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_players =
 
+--set up language
+
+SlashCoLang = {}
+
+include("lang/en.lua")
+AddCSLuaFile("lang/en.lua")
+
+SlashCoLangFallback = SlashCoLang
+
+--[[local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
+
+for _, v in ipairs(lang_files) do  
+    AddCSLuaFile("lang/"..v)
+    include("lang/"..v)
+end]]
+
+function SlashCoLanguage(key)
+
+    if SlashCoLang[key] then
+
+        return SlashCoLang[key]
+
+    elseif SlashCoLangFallback[key] then
+
+        return SlashCoLangFallback[key]
+
+    else
+
+        return "?"
+
+    end
+
+end
+
+function GetOfferingName(key)
+
+    if SlashCoLang.OfferingPreceedsName then
+
+        return SlashCoLanguage("Offering") .. " " .. SlashCoLanguage(key)
+
+    else
+
+        return SlashCoLanguage(key) .. " " .. SlashCoLanguage("Offering")
+
+    end
+
+end
+
 function GM:Initialize()
     -- Do stuff
 end
@@ -143,19 +191,6 @@ SCInfo.Offering = {
     }
 
 }
-
-SCInfo.Main = {
-
-    Base = "Welcome to the SlashCo Power Recovery Program.\n\nYour assignment is refuelling and activating two Generators present in an area called the Slasher Zone.\n\nYou will need to pour four cans of fuel and insert a car battery into each, however it might turn out not to be an easy task.\n\nAn evil entity known as a Slasher will be present in the zone with you. The only way you can successfully complete your \ntask is by knowing how to survive.\n\nYou will be dropped off by a helicopter, which will also pick you up after both of the generators have been activated.\n\nIf you ever find yourself left stranded without a team, the helicopter can come rescue you prematurely if you signal \nit with a Distress Beacon, one of which you will always be able to find within the Slasher Zone.\nRescue will come only if at least one generator has been activated.\n\nBefore you set off to the Slasher Zone, you can choose an Item in the lobby in exchange for Points you earn during rounds as Survivor.",
-    SlasherBase = "As a Slasher, your goal is to kill all of the Survivors before they manage to escape.\n\nYou can track the progress of the Survivors' assignment with a bar which indicates the Game Progress.\n\nEach Slasher has unique abilities which can help achieve your goal in different ways, furthermore, Slashers are divided\ninto three different Classes, each of which has a different ability kind.\n\nCryptid:\nThe abilities of Cryptids are simple and easy to understand. They consist of relatively straightforward ways of\nhelping you kill Survivors.\n\nDemon:\nA Demon's abilities depend on the Items they have consumed, which will be spawned all around the map, and at times the\nGame Progress of the round, meaning that a Demon's goals is not just killing Survivors, but also finding and consuming\nItems to grow their power.\n\nUmbra:\nThe powers of Slashers of the Umbra class grow as the Game Progress increases, meaning they are weak at first, but the\ncloser the Survivors get to completing their assignment, their abilities strengthen.",
-
-}
-
-SCInfo.Survivor = [[As a Survivor, your objective is to fuel two Generators and escape by Helicopter.
-
-A Generator requires up to 4 Fuel Cans and a Battery to be activated.
-
-Survivors can use a variety of Items to help them.]]
 
 SCInfo.Maps = {
     ["error"] = {

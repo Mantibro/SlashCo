@@ -2,11 +2,11 @@ local SlashCoItems = SlashCoItems
 
 SlashCoItems.StepDecoy = SlashCoItems.StepDecoy or {}
 SlashCoItems.StepDecoy.Model = "models/props_junk/Shoe001a.mdl"
-SlashCoItems.StepDecoy.Name = "Step Decoy"
+SlashCoItems.StepDecoy.Name = "StepDecoy"
 SlashCoItems.StepDecoy.EntClass = "sc_stepdecoy"
 SlashCoItems.StepDecoy.Icon = "slashco/ui/icons/items/item_6"
 SlashCoItems.StepDecoy.Price = 10
-SlashCoItems.StepDecoy.Description = "If placed on a solid surface, this will imitate footsteps sounds which can distract slashers."
+SlashCoItems.StepDecoy.Description = "StepDecoy_desc"
 SlashCoItems.StepDecoy.CamPos = Vector(50,0,20)
 SlashCoItems.StepDecoy.IsSpawnable = true
 SlashCoItems.StepDecoy.OnUse = function(ply)

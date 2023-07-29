@@ -2,10 +2,10 @@ local ITEM = SlashCoItems.Brick or {}
 SlashCoItems.Brick = ITEM
 
 ITEM.Model = "models/props_junk/cinderblock01a.mdl"
-ITEM.Name = "Cinder Block"
+ITEM.Name = "Brick"
 ITEM.EntClass = "sc_brick"
 ITEM.Price = 5
-ITEM.Description = "Just some cinder block we found, nothing special. Can be thrown."
+ITEM.Description = "Brick_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ReplacesWorldProps = true
 ITEM.OnDrop = function(ply)

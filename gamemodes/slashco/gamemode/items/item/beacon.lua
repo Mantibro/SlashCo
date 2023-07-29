@@ -3,10 +3,10 @@ local SlashCoItems = SlashCoItems
 SlashCoItems.Beacon = SlashCoItems.Beacon or {}
 SlashCoItems.Beacon.Model = "models/props_c17/light_cagelight01_on.mdl"
 SlashCoItems.Beacon.EntClass = "sc_beacon"
-SlashCoItems.Beacon.Name = "Distress Beacon"
+SlashCoItems.Beacon.Name = "Beacon"
 SlashCoItems.Beacon.Icon = "slashco/ui/icons/items/item_9"
 SlashCoItems.Beacon.Price = 15
-SlashCoItems.Beacon.Description = "Alerts the SlashCo headquarters to abort the mission. Only IMPORTANT circumstances get a fast response."
+SlashCoItems.Beacon.Description = "Beacon_desc"
 SlashCoItems.Beacon.CamPos = Vector(50,0,35)
 SlashCoItems.Beacon.MaxAllowed = function()
     return 1

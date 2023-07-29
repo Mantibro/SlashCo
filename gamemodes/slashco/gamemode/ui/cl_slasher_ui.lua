@@ -29,7 +29,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	if pacified then
-		draw.SimpleText("You have been pacified by consuming an item.",
+		draw.SimpleText(SlashCoLanguage("demon_pacified"),
 				"ItemFontTip", ScrW() / 2, ScrH() / 4, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
@@ -43,9 +43,9 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 			end
 
-			draw.SimpleText("The Survivors are attempting to call emergency escape.", "ItemFontTip", ScrW() / 2,
+			draw.SimpleText(SlashCoLanguage("beacon_call"), "ItemFontTip", ScrW() / 2,
 					ScrH() / 1.5, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			draw.SimpleText("DESTROY THE BEACON.", "ItemFontTip", ScrW() / 2, ScrH() / 1.45, Color(255, 0, 0, 255),
+			draw.SimpleText(SlashCoLanguage("beacon_destroy"), "ItemFontTip", ScrW() / 2, ScrH() / 1.45, Color(255, 0, 0, 255),
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		end
 	end

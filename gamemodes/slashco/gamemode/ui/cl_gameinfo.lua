@@ -62,17 +62,16 @@ function DrawTheGameInfoBox()
 	local MainInfo = vgui.Create( "DLabel", GameInfo )
 	MainInfo:SetPos( 40, 250 )
 	MainInfo:SetSize(1200, 700)
-	--MainInfo:SetText( SCInfo.Main.Base )
 	MainInfo:SetFont( "MenuFont1" )
 	MainInfo:SetAutoStretchVertical( true )
 
 	if CurrentDisplayedInfo == 0 then
 
-		MainInfo:SetText( SCInfo.Main.Base )
+		MainInfo:SetText( SlashCoLanguage("SurvivorInfo") )
 
 	else
 
-		MainInfo:SetText( SCInfo.Main.SlasherBase )
+		MainInfo:SetText( SlashCoLanguage("SlasherInfo") )
 
 	end
 
