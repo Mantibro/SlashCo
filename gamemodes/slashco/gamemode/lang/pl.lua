@@ -52,10 +52,12 @@ SlashCoLang["Considerable"] = "Znaczny"
 SlashCoLang["Devastating"] = "Dewastacyjny"
 
 SlashCoLang["Offering"] = "Dar"
-SlashCoLang.OfferingPreceedsName = true
+SlashCoLang["Offering_name"] = "Dar %s"
 
 SlashCoLang["offervote_1"] = "%s chce złożyć Dar. Czy akceptujesz %s?"
 SlashCoLang["offervote_success"] = "%s będzie aktywny przez następną grę."
+
+SlashCoLang["GameInfo"] = "[%s] INFORMACJE"
 
 --OFFERINGS
 
@@ -84,7 +86,7 @@ SlashCoLang["SurvivorWins"] = "WYGRANYCH JAKO OCALAŁY"
 SlashCoLang["SlasherWins"] = "WYGRANYCH JAKO SLASHER"
 
 SlashCoLang["ToggleSpectate"] = "PRZEŁĄCZ TRYB WIDZA"
-SlashCoLang["SelectPlayermodel"] = "WYBIESZ MODEL"
+SlashCoLang["SelectPlayermodel"] = "WYBIERZ MODEL"
 
 SlashCoLang["NotReady"] = "NIE GOTOWY"
 SlashCoLang["ReadyAs"] = "GOTOWY JAKO %s"
@@ -101,6 +103,9 @@ SlashCoLang["ItemConfirm"] = "POTWIERDŹ"
 SlashCoLang["ItemRemaining"] = "POZOSTAŁO"
 
 SlashCoLang["MapGuaranteeDesc"] = "Bribe the helicopter driver to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
+
+
+
 
 SlashCoLang["Alcohol"] = "\"Bimber\""
 SlashCoLang["Alcohol_desc"] = "Unfortunate."
@@ -123,8 +128,8 @@ SlashCoLang["Brick_desc"] = "Just some cinder block we found, nothing special. C
 SlashCoLang["Cookie"] = "Ciacho"
 SlashCoLang["Cookie_desc"] = "Gain a temporary bonus to fuel pouring on use.\nA certain Slasher seems to really like this item."
 
-SlashCoLang["Deathward"] = "Deathward"
-SlashCoLang["Deathward_desc"] = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
+SlashCoLang["DeathWard"] = "Deathward"
+SlashCoLang["DeathWard_desc"] = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
 
 SlashCoLang["DevilDie"] = "Hazard Diabła"
 SlashCoLang["DevilDie_desc"] = "Gain a random effect on use; either good or horrible."
@@ -138,8 +143,8 @@ SlashCoLang["Jug_desc"] = "We have no idea what is this."
 SlashCoLang["LabMeat"] = "Mięso Laboratoryjne"
 SlashCoLang["LabMeat_desc"] = "Now cleared for sale in the United States! Is it worth it?\nConsuming grants a temporary awareness of any nearby slashers."
 
-SlashCoLang["Mayo"] = "Majonez"
-SlashCoLang["Mayo_desc"] = "Get a large boost to health."
+SlashCoLang["Mayonnaise"] = "Majonez"
+SlashCoLang["Mayonnaise_desc"] = "Get a large boost to health."
 
 SlashCoLang["MilkJug"] = "Mleko"
 SlashCoLang["MilkJug_desc"] = "Gain a temporary boost in speed on use.\nA certain Slasher seems to really like this item."
@@ -227,6 +232,16 @@ SlashCoLang["player_follow"] = "[%s] FOLLOW PLAYER"
 SlashCoLang["player_cycle"] = "[%s] CYCLE SURVIVORS"
 SlashCoLang["switch_view"] = "[%s] SWITCH VIEW"
 SlashCoLang["toggle_light"] = "[%s] TOGGLE LIGHT"
+
+--Pings
+SlashCoLang["LOOK HERE"] = "PATRZ TU"
+SlashCoLang["LOOK AT THIS"] = "PATRZ NA TO"
+SlashCoLang["GENERATOR"] = "AGREGAT"
+SlashCoLang["BASKETBALL"] = "PIŁKA"
+SlashCoLang["SURVIVOR"] = "OCALAŁY"
+SlashCoLang["SLASHER"] = "SLASHER"
+SlashCoLang["DEAD BODY"] = "MARTWE CIAŁO"
+SlashCoLang["HELICOPTER"] = "HELIKOPTER"
 
 --Slasher
 SlashCoLang["demon_pacified"] = "You have been pacified by consuming an item."

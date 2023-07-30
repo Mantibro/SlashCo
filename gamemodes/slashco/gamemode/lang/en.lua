@@ -52,10 +52,12 @@ SlashCoLang["Considerable"] = "Considerable"
 SlashCoLang["Devastating"] = "Devastating"
 
 SlashCoLang["Offering"] = "Offering"
-SlashCoLang.OfferingPreceedsName = false
+SlashCoLang["Offering_name"] = "%s Offering"
 
 SlashCoLang["offervote_1"] = "%s wants to make an Offering. Do you accept the %s?"
 SlashCoLang["offervote_success"] = "%s will be active for the following round."
+
+SlashCoLang["GameInfo"] = "[%s] GAME INFO"
 
 --OFFERINGS
 
@@ -91,6 +93,7 @@ SlashCoLang["ReadyAs"] = "READY AS %s"
 
 SlashCoLang["MapSelect"] = "SELECT A MAP"
 
+SlashCoLang["Item"] = "Item"
 SlashCoLang["ItemSelection"] = "ITEM SELECTION"
 SlashCoLang["ItemSelectionTitle"] = "PICK AN ITEM"
 
@@ -101,6 +104,9 @@ SlashCoLang["ItemConfirm"] = "CONFIRM"
 SlashCoLang["ItemRemaining"] = "REMAINING"
 
 SlashCoLang["MapGuaranteeDesc"] = "Bribe the helicopter driver to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
+
+
+
 
 SlashCoLang["Alcohol"] = "\"Moonshine\""
 SlashCoLang["Alcohol_desc"] = "Unfortunate."
@@ -123,8 +129,8 @@ SlashCoLang["Brick_desc"] = "Just some cinder block we found, nothing special. C
 SlashCoLang["Cookie"] = "Cookie"
 SlashCoLang["Cookie_desc"] = "Gain a temporary bonus to fuel pouring on use.\nA certain Slasher seems to really like this item."
 
-SlashCoLang["Deathward"] = "Deathward"
-SlashCoLang["Deathward_desc"] = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
+SlashCoLang["DeathWard"] = "Deathward"
+SlashCoLang["DeathWard_desc"] = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
 
 SlashCoLang["DevilDie"] = "Devil's Gamble"
 SlashCoLang["DevilDie_desc"] = "Gain a random effect on use; either good or horrible."
@@ -138,8 +144,8 @@ SlashCoLang["Jug_desc"] = "We have no idea what is this."
 SlashCoLang["LabMeat"] = "Lab-Grown Meat"
 SlashCoLang["LabMeat_desc"] = "Now cleared for sale in the United States! Is it worth it?\nConsuming grants a temporary awareness of any nearby slashers."
 
-SlashCoLang["Mayo"] = "Mayonnaise"
-SlashCoLang["Mayo_desc"] = "Get a large boost to health."
+SlashCoLang["Mayonnaise"] = "Mayonnaise"
+SlashCoLang["Mayonnaise_desc"] = "Get a large boost to health."
 
 SlashCoLang["MilkJug"] = "Milk Jug"
 SlashCoLang["MilkJug_desc"] = "Gain a temporary boost in speed on use.\nA certain Slasher seems to really like this item."
@@ -217,6 +223,16 @@ SlashCoLang["item_use"] = "[%s] USE"
 SlashCoLang["item_drop"] = "[%s] DROP"
 SlashCoLang["door_slam"] = "[%s] SLAM OPEN"
 SlashCoLang["surv_ping"] = "[%s] PING"
+
+--Pings
+SlashCoLang["LOOK HERE"] = "LOOK HERE"
+SlashCoLang["LOOK AT THIS"] = "LOOK AT THIS"
+SlashCoLang["GENERATOR"] = "GENERATOR"
+SlashCoLang["BASKETBALL"] = "BASKETBALL"
+SlashCoLang["SURVIVOR"] = "SURVIVOR"
+SlashCoLang["SLASHER"] = "SLASHER"
+SlashCoLang["DEAD BODY"] = "DEAD BODY"
+SlashCoLang["HELICOPTER"] = "HELICOPTER"
 
 --Spectator
 SlashCoLang["spectating"] = "YOU ARE SPECTATING"

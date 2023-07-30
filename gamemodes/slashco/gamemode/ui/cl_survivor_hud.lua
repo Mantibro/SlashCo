@@ -24,7 +24,7 @@ end
 
 local pingType = {
 	ITEM = function(v)
-		return v.Name or "ITEM"
+		return v.Name or "Item"
 	end,
 	SURVIVOR = function(v)
 		return v.SurvivorName, blue
@@ -77,7 +77,7 @@ net.Receive("mantislashcoSurvivorPings", function()
 end)
 
 hook.Add("DrawOverlay", "SlashCoVHS", function()
-	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
+	if IsValid(LocalPlayer()) and LocalPlayer():Team() ~= TEAM_SURVIVOR then
 		return
 	end
 

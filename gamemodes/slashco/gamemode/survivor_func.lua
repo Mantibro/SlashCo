@@ -172,7 +172,7 @@ function PLAYER:SurvivorPing()
 			end
 			if v.EntClass == class then
 				sayPrompt(self, string.sub(input, 4))
-				ping_info.Name = string.upper(v.Name)
+				ping_info.Name = v.Name
 				break
 			end
 		end

@@ -1,4 +1,46 @@
 include("shared.lua")
+
+--set up language
+
+CreateClientConVar("slashco_language", "en", true, false, "Change the Language.", 0, 1)
+
+SlashCoLang = {}
+
+include("lang/en.lua")
+
+SlashCoLangFallback = SlashCoLang
+
+local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
+
+for _, v in ipairs(lang_files) do  
+	if GetConVar("slashco_language"):GetString() == string.Replace(v, ".lua", "") then
+		include("lang/"..v)
+	end
+end
+
+function SlashCoLanguage(key, ...)
+    local vars = {}
+    for _, v in ipairs({...}) do
+        if type(v) == "string" then
+            table.insert(vars, SlashCoLanguage(v))
+        else
+            table.insert(vars, v)
+        end
+    end
+
+    if SlashCoLang[key] then
+        return string.format(SlashCoLang[key], unpack(vars))
+    elseif SlashCoLangFallback[key] then
+        return string.format(SlashCoLangFallback[key], unpack(vars))
+    else
+        return string.format(key, unpack(vars))
+    end
+end
+
+function GetOfferingName(key)
+    return SlashCoLanguage("Offering_name", SlashCoLanguage(key))
+end
+
 include("ui/cl_scoreboard.lua")
 include("cl_headbob.lua")
 include("ui/fonts.lua")
@@ -27,6 +69,7 @@ include("ui/slasher_stock/cl_slasher_control.lua")
 include("ui/slasher_stock/cl_slasher_meter.lua")
 include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
+
 
 SlashCo = SlashCo or {}
 
@@ -527,7 +570,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_cls_t, "BriefingFont", 900 - monitorsize / 2, 350 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("Danger Level") .. ":", "BriefingFont", 25 - monitorsize / 2,
+		draw.SimpleText(SlashCoLanguage("DangerLevel") .. ":", "BriefingFont", 25 - monitorsize / 2,
 				450 - monitorsize / 2, color_white)
 
 		if s_dng == 1 then

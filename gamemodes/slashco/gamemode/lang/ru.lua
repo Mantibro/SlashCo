@@ -1,7 +1,7 @@
 --[[
 
     Language: ru, (Russian), (Русский)
-    Translator: --
+    Translator: -Adolf Fritz-
 
 ]]
 
@@ -9,152 +9,154 @@ SlashCoLang["TwoElements"] = "%s и %s"
 SlashCoLang["InList"] = "%s, "
 SlashCoLang["WordSeparator"] = " "
 
-SlashCoLang["AssignmentSuccess"] = "The assignment was successful."
-SlashCoLang["AssignmentFail"] = "The assignment was unsuccessful."
-SlashCoLang["AssignmentAborted"] = "The assignment ended prematurely."
-SlashCoLang["Rescued"] = "%s were reported present on the rescue helicopter."
-SlashCoLang["RescuedOnlyOne"] = "%s was the only one present on the rescue helicopter."
-SlashCoLang["LeftBehind"] = "%s were left behind."
-SlashCoLang["LeftBehindOnlyOne"] = "%s was left behind."
-SlashCoLang["Killed"] = "%s are now presumed to be dead."
-SlashCoLang["KilledOnlyOne"] = "%s is now presumed to be dead."
-SlashCoLang["AllRescued"] = "All of the dispatched SlashCo Workers were rescued."
-SlashCoLang["SomeRescued"] = "Only some of the dispatched SlashCo Workers could be rescued."
-SlashCoLang["NoneRescued"] = "The dispatched SlashCo Workers could not be rescued."
-SlashCoLang["Cursed"] = "Your soul is now forfeit."
-SlashCoLang["Judgement"] = "JUDGEMENT"
+SlashCoLang["AssignmentSuccess"] = "Задание было выполнено успешно."
+SlashCoLang["AssignmentFail"] = "Задание не было выполнено."
+SlashCoLang["AssignmentAborted"] = "Задание было прервано."
+SlashCoLang["Rescued"] = "%s добрался до спасательного вертолёта."
+SlashCoLang["RescuedOnlyOne"] = "%s был единственным кто добрался до спасательного вертолёта."
+SlashCoLang["LeftBehind"] = "%s были оставлен позади."
+SlashCoLang["LeftBehindOnlyOne"] = "%s был оставлен позади."
+SlashCoLang["Killed"] = "%s считаются убитым."
+SlashCoLang["KilledOnlyOne"] = "%s считается убитым."
+SlashCoLang["AllRescued"] = "Все размещеные работники SlashCo были спасены."
+SlashCoLang["SomeRescued"] = "Только некоторые работники SlashCo были спасены."
+SlashCoLang["NoneRescued"] = "Ни один из работников SlashCo не был спасен."
+SlashCoLang["Cursed"] = "Твоя душа была проклята."
+SlashCoLang["Judgement"] = "ПРАВОСУДИЕ"
 
-SlashCoLang["InLobby"] = "In Lobby"
-SlashCoLang["InGame"] = "In Game (%s)"
+SlashCoLang["InLobby"] = "В лобби"
+SlashCoLang["InGame"] = "В игре (%s)"
 
 SlashCoLang["Survivor"] = "Рабочий"
-SlashCoLang["Slasher"] = "Слашер"
+SlashCoLang["Slasher"] = "Убийца"
 
-SlashCoLang["Difficulty"] = "Difficulty"
+SlashCoLang["Difficulty"] = "Сложность"
 
-SlashCoLang["Easy"] = "Easy"
-SlashCoLang["Novice"] = "Novice"
-SlashCoLang["Intermediate"] = "Intermediate"
-SlashCoLang["Hard"] = "Hard"
+SlashCoLang["Easy"] = "Легкая"
+SlashCoLang["Novice"] = "Средняя"
+SlashCoLang["Intermediate"] = "Тяжелая"
+SlashCoLang["Hard"] = "Невозможная"
 
-SlashCoLang["Unknown"] = "Unknown"
-SlashCoLang["Name"] = "Name"
-SlashCoLang["Notes"] = "Notes"
+SlashCoLang["Unknown"] = "Неизвестный"
+SlashCoLang["Name"] = "Имя"
+SlashCoLang["Notes"] = "Записки"
 
-SlashCoLang["Class"] = "Class"
-SlashCoLang["Cryptid"] = "Cryptid"
-SlashCoLang["Demon"] = "Demon"
-SlashCoLang["Umbra"] = "Umbra"
+SlashCoLang["Class"] = "Класс"
+SlashCoLang["Cryptid"] = "Криптид"
+SlashCoLang["Demon"] = "Демон"
+SlashCoLang["Umbra"] = "Умбра"
 
-SlashCoLang["DangerLevel"] = "Danger Level"
-SlashCoLang["Moderate"] = "Moderate"
-SlashCoLang["Considerable"] = "Considerable"
-SlashCoLang["Devastating"] = "Devastating"
+SlashCoLang["DangerLevel"] = "Уровень опасности"
+SlashCoLang["Moderate"] = "Умеренный"
+SlashCoLang["Considerable"] = "Значительный"
+SlashCoLang["Devastating"] = "Разрушительный"
 
-SlashCoLang["Offering"] = "Offering"
-SlashCoLang.OfferingPreceedsName = false
+SlashCoLang["Offering"] = "Подношение"
+SlashCoLang["Offering_name"] = "Подношение %s"
 
-SlashCoLang["offervote_1"] = "%s wants to make an Offering. Do you accept the %s?"
-SlashCoLang["offervote_success"] = "%s will be active for the following round."
+SlashCoLang["offervote_1"] = "%s хочет сделать подношение, хотите ли вы принять %s?"
+SlashCoLang["offervote_success"] = "%s будет активно в следующем раунде."
+
+SlashCoLang["GameInfo"] = "[%s] Информация об игре"
 
 --OFFERINGS
 
-SlashCoLang["Exposure"] = "Exposure"
-SlashCoLang["Exposure_desc"] = "Will make Gas Cans easier to find,\nBut\nYou will not find more than you need."
+SlashCoLang["Exposure"] = "наглядности"
+SlashCoLang["Exposure_desc"] = "Канистры с бензином можно будет легко найти,\nно\n вы не найдёте больше чем нужно."
 
-SlashCoLang["Satiation"] = "Satiation"
-SlashCoLang["Satiation_desc"] = "The Slasher will be a Demon,\nand its items will be scarce,\nBut\nThe items will have greater effect."
+SlashCoLang["Satiation"] = "насыщения"
+SlashCoLang["Satiation_desc"] = "Убийца будет демоном,\nи его вещи будут,\nBut\nThe items will have greater effect."
+--Переделать описание насыщению.
+SlashCoLang["Drainage"] = "протечки"
+SlashCoLang["Drainage_desc"] = "Канистры можно найти везде,\nно\n топливо из генераторов будет протекать."
 
-SlashCoLang["Drainage"] = "Drainage"
-SlashCoLang["Drainage_desc"] = "Gas cans will be plentiful,\nBut\nGenerators will leak fuel over time."
+SlashCoLang["Duality"] = "двойственности"
+SlashCoLang["Duality_desc"] = "Нужно заправить только один генератор,\nно\nвы встретите двух убийц."
 
-SlashCoLang["Duality"] = "Duality"
-SlashCoLang["Duality_desc"] = "Only one generator will need to be powered,\nBut\nYou will face two Slashers."
+SlashCoLang["Singularity"] = "сингулярности"
+SlashCoLang["Singularity_desc"] = "Канистр будет в избытке,\nно\n убийца будет сильнее."
 
-SlashCoLang["Singularity"] = "Singularity"
-SlashCoLang["Singularity_desc"] = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful."
-
-SlashCoLang["Nightmare"] = "Nightmare"
-SlashCoLang["Nightmare_desc"] = "The Helicopter will come rescue you regardless of Generators.\nFueling Generators will come with a massively increased Point bonus.\nBut\nSurvivors and Slasher will switch sides."
+SlashCoLang["Nightmare"] = "кошмара"
+SlashCoLang["Nightmare_desc"] = "Вертолёт можно вызвать независимо от заправленных генераторов.\nЗаправка генераторов будет сопровождаться значительно увеличенным бонусом в очках.\nНо\nработники и убийца будут менятся местами."
 
 --ITEMS
 
-SlashCoLang["PointCount"] = "POINTS"
-SlashCoLang["SurvivorWins"] = "SURVIVOR WINS"
-SlashCoLang["SlasherWins"] = "SLASHER WINS"
+SlashCoLang["PointCount"] = "ОЧКИ(-ОВ)"
+SlashCoLang["SurvivorWins"] = "ПОБЕД ЗА РАБОТНИКОВ"
+SlashCoLang["SlasherWins"] = "ПОБЕД ЗА УБИЙЦУ"
 
-SlashCoLang["ToggleSpectate"] = "TOGGLE SPECTATE"
-SlashCoLang["SelectPlayermodel"] = "SELECT PLAYERMODEL"
+SlashCoLang["ToggleSpectate"] = "ВСТУПИТЬ В ИГРУ"
+SlashCoLang["SelectPlayermodel"] = "ВЫБРАТЬ МОДЕЛЬ ИГРОКА"
 
-SlashCoLang["NotReady"] = "NOT READY"
-SlashCoLang["ReadyAs"] = "READY AS %s"
+SlashCoLang["NotReady"] = "НЕ ГОТОВ"
+SlashCoLang["ReadyAs"] = "ГОТОВ ИГРАТЬ ЗА %s"
 
-SlashCoLang["MapSelect"] = "SELECT A MAP"
+SlashCoLang["MapSelect"] = "ВЫБРАТЬ КАРТУ"
 
-SlashCoLang["ItemSelection"] = "ITEM SELECTION"
-SlashCoLang["ItemSelectionTitle"] = "PICK AN ITEM"
+SlashCoLang["ItemSelection"] = "ВЫБОР ПРЕДМЕТОВ"
+SlashCoLang["ItemSelectionTitle"] = "ВЗЯТЬ ПРЕДМЕТ"
 
-SlashCoLang["MapGuarantee"] = "MAP GUARANTEE"
-SlashCoLang["MapGuaranteeTitle"] = "GUARANTEE A MAP"
+SlashCoLang["MapGuarantee"] = "ГАРАНТИЯ КАРТЫ"
+SlashCoLang["MapGuaranteeTitle"] = "ГАРАНТИРОВАТЬ КАРТУ"
 
-SlashCoLang["ItemConfirm"] = "CONFIRM"
-SlashCoLang["ItemRemaining"] = "REMAINING"
+SlashCoLang["ItemConfirm"] = "ПОДТВЕРДИТЬ"
+SlashCoLang["ItemRemaining"] = "ОСТАЛОСЬ"
 
-SlashCoLang["MapGuaranteeDesc"] = "Bribe the helicopter driver to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
+SlashCoLang["MapGuaranteeDesc"] = "Подкупить пилота вертолёта, чтобы он летел на ту карту которую вы выбрали--выигрывает тот, кто больше заплатит. Цена увеличивается с колличеством покупок."
 
-SlashCoLang["Alcohol"] = "\"Moonshine\""
-SlashCoLang["Alcohol_desc"] = "Unfortunate."
+SlashCoLang["Alcohol"] = "\"Самогон\""
+SlashCoLang["Alcohol_desc"] = "К сожалению."
 
-SlashCoLang["Baby"] = "The Baby"
-SlashCoLang["Baby_desc"] = "Halve your health to teleport to a random location. At low health, using this item has a chance of killing you instantly. If you die to this item, the slasher will teleport instead."
+SlashCoLang["Baby"] = "Кукла"
+SlashCoLang["Baby_desc"] = "Телепортирует в случайное место ценой половины здоровья. При низком здоровье может убить моментально. Если вы умрете во время использования, то оно телепортирует убийцу вместо этого."
 
-SlashCoLang["Battery"] = "Battery"
-SlashCoLang["Battery_desc"] = "A lead-acid battery that serves as a reusable source of electric current."
+SlashCoLang["Battery"] = "Аккумулятор"
+SlashCoLang["Battery_desc"] = "Кислотно-свинцовый аккумулятор который является восполняемым источником электричества."
+--Переделать описание аккумулятору.
+SlashCoLang["Beacon"] = "Экстренный маяк"
+SlashCoLang["Beacon_desc"] = "Оповещает штаб SlashCo на запрос отмены задания. Быстрое реагирование получают только ВАЖНЫЕ обстоятельства."
+--придумать нормальное название и описание экстренному маяку
+SlashCoLang["Benadryl"] = "Бенадрил"
+SlashCoLang["Benadryl_desc"] = "\n Не стесняйтесь принимать это, если вы чувствует, что ваши задания слишком лёгкие."
 
-SlashCoLang["Beacon"] = "Distress Beacon"
-SlashCoLang["Beacon_desc"] = "Alerts the SlashCo headquarters to abort the mission. Only IMPORTANT circumstances get a fast response."
+SlashCoLang["Brick"] = "Шлакоблок"
+SlashCoLang["Brick_desc"] = "Обычный шлакоблок, ничего специфичного. Можно бросить."
 
-SlashCoLang["Benadryl"] = "25 gram Benadryl"
-SlashCoLang["Benadryl_desc"] = "All new 25 gram Benadryl, made from 1200 pills.\n Feel free to take this if you feel the Assignments aren't challenging enough as is."
+SlashCoLang["Cookie"] = "Печенье"
+SlashCoLang["Cookie_desc"] = "Получите временный бонус на скорость заправки генератора.\nОдин из убийц любит объестся ими."
 
-SlashCoLang["Brick"] = "Cinder Block"
-SlashCoLang["Brick_desc"] = "Just some cinder block we found, nothing special. Can be thrown."
+SlashCoLang["DeathWard"] = " Тотем бессмертия"
+SlashCoLang["DeathWard_desc"] = "Переживите смерть один раз, но взамен вы не сможете переносить другие предметы. Переодически залечивает ваши раны."
 
-SlashCoLang["Cookie"] = "Cookie"
-SlashCoLang["Cookie_desc"] = "Gain a temporary bonus to fuel pouring on use.\nA certain Slasher seems to really like this item."
+SlashCoLang["DevilDie"] = "Дьявольское казино"
+SlashCoLang["DevilDie_desc"] = "Получите случайный эффект при использовании; Может быть и хороший, и ужасный."
 
-SlashCoLang["Deathward"] = "Deathward"
-SlashCoLang["Deathward_desc"] = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
+SlashCoLang["GasCan"] = "Канистра с топливом"
+SlashCoLang["GasCan_desc"] = "Вместо поиска канистры, возьмите с собой одну. Будет меньше канистр если вы возьмете с собой её."
 
-SlashCoLang["DevilDie"] = "Devil's Gamble"
-SlashCoLang["DevilDie_desc"] = "Gain a random effect on use; either good or horrible."
+SlashCoLang["Jug"] = "Кувшин?"
+SlashCoLang["Jug_desc"] = "Понятия не имеем что это забыло здесь."
 
-SlashCoLang["GasCan"] = "Fuel Can"
-SlashCoLang["GasCan_desc"] = "Take a gas can with you instead of having to find one. There will be less gas cans to find if you do this."
+SlashCoLang["LabMeat"] = "Искусственное мясо"
+SlashCoLang["LabMeat_desc"] = "Теперь разрешено к продаже в Соединенных Штатах! Оно того стоит?\nПотребление даёт временный бонус к осведомленности о любых находящихся поблизости убийцах."
 
-SlashCoLang["Jug"] = "The Jug"
-SlashCoLang["Jug_desc"] = "We have no idea what is this."
+SlashCoLang["Mayonnaise"] = "Майонез"
+SlashCoLang["Mayonnaise_desc"] = "Сьеште чтобы залечить ваши раны."
 
-SlashCoLang["LabMeat"] = "Lab-Grown Meat"
-SlashCoLang["LabMeat_desc"] = "Now cleared for sale in the United States! Is it worth it?\nConsuming grants a temporary awareness of any nearby slashers."
+SlashCoLang["MilkJug"] = "Кувшин с молоком"
+SlashCoLang["MilkJug_desc"] = "Даёт временное ускорение бега.\nОдин из убийц обожает пить это!"
 
-SlashCoLang["Mayo"] = "Mayonnaise"
-SlashCoLang["Mayo_desc"] = "Get a large boost to health."
+SlashCoLang["PocketSand"] = "Карманный песок"
+SlashCoLang["PocketSand_desc"] = "Ослепляет убийцу."
 
-SlashCoLang["MilkJug"] = "Milk Jug"
-SlashCoLang["MilkJug_desc"] = "Gain a temporary boost in speed on use.\nA certain Slasher seems to really like this item."
+SlashCoLang["Rock"] = "Камень"
+SlashCoLang["Rock_desc"] = "Вы хотите стать тихим? К сожалению ношение этого камня тормозит вас. При падении на землю он будет время от времени подталкиваться к ближайшей канистре бензина."
 
-SlashCoLang["PocketSand"] = "Pocket Sand"
-SlashCoLang["PocketSand_desc"] = "Blinds a nearby slasher."
+SlashCoLang["Soda"] = "Газировка B-Gone"
+SlashCoLang["Soda_desc"] = "Станьте невидимым во время распития."
 
-SlashCoLang["Rock"] = "The Rock"
-SlashCoLang["Rock_desc"] = "Become silent but unable to sprint while equipped. When dropped, this will occasionally nudge itself to the nearest gas can."
-
-SlashCoLang["Soda"] = "B-Gone Soda"
-SlashCoLang["Soda_desc"] = "Become invisible on use."
-
-SlashCoLang["StepDecoy"] = "Step Decoy"
-SlashCoLang["StepDecoy_desc"] = "If placed on a solid surface, this will imitate footsteps sounds which can distract slashers."
+SlashCoLang["StepDecoy"] = "Приманка"
+SlashCoLang["StepDecoy_desc"] = "Когда лежит на земле, то издает звуки шагов, которые могут привлечь внимания убийцы."
 
 --GameInfo
 
@@ -193,40 +195,50 @@ Umbra:
 The powers of Slashers of the Umbra class grow as the Game Progress increases, meaning they are weak at first, but
 as the Survivors get closer to completing their assignment, their abilities strengthen.]]
 
-SlashCoLang["vocal_say"] = "SAY"
-SlashCoLang["vocal_cancel"] = "CANCEL"
+SlashCoLang["vocal_say"] = "СКАЗАТЬ"
+SlashCoLang["vocal_cancel"] = "ОТМЕНИТЬ"
 
-SlashCoLang["vocal_no"] = "NO"
-SlashCoLang["vocal_follow"] = "FOLLOW ME"
-SlashCoLang["vocal_slasher"] = "SLASHER HERE"
-SlashCoLang["vocal_yes"] = "YES"
-SlashCoLang["vocal_run"] = "RUN"
-SlashCoLang["vocal_help"] = "HELP ME"
+SlashCoLang["vocal_no"] = "НЕТ."
+SlashCoLang["vocal_follow"] = "ЗА МНОЙ."
+SlashCoLang["vocal_slasher"] = "УБИЙЦА ТУТ!!!"
+SlashCoLang["vocal_yes"] = "ДА."
+SlashCoLang["vocal_run"] = "БЕГИ!!!"
+SlashCoLang["vocal_help"] = "ПОМОГИТЕ МНЕ!!!"
 
-SlashCoLang["briefing"] = "BRIEFING:"
-SlashCoLang["player_await"] = "Waiting for players. . ."
-SlashCoLang["player_ready"] = "The round will start soon."
+SlashCoLang["briefing"] = "БРИФИНГ:"
+SlashCoLang["player_await"] = "ОЖИДАНИЕ ИГРОКОВ. . ."
+SlashCoLang["player_ready"] = "РАУНД СКОРО НАЧНЁТСЯ."
 
 SlashCoLang["cur_assignment"] = "Current Assignment:"
 SlashCoLang["slasher_assess"] = "Slasher Assessment:"
 
-SlashCoLang["offering_idle"] = "Make an Offering"
+SlashCoLang["offering_idle"] = "СДЕЛАТЬ ПОДНОШЕНИЕ"
 
 --Survivor
-SlashCoLang["item_use"] = "[%s] USE"
-SlashCoLang["item_drop"] = "[%s] DROP"
-SlashCoLang["door_slam"] = "[%s] SLAM OPEN"
-SlashCoLang["surv_ping"] = "[%s] PING"
+SlashCoLang["item_use"] = "[%s] ИСПОЛЬЗОВАТЬ"
+SlashCoLang["item_drop"] = "[%s] ВЫБРОСИТЬ"
+SlashCoLang["door_slam"] = "[%s] ВЫЛОМАТЬ ДВЕРЬ"
+SlashCoLang["surv_ping"] = "[%s] УКАЗАТЬ"
+
+--Pings
+SlashCoLang["LOOK HERE"] = "СМОТРИ СЮДА"
+SlashCoLang["LOOK AT THIS"] = "ПОСМОТРИ НА ЭТО"
+SlashCoLang["GENERATOR"] = "ГЕНЕРАТОР"
+SlashCoLang["BASKETBALL"] = "БАСКЕТБОЛ"
+SlashCoLang["SURVIVOR"] = "ПАБОЧИЙ"
+SlashCoLang["SLASHER"] = "УБИЙЦА"
+SlashCoLang["DEAD BODY"] = "ТРУП"
+SlashCoLang["HELICOPTER"] = "ГЕЛИКОПТЕР"
 
 --Spectator
-SlashCoLang["spectating"] = "YOU ARE SPECTATING"
-SlashCoLang["hide_info"] = "[%s] HOLD TO HIDE INFO"
-SlashCoLang["toggle_halo"] = "[%s] TOGGLE HALOS"
-SlashCoLang["toggle_halo_gas"] = "[%s] TOGGLE GAS CAN HALOS"
-SlashCoLang["player_follow"] = "[%s] FOLLOW PLAYER"
-SlashCoLang["player_cycle"] = "[%s] CYCLE SURVIVORS"
-SlashCoLang["switch_view"] = "[%s] SWITCH VIEW"
-SlashCoLang["toggle_light"] = "[%s] TOGGLE LIGHT"
+SlashCoLang["spectating"] = "ВЫ НАБЛЮДАЕТЕ"
+SlashCoLang["hide_info"] = "[%s] ИНФОРМАЦИЯ"
+SlashCoLang["toggle_halo"] = "[%s] ПОДСВЕТКА СИЛУЭТОВ ИГРОКОВ"
+SlashCoLang["toggle_halo_gas"] = "[%s] ПОДСВЕТКА СИЛУЭТОВ КАНИСТР"
+SlashCoLang["player_follow"] = "[%s] СЛЕДОВАТЬ ЗА ИГРОКОМ"
+SlashCoLang["player_cycle"] = "[%s] ПЕРЕКЛЮЧИТСЯ МЕЖДУ ИГРОКАМИ"
+SlashCoLang["switch_view"] = "[%s] СМЕНИТЬ ВИД"
+SlashCoLang["toggle_light"] = "[%s] ВКЛЮЧИТЬ ПОДСВЕТКУ"
 
 --Slasher
 SlashCoLang["demon_pacified"] = "You have been pacified by consuming an item."
@@ -290,7 +302,7 @@ SlashCoLang["Bababooey_setclone"] = "set clone"
 
 
 --Borgmire
-SlashCoLang["Borgmire"] = "Боргмаир"
+SlashCoLang["Borgmire"] = ""
 SlashCoLang["Borgmire_desc"] = [[The Brute Slasher who can overpower survivors with overwhelming strength.
 
 -Borgmire is most effective in short chases.
@@ -302,7 +314,7 @@ SlashCoLang["Borgmire_throw"] = "throw"
 
 
 
-
+--Пока что не трогать Covenant
 --The Covenant (WIP)
 SlashCoLang["Covenant"] = "Святой завет"
 SlashCoLang["Covenant_desc"] = [[The Leader Slasher who commands his trusted Cloaks.
@@ -366,7 +378,7 @@ SlashCoLang["FreeSmiley_nodeal"] = "no deal"
 
 
 --Leuonard
-SlashCoLang["Leuonard"] = "Леийонард"
+SlashCoLang["Leuonard"] = "Леонард"
 SlashCoLang["Leuonard_desc"] = [[The Unstable Slasher whose overwhleming power grows with time.
 
 -Leuonard's R██e will increase over time.
@@ -379,7 +391,7 @@ SlashCoLang["Leuonard_roid"] = "r**e"
 
 
 --Male_07
-SlashCoLang["Male07"] = "Меиль-07"
+SlashCoLang["Male07"] = "-07"
 SlashCoLang["Male07_desc"] = [[The Omniscient Slasher which can possess one of his many clones.
 
 -Male_07 will turn into a monstrous entity after a long enough chase.
@@ -426,7 +438,7 @@ SlashCoLang["Princess_aggro"] = "aggro"
 
 
 --Sid
-SlashCoLang["Sid"] = "Сыд"
+SlashCoLang["Sid"] = "Сид"
 SlashCoLang["Sid_desc"] = [[The Psychotic Slasher which keeps his rage in check with Cookies.
 
 -Sid gains speed while chasing over time, but starts out slow.
@@ -477,7 +489,7 @@ SlashCoLang["Thirsty_thirst"] = "thirst"
 
 
 --Trollge
-SlashCoLang["Trollge"] = "Тролледж"
+SlashCoLang["Trollge"] = "Троллдж"
 SlashCoLang["Trollge_desc"] = [[The Bloodthirsty Slasher whose power grows with the amount of
 blood he has collected.
 

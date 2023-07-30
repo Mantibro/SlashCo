@@ -15,53 +15,10 @@ include("player_class/player_lobby.lua")
 
 CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_players =
 
---set up language
 
-SlashCoLang = {}
-
-include("lang/en.lua")
-AddCSLuaFile("lang/en.lua")
-
-SlashCoLangFallback = SlashCoLang
-
---[[local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
-
+local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
 for _, v in ipairs(lang_files) do  
-    AddCSLuaFile("lang/"..v)
-    include("lang/"..v)
-end]]
-
-function SlashCoLanguage(key, ...)
-    local vars = {}
-    for _, v in ipairs({...}) do
-        if type(v) == "string" then
-            table.insert(vars, SlashCoLanguage(v))
-        else
-            table.insert(vars, v)
-        end
-    end
-
-    if SlashCoLang[key] then
-        return string.format(SlashCoLang[key], unpack(vars))
-    elseif SlashCoLangFallback[key] then
-        return string.format(SlashCoLangFallback[key], unpack(vars))
-    else
-        return string.format(key, unpack(vars))
-    end
-end
-
-function GetOfferingName(key)
-
-    if SlashCoLang.OfferingPreceedsName then
-
-        return SlashCoLanguage("Offering") .. " " .. SlashCoLanguage(key)
-
-    else
-
-        return SlashCoLanguage(key) .. " " .. SlashCoLanguage("Offering")
-
-    end
-
+    AddCSLuaFile("lang/"..v)	
 end
 
 function GM:Initialize()

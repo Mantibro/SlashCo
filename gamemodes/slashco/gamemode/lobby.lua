@@ -907,6 +907,7 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
         local doors = ents.FindByName("Slashco_Elev_Shutter")
         doors[1]:Fire("Open")
         doors[2]:Fire("Open")
+        doors[3]:Fire("Open")
 
         for i = 1, #SlashCo.LobbyData.Players do
             --If someone is not ready, force them as ready survivor.
@@ -960,6 +961,7 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
         local doors = ents.FindByName("Slashco_Elev_Shutter")
         doors[1]:Fire("Close")
         doors[2]:Fire("Close")
+        doors[3]:Fire("Open")
 
         timer.Simple(3, function()
 

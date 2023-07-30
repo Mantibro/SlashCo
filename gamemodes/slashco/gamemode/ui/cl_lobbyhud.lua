@@ -36,7 +36,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
         lobbymusic_antispam = true
     end
 
-    if stop_lobbymusic then
+    if IsValid(obby_music) and stop_lobbymusic then
         lobby_music:Stop()
     end
 
@@ -145,9 +145,9 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
                 if clientReadiness < 1 then
                     draw.SimpleText("       ["..SlashCoLanguage("NotReady").."]", "TVCD", scrW * 0.025, (scrH * 0.22), grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
                 elseif clientReadiness == 1 then
-                    draw.SimpleText("       ["..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Survivor")).."]", "TVCD", scrW * 0.025, (scrH * 0.22), green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                    draw.SimpleText("       ["..SlashCoLanguage("ReadyAs", string.upper( SlashCoLanguage("Survivor"))).."]", "TVCD", scrW * 0.025, (scrH * 0.22), green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
                 elseif clientReadiness == 2 then
-                    draw.SimpleText("       ["..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Slasher")).."]", "TVCD", scrW * 0.025, (scrH * 0.22), red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+                    draw.SimpleText("       ["..SlashCoLanguage("ReadyAs", string.upper( SlashCoLanguage("Slasher"))).."]", "TVCD", scrW * 0.025, (scrH * 0.22), red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
                 end
             end
         end
