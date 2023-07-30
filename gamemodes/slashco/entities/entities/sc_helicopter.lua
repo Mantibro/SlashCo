@@ -30,33 +30,37 @@ function ENT:Initialize()
 		self.final_dir = self:GetAngles()[2]
 
 		timer.Simple(0.1, function()
-
 			self:ResetSequence(1)
-
 			SlashCo.UpdateHelicopterSeek(self:GetPos())
-
 			self.EnableMovement = true
-
 		end)
+
+		self.pitchgo = self.pitchgo or 0
+		self.sway_x = self.sway_x or 0
+		self.sway_y = self.sway_y or 0
+		self.sway_z = self.sway_z or 0
+		self.final_dir = self.final_dir or 0
+		self.acceleration = self.acceleration or 0
+		self.targsmoothx = self.targsmoothx or 0
+		self.targsmoothy = self.targsmoothy or 0
+		self.targsmoothz = self.targsmoothz or 0
+		self.vel = self.vel or 0
 	end
 
 	self:EmitSound("slashco/helicopter_engine_distant.wav", 90, 150, 1, CHAN_STATIC)
 	self:EmitSound("slashco/helicopter_rotors_distant.wav", 150, 100, 1, CHAN_STATIC)
-
 	self:EmitSound("slashco/helicopter_engine_close.wav", 75, 150, 1, CHAN_STATIC)
 	self:EmitSound("slashco/helicopter_rotors_close.wav", 100, 100, 1, CHAN_STATIC)
-
 end
 
-function ENT:Use(activator, _, _, _)
-	--activator, caller, useType, value
+function sign(number)
+	return number > 0 and 1 or (number == 0 and 0 or -1)
+end
 
-	if SERVER then
-
+if SERVER then
+	function ENT:Use(activator)
 		local availabilityHeli = false
-
-		local userEnteredAlready = false
-
+		local userEnteredAlready
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
 		if game.GetMap() ~= "sc_lobby" and not SlashCo.CurRound.EscapeHelicopterSummoned then
@@ -67,153 +71,115 @@ function ENT:Use(activator, _, _, _)
 			availabilityHeli = true
 		end
 
-		if activator:Team() == TEAM_SURVIVOR and availabilityHeli then
-			--The Player is sat down in the helicopter
+		if activator:Team() ~= TEAM_SURVIVOR or not availabilityHeli then
+			return
+		end
+		--The Player is sat down in the helicopter
 
-			if activator:GetNWBool("DynamicFlashlight") then
-				activator:SetNWBool("DynamicFlashlight", false)
-			end
+		if activator:GetNWBool("DynamicFlashlight") then
+			activator:SetNWBool("DynamicFlashlight", false)
+		end
 
-			for _, v in ipairs(SatPlayers) do
-				--local id = activator:SteamID64()
+		for _, v in ipairs(SatPlayers) do
+			--local id = activator:SteamID64()
 
-				if v == activator then
-					--If the steamid in this entry matches the one we're looking for, that means the player is already in the copter.
-					userEnteredAlready = true
-					break
-				end
-			end
-
-			if userEnteredAlready == false then
-				table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
-			end
-
-			local vehicle = ents.Create("prop_vehicle_prisoner_pod")
-			--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
-
-			--if t == false then
-			--	SafeRemoveEntity(vehicle)
-			--	return false
-			--end
-
-
-			local ang = Angle(0, 0, 0)
-			local pos = Vector(0, 0, 0)
-			if SatPlayers[1] == activator then
-				pos = self:LocalToWorld(Vector(-34, 24.25, 44.5))
-				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
-			elseif SatPlayers[2] == activator then
-				pos = self:LocalToWorld(Vector(-34, 0, 44.5))
-				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
-			elseif SatPlayers[3] == activator then
-				pos = self:LocalToWorld(Vector(-34, -24.25, 44.5))
-				ang = self:LocalToWorldAngles(Angle(0, -90, 0))
-			elseif SatPlayers[4] == activator then
-				pos = self:LocalToWorld(Vector(24.5, 24.25, 44.5))
-				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
-			elseif SatPlayers[5] == activator then
-				pos = self:LocalToWorld(Vector(24.5, 0, 44.5))
-				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
-			elseif SatPlayers[6] == activator then
-				pos = self:LocalToWorld(Vector(24.5, -24.25, 44.5))
-				ang = self:LocalToWorldAngles(Angle(0, 90, 0))
-			end
-
-			vehicle:SetPos(pos)
-			vehicle:SetAngles(ang)
-			vehicle.playerdynseat = true
-			vehicle:SetNWBool("playerdynseat", true)
-			vehicle:SetModel("models/nova/airboat_seat.mdl") -- DO NOT CHANGE OR CRASHES WILL HAPPEN
-			vehicle:SetKeyValue("vehiclescript", "scripts/vehicles/prisoner_pod.txt")
-			vehicle:SetKeyValue("limitview", "1")
-			vehicle:Spawn()
-			vehicle:Activate()
-
-			if not IsValid(vehicle) or not IsValid(vehicle:GetPhysicsObject()) then
-				SafeRemoveEntity(vehicle)
-				return false
-			end
-
-			local phys = vehicle:GetPhysicsObject()
-			-- Let's try not to crash
-			vehicle:SetMoveType(MOVETYPE_PUSH)
-			phys:Sleep()
-			vehicle:SetCollisionGroup(COLLISION_GROUP_WORLD)
-
-			vehicle:SetNotSolid(true)
-			phys:Sleep()
-			phys:EnableGravity(false)
-			phys:EnableMotion(false)
-			phys:EnableCollisions(false)
-			phys:SetMass(1)
-
-			vehicle:CollisionRulesChanged()
-
-			-- Visibles
-			vehicle:DrawShadow(false)
-			vehicle:SetColor(Color(0, 0, 0, 0))
-			vehicle:SetRenderMode(RENDERMODE_TRANSALPHA)
-			vehicle:SetNoDraw(true)
-			vehicle.VehicleName = "Airboat Seat"
-			vehicle.ClassOverride = "prop_vehicle_prisoner_pod"
-			vehicle:SetParent(self)
-
-			activator:EnterVehicle(vehicle)
-
-			if #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3 and SlashCo.LobbyData.LOBBYSTATE < 5 and GAMEMODE.State == GAMEMODE.States.LOBBY then
-				lobbyFinish()
+			if v == activator then
+				--If the steamid in this entry matches the one we're looking for, that means the player is already in the copter.
+				userEnteredAlready = true
+				break
 			end
 		end
+
+		if not userEnteredAlready then
+			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
+		end
+
+		local vehicle = ents.Create("prop_vehicle_prisoner_pod")
+		--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
+
+		--if t == false then
+		--	SafeRemoveEntity(vehicle)
+		--	return false
+		--end
+
+
+		local ang = Angle(0, 0, 0)
+		local pos = Vector(0, 0, 0)
+		if SatPlayers[1] == activator then
+			pos = self:LocalToWorld(Vector(-34, 24.25, 44.5))
+			ang = self:LocalToWorldAngles(Angle(0, -90, 0))
+		elseif SatPlayers[2] == activator then
+			pos = self:LocalToWorld(Vector(-34, 0, 44.5))
+			ang = self:LocalToWorldAngles(Angle(0, -90, 0))
+		elseif SatPlayers[3] == activator then
+			pos = self:LocalToWorld(Vector(-34, -24.25, 44.5))
+			ang = self:LocalToWorldAngles(Angle(0, -90, 0))
+		elseif SatPlayers[4] == activator then
+			pos = self:LocalToWorld(Vector(24.5, 24.25, 44.5))
+			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
+		elseif SatPlayers[5] == activator then
+			pos = self:LocalToWorld(Vector(24.5, 0, 44.5))
+			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
+		elseif SatPlayers[6] == activator then
+			pos = self:LocalToWorld(Vector(24.5, -24.25, 44.5))
+			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
+		end
+
+		vehicle:SetPos(pos)
+		vehicle:SetAngles(ang)
+		vehicle.playerdynseat = true
+		vehicle:SetNWBool("playerdynseat", true)
+		vehicle:SetModel("models/nova/airboat_seat.mdl") -- DO NOT CHANGE OR CRASHES WILL HAPPEN
+		vehicle:SetKeyValue("vehiclescript", "scripts/vehicles/prisoner_pod.txt")
+		vehicle:SetKeyValue("limitview", "1")
+		vehicle:Spawn()
+		vehicle:Activate()
+
+		if not IsValid(vehicle) or not IsValid(vehicle:GetPhysicsObject()) then
+			SafeRemoveEntity(vehicle)
+			return false
+		end
+
+		local phys = vehicle:GetPhysicsObject()
+		-- Let's try not to crash
+		vehicle:SetMoveType(MOVETYPE_PUSH)
+		phys:Sleep()
+		vehicle:SetCollisionGroup(COLLISION_GROUP_WORLD)
+
+		vehicle:SetNotSolid(true)
+		phys:Sleep()
+		phys:EnableGravity(false)
+		phys:EnableMotion(false)
+		phys:EnableCollisions(false)
+		phys:SetMass(1)
+
+		vehicle:CollisionRulesChanged()
+
+		-- Visibles
+		vehicle:DrawShadow(false)
+		vehicle:SetColor(Color(0, 0, 0, 0))
+		vehicle:SetRenderMode(RENDERMODE_TRANSALPHA)
+		vehicle:SetNoDraw(true)
+		vehicle.VehicleName = "Airboat Seat"
+		vehicle.ClassOverride = "prop_vehicle_prisoner_pod"
+		vehicle:SetParent(self)
+
+		activator:EnterVehicle(vehicle)
+
+		if #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3
+				and SlashCo.LobbyData.LOBBYSTATE < 5 and GAMEMODE.State == GAMEMODE.States.LOBBY then
+			lobbyFinish()
+		end
 	end
-end
 
-function sign(number)
-	return number > 0 and 1 or (number == 0 and 0 or -1)
-end
-
-if SERVER then
 	function ENT:Think()
+		self:NextThink(CurTime())
+
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 		local plyCount = #SatPlayers
 		local TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
 
 		if self.EnableMovement and TargetPosition ~= nil then
-			if pitchgo == nil then
-				pitchgo = 0
-			end
-
-			if sway_x == nil then
-				sway_x = 0
-			end
-			if sway_y == nil then
-				sway_y = 0
-			end
-			if sway_z == nil then
-				sway_z = 0
-			end
-
-			if self.final_dir == nil then
-				self.final_dir = 0
-			end
-
-			if acceleration == nil then
-				acceleration = 0
-			end
-
-			if targsmoothx == nil then
-				targsmoothx = 0
-			end
-			if targsmoothy == nil then
-				targsmoothy = 0
-			end
-			if targsmoothz == nil then
-				targsmoothz = 0
-			end
-
-			if vel == nil then
-				vel = 0
-			end
-
 			local IsAirborne = 1
 
 			local ground = util.TraceLine({
@@ -233,57 +199,62 @@ if SERVER then
 				util.Effect("ThumperDust", fx)
 			end
 
-			self:SetAngles(Angle(pitchgo + sway_x, self.final_dir + sway_y, sway_z))
-			self:SetPos(self:GetPos() + ((Vector(targsmoothx * acceleration - sway_x,
-					targsmoothy * acceleration - sway_y, targsmoothz * acceleration - sway_z)) / 8))
+			self:SetAngles(Angle(self.pitchgo + self.sway_x, self.final_dir + self.sway_y, self.sway_z))
+			self:SetPos(self:GetPos() + ((Vector(self.targsmoothx * self.acceleration - self.sway_x,
+					self.targsmoothy * self.acceleration - self.sway_y,
+					self.targsmoothz * self.acceleration - self.sway_z)) / 8))
 
 			--Calculate it all afterwards
 
-			local targsmoothx = math.sqrt(math.abs(TargetPosition[1] - self:GetPos()[1])) * sign(TargetPosition[1] - self:GetPos()[1])
-			local targsmoothy = math.sqrt(math.abs(TargetPosition[2] - self:GetPos()[2])) * sign(TargetPosition[2] - self:GetPos()[2])
-			local targsmoothz = math.sqrt(math.abs(TargetPosition[3] - self:GetPos()[3])) * sign(TargetPosition[3] - self:GetPos()[3])
+			self.targsmoothx = math.sqrt(math.abs(TargetPosition[1] - self:GetPos()[1])) * sign(TargetPosition[1] - self:GetPos()[1])
+			self.targsmoothy = math.sqrt(math.abs(TargetPosition[2] - self:GetPos()[2])) * sign(TargetPosition[2] - self:GetPos()[2])
+			self.targsmoothz = math.sqrt(math.abs(TargetPosition[3] - self:GetPos()[3])) * sign(TargetPosition[3] - self:GetPos()[3])
 
-			local vel = Vector(targsmoothx, targsmoothy, targsmoothz):Length()
+			self.vel = Vector(self.targsmoothx, self.targsmoothy, self.targsmoothz):Length()
 
-			local sway_x = IsAirborne * math.sin(CurTime() * 0.6) * (2 + (pitchgo * 2))
-			local sway_y = IsAirborne * math.sin(CurTime() * 1) * (1.5 + (pitchgo * 2))
-			local sway_z = IsAirborne * math.sin(CurTime() * 0.8) * (2 + (pitchgo * 2))
+			self.sway_x = IsAirborne * math.sin(CurTime() * 0.6) * (2 + (self.pitchgo * 2))
+			self.sway_y = IsAirborne * math.sin(CurTime() * 1) * (1.5 + (self.pitchgo * 2))
+			self.sway_z = IsAirborne * math.sin(CurTime() * 0.8) * (2 + (self.pitchgo * 2))
 
-			local dir_length = Vector(targsmoothx - sway_x, targsmoothy - sway_y, targsmoothz - sway_z):Length()
+			local dir_length = Vector(self.targsmoothx - self.sway_x, self.targsmoothy - self.sway_y,
+					self.targsmoothz - self.sway_z):Length()
 
-			local dir_length_sqr = Vector(targsmoothx - sway_x, targsmoothy - sway_y, 0):Length()
+			local dir_length_sqr = Vector(self.targsmoothx - self.sway_x, self.targsmoothy - self.sway_y, 0):Length()
 
 			if dir_length > 2 then
-				directional = Vector(targsmoothx, targsmoothy, targsmoothz):Angle()[2] * sign(Vector(targsmoothx,
-						targsmoothy, targsmoothz):Length())
+				local directional = Vector(self.targsmoothx, self.targsmoothy,
+						self.targsmoothz):Angle()[2] * sign(Vector(self.targsmoothx,
+						self.targsmoothy, self.targsmoothz):Length())
 
-				self.final_dir = self.final_dir + (sign(-self.final_dir + directional) * math.sqrt(acceleration * dir_length_sqr / 25) * acceleration * (math.abs(-self.final_dir + directional) / 130))
+				self.final_dir = self.final_dir + (sign(-self.final_dir + directional) * math.sqrt(self.acceleration * dir_length_sqr / 25) * self.acceleration * (math.abs(-self.final_dir + directional) / 130))
 
-				if acceleration == 1.1 then
-					acceleration = 0
+				if self.acceleration == 1.1 then
+					self.acceleration = 0
 				end
 
-				if acceleration < 1 then
-					acceleration = acceleration + (FrameTime() / 3)
+				if self.acceleration < 1 then
+					self.acceleration = self.acceleration + (FrameTime() / 3)
 				end
 			else
-				acceleration = 1.1
+				self.acceleration = 1.1
 			end
 
-			pitchgo = acceleration * vel / 16
+			self.pitchgo = self.acceleration * self.vel / 16
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount == team.NumPlayers(TEAM_SURVIVOR) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch_full == nil then
+		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount == team.NumPlayers(TEAM_SURVIVOR)
+				and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch_full == nil then
+
 			SlashCo.SurvivorWinFinish()
-
 			SlashCo.HelicopterTakeOff()
-
 			self.switch_full = true
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount >= (team.NumPlayers(TEAM_SURVIVOR) / 2) and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then
+		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount >= (team.NumPlayers(TEAM_SURVIVOR) / 2)
+				and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then
+
 			if SlashCo.CurRound.Difficulty ~= 1 then
-				return
+				return true
 			end
 			self.switch = true
 
@@ -292,7 +263,7 @@ if SERVER then
 
 			timer.Simple(abandon, function()
 				if self.switch_full == true then
-					return
+					return true
 				end
 
 				SlashCo.HelicopterTakeOff()
@@ -300,9 +271,11 @@ if SERVER then
 			end)
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then
+		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME
+				and self.switch == nil then
+
 			if SlashCo.CurRound.Difficulty ~= 2 then
-				return
+				return true
 			end
 			self.switch = true
 
@@ -311,15 +284,13 @@ if SERVER then
 
 			timer.Simple(abandon, function()
 				if self.switch_full == true then
-					return
+					return true
 				end
 
 				SlashCo.HelicopterTakeOff()
 				SlashCo.SurvivorWinFinish()
 			end)
 		end
-
-		self:NextThink(CurTime()) -- Set the next think to run as soon as possible, i.e. the next frame.
 
 		return true -- Apply NextThink call
 	end

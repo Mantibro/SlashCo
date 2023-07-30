@@ -4,17 +4,17 @@ local function printPlayersNeatly(players)
 		return SlashCoLanguage("nobody"), 0
 	end
 	if count == 1 then
-		return players[1]:getName(), 1
+		return players[1]:GetName(), 1
 	end
 	if count == 2 then
-		return SlashCoLanguage("TwoElements", players[1]:getName(), players[2]:getName()), 2
+		return SlashCoLanguage("TwoElements", players[1]:GetName(), players[2]:GetName()), 2
 	end
 
 	local strings = {}
 	for i = 1, count - 2 do
-		table.insert(SlashCoLanguage("InList", players[i]:getName()))
+		table.insert(SlashCoLanguage("InList", players[i]:GetName()))
 	end
-	table.insert(SlashCoLanguage("TwoElements", players[count - 1]:getName(), players[count]:getName()))
+	table.insert(SlashCoLanguage("TwoElements", players[count - 1]:GetName(), players[count]:GetName()))
 
 	return table.concat(strings), count
 end
@@ -74,6 +74,7 @@ local function teamSummary(lines, survivors, rescued)
 	if leftBehindString then
 		table.insert(lines, leftBehindString)
 	end
+
 	local killedString = printKilled(survivors)
 	if killedString then
 		table.insert(lines, killedString)
@@ -167,7 +168,7 @@ local function nextLine(panel, lines)
 
 	timer.Simple(0, function()
 		local w = line:GetTextSize()
-		if w > panel:GetWide() then
+		if w > ScrW() then
 			line:SetWrap(true)
 			line:SetTall(80)
 		end
@@ -177,7 +178,7 @@ local function nextLine(panel, lines)
 
 	local fill = panel:Add("Panel")
 	fill:Dock(TOP)
-	fill:SetTall(panel:GetTall() / 20)
+	fill:SetTall(ScrH() / 20)
 
 	table.remove(lines)
 end
@@ -190,7 +191,6 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	end
 
 	local linesPlay = table.Reverse(lines)
-	local shows = 0
 	local panel = GetHUDPanel():Add("Panel")
 	panel:Dock(FILL)
 
@@ -206,23 +206,24 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 
 		local fill = panel:Add("Panel")
 		fill:Dock(TOP)
-		fill:SetTall(panel:GetTall() / 5)
+		fill:SetTall(ScrH() / 5)
 
 		nextLine(panel, linesPlay)
 
 		local fill1 = panel:Add("Panel")
 		fill1:Dock(TOP)
-		fill1:SetTall(panel:GetTall() / 20)
+		fill1:SetTall(ScrH() / 20)
 	end)
 
+	local shows
 	timer.Create("SlashCoRoundEnd", 1, 0, function()
 		if not next(linesPlay) or not IsValid(panel) then
 			timer.Remove("SlashCoRoundEndThink")
 			return
 		end
 
-		shows = shows + 1
-		if shows == 1 then
+		if not shows then
+			shows = true
 			return
 		end
 
