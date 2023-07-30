@@ -53,7 +53,7 @@ end
 
 SlashCo.BroadcastLobbySlasherInformation = function()
 	net.Start("mantislashcoLobbySlasherInformation")
-	net.WriteTable({ player = SlashCo.LobbyData.AssignedSlasher, slasher = SlashCoSlasher[SlashCo.LobbyData.PickedSlasher].Name })
+	net.WriteTable({ player = SlashCo.LobbyData.AssignedSlasher, slasher = SlashCo.LobbyData.PickedSlasher })
 	net.Broadcast()
 end
 
@@ -94,10 +94,6 @@ hook.Add("scValue_sendOffer", "slashCo_StartOfferingVote", function(ply, offer)
 	timer.Create("OfferingVoteTimer", 20, 1, function()
 		SlashCo.OfferingVoteFail()
 	end)
-
-	for _, play in ipairs(player.GetAll()) do
-		play:ChatPrint(ply:GetName() .. " would like to offer " .. SCInfo.Offering[offer].Name)
-	end
 end)
 
 SlashCo.OfferingVote = function(ply, agreement)

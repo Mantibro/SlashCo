@@ -24,6 +24,9 @@ SlashCoLang["NoneRescued"] = "The dispatched SlashCo Workers could not be rescue
 SlashCoLang["Cursed"] = "Your soul is now forfeit."
 SlashCoLang["Judgement"] = "JUDGEMENT"
 
+SlashCoLang["InLobby"] = "In Lobby"
+SlashCoLang["InGame"] = "In Game (%s)"
+
 SlashCoLang["Survivor"] = "Survivor"
 SlashCoLang["Slasher"] = "Slasher"
 

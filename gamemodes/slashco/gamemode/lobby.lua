@@ -278,7 +278,7 @@ local function lobbyReadyTimer(count)
 end
 --				***Begin the transition timer***
 local function lobbyTransitionTimer()
-    timer.Create("LobbyTransition", SlashCo.LobbyBanter(), 1, function()
+    timer.Create("LobbyTransition", math.max(SlashCo.LobbyBanter(), 10), 1, function()
         if SERVER then
             RunConsoleCommand("lobby_debug_brief")
             SlashCo.LobbyPlayerBriefing()
@@ -335,7 +335,7 @@ local function lobbyRoundSetup()
             SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
             SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCoSlasher[rand_name].Class
             SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCoSlasher[rand_name].DangerLevel
-            SlashCo.LobbyData.SelectedSlasherInfo.NAME = SlashCoSlasher[rand_name].Name
+            SlashCo.LobbyData.SelectedSlasherInfo.NAME = rand_name
             SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlasher[rand_name].ProTip
 
             SlashCo.LobbyData.PickedSlasher = rand_name
@@ -584,6 +584,27 @@ local function pickItem(ply, item)
     timer.Simple(0.5, function()
         SlashCo.BroadcastMasterDatabaseForClient(ply)
     end)
+
+    if not SlashCo.LobbyData.VendorCooldown then
+        SlashCo.LobbyData.VendorCooldown = CurTime()
+        LobbyVendorVoice(item)
+    elseif (CurTime() - SlashCo.LobbyData.VendorCooldown) > 5 then
+        SlashCo.LobbyData.VendorCooldown = CurTime()
+        LobbyVendorVoice(item)
+    end
+end
+
+function LobbyVendorVoice(item)
+    local vendor = ents.FindByClass( "sc_itemstash" )[1]
+
+    if item == "DeathWard" then
+        vendor:EmitSound("slashco/itemvendor/itemvendor_deathward"..math.random(1,5)..".mp3")
+    elseif item == "Brick" then
+        vendor:EmitSound("slashco/itemvendor/itemvendor_brick"..math.random(1,5)..".mp3")
+    else
+        vendor:EmitSound("slashco/itemvendor/itemvendor_generic"..math.random(1,12)..".mp3")
+    end
+
 end
 
 local MapForceCost = 50
@@ -859,7 +880,6 @@ SlashCo.OfferingVoteSuccess = function(id)
     timer.Destroy("OfferingVoteTimer")
 
     for _, play in ipairs(player.GetAll()) do
-        play:ChatPrint("Offering vote successful. " .. SCInfo.Offering[id].Name .. " has been offered.")
         SlashCo.EndOfferingVote(play)
     end
 

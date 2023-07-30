@@ -58,7 +58,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
                 if LocalPlayer():GetNWString("Slasher") and LocalPlayer():GetNWString("Slasher") ~= show_slasher_anticipation then
                     local shower = "UNASSIGNED!"
                     if SlashCoSlasher[LocalPlayer():GetNWString("Slasher")] then
-                        shower = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].Name
+                        shower = SlashCoLanguage(LocalPlayer():GetNWString("Slasher"))
                     end
                     show_slasher_anticipation = shower
                 end

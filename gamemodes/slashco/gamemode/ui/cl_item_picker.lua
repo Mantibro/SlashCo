@@ -47,8 +47,8 @@ end
 local function setItemLabel()
     itemSelectFrame.ItemModel:SetModel(SlashCoItems[selectedItem].Model)
     itemSelectFrame.ItemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
-    itemSelectFrame.ItemDescription:SetText( SlashCoLanguage(SlashCoItems[selectedItem].Description) )
-    itemSelectFrame.ItemLabel:SetText(string.upper( SlashCoLanguage(SlashCoItems[selectedItem].Name) ))
+    itemSelectFrame.ItemDescription:SetText( SlashCoLanguage(selectedItem.."_desc") )
+    itemSelectFrame.ItemLabel:SetText(string.upper( SlashCoLanguage(selectedItem) ))
 
     if (SlashCoItems[selectedItem].MaxAllowed) then
         local numRemain = SlashCoItems[selectedItem].MaxAllowed()
