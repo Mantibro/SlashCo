@@ -76,6 +76,20 @@ net.Receive("mantislashcoSurvivorPings", function()
 	end
 end)
 
+hook.Add("DrawOverlay", "SlashCoVHS", function()
+	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
+		return
+	end
+
+	local y = (CurTime() % 4) * (ScrH() / 28)
+	surface.SetDrawColor(192, 192, 192, 1)
+	while y < ScrH() do
+		surface.DrawLine(0, y, ScrW(), y)
+
+		y = y + (ScrH() / 7)
+	end
+end)
+
 hook.Add("HUDPaint", "SurvivorHUD", function()
 	local ply = LocalPlayer()
 
@@ -87,10 +101,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 	if IsFueling then
 		gas = (TimeUntilFueled - CurTime()) / TimeToFuel
 		if not input.IsButtonDown(KEY_E) then
-			--print("not e")
 			IsFueling = false
 		elseif CurTime() >= TimeUntilFueled then
-			--print("not fuel")
 			IsFueling = false
 		end
 	end
@@ -99,19 +111,21 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	local HeldItem = ply:GetNWString("item", "none")
 	if SlashCoItems[HeldItem or "none"] then
-		local parsedItem = markup.Parse("<font=TVCD>---     " .. string.upper(SlashCoLanguage(SlashCoItems[HeldItem].Name)) .. "     ---</font>")
+		local parsedItem = markup.Parse("<font=TVCD>---     " .. string.upper(SlashCoLanguage(HeldItem)) .. "     ---</font>")
 		surface.SetDrawColor(ply:ItemFunctionOrElse("DisplayColor", { 0, 0, 128 }))
 		surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
 		parsedItem:Draw(ScrW() * 0.975 - 4, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
 		local offset = 0
 		if SlashCoItems[HeldItem].OnUse then
-			draw.SimpleText("[R] "..SlashCoLanguage("item_use"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30, color_white, TEXT_ALIGN_RIGHT,
+			draw.SimpleText(SlashCoLanguage("item_use", "R"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30,
+					color_white, TEXT_ALIGN_RIGHT,
 					TEXT_ALIGN_BOTTOM)
 			offset = 30
 		end
 		if SlashCoItems[HeldItem].OnDrop then
-			draw.SimpleText("[Q] "..SlashCoLanguage("item_drop"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset, color_white,
+			draw.SimpleText(SlashCoLanguage("item_drop", "Q"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset,
+					color_white,
 					TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 	end
@@ -125,17 +139,21 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		if realDistance < 100 then
 			genPos = genPos:ToScreen()
 			local fade = math.Round((100 - realDistance) * 2.8)
-			local parsedLiters = markup.Parse("<font=TVCD>" .. math.Round(gas * 10) .. "L</font>") --this only exists to find the length lol
-			local width = 206 + parsedLiters:GetWidth()
+			local parsedTotal = markup.Parse(string.format("<font=TVCD>%s %s %sL</font>",
+					SlashCoLanguage("FUEL"),
+					string.rep("█", 8),
+					math.Round(gas * 10)))
+			local width = parsedTotal:GetWidth()
 			local xClamp = math.Clamp(genPos.x, ScrW() * 0.025 + width / 2, ScrW() * 0.975 - width / 2)
 			local yClamp = math.Clamp(genPos.y, ScrH() * 0.05 + 24, ScrH() * 0.95 - 51)
 			local half = math.Clamp((gas * 8), 0, 8) % 1 >= 0.5
 
 			surface.SetDrawColor(0, 128, 0, fade)
-			surface.DrawRect(xClamp - width / 2, yClamp - 13, width, 27)
-			draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + 205 - width / 2, yClamp,
-					Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
-			draw.SimpleText("--> " .. string.rep("█", gas * 8) .. (half and "▌" or ""), "TVCD", xClamp + 2 - width / 2,
+			surface.DrawRect(xClamp - width / 2 + 2, yClamp - 13, width, 27)
+			draw.SimpleText(math.Round(gas * 10) .. "L", "TVCD", xClamp + width / 2, yClamp,
+					Color(255, 255, 255, fade), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+			draw.SimpleText(SlashCoLanguage("FUEL") .. " " .. string.rep("█", gas * 8) .. (half and "▌" or ""),
+					"TVCD", xClamp + 2 - width / 2,
 					yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 		else
 			IsFueling = false
@@ -148,7 +166,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		local lookent = LocalPlayer():GetEyeTrace().Entity
 		if IsValid(lookent) and lookent:GetClass() == "prop_door_rotating" and g_CheckDoorWL(lookent) then
 			if lookent:GetPos():Distance(LocalPlayer():GetPos()) < 150 and not lookent.IsOpen then
-				draw.SimpleText("[LMB] "..SlashCoLanguage("door_slam"), "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER,
+				draw.SimpleText(SlashCoLanguage("door_slam", "LMB"), "TVCD", ScrW() / 2, ScrH() / 2, color_white,
+						TEXT_ALIGN_CENTER,
 						TEXT_ALIGN_CENTER)
 			end
 		end
@@ -180,7 +199,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 		draw.SimpleText(v.Player:GetName(), "TVCD_small", pos.x, pos.y - 25, Color(255, 255, 255, 180),
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-		draw.SimpleText("[" .. showText .. "]", "TVCD", pos.x, pos.y, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("[" .. SlashCoLanguage(showText) .. "]", "TVCD", pos.x, pos.y, textColor, TEXT_ALIGN_CENTER,
+				TEXT_ALIGN_CENTER)
 	end
 
 	--//item selection crosshair//--
@@ -201,7 +221,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 						TEXT_ALIGN_CENTER)
 
 				if realDistance < 200 and centerDistance < 25 then
-					draw.SimpleText("[MMB] "..SlashCoLanguage("surv_ping"), "TVCD", ScrW() / 2, ScrH() / 2 + 100, color_white, TEXT_ALIGN_CENTER,
+					draw.SimpleText(SlashCoLanguage("surv_ping", "MMB"), "TVCD", ScrW() / 2, ScrH() / 2 + 100,
+							color_white, TEXT_ALIGN_CENTER,
 							TEXT_ALIGN_CENTER)
 				end
 			end
@@ -247,26 +268,32 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		local hpAdjust = math.Clamp(hp, 0, 100) - hpOver
 		local displayHpBar = math.Round(math.Clamp(hpAdjust / maxHp, 0, 1) * 27)
 		local displayHpOverBar = math.Round(math.Clamp(hpOver / maxHp, 0, 1) * 27)
-		parsed = markup.Parse("<font=TVCD>HP <colour=0,255,255,255>" .. string.rep("█",
-				displayHpOverBar) .. "</colour>" --overheal
-				.. string.rep("█", displayHpBar) --hp
-				.. "<colour=255,0,0,255>" .. string.rep("█", displayPrevHpBar) .. "</colour></font>") --indicator
+		parsed = markup.Parse(string.format("<font=TVCD>%s <colour=0,255,255,255>%s</colour>%s<colour=255,0,0,255>%s</colour></font>",
+				SlashCoLanguage("HP"),
+				string.rep("█", displayHpOverBar),
+				string.rep("█", displayHpBar),
+				string.rep("█", displayPrevHpBar)
+		))
 	else
 		local displayHpBar = (CurTime() % 0.7 > 0.35) and math.Round(math.Clamp(hp / maxHp, 0, 1) * 27) or 0
-		parsed = markup.Parse("<font=TVCD>HP <colour=255,255,0,255>" .. string.rep("█",
-				displayHpBar) .. "</colour><colour=255,0,0,255>" --hp
-				.. string.rep("█", displayPrevHpBar) .. "</colour></font>") --indicator
+		parsed = markup.Parse(string.format("<font=TVCD>%s <colour=255,255,0,255>%s</colour><colour=255,0,0,255>%s</colour></font>",
+				SlashCoLanguage("HP"),
+				string.rep("█", displayHpBar),
+				string.rep("█", displayPrevHpBar)
+		))
 	end
 
 	surface.SetDrawColor(0, 0, 128, 255)
 
+	local hpLength = markup.Parse("<font=TVCD>"..SlashCoLanguage("HP").."</font>"):GetWidth()
+
 	if not GetConVar("slashcohud_show_healthvalue"):GetBool() then
-		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 410, 27)
+		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 376 + hpLength, 27)
 	else
 		local displayHp = math.Round(aHp)
 		local parsedValue = markup.Parse("<font=TVCD>" .. displayHp .. "</font>")
-		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 420 + parsedValue:GetWidth(), 27)
-		parsedValue:Draw(ScrW() * 0.025 + 417, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 386 + parsedValue:GetWidth() + hpLength, 27)
+		parsedValue:Draw(ScrW() * 0.025 + 384 + hpLength, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 	end
 
 	parsed:Draw(ScrW() * 0.025 + 4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)

@@ -1,10 +1,28 @@
-
 --[[
 
     Language: en, (English), (English)
     Translator: Manti
 
 ]]
+
+SlashCoLang["TwoElements"] = "%s and %s"
+SlashCoLang["InList"] = "%s, "
+SlashCoLang["WordSeparator"] = " "
+
+SlashCoLang["AssignmentSuccess"] = "The assignment was successful."
+SlashCoLang["AssignmentFail"] = "The assignment was unsuccessful."
+SlashCoLang["AssignmentAborted"] = "The assignment ended prematurely."
+SlashCoLang["Rescued"] = "%s were reported present on the rescue helicopter."
+SlashCoLang["RescuedOnlyOne"] = "%s was the only one present on the rescue helicopter."
+SlashCoLang["LeftBehind"] = "%s were left behind."
+SlashCoLang["LeftBehindOnlyOne"] = "%s was left behind."
+SlashCoLang["Killed"] = "%s are now presumed either dead or missing in action."
+SlashCoLang["KilledOnlyOne"] = "%s is now presumed either dead or missing in action."
+SlashCoLang["AllRescued"] = "All of the dispatched SlashCo Workers were rescued."
+SlashCoLang["SomeRescued"] = "Only some of the dispatched SlashCo Workers could be rescued."
+SlashCoLang["NoneRescued"] = "The dispatched SlashCo Workers could not be rescued."
+SlashCoLang["Cursed"] = "Your soul is now forfeit."
+SlashCoLang["Judgement"] = "JUDGEMENT"
 
 SlashCoLang["Survivor"] = "Survivor"
 SlashCoLang["Slasher"] = "Slasher"
@@ -17,9 +35,7 @@ SlashCoLang["Intermediate"] = "Intermediate"
 SlashCoLang["Hard"] = "Hard"
 
 SlashCoLang["Unknown"] = "Unknown"
-
 SlashCoLang["Name"] = "Name"
-
 SlashCoLang["Notes"] = "Notes"
 
 SlashCoLang["Class"] = "Class"
@@ -31,7 +47,6 @@ SlashCoLang["DangerLevel"] = "Danger Level"
 SlashCoLang["Moderate"] = "Moderate"
 SlashCoLang["Considerable"] = "Considerable"
 SlashCoLang["Devastating"] = "Devastating"
-
 
 SlashCoLang["Offering"] = "Offering"
 SlashCoLang.OfferingPreceedsName = false
@@ -196,10 +211,10 @@ SlashCoLang["slasher_assess"] = "Slasher Assessment:"
 SlashCoLang["offering_idle"] = "Make an Offering"
 
 --Survivor
-SlashCoLang["item_use"] = "USE"
-SlashCoLang["item_drop"] = "DROP"
-SlashCoLang["door_slam"] = "SLAM OPEN"
-SlashCoLang["surv_ping"] = "PING"
+SlashCoLang["item_use"] = "[%s] USE"
+SlashCoLang["item_drop"] = "[%s] DROP"
+SlashCoLang["door_slam"] = "[%s] SLAM OPEN"
+SlashCoLang["surv_ping"] = "[%s] PING"
 
 --Spectator
 SlashCoLang["spectating"] = "YOU ARE SPECTATING"
@@ -215,7 +230,7 @@ SlashCoLang["toggle_light"] = "[%s] TOGGLE LIGHT"
 SlashCoLang["demon_pacified"] = "You have been pacified by consuming an item."
 SlashCoLang["beacon_call"] = "The Survivors are attempting to call emergency escape."
 SlashCoLang["beacon_destroy"] = "DESTROY THE BEACON."
-SlashCoLang["slasher_anticipation"] = "You will soon spawn as "
+SlashCoLang["slasher_anticipation"] = "You will soon spawn as %s"
 SlashCoLang["slasher_unavailable"] = "unavailable"
 SlashCoLang["slasher_killsurvivor"] = "kill survivor"
 SlashCoLang["slasher_startchase"] = "start chasing"
@@ -295,9 +310,7 @@ SlashCoLang["Covenant_desc"] = [[The Leader Slasher who commands his trusted Clo
 -Without the power of the Saturn Stick, must must rely on your Cloaks to catch Survivors.]]
 SlashCoLang["Covenant_tip"] = "-This Slasher can enlist others into its ranks."
 
-
 SlashCoLang["CovenantCloak"] = "Covenant Cloak"
-
 
 SlashCoLang["Rocks"] = "LTG Rocks"
 

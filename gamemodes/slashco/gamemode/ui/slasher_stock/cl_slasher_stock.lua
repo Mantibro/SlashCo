@@ -607,7 +607,7 @@ function PANEL:CheckNetVars(isOr, invertInput, ...)
 
 	local result = isOr
 	for _, v in pairs({ ... }) do
-		if LocalPlayer():GetNWBool(v, not invertInput) ~= invertInput then
+		if LocalPlayer():GetNWBool(v, invertInput) ~= invertInput then
 			result = not result
 			break
 		end
@@ -624,8 +624,6 @@ local nSpin, nTight, nAng, nAlpha = 0, 0, 0, 0
 function PANEL:MakeCrosshair()
 	local crosshair = self:Add("Panel")
 	self.Crosshair = crosshair
-	crosshair:SetSize(120, 120)
-	crosshair:SetPos(ScrW() / 2 - 60, ScrH() / 2 - 60)
 
 	function crosshair.PaintOver(_, w, h)
 		nSpin = math.Clamp(Lerp(0.04, nSpin, self.CrosshairSpin), 0, 1000)
@@ -648,6 +646,30 @@ function PANEL:MakeCrosshair()
 
 	--this element is mainly for demons
 	crosshair:Hide()
+end
+
+---internal: reorient the hud when the resolution changes
+function PANEL:PerformLayout()
+	local size = ScrH() / 12
+	self.Crosshair:SetSize(size, size)
+	self.Crosshair:SetPos((ScrW() - size) / 2, (ScrH() - size) / 2)
+
+	for k, v in ipairs(self.Gens) do
+		local x, y = ScrW() / 2 + 180 * k - 90 * self.GenCount - 170, 0
+		v:SetPos(x, y)
+
+		for _, v1 in ipairs(v.Entries) do
+			v1.DefaultPos = {
+				x + (v:GetWide() / 2) - math.cos(v1.angle) * 50 - (v1:GetWide() / 2),
+				y + (v:GetTall() / 2) + math.sin(v1.angle) * 50 - (v1:GetTall() / 2)
+			}
+			v1.CenteredPos = {
+				(ScrW() / 2) - math.cos(v1.angle) * 100 - (v1:GetWide()),
+				(ScrH() / 2) + math.sin(v1.angle) * 100 - (v1:GetTall())
+			}
+			v1:SetPos(unpack(v1.DefaultPos))
+		end
+	end
 end
 
 ---internal: shows the slasher's name and avatar
@@ -797,8 +819,8 @@ function PANEL:MakeGenEntry(gen, i, model)
 		end
 	end)
 
-	local angle = math.pi / ((gasCansPerGenerator + 1) / 2) * i
-	local x, y = gen:GetPos()
+	entry.angle = math.pi / ((gasCansPerGenerator + 1) / 2) * i
+	--local x, y = gen:GetPos()
 
 	function entry.Think()
 		entry:SetCamPos(Vector(80 + entry.XShake, entry.YShake, entry.ZShake))
@@ -815,6 +837,9 @@ function PANEL:MakeGenEntry(gen, i, model)
 		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5,
 				(YWiggle + entry.YSpin + (i * 360 / (gasCansPerGenerator + 1))) % 360, 5))
 	end
+	--entry.angle = angle
+
+	--[[
 	entry.DefaultPos = {
 		x + (gen:GetWide() / 2) - math.cos(angle) * 50 - (entry:GetWide() / 2),
 		y + (gen:GetTall() / 2) + math.sin(angle) * 50 - (entry:GetTall() / 2)
@@ -824,12 +849,14 @@ function PANEL:MakeGenEntry(gen, i, model)
 		(ScrH() / 2) + math.sin(angle) * 100 - (entry:GetTall())
 	}
 	entry:SetPos(unpack(entry.DefaultPos))
+	--]]
 end
 
 ---internal: shows the generator display up top
 function PANEL:MakeGeneratorsCard()
 	local gens = ents.FindByClass("sc_generator")
 	local genCount = #gens
+	self.GenCount = genCount
 	if genCount < 1 then
 		return
 	end
@@ -838,7 +865,7 @@ function PANEL:MakeGeneratorsCard()
 		local gen = self:Add("slashco_projector")
 		table.insert(self.Gens, gen)
 		gen:SetSize(160, 160)
-		gen:SetPos(ScrW() / 2 + 160 * k - 80 * genCount - 160)
+		--gen:SetPos(ScrW() / 2 + 160 * k - 80 * genCount - 160)
 		gen:SetEntity(v)
 		gen:SetFOV(22)
 		gen:SetDistance(400)

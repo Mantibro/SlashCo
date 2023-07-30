@@ -1,80 +1,248 @@
-net.Receive( "mantislashcoRoundEnd", function( _, _ )
-	local retable = net.ReadTable()
+local function printPlayersNeatly(players)
+	local count = #players
+	if count == 0 then
+		return SlashCoLanguage("nobody"), 0
+	end
+	if count == 1 then
+		return players[1]:getName(), 1
+	end
+	if count == 2 then
+		return SlashCoLanguage("TwoElements", players[1]:getName(), players[2]:getName()), 2
+	end
 
-	local result = retable.result
+	local strings = {}
+	for i = 1, count - 2 do
+		table.insert(SlashCoLanguage("InList", players[i]:getName()))
+	end
+	table.insert(SlashCoLanguage("TwoElements", players[count - 1]:getName(), players[count]:getName()))
 
-	if outromusic_antispam == nil or outromusic_antispam ~= true then
+	return table.concat(strings), count
+end
 
-		if result == 0 then
-			surface.PlaySound( "slashco/music/slashco_win_full.mp3") 
-		elseif result == 1 then
-			surface.PlaySound( "slashco/music/slashco_win_2.mp3") 
-		elseif result == 2 then
-			surface.PlaySound( "slashco/music/slashco_lost_active.mp3") 
-		elseif result == 3 then
-			surface.PlaySound( "slashco/music/slashco_lost.mp3") 
-		elseif result == 4 then
-			surface.PlaySound( "slashco/music/slashco_win_db.mp3") 
+local function printRescued(rescued)
+	local neatString, count = printPlayersNeatly(rescued)
+	if count <= 0 then
+		return
+	end
+	return SlashCoLanguage(count == 1 and "RescuedOnlyOne" or "Rescued", neatString)
+end
+
+local function printLeftBehind(survivors, rescued)
+	local plysLeftBehind = table.Copy(survivors)
+	for k, ply in ipairs(plysLeftBehind) do
+		if ply:Team() ~= TEAM_SURVIVOR then
+			table.remove(plysLeftBehind, k)
+			continue
+		end
+		for _, v in ipairs(rescued) do
+			if ply == v then
+				table.remove(plysLeftBehind, k)
+				break
+			end
+		end
+	end
+
+	local neatString, count = printPlayersNeatly(plysLeftBehind)
+	if count <= 0 then
+		return
+	end
+	return SlashCoLanguage(count == 1 and "leftBehindOnlyOne" or "LeftBehind", neatString)
+end
+
+local function printKilled(survivors)
+	local plysKilled = table.Copy(survivors)
+	for k, ply in ipairs(plysKilled) do
+		if ply:Team() == TEAM_SURVIVOR then
+			table.remove(plysKilled, k)
+		end
+	end
+
+	local neatString, count = printPlayersNeatly(plysKilled)
+	if count <= 0 then
+		return
+	end
+	return SlashCoLanguage(count == 1 and "KilledOnlyOne" or "Killed", neatString)
+end
+
+local function teamSummary(lines, survivors, rescued)
+	local rescuedString = printRescued(rescued)
+	if rescuedString then
+		table.insert(lines, rescuedString)
+	end
+
+	local leftBehindString = printLeftBehind(survivors, rescued)
+	if leftBehindString then
+		table.insert(lines, leftBehindString)
+	end
+	local killedString = printKilled(survivors)
+	if killedString then
+		table.insert(lines, killedString)
+	end
+end
+
+local stateTable = {
+	[0] = "wonAllSurvivors",
+	"wonSomeSurvivors",
+	"wonNoSurvivors",
+	"lost",
+	"wonBeacon",
+	"cursed"
+}
+local stringTable = {
+	wonAllSurvivors = function()
+		surface.PlaySound("slashco/music/slashco_win_full.mp3")
+		return {
+			SlashCoLanguage("AssignmentSuccess"),
+			SlashCoLanguage("AllRescued"),
+		}
+	end,
+	wonSomeSurvivors = function(survivors, rescued)
+		surface.PlaySound("slashco/music/slashco_win_2.mp3")
+		local lines = {
+			SlashCoLanguage("AssignmentSuccess"),
+			SlashCoLanguage("SomeRescued"),
+		}
+		teamSummary(lines, survivors, rescued)
+
+		return lines
+	end,
+	wonNoSurvivors = function()
+		surface.PlaySound("slashco/music/slashco_lost_active.mp3")
+		return {
+			SlashCoLanguage("AssignmentSuccess"),
+			SlashCoLanguage("NoneRescued"),
+		}
+	end,
+	lost = function()
+		surface.PlaySound("slashco/music/slashco_lost.mp3")
+		return {
+			SlashCoLanguage("AssignmentFail"),
+			SlashCoLanguage("NoneRescued"),
+		}
+	end,
+	wonBeacon = function(survivors, rescued)
+		surface.PlaySound("slashco/music/slashco_win_db.mp3")
+		local lines = {
+			SlashCoLanguage("AssignmentAborted"),
+		}
+		teamSummary(lines, survivors, rescued)
+
+		return lines
+	end,
+	cursed = function()
+		surface.PlaySound("slashco/music/slashco_lost.mp3")
+		local lines = {}
+		for i = 0, 19 do
+			local line = string.Split(SlashCoLanguage("Cursed"), SlashCoLanguage("WordSeparator"))
+			for i1 = 1, i do
+				line[math.random(1, #line)] = SlashCoLanguage("Judgement")
+			end
+			table.insert(lines, table.concat(line, SlashCoLanguage("WordSeparator")))
 		end
 
-		outromusic_antispam = true 
+		return lines
+	end
+}
+
+local function fadeIn(panel)
+	local anim = Derma_Anim("Fade", nil, function(_, _, delta)
+		panel:SetAlpha(255 * delta)
+	end)
+	anim:Start(1)
+
+	function panel.Think()
+		if anim:Active() then
+			anim:Run()
+		end
+	end
+end
+
+local function nextLine(panel, lines)
+	local line = panel:Add("DLabel")
+	line:Dock(TOP)
+	line:SetFont("OutroFont")
+	line:SetContentAlignment(8)
+	line:SetTall(40)
+	line:SetText(lines[#lines])
+
+	timer.Simple(0, function()
+		local w = line:GetTextSize()
+		if w > panel:GetWide() then
+			line:SetWrap(true)
+			line:SetTall(80)
+		end
+	end)
+
+	fadeIn(line)
+
+	local fill = panel:Add("Panel")
+	fill:Dock(TOP)
+	fill:SetTall(panel:GetTall() / 20)
+
+	table.remove(lines)
+end
+
+hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescued)
+	local stateString = stateTable[state]
+	local lines = stringTable[stateString](survivors, rescued)
+	if table.IsEmpty(lines) then
+		return
 	end
 
-	outro_line1 = retable.line1
-	outro_line2 = retable.line2
-	outro_line3 = retable.line3
-	outro_line4 = retable.line4
-	outro_line5 = retable.line5
+	local linesPlay = table.Reverse(lines)
+	local shows = 0
+	local panel = GetHUDPanel():Add("Panel")
+	panel:Dock(FILL)
 
-	show_roundend_screen = true
+	function panel.Paint()
+		surface.SetDrawColor(0, 0, 0)
+		panel:DrawFilledRect()
+	end
 
+	timer.Simple(0, function()
+		if not IsValid(panel) then
+			return
+		end
+
+		local fill = panel:Add("Panel")
+		fill:Dock(TOP)
+		fill:SetTall(panel:GetTall() / 5)
+
+		nextLine(panel, linesPlay)
+
+		local fill1 = panel:Add("Panel")
+		fill1:Dock(TOP)
+		fill1:SetTall(panel:GetTall() / 20)
+	end)
+
+	timer.Create("SlashCoRoundEnd", 1, 0, function()
+		if not next(linesPlay) or not IsValid(panel) then
+			timer.Remove("SlashCoRoundEndThink")
+			return
+		end
+
+		shows = shows + 1
+		if shows == 1 then
+			return
+		end
+
+		nextLine(panel, linesPlay)
+	end)
 end)
 
-net.Receive( "mantislashcoHelicopterMusic", function( _, _ )
+local helimusic_antispam
+net.Receive("mantislashcoHelicopterMusic", function(_, _)
 
-	if LocalPlayer():Team() == TEAM_SLASHER then return end
+	--[[ but what if le slashers le heard le music.........
+	if LocalPlayer():Team() == TEAM_SLASHER then
+		return
+	end
+	--]]
 
-	if stop_helimusic ~= true and (helimusic_antispam == nil or helimusic_antispam ~= true) then
-		heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
+	if not helimusic_antispam then
+		local heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
 		heli_music:Play()
-		helimusic_antispam = true 
-		AmbientStop = true
+		helimusic_antispam = true
+		g_AmbientStop = true
 	end
-
-end)
-
-hook.Add("HUDPaint", "RoundOutroHUD", function()
-
-	--local ply = LocalPlayer()
-
-	--Round Ending screen
-
-	if helimusic_antispam == true and LocalPlayer():GetNWBool("SurvivorChased") then stop_helimusic = true end
-
-	if stop_helimusic and helimusic_antispam == true then heli_music:Stop() end
-
-	if show_roundend_screen ~= true then return end
-
-	if re_tick == nil then re_tick = 0 end
-	re_tick = re_tick + 1.5
-
-	stop_helimusic = true
-
-	local black = Material("models/slashco/slashers/trollge/body")
-
-	surface.SetDrawColor(0,0,0,re_tick)
-	surface.SetMaterial(black)
-	surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-
-	draw.SimpleText( outro_line1, "OutroFont", ScrW() * 0.5, (ScrH() * 0.15), Color( 255, 255, 255, re_tick-255 ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-
-	draw.SimpleText( outro_line2, "OutroFont", ScrW() * 0.5, (ScrH() * 0.28), Color( 255, 255, 255, re_tick-(255*2) ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-
-	draw.SimpleText( outro_line3, "OutroFont", ScrW() * 0.5, (ScrH() * 0.44), Color( 255, 255, 255, re_tick-(255*3) ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-
-	draw.SimpleText( outro_line4, "OutroFont", ScrW() * 0.5, (ScrH() * 0.6), Color( 255, 255, 255, re_tick-(255*4) ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-
-	draw.SimpleText( outro_line5, "OutroFont", ScrW() * 0.5, (ScrH() * 0.77), Color( 255, 255, 255, re_tick-(255*5) ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
-
-
 end)

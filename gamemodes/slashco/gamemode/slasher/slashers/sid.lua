@@ -666,6 +666,7 @@ if CLIENT then
 					else
 						hud:SetControlEnabled("F", true)
 					end
+					hud:SetCrosshairProngs(3)
 					hud:UntieControl("LMB")
 					hud:UntieControl("RMB")
 					hud:SetControlVisible("LMB", true)
@@ -708,6 +709,7 @@ if CLIENT then
 				hud:SetTitle("sid (with a gun)")
 				hud:ShakeControl("F")
 				hud:FlashMeter("gun uses")
+				surface.PlaySound("slashco/slashco_progress.mp3")
 				hud.gunMode = true
 			end
 		end

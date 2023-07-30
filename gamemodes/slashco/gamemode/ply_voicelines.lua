@@ -1,4 +1,4 @@
-local SlashCo = SlashCo
+local SlashCo = SlashCo or {}
 
 local ConvoCount = 30
 

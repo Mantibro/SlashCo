@@ -29,7 +29,7 @@ if CLIENT then
 			return
 		end
 
-		timer.Simple(0, function()
+		timer.Simple(FrameTime(), function()
 			SlashCo.InitSlasherHud()
 		end)
 	end

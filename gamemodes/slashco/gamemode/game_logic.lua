@@ -574,7 +574,7 @@ SlashCo.EndRound = function()
 		else
 			--Normal Win
 
-			if #SlashCo.CurRound.SlasherData.AllSurvivors == SurvivorCount and SurvivorCount == #SlashCo.CurRound.HelicopterRescuedPlayers then
+			if #SlashCo.CurRound.SlasherData.AllSurvivors >= SurvivorCount and SurvivorCount <= #SlashCo.CurRound.HelicopterRescuedPlayers then
 				--Everyone lived
 
 				SlashCo.RoundOverScreen(0)
@@ -592,16 +592,16 @@ SlashCo.EndRound = function()
 
 		if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
 			--Add to stats of the remaining survivors' wins.
-			for i = 1, #SlashCo.CurRound.HelicopterRescuedPlayers do
-				SlashCoDatabase.UpdateStats(SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid, "SurvivorRoundsWon",
-						1)
+			for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
+				local plyID = v:SteamID64()
 
-				SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal = SlashCo.PlayerData[SlashCo.CurRound.HelicopterRescuedPlayers[i].steamid].PointsTotal + 25
+				SlashCoDatabase.UpdateStats(plyID, "SurvivorRoundsWon", 1)
+				SlashCo.PlayerData[plyID].PointsTotal = SlashCo.PlayerData[plyID].PointsTotal + 25
 			end
 		end
 
-		for i = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
-			local man = SlashCo.CurRound.SlasherData.AllSurvivors[i].id
+		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
+			local man = v.id
 
 			if IsValid(player.GetBySteamID64(man)) then
 				SlashCoDatabase.UpdateStats(man, "Points", SlashCo.PlayerData[man].PointsTotal)

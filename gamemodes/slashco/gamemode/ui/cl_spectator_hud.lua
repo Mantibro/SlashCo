@@ -52,12 +52,12 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
     local show_slasher_anticipation = false
 
-    if SlasherTeam ~= nil then
+    if SlasherTeam then
         for i = 1, #SlasherTeam do
             if SlasherTeam[i].s_id == LocalPlayer():SteamID64() then
                 if LocalPlayer():GetNWString("Slasher") and LocalPlayer():GetNWString("Slasher") ~= show_slasher_anticipation then
                     local shower = "UNASSIGNED!"
-                    if SlashCoSlasher[LocalPlayer():GetNWString("Slasher")] ~= nil then
+                    if SlashCoSlasher[LocalPlayer():GetNWString("Slasher")] then
                         shower = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].Name
                     end
                     show_slasher_anticipation = shower
@@ -67,7 +67,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
     end
 
     if show_slasher_anticipation ~= false then
-        draw.SimpleText(SlashCoLanguage("slasher_anticipatiuon") .. show_slasher_anticipation, "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color(255, 50, 50, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+        draw.SimpleText(SlashCoLanguage("slasher_anticipation", show_slasher_anticipation), "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color(255, 50, 50, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
         return
     end
 

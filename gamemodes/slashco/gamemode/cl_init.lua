@@ -130,6 +130,9 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 	end
 	DrawBloom(0.5, 2, 9, 9, 1, 1, 1, 1, 1)
 
+	LocalPlayer():ItemFunction("Screenspace")
+	DrawBokehDOF(1, 1, 12)
+
 	local blur_insensity = 0
 	local red_insensity = 0
 	local hp = LocalPlayer():Health()
@@ -406,7 +409,8 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
 	else
 
-		draw.SimpleText(SlashCoLanguage("player_await"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER,
+		draw.SimpleText(SlashCoLanguage("player_await"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
+				TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
 
 	end
@@ -497,19 +501,23 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		surface.DrawRect(-monitorsize / 2, -monitorsize / 2, monitorsize, monitorsize)
 
 		surface.SetDrawColor(0, 0, 0, 255)
-		draw.SimpleText(SlashCoLanguage("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2,
+				color_white)
 
-		draw.SimpleText(SlashCoLanguage("Name")..":", "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Name") .. ":", "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2,
+				color_white)
 		if s_n == "Unknown" then
 			txtcolor = Color(200, 0, 0, (b_tick - 0))
 		else
 			txtcolor = Color(255, 255, 255, (b_tick - 0))
 		end
 
-		draw.SimpleText(SlashCoLanguage(s_n), "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor, TEXT_ALIGN_CENTER,
+		draw.SimpleText(SlashCoLanguage(s_n), "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor,
+				TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("Class")..":", "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Class") .. ":", "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2,
+				color_white)
 		if s_cls == 0 then
 			txtcolor = Color(200, 0, 0, (b_tick - 255))
 		else
@@ -519,7 +527,8 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_cls_t, "BriefingFont", 900 - monitorsize / 2, 350 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("Danger Level")..":", "BriefingFont", 25 - monitorsize / 2, 450 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Danger Level") .. ":", "BriefingFont", 25 - monitorsize / 2,
+				450 - monitorsize / 2, color_white)
 
 		if s_dng == 1 then
 			txtcolor = Color(255, 255, 0, (b_tick - (255 * 2)))
@@ -534,7 +543,8 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_dng_t, "BriefingFont", 900 - monitorsize / 2, 450 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("Notes")..":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCoLanguage("Notes") .. ":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2,
+				color_white)
 
 		local icondrawid = 0
 
@@ -594,7 +604,6 @@ end)
 local AmbientMusic = nil
 local AmbientLength = nil
 local AmbientVol = 1
-local AmbientStop = false
 
 net.Receive("mantislashcoMapAmbientPlay", function()
 	timer.Simple(math.random(1, 8), function()
@@ -631,7 +640,7 @@ end
 local BenadrylSound = nil
 
 hook.Add("Think", "amb_vol", function()
-	if AmbientStop then
+	if g_AmbientStop then
 		AmbientVol = 0
 	end
 

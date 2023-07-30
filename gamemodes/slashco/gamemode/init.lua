@@ -37,13 +37,13 @@ include("slasher/slasher_func.lua")
 include("concommands.lua")
 include("ply_voicelines.lua")
 include("survivor_func.lua")
-include("sh_values.lua")
-include("sh_doors.lua")
 include("items/sv_playerspeed.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
+include("sh_values.lua")
+include("sh_doors.lua")
 
-local SlashCo = SlashCo
-local SlashCoItems = SlashCoItems
+local SlashCo = SlashCo or {}
+local SlashCoItems = SlashCoItems or {}
 
 --[[
 

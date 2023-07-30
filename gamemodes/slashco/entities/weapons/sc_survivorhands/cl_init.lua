@@ -33,7 +33,7 @@ end
 function SWEP:RenderModel(v, model, owner, flipVM, xPos, item)
 	if IsValid(model) then
 		if SlashCoItems[item] and SlashCoItems[item].ModifyRender then
-			v = SlashCoItems[item].ModifyRender(v)
+			SlashCoItems[item].ModifyRender(v)
 		end
 
 		local bone = owner:LookupBone(v.bone)

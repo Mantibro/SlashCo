@@ -163,14 +163,6 @@ hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
 	end
 end)
 
-if CLIENT then
-	hook.Add("RenderScreenspaceEffects", "PostProcessingExample", function()
-		LocalPlayer():ItemFunction("Screenspace")
-	end)
-
-	return
-end
-
 --[[local spawnableItems = {}
 for k, v in pairs(SlashCoItems) do
     if v.ReplacesWorldProps then
