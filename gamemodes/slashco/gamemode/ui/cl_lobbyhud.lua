@@ -94,8 +94,8 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
         if isClientinLobby then
             surface.SetDrawColor(255, 255, 255, 255)
 
-            draw.SimpleText("[F1] "..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Survivor") ), "TVCD", scrW * 0.975, (scrH * 0.95) - 130, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-            draw.SimpleText("[F2] "..SlashCoLanguage("ReadyAs").." "..string.upper( SlashCoLanguage("Slasher") ), "TVCD", scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+            draw.SimpleText("[F1] "..SlashCoLanguage("ReadyAs", string.upper( SlashCoLanguage("Survivor") )), "TVCD", scrW * 0.975, (scrH * 0.95) - 130, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+            draw.SimpleText("[F2] "..SlashCoLanguage("ReadyAs", string.upper( SlashCoLanguage("Slasher") )), "TVCD", scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
             if TimeLeft ~= nil and TimeLeft > 0 and TimeLeft < 61 then
                 draw.SimpleText(tostring(TimeLeft), "LobbyFont2", scrW * 0.5, (scrH * 0.65), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)

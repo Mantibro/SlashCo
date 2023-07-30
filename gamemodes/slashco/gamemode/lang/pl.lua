@@ -54,16 +54,15 @@ SlashCoLang["Devastating"] = "Dewastacyjny"
 SlashCoLang["Offering"] = "Dar"
 SlashCoLang.OfferingPreceedsName = true
 
-SlashCoLang["offervote_1"] = " chec złożyć Dar. Czy akceptujesz "
-SlashCoLang["offervote_2"] = "?"
-SlashCoLang["offervote_success"] = " będzie aktywny przez następną grę."
+SlashCoLang["offervote_1"] = "%s chce złożyć Dar. Czy akceptujesz %s?"
+SlashCoLang["offervote_success"] = "%s będzie aktywny przez następną grę."
 
 --OFFERINGS
 
 SlashCoLang["Exposure"] = "Widma"
 SlashCoLang["Exposure_desc"] = "Paliwo będzie łatwe do znalezienia,\nAle\nNie znajdzie się więcej niż potrzeba."
 
-SlashCoLang["Satiation"] = "Syta"
+SlashCoLang["Satiation"] = "Sytości"
 SlashCoLang["Satiation_desc"] = "Slasher będzie Demonem,\noraz jego przedmioty będą rzadkie,\nAle\nTe przedmioty będą mocniejsze."
 
 SlashCoLang["Drainage"] = "Wycieku"
@@ -80,26 +79,26 @@ SlashCoLang["Nightmare_desc"] = "The Helicopter will come rescue you regardless 
 
 --ITEMS
 
-SlashCoLang["PointCount"] = "POINTS"
-SlashCoLang["SurvivorWins"] = "SURVIVOR WINS"
-SlashCoLang["SlasherWins"] = "SLASHER WINS"
+SlashCoLang["PointCount"] = "PUNKTY"
+SlashCoLang["SurvivorWins"] = "WYGRANYCH JAKO OCALAŁY"
+SlashCoLang["SlasherWins"] = "WYGRANYCH JAKO SLASHER"
 
-SlashCoLang["ToggleSpectate"] = "TOGGLE SPECTATE"
-SlashCoLang["SelectPlayermodel"] = "SELECT PLAYERMODEL"
+SlashCoLang["ToggleSpectate"] = "PRZEŁĄCZ TRYB WIDZA"
+SlashCoLang["SelectPlayermodel"] = "WYBIESZ MODEL"
 
-SlashCoLang["NotReady"] = "NOT READY"
-SlashCoLang["ReadyAs"] = "READY AS "
+SlashCoLang["NotReady"] = "NIE GOTOWY"
+SlashCoLang["ReadyAs"] = "GOTOWY JAKO %s"
 
-SlashCoLang["MapSelect"] = "SELECT A MAP"
+SlashCoLang["MapSelect"] = "WYBIERZ MAPĘ"
 
-SlashCoLang["ItemSelection"] = "ITEM SELECTION"
-SlashCoLang["ItemSelectionTitle"] = "PICK AN ITEM"
+SlashCoLang["ItemSelection"] = "WYBÓR PRZEDMIOTU"
+SlashCoLang["ItemSelectionTitle"] = "WYBIERZ PRZEDMIOT"
 
-SlashCoLang["MapGuarantee"] = "MAP GUARANTEE"
-SlashCoLang["MapGuaranteeTitle"] = "GUARANTEE A MAP"
+SlashCoLang["MapGuarantee"] = "GWARANCJA MAPY"
+SlashCoLang["MapGuaranteeTitle"] = "GWARANTUJ MAPĘ"
 
-SlashCoLang["ItemConfirm"] = "CONFIRM"
-SlashCoLang["ItemRemaining"] = "REMAINING"
+SlashCoLang["ItemConfirm"] = "POTWIERDŹ"
+SlashCoLang["ItemRemaining"] = "POZOSTAŁO"
 
 SlashCoLang["MapGuaranteeDesc"] = "Bribe the helicopter driver to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
 

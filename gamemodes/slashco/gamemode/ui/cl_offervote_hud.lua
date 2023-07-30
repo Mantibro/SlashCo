@@ -57,7 +57,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 			lobbymusic_antispam = false
 		end
 
-		draw.SimpleText( GetOfferingName(offering_name)..SlashCoLanguage("offervote_success"), "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.5), Color( 255, 255, 255, math.abs(o_tick) ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+		draw.SimpleText( SlashCoLanguage("offervote_success", GetOfferingName(offering_name)), "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.5), Color( 255, 255, 255, math.abs(o_tick) ), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
 
 	end
@@ -66,7 +66,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 
 	if show_vote_screen ~= true then return end
 
-	draw.SimpleText( offeror_name..SlashCoLanguage("offervote_1")..GetOfferingName(offering_name)..SlashCoLanguage("offervote_2"), "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.27), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
+	draw.SimpleText( SlashCoLanguage("offervote_1", offeror_name, GetOfferingName(offering_name)), "LobbyFont1", ScrW() * 0.5, (ScrH() * 0.27), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 
 	draw.SimpleText( "[F4]", "TVCD", ScrW() * 0.5, (ScrH() * 0.33), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP )
 

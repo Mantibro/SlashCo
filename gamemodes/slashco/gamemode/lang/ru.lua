@@ -1,11 +1,11 @@
 --[[
 
-    Language: en, (English), (English)
-    Translator: Manti
+    Language: ru, (Russian), (Русский)
+    Translator: --
 
 ]]
 
-SlashCoLang["TwoElements"] = "%s and %s"
+SlashCoLang["TwoElements"] = "%s и %s"
 SlashCoLang["InList"] = "%s, "
 SlashCoLang["WordSeparator"] = " "
 
@@ -27,8 +27,8 @@ SlashCoLang["Judgement"] = "JUDGEMENT"
 SlashCoLang["InLobby"] = "In Lobby"
 SlashCoLang["InGame"] = "In Game (%s)"
 
-SlashCoLang["Survivor"] = "Survivor"
-SlashCoLang["Slasher"] = "Slasher"
+SlashCoLang["Survivor"] = "Рабочий"
+SlashCoLang["Slasher"] = "Слашер"
 
 SlashCoLang["Difficulty"] = "Difficulty"
 
@@ -244,7 +244,7 @@ SlashCoLang["slasher_diffrate"] = "Difficulty"
 --Every Slasher:
 
 --Abomignat
-SlashCoLang["Abomignat"] = "Abomignat"
+SlashCoLang["Abomignat"] = "Абоминать"
 SlashCoLang["Abomignat_desc"] = [[The Monstrous Slasher which uses basic abilities to achieve quick kills.
 
 -Abomignat can use its sharp claws to quickly damage Survivors.
@@ -259,7 +259,7 @@ SlashCoLang["Abomignat_lunge"] = "lunge"
 
 
 --Amogus
-SlashCoLang["Amogus"] = "Amogus"
+SlashCoLang["Amogus"] = "Амогус"
 SlashCoLang["Amogus_desc"] = [[The Imposter Slasher who is the master of deception and hiding in plain sight.
 
 -Amogus can assume the form of a Survivor.
@@ -276,7 +276,7 @@ SlashCoLang["Amogus_un_disguise"] = "reveal yourself"
 
 
 --Bababooey
-SlashCoLang["Bababooey"] = "Bababooey"
+SlashCoLang["Bababooey"] = "Бабабуий"
 SlashCoLang["Bababooey_desc"] = [[The Phantom Slasher which specialises in illusion abilities to catch \nsurvivors off-guard.
 
 -Bababooey can turn himself invisible.
@@ -290,7 +290,7 @@ SlashCoLang["Bababooey_setclone"] = "set clone"
 
 
 --Borgmire
-SlashCoLang["Borgmire"] = "Borgmire"
+SlashCoLang["Borgmire"] = "Боргмаир"
 SlashCoLang["Borgmire_desc"] = [[The Brute Slasher who can overpower survivors with overwhelming strength.
 
 -Borgmire is most effective in short chases.
@@ -304,7 +304,7 @@ SlashCoLang["Borgmire_throw"] = "throw"
 
 
 --The Covenant (WIP)
-SlashCoLang["Covenant"] = "The Covenant"
+SlashCoLang["Covenant"] = "Святой завет"
 SlashCoLang["Covenant_desc"] = [[The Leader Slasher who commands his trusted Cloaks.
 
 -Catching a Survivor will sacrifice their soul, making them become your Covenant Cloak.
@@ -317,7 +317,7 @@ SlashCoLang["CovenantCloak"] = "Covenant Cloak"
 SlashCoLang["Rocks"] = "LTG Rocks"
 
 --Criminal
-SlashCoLang["Criminal"] = "Criminal"
+SlashCoLang["Criminal"] = "Криминал"
 SlashCoLang["Criminal_desc"] = [[The Tormented Slasher which relies on confusion and\nentrapment to catch his victims.
 
 -Criminal is only able to attack while standing still.
@@ -332,7 +332,7 @@ SlashCoLang["Criminal_rage"] = "rage"
 
 
 --Dolphinman
-SlashCoLang["Dolphinman"] = "Dolphinman"
+SlashCoLang["Dolphinman"] = "Дельфин-человек"
 SlashCoLang["Dolphinman_desc"] = [[The Patient Slasher who waits for survivors to come to him.
 
 -Dolphinman must hide away from survivors, to build up Hunt.
@@ -348,7 +348,7 @@ SlashCoLang["Dolphinman_hunt"] = "hunt"
 
 
 --FreeSmiley
-SlashCoLang["FreeSmiley"] = "Free Smiley Dealer"
+SlashCoLang["FreeSmiley"] = "Дилер бесплатных смайликов"
 SlashCoLang["FreeSmiley_desc"] = [[The Summoner Slasher which uses his minions to take control of the map.
 
 -Free Smiley Dealer can summon two types of minions, Pensive and Zany.
@@ -366,7 +366,7 @@ SlashCoLang["FreeSmiley_nodeal"] = "no deal"
 
 
 --Leuonard
-SlashCoLang["Leuonard"] = "Leuonard"
+SlashCoLang["Leuonard"] = "Леийонард"
 SlashCoLang["Leuonard_desc"] = [[The Unstable Slasher whose overwhleming power grows with time.
 
 -Leuonard's R██e will increase over time.
@@ -379,7 +379,7 @@ SlashCoLang["Leuonard_roid"] = "r**e"
 
 
 --Male_07
-SlashCoLang["Male07"] = "Male_07"
+SlashCoLang["Male07"] = "Меиль-07"
 SlashCoLang["Male07_desc"] = [[The Omniscient Slasher which can possess one of his many clones.
 
 -Male_07 will turn into a monstrous entity after a long enough chase.
@@ -393,7 +393,7 @@ SlashCoLang["Male07_slash"] = "slash"
 
 
 --Manspider
-SlashCoLang["Manspider"] = "Manspider"
+SlashCoLang["Manspider"] = "Паук-человек"
 SlashCoLang["Manspider_desc"] = [[The Huntsman Slasher which is picky with its victims.
 
 -Manspider can only target one Survivor at a time.
@@ -410,7 +410,7 @@ SlashCoLang["Manspider_abandonnest"] = "abandon nest"
 
 
 --Princess
-SlashCoLang["Princess"] = "Princess"
+SlashCoLang["Princess"] = "Принцесса"
 SlashCoLang["Princess_desc"] = [[The Feral Slasher who mauls children.
 
 -Princess can increase his aggression during chase, but up to a threshold.
@@ -426,7 +426,7 @@ SlashCoLang["Princess_aggro"] = "aggro"
 
 
 --Sid
-SlashCoLang["Sid"] = "Sid"
+SlashCoLang["Sid"] = "Сыд"
 SlashCoLang["Sid_desc"] = [[The Psychotic Slasher which keeps his rage in check with Cookies.
 
 -Sid gains speed while chasing over time, but starts out slow.
@@ -445,7 +445,7 @@ SlashCoLang["Sid_unequipgun"] = "unequip gun"
 
 
 --Speedrunner
-SlashCoLang["Speedrunner"] = "Speedrunner"
+SlashCoLang["Speedrunner"] = "Спидранер"
 SlashCoLang["Speedrunner_desc"] = [[The Speed Slasher whose speed grows at a constant rate over time.
 
 -Speedrunner will start out extremely slow.
@@ -461,7 +461,7 @@ SlashCoLang["Speedrunner_sacrifice"] = "rng sacrifice"
 
 
 --Thirsty
-SlashCoLang["Thirsty"] = "Thirsty"
+SlashCoLang["Thirsty"] = "Жаждущий демон"
 SlashCoLang["Thirsty_desc"] = [[The Milk Slasher whose abilities depend on his level of Thirst.
 
 -Thirsty must drink Jugs of Milk to reset his thirst.
@@ -477,7 +477,7 @@ SlashCoLang["Thirsty_thirst"] = "thirst"
 
 
 --Trollge
-SlashCoLang["Trollge"] = "Trollge"
+SlashCoLang["Trollge"] = "Тролледж"
 SlashCoLang["Trollge_desc"] = [[The Bloodthirsty Slasher whose power grows with the amount of
 blood he has collected.
 
@@ -494,7 +494,7 @@ SlashCoLang["Trollge_blood"] = "blood"
 
 
 --Tyler
-SlashCoLang["Tyler"] = "Tyler"
+SlashCoLang["Tyler"] = "Тайлер"
 SlashCoLang["Tyler_desc"] = [[The Balance Slasher who controls the progress of the round.
 
 -Tyler has two forms. Creator, and Destroyer.
@@ -513,7 +513,7 @@ SlashCoLang["Tyler_destroy"] = "destroy"
 
 
 --Watcher
-SlashCoLang["Watcher"] = "Watcher"
+SlashCoLang["Watcher"] = "Наблюдатель"
 SlashCoLang["Watcher_desc"] = [[The Observing Slasher whose power relies on sight.
 
 -The Watcher can Survey the map every once in a while to locate all survivors.
