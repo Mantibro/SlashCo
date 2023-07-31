@@ -313,7 +313,8 @@ SlashCoLang["Amogus_un_disguise"] = "reveal yourself"
 
 --Bababooey
 SlashCoLang["Bababooey"] = "Bababooey"
-SlashCoLang["Bababooey_desc"] = [[The Phantom Slasher which specialises in illusion abilities to catch \nsurvivors off-guard.
+SlashCoLang["Bababooey_desc"] = [[The Phantom Slasher which specialises in illusion abilities to catch
+survivors off-guard.
 
 -Bababooey can turn himself invisible.
 -He can create a phantom clone of himself to scare and locate Survivors.]]
@@ -544,7 +545,6 @@ SlashCoLang["Tyler_destroyer"] = "Tyler, The Destroyer"
 
 SlashCoLang["Tyler_manifest"] = "manifest"
 SlashCoLang["Tyler_hiding"] = "(hiding)"
-SlashCoLang["Tyler_manifest"] = "manifest"
 SlashCoLang["Tyler_destroy"] = "destroy"
 
 

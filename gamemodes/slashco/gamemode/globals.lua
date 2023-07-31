@@ -386,13 +386,13 @@ SlashCo.RemoveAllCurRoundEnts = function()
 	local gens = ents.FindByClass("sc_generator")
 	for _, v in ipairs(gens) do
 		local can = v.FuelingCan --make sure any attached cans and bats go too
-		local bat = v.HasBattery
+		--local bat = v.HasBattery --this returns a boolean
 		if IsValid(can) then
 			can:Remove()
 		end
-		if IsValid(bat) then
-			bat:Remove()
-		end
+		--if IsValid(bat) then
+		--	bat:Remove()
+		--end
 		v:Remove()
 	end
 

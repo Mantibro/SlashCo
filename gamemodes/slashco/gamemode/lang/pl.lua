@@ -541,7 +541,6 @@ SlashCoLang["Tyler_destroyer"] = "Tyler, The Destroyer"
 
 SlashCoLang["Tyler_manifest"] = "manifest"
 SlashCoLang["Tyler_hiding"] = "(hiding)"
-SlashCoLang["Tyler_manifest"] = "manifest"
 SlashCoLang["Tyler_destroy"] = "destroy"
 
 

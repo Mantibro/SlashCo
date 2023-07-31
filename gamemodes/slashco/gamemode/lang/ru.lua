@@ -533,7 +533,6 @@ SlashCoLang["Tyler_destroyer"] = "Уничтожитель Тайлер"
 
 SlashCoLang["Tyler_manifest"] = "появиться"
 SlashCoLang["Tyler_hiding"] = "(прячется)"
-SlashCoLang["Tyler_manifest"] = "появиться"
 SlashCoLang["Tyler_destroy"] = "уничтожачь"
 
 

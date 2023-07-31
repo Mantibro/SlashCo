@@ -9,9 +9,8 @@ include("lang/en.lua")
 SlashCoLangFallback = SlashCoLang
 
 local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
-
 for _, v in ipairs(lang_files) do  
-	if language.GetPhrase("slashco.language") == string.Replace(v, ".lua", "") then
+	if string.lower(language.GetPhrase("slashco.language")) == string.Replace(v, ".lua", "") then
 		include("lang/"..v)
 	end
 end
