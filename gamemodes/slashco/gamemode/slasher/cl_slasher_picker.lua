@@ -216,7 +216,7 @@ function DrawTheSlasherSelectorBox()
 		
 
 		
-		]]..SlashCoLanguage("DangelLevel","")..[[:]])
+		]]..SlashCoLanguage("DangerLevel","")..[[:]])
 		Descriptor:SetFont( "MenuFont1" )
 		Descriptor:SetAutoStretchVertical( true )
 	else

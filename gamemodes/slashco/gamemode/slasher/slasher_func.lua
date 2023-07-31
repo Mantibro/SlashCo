@@ -195,9 +195,7 @@ SlashCo.Jumpscare = function(slasher, target)
 		return
 	end
 
-	if slasher:GetPos():Distance(target:GetPos()) < slasher:SlasherValue("KillDistance", 135)
-			and not target:GetNWBool("SurvivorBeingJumpscared") then
-
+	if slasher:GetPos():Distance(target:GetPos()) > slasher:SlasherValue("KillDistance", 135) and not target:GetNWBool("SurvivorBeingJumpscared") then
 		return
 	end
 
