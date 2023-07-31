@@ -2,8 +2,6 @@ include("shared.lua")
 
 --set up language
 
-CreateClientConVar("slashco_language", "en", true, false, "Change the Language.", 0, 1)
-
 SlashCoLang = {}
 
 include("lang/en.lua")
@@ -13,7 +11,7 @@ SlashCoLangFallback = SlashCoLang
 local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
 
 for _, v in ipairs(lang_files) do  
-	if GetConVar("slashco_language"):GetString() == string.Replace(v, ".lua", "") then
+	if language.GetPhrase("slashco.language") == string.Replace(v, ".lua", "") then
 		include("lang/"..v)
 	end
 end
