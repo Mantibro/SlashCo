@@ -2,7 +2,7 @@ hook.Add("HUDPaint", "GameInfo_Info", function()
 
 	if LocalPlayer():Team() ~= TEAM_LOBBY then return end
 
-	draw.SimpleText(SlashCoLanguage("GameInfo", "F6") , "TVCD", ScrW() * 0.975, (ScrH() * 0.95), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
+	draw.SimpleText(SlashCo.Language("GameInfo", "F6") , "TVCD", ScrW() * 0.975, (ScrH() * 0.95), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM )
 end)
 
 hook.Add("PlayerButtonDown", "GameInfo", function(ply, key) 
@@ -67,11 +67,11 @@ function DrawTheGameInfoBox()
 
 	if CurrentDisplayedInfo == 0 then
 
-		MainInfo:SetText( SlashCoLanguage("SurvivorInfo") )
+		MainInfo:SetText( SlashCo.Language("SurvivorInfo") )
 
 	else
 
-		MainInfo:SetText( SlashCoLanguage("SlasherInfo") )
+		MainInfo:SetText( SlashCo.Language("SlasherInfo") )
 
 	end
 

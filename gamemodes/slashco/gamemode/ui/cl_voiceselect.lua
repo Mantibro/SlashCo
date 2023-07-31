@@ -2,27 +2,27 @@ local PANEL = {}
 
 local voiceText = {
     {
-        prompt = SlashCoLanguage("vocal_no"),
+        prompt = SlashCo.Language("vocal_no"),
         snd = "no"
     },
     {
-        prompt = SlashCoLanguage("vocal_follow"),
+        prompt = SlashCo.Language("vocal_follow"),
         snd = "follow"
     },
     {
-        prompt = SlashCoLanguage("vocal_slasher"),
+        prompt = SlashCo.Language("vocal_slasher"),
         snd = "spot"
     },
     {
-        prompt = SlashCoLanguage("vocal_yes"),
+        prompt = SlashCo.Language("vocal_yes"),
         snd = "yes"
     },
     {
-        prompt = SlashCoLanguage("vocal_run"),
+        prompt = SlashCo.Language("vocal_run"),
         snd = "run"
     },
     {
-        prompt = SlashCoLanguage("vocal_help"),
+        prompt = SlashCo.Language("vocal_help"),
         snd = "help"
     }
 }
@@ -43,7 +43,7 @@ function PANEL:Init()
     voiceSay:Center()
     voiceSay:SetContentAlignment(5)
     voiceSay:SetFont("TVCD")
-    voiceSay.Prompt = SlashCoLanguage("vocal_say")
+    voiceSay.Prompt = SlashCo.Language("vocal_say")
 
     local rad = math.pi/3
     for k, v in ipairs(voiceText) do
@@ -86,11 +86,11 @@ function PANEL:Think()
     if say:DistanceFrom(x, y) < 100 then
         say:SetText( "[ "..say.Prompt.." ]" )
         self.CursorSelect = false
-        say:SetTextColor(say.Prompt == SlashCoLanguage("vocal_cancel") and red or color_white)
+        say:SetTextColor(say.Prompt == SlashCo.Language("vocal_cancel") and red or color_white)
     else
-        say.Prompt = SlashCoLanguage("vocal_cancel")
+        say.Prompt = SlashCo.Language("vocal_cancel")
         say:SetTextColor(color_white)
-        say:SetText(SlashCoLanguage("vocal_cancel"))
+        say:SetText(SlashCo.Language("vocal_cancel"))
     end
 
     for _, v in ipairs( self.Voices ) do

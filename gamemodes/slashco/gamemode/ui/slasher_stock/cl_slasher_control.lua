@@ -40,7 +40,7 @@ function PANEL:Init()
 	label:SetTall(60)
 	label:SetContentAlignment(6)
 	label:SetFont("HalfCutTitle")
-	label:SetText(SlashCoLanguage("control"))
+	label:SetText(SlashCo.Language("control"))
 	label:SetTextColor(red)
 
 	local keyLabel = vgui.Create("DLabel", self)
@@ -194,7 +194,7 @@ end
 ---sets the text for the control and updates the icon
 function PANEL:SetText(text, dontSetIcon)
 	self.Text = text
-	self.Label:SetText(SlashCoLanguage(text) .. " ")
+	self.Label:SetText(SlashCo.Language(text) .. " ")
 
 	if not dontSetIcon then
 		if self.Enabled then

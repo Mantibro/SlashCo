@@ -15,7 +15,7 @@ function DrawThePlayermodelSelectorBox()
 	if IsValid(pmSelectFrame) then return end
 
 	pmSelectFrame = vgui.Create("DFrame")
-	pmSelectFrame:SetTitle( SlashCoLanguage("playermodel_choose") )
+	pmSelectFrame:SetTitle( SlashCo.Language("playermodel_choose") )
 
 	local val = 1
 	for c = 0, 2 do

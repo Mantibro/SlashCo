@@ -41,7 +41,7 @@ end
 ---set the label for the meter
 function PANEL:SetName(value)
 	self.LabelText = value
-	self.Label:SetText(" " .. SlashCoLanguage(self.LabelText))
+	self.Label:SetText(" " .. SlashCo.Language(self.LabelText))
 end
 
 ---set the value of the meter
@@ -198,7 +198,7 @@ function PANEL:MakeLabels()
 	label:SetTextColor(red)
 	label:SetContentAlignment(1)
 	label:DockMargin(4, 0, 0, -8)
-	label:SetText(" " .. SlashCoLanguage(self.LabelText))
+	label:SetText(" " .. SlashCo.Language(self.LabelText))
 end
 
 vgui.Register("slashco_slasher_meter", PANEL, "Panel")

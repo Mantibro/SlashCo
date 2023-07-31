@@ -24,7 +24,7 @@ local function SetConfirm()
         return
     end
 
-    itemSelectFrame.Confirm:SetText(SlashCoLanguage("ItemConfirm"))
+    itemSelectFrame.Confirm:SetText(SlashCo.Language("ItemConfirm"))
     function itemSelectFrame.Confirm.Paint(_, w, h)
         if itemSelectFrame.Confirm:IsHovered() then
             surface.SetDrawColor(0, 0, 128)
@@ -47,8 +47,8 @@ end
 local function setItemLabel()
     itemSelectFrame.ItemModel:SetModel(SlashCoItems[selectedItem].Model)
     itemSelectFrame.ItemModel:SetCamPos(SlashCoItems[selectedItem].CamPos)
-    itemSelectFrame.ItemDescription:SetText( SlashCoLanguage(selectedItem.."_desc") )
-    itemSelectFrame.ItemLabel:SetText(string.upper( SlashCoLanguage(selectedItem) ))
+    itemSelectFrame.ItemDescription:SetText( SlashCo.Language(selectedItem.."_desc") )
+    itemSelectFrame.ItemLabel:SetText(string.upper( SlashCo.Language(selectedItem) ))
 
     if (SlashCoItems[selectedItem].MaxAllowed) then
         local numRemain = SlashCoItems[selectedItem].MaxAllowed()
@@ -58,14 +58,14 @@ local function setItemLabel()
                 numRemain = numRemain - 1
             end
         end
-        itemSelectFrame.ItemValues:SetText("[" .. SlashCoItems[selectedItem].Price .. " "..SlashCoLanguage("PointCount").."] [" .. numRemain .. " "..SlashCoLanguage("ItemRemaining").."]")
+        itemSelectFrame.ItemValues:SetText("[" .. SlashCoItems[selectedItem].Price .. " "..SlashCo.Language("PointCount").."] [" .. numRemain .. " "..SlashCo.Language("ItemRemaining").."]")
         if numRemain <= 0 then
             BlockConfirm()
         else
             SetConfirm()
         end
     else
-        itemSelectFrame.ItemValues:SetText("[" .. SlashCoItems[selectedItem].Price .. " "..SlashCoLanguage("PointCount").."]")
+        itemSelectFrame.ItemValues:SetText("[" .. SlashCoItems[selectedItem].Price .. " "..SlashCo.Language("PointCount").."]")
         SetConfirm()
     end
 end
@@ -187,7 +187,7 @@ local function SetupBase()
 end
 
 local function SetupItems()
-    itemSelectFrame:SetTitle("["..SlashCoLanguage("ItemSelectionTitle").."...]")
+    itemSelectFrame:SetTitle("["..SlashCo.Language("ItemSelectionTitle").."...]")
     selectedItem = selectedItem or "Baby"
 
     local leftSide = itemSelectFrame.Left
@@ -211,7 +211,7 @@ local function SetupItems()
         item:Dock(TOP)
         item:SetHeight(30)
         item:DockMargin(0, 5, 0, 0)
-        item:SetText(string.upper( SlashCoLanguage( k ) ))
+        item:SetText(string.upper( SlashCo.Language( k ) ))
         item:SetFont("TVCD_small")
         item:SetTextColor(color_white)
         local wi = item:GetTextSize()
@@ -246,7 +246,7 @@ local function SetupItems()
 end
 
 local function SetupMaps()
-    itemSelectFrame:SetTitle("["..SlashCoLanguage("MapGuaranteeTitle").."...]")
+    itemSelectFrame:SetTitle("["..SlashCo.Language("MapGuaranteeTitle").."...]")
     local leftSide = itemSelectFrame.Left
     local width = 0
 
@@ -305,13 +305,13 @@ local function SetupMaps()
     if selectedMap then
         itemSelectFrame.ItemLabel:SetText(string.upper(SCInfo.Maps[selectedMap].NAME))
     else
-        itemSelectFrame.ItemLabel:SetText(SlashCoLanguage("MapSelect"))
+        itemSelectFrame.ItemLabel:SetText(SlashCo.Language("MapSelect"))
     end
     SetConfirm()
 
     itemSelectFrame.ModelHolder:Hide()
-    itemSelectFrame.ItemValues:SetText("[" .. mapPrice .. " "..SlashCoLanguage("PointCount").."]")
-    itemSelectFrame.ItemDescription:SetText(SlashCoLanguage("MapGuaranteeDesc"))
+    itemSelectFrame.ItemValues:SetText("[" .. mapPrice .. " "..SlashCo.Language("PointCount").."]")
+    itemSelectFrame.ItemDescription:SetText(SlashCo.Language("MapGuaranteeDesc"))
 end
 
 function DrawItemSelectorBox()
@@ -319,7 +319,7 @@ function DrawItemSelectorBox()
         SetupBase()
     end
 
-    itemSelectFrame.MapGuaranteeSelect:SetText(MGSelection and SlashCoLanguage("ItemSelection") or SlashCoLanguage("MapGuarantee"))
+    itemSelectFrame.MapGuaranteeSelect:SetText(MGSelection and SlashCo.Language("ItemSelection") or SlashCo.Language("MapGuarantee"))
 
     if MGSelection then
         SetupMaps()
@@ -339,6 +339,6 @@ hook.Add("scValue_mapGuar", "slashCo_MapGuar", function(mapForce1, mapPrice1)
 
     if IsValid(itemSelectFrame) and MGSelection then
         SetConfirm()
-        itemSelectFrame.ItemValues:SetText("[" .. mapPrice .. " "..SlashCoLanguage("PointCount").."]")
+        itemSelectFrame.ItemValues:SetText("[" .. mapPrice .. " "..SlashCo.Language("PointCount").."]")
     end
 end)

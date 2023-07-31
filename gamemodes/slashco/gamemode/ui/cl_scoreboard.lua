@@ -219,7 +219,7 @@ local SCORE_BOARD = {
 		self.Scores = self:Add( "DScrollPanel" )
 		self.Scores:Dock( FILL )
 
-		local game_state = SlashCoLanguage("InLobby")
+		local game_state = SlashCo.Language("InLobby")
 
 		if game.GetMap() ~= "sc_lobby" then
 
@@ -227,7 +227,7 @@ local SCORE_BOARD = {
 
 			if PlayerData.offering ~= "" then offer = PlayerData.offering end
 
-			game_state = SlashCoLanguage("InGame", offer)
+			game_state = SlashCo.Language("InGame", offer)
 
 		end
 

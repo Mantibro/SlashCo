@@ -1,20 +1,20 @@
 local function printPlayersNeatly(players)
 	local count = #players
 	if count == 0 then
-		return SlashCoLanguage("nobody"), 0
+		return SlashCo.Language("nobody"), 0
 	end
 	if count == 1 then
 		return players[1]:GetName(), 1
 	end
 	if count == 2 then
-		return SlashCoLanguage("TwoElements", players[1]:GetName(), players[2]:GetName()), 2
+		return SlashCo.Language("TwoElements", players[1]:GetName(), players[2]:GetName()), 2
 	end
 
 	local strings = {}
 	for i = 1, count - 2 do
-		table.insert(SlashCoLanguage("InList", players[i]:GetName()))
+		table.insert(SlashCo.Language("InList", players[i]:GetName()))
 	end
-	table.insert(SlashCoLanguage("TwoElements", players[count - 1]:GetName(), players[count]:GetName()))
+	table.insert(SlashCo.Language("TwoElements", players[count - 1]:GetName(), players[count]:GetName()))
 
 	return table.concat(strings), count
 end
@@ -31,7 +31,7 @@ local function printRescued(rescued)
 	if count <= 0 then
 		return
 	end
-	return SlashCoLanguage(count == 1 and "RescuedOnlyOne" or "Rescued", neatString)
+	return SlashCo.Language(count == 1 and "RescuedOnlyOne" or "Rescued", neatString)
 end
 
 local function printLeftBehind(survivors, rescued)
@@ -60,7 +60,7 @@ local function printLeftBehind(survivors, rescued)
 	if count <= 0 then
 		return
 	end
-	return SlashCoLanguage(count == 1 and "LeftBehindOnlyOne" or "LeftBehind", neatString)
+	return SlashCo.Language(count == 1 and "LeftBehindOnlyOne" or "LeftBehind", neatString)
 end
 
 local function printKilled(survivors)
@@ -79,7 +79,7 @@ local function printKilled(survivors)
 	if count <= 0 then
 		return
 	end
-	return SlashCoLanguage(count == 1 and "KilledOnlyOne" or "Killed", neatString)
+	return SlashCo.Language(count == 1 and "KilledOnlyOne" or "Killed", neatString)
 end
 
 local function teamSummary(lines, survivors, rescued)
@@ -130,15 +130,15 @@ local stringTable = {
 	wonAllSurvivors = function()
 		surface.PlaySound("slashco/music/slashco_win_full.mp3")
 		return {
-			SlashCoLanguage("AssignmentSuccess"),
-			SlashCoLanguage("AllRescued"),
+			SlashCo.Language("AssignmentSuccess"),
+			SlashCo.Language("AllRescued"),
 		}
 	end,
 	wonSomeSurvivors = function(survivors, rescued)
 		surface.PlaySound("slashco/music/slashco_win_2.mp3")
 		local lines = {
-			SlashCoLanguage("AssignmentSuccess"),
-			SlashCoLanguage("SomeRescued"),
+			SlashCo.Language("AssignmentSuccess"),
+			SlashCo.Language("SomeRescued"),
 		}
 		teamSummary(lines, survivors, rescued)
 
@@ -147,21 +147,21 @@ local stringTable = {
 	wonNoSurvivors = function()
 		surface.PlaySound("slashco/music/slashco_lost_active.mp3")
 		return {
-			SlashCoLanguage("AssignmentSuccess"),
-			SlashCoLanguage("NoneRescued"),
+			SlashCo.Language("AssignmentSuccess"),
+			SlashCo.Language("NoneRescued"),
 		}
 	end,
 	lost = function()
 		surface.PlaySound("slashco/music/slashco_lost.mp3")
 		return {
-			SlashCoLanguage("AssignmentFail"),
-			SlashCoLanguage("NoneRescued"),
+			SlashCo.Language("AssignmentFail"),
+			SlashCo.Language("NoneRescued"),
 		}
 	end,
 	wonBeacon = function(survivors, rescued)
 		surface.PlaySound("slashco/music/slashco_win_db.mp3")
 		local lines = {
-			SlashCoLanguage("AssignmentAborted"),
+			SlashCo.Language("AssignmentAborted"),
 		}
 		teamSummary(lines, survivors, rescued)
 
@@ -171,11 +171,11 @@ local stringTable = {
 		surface.PlaySound("slashco/music/slashco_lost.mp3")
 		local lines = {}
 		for i = 0, 19 do
-			local line = string.Split(SlashCoLanguage("Cursed"), SlashCoLanguage("WordSeparator"))
+			local line = string.Split(SlashCo.Language("Cursed"), SlashCo.Language("WordSeparator"))
 			for i1 = 1, i do
-				line[math.random(1, #line)] = SlashCoLanguage("Judgement")
+				line[math.random(1, #line)] = SlashCo.Language("Judgement")
 			end
-			table.insert(lines, table.concat(line, SlashCoLanguage("WordSeparator")))
+			table.insert(lines, table.concat(line, SlashCo.Language("WordSeparator")))
 		end
 
 		return lines
@@ -183,15 +183,15 @@ local stringTable = {
 	intro = function(info)
 		surface.PlaySound("slashco/music/slashco_intro.mp3")
 		local lines = {
-			SlashCoLanguage("cur_assignment", info[1]),
-			SlashCoLanguage("slasher_assess"),
-			SlashCoLanguage("Name", info[2]),
-			SlashCoLanguage("Class", classTable[info[3]]),
-			SlashCoLanguage("DangerLevel", dangerTable[info[4]]),
-			SlashCoLanguage("Difficulty", difficultyTable[info[5]]),
+			SlashCo.Language("cur_assignment", info[1]),
+			SlashCo.Language("slasher_assess"),
+			SlashCo.Language("Name", info[2]),
+			SlashCo.Language("Class", classTable[info[3]]),
+			SlashCo.Language("DangerLevel", dangerTable[info[4]]),
+			SlashCo.Language("Difficulty", difficultyTable[info[5]]),
 		}
 		if info[6] ~= "Regular" then
-			table.insert(lines, SlashCoLanguage("Offering_name", difficultyTable[info[6]]))
+			table.insert(lines, SlashCo.Language("Offering_name", difficultyTable[info[6]]))
 		end
 
 		return lines

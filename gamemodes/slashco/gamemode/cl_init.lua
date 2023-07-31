@@ -2,40 +2,37 @@ include("shared.lua")
 
 --set up language
 
-SlashCoLang = {}
+SlashCo = SlashCo or {}
 
-include("lang/en.lua")
+SlashCo.LangTable = {}
+include("slashco/lang/en.lua")
+SlashCo.LangTableFallback = SlashCo.LangTable
 
-SlashCoLangFallback = SlashCoLang
-
-local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
-for _, v in ipairs(lang_files) do  
+local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
+for _, v in ipairs(lang_files) do
 	if string.lower(language.GetPhrase("slashco.language")) == string.Replace(v, ".lua", "") then
-		include("lang/"..v)
+		include("slashco/lang/" .. v)
+		break
 	end
 end
 
-function SlashCoLanguage(key, ...)
-    local vars = {}
-    for _, v in ipairs({...}) do
-        if type(v) == "string" then
-            table.insert(vars, SlashCoLanguage(v))
-        else
-            table.insert(vars, v)
-        end
-    end
+function SlashCo.Language(key, ...)
+	local vars = {}
+	for _, v in ipairs({ ... }) do
+		if type(v) == "string" then
+			table.insert(vars, SlashCo.Language(v))
+		else
+			table.insert(vars, v)
+		end
+	end
 
-    if SlashCoLang[key] then
-        return string.format(SlashCoLang[key], unpack(vars))
-    elseif SlashCoLangFallback[key] then
-        return string.format(SlashCoLangFallback[key], unpack(vars))
-    else
-        return string.format(key, unpack(vars))
-    end
-end
-
-function GetOfferingName(key)
-    return SlashCoLanguage("Offering_name", SlashCoLanguage(key))
+	if SlashCo.LangTable[key] then
+		return string.format(SlashCo.LangTable[key], unpack(vars))
+	elseif SlashCo.LangTableFallback[key] then
+		return string.format(SlashCo.LangTableFallback[key], unpack(vars))
+	else
+		return string.format(Localize("slashco." .. string.gsub(key, " ", "_"), key), unpack(vars))
+	end
 end
 
 include("ui/cl_scoreboard.lua")
@@ -47,7 +44,6 @@ include("slasher/slasher_init.lua")
 
 include("ui/cl_lobbyhud.lua")
 include("ui/cl_survivor_hud.lua")
-include("ui/cl_intro_hud.lua")
 include("ui/cl_roundend_hud.lua")
 include("ui/cl_slasher_ui.lua")
 include("slasher/cl_slasher_picker.lua")
@@ -67,10 +63,7 @@ include("ui/slasher_stock/cl_slasher_meter.lua")
 include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 
-SlashCo = SlashCo or {}
-
 CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
-
 CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
 		"SlashCo Survivor Playermodel")
 
@@ -424,12 +417,12 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 
 	if GameReady == true then
 
-		draw.SimpleText(SlashCoLanguage("player_ready"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
+		draw.SimpleText(SlashCo.Language("player_ready"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 	else
 
-		draw.SimpleText(SlashCoLanguage("player_await"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
+		draw.SimpleText(SlashCo.Language("player_await"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
 				TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
 
@@ -466,10 +459,10 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		cam.Start3D2D(pos, angle, 0.15)
 		-- Get the size of the text we are about to draw
 
-		local text = SlashCoLanguage("offering_idle")
+		local text = SlashCo.Language("offering_idle")
 
 		if offering_name ~= nil then
-			text = GetOfferingName(offering_name)
+			text = SlashCo.Language("Offering_name", offering_name)
 		end
 
 		surface.SetFont("LobbyFont1")
@@ -514,17 +507,17 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
 		local txtcolor = color_white
 
-		local s_cls_t = SlashCoLanguage(TranslateSlasherClass(s_cls))
-		local s_dng_t = SlashCoLanguage(TranslateDangerLevel(s_dng))
+		local s_cls_t = SlashCo.Language(TranslateSlasherClass(s_cls))
+		local s_dng_t = SlashCo.Language(TranslateDangerLevel(s_dng))
 
 		surface.SetDrawColor(0, 0, 0, 255)
 		surface.DrawRect(-monitorsize / 2, -monitorsize / 2, monitorsize, monitorsize)
 
 		surface.SetDrawColor(0, 0, 0, 255)
-		draw.SimpleText(SlashCoLanguage("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2,
+		draw.SimpleText(SlashCo.Language("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2,
 				color_white)
 
-		draw.SimpleText(SlashCoLanguage("Name", ""), "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2,
+		draw.SimpleText(SlashCo.Language("Name", ""), "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2,
 				color_white)
 		if s_n == "Unknown" then
 			txtcolor = Color(200, 0, 0, (b_tick - 0))
@@ -532,11 +525,11 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 			txtcolor = Color(255, 255, 255, (b_tick - 0))
 		end
 
-		draw.SimpleText(SlashCoLanguage(s_n), "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor,
+		draw.SimpleText(SlashCo.Language(s_n), "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("Class", ""), "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2,
+		draw.SimpleText(SlashCo.Language("Class", ""), "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2,
 				color_white)
 		if s_cls == 0 then
 			txtcolor = Color(200, 0, 0, (b_tick - 255))
@@ -547,7 +540,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_cls_t, "BriefingFont", 900 - monitorsize / 2, 350 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("DangerLevel", ""), "BriefingFont", 25 - monitorsize / 2,
+		draw.SimpleText(SlashCo.Language("DangerLevel", ""), "BriefingFont", 25 - monitorsize / 2,
 				450 - monitorsize / 2, color_white)
 
 		if s_dng == 1 then
@@ -563,14 +556,15 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_dng_t, "BriefingFont", 900 - monitorsize / 2, 450 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("Notes") .. ":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2,
+		draw.SimpleText(SlashCo.Language("Notes") .. ":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2,
 				color_white)
 
 		local icondrawid = 0
 
 		if b_tick > 200 then
 
-			draw.SimpleText(SlashCoLanguage(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
+			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2,
+					color_white)
 
 			if s_id ~= nil and s_id ~= 0 then
 				icondrawid = s_id
