@@ -533,10 +533,16 @@ SlashCo.ValidateMap = function(map)
 	return valid
 end
 
+local roundEnding
 SlashCo.EndRound = function()
 	if g_SlashCoDebug then
 		return
 	end
+
+	if roundEnding then
+		return
+	end
+	roundEnding = true
 
 	local delay = 20
 

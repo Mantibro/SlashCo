@@ -20,7 +20,14 @@ local function printPlayersNeatly(players)
 end
 
 local function printRescued(rescued)
-	local neatString, count = printPlayersNeatly(rescued)
+	local plysRescued = table.Copy(rescued)
+	for k, ply in ipairs(plysRescued) do
+		if not IsValid(ply) then
+			table.remove(plysRescued, k)
+		end
+	end
+
+	local neatString, count = printPlayersNeatly(plysRescued)
 	if count <= 0 then
 		return
 	end
@@ -30,12 +37,19 @@ end
 local function printLeftBehind(survivors, rescued)
 	local plysLeftBehind = table.Copy(survivors)
 	for k, ply in ipairs(plysLeftBehind) do
+		if not IsValid(ply) then
+			table.remove(plysLeftBehind, k)
+			continue
+		end
 		if ply:Team() ~= TEAM_SURVIVOR then
 			table.remove(plysLeftBehind, k)
 			continue
 		end
 		for _, v in ipairs(rescued) do
-			if ply == v then
+			if not IsValid(v) then
+				continue
+			end
+			if ply:UserID() == v:UserID() then
 				table.remove(plysLeftBehind, k)
 				break
 			end
@@ -46,12 +60,16 @@ local function printLeftBehind(survivors, rescued)
 	if count <= 0 then
 		return
 	end
-	return SlashCoLanguage(count == 1 and "leftBehindOnlyOne" or "LeftBehind", neatString)
+	return SlashCoLanguage(count == 1 and "LeftBehindOnlyOne" or "LeftBehind", neatString)
 end
 
 local function printKilled(survivors)
 	local plysKilled = table.Copy(survivors)
 	for k, ply in ipairs(plysKilled) do
+		if not IsValid(ply) then
+			table.remove(plysKilled, k)
+			continue
+		end
 		if ply:Team() == TEAM_SURVIVOR then
 			table.remove(plysKilled, k)
 		end
