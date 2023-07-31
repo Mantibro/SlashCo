@@ -30,7 +30,7 @@ SlashCoLang["InGame"] = "В игре (%s)"
 SlashCoLang["Survivor"] = "Рабочий"
 SlashCoLang["Slasher"] = "Убийца"
 
-SlashCoLang["Difficulty"] = "Сложность"
+SlashCoLang["Difficulty"] = "Сложность: %s"
 
 SlashCoLang["Easy"] = "Легкая"
 SlashCoLang["Novice"] = "Средняя"
@@ -38,15 +38,15 @@ SlashCoLang["Intermediate"] = "Тяжелая"
 SlashCoLang["Hard"] = "Невозможная"
 
 SlashCoLang["Unknown"] = "Неизвестный"
-SlashCoLang["Name"] = "Имя"
+SlashCoLang["Name"] = "Имя: %s"
 SlashCoLang["Notes"] = "Записки"
 
-SlashCoLang["Class"] = "Класс"
+SlashCoLang["Class"] = "Класс: %s"
 SlashCoLang["Cryptid"] = "Криптид"
 SlashCoLang["Demon"] = "Демон"
 SlashCoLang["Umbra"] = "Умбра"
 
-SlashCoLang["DangerLevel"] = "Уровень опасности"
+SlashCoLang["DangerLevel"] = "Уровень опасности: %s"
 SlashCoLang["Moderate"] = "Умеренный"
 SlashCoLang["Considerable"] = "Значительный"
 SlashCoLang["Devastating"] = "Разрушительный"
@@ -209,8 +209,8 @@ SlashCoLang["briefing"] = "БРИФИНГ:"
 SlashCoLang["player_await"] = "ОЖИДАНИЕ ИГРОКОВ. . ."
 SlashCoLang["player_ready"] = "РАУНД СКОРО НАЧНЁТСЯ."
 
-SlashCoLang["cur_assignment"] = "Current Assignment:"
-SlashCoLang["slasher_assess"] = "Slasher Assessment:"
+SlashCoLang["cur_assignment"] = "Current Assignment: %s"
+SlashCoLang["slasher_assess"] = "Slasher Assessment-"
 
 SlashCoLang["offering_idle"] = "СДЕЛАТЬ ПОДНОШЕНИЕ"
 
