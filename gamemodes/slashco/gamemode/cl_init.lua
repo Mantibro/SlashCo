@@ -571,7 +571,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
 		if b_tick > 200 then
 
-			draw.SimpleText(pro_tip, "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
+			draw.SimpleText(SlashCoLanguage(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
 
 			if s_id ~= nil and s_id ~= 0 then
 				icondrawid = s_id
