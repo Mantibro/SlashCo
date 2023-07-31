@@ -525,7 +525,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(SlashCoLanguage("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2,
 				color_white)
 
-		draw.SimpleText(SlashCoLanguage("Name") .. ":", "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2,
+		draw.SimpleText(SlashCoLanguage("Name", ""), "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2,
 				color_white)
 		if s_n == "Unknown" then
 			txtcolor = Color(200, 0, 0, (b_tick - 0))
@@ -537,7 +537,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 				TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("Class") .. ":", "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2,
+		draw.SimpleText(SlashCoLanguage("Class", ""), "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2,
 				color_white)
 		if s_cls == 0 then
 			txtcolor = Color(200, 0, 0, (b_tick - 255))
@@ -548,7 +548,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(s_cls_t, "BriefingFont", 900 - monitorsize / 2, 350 - monitorsize / 2, txtcolor,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-		draw.SimpleText(SlashCoLanguage("DangerLevel") .. ":", "BriefingFont", 25 - monitorsize / 2,
+		draw.SimpleText(SlashCoLanguage("DangerLevel", ""), "BriefingFont", 25 - monitorsize / 2,
 				450 - monitorsize / 2, color_white)
 
 		if s_dng == 1 then

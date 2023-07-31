@@ -138,11 +138,9 @@ local function lobbyButtons(ply, button)
 	if SlashCo.LobbyData.LOBBYSTATE == 0 then
 		if ply:Team() == TEAM_LOBBY and button == 92 then
 			if getReadyState(ply) ~= 1 then
-				ply:ChatPrint("Now ready as Survivor.")
 				lobbyPlayerReadying(ply, 1)
 				broadcastLobbyInfo()
 			else
-				ply:ChatPrint("You are no longer ready.")
 				lobbyPlayerReadying(ply, 0)
 				broadcastLobbyInfo()
 			end
@@ -164,7 +162,6 @@ local function lobbyButtons(ply, button)
 					return
 				end
 
-				ply:ChatPrint("Now ready as Slasher.")
 				lobbyPlayerReadying(ply, 2)
 				broadcastLobbyInfo()
 				local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
@@ -172,7 +169,6 @@ local function lobbyButtons(ply, button)
 				Sndd:ChangeVolume(0.5, 0)
 				Sndd:ChangePitch(100, 0)
 			else
-				ply:ChatPrint("You are no longer ready.")
 				lobbyPlayerReadying(ply, 0)
 				broadcastLobbyInfo()
 				local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
@@ -185,7 +181,6 @@ local function lobbyButtons(ply, button)
 		if ply:Team() == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferer(ply) then
 			SlashCo.OfferingVote(ply, true)
 			SlashCo.EndOfferingVote(ply)
-			ply:ChatPrint("You agree to the Offering.")
 		end
 	end
 
@@ -195,7 +190,6 @@ local function lobbyButtons(ply, button)
 			if (#team.GetPlayers(TEAM_LOBBY) < SlashCo.MAXPLAYERS) then
 				ply:SetTeam(TEAM_LOBBY)
 				ply:Spawn()
-				ply:ChatPrint("Now joining the Lobby...")
 				local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 				Sndd:Play()
 				Sndd:ChangeVolume(0.5, 0)
@@ -210,7 +204,6 @@ local function lobbyButtons(ply, button)
 		elseif ply:Team() == TEAM_LOBBY then
 			ply:SetTeam(TEAM_SPECTATOR)
 			ply:Spawn()
-			ply:ChatPrint("Now joining Spectators...")
 			local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 			Sndd:Play()
 			Sndd:ChangeVolume(0.5, 0)
@@ -569,7 +562,6 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 	if new == TEAM_LOBBY and #team.GetPlayers(TEAM_LOBBY) > 5 then
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()
-		ply:ChatPrint("[SlashCo] The Lobby is full. Switching to Spectator...")
 	end
 
 	if old == TEAM_LOBBY then

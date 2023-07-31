@@ -76,10 +76,6 @@ local function lobbySaveCurData()
 
             end
 
-        else
-
-            --ChatPrint("[SlashCo] ERROR! Survivor team empty! Could not database!")
-
         end
 
         local allSpectators = team.GetPlayers(TEAM_SPECTATOR)
@@ -103,10 +99,6 @@ local function lobbySaveCurData()
                 end
 
             end
-
-        else
-
-            --ChatPrint("[SlashCo] ERROR! Could not database the Slasher!")
 
         end
 
@@ -496,10 +488,6 @@ local function lobbyRoundSetup()
                 ply:SetTeam(TEAM_SPECTATOR)
                 ply:Spawn()
 
-                --[[for i, play in ipairs( player.GetAll() ) do
-                    --play:ChatPrint("(Debug) Slasher selection successful, the Slasher is: "..ply:GetName())
-                end]]
-
             end
 
         end
@@ -513,11 +501,6 @@ local function lobbyRoundSetup()
                 goto Map_reroll
             end
         end
-
-
-        --for i, ply in ipairs( player.GetAll() ) do
-        --	ply:ChatPrint("(Debug) Lobby Setup complete. Difficulty: "..SlashCo.LobbyData.SelectedDifficulty)
-        --end
 
         if SlashCo.LobbyData.SelectedDifficulty > 0 then
             BeginSlasherSelection()
@@ -894,7 +877,6 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
-                ply:ChatPrint("Only admins can use debug commands!")
                 return
             end
         end
@@ -924,8 +906,6 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
             net.Broadcast()
         end
 
-        --ply:ChatPrint("(Debug) Lobby advanced, Finalizing teams...")
-
         table.Empty(SlashCo.LobbyData.PotentialSlashers)
         table.Empty(SlashCo.LobbyData.PotentialSurvivors)
         table.Empty(SlashCo.LobbyData.AssignedSurvivors)
@@ -948,7 +928,6 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
-                ply:ChatPrint("Only admins can use debug commands!")
                 return
             end
         end
@@ -986,7 +965,6 @@ concommand.Add("lobby_debug_brief", function(ply, _, _)
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
-                ply:ChatPrint("Only admins can use debug commands!")
                 return
             end
         end
@@ -1015,7 +993,6 @@ concommand.Add("timer_start", function(ply, _, _)
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
-                ply:ChatPrint("Only admins can use debug commands!")
                 return
             end
         end
@@ -1034,7 +1011,6 @@ concommand.Add("lobby_reset", function(ply, _, _)
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
-                ply:ChatPrint("Only admins can use debug commands!")
                 return
             end
         end
@@ -1073,7 +1049,6 @@ concommand.Add("lobby_openitems", function(ply, _, _)
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
-                ply:ChatPrint("Only admins can use debug commands!")
                 return
             end
         end
@@ -1093,7 +1068,6 @@ concommand.Add("lobby_leave", function(ply, _, _)
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
-                ply:ChatPrint("Only admins can use debug commands!")
                 return
             end
         end

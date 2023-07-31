@@ -653,10 +653,6 @@ end
 SlashCo.SurvivorWinFinish = function()
 	local delay = 16
 
-	for _, play in ipairs(player.GetAll()) do
-		play:ChatPrint("[SlashCo] The Helicopter will now leave.")
-	end
-
 	timer.Simple(delay, function()
 
 		SlashCo.EndRound()

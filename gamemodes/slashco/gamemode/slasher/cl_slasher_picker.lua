@@ -212,11 +212,11 @@ function DrawTheSlasherSelectorBox()
 		local Descriptor = vgui.Create( "DLabel", SlasherSelectFrame )
 		Descriptor:SetPos( ScrW()/2, ScrH()/1.75 )
 		Descriptor:SetSize(1024, 600)
-		Descriptor:SetText(SlashCoLanguage("Class")..[[:
+		Descriptor:SetText(SlashCoLanguage("Class", "")..[[:
 		
 
 		
-		]]..SlashCoLanguage("DangelLevel")..[[:]])
+		]]..SlashCoLanguage("DangelLevel","")..[[:]])
 		Descriptor:SetFont( "MenuFont1" )
 		Descriptor:SetAutoStretchVertical( true )
 	else

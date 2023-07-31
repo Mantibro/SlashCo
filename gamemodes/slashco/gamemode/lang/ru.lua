@@ -56,6 +56,24 @@ SlashCoLang["Offering_name"] = "Подношение %s"
 
 SlashCoLang["offervote_1"] = "%s хочет сделать подношение, хотите ли вы принять %s?"
 SlashCoLang["offervote_success"] = "%s будет активно в следующем раунде."
+SlashCoLang["offervote_not_success"] = "The offering vote was unsuccessful."
+SlashCoLang["offervote_duality_fail"] = "Offering vote successful, however a Spectator could not be found to assign as the second Slasher. Duality was not offered."
+
+SlashCoLang["offer_made_already"] = "An Offering has already been made."
+SlashCoLang["offer_too_late"] = "It is too late to make an Offering."
+SlashCoLang["offer_not_ready"] = "Cannot make an Offering when you are ready."
+SlashCoLang["offer_cannot_ready"] = "Cannot ready as Slasher as you have either made or agreed to an Offering."
+
+SlashCoLang["lobby_full"] = "The Lobby is currently full."
+SlashCoLang["second_slasher"] = "You will become the Second Slasher."
+SlashCoLang["item_already_chosen"] = "You have already chosen an item."
+SlashCoLang["item_afford"] = "You cannot afford this item."
+SlashCoLang["item_toomany"] = "Too many Survivors already have this item."
+SlashCoLang["map_already_selected"] = "This map has already been selected."
+SlashCoLang["map_notenough"] = "You don't have enough points for a Map Guarantee."
+SlashCoLang["map_guaranteed_to"] = "%s spent %s points to set the mission to be on %s."
+
+SlashCoLang["playermodel_choose"] = "[CHOOSE...]"
 
 SlashCoLang["GameInfo"] = "[%s] Информация об игре"
 
