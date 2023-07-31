@@ -51,7 +51,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	--[[ kept for reference
-	if not SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].UserInterface then
+	if not SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].UserInterface then
 		return
 	end
 
@@ -64,8 +64,8 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	local mainiconposx = cx / 20
 	local mainiconposy = cy + (cy / 2)
 
-	if SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].ID ~= SlashID then
-		SlashID = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].ID
+	if SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].ID ~= SlashID then
+		SlashID = SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].ID
 		MainIcon = Material("slashco/ui/icons/slasher/s_" .. SlashID)
 	end
 
@@ -146,10 +146,10 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	--Call for the HUD
-	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].UserInterface(cx,
+	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].UserInterface(cx,
 			cy, mainiconposx, mainiconposy)
 
-	local SlashName = SlashCoSlasher[LocalPlayer():GetNWString("Slasher")].Name
+	local SlashName = SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].Name
 
 	draw.SimpleText(SlashName, "LobbyFont2", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 4.25),
 			Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)

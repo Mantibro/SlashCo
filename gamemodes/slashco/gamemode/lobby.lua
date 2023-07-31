@@ -30,7 +30,7 @@ local function lobbySaveCurData()
 
             else
 
-                if SlashCo.LobbyData.SelectedSlasherInfo.CLS ~= SlashCoSlasher[rand_name].Class then
+                if SlashCo.LobbyData.SelectedSlasherInfo.CLS ~= SlashCoSlashers[rand_name].Class then
                     goto retry
                 end --the random slasher's class does not match.
 
@@ -43,7 +43,7 @@ local function lobbySaveCurData()
 
             else
 
-                if SlashCo.LobbyData.SelectedSlasherInfo.DNG ~= SlashCoSlasher[rand_name].DangerLevel then
+                if SlashCo.LobbyData.SelectedSlasherInfo.DNG ~= SlashCoSlashers[rand_name].DangerLevel then
                     goto retry
                 end --the random slasher's danger level does not match.
 
@@ -333,10 +333,10 @@ local function lobbyRoundSetup()
             local rand_name = GetRandomSlasher()
 
             SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
-            SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCoSlasher[rand_name].Class
-            SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCoSlasher[rand_name].DangerLevel
+            SlashCo.LobbyData.SelectedSlasherInfo.CLS = SlashCoSlashers[rand_name].Class
+            SlashCo.LobbyData.SelectedSlasherInfo.DNG = SlashCoSlashers[rand_name].DangerLevel
             SlashCo.LobbyData.SelectedSlasherInfo.NAME = rand_name
-            SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlasher[rand_name].ProTip
+            SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlashers[rand_name].ProTip
 
             SlashCo.LobbyData.PickedSlasher = rand_name
 

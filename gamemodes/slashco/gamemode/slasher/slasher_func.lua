@@ -1,9 +1,10 @@
 local SlashCo = SlashCo
 
 SlashCo.SelectSlasher = function(slasher_name, plyid)
+	print(slasher_name)
 	SlashCo.CurRound.Slashers[plyid] = {}
 	SlashCo.CurRound.Slashers[plyid].SlasherID = slasher_name
-	SlashCo.CurRound.Slashers[plyid].GasCanMod = SlashCoSlasher[slasher_name].GasCanMod
+	SlashCo.CurRound.Slashers[plyid].GasCanMod = SlashCoSlashers[slasher_name].GasCanMod
 end
 
 SlashCo.ApplySlasherToPlayer = function(ply)
@@ -69,8 +70,8 @@ SlashCo.SpawnSlasher = function()
 end
 
 SlashCo.OnSlasherSpawned = function(ply)
-	ply:SetRunSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
-	ply:SetWalkSpeed(SlashCoSlasher[ply:GetNWString("Slasher")].ProwlSpeed)
+	ply:SetRunSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
+	ply:SetWalkSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
 
 	ply.ChaseActivationCooldown = 0
 	ply.KillDelayTick = 0
@@ -110,7 +111,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 		local dist = slasher:SlasherValue("ChaseRange", 600) + (SO * 250)
 
 		--Handle The Chase Functions \/ \/ \/
-		--SlashCoSlasher[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
+		--SlashCoSlashers[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
 		if slasher:GetNWBool("CanChase") == false then
 			slasher.CurrentChaseTick = 99
 		end
@@ -122,7 +123,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			slasher.CurrentChaseTick = slasher.CurrentChaseTick + FrameTime()
 
-			--local inv = (1 - SlashCoSlasher[slasher:GetNWString("Slasher")].ChaseRadius) / 2
+			--local inv = (1 - SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseRadius) / 2
 			local inv = -0.2
 
 			local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2,

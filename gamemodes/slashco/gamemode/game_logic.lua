@@ -97,7 +97,7 @@ SlashCo.LoadCurRoundData = function()
 						table.insert(SlashCo.CurRound.SlasherData.AllSlashers,
 								{ s_id = id, slasherkey = slasher2id })
 					else
-						table.insert(SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
+						table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
 					end
 				end
 			end)
@@ -266,7 +266,7 @@ SlashCo.LoadCurRoundTeams = function()
 					print(playercur:Name() .. " now Spectator")
 
 					if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
-						table.insert(SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
+						table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
 						becameCovenant = becameCovenant + 1
 					end
 				end
@@ -275,7 +275,7 @@ SlashCo.LoadCurRoundTeams = function()
 
 			for i = 1, #slashers do
 				if id == slashers[i].Slashers then
-					for _, v in ipairs(SlashCoSlasher.Covenant.PlayersToBecomePartOfCovenant) do
+					for _, v in ipairs(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant) do
 						if v.steamid == id then
 							print(playercur:Name() .. " will become part of the Covenant.")
 							playercur:SetTeam(TEAM_SPECTATOR)

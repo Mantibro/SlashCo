@@ -17,7 +17,7 @@ function PLAYER:Loadout()
 end
 
 function PLAYER:SetModel()
-	local modelname = SlashCoSlasher[self.Player:GetNWBool("Slasher")].Model
+	local modelname = SlashCoSlashers[self.Player:GetNWBool("Slasher")].Model
 	util.PrecacheModel(modelname)
 	self.Player:SetModel(modelname)
 	self.Player:SetCanWalk(false)

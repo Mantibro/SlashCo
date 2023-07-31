@@ -1,22 +1,42 @@
 AddCSLuaFile()
-AddCSLuaFile("items_meta.lua")
 
+SlashCo = SlashCo or {}
 SlashCoItems = SlashCoItems or {}
 SlashCoEffects = SlashCoEffects or {}
 
-include("items_meta.lua")
+function SlashCo.RegisterItem(table, name)
+	if SC_LOADEDITEMS then
+		error("Tried to register an item illegally", 2)
+		return
+	end
 
-local effect_files = file.Find("slashco/gamemode/items/effect/*", "LUA")
+	SlashCoItems[name] = table
+end
+
+function SlashCo.RegisterEffect(table, name)
+	if SC_LOADEDITEMS then
+		error("Tried to register an effect illegally", 2)
+		return
+	end
+
+	SlashCoEffects[name] = table
+end
+
+SC_LOADEDITEMS = nil
+
+local effect_files = file.Find("slashco/effect/*.lua", "LUA")
 for _, v in ipairs(effect_files) do
-	AddCSLuaFile("effect/" .. v)
-	include("effect/" .. v)
+	AddCSLuaFile("slashco/effect/" .. v)
+	include("slashco/effect/" .. v)
 end
 
-local item_files = file.Find("slashco/gamemode/items/item/*", "LUA")
+local item_files = file.Find("slashco/item/*.lua", "LUA")
 for _, v in ipairs(item_files) do
-	AddCSLuaFile("item/" .. v)
-	include("item/" .. v)
+	AddCSLuaFile("slashco/item/" .. v)
+	include("slashco/item/" .. v)
 end
+
+SC_LOADEDITEMS = true
 
 local PLAYER = FindMetaTable("Player")
 
@@ -163,6 +183,7 @@ hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
 	end
 end)
 
+---this is a little outdated lol
 --[[local spawnableItems = {}
 for k, v in pairs(SlashCoItems) do
     if v.ReplacesWorldProps then

@@ -64,157 +64,6 @@ CreateConVar("slashco_force_difficulty", 0, FCVAR_NONE,
 		"Have the gamemode force a certan difficulty.(0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)", 0,
 		4)
 
-concommand.Add("slashco_add_survivor", function(ply, _, args)
-	if IsValid(ply) then
-		if ply:IsPlayer() then
-			if not ply:IsAdmin() then
-				ply:ChatPrint("Only admins can use debug commands!")
-				return
-			end
-		end
-	end
-
-	if args[1] == nil or args[1] == "" or args[2] == nil or args[2] == "" then
-		ply:ChatPrint("Command format: slashco_add_survivor [Player Name]")
-
-		return
-	end
-
-	if game.GetMap() == "sc_lobby" then
-		ply:ChatPrint("Cannot assign Survivor while in lobby.")
-
-		return
-	end
-
-	local theman = ""
-
-	for i = 1, #player.GetAll() do
-
-		local p = player.GetAll()[1]
-
-		if p:GetName() == args[1] then
-			theman = p:SteamID64()
-			break
-		end
-
-	end
-
-	if args[1] == "^" then
-		theman = ply:SteamID64()
-	end
-
-	if theman == "" then
-		ply:ChatPrint("Player not found.")
-		return
-	end
-
-	if player.GetBySteamID64(theman):Team() ~= TEAM_SPECTATOR then
-		ply:ChatPrint("Player must be Spectator.")
-		return
-	end
-
-	for s = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
-		if SlashCo.CurRound.SlasherData.AllSurvivors[s].id == theman then
-			goto FOUND
-		end
-	end
-
-	table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = theman, GameContribution = 0 })
-
-	:: FOUND ::
-
-	ply:ChatPrint("New Survivor successfully assigned.")
-
-	ply:SetTeam(TEAM_SURVIVOR)
-	ply:Spawn()
-
-end)
-
-concommand.Add("slashco_add_slasher", function(ply, _, args)
-	if IsValid(ply) then
-		if ply:IsPlayer() then
-			if not ply:IsAdmin() then
-				ply:ChatPrint("Only admins can use debug commands!")
-				return
-			end
-		end
-	end
-
-	if game.GetMap() == "sc_lobby" then
-		ply:ChatPrint("Cannot assign Slasher while in lobby.")
-
-		return
-	end
-
-	if args[1] == nil or args[1] == "" or args[2] == nil or args[2] == "" then
-		ply:ChatPrint("Command format: slashco_add_slasher [Player Name] [Slasher ID]")
-
-		return
-	end
-
-	--[[
-	if tonumber(args[2]) > table.Count(SlashCoSlasher) or tonumber(args[2]) < 1 then
-		ply:ChatPrint("Incorrect Slasher ID")
-
-		return
-	end
-	--]]
-
-	local theman = ""
-	local plyFound
-
-	for i = 1, #player.GetAll() do
-
-		local p = player.GetAll()[1]
-
-		if p:GetName() == args[1] then
-			theman = p:SteamID64()
-			plyFound = p
-			break
-		end
-
-	end
-
-	if args[1] == "^" then
-		theman = ply:SteamID64()
-		plyFound = ply
-	end
-
-	if theman == "" then
-		ply:ChatPrint("Player not found.")
-		return
-	end
-
-	--[[
-	if plyFound:Team() ~= TEAM_SPECTATOR then
-		ply:ChatPrint("Player must be Spectator.")
-		return
-	end
-	--]]
-
-	for s = 1, #SlashCo.CurRound.SlasherData do
-
-		if SlashCo.CurRound.SlasherData[theman] ~= nil then
-			goto ALREADYIN
-		end
-
-	end
-
-	SlashCo.SelectSlasher(args[2], theman)
-	SlashCo.ApplySlasherToPlayer(plyFound)
-	SlashCo.OnSlasherSpawned(plyFound)
-	--SlashCo.InsertSlasherToTable(theman)
-
-	:: ALREADYIN ::
-
-	--SlashCo.SelectSlasher(tonumber(args[2]), theman)
-
-	ply:ChatPrint("New Slasher successfully assigned.")
-
-	ply:SetTeam(TEAM_SLASHER)
-	ply:Spawn()
-end)
-
 hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
 	if ply:Team() == TEAM_SURVIVOR then
 		return veh.VehicleName ~= "Airboat Seat"
@@ -787,7 +636,6 @@ function GM:PlayerDeath(victim, _, _)
 		local ang_offset = 0
 
 		if victim:GetNWBool("SurvivorDecapitate") then
-
 			ragdoll:ManipulateBoneScale(ragdoll:LookupBone("ValveBiped.Bip01_Head1"), Vector(0, 0, 0))
 
 			local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone("ValveBiped.Bip01_Head1"))
@@ -804,7 +652,6 @@ function GM:PlayerDeath(victim, _, _)
 			util.Effect("bloodspray", dripfx)
 
 			ang_offset = 180
-
 		end
 
 		ragdoll:SetAngles(Angle(0, victim:EyeAngles()[2] + ang_offset, 0))

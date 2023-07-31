@@ -6,7 +6,7 @@ local SlashCoItems = SlashCoItems
 ENT.Type = "anim"
 
 ENT.ClassName = "sc_baseitem"
-ENT.PrintName = "none"
+ENT.PrintName = "Soda"
 ENT.Author = "textstack"
 ENT.Contact = ""
 ENT.Purpose = "the essential item"
@@ -16,7 +16,7 @@ ENT.PingType = "ITEM"
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel(SlashCoItems[self.PrintName].Model or "models/props_junk/PopCan01a.mdl")
+		self:SetModel(SlashCoItems[self.PrintName].Model)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)

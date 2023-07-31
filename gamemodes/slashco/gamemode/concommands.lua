@@ -1,6 +1,76 @@
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
 
+concommand.Add("slashco_become_survivor", function(ply)
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if game.GetMap() == "sc_lobby" then
+		ply:ChatPrint("Cannot assign Survivor while in lobby.")
+		return
+	end
+
+	local id = ply:SteamID64()
+	local found
+	for s = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
+		if SlashCo.CurRound.SlasherData.AllSurvivors[s].id == id then
+			found = true
+			break
+		end
+	end
+
+	if found then
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = theman, GameContribution = 0 })
+	end
+
+	ply:ChatPrint("New Survivor successfully assigned.")
+	ply:SetTeam(TEAM_SURVIVOR)
+	ply:Spawn()
+end)
+
+concommand.Add("slashco_become_slasher", function(ply, _, args)
+	if IsValid(ply) then
+		if ply:IsPlayer() then
+			if not ply:IsAdmin() then
+				ply:ChatPrint("Only admins can use debug commands!")
+				return
+			end
+		end
+	end
+
+	if game.GetMap() == "sc_lobby" then
+		ply:ChatPrint("Cannot assign Slasher while in lobby.")
+		return
+	end
+
+	SlashCo.SelectSlasher(args[1], ply:SteamID64())
+	SlashCo.ApplySlasherToPlayer(ply)
+	SlashCo.OnSlasherSpawned(ply)
+
+	ply:ChatPrint("New Slasher successfully assigned.")
+	ply:SetTeam(TEAM_SLASHER)
+	ply:Spawn()
+end, function(cmd, args)
+	--this is for autocomplete
+	args = string.lower(string.Trim(args))
+	local tbl = table.GetKeys(SlashCoSlashers)
+
+	local tbl1 = {}
+	for _, v in ipairs(tbl) do
+		--find every item that matches what's inputted
+		if string.find(string.lower(v), args) then
+			table.insert(tbl1, cmd .. " " .. v)
+		end
+	end
+	return tbl1
+end)
+
 concommand.Add("slashco_run_curconfig", function(_, _, _)
 	SlashCo.LoadCurRoundTeams()
 	SlashCo.SpawnCurConfig()
