@@ -7,7 +7,7 @@ ITEM.Price = 35
 ITEM.Description = "LabMeat_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
-ITEM.OnDrop = function(ply)
+ITEM.OnDrop = function()
 	return nil, nil, true
 end
 ITEM.ItemDropped = function(ply, ent)
@@ -27,7 +27,6 @@ ITEM.OnUse = function(ply)
 	ply:AddEffect("Awareness", 120)
 end
 ITEM.OnSetModel = function(model)
-	PrintTable(model:GetSequenceList())
 	model:SetSequence(0)
 end
 ITEM.ViewModel = {

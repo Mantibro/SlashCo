@@ -4,6 +4,13 @@ local EFFECT = {}
 
 EFFECT.Name = "Awareness"
 
+EFFECT.OnApplied = function(ply)
+	SlashCo.SendValue(ply, "Awareness", true)
+end
+EFFECT.OnExpired = function(ply)
+	SlashCo.SendValue(ply, "Awareness", false)
+end
+
 local colors = {
 	["$pp_colour_addr"] = 0,
 	["$pp_colour_addg"] = 0,
@@ -36,6 +43,46 @@ EFFECT.Screenspace = function()
 	end
 
 	DrawColorModify(colors)
+end
+
+if CLIENT then
+	local mat = Material("models/shiny")
+
+	local function showSurvivors()
+		cam.Start3D()
+		render.MaterialOverride(mat)
+
+		local num = render.GetBlend()
+		local dist = 0.5
+		for _, v in pairs(ents.FindInSphere(LocalPlayer():EyePos(), 1000)) do
+			if v:IsPlayer() and v:Team() == TEAM_SLASHER then
+				local lDist = math.max(v:WorldSpaceCenter():DistToSqr(LocalPlayer():EyePos()) * 0.0000001, 0)
+				if lDist < dist then
+					dist = lDist
+				end
+			end
+		end
+		render.SetBlend(math.Clamp(dist, 0, 0.1))
+
+		for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			ply:DrawModel()
+		end
+		for _, v in ipairs(ents.FindByClass("sc_generator")) do
+			v:DrawModel()
+		end
+
+		render.SetBlend(num)
+		cam.End3D()
+	end
+
+	hook.Add("scValue_Awareness", "SlashCoAwareness", function(state)
+		if state then
+			hook.Add("HUDPaint", "SlashCoAwareness", showSurvivors)
+			return
+		end
+
+		hook.Remove("HUDPaint", "SlashCoAwareness")
+	end)
 end
 
 SlashCo.RegisterEffect(EFFECT, "Awareness")
