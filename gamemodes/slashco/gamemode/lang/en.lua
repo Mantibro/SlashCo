@@ -157,7 +157,7 @@ SlashCoLang["GasCan"] = "Fuel Can"
 SlashCoLang["GasCan_desc"] = "Take a gas can with you instead of having to find one. There will be less gas cans to find if you do this."
 
 SlashCoLang["Jug"] = "The Jug"
-SlashCoLang["Jug_desc"] = "We have no idea what is this."
+SlashCoLang["Jug_desc"] = "We have no idea what this is."
 
 SlashCoLang["LabMeat"] = "Lab-Grown Meat"
 SlashCoLang["LabMeat_desc"] = "Now cleared for sale in the United States! Is it worth it?\nConsuming grants a temporary awareness of any nearby slashers."
