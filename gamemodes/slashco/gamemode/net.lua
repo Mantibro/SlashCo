@@ -116,23 +116,31 @@ SlashCo.LobbyPlayerBriefing = function()
 	net.Broadcast()
 end
 
-SlashCo.StartGameIntro = function()
-	local offering = "Regular"
+local function quietHeli()
+	for _, heli in ipairs(ents.FindByClass("sc_helicopter")) do
+		heli:StopSound("slashco/helicopter_engine_distant.wav")
+		heli:StopSound("slashco/helicopter_rotors_distant.wav")
+		heli:StopSound("slashco/helicopter_engine_close.wav")
+		heli:StopSound("slashco/helicopter_rotors_close.wav")
+	end
+end
 
+SlashCo.StartGameIntro = function()
+	quietHeli()
+
+	local offering = "Regular"
 	if SlashCo.LobbyData.Offering > 0 then
 		offering = SCInfo.Offering[SlashCo.LobbyData.Offering].Name
 	end
 
-	net.Start("mantislashcoGameIntro")
-	net.WriteTable({
-		map = SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME,
-		diff = SlashCo.LobbyData.SelectedDifficulty,
-		offer = offering,
-		s_name = SlashCo.LobbyData.SelectedSlasherInfo.NAME,
-		s_class = SlashCo.LobbyData.SelectedSlasherInfo.CLS,
-		s_danger = SlashCo.LobbyData.SelectedSlasherInfo.DNG
+	SlashCo.SendValue(nil, "RoundEnd", 6, {
+		SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME,
+		SlashCo.LobbyData.SelectedSlasherInfo.NAME,
+		SlashCo.LobbyData.SelectedSlasherInfo.CLS,
+		SlashCo.LobbyData.SelectedSlasherInfo.DNG,
+		SlashCo.LobbyData.SelectedDifficulty,
+		offering
 	})
-	net.Broadcast()
 end
 
 --[[ state value:
@@ -144,14 +152,7 @@ end
 	5 - (fun test end)
 ]]
 SlashCo.RoundOverScreen = function(state)
-	local heli = table.Random(ents.FindByClass("sc_helicopter"))
-
-	if IsValid(heli) then
-		heli:StopSound("slashco/helicopter_engine_distant.wav")
-		heli:StopSound("slashco/helicopter_rotors_distant.wav")
-		heli:StopSound("slashco/helicopter_engine_close.wav")
-		heli:StopSound("slashco/helicopter_rotors_close.wav")
-	end
+	quietHeli()
 
 	--yucky yucky
 	local goodSurvivorTable = {}

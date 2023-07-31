@@ -81,13 +81,32 @@ local function teamSummary(lines, survivors, rescued)
 	end
 end
 
+local dangerTable = {
+	[0] = "Unknown",
+	"Moderate",
+	"Considerable",
+	"Devastating"
+}
+local classTable = {
+	[0] = "Unknown",
+	"Cryptid",
+	"Demon",
+	"Umbra"
+}
+local difficultyTable = {
+	[0] = "Easy",
+	"Novice",
+	"Intermediate",
+	"Hard"
+}
 local stateTable = {
 	[0] = "wonAllSurvivors",
 	"wonSomeSurvivors",
 	"wonNoSurvivors",
 	"lost",
 	"wonBeacon",
-	"cursed"
+	"cursed",
+	"intro"
 }
 local stringTable = {
 	wonAllSurvivors = function()
@@ -142,6 +161,22 @@ local stringTable = {
 		end
 
 		return lines
+	end,
+	intro = function(info)
+		surface.PlaySound("slashco/music/slashco_intro.mp3")
+		local lines = {
+			SlashCoLanguage("cur_assignment", info[1]),
+			SlashCoLanguage("slasher_assess"),
+			SlashCoLanguage("Name", info[2]),
+			SlashCoLanguage("Class", classTable[info[3]]),
+			SlashCoLanguage("DangerLevel", dangerTable[info[4]]),
+			SlashCoLanguage("Difficulty", difficultyTable[info[5]]),
+		}
+		if info[6] ~= "Regular" then
+			table.insert(lines, SlashCoLanguage("Offering_name", difficultyTable[info[6]]))
+		end
+
+		return lines
 	end
 }
 
@@ -191,8 +226,9 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	end
 
 	local linesPlay = table.Reverse(lines)
-	local panel = GetHUDPanel():Add("Panel")
+	local panel = vgui.Create("Panel") --GetHUDPanel():Add("Panel")
 	panel:Dock(FILL)
+	fadeIn(panel)
 
 	function panel.Paint()
 		surface.SetDrawColor(0, 0, 0)

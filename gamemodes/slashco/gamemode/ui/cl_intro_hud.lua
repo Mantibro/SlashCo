@@ -1,3 +1,9 @@
+if true then
+	return
+end
+--deprecated file, safe to delete
+
+
 net.Receive( "mantislashcoGameIntro", function( _, _ )
 	local introtable = net.ReadTable()
 

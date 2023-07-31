@@ -26,6 +26,10 @@ ITEM.OnUse = function(ply)
 	ply:EmitSound("slashco/slasher/amogus_transform" .. math.random(1, 2) .. ".mp3")
 	ply:AddEffect("Awareness", 120)
 end
+ITEM.OnSetModel = function(model)
+	PrintTable(model:GetSequenceList())
+	model:SetSequence(0)
+end
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

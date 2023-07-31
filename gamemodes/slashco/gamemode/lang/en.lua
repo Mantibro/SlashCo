@@ -30,7 +30,7 @@ SlashCoLang["InGame"] = "In Game (%s)"
 SlashCoLang["Survivor"] = "Survivor"
 SlashCoLang["Slasher"] = "Slasher"
 
-SlashCoLang["Difficulty"] = "Difficulty"
+SlashCoLang["Difficulty"] = "Difficulty: %s"
 
 SlashCoLang["Easy"] = "Easy"
 SlashCoLang["Novice"] = "Novice"
@@ -38,15 +38,15 @@ SlashCoLang["Intermediate"] = "Intermediate"
 SlashCoLang["Hard"] = "Hard"
 
 SlashCoLang["Unknown"] = "Unknown"
-SlashCoLang["Name"] = "Name"
+SlashCoLang["Name"] = "Name: %s"
 SlashCoLang["Notes"] = "Notes"
 
-SlashCoLang["Class"] = "Class"
+SlashCoLang["Class"] = "Class: %s"
 SlashCoLang["Cryptid"] = "Cryptid"
 SlashCoLang["Demon"] = "Demon"
 SlashCoLang["Umbra"] = "Umbra"
 
-SlashCoLang["DangerLevel"] = "Danger Level"
+SlashCoLang["DangerLevel"] = "Danger Level: %s"
 SlashCoLang["Moderate"] = "Moderate"
 SlashCoLang["Considerable"] = "Considerable"
 SlashCoLang["Devastating"] = "Devastating"
@@ -213,8 +213,8 @@ SlashCoLang["briefing"] = "BRIEFING:"
 SlashCoLang["player_await"] = "Waiting for players. . ."
 SlashCoLang["player_ready"] = "The round will start soon."
 
-SlashCoLang["cur_assignment"] = "Current Assignment:"
-SlashCoLang["slasher_assess"] = "Slasher Assessment:"
+SlashCoLang["cur_assignment"] = "Current Assignment: %s"
+SlashCoLang["slasher_assess"] = "-Slasher Assessment-"
 
 SlashCoLang["offering_idle"] = "Make an Offering"
 
