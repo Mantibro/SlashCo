@@ -16,7 +16,7 @@ function GetRandomMap(ply_count)
 	repeat
 		rand = math.random(1, #keys)
 		rand_name = keys[rand] --random id for this roll
-	until SCInfo.Maps[rand_name].MIN_PLAYERS <= (ply_count + (SCInfo.MinimumMapPlayers - 1))
+	until SCInfo.Maps[rand_name].MIN_PLAYERS <= (ply_count + (SCInfo.MinimumMapPlayers - 1)) and rand_name ~= "error"
 
 	return rand_name
 end
