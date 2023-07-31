@@ -15,7 +15,7 @@ end
 function PLAYER:UpdateSpeed()
 	local highestPriority = -9999
 	local highestPrioritySpeed
-	for k, v in pairs(self.SpeedEffects) do
+	for _, v in pairs(self.SpeedEffects) do
 		if v[2] > highestPriority then
 			highestPriority = v[2]
 			highestPrioritySpeed = v[1]
@@ -24,8 +24,12 @@ function PLAYER:UpdateSpeed()
 
 	if highestPriority == -9999 then
 		self:SetRunSpeed(300)
+		self:SetWalkSpeed(200)
+		self:SetSlowWalkSpeed(100)
 	else
 		self:SetRunSpeed(highestPrioritySpeed)
+		self:SetWalkSpeed(math.min(highestPrioritySpeed, 200))
+		self:SetSlowWalkSpeed(math.min(highestPrioritySpeed, 100))
 	end
 end
 

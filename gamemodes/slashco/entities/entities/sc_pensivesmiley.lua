@@ -294,8 +294,6 @@ function ENT:Think()
 		end
 
 		local attacked = player.GetBySteamID64(self.AttackedPlayer)
-		attacked:SetSlowWalkSpeed(50)
-		attacked:SetWalkSpeed(50)
 		attacked:AddSpeedEffect("smiley", 50, 15)
 
 		attacked:SetNWBool("MarkedBySmiley", true)
@@ -308,8 +306,6 @@ function ENT:Think()
 					return
 				end
 
-				attacked:SetSlowWalkSpeed(200)
-				attacked:SetWalkSpeed(200)
 				attacked:RemoveSpeedEffect("smiley")
 
 				attacked:SetNWBool("MarkedBySmiley", false)

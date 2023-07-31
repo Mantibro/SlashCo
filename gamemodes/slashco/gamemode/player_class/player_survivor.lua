@@ -10,6 +10,7 @@ local PLAYER = {}
 --
 PLAYER.DisplayName = "Survivor"
 
+PLAYER.SlowWalkSpeed = 100
 PLAYER.WalkSpeed = 200
 PLAYER.RunSpeed = 300
 PLAYER.StartHealth = 100
@@ -24,6 +25,7 @@ end
 function PLAYER:Loadout()
 	self.Player:RemoveAllAmmo()
 	self.Player:Give("sc_survivorhands")
+	self.Player:SetCanWalk(true)
 end
 
 function PLAYER:SetModel()

@@ -70,7 +70,6 @@ include("ui/slasher_stock/cl_slasher_meter.lua")
 include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 
-
 SlashCo = SlashCo or {}
 
 CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
@@ -78,14 +77,13 @@ CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post proces
 CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
 		"SlashCo Survivor Playermodel")
 
+--[[
 cvars.AddChangeCallback("cl_slashco_playermodel", function(_, _, newVal)
-
 	if newVal ~= "models/slashco/survivor/male_0*.mdl" then
 		--print("[SlashCo] Bad Playermodel. It will be randomized instead.")
 	end
-
-
 end)
+--]]
 
 function GM:HUDDrawTargetID()
 	return false
@@ -109,6 +107,7 @@ end
 
 local fx_t = 0
 
+local rand = 0
 hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
 		return
@@ -128,19 +127,13 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 		end
 
 		local fuck = math.min(math.abs(LocalPlayer().BenadrylIntensity) * 2, 1)
-
-		local rand = rand or 0
-
 		rand = rand + (math.random() / 3)
-
 		local contrast = 3.5 + math.sin((CurTime() + rand) / 10) * 3
 		local bloom = 3 + math.cos((CurTime() + rand) / 2) * 1
 		local bloom2 = 3 + math.cos((CurTime() + rand) / 4) * 1
-
 		local bokeh = -3 + math.cos((CurTime() + rand) / 20) * 4
 
 		DrawBloom(0.5, fuck * bloom * 1.5, fuck * bloom2 * 9, fuck * bloom2 * 9, 1, 8, 2, 2, 2)
-
 		DrawBokehDOF(12 * fuck, fuck * bokeh, 4 * fuck)
 
 		local tab = {
@@ -156,9 +149,7 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 		}
 
 		DrawColorModify(tab)
-
 		DrawMotionBlur(fuck * 0.75 + (contrast * 0.08), fuck * 0.8, fuck * 0.07)
-
 		DrawSharpen(fuck * bloom, fuck * bloom)
 	else
 		LocalPlayer().BenadrylIntensity = 0
@@ -168,38 +159,27 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 		return
 	end
 
-	if game.GetMap() == "sc_lobby" then
-		return
-	end
+	LocalPlayer():ItemFunction("Screenspace")
+	DrawBokehDOF(0.5, 1, 12)
+	DrawSharpen(5, 0.15)
 	DrawBloom(0.5, 2, 9, 9, 1, 1, 1, 1, 1)
 
-	LocalPlayer():ItemFunction("Screenspace")
-	DrawBokehDOF(1, 1, 12)
-
-	local blur_insensity = 0
-	local red_insensity = 0
 	local hp = LocalPlayer():Health()
 	if hp < 30 then
 		fx_t = fx_t + RealFrameTime() * 0.25
-		blur_intensity = math.sin(fx_t) * (3 - (hp / 10))
-		red_intensity = math.sin(fx_t) * (0.05) * (1 - (hp / 30))
+		DrawBokehDOF(12, 0.4, 4 - math.sin(fx_t) * (3 - (hp / 10)))
+		DrawColorModify({
+			["$pp_colour_addr"] = math.sin(fx_t) * (0.05) * (1 - (hp / 30)),
+			["$pp_colour_addg"] = 0,
+			["$pp_colour_addb"] = 0,
+			["$pp_colour_brightness"] = 0,
+			["$pp_colour_contrast"] = 1,
+			["$pp_colour_colour"] = 1,
+			["$pp_colour_mulr"] = 0,
+			["$pp_colour_mulg"] = 0,
+			["$pp_colour_mulb"] = 0
+		})
 	end
-
-	DrawBokehDOF(12, 0.4, 4 - blur_insensity)
-
-	local tab = {
-		["$pp_colour_addr"] = red_insensity,
-		["$pp_colour_addg"] = 0,
-		["$pp_colour_addb"] = 0,
-		["$pp_colour_brightness"] = 0,
-		["$pp_colour_contrast"] = 1,
-		["$pp_colour_colour"] = 1,
-		["$pp_colour_mulr"] = 0,
-		["$pp_colour_mulg"] = 0,
-		["$pp_colour_mulb"] = 0
-	}
-
-	DrawColorModify(tab)
 end)
 
 hook.Add("KeyPress", "PlayerSelect", function(ply, key)
@@ -233,7 +213,7 @@ local colors = {
 ---draw halos; can only be used in the below function
 function SlashCo.DrawHalo(ents, color, passes, noZ)
 	if not g_SlashCoDrawingHalos then
-		print("You're using SlashCo.DrawHalo where it's not allowed!!!!!")
+		error("Using SlashCo.DrawHalo illegally", 2)
 		return
 	end
 
