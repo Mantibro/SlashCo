@@ -47,7 +47,7 @@ end
 
 ---sets the slasher title
 function PANEL:SetTitle(name)
-	self.TitleCard.Label:SetText(" " .. name)
+	self.TitleCard.Label:SetText(" " .. SlashCoLanguage(name))
 end
 
 ---sets up the slasher avatar table to simplify setting avatars
@@ -695,7 +695,7 @@ function PANEL:MakeTitleCard()
 	label:Dock(FILL)
 	label:SetContentAlignment(1)
 	label:SetFont("HalfCutTitle")
-	label:SetText(" slasher")
+	label:SetText(" "..SlashCoLanguage("Slasher"))
 	label:SetTextColor(red)
 end
 

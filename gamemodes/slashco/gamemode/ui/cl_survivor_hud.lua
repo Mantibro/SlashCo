@@ -82,7 +82,7 @@ hook.Add("DrawOverlay", "SlashCoVHS", function()
 	end
 
 	local y = (CurTime() % 4) * (ScrH() / 28)
-	surface.SetDrawColor(192, 192, 192, 1)
+	surface.SetDrawColor(75, 75, 75, 1)
 	while y < ScrH() do
 		surface.DrawLine(0, y, ScrW(), y)
 

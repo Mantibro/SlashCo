@@ -40,7 +40,7 @@ function PANEL:Init()
 	label:SetTall(60)
 	label:SetContentAlignment(6)
 	label:SetFont("HalfCutTitle")
-	label:SetText("control")
+	label:SetText(SlashCoLanguage("control"))
 	label:SetTextColor(red)
 
 	local keyLabel = vgui.Create("DLabel", self)
@@ -183,15 +183,18 @@ function PANEL:Untie()
 end
 
 ---sets a new key to display
+---adding a "<number>/" before the key will still only display the key
+---this so multiple controls with the same key can still be differentiated in code
 function PANEL:SetKey(key)
 	self.Key = key
+	key = string.gsub(key, "%d*/", "")
 	self.KeyLabel:SetText(string.format("[%s]", string.upper(key)))
 end
 
 ---sets the text for the control and updates the icon
 function PANEL:SetText(text, dontSetIcon)
 	self.Text = text
-	self.Label:SetText(text .. " ")
+	self.Label:SetText(SlashCoLanguage(text) .. " ")
 
 	if not dontSetIcon then
 		if self.Enabled then
