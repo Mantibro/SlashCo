@@ -493,14 +493,7 @@ local function lobbyRoundSetup()
         end
 
         --Assign the map randomly
-        :: Map_reroll ::
         SlashCo.LobbyData.SelectedMap = GetRandomMap(#SlashCo.LobbyData.AssignedSurvivors)
-
-        if not GetConVar("slashco_map_default"):GetBool() then
-            if SCInfo.Maps[SlashCo.LobbyData.SelectedMap].DEFAULT == false then
-                goto Map_reroll
-            end
-        end
 
         if SlashCo.LobbyData.SelectedDifficulty > 0 then
             BeginSlasherSelection()
@@ -1056,8 +1049,10 @@ concommand.Add("lobby_openitems", function(ply, _, _)
 
     if SERVER then
 
-        SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_itembox"))
-        SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Open")
+        local door = table.Random(ents.FindByName("door_itembox"))
+        if IsValid(door) then
+            door:Fire("Open")
+        end
 
     end
 

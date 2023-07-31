@@ -64,16 +64,16 @@ SlashCoLang["offer_too_late"] = "It is too late to make an Offering."
 SlashCoLang["offer_not_ready"] = "Cannot make an Offering when you are ready."
 SlashCoLang["offer_cannot_ready"] = "Cannot ready as Slasher as you have either made or agreed to an Offering."
 
-SlashCoLang["lobby_full"] = "The Lobby is currently full."
-SlashCoLang["second_slasher"] = "You will become the Second Slasher."
-SlashCoLang["item_already_chosen"] = "You have already chosen an item."
-SlashCoLang["item_afford"] = "You cannot afford this item."
-SlashCoLang["item_toomany"] = "Too many Survivors already have this item."
-SlashCoLang["map_already_selected"] = "This map has already been selected."
-SlashCoLang["map_notenough"] = "You don't have enough points for a Map Guarantee."
-SlashCoLang["map_guaranteed_to"] = "%s spent %s points to set the mission to be on %s."
+SlashCoLang["lobby_full"] = "Poczekalnia jest pełna."
+SlashCoLang["second_slasher"] = "Zostaniesz drugim Slasherem."
+SlashCoLang["item_already_chosen"] = "Już wybrałeś przedmiot."
+SlashCoLang["item_afford"] = "Nie stać cię na ten przedmiot."
+SlashCoLang["item_toomany"] = "Zbyt dużo Ocalałych wybrało ten przedmiot."
+SlashCoLang["map_already_selected"] = "Ta mapa została już wybrana."
+SlashCoLang["map_notenough"] = "Nit stać cię na gwarancję mapy."
+SlashCoLang["map_guaranteed_to"] = "%s wydał %s punktów aby zmienić gwarancję mapy na: %s."
 
-SlashCoLang["playermodel_choose"] = "[CHOOSE...]"
+SlashCoLang["playermodel_choose"] = "[WYBIERZ...]"
 
 SlashCoLang["GameInfo"] = "[%s] INFORMACJE"
 
@@ -95,7 +95,7 @@ SlashCoLang["Singularity"] = "Jedności"
 SlashCoLang["Singularity_desc"] = "Znajdziesz więcej Paliwa,\nAle\nSlasher będzie o wiele silniejszy."
 
 SlashCoLang["Nightmare"] = "Koszmaru"
-SlashCoLang["Nightmare_desc"] = "The Helicopter will come rescue you regardless of Generators.\nFueling Generators will come with a massively increased Point bonus.\nBut\nSurvivors and Slasher will switch sides."
+SlashCoLang["Nightmare_desc"] = "Śmigłowiec przyleci bez aktywnych agregatów.\nTankowanie agregatów wypłaci więcej punktów.\nAle\nOcalali i Slasher zamienią strony."
 
 --ITEMS
 
@@ -120,7 +120,7 @@ SlashCoLang["MapGuaranteeTitle"] = "GWARANTUJ MAPĘ"
 SlashCoLang["ItemConfirm"] = "POTWIERDŹ"
 SlashCoLang["ItemRemaining"] = "POZOSTAŁO"
 
-SlashCoLang["MapGuaranteeDesc"] = "Bribe the helicopter driver to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
+SlashCoLang["MapGuaranteeDesc"] = "Zapłać pilotowi aby zabrał cię gdzie chcesz--Wygrywa ocalały, który zapłacił najwięcej. Cena zwiększa się z każdym zakupem."
 
 
 
@@ -260,6 +260,8 @@ SlashCoLang["SURVIVOR"] = "OCALAŁY"
 SlashCoLang["SLASHER"] = "SLASHER"
 SlashCoLang["DEAD BODY"] = "MARTWE CIAŁO"
 SlashCoLang["HELICOPTER"] = "HELIKOPTER"
+SlashCoLang["PLUSH DOG"] = "PLUSZOWY PIESEK"
+SlashCoLang["ITEM STASH"] = "PRZEDMIOTY"
 
 --Slasher
 SlashCoLang["demon_pacified"] = "You have been pacified by consuming an item."
@@ -404,7 +406,7 @@ SlashCoLang["Leuonard_desc"] = [[The Unstable Slasher whose overwhleming power g
 
 -Leuonard's R██e will increase over time.
 -Wrestling a Plush Dog will cause R██e to decrease.
--Reaching 100% R██e will cause Leuonard to become extremely lethal, but nearly uncontrollable.]]
+-Reaching 100 Procent R██e will cause Leuonard to become extremely lethal, but nearly uncontrollable.]]
 SlashCoLang["Leuonard_tip"] = "-This Slasher seems to have a fondness for plush dogs."
 
 SlashCoLang["Leuonard_roid"] = "r**e"

@@ -1,6 +1,6 @@
 --[[
 
-    Language: pt-BR, (Portuguese (Brazil)), (Português)
+    Language: en, (Pirate English), (Pirate English)
     Translator: 
 
 ]]

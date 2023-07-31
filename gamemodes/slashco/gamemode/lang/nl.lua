@@ -251,6 +251,8 @@ SlashCoLang["SURVIVOR"] = "SURVIVOR"
 SlashCoLang["SLASHER"] = "SLASHER"
 SlashCoLang["DEAD BODY"] = "DEAD BODY"
 SlashCoLang["HELICOPTER"] = "HELICOPTER"
+SlashCoLang["PLUSH DOG"] = "PLUSH DOG"
+SlashCoLang["ITEM STASH"] = "ITEM STASH"
 
 --Spectator
 SlashCoLang["spectating"] = "YOU ARE SPECTATING"
@@ -407,7 +409,7 @@ SlashCoLang["Leuonard_desc"] = [[The Unstable Slasher whose overwhleming power g
 
 -Leuonard's R██e will increase over time.
 -Wrestling a Plush Dog will cause R██e to decrease.
--Reaching 100% R██e will cause Leuonard to become extremely lethal, but nearly uncontrollable.]]
+-Reaching 100 Percent R██e will cause Leuonard to become extremely lethal, but nearly uncontrollable.]]
 SlashCoLang["Leuonard_tip"] = "-This Slasher seems to have a fondness for plush dogs."
 
 SlashCoLang["Leuonard_roid"] = "r**e"
