@@ -137,7 +137,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 			slasher:SetNWBool("AmogusDisguised", true)
 
 			slasher:SlasherHudFunc("SetAvatar", "survivor")
-			slasher:SlasherHudFunc("SetTitle", "inconspicuous survivor")
+			slasher:SlasherHudFunc("SetTitle", "Amogus_survivor_disguised_title")
 
 			slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
@@ -161,7 +161,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		slasher:SetNWBool("DynamicFlashlight", false)
 
 		slasher:SlasherHudFunc("SetAvatar", "default")
-		slasher:SlasherHudFunc("SetTitle", "amogus")
+		slasher:SlasherHudFunc("SetTitle", "Amogus")
 
 		util.PrecacheModel("models/slashco/slashers/amogus/amogus.mdl")
 		slasher:SetModel("models/slashco/slashers/amogus/amogus.mdl")
@@ -206,7 +206,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 			slasher:SetNWBool("AmogusDisguised", true)
 
 			slasher:SlasherHudFunc("SetAvatar", "fuel")
-			slasher:SlasherHudFunc("SetTitle", "regular fuel can")
+			slasher:SlasherHudFunc("SetTitle", "Amogus_gas_disguised_title")
 
 			slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
@@ -315,7 +315,7 @@ local killTable = {
 }
 
 SLASHER.InitHud = function(_, hud)
-	hud:SetTitle("amogus")
+	hud:SetTitle("Amogus")
 	hud:SetAvatarTable(avatarTable)
 
 	hud:AddControl("R", "disguise as survivor", disguiseTable)

@@ -258,7 +258,7 @@ local milkTable = {
 local gray = Color(128, 128, 128)
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_5"))
-	hud:SetTitle("thirsty")
+	hud:SetTitle("Thirsty")
 
 	hud:AddControl("R", "drink milk", milkTable)
 	hud:ChaseAndKill()

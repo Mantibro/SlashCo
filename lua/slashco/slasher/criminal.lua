@@ -195,7 +195,7 @@ local avatarTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatarTable(avatarTable)
-	hud:SetTitle("criminal")
+	hud:SetTitle("Criminal")
 
 	hud:ChaseAndKill(true)
 	hud:AddControl("RMB", "summon clones", Material("slashco/ui/icons/slasher/s_12_a1"))

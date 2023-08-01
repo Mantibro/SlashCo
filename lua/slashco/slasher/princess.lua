@@ -355,7 +355,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 	slasher:SetNWBool("PrincessSniffing", true)
 	slasher:Freeze(true)
-	slasher:EmitSound("slashco/slasher/princess_sniff.mp3")
+	slasher:EmitSound("slashco/slasher/sniff.mp3")
 
 	timer.Simple(4, function()
 		if not IsValid(slasher) then

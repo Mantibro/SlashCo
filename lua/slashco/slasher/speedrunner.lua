@@ -176,7 +176,7 @@ end
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_15"))
-	hud:SetTitle("speedrunner")
+	hud:SetTitle("Speedrunner")
 
 	hud:AddControl("R", "rng sacrifice", "chase")
 	hud:ChaseAndKill(true)

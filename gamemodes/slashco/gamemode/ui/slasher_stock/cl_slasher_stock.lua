@@ -27,7 +27,7 @@ function PANEL:Init()
 
 	local right = vgui.Create("Panel", self)
 	self.Right = right
-	right:SetWide(420)
+	right:SetWide(600)
 	right:Dock(RIGHT)
 
 	self:MakeTitleCard()

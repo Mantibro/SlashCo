@@ -22,6 +22,11 @@ for _, v in ipairs(lang_files) do
 	AddCSLuaFile("slashco/lang/" .. v)
 end
 
+local lang_patches, _ = file.Find("slashco/patch/lang/*.lua", "LUA")
+for _, v in ipairs(lang_patches) do
+	AddCSLuaFile("slashco/lang/" .. v)
+end
+
 function GM:Initialize()
 	-- Do stuff
 end

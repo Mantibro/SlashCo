@@ -563,7 +563,7 @@ local cookieTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_2"))
-	hud:SetTitle("sid")
+	hud:SetTitle("Sid")
 
 	hud:AddControl("R", "eat cookie", cookieTable)
 	hud:TieControlVisible("R", "SidGun", true, false, false)
@@ -653,7 +653,7 @@ SLASHER.InitHud = function(_, hud)
 			hud:SetControlVisible("F", true)
 			hud:SetMeterName("satiation", "gun uses")
 			hud:FlashMeter("gun uses")
-			hud:SetTitle("sid (with a gun)")
+			hud:SetTitle("Sid_gun_title")
 			hud:ShakeControl("F")
 			hud:FlashMeter("gun uses")
 			surface.PlaySound("slashco/slashco_progress.mp3")

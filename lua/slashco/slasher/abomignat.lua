@@ -350,7 +350,7 @@ local controlTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_11"))
-	hud:SetTitle("abomignat")
+	hud:SetTitle("Abomignat")
 
 	hud:AddControl("R", "enable crawling")
 	hud:TieControlText("R", "AbomignatCrawling", "disable crawling", "enable crawling", true)

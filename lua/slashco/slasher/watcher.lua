@@ -279,7 +279,7 @@ local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 local red = Color(255, 0, 0)
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_10"))
-	hud:SetTitle("the watcher")
+	hud:SetTitle("Watcher")
 
 	hud:AddControl("R", "survey", surveyTable)
 	hud:ChaseAndKill()

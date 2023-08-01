@@ -271,9 +271,9 @@ SlashCo.LangTable["beacon_call"] = "The Survivors are attempting to call emergen
 SlashCo.LangTable["beacon_destroy"] = "DESTROY THE BEACON."
 SlashCo.LangTable["slasher_anticipation"] = "You will soon spawn as %s"
 SlashCo.LangTable["slasher_unavailable"] = "unavailable"
-SlashCo.LangTable["slasher_killsurvivor"] = "kill survivor"
-SlashCo.LangTable["slasher_startchase"] = "start chasing"
-SlashCo.LangTable["slasher_stopchase"] = "stop chasing"
+SlashCo.LangTable["kill survivor"] = "kill survivor"
+SlashCo.LangTable["start chasing"] = "start chasing"
+SlashCo.LangTable["stop chasing"] = "stop chasing"
 SlashCo.LangTable["slasher_speedrate"] = "Speed"
 SlashCo.LangTable["slasher_eyerate"] = "Eyesight"
 SlashCo.LangTable["slasher_diffrate"] = "Difficulty"
@@ -289,10 +289,10 @@ SlashCo.LangTable["Abomignat_desc"] = [[The Monstrous Slasher which uses basic a
 -Its Crawling Mode can enable swift map traversal.]]
 SlashCo.LangTable["Abomignat_tip"] = "-This Slasher enters bursts of speed while attacking."
 
-SlashCo.LangTable["Abomignat_enablecrawling"] = "enable crawling"
-SlashCo.LangTable["Abomignat_disablecrawling"] = "disable crawling"
-SlashCo.LangTable["Abomignat_slashcharge"] = "slash charge"
-SlashCo.LangTable["Abomignat_lunge"] = "lunge"
+SlashCo.LangTable["enable crawling"] = "enable crawling"
+SlashCo.LangTable["disable crawling"] = "disable crawling"
+SlashCo.LangTable["slash charge"] = "slash charge"
+SlashCo.LangTable["lunge"] = "lunge"
 
 
 --Amogus
@@ -307,8 +307,8 @@ SlashCo.LangTable["Amogus_tip"] = "-This Slasher can disguise itself as a human.
 SlashCo.LangTable["Amogus_survivor_disguised_title"] = "inconspicuous survivor"
 SlashCo.LangTable["Amogus_gas_disguised_title"] = "regular fuel can"
 SlashCo.LangTable["Amogus_survivor_disguise"] = "disguise as survivor"
-SlashCo.LangTable["Amogus_gas_disguise"] = "disguise as fuel"
-SlashCo.LangTable["Amogus_un_disguise"] = "reveal yourself"
+SlashCo.LangTable["disguise as fuel"] = "disguise as fuel"
+SlashCo.LangTable["reveal yourself"] = "reveal yourself"
 
 
 
@@ -321,9 +321,9 @@ survivors off-guard.
 -He can create a phantom clone of himself to scare and locate Survivors.]]
 SlashCo.LangTable["Bababooey_tip"] = "-This Slasher has the ability to vanish into thin air."
 
-SlashCo.LangTable["Bababooey_enableinvis"] = "enable invisibility"
-SlashCo.LangTable["Bababooey_disableinvis"] = "disable invisibility"
-SlashCo.LangTable["Bababooey_setclone"] = "set clone"
+SlashCo.LangTable["enable invisibility"] = "enable invisibility"
+SlashCo.LangTable["disable invisibility"] = "disable invisibility"
+SlashCo.LangTable["set clone"] = "set clone"
 SlashCo.LangTable["Bababooey_clonetrip"] = "A Bababooey Clone has been tripped!"
 
 
@@ -337,8 +337,8 @@ SlashCo.LangTable["Borgmire_desc"] = [[The Brute Slasher who can overpower survi
 -He can pick up and throw nearby Survivors for heavy damage.]]
 SlashCo.LangTable["Borgmire_tip"] = "-This Slasher seems to suffer from exhaustion during long chases."
 
-SlashCo.LangTable["Borgmire_punch"] = "punch"
-SlashCo.LangTable["Borgmire_throw"] = "throw"
+SlashCo.LangTable["punch"] = "punch"
+SlashCo.LangTable["throw"] = "throw"
 
 
 
@@ -364,9 +364,9 @@ SlashCo.LangTable["Criminal_desc"] = [[The Tormented Slasher which relies on con
 -He can summon clones around himself as a tool of confusion.]]
 SlashCo.LangTable["Criminal_tip"] = "-This Slasher was seen surrounded by fake copies of itself."
 
-SlashCo.LangTable["Criminal_summonclones"] = "summon clones"
-SlashCo.LangTable["Criminal_unsummonclones"] = "unsummon clones"
-SlashCo.LangTable["Criminal_rage"] = "rage"
+SlashCo.LangTable["summon clones"] = "summon clones"
+SlashCo.LangTable["unsummon clones"] = "unsummon clones"
+SlashCo.LangTable["rage"] = "rage"
 
 
 
@@ -381,8 +381,8 @@ SlashCo.LangTable["Dolphinman_desc"] = [[The Patient Slasher who waits for survi
 SlashCo.LangTable["Dolphinman_tip"] = "-This Slasher does not appear to approach victims on its own."
 
 SlashCo.LangTable["Dolphinman_cannothide"] = "You cannot hide here. A survivor is too close."
-SlashCo.LangTable["Dolphinman_hide"] = "hide"
-SlashCo.LangTable["Dolphinman_hunt"] = "hunt"
+SlashCo.LangTable["hide"] = "hide"
+SlashCo.LangTable["hunt"] = "hunt"
 
 
 
@@ -397,10 +397,10 @@ Both will alert him when a Survivor is detected.
 -Zany will charge at Survivors and damage them.]]
 SlashCo.LangTable["FreeSmiley_tip"] = "-This Slasher does not work alone."
 
-SlashCo.LangTable["FreeSmiley_switchdeal"] = "switch deal"
-SlashCo.LangTable["FreeSmiley_zanydeal"] = "deal a zany"
-SlashCo.LangTable["FreeSmiley_pensivedeal"] = "deal a pensive"
-SlashCo.LangTable["FreeSmiley_nodeal"] = "no deal"
+SlashCo.LangTable["switch deal"] = "switch deal"
+SlashCo.LangTable["deal a zany"] = "deal a zany"
+SlashCo.LangTable["deal a pensive"] = "deal a pensive"
+SlashCo.LangTable["no deal"] = "no deal"
 
 
 
@@ -426,9 +426,9 @@ SlashCo.LangTable["Male07_desc"] = [[The Omniscient Slasher which can possess on
 -He can keep his deadlier human form for longer as the game progresses.]]
 SlashCo.LangTable["Male07_tip"] = "-This Slasher is incorporeal and can possess vessels."
 
-SlashCo.LangTable["Male07_possess"] = "possess vessel"
-SlashCo.LangTable["Male07_unpossess"] = "unpossess vessel"
-SlashCo.LangTable["Male07_slash"] = "slash"
+SlashCo.LangTable["possess vessel"] = "possess vessel"
+SlashCo.LangTable["unpossess vessel"] = "unpossess vessel"
+SlashCo.LangTable["slash"] = "slash"
 
 
 
@@ -441,10 +441,10 @@ SlashCo.LangTable["Manspider_desc"] = [[The Huntsman Slasher which is picky with
 -He can nest somewhere for a chance to instantly find Prey.]]
 SlashCo.LangTable["Manspider_tip"] = "-This Slasher is a very selective hunter."
 
-SlashCo.LangTable["Manspider_nest"] = "nest"
+SlashCo.LangTable["nest"] = "nest"
 SlashCo.LangTable["Manspider_yourprey"] = "your prey: "
-SlashCo.LangTable["Manspider_awaitprey"] = "waiting for prey"
-SlashCo.LangTable["Manspider_abandonnest"] = "abandon nest"
+SlashCo.LangTable["waiting for prey"] = "waiting for prey"
+SlashCo.LangTable["abandon nest"] = "abandon nest"
 
 
 
@@ -458,9 +458,9 @@ SlashCo.LangTable["Princess_desc"] = [[The Feral Slasher who mauls children.
 -The higher your aggression, the faster and more brutal your chase is.]]
 SlashCo.LangTable["Princess_tip"] = "-This Slasher can be distracted with Babies."
 
-SlashCo.LangTable["Princess_sniff"] = "sniff"
-SlashCo.LangTable["Princess_maul"] = "maul"
-SlashCo.LangTable["Princess_aggro"] = "aggro"
+SlashCo.LangTable["sniff"] = "sniff"
+SlashCo.LangTable["maul"] = "maul"
+SlashCo.LangTable["aggro"] = "aggro"
 
 
 
@@ -475,11 +475,11 @@ SlashCo.LangTable["Sid_desc"] = [[The Psychotic Slasher which keeps his rage in 
 SlashCo.LangTable["Sid_tip"] = "-Loud gunshots have been heard in zones where this Slasher was present."
 
 SlashCo.LangTable["Sid_gun_title"] = "Sid (with a gun)"
-SlashCo.LangTable["Sid_gunuses"] = "gun uses"
-SlashCo.LangTable["Sid_shoot"] = "shoot"
-SlashCo.LangTable["Sid_eatcookie"] = "eat cookie"
-SlashCo.LangTable["Sid_equipgun"] = "equip gun"
-SlashCo.LangTable["Sid_unequipgun"] = "unequip gun"
+SlashCo.LangTable["gun uses"] = "gun uses"
+SlashCo.LangTable["shoot"] = "shoot"
+SlashCo.LangTable["eat cookie"] = "eat cookie"
+SlashCo.LangTable["equip gun"] = "equip gun"
+SlashCo.LangTable["unequip gun"] = "unequip gun"
 
 
 
@@ -494,8 +494,8 @@ but allowing him to regain it faster, and more of it.
 -RNG Sacrifice will have additional effects on the round when it is used.]]
 SlashCo.LangTable["Speedrunner_tip"] = "-This Slasher grows exeptionally faster with time."
 
-SlashCo.LangTable["Speedrunner_speed"] = "speed"
-SlashCo.LangTable["Speedrunner_sacrifice"] = "rng sacrifice"
+SlashCo.LangTable["speed"] = "speed"
+SlashCo.LangTable["rng sacrifice"] = "rng sacrifice"
 
 
 
@@ -509,9 +509,9 @@ SlashCo.LangTable["Thirsty_desc"] = [[The Milk Slasher whose abilities depend on
 -Thirsty is really quiet.]]
 SlashCo.LangTable["Thirsty_tip"] = "-This Slasher is heavily linked with Milk Jugs."
 
-SlashCo.LangTable["Thirsty_drinkmilk"] = "drink milk"
-SlashCo.LangTable["Thirsty_milkies"] = "milkies"
-SlashCo.LangTable["Thirsty_thirst"] = "thirst"
+SlashCo.LangTable["drink milk"] = "drink milk"
+SlashCo.LangTable["milkies"] = "milkies"
+SlashCo.LangTable["thirst"] = "thirst"
 
 
 
@@ -526,9 +526,9 @@ blood he has collected.
 -He can not collect blood after the round has progressed enough.]]
 SlashCo.LangTable["Trollge_tip"] = "-Its eyesight seems to be limited to moving objects."
 
-SlashCo.LangTable["Trollge_dash"] = "dash"
-SlashCo.LangTable["Trollge_claw"] = "claw"
-SlashCo.LangTable["Trollge_blood"] = "blood"
+SlashCo.LangTable["dash"] = "dash"
+SlashCo.LangTable["claw"] = "claw"
+SlashCo.LangTable["claw"] = "blood"
 
 
 
@@ -544,9 +544,9 @@ SlashCo.LangTable["Tyler_tip"] = "-Noticeably fewer Fuel Cans were spotted in th
 SlashCo.LangTable["Tyler_creator"] = "Tyler, The Creator"
 SlashCo.LangTable["Tyler_destroyer"] = "Tyler, The Destroyer"
 
-SlashCo.LangTable["Tyler_manifest"] = "manifest"
-SlashCo.LangTable["Tyler_hiding"] = "(hiding)"
-SlashCo.LangTable["Tyler_destroy"] = "destroy"
+SlashCo.LangTable["manifest"] = "manifest"
+SlashCo.LangTable["(hiding)"] = "(hiding)"
+SlashCo.LangTable["destroy"] = "destroy"
 
 
 
@@ -560,8 +560,8 @@ SlashCo.LangTable["Watcher_desc"] = [[The Observing Slasher whose power relies o
 -The Watcher can stalk Survivors to build up his special ability, Full Surveillance.]]
 SlashCo.LangTable["Watcher_tip"] = "-This Slasher suffers from a loss of speed while observed."
 
-SlashCo.LangTable["Watcher_survey"] = "survey"
-SlashCo.LangTable["Watcher_fullsurveillance"] = "full surveillance"
+SlashCo.LangTable["survey"] = "survey"
+SlashCo.LangTable["full surveillance"] = "full surveillance"
 SlashCo.LangTable["Watcher_watched"] = "YOU ARE BEING WATCHED"
 SlashCo.LangTable["Watcher_observe"] = "OBSERVING A SURVIVOR. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "STALK TIME: "

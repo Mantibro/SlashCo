@@ -260,7 +260,7 @@ local cloneTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatarTable(avatarTable)
-	hud:SetTitle("bababooey")
+	hud:SetTitle("Bababooey")
 
 	hud:AddControl("R", "enable invisibilty", invisTable)
 	hud:TieControlText("R", "BababooeyInvisibility", "disable invisibility", "enable invisibility", true)

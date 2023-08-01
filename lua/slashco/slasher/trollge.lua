@@ -346,7 +346,7 @@ local dashTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatarTable(avatarTable)
-	hud:SetTitle("trollge")
+	hud:SetTitle("Trollge")
 
 	hud:AddControl("R", "dash", dashTable)
 	hud:AddControl("LMB", "claw", killTable)

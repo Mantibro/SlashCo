@@ -443,7 +443,7 @@ local manifestTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatarTable(avatarTable)
-	hud:SetTitle("tyler, the creator")
+	hud:SetTitle("Tyler_creator")
 
 	hud:AddControl("R", "manifest", manifestTable)
 
@@ -469,10 +469,10 @@ SLASHER.InitHud = function(_, hud)
 			end
 
 			if state <= 1 then
-				hud:SetTitle("tyler, the creator")
+				hud:SetTitle("Tyler_creator")
 				hud:SetAvatar("creator")
 			else
-				hud:SetTitle("tyler, the destroyer")
+				hud:SetTitle("Tyler_destroyer")
 				hud:SetAvatar("destroyer")
 			end
 

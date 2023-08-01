@@ -218,7 +218,7 @@ end
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_16"))
-	hud:SetTitle("dolphinman")
+	hud:SetTitle("Dolphinman")
 
 	hud:AddControl("R", "hide", Material("slashco/ui/icons/slasher/s_16"))
 	hud:ChaseAndKill(true)

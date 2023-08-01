@@ -342,7 +342,7 @@ local avatarTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatarTable(avatarTable)
-	hud:SetTitle("male_07")
+	hud:SetTitle("Male07")
 
 	hud:AddControl("R", "possess vessel", possessTable)
 	hud:ChaseAndKill()

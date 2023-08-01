@@ -174,7 +174,7 @@ local dealSwitchTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_13"))
-	hud:SetTitle("free smiley dealer")
+	hud:SetTitle("FreeSmiley")
 
 	hud:AddControl("R", "switch deal", dealSwitchTable)
 	hud:ChaseAndKill()

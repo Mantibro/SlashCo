@@ -283,7 +283,7 @@ end
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_14"))
-	hud:SetTitle("leuonard")
+	hud:SetTitle("Leuonard")
 
 	hud:ChaseAndKill()
 	hud:TieControlVisible("LMB", "LeuonardFullRoid", true, false, false)

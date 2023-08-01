@@ -304,7 +304,7 @@ local nestTable = {
 
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_9"))
-	hud:SetTitle("manspider")
+	hud:SetTitle("Manspider")
 
 	hud:AddControl("R", "nest", nestTable)
 	hud:ChaseAndKill()
