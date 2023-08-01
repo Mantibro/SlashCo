@@ -21,7 +21,7 @@ end
 
 local function printRescued(rescued)
 	local plysRescued = table.Copy(rescued)
-	for k, ply in ipairs(plysRescued) do
+	for k, ply in pairs(plysRescued) do
 		if not IsValid(ply) then
 			table.remove(plysRescued, k)
 		end
@@ -36,7 +36,7 @@ end
 
 local function printLeftBehind(survivors, rescued)
 	local plysLeftBehind = table.Copy(survivors)
-	for k, ply in ipairs(plysLeftBehind) do
+	for k, ply in pairs(plysLeftBehind) do
 		if not IsValid(ply) then
 			table.remove(plysLeftBehind, k)
 			continue
@@ -65,7 +65,7 @@ end
 
 local function printKilled(survivors)
 	local plysKilled = table.Copy(survivors)
-	for k, ply in ipairs(plysKilled) do
+	for k, ply in pairs(plysKilled) do
 		if not IsValid(ply) then
 			table.remove(plysKilled, k)
 			continue
@@ -181,6 +181,7 @@ local stringTable = {
 		return lines
 	end,
 	intro = function(info)
+		stop_lobbymusic = true --incredibly lame
 		surface.PlaySound("slashco/music/slashco_intro.mp3")
 		local lines = {
 			SlashCo.Language("cur_assignment", info[1]),

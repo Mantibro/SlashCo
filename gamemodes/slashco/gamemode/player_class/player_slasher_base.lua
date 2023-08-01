@@ -25,6 +25,8 @@ end
 
 if CLIENT then
 	function PLAYER:Init()
+		self.Player:RemoveEffects(EF_NOFLASHLIGHT)
+
 		if LocalPlayer() ~= self.Player then
 			return
 		end
@@ -42,6 +44,10 @@ if CLIENT then
 		if IsValid(LocalPlayer().SlasherHud) then
 			LocalPlayer().SlasherHud:Remove()
 		end
+	end
+else
+	function PLAYER:Init()
+		self.Player:RemoveEffects(EF_NOFLASHLIGHT)
 	end
 end
 

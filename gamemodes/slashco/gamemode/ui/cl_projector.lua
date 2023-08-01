@@ -93,7 +93,7 @@ function PANEL:ApplyProjectedModel(ent)
 	ent.ProjectedModel:SetAngles(ent:GetAngles())
 	ent.ProjectedModel:SetNoDraw(true)
 	ent.ProjectedModel:SetParent(ent)
-	ent.ProjectedModel:AddEffects(EF_NOSHADOW + EF_NORECEIVESHADOW + EF_NOFLASHLIGHT + EF_BONEMERGE + EF_PARENT_ANIMATES)
+	--ent.ProjectedModel:AddEffects(EF_NOSHADOW + EF_NORECEIVESHADOW + EF_NOFLASHLIGHT + EF_BONEMERGE + EF_PARENT_ANIMATES)
 end
 
 ---internal: renders the first entity
@@ -103,7 +103,7 @@ function PANEL:RenderTop(ent)
 	end
 
 	-- [[
-	if not IsValid(ent.ProjectedModel) then
+	if not IsValid(ent.ProjectedModel) and not ent:IsPlayer() then
 		self:ApplyProjectedModel(ent)
 	end
 	--]]
@@ -111,10 +111,12 @@ function PANEL:RenderTop(ent)
 	if not ent:GetNoDraw() then
 		if IsValid(ent.ProjectedModel) and not ent.RenderOverride then
 			--draw original model at zero opacity for bonemerging
+			--[[
 			local num = render.GetBlend()
 			render.SetBlend(0)
 			ent:DrawModel()
 			render.SetBlend(num)
+			--]]
 
 			ent.ProjectedModel:DrawModel()
 

@@ -49,6 +49,10 @@ function PLAYER:SetModel()
 	self.Player:SetModel(modelname)
 end
 
+function PLAYER:Init()
+	self.Player:AddEffects(EF_NOFLASHLIGHT)
+end
+
 player_manager.RegisterClass("player_survivor", PLAYER, "player_default")
 
 hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
