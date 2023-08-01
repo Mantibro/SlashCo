@@ -8,7 +8,7 @@ SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
 
 local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
 for _, v in ipairs(lang_files) do
-	if language.GetPhrase("slashco.language") == string.Replace(v, ".lua", "") then
+	if string.lower(language.GetPhrase("slashco.language")) == string.Replace(v, ".lua", "") then
 		include("slashco/lang/" .. v)
 		break
 	end

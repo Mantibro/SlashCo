@@ -17,9 +17,9 @@ CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_player
 
 SlashCo = SlashCo or {}
 
-local lang_files, _ = file.Find("slashco/gamemode/lang/*", "LUA")
+local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
 for _, v in ipairs(lang_files) do
-	AddCSLuaFile("lang/" .. v)
+	AddCSLuaFile("slashco/lang/" .. v)
 end
 
 function GM:Initialize()
