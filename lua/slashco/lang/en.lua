@@ -157,6 +157,9 @@ SlashCo.LangTable["DeathWard_desc"] = "Survive death once, but become unable to 
 SlashCo.LangTable["DevilDie"] = "Devil's Gamble"
 SlashCo.LangTable["DevilDie_desc"] = "Gain a random effect on use; either good or horrible."
 
+SlashCo.LangTable["Flare"] = "Signal Flare"
+SlashCo.LangTable["Flare_desc"] = "When used, it will create a permanent marker for all Survivors."
+
 SlashCo.LangTable["GasCan"] = "Fuel Can"
 SlashCo.LangTable["GasCan_desc"] = "Take a gas can with you instead of having to find one. There will be less gas cans to find if you do this."
 

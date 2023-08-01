@@ -203,6 +203,19 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				TEXT_ALIGN_CENTER)
 	end
 
+	for k, v in ipairs( ents.FindByClass("sc_flare") ) do
+
+		if not v:GetNWBool("FlareActive") then continue end
+
+		local fl_pos = fl_pos or (v:GetPos()):ToScreen()
+
+		draw.SimpleText(v:GetNWString("FlareDropperName"), "TVCD_small", fl_pos.x, fl_pos.y - 25, Color(255, 255, 255, 180),
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, textColor, TEXT_ALIGN_CENTER,
+				TEXT_ALIGN_CENTER)
+
+	end
+
 	--//item selection crosshair//--
 
 	for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
