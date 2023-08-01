@@ -163,6 +163,9 @@ for _, v in ipairs(map_configs) do
 	if v ~= "template.json" and v ~= "rp_deadcity.json" then
 		local config_table = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
 		local mapid = string.Replace(v, ".lua", "")
+		mapid = string.Replace(mapi, ".json", "")
+
+		if SCInfo.Maps[mapid] then continue end
 
 		SCInfo.Maps[mapid] = {}
 		SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
