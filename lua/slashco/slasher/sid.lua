@@ -668,7 +668,7 @@ SLASHER.PreDrawHalos = function()
 	local plyWithItem = {}
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		if v:HasItem("Cookie") then
-			table.Insert(plyWithItem, v)
+			table.insert(plyWithItem, v)
 		end
 	end
 
