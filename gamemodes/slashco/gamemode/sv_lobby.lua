@@ -108,7 +108,7 @@ local function lobbySaveCurData()
 
         end
 
-        --Major data dump SOON: Duality
+        --Major data dump
         sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
 
         for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -459,7 +459,7 @@ local function lobbyRoundSetup()
             --SlashCo.LobbyData.AssignedSlashers[2].steamid = team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64()
 
             local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
-            p:ChatPrint("You will become the second Slasher.")
+            p:ChatText("second_slasher")
 
         end
 
@@ -529,12 +529,12 @@ local function pickItem(ply, item)
     end
 
     if ply:GetNWString("item", "none") ~= "none" or ply:GetNWString("item2", "none") ~= "none" then
-        ply:ChatPrint("You have already chosen an item.")
+        ply:ChatText("item_already_chosen")
         return
     end
 
     if SlashCoItems[item].Price > balance then
-        ply:ChatPrint("You cannot afford this item.")
+        ply:ChatText("item_afford")
         return
     end
 
@@ -548,7 +548,7 @@ local function pickItem(ply, item)
             end
         end
         if itemCount >= numAllowed then
-            ply:ChatPrint("Too many players already have this item.")
+            ply:ChatText("item_toomany")
             return
         end
     end
@@ -588,17 +588,17 @@ local function pickMap(ply, map)
     local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
     if SlashCo.LobbyData.SelectedMap == map then
-        ply:ChatPrint("That map has already been selected.")
+        ply:ChatText("map_already_selected")
         return
     end
 
     if balance < MapForceCost then
-        ply:ChatPrint("You don't have enough points for a map guarantee.")
+        ply:ChatText("map_notenough")
         return
     end
 
     for _, play in ipairs(player.GetAll()) do
-        play:ChatPrint(string.format("%s spent %s points to set the mission to be on %s.",
+        play:ChatText(string.format("map_guaranteed_to",
                 ply:Nick(),
                 MapForceCost,
                 SCInfo.Maps[map].NAME))
@@ -813,7 +813,7 @@ SlashCo.OfferingVoteFail = function()
     table.Empty(SlashCo.LobbyData.Offerors)
 
     for _, play in ipairs(player.GetAll()) do
-        play:ChatPrint("Offering vote was unsuccessful.")
+        play:ChatText("offervote_not_success")
         SlashCo.EndOfferingVote(play)
     end
 
@@ -829,7 +829,7 @@ SlashCo.OfferingVoteSuccess = function(id)
         if #team.GetPlayers(TEAM_SPECTATOR) < 1 then
 
             for _, play in ipairs(player.GetAll()) do
-                play:ChatPrint("Offering vote successful, however a Spectator could not be found to assign as the second Slasher. Duality was not offered.")
+                play:ChatText("offervote_duality_fail")
                 SlashCo.EndOfferingVote(play)
                 fail = true
             end

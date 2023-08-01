@@ -262,6 +262,7 @@ SlashCo.LangTable["DEAD BODY"] = "MARTWE CIAŁO"
 SlashCo.LangTable["HELICOPTER"] = "HELIKOPTER"
 SlashCo.LangTable["PLUSH DOG"] = "PLUSZOWY PIESEK"
 SlashCo.LangTable["ITEM STASH"] = "PRZEDMIOTY"
+SlashCo.LangTable["OFFERING TABLE"] = "STOL DAROW"
 
 --Slasher
 SlashCo.LangTable["demon_pacified"] = "You have been pacified by consuming an item."

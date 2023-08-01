@@ -194,7 +194,7 @@ function PLAYER:SlamDoor(door_ent)
 		return
 	end
 
-	if not SlashCo.CheckDoorWL(door_ent) then
+	if not g_CheckDoorWL(door_ent) then
 		return
 	end
 
@@ -248,10 +248,8 @@ function slamDoor(door_ent, pos)
 	door_ent:Fire("SetSpeed", 1000)
 	door_ent:Fire("Open")
 	timer.Simple(0.1, function()
-		if IsValid( door_ent ) then
-			door_ent:Fire("SetSpeed", 1)
-			door_ent:Fire("Open")
-		end
+		door_ent:Fire("SetSpeed", 1)
+		door_ent:Fire("Open")
 	end)
 
 	for i = 1, 10 do
@@ -263,9 +261,7 @@ function slamDoor(door_ent, pos)
 	end
 
 	timer.Simple(0.5, function()
-		if IsValid( door_ent ) then
-			door_ent:Fire("SetSpeed", oldSpeed) --100
-			door_ent:SetKeyValue("opendir", "0")
-		end
+		door_ent:Fire("SetSpeed", oldSpeed) --100
+		door_ent:SetKeyValue("opendir", "0")
 	end)
 end

@@ -253,6 +253,7 @@ SlashCo.LangTable["DEAD BODY"] = "DEAD BODY"
 SlashCo.LangTable["HELICOPTER"] = "GALLEON"
 SlashCo.LangTable["PLUSH DOG"] = "PLUSH DOG"
 SlashCo.LangTable["ITEM STASH"] = "BOOTY"
+SlashCo.LangTable["OFFERING TABLE"] = "OFFERIN' TABLE"
 
 --Spectator
 SlashCo.LangTable["spectating"] = "YE BE A GHOST"

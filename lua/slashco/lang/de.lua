@@ -1,11 +1,11 @@
 --[[
 
-    Language: en, (English), (English)
-    Translator: Manti
+    Language: de, (German), (Deutsch)
+    Translator: 
 
 ]]
 
-SlashCo.LangTable["TwoElements"] = "%s and %s"
+SlashCo.LangTable["TwoElements"] = "%s und %s"
 SlashCo.LangTable["InList"] = "%s, "
 SlashCo.LangTable["WordSeparator"] = " "
 

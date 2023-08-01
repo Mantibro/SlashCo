@@ -49,12 +49,12 @@ function ENT:Use(activator)
     if SERVER then
         if activator:Team() == TEAM_LOBBY then
             if #SlashCo.LobbyData.Offerors > 0 or SlashCo.LobbyData.Offering ~= 0 then
-                activator:ChatPrint("An Offering has already been made.")
+                activator:ChatText("offer_made_already")
                 return
             end
 
             if SlashCo.LobbyData.ReadyTimerStarted then
-                activator:ChatPrint("It is too late to make an Offering.")
+                activator:ChatText("offer_too_late")
                 return
             end
 
@@ -62,7 +62,7 @@ function ENT:Use(activator)
                 SlashCo.BroadcastGlobalData()
                 SlashCo.SendValue(activator, "openOfferingPicker")
             else
-                activator:ChatPrint("Cannot make an Offering when you are ready.")
+                activator:ChatText("offer_not_ready")
             end
         end
     end
