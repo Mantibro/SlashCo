@@ -49,7 +49,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local size_multiplier = (((5 - ms) / 10) + ((ms - 1) / 15))
 
 	if v1 < v3 then
-		slasher.SlasherValue1 = v1 + (((FrameTime() * (size_multiplier)) * (v2))) * (1 + SO)
+		slasher.SlasherValue1 = v1 + ( (((FrameTime() * (size_multiplier)) * (v2))) * (1 + SO) ) * 1.35
 	end
 
 	slasher:SetRunSpeed(50 + slasher.SlasherValue1)
