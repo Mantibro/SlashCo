@@ -137,10 +137,10 @@ SlashCo.LangTable["Battery_desc"] = "Uma bateria de chumbo-ácido que serve como
 
 SlashCo.LangTable["Beacon"] = "Sinalizador de socorro"
 SlashCo.LangTable["Beacon_desc"] = "Alerta a sede da SlashCo para abortar a missão. Somente circunstâncias IMPORTANTES obtêm uma resposta rápida."
-SlashCo.LangTable["Beacon_already_on_way"] = "The Helicopter is already on its way."
-SlashCo.LangTable["Beacon_already_active"] = "There is already a beacon deployed."
-SlashCo.LangTable["Beacon_confirm"] = "Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm."
-SlashCo.LangTable["Beacon_unavailable"] = "You can activate the beacon once one generator has been turned on."
+SlashCo.LangTable["Beacon_already_on_way"] = "O Helicóptero já está a caminho."
+SlashCo.LangTable["Beacon_already_active"] = "Um sinalizador já foi usado."
+SlashCo.LangTable["Beacon_confirm"] = "Usar o sinalizador com mais de um jogador vivo vai causar com que o sinalizador level mais tempo para ativar. use novamente para confirmar."
+SlashCo.LangTable["Beacon_unavailable"] = "Você pode ativar o sinalizador quando um dos geradores for ligado."
 
 SlashCo.LangTable["Benadryl"] = "25 gramas de Benadryl"
 SlashCo.LangTable["Benadryl_desc"] = "O novo Benadryl de 25 gramas, feito de 1200 comprimidos.\n Sinta-se à vontade para fazer isso se achar que as Missões não são desafiadoras o suficiente."
@@ -196,7 +196,7 @@ Uma entidade maligna conhecida como Slasher estará presente na zona com você. 
 \n\nVocê será deixado por um helicóptero, que também irá buscá-lo depois que ambos os geradores forem ativados.
 
 Se você se encontrar sem uma equipe, o helicóptero pode vir resgatá-lo prematuramente se você sinalizar
-com um farol de socorro, um dos quais você sempre poderá encontrar na zona de Slashers.
+com um sinalizador de socorro, um dos quais você sempre poderá encontrar na zona de Slashers.
 O resgate virá somente se pelo menos um dos geradores estiver ativo.
 
 Antes de partir para a zona do Slasher, você pode escolher um Item no lobby em troca de Pontos que você ganha durante as rodadas como Sobrevivente.]]
@@ -257,7 +257,6 @@ SlashCo.LangTable["DEAD BODY"] = "CORPO MORTO"
 SlashCo.LangTable["HELICOPTER"] = "HELICÓPTERO"
 SlashCo.LangTable["PLUSH DOG"] = "CÃO DE PELUCHE"
 SlashCo.LangTable["ITEM STASH"] = "LOJA DE ARTIGOS"
-SlashCo.LangTable["OFFERING TABLE"] = "TABELA DE OFERTAS"
 
 --Spectator
 SlashCo.LangTable["spectating"] = "VOCÊ ESTÁ ESPECTANDO"
@@ -272,7 +271,7 @@ SlashCo.LangTable["toggle_light"] = "[%s] LIGAR/DESLIGAR LUZ"
 --Slasher
 SlashCo.LangTable["demon_pacified"] = "Você foi pacificado ao consumir um item."
 SlashCo.LangTable["beacon_call"] = "Os sobreviventes estão tentando chamar um resgate."
-SlashCo.LangTable["beacon_destroy"] = "DESTRUA O FAROL DE ALARME."
+SlashCo.LangTable["beacon_destroy"] = "DESTRUA O SINALIZADOR."
 SlashCo.LangTable["slasher_anticipation"] = "Em breve você irá nascer como %s"
 SlashCo.LangTable["slasher_unavailable"] = "indisponível"
 SlashCo.LangTable["slasher_killsurvivor"] = "matar sobrevivente"
@@ -568,3 +567,4 @@ SlashCo.LangTable["Watcher_fullsurveillance"] = "vigilância total"
 SlashCo.LangTable["Watcher_watched"] = "VOCÊ ESTÁ SENDO VIGIADO"
 SlashCo.LangTable["Watcher_observe"] = "OBSERVANDO UM SOBREVIVENTE. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "TEMPO DE STALK: "
+
