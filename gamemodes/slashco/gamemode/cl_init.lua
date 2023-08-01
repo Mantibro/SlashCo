@@ -8,7 +8,7 @@ SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
 
 local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
 for _, v in ipairs(lang_files) do
-	if string.lower(language.GetPhrase("slashco.language")) == string.Replace(v, ".lua", "") then
+	if language.GetPhrase("slashco.language") == string.Replace(v, ".lua", "") then
 		include("slashco/lang/" .. v)
 		break
 	end
@@ -807,3 +807,17 @@ hook.Add("HUDPaint", "MiscItemVisions", function()
 		LocalPlayer().JugFrame = 0
 	end
 end)
+
+SC_CLIENT_LOADED = true
+
+---load patch files; these are specifically intended to modify existing addon code
+
+local shared_patches = file.Find("slashco/patch/shared/*.lua", "LUA")
+for _, v in ipairs(shared_patches) do
+	include("slashco/patch/shared/" .. v)
+end
+
+local client_patches = file.Find("slashco/patch/client/*.lua", "LUA")
+for _, v in ipairs(client_patches) do
+	include("slashco/patch/client/" .. v)
+end

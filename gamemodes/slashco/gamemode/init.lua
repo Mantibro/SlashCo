@@ -524,7 +524,8 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 	print("[SlashCo] Loaded playerdata for '" .. ply:GetName() .. "'")
 
 	SlashCo.PlayerData[pid] = {}
-	SlashCo.PlayerData[pid].Lives = 1
+	ply.Lives = 1
+	--SlashCo.PlayerData[pid].Lives = 1
 	SlashCo.PlayerData[pid].RoundsWonSurvivor = data.Stats.RoundsWon.Survivor or 0
 	SlashCo.PlayerData[pid].RoundsWonSlasher = data.Stats.RoundsWon.Slasher or 0
 	SlashCo.PlayerData[pid].PointsTotal = 0
@@ -556,7 +557,8 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 	SlashCo.BroadcastMasterDatabaseForClient(ply)
 
 	if new == TEAM_SURVIVOR and SlashCo.PlayerData then
-		SlashCo.PlayerData[pid].Lives = 1
+		ply.Lives = 1
+		--SlashCo.PlayerData[pid].Lives = 1
 	end
 
 	if new == TEAM_LOBBY and #team.GetPlayers(TEAM_LOBBY) > 5 then
@@ -589,35 +591,30 @@ function GM:PlayerDeath(victim, _, _)
 	end
 
 	victim:SetNWBool("DynamicFlashlight", false)
-	local itid = victim:GetNWString("item", "none")
-	local dontTickLife = false
 
-	if SlashCoItems[itid] and SlashCoItems[itid].OnDie then
-		dontTickLife = SlashCoItems[itid].OnDie(victim)
-	end
-
+	local dontTickLife = victim:ItemFunction("OnDie")
 	if dontTickLife then
 		return
 	end
 
 	SlashCo.DropAllItems(victim)
-	local pid = victim:SteamID64()
-	local lives = SlashCo.PlayerData[pid].Lives
-	SlashCo.PlayerData[pid].Lives = tonumber(lives) - 1
+	--local pid = victim:SteamID64()
+	--local lives = SlashCo.PlayerData[pid].Lives
+	--SlashCo.PlayerData[pid].Lives = tonumber(lives) - 1
+	victim.Lives = victim.Lives or 1
+	victim.Lives = victim.Lives - 1
 
-	if tonumber(lives) - 1 <= 0 then
+	if victim.Lives <= 0 then
 		print("[SlashCo] '" .. victim:GetName() .. "' is out of lives, moving them to the Spectator team.")
 
 		--Spawn the Ragdoll
-
 		local ragdoll = ents.Create("prop_ragdoll")
 		ragdoll:SetModel(victim:GetModel())
 		ragdoll.PingType = "DEAD BODY"
 		ragdoll.SurvivorSteamID = victim:SteamID64()
 
 		victim.DeadBody = ragdoll
-
-		if victim.Devastate ~= nil then
+		if victim.Devastate then
 			ragdoll:SetModel("models/player/corpse1.mdl")
 		end
 
@@ -647,7 +644,6 @@ function GM:PlayerDeath(victim, _, _)
 		end
 
 		ragdoll:SetAngles(Angle(0, victim:EyeAngles()[2] + ang_offset, 0))
-
 		local physCount = ragdoll:GetPhysicsObjectCount()
 
 		for i = 0, (physCount - 1) do
@@ -664,7 +660,6 @@ function GM:PlayerDeath(victim, _, _)
 					if plybone == PhysBone then
 						PhysBone:SetAngles(PhysBone:GetAngles(), plybone:GetAngles())
 					end
-
 				end
 			end
 		end
@@ -699,3 +694,23 @@ hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, sta
 
 	return false
 end)
+
+SC_SERVER_LOADED = true
+
+---load patch files; these are specifically intended to modify existing addon code
+
+local shared_patches = file.Find("slashco/patch/shared/*.lua", "LUA")
+for _, v in ipairs(shared_patches) do
+	AddCSLuaFile("slashco/patch/shared/" .. v)
+	include("slashco/patch/shared/" .. v)
+end
+
+local server_patches = file.Find("slashco/patch/server/*.lua", "LUA")
+for _, v in ipairs(server_patches) do
+	include("slashco/patch/server/" .. v)
+end
+
+local client_patches = file.Find("slashco/patch/client/*.lua", "LUA")
+for _, v in ipairs(client_patches) do
+	AddCSLuaFile("slashco/patch/client/" .. v)
+end

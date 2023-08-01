@@ -3,6 +3,8 @@ AddCSLuaFile()
 SlashCo = SlashCo or {}
 SlashCoSlashers = SlashCoSlashers or {}
 
+---load slashers
+
 function SlashCo.RegisterSlasher(table, name)
 	if SC_LOADEDSLASHERS then
 		error("Tried to register a slasher illegally", 2)
@@ -10,6 +12,10 @@ function SlashCo.RegisterSlasher(table, name)
 	end
 
 	SlashCoSlashers[name] = table
+end
+
+function SlashCo.GetSlasherTable(name)
+	return SlashCoSlashers[name]
 end
 
 SC_LOADEDSLASHERS = nil
@@ -21,6 +27,8 @@ for _, v in ipairs(slasher_files) do
 end
 
 SC_LOADEDSLASHERS = true
+
+---remainder of init code
 
 local PLAYER = FindMetaTable("Player")
 
@@ -210,3 +218,11 @@ hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
 
 	DrawColorModify(tab) --Draws Color Modify effect
 end)
+
+---load patch files; these are specifically intended to modify existing addon code
+
+local slasher_patches = file.Find("slashco/patch/slasher/*.lua", "LUA")
+for _, v in ipairs(slasher_patches) do
+	AddCSLuaFile("slashco/patch/slasher/" .. v)
+	include("slashco/patch/slasher/" .. v)
+end

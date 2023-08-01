@@ -40,9 +40,9 @@ end
 SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 
-	v1 = slasher.SlasherValue1 --Time Spent chasing
-	v2 = slasher.SlasherValue2 --Punch Cooldown
-	v3 = slasher.SlasherValue3 --Punch Slowdown
+	local v1 = slasher.SlasherValue1 --Time Spent chasing
+	local v2 = slasher.SlasherValue2 --Punch Cooldown
+	local v3 = slasher.SlasherValue3 --Punch Slowdown
 
 	if v2 > 0 then
 		slasher.SlasherValue2 = v2 - FrameTime()
@@ -110,41 +110,50 @@ SLASHER.OnPrimaryFire = function(slasher)
 		slasher.SlasherValue2 = 2
 
 		timer.Simple(0.3, function()
-			slasher:EmitSound("slashco/slasher/borgmire_swing" .. math.random(1, 2) .. ".mp3")
+			if not IsValid(slasher) then
+				return
+			end
 
+			slasher:EmitSound("slashco/slasher/borgmire_swing" .. math.random(1, 2) .. ".mp3")
 			slasher.SlasherValue3 = 2
 
-			if SERVER then
-				local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
-						Vector(-35, -45, -60), Vector(35, 45, 60), 35 + (SO * 20), DMG_SLASH, 5, false)
+			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
+					Vector(-35, -45, -60), Vector(35, 45, 60), 35 + (SO * 20), DMG_SLASH, 5, false)
 
-				if not target:IsValid() then
-					return
+			if not target:IsValid() then
+				return
+			end
+
+			if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) or target:GetClass() == "prop_ragdoll" then
+				local o = Vector(0, 0, 0)
+
+				if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) then
+					o = Vector(0, 0, 50)
 				end
 
-				if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) or target:GetClass() == "prop_ragdoll" then
-					local o = Vector(0, 0, 0)
+				local vPoint = target:GetPos() + o
+				local bloodfx = EffectData()
+				bloodfx:SetOrigin(vPoint)
+				util.Effect("BloodImpact", bloodfx)
 
-					if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) then
-						o = Vector(0, 0, 50)
-					end
-
-					local vPoint = target:GetPos() + o
-					local bloodfx = EffectData()
-					bloodfx:SetOrigin(vPoint)
-					util.Effect("BloodImpact", bloodfx)
-
-					target:EmitSound("slashco/slasher/borgmire_hit" .. math.random(1, 2) .. ".mp3")
-				end
+				target:EmitSound("slashco/slasher/borgmire_hit" .. math.random(1, 2) .. ".mp3")
 
 				SlashCo.BustDoor(slasher, target, 60000)
 			end
 		end)
 
 		timer.Simple(0.05, function()
+			if not IsValid(slasher) then
+				return
+			end
+
 			slasher:SetNWBool("BorgmirePunch", true)
 
 			timer.Create("BorgmirePunchDecay", 1.5, 1, function()
+				if not IsValid(slasher) then
+					return
+				end
+
 				slasher:SetNWBool("BorgmirePunch", false)
 			end)
 		end)
@@ -153,9 +162,6 @@ end
 
 SLASHER.OnSecondaryFire = function(slasher)
 	SlashCo.StartChaseMode(slasher)
-end
-
-SLASHER.OnMainAbilityFire = function(slasher)
 end
 
 SLASHER.OnSpecialAbilityFire = function(slasher, target)
@@ -188,11 +194,19 @@ SLASHER.OnSpecialAbilityFire = function(slasher, target)
 
 	for i = 1, 13 do
 		timer.Simple(0.1 + (i / 10), function()
+			if not IsValid(target) then
+				return
+			end
+
 			target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
 		end)
 	end
 
 	timer.Simple(1.5, function()
+		if not IsValid(target) then
+			return
+		end
+
 		target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
 
 		local strength_forward = 1600 + (SO * 450)
@@ -202,11 +216,15 @@ SLASHER.OnSpecialAbilityFire = function(slasher, target)
 
 		target:Freeze(false)
 		if target:Health() > 1 then
-			target:SetHealth(target:Health() - (target:Health() / 4))
+			target:SetHealth(target:Health() * 0.75)
 		end
 	end)
 
 	timer.Simple(2, function()
+		if not IsValid(target) then
+			return
+		end
+
 		slasher:Freeze(false)
 		slasher:SetNWBool("BorgmireThrow", false)
 		slasher.ChaseActivationCooldown = 2
@@ -270,9 +288,7 @@ SLASHER.Footstep = function(ply)
 		return true
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 SLASHER.InitHud = function(_, hud)

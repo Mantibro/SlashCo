@@ -4,6 +4,8 @@ SlashCo = SlashCo or {}
 SlashCoItems = SlashCoItems or {}
 SlashCoEffects = SlashCoEffects or {}
 
+---load items and effects
+
 function SlashCo.RegisterItem(table, name)
 	if SC_LOADEDITEMS then
 		error("Tried to register an item illegally", 2)
@@ -22,6 +24,14 @@ function SlashCo.RegisterEffect(table, name)
 	SlashCoEffects[name] = table
 end
 
+function SlashCo.GetItemTable(name)
+	return SlashCoItems[name]
+end
+
+function SlashCo.GetEffectTable(name)
+	return SlashCoEffects[name]
+end
+
 SC_LOADEDITEMS = nil
 
 local effect_files = file.Find("slashco/effect/*.lua", "LUA")
@@ -37,6 +47,8 @@ for _, v in ipairs(item_files) do
 end
 
 SC_LOADEDITEMS = true
+
+---remainder of init code
 
 local PLAYER = FindMetaTable("Player")
 
@@ -182,6 +194,20 @@ hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
 		return false
 	end
 end)
+
+---load patch files; these are specifically intended to modify existing addon code
+
+local effect_patches = file.Find("slashco/patch/effect/*.lua", "LUA")
+for _, v in ipairs(effect_patches) do
+	AddCSLuaFile("slashco/patch/effect/" .. v)
+	include("slashco/patch/effect/" .. v)
+end
+
+local item_patches = file.Find("slashco/patch/item/*.lua", "LUA")
+for _, v in ipairs(item_patches) do
+	AddCSLuaFile("slashco/patch/item/" .. v)
+	include("slashco/patch/item/" .. v)
+end
 
 ---this is a little outdated lol
 --[[local spawnableItems = {}
