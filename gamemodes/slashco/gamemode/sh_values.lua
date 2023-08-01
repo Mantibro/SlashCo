@@ -45,17 +45,17 @@ typeWrite = {
 	end,
 	table = function(val)
 		if IsColor(val) then
-			typeWrite["color"](val)
+			typeWrite["Color"](val)
 			return
 		end
 
 		if isvector(val) then
-			typeWrite["vector"](val)
+			typeWrite["Vector"](val)
 			return
 		end
 
 		if isangle(val) then
-			typeWrite["angle"](val)
+			typeWrite["Angle"](val)
 			return
 		end
 

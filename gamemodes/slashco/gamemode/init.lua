@@ -40,6 +40,7 @@ include("items/sv_playerspeed.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
+include("sh_chattext.lua")
 
 local SlashCo = SlashCo or {}
 local SlashCoItems = SlashCoItems or {}

@@ -26,7 +26,7 @@ function GM:PlayerSpawn(player, transition)
 		player_manager.SetPlayerClass(player, "player_lobby")
 	end
 
-	if (self.TeamBased and (player:Team() == TEAM_SPECTATOR or player:Team() == TEAM_UNASSIGNED)) then
+	if self.TeamBased and (player:Team() == TEAM_SPECTATOR or player:Team() == TEAM_UNASSIGNED) then
 		self:PlayerSpawnAsSpectator(player)
 		return
 	end

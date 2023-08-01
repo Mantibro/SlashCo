@@ -54,6 +54,7 @@ include("ui/cl_playermodel_picker.lua")
 include("ui/cl_gameinfo.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
+include("sh_chattext.lua")
 
 include("ui/cl_projector.lua")
 include("ui/cl_voiceselect.lua")
