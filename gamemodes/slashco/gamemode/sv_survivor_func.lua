@@ -194,7 +194,7 @@ function PLAYER:SlamDoor(door_ent)
 		return
 	end
 
-	if not g_CheckDoorWL(door_ent) then
+	if not SlashCo.CheckDoorWL(door_ent) then
 		return
 	end
 

@@ -1,12 +1,10 @@
-include("shared.lua")
-
 --set up language
 
 SlashCo = SlashCo or {}
 
 SlashCo.LangTable = {}
 include("slashco/lang/en.lua")
-SlashCo.LangTableFallback = SlashCo.LangTable
+SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
 
 local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
 for _, v in ipairs(lang_files) do
@@ -35,9 +33,10 @@ function SlashCo.Language(key, ...)
 	end
 end
 
+include("sh_shared.lua")
 include("ui/cl_scoreboard.lua")
 include("cl_headbob.lua")
-include("ui/fonts.lua")
+include("ui/cl_fonts.lua")
 
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")

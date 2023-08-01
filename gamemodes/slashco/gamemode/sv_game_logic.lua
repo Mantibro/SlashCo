@@ -1,4 +1,4 @@
-local SlashCo = SlashCo
+SlashCo = SlashCo or {}
 
 SlashCo.LoadCurRoundData = function()
 	table.Empty(SlashCo.CurRound.ExpectedPlayers)
@@ -344,7 +344,7 @@ end
 
 --Returns whether a config for the given map exists or not
 SlashCo.CheckMap = function(map)
-	return file.Exists("slashco/configs/maps/" .. map .. ".lua", "LUA")
+	return file.Exists("slashco/configs/maps/" .. map .. ".json", "LUA")
 end
 
 --Loads a config file and return its contents as a table from JSON
@@ -353,7 +353,7 @@ SlashCo.LoadMap = function(map)
 		return nil
 	end
 
-	return util.JSONToTable(file.Read("slashco/configs/maps/" .. map .. ".lua", "LUA")) or nil
+	return util.JSONToTable(file.Read("slashco/configs/maps/" .. map .. ".json", "LUA")) or nil
 end
 
 --Algorithm found on reddit from u/skeeto, adapted to GLua functions

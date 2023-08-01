@@ -1,5 +1,3 @@
-include("globals.lua")
-
 --local SlashCo = SlashCo
 
 function GM:PlayerSwitchWeapon(_, _, _)
