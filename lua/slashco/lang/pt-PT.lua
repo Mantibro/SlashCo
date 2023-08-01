@@ -137,6 +137,10 @@ SlashCo.LangTable["Battery_desc"] = "Uma bateria de chumbo-ácido que serve como
 
 SlashCo.LangTable["Beacon"] = "Sinalizador de socorro"
 SlashCo.LangTable["Beacon_desc"] = "Alerta a sede da SlashCo para abortar a missão. Somente circunstâncias IMPORTANTES obtêm uma resposta rápida."
+SlashCo.LangTable["Beacon_already_on_way"] = "The Helicopter is already on its way."
+SlashCo.LangTable["Beacon_already_active"] = "There is already a beacon deployed."
+SlashCo.LangTable["Beacon_confirm"] = "Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm."
+SlashCo.LangTable["Beacon_unavailable"] = "You can activate the beacon once one generator has been turned on."
 
 SlashCo.LangTable["Benadryl"] = "25 gramas de Benadryl"
 SlashCo.LangTable["Benadryl_desc"] = "O novo Benadryl de 25 gramas, feito de 1200 comprimidos.\n Sinta-se à vontade para fazer isso se achar que as Missões não são desafiadoras o suficiente."

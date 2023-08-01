@@ -121,7 +121,7 @@ SlashCo.LangTable["MapGuaranteeTitle"] = "GUARANTEE A MAP"
 SlashCo.LangTable["ItemConfirm"] = "CONFIRM"
 SlashCo.LangTable["ItemRemaining"] = "REMAINING"
 
-SlashCo.LangTable["MapGuaranteeDesc"] = "Bribe the helicopter driver to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
+SlashCo.LangTable["MapGuaranteeDesc"] = "Bribe the helicopter pilot to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
 
 
 
@@ -137,6 +137,10 @@ SlashCo.LangTable["Battery_desc"] = "A lead-acid battery that serves as a reusab
 
 SlashCo.LangTable["Beacon"] = "Distress Beacon"
 SlashCo.LangTable["Beacon_desc"] = "Alerts the SlashCo headquarters to abort the mission. Only IMPORTANT circumstances get a fast response."
+SlashCo.LangTable["Beacon_already_on_way"] = "The Helicopter is already on its way."
+SlashCo.LangTable["Beacon_already_active"] = "There is already a beacon deployed."
+SlashCo.LangTable["Beacon_confirm"] = "Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm."
+SlashCo.LangTable["Beacon_unavailable"] = "You can activate the beacon once one generator has been turned on."
 
 SlashCo.LangTable["Benadryl"] = "25 gram Benadryl"
 SlashCo.LangTable["Benadryl_desc"] = "All new 25 gram Benadryl, made from 1200 pills.\n Feel free to take this if you feel the Assignments aren't challenging enough as is."

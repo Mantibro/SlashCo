@@ -598,10 +598,7 @@ local function pickMap(ply, map)
     end
 
     for _, play in ipairs(player.GetAll()) do
-        play:ChatText(string.format("map_guaranteed_to",
-                ply:Nick(),
-                MapForceCost,
-                SCInfo.Maps[map].NAME))
+        play:ChatText("map_guaranteed_to", ply:Nick(), MapForceCost, SCInfo.Maps[map].NAME)
     end
 
     SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -MapForceCost)

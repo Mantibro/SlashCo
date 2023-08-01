@@ -133,6 +133,10 @@ SlashCo.LangTable["Battery_desc"] = "Кислотно-свинцовый акк�
 --Переделать описание аккумулятору.
 SlashCo.LangTable["Beacon"] = "Аварийный маяк"
 SlashCo.LangTable["Beacon_desc"] = "Запрашивает отмену задания у штаба SlashCo. Быстрое реагирование получают только ВАЖНЫЕ обстоятельства."
+SlashCo.LangTable["Beacon_already_on_way"] = "The Helicopter is already on its way."
+SlashCo.LangTable["Beacon_already_active"] = "There is already a beacon deployed."
+SlashCo.LangTable["Beacon_confirm"] = "Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm."
+SlashCo.LangTable["Beacon_unavailable"] = "You can activate the beacon once one generator has been turned on."
 --придумать нормальное название и описание экстренному маяку
 SlashCo.LangTable["Benadryl"] = "Бенадрил"
 SlashCo.LangTable["Benadryl_desc"] = "\n Не стесняйтесь принимать это, если вы чувствует, что ваши задания слишком лёгкие."

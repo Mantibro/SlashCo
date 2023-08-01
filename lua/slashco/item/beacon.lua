@@ -15,7 +15,7 @@ ITEM.OnUse = function(ply)
     --If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
 
     if SlashCo.CurRound.EscapeHelicopterSummoned then 
-        ply:ChatPrint("The Helicopter is already on its way.") 
+        ply:ChatText("Beacon_already_on_way") 
         return true 
     end
 
@@ -27,7 +27,7 @@ ITEM.OnUse = function(ply)
 
     for k, v in ipairs(ents.FindByClass( "sc_activebeacon")) do
         if not v:GetNWBool("BeaconBroken") then
-            ply:ChatPrint("There is already a beacon deployed.")
+            ply:ChatText("Beacon_already_active")
             return true 
         end
     end
@@ -39,7 +39,7 @@ ITEM.OnUse = function(ply)
             if team.NumPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
 
                 if not ply.BeaconWarning then
-                    ply:ChatPrint("Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm.")
+                    ply:ChatText("Beacon_confirm")
                     ply.BeaconWarning = true
                     timer.Simple(3, function() ply.BeaconWarning = false end)
                     return true
@@ -64,7 +64,7 @@ ITEM.OnUse = function(ply)
         end
 
     else
-        ply:ChatPrint("You can activate the beacon once one generator has been turned on.")
+        ply:ChatText("Beacon_unavailable")
         return true
     end
 end
