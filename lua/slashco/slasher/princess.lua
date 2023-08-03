@@ -257,7 +257,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 						target:Kill()
 
 						timer.Simple(FrameTime() * 3, function()
-							slasher.victimragdoll = target.DeadBody
+							slasher.victimragdoll = target.DeadBody or NULL
 						end)
 					end)
 
@@ -276,40 +276,51 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 					for i = 1, math.random(9, 10) do
 						timer.Simple((i / 8) * (0.7 + (math.random() * 0.3)), function()
-							local vPoint = slasher.victimragdoll:GetPos()
-							local bloodfx = EffectData()
-							bloodfx:SetOrigin(vPoint)
-							util.Effect("BloodImpact", bloodfx)
 
-							slasher.victimragdoll:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(2,
+							if IsValid( slasher.victimragdoll ) then
+
+								local vPoint = slasher.victimragdoll:GetPos()
+								local bloodfx = EffectData()
+								bloodfx:SetOrigin(vPoint)
+								util.Effect("BloodImpact", bloodfx)
+
+								slasher.victimragdoll:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(2,
 									4) .. ".wav")
-							slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1,
+								slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1,
 									5) .. ".wav")
+									
+							end
+
 						end)
 					end
 
 					timer.Simple(2, function()
-						slasher.ref_child:Remove()
-						slasher.victimragdoll:Remove()
 
-						local pickedclean = ents.Create("prop_ragdoll")
-						pickedclean:SetModel("models/player/skeleton.mdl")
-						pickedclean:SetPos(slasher:LocalToWorld(Vector(30, 0, 40)))
-						pickedclean:SetNoDraw(false)
-						pickedclean:Spawn()
-						pickedclean:SetSkin(2)
+						if IsValid( slasher.victimragdoll ) then
 
-						pickedclean:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+							slasher.ref_child:Remove()
+							slasher.victimragdoll:Remove()
 
-						local physCount = pickedclean:GetPhysicsObjectCount()
+							local pickedclean = ents.Create("prop_ragdoll")
+							pickedclean:SetModel("models/player/skeleton.mdl")
+							pickedclean:SetPos(slasher:LocalToWorld(Vector(30, 0, 40)))
+							pickedclean:SetNoDraw(false)
+							pickedclean:Spawn()
+							pickedclean:SetSkin(2)
 
-						for i = 0, (physCount - 1) do
-							local PhysBone = pickedclean:GetPhysicsObjectNum(i)
+							pickedclean:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 
-							if PhysBone:IsValid() then
-								PhysBone:SetVelocity(slasher:GetForward() * 600)
-								PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
+							local physCount = pickedclean:GetPhysicsObjectCount()
+
+							for i = 0, (physCount - 1) do
+								local PhysBone = pickedclean:GetPhysicsObjectNum(i)
+
+								if PhysBone:IsValid() then
+									PhysBone:SetVelocity(slasher:GetForward() * 600)
+									PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
+								end
 							end
+
 						end
 
 						slasher:SetNWBool("PrincessMaulingSurvivor", false)

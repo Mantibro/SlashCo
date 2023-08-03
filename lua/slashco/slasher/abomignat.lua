@@ -168,7 +168,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 		SlashCo.BustDoor(slasher, target, 20000)
 
-		if not IsValid(target) or target:IsPlayer() then
+		if target:IsPlayer() then
 			if target:Team() ~= TEAM_SURVIVOR then
 				return
 			end
