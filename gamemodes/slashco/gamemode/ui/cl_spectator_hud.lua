@@ -161,22 +161,85 @@ hook.Add("Think", "Spectator_Vision_Light", function()
         dlight.DieTime = CurTime() + 0.1
     end
 end)
---[[hook.Add("RenderScreenspaceEffects", "SpectatorVision", function()
 
-	if LocalPlayer():Team() ~= TEAM_SPECTATOR then return end
-	if not vision then return end
+local cutscene_views = {
+    {
+        Start = {Vector(388, 768, 110), Angle(25,0,0)},
+        Stop = {Vector(388, 176, 110), Angle(25,50,0)},
+        Speed = 1
+    },
+    {
+        Start = {Vector(499, 843, 16), Angle(-17, 107, 0)},
+        Stop = {Vector(829, 710, -114), Angle(-26, 137, 0)},
+        Speed = 0.75
+    },
+    {
+        Start = {Vector(1462, -926,43), Angle(-5, 149, 0)},
+        Stop = {Vector(1462, -926, 403), Angle(15, 148.,0)},
+        Speed = 1
+    },
+    {
+        Start = {Vector(134, 443, 437), Angle(-2, -92, 0)},
+        Stop = {Vector(440, 886, 281), Angle(-21, -143,0)},
+        Speed = 0.5
+    },
 
-	local tab = {
-		["$pp_colour_addr"] = 0.01,
-		["$pp_colour_addg"] = 0,
-		["$pp_colour_addb"] = 0,
-		["$pp_colour_brightness"] = 0.1,
-		["$pp_colour_contrast"] = 1,
-		["$pp_colour_colour"] = 1,
-		["$pp_colour_mulr"] = 0,
-		["$pp_colour_mulg"] = 0,
-		["$pp_colour_mulb"] = 0
-	}
+    {
+        Start = {Vector(844, 930, 148), Angle(27, -89, 0)},
+        Stop = {Vector(401,932, 148), Angle(22, -49,0)},
+        Speed = 0.7
+    },
 
-	DrawColorModify( tab ) --Draws Color Modify effect
-end )]]
+    {
+        Start = {Vector(-71, 642, 20), Angle(-5, 155, 0)},
+        Stop = {Vector(-707, 644, 22), Angle(-5, 155, 0)},
+        Speed = 1
+    },
+
+    {
+        Start = {Vector(-88, 112, 127), Angle(11, -151, 0)},
+        Stop = {Vector(-86, -422, 50), Angle(3, 135,0)},
+        Speed = 1
+    },
+
+    {
+        Start = {Vector(490, -80, 53), Angle(-11,-68, 0)},
+        Stop = {Vector(815, -94, 63), Angle(-9, -118,0)},
+        Speed = 0.25
+    }
+}
+local cur_scene = nil
+local cur_pos = Vector(0,0,0)
+local cur_ang = Angle(0,0,0)
+
+hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
+
+    if pl:Team() ~= TEAM_SPECTATOR or game.GetMap() ~= "sc_lobby" then
+        return
+    end
+
+    if not cur_scene then
+        cur_scene = math.random(1, #cutscene_views)
+        cur_pos = cutscene_views[cur_scene].Start[1]
+        cur_ang = cutscene_views[cur_scene].Start[2]
+    end
+
+    local cur_dist = cur_pos:Distance( cutscene_views[cur_scene].Stop[1] )
+
+    if cur_dist > 1 then
+        local add = (cutscene_views[cur_scene].Stop[1] - cur_pos):GetNormalized() / 3
+        cur_pos = cur_pos + add * cutscene_views[cur_scene].Speed
+
+        local total_dist = cutscene_views[cur_scene].Start[1]:Distance( cutscene_views[cur_scene].Stop[1] )
+        local fraction = 1-(cur_dist / total_dist)
+        cur_ang.pitch = cutscene_views[cur_scene].Start[2].pitch + ( (cutscene_views[cur_scene].Stop[2].pitch - cutscene_views[cur_scene].Start[2].pitch) * (fraction/360) )
+        cur_ang.yaw = cutscene_views[cur_scene].Start[2].yaw + ( (cutscene_views[cur_scene].Stop[2].yaw - cutscene_views[cur_scene].Start[2].yaw) * (fraction/360) )
+
+    else
+        cur_scene = math.random(1, #cutscene_views)
+        cur_pos = cutscene_views[cur_scene].Start[1]
+        cur_ang = cutscene_views[cur_scene].Start[2]
+    end
+
+	return GAMEMODE:CalcView(pl, cur_pos, cur_ang, fov)
+end)
