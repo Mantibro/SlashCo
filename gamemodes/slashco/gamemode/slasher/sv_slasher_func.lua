@@ -266,9 +266,8 @@ SlashCo.StartChaseMode = function(slasher)
 	local trace = slasher:GetEyeTrace()
 	slasher:LagCompensation(false)
 
-	--local target
-	local target = slasher
-	local isFound = true
+	local target
+	local isFound = false
 	local dist = slasher:SlasherValue("ChaseRange", 600)
 	if trace.Entity:IsPlayer() and trace.Entity:Team() == TEAM_SURVIVOR
 			and slasher:GetPos():Distance(trace.Entity:GetPos()) < dist then

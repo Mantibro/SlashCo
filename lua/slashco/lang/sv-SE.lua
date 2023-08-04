@@ -1,567 +1,570 @@
 --[[
 
     Language: sv-SE, (Swedish), (Svenska)
-    Translator: 
+    Translator: DC:marreknarre STEAM: Marrebarre (steamcommunity.com/id/TomteJagare)
 
 ]]
 
-SlashCo.LangTable["TwoElements"] = "%s and %s"
+SlashCo.LangTable["TwoElements"] = "%s och %s"
 SlashCo.LangTable["InList"] = "%s, "
 SlashCo.LangTable["WordSeparator"] = " "
 
-SlashCo.LangTable["AssignmentSuccess"] = "The assignment was successful."
-SlashCo.LangTable["AssignmentFail"] = "The assignment was unsuccessful."
-SlashCo.LangTable["AssignmentAborted"] = "The assignment ended prematurely."
-SlashCo.LangTable["Rescued"] = "%s were reported present on the rescue helicopter."
-SlashCo.LangTable["RescuedOnlyOne"] = "%s was the only one present on the rescue helicopter."
-SlashCo.LangTable["LeftBehind"] = "%s were left behind."
-SlashCo.LangTable["LeftBehindOnlyOne"] = "%s was left behind."
-SlashCo.LangTable["Killed"] = "%s are now presumed to be dead."
-SlashCo.LangTable["KilledOnlyOne"] = "%s is now presumed to be dead."
-SlashCo.LangTable["AllRescued"] = "All of the dispatched SlashCo Workers were rescued."
-SlashCo.LangTable["SomeRescued"] = "Only some of the dispatched SlashCo Workers could be rescued."
-SlashCo.LangTable["NoneRescued"] = "The dispatched SlashCo Workers could not be rescued."
-SlashCo.LangTable["Cursed"] = "Your soul is now forfeit."
-SlashCo.LangTable["Judgement"] = "JUDGEMENT"
+SlashCo.LangTable["AssignmentSuccess"] = "Uppdraget avklarat."
+SlashCo.LangTable["AssignmentFail"] = "Uppdraget misslyckades."
+SlashCo.LangTable["AssignmentAborted"] = "Uppdraget slutade för tidigt"
+SlashCo.LangTable["Rescued"] = "%s rapporterades närvarande på räddningshelikoptern."
+SlashCo.LangTable["RescuedOnlyOne"] = "%s var den enda personen närvarande på räddningshelikoptern "
+SlashCo.LangTable["LeftBehind"] = "%s vart kvarlämnad."
+SlashCo.LangTable["LeftBehindOnlyOne"] = "%s vart kvarlämnad."
+SlashCo.LangTable["Killed"] = "%s är misstänka att vara döda."
+SlashCo.LangTable["KilledOnlyOne"] = "%s är misstänkt att vara död."
+SlashCo.LangTable["AllRescued"] = "Alla utskickade SlashCo Arbetare vart räddade."
+SlashCo.LangTable["SomeRescued"] = "Bara ett fåtal av de utskickade SlashCo Arbetarna kunde bli räddade."
+SlashCo.LangTable["NoneRescued"] = "Dom utskickande SlashCo Arbetarna kunde ej bli räddade."
+SlashCo.LangTable["Cursed"] = "Din själ är nu försvunnen."
+SlashCo.LangTable["Judgement"] = "UTSLAG"
 
-SlashCo.LangTable["InLobby"] = "In Lobby"
-SlashCo.LangTable["InGame"] = "In Game (%s)"
+SlashCo.LangTable["InLobby"] = "I Väntrummet"
+SlashCo.LangTable["InGame"] = "I Spel (%s)"
 
-SlashCo.LangTable["Survivor"] = "Survivor"
-SlashCo.LangTable["Slasher"] = "Slasher"
+SlashCo.LangTable["Survivor"] = "Överlevare"
+SlashCo.LangTable["Slasher"] = "Jagare"
 
-SlashCo.LangTable["Difficulty"] = "Difficulty: %s"
+SlashCo.LangTable["Difficulty"] = "Svårighetsgrad: %s"
 
-SlashCo.LangTable["Easy"] = "Easy"
-SlashCo.LangTable["Novice"] = "Novice"
-SlashCo.LangTable["Intermediate"] = "Intermediate"
-SlashCo.LangTable["Hard"] = "Hard"
+SlashCo.LangTable["Easy"] = "Enkelt"
+SlashCo.LangTable["Novice"] = "Novis"
+SlashCo.LangTable["Intermediate"] = "Mellanliggande"
+SlashCo.LangTable["Hard"] = "Svårt"
 
-SlashCo.LangTable["Unknown"] = "Unknown"
-SlashCo.LangTable["Name"] = "Name: %s"
-SlashCo.LangTable["Notes"] = "Notes"
+SlashCo.LangTable["Unknown"] = "Okänt"
+SlashCo.LangTable["Name"] = "Namn: %s"
+SlashCo.LangTable["Notes"] = "Anteckningar"
 
-SlashCo.LangTable["Class"] = "Class: %s"
-SlashCo.LangTable["Cryptid"] = "Cryptid"
+SlashCo.LangTable["Class"] = "Klass: %s"
+SlashCo.LangTable["Cryptid"] = "Kryptid"
 SlashCo.LangTable["Demon"] = "Demon"
 SlashCo.LangTable["Umbra"] = "Umbra"
 
-SlashCo.LangTable["DangerLevel"] = "Danger Level: %s"
-SlashCo.LangTable["Moderate"] = "Moderate"
-SlashCo.LangTable["Considerable"] = "Considerable"
-SlashCo.LangTable["Devastating"] = "Devastating"
+SlashCo.LangTable["DangerLevel"] = "Farlighetsgrad: %s"
+SlashCo.LangTable["Moderate"] = "Måttligt"
+SlashCo.LangTable["Considerable"] = "Ansenlig"
+SlashCo.LangTable["Devastating"] = "Förödande"
 
-SlashCo.LangTable["Offering"] = "Offering"
-SlashCo.LangTable["Offering_name"] = "%s Offering"
+SlashCo.LangTable["Offering"] = "Offer"
+SlashCo.LangTable["Offering_name"] = "%s Offrar"
 
-SlashCo.LangTable["offervote_1"] = "%s wants to make an Offering. Do you accept the %s?"
-SlashCo.LangTable["offervote_success"] = "%s will be active for the following round."
-SlashCo.LangTable["offervote_not_success"] = "The offering vote was unsuccessful."
-SlashCo.LangTable["offervote_duality_fail"] = "Offering vote successful, however a Spectator could not be found to assign as the second Slasher. Duality was not offered."
+SlashCo.LangTable["offervote_1"] = "%s vill göra ett Offer. Accepterar du %s?"
+SlashCo.LangTable["offervote_success"] = "%s Kommer vara aktiv för följande runda."
+SlashCo.LangTable["offervote_not_success"] = "Beslutet av Offret vart nekat."
+SlashCo.LangTable["offervote_duality_fail"] = "Beslutet av Offret vart lyckad, dock så kunde inte en åskådare bli valt för att bli den andra jagaren. Dualitet vart inte offrad."
 
-SlashCo.LangTable["offer_made_already"] = "An Offering has already been made."
-SlashCo.LangTable["offer_too_late"] = "It is too late to make an Offering."
-SlashCo.LangTable["offer_not_ready"] = "Cannot make an Offering when you are ready."
-SlashCo.LangTable["offer_cannot_ready"] = "Cannot ready as Slasher as you have either made or agreed to an Offering."
+SlashCo.LangTable["offer_made_already"] = "Ett Offer har redan blivit gjort."
+SlashCo.LangTable["offer_too_late"] = "Det är för sent att göra ett Offer."
+SlashCo.LangTable["offer_not_ready"] = "Kan ej göra ett Offer när du är redo."
+SlashCo.LangTable["offer_cannot_ready"] = "Kan ej bli redo som Jagare, antingen för du har gjort eller accepterat till ett Offer."
 
-SlashCo.LangTable["lobby_full"] = "The Lobby is currently full."
-SlashCo.LangTable["second_slasher"] = "You will become the Second Slasher."
-SlashCo.LangTable["item_already_chosen"] = "You have already chosen an item."
-SlashCo.LangTable["item_afford"] = "You cannot afford this item."
-SlashCo.LangTable["item_toomany"] = "Too many Survivors already have this item."
-SlashCo.LangTable["map_already_selected"] = "This map has already been selected."
-SlashCo.LangTable["map_notenough"] = "You don't have enough points for a Map Guarantee."
-SlashCo.LangTable["map_guaranteed_to"] = "%s spent %s points to set the mission to be on %s."
+SlashCo.LangTable["lobby_full"] = "Väntrummet är nurvarande fullt."
+SlashCo.LangTable["second_slasher"] = "Du kommer bli den andra Jagaren."
+SlashCo.LangTable["item_already_chosen"] = "Du har redan valt ett föremål."
+SlashCo.LangTable["item_afford"] = "Du har inte råd med att köpa föremålet."
+SlashCo.LangTable["item_toomany"] = "För många överlevare har denna sak."
+SlashCo.LangTable["map_already_selected"] = "Denna karta har redan blivit tagen."
+SlashCo.LangTable["map_notenough"] = "Du har inte tillräckligt med poäng för att bestämma karta."
+SlashCo.LangTable["map_guaranteed_to"] = "%s spenderade %s poäng för att ställa in uppdraget till att vara på %s."
 
-SlashCo.LangTable["playermodel_choose"] = "[CHOOSE...]"
+SlashCo.LangTable["playermodel_choose"] = "[VÄLJ...]"
 
-SlashCo.LangTable["GameInfo"] = "[%s] GAME INFO"
+SlashCo.LangTable["GameInfo"] = "[%s] SPELINFO"
 
 --OFFERINGS
 
-SlashCo.LangTable["Exposure"] = "Exposure"
-SlashCo.LangTable["Exposure_desc"] = "Will make Gas Cans easier to find,\nBut\nYou will not find more than you need."
+SlashCo.LangTable["Exposure"] = "Utsatthet"
+SlashCo.LangTable["Exposure_desc"] = "Gör det lättare att hitta fler bensindunkar,\nMen\nDu kommer inte hitta fler än vad det behövs."
 
-SlashCo.LangTable["Satiation"] = "Satiation"
-SlashCo.LangTable["Satiation_desc"] = "The Slasher will be a Demon,\nand its items will be scarce,\nBut\nThe items will have greater effect."
+SlashCo.LangTable["Satiation"] = "Måttnad"
+SlashCo.LangTable["Satiation_desc"] = "Jagaren kommer att vara en Demon,\noch dens grejer kommer vara mer sällsynt,\nMen\nSakerna kommer ha starkare effekt."
 
-SlashCo.LangTable["Drainage"] = "Drainage"
-SlashCo.LangTable["Drainage_desc"] = "Gas cans will be plentiful,\nBut\nGenerators will leak fuel over time."
+SlashCo.LangTable["Drainage"] = "Dränering"
+SlashCo.LangTable["Drainage_desc"] = "Mer rikligt på bensindunkar,\nMen\nGeneratorerna kommer läcka bensin över tiden."
 
-SlashCo.LangTable["Duality"] = "Duality"
-SlashCo.LangTable["Duality_desc"] = "Only one generator will need to be powered,\nBut\nYou will face two Slashers."
+SlashCo.LangTable["Duality"] = "Dualitet"
+SlashCo.LangTable["Duality_desc"] = "Bara en generator kommer behövas startas,\nMen\nDu kommer vara emot två Jagare."
 
-SlashCo.LangTable["Singularity"] = "Singularity"
-SlashCo.LangTable["Singularity_desc"] = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful."
+SlashCo.LangTable["Singularity"] = "Säregenhet"
+SlashCo.LangTable["Singularity_desc"] = "Mer rikligt på bensindunkar,\nMen\nJagaren kommer växa mer kraftfull under tiden."
 
-SlashCo.LangTable["Nightmare"] = "Nightmare"
-SlashCo.LangTable["Nightmare_desc"] = "The Helicopter will come rescue you regardless of Generators.\nFueling Generators will come with a massively increased Point bonus.\nBut\nSurvivors and Slasher will switch sides."
+SlashCo.LangTable["Nightmare"] = "Mardröm"
+SlashCo.LangTable["Nightmare_desc"] = "Helikoptern kommer att rädda dig oavsett generatorer.\nAtt fylla på generatorer kommer att ge en massiv poängbonus.\nMen\nÖverlevare och Jagare kommer byta sidor."
 
 --ITEMS
 
-SlashCo.LangTable["PointCount"] = "POINTS"
-SlashCo.LangTable["SurvivorWins"] = "SURVIVOR WINS"
-SlashCo.LangTable["SlasherWins"] = "SLASHER WINS"
+SlashCo.LangTable["PointCount"] = "POÄNG"
+SlashCo.LangTable["SurvivorWins"] = "ÖVERLEVANDE VANN"
+SlashCo.LangTable["SlasherWins"] = "JAGARNA VANN"
 
-SlashCo.LangTable["ToggleSpectate"] = "TOGGLE SPECTATE"
-SlashCo.LangTable["SelectPlayermodel"] = "SELECT PLAYERMODEL"
+SlashCo.LangTable["ToggleSpectate"] = "VÄXLA ÅSKÅDARESLÄGE"
+SlashCo.LangTable["SelectPlayermodel"] = "VÄLJ SPELARMODELL"
 
-SlashCo.LangTable["NotReady"] = "NOT READY"
-SlashCo.LangTable["ReadyAs"] = "READY AS %s"
+SlashCo.LangTable["NotReady"] = "EJ REDO"
+SlashCo.LangTable["ReadyAs"] = "REDO SOM %s"
 
-SlashCo.LangTable["MapSelect"] = "SELECT A MAP"
+SlashCo.LangTable["MapSelect"] = "VÄLJ EN KARTA"
 
-SlashCo.LangTable["Item"] = "Item"
-SlashCo.LangTable["ItemSelection"] = "ITEM SELECTION"
-SlashCo.LangTable["ItemSelectionTitle"] = "PICK AN ITEM"
+SlashCo.LangTable["Item"] = "Föremål"
+SlashCo.LangTable["ItemSelection"] = "FÖREMÅLSVAL"
+SlashCo.LangTable["ItemSelectionTitle"] = "VÄLJ ETT FÖREMÅL"
 
-SlashCo.LangTable["MapGuarantee"] = "MAP GUARANTEE"
-SlashCo.LangTable["MapGuaranteeTitle"] = "GUARANTEE A MAP"
+SlashCo.LangTable["MapGuarantee"] = "KARTGARANTI"
+SlashCo.LangTable["MapGuaranteeTitle"] = "GARANTERA EN KARTA"
 
-SlashCo.LangTable["ItemConfirm"] = "CONFIRM"
-SlashCo.LangTable["ItemRemaining"] = "REMAINING"
+SlashCo.LangTable["ItemConfirm"] = "BEKRÄFTA"
+SlashCo.LangTable["ItemRemaining"] = "ÅTERSTÅENDE"
 
-SlashCo.LangTable["MapGuaranteeDesc"] = "Bribe the helicopter driver to go to a location of your choosing--highest payer wins. Price increases with each consecutive purchase."
-
-
+SlashCo.LangTable["MapGuaranteeDesc"] = "Muta helikopterpiloten att åka till en plats du väljer---den som betalar mest vinner. Priset ökar med varje påföljande köp."
 
 
-SlashCo.LangTable["Alcohol"] = "\"Moonshine\""
-SlashCo.LangTable["Alcohol_desc"] = "Unfortunate."
 
-SlashCo.LangTable["Baby"] = "The Baby"
-SlashCo.LangTable["Baby_desc"] = "Halve your health to teleport to a random location. At low health, using this item has a chance of killing you instantly. If you die to this item, the slasher will teleport instead."
 
-SlashCo.LangTable["Battery"] = "Battery"
-SlashCo.LangTable["Battery_desc"] = "A lead-acid battery that serves as a reusable source of electric current."
+SlashCo.LangTable["Alcohol"] = "\"Månsken\""
+SlashCo.LangTable["Alcohol_desc"] = "Olyckligt."
 
-SlashCo.LangTable["Beacon"] = "Distress Beacon"
-SlashCo.LangTable["Beacon_desc"] = "Alerts the SlashCo headquarters to abort the mission. Only IMPORTANT circumstances get a fast response."
+SlashCo.LangTable["Baby"] = "Bebisen"
+SlashCo.LangTable["Baby_desc"] = "Halvera din hälsa för att teleportera till en slumpmässig plats. Vid låg hälsa finns det en risk att användning av detta föremål kan döda dig omedelbart. Om du dör av detta föremål kommer Jagaren teleporteras istället."
+
+SlashCo.LangTable["Battery"] = "Batteri"
+SlashCo.LangTable["Battery_desc"] = "Vanlig syrlig batteri för att få start på generatorer."
+
+SlashCo.LangTable["Beacon"] = "Nödsignal"
+SlashCo.LangTable["Beacon_desc"] = "Ger larm till SlashCo högkvarter för att avbryta uppdraget. bara under NÖD så kommer responsen snabbt."
+SlashCo.LangTable["Beacon_already_on_way"] = "Helikoptern är redan påväg."
+SlashCo.LangTable["Beacon_already_active"] = "Nödsignalen är redan placerad."
+SlashCo.LangTable["Beacon_confirm"] = "Att använda nödsignalen när det finns mer än 1 överlevare så kommer det orsaka till att nödsignalen tar längre tid för att utlösa. Använd igen för att bekräfta."
+SlashCo.LangTable["Beacon_unavailable"] = "Du kan aktivera Nödsignalen när en generator har blivit påslagen."
 
 SlashCo.LangTable["Benadryl"] = "25 gram Benadryl"
-SlashCo.LangTable["Benadryl_desc"] = "All new 25 gram Benadryl, made from 1200 pills.\n Feel free to take this if you feel the Assignments aren't challenging enough as is."
+SlashCo.LangTable["Benadryl_desc"] = "Alla nya 25 gram Benadryl, gjort utav 1200 piller ny importerat från USA.\n Fråga gärna att ta det om du känner att updragget verkar vara alldeles för enkelt än vad det redan är."
 
-SlashCo.LangTable["Brick"] = "Cinder Block"
-SlashCo.LangTable["Brick_desc"] = "Just some cinder block we found, nothing special. Can be thrown."
+SlashCo.LangTable["Brick"] = "Betongshålsten"
+SlashCo.LangTable["Brick_desc"] = "Hittat ute på en byggnadsplats, knappast speciel men kan kastas om det önskas."
 
-SlashCo.LangTable["Cookie"] = "Cookie"
-SlashCo.LangTable["Cookie_desc"] = "Gain a temporary bonus to fuel pouring on use.\nA certain Slasher seems to really like this item."
+SlashCo.LangTable["Cookie"] = "Kaka"
+SlashCo.LangTable["Cookie_desc"] = "Få en temoprär bonus för att fylla bränsle vid använding.\nEn viss jagare gillar verkar att mumsa i sig detta dock."
 
-SlashCo.LangTable["DeathWard"] = "Deathward"
-SlashCo.LangTable["DeathWard_desc"] = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
+SlashCo.LangTable["DeathWard"] = "Dödssal"
+SlashCo.LangTable["DeathWard_desc"] = "Överlev döden en gång, men blir förhindrar att bära på sig andra prylar när den är aktiverad. Ibland tjänas en liten helande effekt när man håller i den."
 
-SlashCo.LangTable["DevilDie"] = "Devil's Gamble"
-SlashCo.LangTable["DevilDie_desc"] = "Gain a random effect on use; either good or horrible."
+SlashCo.LangTable["DevilDie"] = "Djävulens Spel"
+SlashCo.LangTable["DevilDie_desc"] = "Få en slumpmässig effekt; antagligen bra eller vädigt dåligt."
 
-SlashCo.LangTable["GasCan"] = "Fuel Can"
-SlashCo.LangTable["GasCan_desc"] = "Take a gas can with you instead of having to find one. There will be less gas cans to find if you do this."
+SlashCo.LangTable["GasCan"] = "Bränsledunk"
+SlashCo.LangTable["GasCan_desc"] = "Ta med dig en soppadunk istället för att hitta en. Blir mindre soppa dunkar att hitta om du kör denna strategi."
 
-SlashCo.LangTable["Jug"] = "The Jug"
-SlashCo.LangTable["Jug_desc"] = "We have no idea what this is."
+SlashCo.LangTable["Jug"] = "Kannan"
+SlashCo.LangTable["Jug_desc"] = "Ingen vet vad denna används till."
 
-SlashCo.LangTable["LabMeat"] = "Lab-Grown Meat"
-SlashCo.LangTable["LabMeat_desc"] = "Now cleared for sale in the United States! Is it worth it?\nConsuming grants a temporary awareness of any nearby slashers."
+SlashCo.LangTable["LabMeat"] = "Lab-Växt Kött"
+SlashCo.LangTable["LabMeat_desc"] = "Säljs nu runt om centrum i Stockholm! Är det verkligen ens värt det?\nOm äten så får du en temporär sikt på vart Jagarna är."
 
-SlashCo.LangTable["Mayonnaise"] = "Mayonnaise"
-SlashCo.LangTable["Mayonnaise_desc"] = "Get a large boost to health."
+SlashCo.LangTable["Mayonnaise"] = "Majonnäs"
+SlashCo.LangTable["Mayonnaise_desc"] = "Få en stor boost för hälsan."
 
-SlashCo.LangTable["MilkJug"] = "Milk Jug"
-SlashCo.LangTable["MilkJug_desc"] = "Gain a temporary boost in speed on use.\nA certain Slasher seems to really like this item."
+SlashCo.LangTable["MilkJug"] = "Mjölkpaket"
+SlashCo.LangTable["MilkJug_desc"] = "Få en temporär boost i hastighet när använt.\nEn viss Jagare verkar verkligen gilla denna produkt."
 
-SlashCo.LangTable["PocketSand"] = "Pocket Sand"
-SlashCo.LangTable["PocketSand_desc"] = "Blinds a nearby slasher."
+SlashCo.LangTable["PocketSand"] = "Fiksand"
+SlashCo.LangTable["PocketSand_desc"] = "Bländer en närliggande Jagare."
 
-SlashCo.LangTable["Rock"] = "The Rock"
-SlashCo.LangTable["Rock_desc"] = "Become silent but unable to sprint while equipped. When dropped, this will occasionally nudge itself to the nearest gas can."
+SlashCo.LangTable["Rock"] = "Sten"
+SlashCo.LangTable["Rock_desc"] = "Blir tyst men förlorar förmågan att springa när den hålls. När tappad så kommer den ibland knuffa sig till närmaste bensindunk."
 
-SlashCo.LangTable["Soda"] = "B-Gone Soda"
-SlashCo.LangTable["Soda_desc"] = "Become invisible on use."
+SlashCo.LangTable["Soda"] = "B-Gone Läsk"
+SlashCo.LangTable["Soda_desc"] = "Blir osynlig när konsumeras."
 
-SlashCo.LangTable["StepDecoy"] = "Step Decoy"
-SlashCo.LangTable["StepDecoy_desc"] = "If placed on a solid surface, this will imitate footsteps sounds which can distract slashers."
+SlashCo.LangTable["StepDecoy"] = "Steg Bete"
+SlashCo.LangTable["StepDecoy_desc"] = "När placerad på en plan yta så kommer den härma fotsteg ljud som kan förvirra Jagaren."
 
 --GameInfo
 
-SlashCo.LangTable["SurvivorInfo"] = [[Welcome to the SlashCo Power Recovery Program.
+SlashCo.LangTable["SurvivorInfo"] = [[Välkommen till SlashCo Kraft Återhämtings Programet.
 
-Your assignment is refuelling and activating two Generators present in an area called the Slasher Zone.
+Ditt uppdrag är att tanka och aktivera två Generatorer som finns i ett område kallad Slasher Zonen.
 
-You will need to pour four cans of fuel and insert a car battery into each, however it might turn out not to be an easy task.
+Du kommer behöva hälla i fyra dunkar av bränsle och fixa en bil batteri till varända generator, dock finns det en risk att det må inte va så enkelt som planerat.
 
-An evil entity known as a Slasher will be present in the zone with you. The only way you can successfully complete your 
-task is by knowing how to survive.\n\nYou will be dropped off by a helicopter, which will also pick you up after both of the generators have been activated.
+En ond entitet som är känt kallad Slasher (Jagare) kommer vara närvarande i zonen med dig. De enda sättet för att lyckas med din
+uppgift är att veta hur man överlever. Du kommer bli avsläppt av en helikopter, som kommer sen att hämta dig efter du har aktiverat båda generatorer.
 
-If you ever find yourself left stranded without a team, the helicopter can come rescue you prematurely if you signal
-it with a Distress Beacon, one of which you will always be able to find within the Slasher Zone.
-Rescue will come only if at least one generator has been activated.
+Om du någon gång blir strandsatt utan ett lag, så kan helikoptern rädda dig genom att du använder dig 
+en Nödsignal, något som du alltid kommer kunna hitta inne i Slasher Zonen.
+Räddningstjänsten kommer bara enbart om en generator har blivit aktiverad.
 
-Before you set off to the Slasher Zone, you can choose an Item in the lobby in exchange for Points you earn during rounds as Survivor.]]
+Innan du sätter fot i Slasher Zonen, så kan du välja en föremål i väntrummet utbyt för poäng som du kan tjäna vid runder som Överlevare.]]
 
-SlashCo.LangTable["SlasherInfo"] = [[As a Slasher, your goal is to kill all of the Survivors before they manage to escape.
+SlashCo.LangTable["SlasherInfo"] = [[Som Jagare är ditt mål att döda alla överlevare innan dom hinner fly.
 
-You can track the progress of the Survivors' assignment with a bar which indicates the Game Progress.
+Du kan spåra framsteg av Överlevarnas uppdrag med skenan uppe på skärmen som indikerar spelets framsteg.
 
-Each Slasher has unique abilities which can help achieve your goal in different ways, furthermore, Slashers are divided
-into three different Classes, each of which has a different ability kind.
+Varända Jagare har sina enga unika förmågor som kan hjälpa dig att uppnå dina mål i olika sätt, dessutom, Jagarna är delade
+in i tre olika Klasser, var och en av har olika förmågor.
 
-Cryptid:
-The abilities of Cryptids are simple and easy to understand. They consist of relatively straightforward ways of
-helping you kill Survivors.
+Kryptid:
+Förmågor av Kryptider är enkla och lätta att förstå. Dom består sig utav relativt enkla sätt att
+hjälpa dig med att döda överlevarna.
+
 
 Demon:
-A Demon's abilities depend on the Items they have consumed, which will be spawned all around the map, and at times the
-Game Progress of the round, meaning that a Demon's goals is not just killing Survivors, but also finding and consuming
-Items to grow their power.
+En demons förmågor beror på föremålen dom har konsumerat, som sedan kommer uppstå runt omkring kartan, och ibland under visa tider i
+Spelets Framsteg, betyder att Demonens mål är att inte bara att döda men också att hitta och konsumera produkter 
+för att växa deras krafter.
 
 Umbra:
-The powers of Slashers of the Umbra class grow as the Game Progress increases, meaning they are weak at first, but
-as the Survivors get closer to completing their assignment, their abilities strengthen.]]
+Kraften utav Umbra klasserna är att dom växer sig mer kraftfulla medans spelet framgångs ökas, vilket betyder att dom är svaga i början, men
+när överlevarna närmas sig slutet av uppdraget, så blir deras förmågor starkare.]]
 
-SlashCo.LangTable["vocal_say"] = "SAY"
-SlashCo.LangTable["vocal_cancel"] = "CANCEL"
+SlashCo.LangTable["vocal_say"] = "SÄG"
+SlashCo.LangTable["vocal_cancel"] = "AVBRYT"
 
-SlashCo.LangTable["vocal_no"] = "NO"
-SlashCo.LangTable["vocal_follow"] = "FOLLOW ME"
-SlashCo.LangTable["vocal_slasher"] = "SLASHER HERE"
-SlashCo.LangTable["vocal_yes"] = "YES"
-SlashCo.LangTable["vocal_run"] = "RUN"
-SlashCo.LangTable["vocal_help"] = "HELP ME"
+SlashCo.LangTable["vocal_no"] = "NEJ"
+SlashCo.LangTable["vocal_follow"] = "FÖLJ EFTER MIG"
+SlashCo.LangTable["vocal_slasher"] = "JAGAREN ÄR HÄR"
+SlashCo.LangTable["vocal_yes"] = "JA"
+SlashCo.LangTable["vocal_run"] = "SPRING"
+SlashCo.LangTable["vocal_help"] = "HJÄLP MIG"
 
-SlashCo.LangTable["briefing"] = "BRIEFING:"
-SlashCo.LangTable["player_await"] = "Waiting for players. . ."
-SlashCo.LangTable["player_ready"] = "The round will start soon."
+SlashCo.LangTable["briefing"] = "GENOMGÅNG:"
+SlashCo.LangTable["player_await"] = "Väntar på spelare. . ."
+SlashCo.LangTable["player_ready"] = "Rundan startas strax."
 
-SlashCo.LangTable["cur_assignment"] = "Current Assignment: %s"
-SlashCo.LangTable["slasher_assess"] = "-Slasher Assessment-"
+SlashCo.LangTable["cur_assignment"] = "Nurvarande Uppdrag: %s"
+SlashCo.LangTable["slasher_assess"] = "-Jagarens Bedömning-"
 
-SlashCo.LangTable["offering_idle"] = "Make an Offering"
+SlashCo.LangTable["offering_idle"] = "Gör ett Offer"
 
 --Survivor
-SlashCo.LangTable["item_use"] = "[%s] USE"
-SlashCo.LangTable["item_drop"] = "[%s] DROP"
-SlashCo.LangTable["door_slam"] = "[%s] SLAM OPEN"
-SlashCo.LangTable["surv_ping"] = "[%s] PING"
+SlashCo.LangTable["item_use"] = "[%s] ANVÄND"
+SlashCo.LangTable["item_drop"] = "[%s] SLÄPPA"
+SlashCo.LangTable["door_slam"] = "[%s] SLÅ ÖPEN"
+SlashCo.LangTable["surv_ping"] = "[%s] PLINGA"
 
 --Pings
-SlashCo.LangTable["LOOK HERE"] = "LOOK HERE"
-SlashCo.LangTable["LOOK AT THIS"] = "LOOK AT THIS"
+SlashCo.LangTable["LOOK HERE"] = "KOLLA HÄR"
+SlashCo.LangTable["LOOK AT THIS"] = "KOLLA PÅ DET DÄR"
 SlashCo.LangTable["GENERATOR"] = "GENERATOR"
-SlashCo.LangTable["BASKETBALL"] = "BASKETBALL"
-SlashCo.LangTable["SURVIVOR"] = "SURVIVOR"
-SlashCo.LangTable["SLASHER"] = "SLASHER"
-SlashCo.LangTable["DEAD BODY"] = "DEAD BODY"
-SlashCo.LangTable["HELICOPTER"] = "HELICOPTER"
-SlashCo.LangTable["PLUSH DOG"] = "PLUSH DOG"
-SlashCo.LangTable["ITEM STASH"] = "ITEM STASH"
-SlashCo.LangTable["OFFERING TABLE"] = "OFFERING TABLE"
+SlashCo.LangTable["BASKETBALL"] = "BASKETBOLL"
+SlashCo.LangTable["SURVIVOR"] = "ÖVERLEVARE"
+SlashCo.LangTable["SLASHER"] = "JAGARE"
+SlashCo.LangTable["DEAD BODY"] = "DÖD KROPP"
+SlashCo.LangTable["HELICOPTER"] = "HELIKOPTER"
+SlashCo.LangTable["PLUSH DOG"] = "GOSEDJUR"
+SlashCo.LangTable["ITEM STASH"] = "FÖREMÅL LAGRING"
+SlashCo.LangTable["OFFERING TABLE"] = "OFFER BORD"
 
 --Spectator
-SlashCo.LangTable["spectating"] = "YOU ARE SPECTATING"
-SlashCo.LangTable["hide_info"] = "[%s] HOLD TO HIDE INFO"
-SlashCo.LangTable["toggle_halo"] = "[%s] TOGGLE HALOS"
-SlashCo.LangTable["toggle_halo_gas"] = "[%s] TOGGLE GAS CAN HALOS"
-SlashCo.LangTable["player_follow"] = "[%s] FOLLOW PLAYER"
-SlashCo.LangTable["player_cycle"] = "[%s] CYCLE SURVIVORS"
-SlashCo.LangTable["switch_view"] = "[%s] SWITCH VIEW"
-SlashCo.LangTable["toggle_light"] = "[%s] TOGGLE LIGHT"
+SlashCo.LangTable["spectating"] = "DU KOLLAR PÅ"
+SlashCo.LangTable["hide_info"] = "[%s] HÅLL I FÖR ATT GÖMMA INFO"
+SlashCo.LangTable["toggle_halo"] = "[%s] VÄXLA HALOS"
+SlashCo.LangTable["toggle_halo_gas"] = "[%s] VÄXLA BENSINDUNK HALOS"
+SlashCo.LangTable["player_follow"] = "[%s] FÖLJ SPELARE"
+SlashCo.LangTable["player_cycle"] = "[%s] VÄXLA ÖVERLEVARE"
+SlashCo.LangTable["switch_view"] = "[%s] BYT SYN"
+SlashCo.LangTable["toggle_light"] = "[%s] VÄXLA LJUS"
 
 --Slasher
-SlashCo.LangTable["demon_pacified"] = "You have been pacified by consuming an item."
-SlashCo.LangTable["beacon_call"] = "The Survivors are attempting to call emergency escape."
-SlashCo.LangTable["beacon_destroy"] = "DESTROY THE BEACON."
-SlashCo.LangTable["slasher_anticipation"] = "You will soon spawn as %s"
-SlashCo.LangTable["slasher_unavailable"] = "unavailable"
-SlashCo.LangTable["kill survivor"] = "kill survivor"
-SlashCo.LangTable["start chasing"] = "start chasing"
-SlashCo.LangTable["stop chasing"] = "stop chasing"
-SlashCo.LangTable["slasher_speedrate"] = "Speed"
-SlashCo.LangTable["slasher_eyerate"] = "Eyesight"
-SlashCo.LangTable["slasher_diffrate"] = "Difficulty"
+SlashCo.LangTable["demon_pacified"] = "Du har blivit pacifierad genom att ha konsumerat ett föremål."
+SlashCo.LangTable["beacon_call"] = "Överlevarna försöker att ringa in nödflykt."
+SlashCo.LangTable["beacon_destroy"] = "FÖRSTÖR NÖDSIGNALEN."
+SlashCo.LangTable["slasher_anticipation"] = "Du kommer inom kort spawna som jagaren %s"
+SlashCo.LangTable["slasher_unavailable"] = "otilgänglig"
+SlashCo.LangTable["slasher_killsurvivor"] = "döda överlevare"
+SlashCo.LangTable["slasher_startchase"] = "börja jaga"
+SlashCo.LangTable["slasher_stopchase"] = "sluta jaga"
+SlashCo.LangTable["slasher_speedrate"] = "Hastighet"
+SlashCo.LangTable["slasher_eyerate"] = "Ögonsikt"
+SlashCo.LangTable["slasher_diffrate"] = "Svårighetsgrad"
 
 --Every Slasher:
 
 --Abomignat
-SlashCo.LangTable["Abomignat"] = "Abomignat"
-SlashCo.LangTable["Abomignat_desc"] = [[The Monstrous Slasher which uses basic abilities to achieve quick kills.
+SlashCo.LangTable["Abomignat"] = "Monstruös"
+SlashCo.LangTable["Abomignat_desc"] = [[Själva monstret vill använda sina enkla förmågor för att döda sina beten snabbt.
 
--Abomignat can use its sharp claws to quickly damage Survivors.
--It can perform a short-range high-speed lunge to finish off its victims.
--Its Crawling Mode can enable swift map traversal.]]
-SlashCo.LangTable["Abomignat_tip"] = "-This Slasher enters bursts of speed while attacking."
+-Monstruös kan använda sina vassa klor för att snabbt göra skada mot överlevarna.
+-Den kan kasta sig fram snabbt under en kort sträcka för att ta liv av sina beten.
+-Dens Krypande form kan tillåta snabb övergång genom kartan.]]
+SlashCo.LangTable["Abomignat_tip"] = "-Denna Jagare kommer i skurar av hastighet när den attackerar."
 
-SlashCo.LangTable["enable crawling"] = "enable crawling"
-SlashCo.LangTable["disable crawling"] = "disable crawling"
-SlashCo.LangTable["slash charge"] = "slash charge"
-SlashCo.LangTable["lunge"] = "lunge"
+SlashCo.LangTable["Abomignat_enablecrawling"] = "sätt på krypning"
+SlashCo.LangTable["Abomignat_disablecrawling"] = "stäng av krypning"
+SlashCo.LangTable["Abomignat_slashcharge"] = "Snabbt rus"
+SlashCo.LangTable["Abomignat_lunge"] = "kasta sig"
 
 
 --Amogus
-SlashCo.LangTable["Amogus"] = "Amogus"
-SlashCo.LangTable["Amogus_desc"] = [[The Imposter Slasher who is the master of deception and hiding in plain sight.
+SlashCo.LangTable["Amogus"] = "BlandOss"
+SlashCo.LangTable["Amogus_desc"] = [[Bedragaren som är mästaren av bedrägeri och gömma sig och att gömma sig i klar sikt.
 
--Amogus can assume the form of a Survivor.
--He can assume the form of a Fuel Can.
--Amogus is really loud while running.]]
-SlashCo.LangTable["Amogus_tip"] = "-This Slasher can disguise itself as a human."
+-BlandOss kan kopiera en av överlevarnas identitet.
+-Han kan också förtrolla sig till en falsk bensindunk.
+-BlandOss är verkligen högljud när han börjar springa.]]
+SlashCo.LangTable["Amogus_tip"] = "-Denna Jagare kan maskera sig som människa."
 
-SlashCo.LangTable["Amogus_survivor_disguised_title"] = "inconspicuous survivor"
-SlashCo.LangTable["Amogus_gas_disguised_title"] = "regular fuel can"
-SlashCo.LangTable["Amogus_survivor_disguise"] = "disguise as survivor"
-SlashCo.LangTable["disguise as fuel"] = "disguise as fuel"
-SlashCo.LangTable["reveal yourself"] = "reveal yourself"
+SlashCo.LangTable["Amogus_survivor_disguised_title"] = "maskera sin titel till överlevare"
+SlashCo.LangTable["Amogus_gas_disguised_title"] = "maskera sin titel som en bensindunk"
+SlashCo.LangTable["Amogus_survivor_disguise"] = "maskera sig som en överlevare"
+SlashCo.LangTable["Amogus_gas_disguise"] = "maskera sig som en bensindunk"
+SlashCo.LangTable["Amogus_un_disguise"] = "avslöja dig själv"
 
 
 
 --Bababooey
-SlashCo.LangTable["Bababooey"] = "Bababooey"
-SlashCo.LangTable["Bababooey_desc"] = [[The Phantom Slasher which specialises in illusion abilities to catch
-survivors off-guard.
+SlashCo.LangTable["Bababooey"] = "Babapoojken"
+SlashCo.LangTable["Bababooey_desc"] = [[Han specialiserar sig med förmågor som illusioner för att kunna ta
+oväntade överlevarna.
 
--Bababooey can turn himself invisible.
--He can create a phantom clone of himself to scare and locate Survivors.]]
-SlashCo.LangTable["Bababooey_tip"] = "-This Slasher has the ability to vanish into thin air."
+-Babapoojken kan göra sig själv osynlig.
+-Han kan skapa en spök-klon utav sig själv för att skrämma och lokalisera Överlevare.]]
+SlashCo.LangTable["Bababooey_tip"] = "-Har förmågan att försvinna helt plöstligt in till tunn luft."
 
-SlashCo.LangTable["enable invisibility"] = "enable invisibility"
-SlashCo.LangTable["disable invisibility"] = "disable invisibility"
-SlashCo.LangTable["set clone"] = "set clone"
-SlashCo.LangTable["Bababooey_clonetrip"] = "A Bababooey Clone has been tripped!"
+SlashCo.LangTable["Bababooey_enableinvis"] = "sätt på osynlighet"
+SlashCo.LangTable["Bababooey_disableinvis"] = "sträng av osynlighet"
+SlashCo.LangTable["Bababooey_setclone"] = "sätt klon"
+SlashCo.LangTable["Bababooey_clonetrip"] = "En Babapoojke Klon har blivit aktiverad!"
 
 
 
 
 --Borgmire
-SlashCo.LangTable["Borgmire"] = "Borgmire"
-SlashCo.LangTable["Borgmire_desc"] = [[The Brute Slasher who can overpower survivors with overwhelming strength.
+SlashCo.LangTable["Borgmire"] = "Borgarn"
+SlashCo.LangTable["Borgmire_desc"] = [[Denna råstarka Jagare kan övermanna överlevare med extrem styrka.
 
--Borgmire is most effective in short chases.
--He can pick up and throw nearby Survivors for heavy damage.]]
-SlashCo.LangTable["Borgmire_tip"] = "-This Slasher seems to suffer from exhaustion during long chases."
+-Borgarn är mest effektiv när det kommer till korta jakter.
+-Han kan ta upp närvarande överlevare och kasta dom som leder till stor skada.]]
+SlashCo.LangTable["Borgmire_tip"] = "-Borgarn blir lätt trött under långa jakter."
 
-SlashCo.LangTable["punch"] = "punch"
-SlashCo.LangTable["throw"] = "throw"
+SlashCo.LangTable["Borgmire_punch"] = "tvärslå"
+SlashCo.LangTable["Borgmire_throw"] = "kasta"
 
 
 
 
 --The Covenant (WIP)
-SlashCo.LangTable["Covenant"] = "The Covenant"
-SlashCo.LangTable["Covenant_desc"] = [[The Leader Slasher who commands his trusted Cloaks.
+SlashCo.LangTable["Covenant"] = "Svarta Häxan"
+SlashCo.LangTable["Covenant_desc"] = [[Ledaren som  bestämmer över sina pålitliga kappor.
 
--Catching a Survivor will sacrifice their soul, making them become your Covenant Cloak.
--The first Survivor you catch will be handed the Saturn Stick, becoming your most powerful ally, Rocks.
--Without the power of the Saturn Stick, must must rely on your Cloaks to catch Survivors.]]
-SlashCo.LangTable["Covenant_tip"] = "-This Slasher can enlist others into its ranks."
+-Att fånga en överlevare kommer leda till att deras själ offras, vilket som gör dom till din pålitliga mantel.
+-Den första överlevaren du fångar kommer få en magisk käpp, han kommer va din mest kraftfulla mantel, kallad Sten.
+-Utan kraften utav den magiska käppen, så kommer du behöva lita på dina mantlar för att fånga Överlevarna.]]
 
-SlashCo.LangTable["CovenantCloak"] = "Covenant Cloak"
+SlashCo.LangTable["CovenantCloak"] = "Förbinda nån till mantel"
 
-SlashCo.LangTable["Rocks"] = "LTG Rocks"
+SlashCo.LangTable["Rocks"] = "LTG Stenar"
 
 --Criminal
-SlashCo.LangTable["Criminal"] = "Criminal"
-SlashCo.LangTable["Criminal_desc"] = [[The Tormented Slasher which relies on confusion and\nentrapment to catch his victims.
+SlashCo.LangTable["Criminal"] = "Kriminell"
+SlashCo.LangTable["Criminal_desc"] = [[Jagare som använder sig av förvirring och infånging mot sina offer.
 
--Criminal is only able to attack while standing still.
--He can summon clones around himself as a tool of confusion.]]
-SlashCo.LangTable["Criminal_tip"] = "-This Slasher was seen surrounded by fake copies of itself."
+-Kriminell kan bara enbart attackera om han står still.
+-Han kan kalla in kloner runt sig själv för att förvira Överlevarna.]]
+SlashCo.LangTable["Criminal_tip"] = "-Denna Jagare har varit sett att blivit omrigad av sina egna kopior runt omkring sig."
 
-SlashCo.LangTable["summon clones"] = "summon clones"
-SlashCo.LangTable["unsummon clones"] = "unsummon clones"
-SlashCo.LangTable["rage"] = "rage"
+SlashCo.LangTable["Criminal_summonclones"] = "kalla in kloner"
+SlashCo.LangTable["Criminal_unsummonclones"] = "kalla bort kloner"
+SlashCo.LangTable["Criminal_rage"] = "rå damp"
 
 
 
 
 --Dolphinman
-SlashCo.LangTable["Dolphinman"] = "Dolphinman"
-SlashCo.LangTable["Dolphinman_desc"] = [[The Patient Slasher who waits for survivors to come to him.
+SlashCo.LangTable["Dolphinman"] = "Delfinmannen"
+SlashCo.LangTable["Dolphinman_desc"] = [[Delfinmannen använder tålamod och väntar tills överlevare kommer till honom.
 
--Dolphinman must hide away from survivors, to build up Hunt.
--Upon being found, his power will activate, and stay active until he runs out of Hunt.
--Killing Survivors increases Hunt.]]
-SlashCo.LangTable["Dolphinman_tip"] = "-This Slasher does not appear to approach victims on its own."
+-Delfinmannen måste gömma sig bort från överlevare för att kunna bilda sig till ett jag.
+-När blivit hittad så aktiveras hans kraft och fortsätter vara aktiv tills han förlorar orken till att jaga.
+-Få död på överlevare ökar Jakten.]]
+SlashCo.LangTable["Dolphinman_tip"] = "-Denna Jagare verkar inte möta överlevar på sin egen hand."
 
-SlashCo.LangTable["Dolphinman_cannothide"] = "You cannot hide here. A survivor is too close."
-SlashCo.LangTable["hide"] = "hide"
-SlashCo.LangTable["hunt"] = "hunt"
+SlashCo.LangTable["Dolphinman_cannothide"] = "Du kan ej gömma dig här. En Överlevare är för nära."
+SlashCo.LangTable["Dolphinman_hide"] = "Gömma sig"
+SlashCo.LangTable["Dolphinman_hunt"] = "jaga"
 
 
 
 
 --FreeSmiley
-SlashCo.LangTable["FreeSmiley"] = "Free Smiley Dealer"
-SlashCo.LangTable["FreeSmiley_desc"] = [[The Summoner Slasher which uses his minions to take control of the map.
+SlashCo.LangTable["FreeSmiley"] = "Gratis Glädje Langarn"
+SlashCo.LangTable["FreeSmiley_desc"] = [[Använder sig sina minioner för att ta över kartan.
 
--Free Smiley Dealer can summon two types of minions, Pensive and Zany.
-Both will alert him when a Survivor is detected.
--Pensive can stun a Survivor for a short while.
--Zany will charge at Survivors and damage them.]]
-SlashCo.LangTable["FreeSmiley_tip"] = "-This Slasher does not work alone."
+-Glädje Langarn kan kalla sig 2 typer av minioner, Fundersam och Gycklaren.
+Båda vill slå en pling när en Överlevare är detekterad.
+-Fundersam kan förlama en Överlevare i en kort stund.
+-Gycklaren kommer rusa mot Överlevarna och skada dom.]]
+SlashCo.LangTable["FreeSmiley_tip"] = "-Denna Jagare arbetar ej själv."
 
-SlashCo.LangTable["switch deal"] = "switch deal"
-SlashCo.LangTable["deal a zany"] = "deal a zany"
-SlashCo.LangTable["deal a pensive"] = "deal a pensive"
-SlashCo.LangTable["no deal"] = "no deal"
+SlashCo.LangTable["FreeSmiley_switchdeal"] = "byt handel"
+SlashCo.LangTable["FreeSmiley_zanydeal"] = "ge en Fundersamare"
+SlashCo.LangTable["FreeSmiley_pensivedeal"] = "ge en Gycklare"
+SlashCo.LangTable["FreeSmiley_nodeal"] = "ingen handel"
 
 
 
 
 --Leuonard
-SlashCo.LangTable["Leuonard"] = "Leuonard"
-SlashCo.LangTable["Leuonard_desc"] = [[The Unstable Slasher whose overwhleming power grows with time.
+SlashCo.LangTable["Leuonard"] = "Leonard"
+SlashCo.LangTable["Leuonard_desc"] = [[En ostabil Jagare som växer sig starkare under tiden.
 
--Leuonard's R██e will increase over time.
--Wrestling a Plush Dog will cause R██e to decrease.
--Reaching 100 Percent R██e will cause Leuonard to become extremely lethal, but nearly uncontrollable.]]
-SlashCo.LangTable["Leuonard_tip"] = "-This Slasher seems to have a fondness for plush dogs."
+-Leonards Våldt██kt kommer ökas under tiden.
+-Brottas mot en gosedjur kommer sänka Våldt██kts frustrationen.
+-Om Våldt██kt ökas med 100 Procent så kommer Leonard bli extrem dödlig och väldigt okontrollerbar.]]
+SlashCo.LangTable["Leuonard_tip"] = "-Denna jagare värkar tycka om gosedjur."
 
-SlashCo.LangTable["Leuonard_roid"] = "r**e"
+SlashCo.LangTable["Leuonard_roid"] = "v*ldta"
 
 
 
 --Male_07
-SlashCo.LangTable["Male07"] = "Male_07"
-SlashCo.LangTable["Male07_desc"] = [[The Omniscient Slasher which can possess one of his many clones.
+SlashCo.LangTable["Male07"] = "Man_07"
+SlashCo.LangTable["Male07_desc"] = [[Denna Allvetande Jagare kan besitta hans kloner.
 
--Male_07 will turn into a monstrous entity after a long enough chase.
--He can keep his deadlier human form for longer as the game progresses.]]
-SlashCo.LangTable["Male07_tip"] = "-This Slasher is incorporeal and can possess vessels."
+-Man_07 kommer förvandlas till en monsturös entitet efter att ha jagat ett bra tag.
+-Han kan behölla sin dödliga mänskliga form längre medans spelet fortsätter.]]
+SlashCo.LangTable["Male07_tip"] = "-Denna Jagare är okroppslig och kan besitta sina kloner."
 
-SlashCo.LangTable["possess vessel"] = "possess vessel"
-SlashCo.LangTable["unpossess vessel"] = "unpossess vessel"
-SlashCo.LangTable["slash"] = "slash"
+SlashCo.LangTable["Male07_possess"] = "besitta klon"
+SlashCo.LangTable["Male07_unpossess"] = "sluta besitta klon"
+SlashCo.LangTable["Male07_slash"] = "attackera"
 
 
 
 --Manspider
-SlashCo.LangTable["Manspider"] = "Manspider"
-SlashCo.LangTable["Manspider_desc"] = [[The Huntsman Slasher which is picky with its victims.
+SlashCo.LangTable["Manspider"] = "Manspindeln"
+SlashCo.LangTable["Manspider_desc"] = [[Denna jagare är kräsen när det kommer till att jaga sina beten.
 
--Manspider can only target one Survivor at a time.
--He will slowly gather aggression while close to Survivors.
--He can nest somewhere for a chance to instantly find Prey.]]
-SlashCo.LangTable["Manspider_tip"] = "-This Slasher is a very selective hunter."
+-Manspindel kan bara rikta sig mot en överlevare åt gången.
+-Han kommer bli mer aggresive desto närmre han är mot Överlevare.
+-Han kan bygga ett bo för att kunna hitta ett bete direkt.]]
+SlashCo.LangTable["Manspider_tip"] = "-Denna Jagare är väldigt kräsen."
 
-SlashCo.LangTable["nest"] = "nest"
-SlashCo.LangTable["Manspider_yourprey"] = "your prey: "
-SlashCo.LangTable["waiting for prey"] = "waiting for prey"
-SlashCo.LangTable["abandon nest"] = "abandon nest"
+SlashCo.LangTable["Manspider_nest"] = "fixa bo"
+SlashCo.LangTable["Manspider_yourprey"] = "ditt bete: "
+SlashCo.LangTable["Manspider_awaitprey"] = "väntar på bete"
+SlashCo.LangTable["Manspider_abandonnest"] = "dissa boet"
 
 
 
 
 --Princess
-SlashCo.LangTable["Princess"] = "Princess"
-SlashCo.LangTable["Princess_desc"] = [[The Feral Slasher who mauls children.
+SlashCo.LangTable["Princess"] = "Prinsessa"
+SlashCo.LangTable["Princess_desc"] = [[Ett odjur som älskar att brutalt tugga på barn.
 
--Princess can increase his aggression during chase, but up to a threshold.
--The Agression Threshold can be increased by mauling Babies, which will reset your Aggression.
--The higher your aggression, the faster and more brutal your chase is.]]
-SlashCo.LangTable["Princess_tip"] = "-This Slasher can be distracted with Babies."
+-Prinsessan kan öka sin aggression när han jagar men bara under början.
+-Själva aggresions-öpnningen kan bli ökad genom att mumsa på barn men kommer återställa din Aggression.
+-Desto högre aggression, desto snabbare och mer brutalt kommer jaget bli.]]
+SlashCo.LangTable["Princess_tip"] = "-Denna jagare kan bli lurad med bebisar."
 
-SlashCo.LangTable["sniff"] = "sniff"
-SlashCo.LangTable["maul"] = "maul"
-SlashCo.LangTable["aggro"] = "aggro"
+SlashCo.LangTable["Princess_sniff"] = "sniffa"
+SlashCo.LangTable["Princess_maul"] = "bit"
+SlashCo.LangTable["Princess_aggro"] = "damp"
 
 
 
 
 --Sid
 SlashCo.LangTable["Sid"] = "Sid"
-SlashCo.LangTable["Sid_desc"] = [[The Psychotic Slasher which keeps his rage in check with Cookies.
+SlashCo.LangTable["Sid_desc"] = [[Psykotisk jagare som lugnar sitt vrålande damp med kakor.
 
--Sid gains speed while chasing over time, but starts out slow.
--Cookies will pacify him for a while.
--Sid's special ability allows him to devastate Survivors at long range.]]
-SlashCo.LangTable["Sid_tip"] = "-Loud gunshots have been heard in zones where this Slasher was present."
+-Sid blir snabbare under tiden han jagar, fast han är långsam i början.
+-Kakor kommer alltid att lugna ner honom under en liten tag.
+-Sids speciella förmåga är att bokstavligen förstöra Överlevare vid långa avstånder.]]
+SlashCo.LangTable["Sid_tip"] = "-Högljuda skottlosningar har hörts runt området där jagaren har varit närvarande."
 
-SlashCo.LangTable["Sid_gun_title"] = "Sid (with a gun)"
-SlashCo.LangTable["gun uses"] = "gun uses"
-SlashCo.LangTable["shoot"] = "shoot"
-SlashCo.LangTable["eat cookie"] = "eat cookie"
-SlashCo.LangTable["equip gun"] = "equip gun"
-SlashCo.LangTable["unequip gun"] = "unequip gun"
+SlashCo.LangTable["Sid_gun_title"] = "Sid (med en pistol)"
+SlashCo.LangTable["Sid_gunuses"] = "skott kvar"
+SlashCo.LangTable["Sid_shoot"] = "skjut"
+SlashCo.LangTable["Sid_eatcookie"] = "ät kaka"
+SlashCo.LangTable["Sid_equipgun"] = "ta tag i pistolen"
+SlashCo.LangTable["Sid_unequipgun"] = "ta bort pistolen"
 
 
 
 
 --Speedrunner
-SlashCo.LangTable["Speedrunner"] = "Speedrunner"
-SlashCo.LangTable["Speedrunner_desc"] = [[The Speed Slasher whose speed grows at a constant rate over time.
+SlashCo.LangTable["Speedrunner"] = "Löparen"
+SlashCo.LangTable["Speedrunner_desc"] = [[Denna Jagare snabbhet ökas stadigt under tiden.
 
--Speedrunner will start out extremely slow.
--After gaining enough speed, he will gain the ability to perform RNG sacrifice, resetting speed,
-but allowing him to regain it faster, and more of it.
--RNG Sacrifice will have additional effects on the round when it is used.]]
-SlashCo.LangTable["Speedrunner_tip"] = "-This Slasher grows exeptionally faster with time."
+-Löparen kommer startas extremt slö vid början.
+-Efter att ha fått tillräckligt med snabbhet, så kommer han få förmågan att göra en RNG offer, som nollställer snabbheten,
+men tillåter honom att få det snabbare och mer av det.
+-RNG Offer kommer ge extra effekter på runden när den väl används .]]
+SlashCo.LangTable["Speedrunner_tip"] = "-Denna Jagare blir snabbare under tiden."
 
-SlashCo.LangTable["speed"] = "speed"
-SlashCo.LangTable["rng sacrifice"] = "rng sacrifice"
+SlashCo.LangTable["Speedrunner_speed"] = "snabbhet"
+SlashCo.LangTable["Speedrunner_sacrifice"] = "rng offer"
 
 
 
 
 --Thirsty
-SlashCo.LangTable["Thirsty"] = "Thirsty"
-SlashCo.LangTable["Thirsty_desc"] = [[The Milk Slasher whose abilities depend on his level of Thirst.
+SlashCo.LangTable["Thirsty"] = "Törstis"
+SlashCo.LangTable["Thirsty_desc"] = [[Denna mjölk Jagare där dens förmågor beror på hans nivå av törstighet.
 
--Thirsty must drink Jugs of Milk to reset his thirst.
--The Thirstier he is, the slower he is, but can sense the position of players.
--Thirsty is really quiet.]]
-SlashCo.LangTable["Thirsty_tip"] = "-This Slasher is heavily linked with Milk Jugs."
+-Törstis måste dricka mjölk för att nollställa sin törst .
+-Desto törstigare han är desto långsamare han blir, fast hans sinne av att se Överlevarna blir större.
+-Törstis är väldig smygig och tyst.]]
+SlashCo.LangTable["Thirsty_tip"] = "-Denna Jagare har en stark länk för mjölk."
 
-SlashCo.LangTable["drink milk"] = "drink milk"
-SlashCo.LangTable["milkies"] = "milkies"
-SlashCo.LangTable["thirst"] = "thirst"
+SlashCo.LangTable["Thirsty_drinkmilk"] = "drick mjölk"
+SlashCo.LangTable["Thirsty_milkies"] = "mjölkisar"
+SlashCo.LangTable["Thirsty_thirst"] = "törst"
 
 
 
 
 --Trollge
-SlashCo.LangTable["Trollge"] = "Trollge"
-SlashCo.LangTable["Trollge_desc"] = [[The Bloodthirsty Slasher whose power grows with the amount of
-blood he has collected.
+SlashCo.LangTable["Trollge"] = "Trollet"
+SlashCo.LangTable["Trollge_desc"] = [[Den blodtörstiga jagare där ens krafter växer genom all blod han har samlat.
 
--Trollge cannot see Survivors who stand still.
--He must collect enough blood to unlock his true form.
--He can not collect blood after the round has progressed enough.]]
-SlashCo.LangTable["Trollge_tip"] = "-Its eyesight seems to be limited to moving objects."
+-Trollet kan ej se Överlevare som står stilla.
+-Han måste samla in blod för att upplåsa hans riktiga form.
+-Han kan ej samla in blod om rundan har pågått under ett bra tag.]]
+SlashCo.LangTable["Trollge_tip"] = "-Hans ögonsikt verkar bara kunna se rörande objekt."
 
-SlashCo.LangTable["dash"] = "dash"
-SlashCo.LangTable["claw"] = "claw"
-SlashCo.LangTable["claw"] = "blood"
+SlashCo.LangTable["Trollge_dash"] = "kasta sig"
+SlashCo.LangTable["Trollge_claw"] = "riva"
+SlashCo.LangTable["Trollge_blood"] = "blod"
 
 
 
 
 --Tyler
 SlashCo.LangTable["Tyler"] = "Tyler"
-SlashCo.LangTable["Tyler_desc"] = [[The Balance Slasher who controls the progress of the round.
+SlashCo.LangTable["Tyler_desc"] = [[Jagaren som kontrollerar utvecklingen av rundan.
 
--Tyler has two forms. Creator, and Destroyer.
--Tyler, the Creator will create gas cans for survivors upon being found.
-Tyler, the Destroyer will destroy anything in its path.]]
-SlashCo.LangTable["Tyler_tip"] = "-Noticeably fewer Fuel Cans were spotted in this Slasher's Zone."
-SlashCo.LangTable["Tyler_creator"] = "Tyler, The Creator"
-SlashCo.LangTable["Tyler_destroyer"] = "Tyler, The Destroyer"
+-Tyler har två olika former. Skaparen, och Förstöraren.
+-Tyler, Skaparen kommer skapa bensindunkar för Överlevare om han blir funnend.
+Tyler, Förstöraren kommer förgöra allt som står emot hans väg.]]
+SlashCo.LangTable["Tyler_tip"] = "-Mycket få bensindunkar vart hittade runt omkring Jagarens zon."
+SlashCo.LangTable["Tyler_creator"] = "Tyler, Skaparen"
+SlashCo.LangTable["Tyler_destroyer"] = "Tyler, Förstöraren"
 
-SlashCo.LangTable["manifest"] = "manifest"
-SlashCo.LangTable["(hiding)"] = "(hiding)"
-SlashCo.LangTable["destroy"] = "destroy"
+SlashCo.LangTable["Tyler_manifest"] = "manifestera"
+SlashCo.LangTable["Tyler_hiding"] = "(gömmer sig)"
+SlashCo.LangTable["Tyler_destroy"] = "förgör"
 
 
 
 
 --Watcher
-SlashCo.LangTable["Watcher"] = "Watcher"
-SlashCo.LangTable["Watcher_desc"] = [[The Observing Slasher whose power relies on sight.
+SlashCo.LangTable["Watcher"] = "Kikaren"
+SlashCo.LangTable["Watcher_desc"] = [[Jagaren där dens krafters förlitar sig på syn.
 
--The Watcher can Survey the map every once in a while to locate all survivors.
--He will be slowed down if he is looked at, but anyone who does so will be located.
--The Watcher can stalk Survivors to build up his special ability, Full Surveillance.]]
-SlashCo.LangTable["Watcher_tip"] = "-This Slasher suffers from a loss of speed while observed."
+-Kikaren kan kika runt kartan då och då för att lokalisera alla Överlevare.
+-Han blir långsamare om han blir kollad på, fast personen som gör det kommer bli lokaliserad.
+-Kikaren kan stalka Överlevare för att bygga upp på sin speciella förmåga, Full Övervakning.]]
+SlashCo.LangTable["Watcher_tip"] = "-Jagaren förlorar hastightet om han blir observerad."
 
-SlashCo.LangTable["survey"] = "survey"
-SlashCo.LangTable["full surveillance"] = "full surveillance"
-SlashCo.LangTable["Watcher_watched"] = "YOU ARE BEING WATCHED"
-SlashCo.LangTable["Watcher_observe"] = "OBSERVING A SURVIVOR. . ."
-SlashCo.LangTable["Watcher_stalktime"] = "STALK TIME: "
+SlashCo.LangTable["Watcher_survey"] = "övervaka"
+SlashCo.LangTable["Watcher_fullsurveillance"] = "full övervakning"
+SlashCo.LangTable["Watcher_watched"] = "DU ÄR PÅKOLLAD"
+SlashCo.LangTable["Watcher_observe"] = "OBSERVERAR EN ÖVERLEVARE. . ."
+SlashCo.LangTable["Watcher_stalktime"] = "STALK TID: "
