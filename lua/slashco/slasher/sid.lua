@@ -576,7 +576,7 @@ SLASHER.InitHud = function(_, hud)
 	hud:SetCrosshairEnabled(true)
 	hud:SetCrosshairAlpha(255)
 	hud:TieCrosshair("SidGunAimed")
-	hud:TieCrosshairEntity("sc_cookie", 150, "R", {"SidGun", "SidEating", IsOr = true})
+	hud:TieCrosshairEntity("sc_cookie", 150, "R", { "SidGun", "SidEating", IsOr = true })
 
 	timer.Simple(0, function()
 		if LocalPlayer():GetNWBool("SidCanUseGun") then

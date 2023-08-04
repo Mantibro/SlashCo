@@ -320,6 +320,10 @@ SLASHER.InitHud = function(_, hud)
 	end
 end
 
+SLASHER.PreDrawHalos = function()
+	SlashCo.DrawHalo(ents.FindByClass("sc_dogg"), nil, 2, false)
+end
+
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
 		if LocalPlayer():GetNWBool("SurvivorJumpscare_Leuonard") == true then

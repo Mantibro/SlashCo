@@ -1,7 +1,7 @@
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
 
-concommand.Add("slashco_become_survivor", function(ply)
+concommand.Add("slashco_become_survivor", function(ply, _, args)
 	if IsValid(ply) then
 		if ply:IsPlayer() then
 			if not ply:IsAdmin() then
@@ -16,22 +16,42 @@ concommand.Add("slashco_become_survivor", function(ply)
 		return
 	end
 
-	local id = ply:SteamID64()
+	local target = ply
+	if args[1] then
+		if tonumber(args[1]) then
+			target = Player(args[1])
+		else
+			target = player.GetBySteamID(args[1])
+		end
+
+		if not IsValid(target) then
+			ply:ChatPrint("Not a valid target.")
+			return
+		end
+	end
+
+	local id = target:SteamID64()
 	local found
-	for s = 1, #SlashCo.CurRound.SlasherData.AllSurvivors do
-		if SlashCo.CurRound.SlasherData.AllSurvivors[s].id == id then
+	for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
+		if v.id == id then
 			found = true
 			break
 		end
 	end
 
-	if found then
-		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = theman, GameContribution = 0 })
+	if not found then
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = id, GameContribution = 0 })
 	end
 
-	ply:ChatPrint("New Survivor successfully assigned.")
-	ply:SetTeam(TEAM_SURVIVOR)
-	ply:Spawn()
+	target:ChatPrint("New Survivor successfully assigned.")
+	target:SetTeam(TEAM_SURVIVOR)
+	target:Spawn()
+end, function(cmd)
+	--this is for autocomplete
+
+	return {
+		cmd .. " [steamid/userid]"
+	}
 end)
 
 concommand.Add("slashco_become_slasher", function(ply, _, args)
@@ -49,13 +69,29 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		return
 	end
 
-	SlashCo.SelectSlasher(args[1], ply:SteamID64())
-	SlashCo.ApplySlasherToPlayer(ply)
-	SlashCo.OnSlasherSpawned(ply)
+	local target = ply
+	if args[2] then
+		if tonumber(args[2]) then
+			target = Player(args[2])
+		else
+			target = player.GetBySteamID(args[2])
+		end
+
+		if not IsValid(target) then
+			ply:ChatPrint("Not a valid target.")
+			return
+		end
+	end
+
+	SlashCo.SelectSlasher(args[1], target:SteamID64())
+	SlashCo.ApplySlasherToPlayer(target)
+	SlashCo.OnSlasherSpawned(target)
 
 	ply:ChatPrint("New Slasher successfully assigned.")
-	ply:SetTeam(TEAM_SLASHER)
-	ply:Spawn()
+	SlashCo.DropAllItems(target)
+	target:StripWeapons()
+	target:SetTeam(TEAM_SLASHER)
+	target:Spawn()
 end, function(cmd, args)
 	--this is for autocomplete
 	args = string.lower(string.Trim(args))
@@ -68,6 +104,11 @@ end, function(cmd, args)
 			table.insert(tbl1, cmd .. " " .. v)
 		end
 	end
+
+	if #tbl1 == 1 then
+		tbl1[1] = tbl1[1] .. " [steamid/userid]"
+	end
+
 	return tbl1
 end)
 

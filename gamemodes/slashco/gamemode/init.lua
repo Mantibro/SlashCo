@@ -581,7 +581,7 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 	end
 end)
 
-function GM:PlayerDeath(victim, _, _)
+function GM:PlayerDeath(victim)
 	if not IsValid(victim) then
 		return
 	end

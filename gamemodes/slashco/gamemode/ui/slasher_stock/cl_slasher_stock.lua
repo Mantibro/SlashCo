@@ -18,6 +18,7 @@ function PANEL:Init()
 	self.Controls = {}
 	self.Meters = {}
 	self.Gens = {}
+	self.FlipFlops = {}
 	self.ControlTies = {}
 	self.CrosshairSpin = 0
 	self.CrosshairTight = 0
@@ -616,6 +617,31 @@ function PANEL:CheckNetVars(isOr, invertInput, ...)
 	return result
 end
 
+---Makes a 'flip flop' operation
+---checks the result of the condition function every frame;
+---if the result changes, the corresponding function (onTrue or onFalse) will execute once.
+function PANEL:FlipFlop(key, condition, onTrue, onFalse)
+	if self.FlipFlops[key] then
+		return
+	end
+
+	self.FlipFlops[key] = {
+		condition = condition,
+		onTrue = onTrue,
+		onFalse = onFalse,
+		prevState = not condition()
+	}
+end
+
+---remove a running flip flop operation by key
+function PANEL:RemoveFlipFlop(key)
+	if not self.FlipFlops[key] then
+		return
+	end
+
+	self.FlipFlops[key] = nil
+end
+
 ---[INTERNAL]---
 
 ---internal: draws the crosshair
@@ -861,7 +887,7 @@ function PANEL:MakeGeneratorsCard()
 		return
 	end
 
-	for k, v in ipairs(gens) do
+	for _, v in ipairs(gens) do
 		local gen = self:Add("slashco_projector")
 		table.insert(self.Gens, gen)
 		gen:SetSize(160, 160)
@@ -947,6 +973,18 @@ function PANEL:Think()
 			if v.doShake then
 				self.Controls[k]:Shake()
 			end
+		end
+	end
+
+	for _, v in pairs(self.FlipFlops) do
+		local state = v.condition()
+		if state ~= v.prevState then
+			if state then
+				v.onTrue()
+			else
+				v.onFalse()
+			end
+			v.prevState = state
 		end
 	end
 

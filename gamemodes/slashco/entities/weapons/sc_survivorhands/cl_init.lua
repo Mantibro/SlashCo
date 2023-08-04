@@ -33,6 +33,18 @@ function SWEP:Initialize()
 	end
 end
 
+function SWEP:OnRemove()
+	if IsValid(self.heldEntity) then
+		self.heldEntity:Remove()
+	end
+	if IsValid(self.heldEntityWorld) then
+		self.heldEntityWorld:Remove()
+	end
+	if IsValid(self.heldEntityHolstered) then
+		self.heldEntityHolstered:Remove()
+	end
+end
+
 function SWEP:RenderModel(v, model, owner, flipVM, xPos, item)
 	if not IsValid(model) then
 		self:Initialize()
