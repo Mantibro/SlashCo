@@ -158,7 +158,9 @@ function PLAYER:SurvivorPing()
 	end
 
 	if ping_info.Type == "DEAD BODY" then
-		player.GetBySteamID64(look.SurvivorSteamID):SetNWBool("ConfirmedDead", true)
+		if IsValid(player.GetBySteamID64(look.SurvivorSteamID)) then
+			player.GetBySteamID64(look.SurvivorSteamID):SetNWBool("ConfirmedDead", true)
+		end
 	end
 
 	if typeCheck[ping_info.Type] then

@@ -350,7 +350,7 @@ SLASHER.InitHud = function(_, hud)
 						hook.Remove("HUDPaint", "SlashCoPreyReal")
 					end
 
-					local distColor = math.Clamp(LocalPlayer():GetPos():Distance(Entity(51):GetPos()), 0, 2048) / 16
+					local distColor = math.Clamp(LocalPlayer():GetPos():Distance(targetEnt:GetPos()), 0, 2048) / 16
 					draw.SimpleText("Your Prey: " .. targetEnt:Name(), "ItemFontTip",
 							ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
 							TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
