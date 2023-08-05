@@ -28,7 +28,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
     --Cool Spectator Lobby Menu
 
-    if #team.GetPlayers( TEAM_SURVIVOR ) < 1 then
+    if #team.GetPlayers( TEAM_SURVIVOR ) < 1 and game.GetMap() == "sc_lobby" then
 
         local srvwin_count = CL_srvwin_count or 0
         local slswin_count = CL_slswin_count or 0
