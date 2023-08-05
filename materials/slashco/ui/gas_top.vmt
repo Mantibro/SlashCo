@@ -1,6 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture" "slashco/ui/gas_top"
-	"$translucent" 1
-	"$halflambert" 1
-}

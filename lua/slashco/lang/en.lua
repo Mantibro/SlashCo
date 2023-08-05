@@ -540,7 +540,7 @@ SlashCo.LangTable["Trollge_tip"] = "-Its eyesight seems to be limited to moving 
 
 SlashCo.LangTable["dash"] = "dash"
 SlashCo.LangTable["claw"] = "claw"
-SlashCo.LangTable["claw"] = "blood"
+SlashCo.LangTable["blood"] = "blood"
 
 
 

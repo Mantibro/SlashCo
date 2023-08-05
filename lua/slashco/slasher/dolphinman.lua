@@ -157,7 +157,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 			if s:GetPos():Distance(slasher:GetPos()) < 1000 then
-				slasher:ChatPrint("You cannot hide here. A survivor is too close.")
+				slasher:ChatText("Dolphinman_cannothide")
 				return
 			end
 		end

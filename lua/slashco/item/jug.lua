@@ -33,6 +33,8 @@ hook.Add("Think", "JugFunc", function()
 
             if surv:GetNWString("item") ~= "Jug" then continue end
 
+            if surv:GetNWBool("CurseOfTheJug")then continue end
+
             local find = ents.FindInSphere(surv:GetPos(), 120)
 
             for i = 1, #find do
