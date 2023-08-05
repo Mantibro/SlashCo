@@ -284,7 +284,11 @@ local cur_ang = Angle(0,0,0)
 
 hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 
-    if pl:Team() ~= TEAM_SPECTATOR or game.GetMap() ~= "sc_lobby" then
+    if game.GetMap() ~= "sc_lobby" then
+        return
+    end
+
+    if pl:Team() ~= TEAM_SPECTATOR then
         return
     end
 
