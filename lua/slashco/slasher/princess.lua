@@ -226,7 +226,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 		slasher:Freeze(true)
 
 		if slasher:IsOnGround() then
-			slasher:SetVelocity(slasher:GetForward() * 700)
+			slasher:SetVelocity(slasher:GetForward() * 800)
 		end
 
 		timer.Simple(0.25, function()
@@ -235,7 +235,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 			end
 
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-					Vector(-15, -15, -60), Vector(15, 15, 60),
+					Vector(-25, -25, -60), Vector(25, 25, 60),
 					math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4)), DMG_SLASH, 5, false)
 
 			if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
@@ -296,6 +296,10 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 					timer.Simple(2, function()
 
+						slasher:SetNWBool("PrincessMaulingSurvivor", false)
+						slasher:SetNWBool("PrincessMaulingBase", false)
+						slasher:Freeze(false)
+
 						if IsValid( slasher.victimragdoll ) then
 
 							slasher.ref_child:Remove()
@@ -322,9 +326,6 @@ SLASHER.OnPrimaryFire = function(slasher)
 							end
 
 						end
-
-						slasher:SetNWBool("PrincessMaulingSurvivor", false)
-						slasher:Freeze(false)
 					end)
 				end
 			end
@@ -366,7 +367,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 	slasher:SetNWBool("PrincessSniffing", true)
 	slasher:Freeze(true)
-	slasher:EmitSound("slashco/slasher/sniff.mp3")
+	slasher:EmitSound("slashco/slasher/princess_sniff.mp3")
 
 	timer.Simple(4, function()
 		if not IsValid(slasher) then
