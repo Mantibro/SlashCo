@@ -1,7 +1,7 @@
 --[[
 
     Language: de, (German), (Deutsch)
-    Translator: 
+    Translator: Fuchs, eno
 
 ]]
 
@@ -102,8 +102,8 @@ SlashCo.LangTable["Nightmare_desc"] = "Der Hubschrauber wird dich retten, unabh�
 --ITEMS
 
 SlashCo.LangTable["PointCount"] = "PUNKTE"
-SlashCo.LangTable["SurvivorWins"] = "ÜBERLEBENDER GEWINNT"
-SlashCo.LangTable["SlasherWins"] = "SLASHER GEWINNT"
+SlashCo.LangTable["SurvivorWins"] = "GEWINNE ALS ÜBERLEBENDER"
+SlashCo.LangTable["SlasherWins"] = "GEWINNE ALS SLASHER"
 
 SlashCo.LangTable["ToggleSpectate"] = "ZUSCHAUER ANSCHALTEN"
 SlashCo.LangTable["SelectPlayermodel"] = "SPIELERMODELL WÄHLEN"
