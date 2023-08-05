@@ -168,4 +168,6 @@ SlashCo.ItemPickUp = function(ply, item, itid)
 	SlashCo.ChangeSurvivorItem(ply, itid)
 
 	ents.GetByIndex(item):Remove()
+
+	return true
 end

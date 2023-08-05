@@ -77,6 +77,8 @@ SlashCo.LangTable["playermodel_choose"] = "[VÄLJ...]"
 
 SlashCo.LangTable["GameInfo"] = "[%s] SPELINFO"
 
+SlashCo.LangTable["Welcome"] = "VÄLKOMMEN, %s"
+
 --OFFERINGS
 
 SlashCo.LangTable["Exposure"] = "Utsatthet"
@@ -156,6 +158,9 @@ SlashCo.LangTable["DeathWard_desc"] = "Överlev döden en gång, men blir förhi
 
 SlashCo.LangTable["DevilDie"] = "Djävulens Spel"
 SlashCo.LangTable["DevilDie_desc"] = "Få en slumpmässig effekt; antagligen bra eller vädigt dåligt."
+
+SlashCo.LangTable["Flare"] = "Signalflare"
+SlashCo.LangTable["Flare_desc"] = "När den används blir den synlig för alla Överlevare."
 
 SlashCo.LangTable["GasCan"] = "Bränsledunk"
 SlashCo.LangTable["GasCan_desc"] = "Ta med dig en soppadunk istället för att hitta en. Blir mindre soppa dunkar att hitta om du kör denna strategi."

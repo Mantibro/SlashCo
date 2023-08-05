@@ -4,12 +4,82 @@ net.Receive("mantislashcoLobbySlasherInformation", function()
 
 end)
 
+local blur_mat = Material("pp/blurscreen")
+timer.Simple(1, function()
+    blur_mat:SetFloat("$blur", 5)
+    blur_mat:Recompute()
+end)
+
+local logo_mat = Material("slashco/ui/slashco_skull")
+
+local spin = 0
+local flash = 0
+
+local srvwin_count = 0
+local slswin_count = 0
+
 hook.Add("HUDPaint", "Spectator_Vision", function()
 
     local ply = LocalPlayer()
 
     if ply:Team() ~= TEAM_SPECTATOR then
         return
+    end
+
+    --Cool Spectator Lobby Menu
+
+    if #team.GetPlayers( TEAM_SURVIVOR ) < 1 then
+
+        local srvwin_count = CL_srvwin_count or 0
+        local slswin_count = CL_slswin_count or 0
+
+        surface.SetMaterial(blur_mat)
+        surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+
+        spin = spin +  ( ( 0.5 / ((spin)+0.5) ) ) / (spin+1)
+
+        local fin_spin = ((spin % 2) - 1)
+
+        if spin > 15 then
+            spin = 1
+        end
+
+        if spin > 10 then
+            fin_spin = 1
+        end
+
+        local blip = "☞ [,] ☜"
+        if #team.GetPlayers(TEAM_LOBBY) > 6 then
+            blip = "☓ [,] ☓"
+        else
+            flash = flash + RealFrameTime()
+            if flash > 1 then flash = 0 end
+
+            if flash > 0.5 then
+                blip = "☛[,]☚"
+            end
+        end
+
+        surface.SetMaterial(logo_mat)
+        surface.DrawTexturedRect(128 + ((ScrW() / 2) - 128) - ( math.abs(fin_spin) * 128), (ScrH() / 4) - 256, 256 * math.abs(fin_spin), 256)
+
+        draw.SimpleText(SlashCo.Language("Welcome", string.upper(LocalPlayer():Nick())), "TVCD", ScrW() / 2, ScrH() / 3.5,
+                Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+        draw.SimpleText("SLASHCO", "LobbyFont2", ScrW() / 2, ScrH() / 4,
+                Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+        draw.SimpleText(blip, "TVCD", ScrW() / 2, ScrH() / 2,
+                Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+        local players = CL_LobbyPlayers or #team.GetPlayers(TEAM_LOBBY)
+
+        draw.SimpleText("["..players.." / 7]", "TVCD", ScrW() / 2, ScrH() / 2.5,
+                Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+        draw.SimpleText("[" .. srvwin_count .. " " .. SlashCo.Language("SurvivorWins") .. "]  [" .. slswin_count .. " " .. SlashCo.Language("SlasherWins") .. "]",
+                "TVCD", ScrW() * 0.5, (ScrH() * 0.75), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
     end
 
     if LobbySlasherInfo ~= nil then
@@ -227,7 +297,7 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
     local cur_dist = cur_pos:Distance( cutscene_views[cur_scene].Stop[1] )
 
     if cur_dist > 1 then
-        local add = (cutscene_views[cur_scene].Stop[1] - cur_pos):GetNormalized() / 3
+        local add = (cutscene_views[cur_scene].Stop[1] - cur_pos):GetNormalized()*RealFrameTime() * 30
         cur_pos = cur_pos + add * cutscene_views[cur_scene].Speed
 
         local total_dist = cutscene_views[cur_scene].Start[1]:Distance( cutscene_views[cur_scene].Stop[1] )

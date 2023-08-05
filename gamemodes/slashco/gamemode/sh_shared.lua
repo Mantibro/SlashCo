@@ -62,7 +62,8 @@ local DoorSlamWhitelist = {
 	["models/props_doors/doormain01.mdl"] = true,
 	["models/props_doors/doorglassmain01.mdl"] = true,
 	["models/props_doors/door_rotate_112.mdl"] = true,
-	["models/props_doors/doormainmetalwindow01.mdl"] = true
+	["models/props_doors/doormainmetalwindow01.mdl"] = true,
+	["models/props_c17/door01_addg_medium.mdl"] = true
 }
 
 function SlashCo.CheckDoorWL(ent)
@@ -165,10 +166,9 @@ if SERVER then
 end
 
 for _, v in ipairs(map_configs) do
-	if v ~= "template.json" and v ~= "rp_deadcity.json" then
+	if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
 		local config_table = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
 		local mapid = string.Replace(v, ".lua", "")
-		mapid = string.Replace(mapid, ".json", "")
 
 		if SCInfo.Maps[mapid] then continue end
 

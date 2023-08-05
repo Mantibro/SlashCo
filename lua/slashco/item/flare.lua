@@ -6,6 +6,7 @@ ITEM.EntClass = "sc_flare"
 ITEM.Icon = "slashco/ui/icons/items/item_1"
 ITEM.Price = 5
 ITEM.Description = "Flare_desc"
+ITEM.ReplacesWorldProps = true
 ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = true
 ITEM.OnUse = function(ply)
@@ -13,6 +14,7 @@ ITEM.OnUse = function(ply)
     Entity( flare ):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 400)
     Entity( flare ):SetNWBool("FlareActive", true)
     Entity( flare ):SetNWString("FlareDropperName", ply:Nick())
+    Entity( flare ):EmitSound("weapons/flaregun/burn.wav")
     SlashCo.CurRound.Items[flare] = true
 end
 ITEM.OnDrop = function()

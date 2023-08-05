@@ -213,6 +213,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, textColor, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
+		draw.SimpleText(tostring( math.floor(LocalPlayer():GetPos():Distance( v:GetPos() ) * 0.0254)).." m", "TVCD_small", fl_pos.x, fl_pos.y + 25, Color(255, 255, 255, 180),
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 	end
 

@@ -23,11 +23,6 @@ net.Receive("mantislashcoGiveLobbyInfo", function(_, _)
 	LobbyInfoTable = net.ReadTable()
 end)
 
-net.Receive("mantislashcoGiveMasterDatabase", function(_, _)
-	local t = net.ReadTable()
-	data_load = t
-end)
-
 hook.Add("HUDPaint", "LobbyInfoText", function()
 	if stop_lobbymusic ~= true and (lobbymusic_antispam == nil or lobbymusic_antispam ~= true) then
 		lobby_music = CreateSound(LocalPlayer(), "slashco/music/slashco_lobby.wav")
@@ -41,21 +36,17 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	end
 
 	local point_count = 0
-	local srvwin_count = 0
-	local slswin_count = 0
 
 	if data_load ~= nil and data_load ~= false then
-
 		point_count = data_load[1].Points
-		srvwin_count = data_load[1].SurvivorRoundsWon
-		slswin_count = data_load[1].SlasherRoundsWon
-
 	end
 
 	local scrW, scrH = ScrW(), ScrH()
 
+	local point_count = CL_points or 0
+
 	--LobbyFont1
-	draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]  [" .. srvwin_count .. " " .. SlashCo.Language("SurvivorWins") .. "]  [" .. slswin_count .. " " .. SlashCo.Language("SlasherWins") .. "]",
+	draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
 			"TVCD", ScrW() * 0.025, (ScrH() * 0.05), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 	if StateOfLobby == nil or StateOfLobby < 1 then
@@ -94,6 +85,14 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 			end
 		end
 
+		longest_name = longest_name or 0
+		if not plynum or plynum ~= #Lobby_Players then
+			longest_name = 0
+			plynum = #Lobby_Players
+		end
+
+		CL_LobbyPlayers = plynum
+
 		if isClientinLobby then
 			surface.SetDrawColor(255, 255, 255, 255)
 
@@ -108,11 +107,6 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 			end
 
 			local mul_y = 1
-			longest_name = longest_name or 0
-			if not plynum or plynum ~= #Lobby_Players then
-				longest_name = 0
-				plynum = #Lobby_Players
-			end
 
 			draw.SimpleText("[" .. plynum .. "/7] ", "TVCD", scrW * 0.025, (scrH * 0.22), color_white, TEXT_ALIGN_LEFT,
 					TEXT_ALIGN_TOP)

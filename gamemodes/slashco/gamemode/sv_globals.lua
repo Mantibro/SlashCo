@@ -704,7 +704,7 @@ SlashCo.LocalizedTraceHullLocator = function(ent, input_range)
 
 	if err > 250 then
 		print("TRACE LOCATOR FAILURE.")
-		return
+		return ent:GetPos()
 	end
 
 	pos = ent:LocalToWorld(Vector(math.random(-range, range), math.random(-range, range), height_offset * 50))

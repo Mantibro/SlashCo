@@ -77,6 +77,8 @@ SlashCo.LangTable["playermodel_choose"] = "[ESCOLHA...]"
 
 SlashCo.LangTable["GameInfo"] = "[%s] INFORMAÇÕES DO JOGO"
 
+SlashCo.LangTable["Welcome"] = "BEM-VINDO, %s"
+
 --OFFERINGS
 
 SlashCo.LangTable["Exposure"] = "Exposição"
@@ -156,6 +158,9 @@ SlashCo.LangTable["DeathWard_desc"] = "Sobreviva à morte uma vez, mas torna-se 
 
 SlashCo.LangTable["DevilDie"] = "Dado do Diabo"
 SlashCo.LangTable["DevilDie_desc"] = "Ganhe um efeito aleatório ao usar; bom ou horrivel."
+
+SlashCo.LangTable["Flare"] = "Marcador"
+SlashCo.LangTable["Flare_desc"] = "Quando usado, ira criar um ponto de interesse permanente para todos os Sobreviventes."
 
 SlashCo.LangTable["GasCan"] = "Lata de gasolina"
 SlashCo.LangTable["GasCan_desc"] = "Leve uma lata de gasolina com você em vez de ter que encontrar uma. Haverá menos latas de gasolina para encontrar se você fizer isso."

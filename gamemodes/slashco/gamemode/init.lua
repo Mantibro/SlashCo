@@ -503,7 +503,7 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 
 	local pid = ply:SteamID64()
 	local data = {}
-
+	
 	--Don't load playerdata if it's already loaded
 	if SlashCo.PlayerData[ply:SteamID64()] ~= nil then
 		return

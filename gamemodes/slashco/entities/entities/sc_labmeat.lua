@@ -39,15 +39,14 @@ if SERVER then
 			return
 		end
 
-		SlashCo.ItemPickUp(activator, self:EntIndex(), "LabMeat")
+		if SlashCo.ItemPickUp(activator, self:EntIndex(), "LabMeat") then
+			self.ragdoll:Remove()
+			activator:EmitSound("slashco/survivor/eat_mayo.mp3")
+		end
 
 		if self:IsPlayerHolding() then
 			return
 		end
-
-		activator:PickupObject(self)
-		self.ragdoll:Remove()
-		activator:EmitSound("slashco/survivor/eat_mayo.mp3")
 	end
 
 	function ENT:Think()

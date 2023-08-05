@@ -77,6 +77,8 @@ SlashCo.LangTable["playermodel_choose"] = "[CHOOSE...]"
 
 SlashCo.LangTable["GameInfo"] = "[%s] GAME INFO"
 
+SlashCo.LangTable["Welcome"] = "WILKOMMEN, %s"
+
 --OFFERINGS
 
 SlashCo.LangTable["Exposure"] = "Exposure"

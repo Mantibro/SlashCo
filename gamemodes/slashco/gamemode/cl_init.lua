@@ -36,6 +36,19 @@ function SlashCo.Language(key, ...)
 	end
 end
 
+net.Receive("mantislashcoGiveMasterDatabase", function(_, _)
+	local t = net.ReadTable()
+	data_load = t
+
+	if data_load ~= nil and data_load ~= false then
+
+		CL_srvwin_count = data_load[1].SurvivorRoundsWon
+		CL_slswin_count = data_load[1].SlasherRoundsWon
+		CL_points = data_load[1].Points
+
+	end
+end)
+
 include("sh_shared.lua")
 include("ui/cl_scoreboard.lua")
 include("cl_headbob.lua")
