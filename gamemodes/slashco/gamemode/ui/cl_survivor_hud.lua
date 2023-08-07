@@ -15,11 +15,13 @@ local green = Color(64, 255, 64)
 local blue = Color(64, 64, 255)
 
 local function FindPos(search)
-	if type(search) == "Entity" then
+	if IsEntity(search) then
 		return search:WorldSpaceCenter()
-	elseif type(search) == "Vector" then
+	elseif isvector(search) then
 		return search
 	end
+
+	return vector_origin
 end
 
 local pingType = {
@@ -176,6 +178,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 	--ping display
 	for k, v in pairs(global_pings) do
 		if v.Entity == nil then
+			removePing(k)
 			continue
 		end
 
@@ -203,19 +206,21 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 				TEXT_ALIGN_CENTER)
 	end
 
-	for k, v in ipairs( ents.FindByClass("sc_flare") ) do
+	for _, v in ipairs(ents.FindByClass("sc_flare")) do
+		if not v:GetNWBool("FlareActive") then
+			continue
+		end
 
-		if not v:GetNWBool("FlareActive") then continue end
+		local fl_pos = v:WorldSpaceCenter():ToScreen()
 
-		local fl_pos = fl_pos or (v:GetPos()):ToScreen()
-
-		draw.SimpleText(v:GetNWString("FlareDropperName"), "TVCD_small", fl_pos.x, fl_pos.y - 25, Color(255, 255, 255, 180),
+		draw.SimpleText(v:GetNWString("FlareDropperName"), "TVCD_small", fl_pos.x, fl_pos.y - 25,
+				Color(255, 255, 255, 180),
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, textColor, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
-		draw.SimpleText(tostring( math.floor(LocalPlayer():GetPos():Distance( v:GetPos() ) * 0.0254)).." m", "TVCD_small", fl_pos.x, fl_pos.y + 25, Color(255, 255, 255, 180),
+		draw.SimpleText(tostring(math.floor(LocalPlayer():GetPos():Distance(v:GetPos()) * 0.0254)) .. " m",
+				"TVCD_small", fl_pos.x, fl_pos.y + 25, Color(255, 255, 255, 180),
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-
 	end
 
 	--//item selection crosshair//--
@@ -300,7 +305,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	surface.SetDrawColor(0, 0, 128, 255)
 
-	local hpLength = markup.Parse("<font=TVCD>"..SlashCo.Language("HP").."</font>"):GetWidth()
+	local hpLength = markup.Parse("<font=TVCD>" .. SlashCo.Language("HP") .. "</font>"):GetWidth()
 
 	if not GetConVar("slashcohud_show_healthvalue"):GetBool() then
 		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 376 + hpLength, 27)
