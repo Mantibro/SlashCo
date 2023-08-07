@@ -1,35 +1,235 @@
 AddCSLuaFile()
-AddCSLuaFile("baby.lua")
-AddCSLuaFile("beacon.lua")
-AddCSLuaFile("cookie.lua")
-AddCSLuaFile("deathward.lua")
-AddCSLuaFile("devildie.lua")
-AddCSLuaFile("gascan.lua")
-AddCSLuaFile("mayo.lua")
-AddCSLuaFile("milkjug.lua")
-AddCSLuaFile("soda.lua")
-AddCSLuaFile("stepdecoy.lua")
-AddCSLuaFile("deathward_used.lua")
-AddCSLuaFile("battery.lua")
-AddCSLuaFile("rock.lua")
-AddCSLuaFile("pocketsand.lua")
 
-if not SlashCoItems then SlashCoItems = {} end
+SlashCo = SlashCo or {}
+SlashCoItems = SlashCoItems or {}
+SlashCoEffects = SlashCoEffects or {}
 
-include("baby.lua")
-include("beacon.lua")
-include("cookie.lua")
-include("deathward.lua")
-include("devildie.lua")
-include("gascan.lua")
-include("mayo.lua")
-include("milkjug.lua")
-include("soda.lua")
-include("stepdecoy.lua")
-include("deathward_used.lua")
-include("battery.lua")
-include("rock.lua")
-include("pocketsand.lua")
+---load items and effects
+
+function SlashCo.RegisterItem(table, name)
+	if SC_LOADEDITEMS then
+		error("Tried to register an item illegally", 2)
+		return
+	end
+
+	SlashCoItems[name] = table
+end
+
+function SlashCo.RegisterEffect(table, name)
+	if SC_LOADEDITEMS then
+		error("Tried to register an effect illegally", 2)
+		return
+	end
+
+	SlashCoEffects[name] = table
+end
+
+function SlashCo.GetItemTable(name)
+	return SlashCoItems[name]
+end
+
+function SlashCo.GetEffectTable(name)
+	return SlashCoEffects[name]
+end
+
+SC_LOADEDITEMS = nil
+
+local effect_files = file.Find("slashco/effect/*.lua", "LUA")
+for _, v in ipairs(effect_files) do
+	AddCSLuaFile("slashco/effect/" .. v)
+	include("slashco/effect/" .. v)
+end
+
+local item_files = file.Find("slashco/item/*.lua", "LUA")
+for _, v in ipairs(item_files) do
+	AddCSLuaFile("slashco/item/" .. v)
+	include("slashco/item/" .. v)
+end
+
+SC_LOADEDITEMS = true
+
+---remainder of init code
+
+local PLAYER = FindMetaTable("Player")
+
+---gives a player an effect
+function PLAYER:AddEffect(value, duration)
+	if not self:EffectFunction("OnRemoved") then
+		self:EffectFunction("OnExpired")
+	end
+	self:SetNWString("itemEffect", value)
+	self:EffectFunction("OnApplied")
+	timer.Create("itemEffectExpire_" .. self:UserID(), duration, 1, function()
+		if not IsValid(self) then
+			return
+		end
+		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+		self:EffectFunction("OnExpired")
+		self:SetNWString("itemEffect", "none")
+	end)
+end
+
+---calls the <funcName> function of a player's effect with passed args
+function PLAYER:EffectFunction(funcName, ...)
+	local effect = self:GetNWString("itemEffect", "none")
+	if SlashCoEffects[effect] and SlashCoEffects[effect][funcName] then
+		return SlashCoEffects[effect][funcName](self, ...)
+	end
+end
+
+---removes a player's effect
+function PLAYER:ClearEffect()
+	if not self:EffectFunction("OnRemoved") then
+		self:EffectFunction("OnExpired")
+	end
+	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+	self:SetNWString("itemEffect", "none")
+	timer.Remove("itemEffectExpire_" .. self:UserID())
+end
+
+---check the <valueName> value of a player's item in a specific slot
+--this doesn't include a team check because we assume that it's in a survivor-only context
+function PLAYER:ItemValue(valueName, fallback, isSecondary)
+	local effect = self:GetNWString("itemEffect", "none")
+	if SlashCoEffects[effect] and SlashCoEffects[effect][valueName] then
+		return SlashCoEffects[effect][valueName]
+	end
+
+	local slot = isSecondary and "item2" or "item"
+	local item = self:GetNWString(slot, "none")
+	if SlashCoItems[item] and SlashCoItems[item][valueName] then
+		return SlashCoItems[item][valueName]
+	end
+
+	return fallback
+end
+
+---check the <valueName> value across a player's entire 'inventory' (effect first, then item2, then item1)
+function PLAYER:ItemValue2(value, fallback, noEffect)
+	local item
+	if not noEffect then
+		item = self:GetNWString("itemEffect", "none")
+		if SlashCoItems[item] and SlashCoItems[item][value] then
+			return SlashCoItems[item][value]
+		end
+	end
+
+	item = self:GetNWString("item2", "none")
+	if item == "none" then
+		item = self:GetNWString("item", "none")
+	end
+	if SlashCoItems[item] and SlashCoItems[item][value] then
+		return SlashCoItems[item][value]
+	end
+
+	return fallback
+end
+
+---returns whether a player has a specific item
+function PLAYER:HasItem(item, isSecondary)
+	return self:GetNWString(isSecondary and "item2" or "item", "none") == item
+end
+
+---calls the <funcName> function of a player's item1 with passed args
+---checks the player's effect slot first!
+function PLAYER:ItemFunction(funcName, ...)
+	return self:ItemFunctionInternal(funcName, "item", ...)
+end
+
+---calls the <funcName> function of a player's item1 with passed args, or a fallback if it doesn't return anything
+---function and fallback must both return tables
+---checks the player's effect slot first!
+function PLAYER:ItemFunctionOrElse(funcName, fallback, ...)
+	local val = { self:ItemFunctionInternal(funcName, "item", ...) }
+	if val[1] then
+		return unpack(val)
+	end
+	return unpack(fallback)
+end
+
+---calls the <funcName> function of a player's item2 with passed args
+---checks the player's effect slot first!
+function PLAYER:SecondaryItemFunction(funcName, ...)
+	return self:ItemFunctionInternal(funcName, "item2", ...)
+end
+
+---calls the <funcName> function of a player's item2 with passed args, or a fallback if it doesn't return anything
+---function and fallback must both return tables
+---checks the player's effect slot first!
+function PLAYER:SecondaryItemFunctionOrElse(funcName, fallback, ...)
+	local val = { self:ItemFunctionInternal(funcName, "item2", ...) }
+	if val[1] then
+		return unpack(val)
+	end
+	return unpack(fallback)
+end
+
+---calls the <funcName> function of a specific item; ignores the player's 'inventory' entirely
+---good for situations where you already know the player's item
+function PLAYER:ItemFunction2(funcName, item, ...)
+	if SlashCoItems[item] and SlashCoItems[item][funcName] then
+		return SlashCoItems[item][funcName](self, ...)
+	end
+end
+
+---internal: checks effect function first before checking the specified slot
+function PLAYER:ItemFunctionInternal(value, slot, ...)
+	local effect = self:GetNWString("itemEffect", "none")
+	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
+		return SlashCoEffects[effect][value](self, ...)
+	end
+
+	local item = self:GetNWString(slot, "none")
+	if SlashCoItems[item] and SlashCoItems[item][value] then
+		return SlashCoItems[item][value](self, ...)
+	end
+end
+
+--might break physics idk
+hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
+	if ent1:GetClass() == "sc_brick" and ent2:IsPlayer() and ent2:Team() == TEAM_SURVIVOR then
+		return false
+	end
+	if ent2:GetClass() == "sc_brick" and ent1:IsPlayer() and ent1:Team() == TEAM_SURVIVOR then
+		return false
+	end
+end)
+
+---load patch files; these are specifically intended to modify existing addon code
+
+local effect_patches = file.Find("slashco/patch/effect/*.lua", "LUA")
+for _, v in ipairs(effect_patches) do
+	AddCSLuaFile("slashco/patch/effect/" .. v)
+	include("slashco/patch/effect/" .. v)
+end
+
+local item_patches = file.Find("slashco/patch/item/*.lua", "LUA")
+for _, v in ipairs(item_patches) do
+	AddCSLuaFile("slashco/patch/item/" .. v)
+	include("slashco/patch/item/" .. v)
+end
+
+---this is a little outdated lol
+--[[local spawnableItems = {}
+for k, v in pairs(SlashCoItems) do
+    if v.ReplacesWorldProps then
+        spawnableItems[v.Model] = k
+    end
+end
+
+hook.Add("InitPostEntity", "SlashCo_ReplaceCinderBlocks", function()
+    for _, v in ipairs(ents.FindByClass("prop_physics")) do
+        local item = spawnableItems[v:GetModel()]
+        if item then
+            local it_pos = v:GetPos()
+            local it_ang = v:GetAngles()
+            local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, it_pos, it_ang)
+            SlashCo.CurRound.Items[droppedItem] = true
+            Entity(droppedItem):SetCollisionGroup(COLLISION_GROUP_NONE)
+            v:Remove()
+        end
+    end
+end)]]
 
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems

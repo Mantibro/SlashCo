@@ -1,0 +1,5 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\covenant\ltg_face"
+	"$halflambert" 1
+}

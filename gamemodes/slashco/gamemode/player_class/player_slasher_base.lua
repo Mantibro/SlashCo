@@ -17,12 +17,38 @@ function PLAYER:Loadout()
 end
 
 function PLAYER:SetModel()
+	local modelname = SlashCoSlashers[self.Player:GetNWBool("Slasher")].Model
+	util.PrecacheModel(modelname)
+	self.Player:SetModel(modelname)
+	self.Player:SetCanWalk(false)
+end
 
-	local modelname = SlashCoSlasher[self.Player:GetNWBool("Slasher")].Model
-	util.PrecacheModel( modelname )
-	self.Player:SetModel( modelname ) 
-	self.Player:SetCanWalk( false )
+if CLIENT then
+	function PLAYER:Init()
+		self.Player:RemoveEffects(EF_NOFLASHLIGHT)
 
+		if LocalPlayer() ~= self.Player then
+			return
+		end
+
+		timer.Simple(FrameTime(), function()
+			SlashCo.InitSlasherHud()
+		end)
+	end
+
+	function PLAYER:ClassChanged()
+		if LocalPlayer() ~= self.Player then
+			return
+		end
+
+		if IsValid(LocalPlayer().SlasherHud) then
+			LocalPlayer().SlasherHud:Remove()
+		end
+	end
+else
+	function PLAYER:Init()
+		self.Player:RemoveEffects(EF_NOFLASHLIGHT)
+	end
 end
 
 player_manager.RegisterClass("player_slasher_base", PLAYER, "player_default")

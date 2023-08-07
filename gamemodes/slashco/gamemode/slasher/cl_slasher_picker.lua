@@ -74,7 +74,7 @@ function DrawTheSlasherSelectorBox()
 	
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create( "DFrame" )
-	SlasherSelectFrame:SetTitle( "Pick Your Slasher" )
+	SlasherSelectFrame:SetTitle( "" )
 
 	local x = ScrW()/50
 	local y = ScrH()/25
@@ -83,7 +83,7 @@ function DrawTheSlasherSelectorBox()
 	local row = 0
 	local count = 1
 
-	for k, v in SortedPairs( SlashCoSlasher ) do
+	for k, v in SortedPairs( SlashCoSlashers ) do
 	
 		if not v.IsSelectable then continue end
 
@@ -125,7 +125,7 @@ function DrawTheSlasherSelectorBox()
 
 		Slash.Paint = function( self, w, h )
 			if is_available then
-				surface.SetMaterial( Material( "slashco/ui/icons/slasher/s_"..SlashCoSlasher[k].ID ) )
+				surface.SetMaterial( Material( "slashco/ui/icons/slasher/s_"..SlashCoSlashers[k].ID ) )
 			else
 				surface.SetMaterial( Material( "slashco/ui/icons/slasher/kill_disabled" ) )
 			end
@@ -148,7 +148,7 @@ function DrawTheSlasherSelectorBox()
 	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() LocalPlayer():EmitSound("slashco/slasher_select.mp3") end
 	confirmselect:SetPos( ScrW()/2, ScrH()/1.1 )
 	confirmselect:SetSize( ScrW()/4, 40 )
-	confirmselect:SetText( "SELECT" )
+	confirmselect:SetText( SlashCo.Language("ItemConfirm") )
 	confirmselect:SetFont( "MenuFont2" )
 	confirmselect.Paint = function( self, w, h )
 		draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 0, 0, 255 ) )
@@ -160,7 +160,7 @@ function DrawTheSlasherSelectorBox()
 		local mat = vgui.Create("Material", SlasherSelectFrame)
 		mat:SetPos(ScrW() - (ScrW()/2.5 ), 0)
 		mat:SetSize(ScrW()/2.5, ScrH()/1.5)
-		mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_"..SlashCoSlasher[SelectedSlasher].ID)
+		mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_"..SlashCoSlashers[SelectedSlasher].ID)
 		--mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1" )
 		mat.AutoSize = false
 	end
@@ -192,31 +192,31 @@ function DrawTheSlasherSelectorBox()
 	ISDesc:SetSize(ScrW()/2, 100)
 
 	if SelectedSlasher ~= "None" then 
-		ILabel:SetText( SlashCoSlasher[SelectedSlasher].Name ) 
-		ISDesc:SetText(SlashCoSlasher[SelectedSlasher].Description.."\n\nSpeed: "..SlashCoSlasher[SelectedSlasher].SpeedRating.."\nEyesight: "..SlashCoSlasher[SelectedSlasher].EyeRating.."\nDifficulty: "..SlashCoSlasher[SelectedSlasher].DiffRating ) 
-		ISClass:SetText( TranslateSlasherClass(SlashCoSlasher[SelectedSlasher].Class) ) 
-		ISDanger:SetText( TranslateDangerLevel(SlashCoSlasher[SelectedSlasher].DangerLevel)) 
+		ILabel:SetText( SlashCo.Language(SelectedSlasher) )
+		ISDesc:SetText(SlashCo.Language(SelectedSlasher.."_desc").."\n\n"..SlashCo.Language("slasher_speedrate")..": "..SlashCoSlashers[SelectedSlasher].SpeedRating.."\n"..SlashCo.Language("slasher_eyerate")..": "..SlashCoSlashers[SelectedSlasher].EyeRating.."\n"..SlashCo.Language("slasher_diffrate")..": "..SlashCoSlashers[SelectedSlasher].DiffRating )
+		ISClass:SetText( SlashCo.Language(TranslateSlasherClass(SlashCoSlashers[SelectedSlasher].Class)) )
+		ISDanger:SetText( SlashCo.Language(TranslateDangerLevel(SlashCoSlashers[SelectedSlasher].DangerLevel)))
 
-		if SlashCoSlasher[SelectedSlasher].DangerLevel == 1 then
+		if SlashCoSlashers[SelectedSlasher].DangerLevel == 1 then
 			ISDanger:SetTextColor( Color( 255, 200, 0) )
 		end
 
-		if SlashCoSlasher[SelectedSlasher].DangerLevel == 2 then
+		if SlashCoSlashers[SelectedSlasher].DangerLevel == 2 then
 			ISDanger:SetTextColor( Color( 255, 120, 120) )
 		end
 
-		if SlashCoSlasher[SelectedSlasher].DangerLevel == 3 then
+		if SlashCoSlashers[SelectedSlasher].DangerLevel == 3 then
 			ISDanger:SetTextColor( Color( 255, 0, 0) )
 		end
 
 		local Descriptor = vgui.Create( "DLabel", SlasherSelectFrame )
 		Descriptor:SetPos( ScrW()/2, ScrH()/1.75 )
 		Descriptor:SetSize(1024, 600)
-		Descriptor:SetText([[SLASHER CLASS:
+		Descriptor:SetText(SlashCo.Language("Class", "")..[[:
 		
 
 		
-		DANGER LEVEL:]])
+		]]..SlashCo.Language("DangerLevel","")..[[:]])
 		Descriptor:SetFont( "MenuFont1" )
 		Descriptor:SetAutoStretchVertical( true )
 	else
@@ -268,7 +268,7 @@ hook.Add("PlayerButtonDown", "TheCoder", function(ply, key)
 			if Fun.CurInput > 11 then
 				ply:ChatPrint("You unleashed the Beast.")
 				ply:EmitSound("slashco/slasher/leuonard_yell1.mp3")
-				SlashCoSlasher.Leuonard.IsSelectable = true
+				SlashCoSlashers.Leuonard.IsSelectable = true
 				if ( IsValid(SlasherSelectFrame) ) then
 					SlasherSelectFrame:Remove()
 					SlasherSelectFrame = nil

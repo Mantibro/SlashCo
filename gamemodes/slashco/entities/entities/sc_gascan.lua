@@ -1,55 +1,32 @@
 AddCSLuaFile()
 
-local SlashCo = SlashCo
-local SlashCoItems = SlashCoItems
-
 ENT.Type = "anim"
+ENT.Base = "sc_baseitem"
+ENT.PrintName = "GasCan"
+ENT.ClassName = "sc_gascan"
 
-ENT.ClassName 		= "sc_gascan"
-ENT.PrintName		= "gascan"
-ENT.Author			= "textstack"
-ENT.Contact			= ""
-ENT.Purpose			= "Something I don't remember."
-ENT.Instructions	= ""
-ENT.IsSelectable 	= true
-ENT.PingType = "ITEM"
+if SERVER then
+	function ENT:Use(activator)
+		if activator:Team() ~= TEAM_SURVIVOR then
+			return
+		end
 
-function ENT:Initialize()
-    if SERVER then
-        self:SetModel( SlashCoItems.GasCan.Model)
-        self:SetSolid( SOLID_VPHYSICS )
-        self:PhysicsInit( SOLID_VPHYSICS )
-        self:SetUseType( SIMPLE_USE )
-        self:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR ) --Collide with everything but the player
-        self:SetMoveType( MOVETYPE_VPHYSICS)
-    end
+		if activator:GetNWBool("CurseOfTheJug") and self:GetNWBool("JugCursed") then
+			self:SetPos(SlashCo.TraceHullLocator() + Vector(0, 0, 50))
+			self:SetNWBool("JugCursed", false)
 
-    local phys = self:GetPhysicsObject()
+			activator:SetNWBool("JugCurseActivate", true)
 
-    if phys:IsValid() then phys:Wake() end
-end
+			timer.Simple(6, function()
+				if IsValid(activator) then
+					activator:SetNWBool("JugCurseActivate", false)
+				end
+			end)
 
-function ENT:Use( activator )
+			return
+		end
 
-    if SERVER then
-
-        if activator:Team() == TEAM_SURVIVOR then
-
-            local index = self:EntIndex()
-            SlashCo.ItemPickUp(activator, index, "GasCan")
-
-        end
-
-    end
-
-end
-
-function ENT:UpdateTransmitState()
-    return TRANSMIT_ALWAYS
-end
-
-if CLIENT then
-    function ENT:Draw()
-        self:DrawModel()
-    end
+		local index = self:EntIndex()
+		SlashCo.ItemPickUp(activator, index, "GasCan")
+	end
 end

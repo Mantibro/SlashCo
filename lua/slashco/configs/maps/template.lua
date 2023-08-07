@@ -1,4 +1,16 @@
 {
+	"Manifest": {
+		"Name": "Template",
+		"Author": "Manti, Octo",
+		"Default": true,
+		"Size": 1,
+		"MinimumPlayers": 1,
+		"Levels": {
+			"1": 0,
+            "2": 0
+		}
+	},
+
 	"Spawnpoints": {
 		"Slasher": {
 			"1": {
@@ -29,6 +41,11 @@
 	},
 	"Helicopter": {
 
+		"IntroLocation": {
+			"pos":  [0, 0, 0],
+			"ang":  [0, 0, 0]							 
+		},
+
 		"StartLocation": {
 			"pos":  [0, 0, 0]
 		},
@@ -44,8 +61,8 @@
 		"Count": 8,
 		"Spawnpoints": {
 			"1": {
-				"pos":  [5904, 5961, 162.85162353516],
-				"ang":  [44, -154, 3]			   
+				"pos":  [0, 0, 0],
+				"ang":  [0, 0, 0]			   
 			},
 			"2": {
 				"pos": [0, 0, 0],
@@ -82,7 +99,7 @@
 			"10": {
 				"pos": [0, 0, 0],
 				"ang": [0, 0, 0]
-			},
+			}
 		}
 	},
 	"Items": {

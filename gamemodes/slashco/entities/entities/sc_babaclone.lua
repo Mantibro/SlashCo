@@ -49,12 +49,12 @@ function ENT:Think()
 			endpos = self:LocalToWorld(Vector(0,0,40)) + self:GetUp() * -10000
 		} )
 
-		if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SURVIVOR and SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateWalk == false and SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook == false then 
-			SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateWalk = true 
+		if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SURVIVOR and not self.activateWalk and SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook == false then
+			self.activateWalk = true
 			self:EmitSound("slashco/slasher/baba_reveal.mp3") 
 		end
 
-		if SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateWalk == true then 
+		if self.activateWalk == true then
 
 			if SlashCo.CurRound.SlasherEntities[self:EntIndex()].PostActivation == false then 
 				for s = 1, #team.GetPlayers(TEAM_SLASHER) do local sl = team.GetPlayers(TEAM_SLASHER)[s] sl:ChatPrint("A Bababooey Clone has been tripped!") end
@@ -111,7 +111,7 @@ function ENT:Think()
 
 		end
 
-		for i = 1, #team.GetPlayers(TEAM_SURVIVOR) do
+		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
 			if ply:GetPos():Distance( self:GetPos() ) < 150 then 

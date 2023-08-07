@@ -1,18 +1,9 @@
 AddCSLuaFile()
 
-local SlashCo = SlashCo
-local SlashCoItems = SlashCoItems
-
 ENT.Type = "anim"
-
-ENT.ClassName 		= "sc_rock"
-ENT.PrintName		= "rock"
-ENT.Author			= "Manti"
-ENT.Contact			= ""
-ENT.Purpose			= "This is plutonium."
-ENT.Instructions	= ""
-ENT.IsSelectable 	= true
-ENT.PingType = "ITEM"
+ENT.Base = "sc_baseitem"
+ENT.PrintName = "Rock"
+ENT.ClassName = "sc_rock"
 
 function ENT:Orient()
 	local selfPos = self:GetPos()
@@ -60,31 +51,4 @@ function ENT:Initialize()
 		end
 		self:Orient()
 	end)
-end
-
-function ENT:Use( activator )
-
-if SERVER then
-
-	if activator:Team() == TEAM_SURVIVOR then 
-
-		SlashCo.ItemPickUp(activator, self:EntIndex(), "Rock")
-
-		if ( self:IsPlayerHolding() ) then return end
-		activator:PickupObject( self )
-
-	end
-
-end
-
-end
-
-function ENT:UpdateTransmitState()	
-	return TRANSMIT_ALWAYS 
-end
-
-if CLIENT then
-    function ENT:Draw()
-		self:DrawModel()
-	end
 end

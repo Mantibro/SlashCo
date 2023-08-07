@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models\slashco\slashers\covenant\ltg_body"
+	"$bumpmap" "models\slashco\slashers\covenant\ltg_body_nm"
+	"$halflambert" 1
+}
