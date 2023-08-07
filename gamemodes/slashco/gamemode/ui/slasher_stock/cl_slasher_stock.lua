@@ -1,7 +1,5 @@
 local PANEL = {}
 
-local gasCansPerGenerator = 4 --this is set here since SlashCo.GasCansPerGenerator is serverside only for some reason
-
 local red = Color(255, 0, 0)
 local darkRed = Color(128, 32, 32)
 local lightRed = Color(255, 128, 128)
@@ -845,7 +843,7 @@ function PANEL:MakeGenEntry(gen, i, model)
 		end
 	end)
 
-	entry.angle = math.pi / ((gasCansPerGenerator + 1) / 2) * i
+	entry.angle = math.pi / ((SlashCo.GasCansPerGenerator + 1) / 2) * i
 	--local x, y = gen:GetPos()
 
 	function entry.Think()
@@ -861,7 +859,7 @@ function PANEL:MakeGenEntry(gen, i, model)
 	function entry.LayoutEntity(_, ent)
 		local YWiggle = math.sin(CurTime()) * 10
 		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5,
-				(YWiggle + entry.YSpin + (i * 360 / (gasCansPerGenerator + 1))) % 360, 5))
+				(YWiggle + entry.YSpin + (i * 360 / (SlashCo.GasCansPerGenerator + 1))) % 360, 5))
 	end
 	--entry.angle = angle
 
@@ -897,12 +895,12 @@ function PANEL:MakeGeneratorsCard()
 		gen:SetDistance(400)
 		self:ModelFog(gen)
 
-		gen.CansRemaining = gasCansPerGenerator
+		gen.CansRemaining = SlashCo.GasCansPerGenerator
 
 		gen.Entries = {}
 		PANEL:MakeGenEntry(gen, 0, "models/items/car_battery01.mdl")
 
-		for i = 1, gasCansPerGenerator do
+		for i = 1, SlashCo.GasCansPerGenerator do
 			PANEL:MakeGenEntry(gen, i)
 		end
 
@@ -1074,7 +1072,7 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 		if panel.CansRemainingNew then
 			playSound = true
 
-			for i = 2, 1 + gasCansPerGenerator - panel.CansRemainingNew do
+			for i = 2, 1 + SlashCo.GasCansPerGenerator - panel.CansRemainingNew do
 				if 5 - i < panel.CansRemaining then
 					panel.Entries[i].Spin:Start(1)
 				end

@@ -17,6 +17,10 @@ CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_player
 
 SlashCo = SlashCo or {}
 
+SlashCo.GasCansPerGenerator = 4 --Number of gas cans required to fill up a generator
+SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
+SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
+
 local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
 for _, v in ipairs(lang_files) do
 	AddCSLuaFile("slashco/lang/" .. v)
@@ -24,7 +28,7 @@ end
 
 local lang_patches, _ = file.Find("slashco/patch/lang/*.lua", "LUA")
 for _, v in ipairs(lang_patches) do
-	AddCSLuaFile("slashco/lang/" .. v)
+	AddCSLuaFile("slashco/patch/lang/" .. v)
 end
 
 function GM:Initialize()

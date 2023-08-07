@@ -17,13 +17,6 @@ local TimeToFuel = DefaultTimeToFuel
 
 function ENT:Initialize()
 	if CLIENT then
-		--[[
-		self.ProjectedModel = ClientsideModel("models/slashco/other/generator/generator.mdl")
-		self.ProjectedModel:SetPos(self:GetPos())
-		self.ProjectedModel:SetAngles(self:GetAngles())
-		self.ProjectedModel:SetNoDraw(true)
-		--]]
-
 		return
 	end
 
