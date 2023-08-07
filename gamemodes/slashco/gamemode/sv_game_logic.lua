@@ -165,11 +165,11 @@ end
 
 SlashCo.LoadCurRoundTeams = function()
 	local becameCovenant = 0
+	local spawn_queue = 0
 	if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
-		timer.Simple(0.05, function()
+		timer.Simple(0.25, function()
 			print("[SlashCo] Now proceeding with Spawns...")
 			SlashCo.PrepareSlasherForSpawning()
-			SlashCo.SpawnPlayers()
 		end)
 
 		print("[SlashCo] Teams database loaded...")
@@ -234,8 +234,10 @@ SlashCo.LoadCurRoundTeams = function()
 			--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
 			local query = sql.Query("SELECT * FROM slashco_table_survivordata; ") --This table shouldn't be organized like this.
+
 			for i = 1, #survivors do
 				if id == survivors[i].Survivors then
+
 					playercur:SetTeam(TEAM_SURVIVOR)
 					playercur:Spawn()
 					for _, v in ipairs(query) do
@@ -264,6 +266,7 @@ SlashCo.LoadCurRoundTeams = function()
 					playercur:SetTeam(TEAM_SPECTATOR)
 					playercur:Spawn()
 					print(playercur:Name() .. " now Spectator")
+					spawn_queue = spawn_queue + 1
 
 					if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
 						table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
@@ -280,14 +283,14 @@ SlashCo.LoadCurRoundTeams = function()
 							print(playercur:Name() .. " will become part of the Covenant.")
 							playercur:SetTeam(TEAM_SPECTATOR)
 							playercur:Spawn()
-
+							spawn_queue = spawn_queue + 1
 							goto covenant_member
 						end
 					end
-
 					print(playercur:Name() .. " now Slasher (Memorized)")
 					playercur:SetTeam(TEAM_SPECTATOR)
 					playercur:Spawn()
+					spawn_queue = spawn_queue + 1
 
 					table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
 
@@ -300,12 +303,16 @@ SlashCo.LoadCurRoundTeams = function()
 		end
 
 		--local id1 = slashers[1].Slashers
-		local id2 = 0
+		--[[local id2 = 0
 		if slashers[2] ~= nil then
 			id2 = slashers[2].Slashers
-		end
+		end]]
 
 		:: NIGHTMARE_SKIPALL ::
+
+		timer.Simple(0.1, function()
+			SlashCo.SpawnPlayers()
+		end)
 	else
 
 		print("[SlashCo] Something went wrong while trying to load the round data from the Teams Database! Restart imminent. (loadrounds)")
@@ -314,13 +321,20 @@ SlashCo.LoadCurRoundTeams = function()
 end
 
 SlashCo.SpawnPlayers = function()
-	for i, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		local pos = Vector(SlashCo.CurConfig.Spawnpoints.Survivor[i].pos[1],
-				SlashCo.CurConfig.Spawnpoints.Survivor[i].pos[2], SlashCo.CurConfig.Spawnpoints.Survivor[i].pos[3])
-		local ang = Angle(0, SlashCo.CurConfig.Spawnpoints.Survivor[i].ang, 0)
+	spawn_queue = 1
 
-		ply:SetPos(pos)
-		ply:SetAngles(ang)
+	for i, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		timer.Simple(FrameTime()*spawn_queue, function()
+
+			local pos = Vector(SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[1],
+					SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[2], SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[3])
+			local ang = Angle(0, SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].ang, 0)
+
+			ply:SetPos(pos)
+			ply:SetAngles(ang)
+
+		end)
+		spawn_queue = spawn_queue + 1
 	end
 end
 
