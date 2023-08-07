@@ -192,7 +192,7 @@ local stringTable = {
 			SlashCo.Language("Difficulty", difficultyTable[info[5]]),
 		}
 		if info[6] ~= "Regular" then
-			table.insert(lines, SlashCo.Language("Offering_name", difficultyTable[info[6]]))
+			table.insert(lines, SlashCo.Language("Offering_name", info[6]))
 		end
 
 		return lines
