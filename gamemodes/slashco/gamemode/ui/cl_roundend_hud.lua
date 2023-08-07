@@ -12,9 +12,9 @@ local function printPlayersNeatly(players)
 
 	local strings = {}
 	for i = 1, count - 2 do
-		table.insert(SlashCo.Language("InList", players[i]:GetName()))
+		table.insert(strings, SlashCo.Language("InList", players[i]:GetName()))
 	end
-	table.insert(SlashCo.Language("TwoElements", players[count - 1]:GetName(), players[count]:GetName()))
+	table.insert(strings, SlashCo.Language("TwoElements", players[count - 1]:GetName(), players[count]:GetName()))
 
 	return table.concat(strings), count
 end
