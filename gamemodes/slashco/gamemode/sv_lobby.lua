@@ -835,6 +835,10 @@ SlashCo.OfferingVoteSuccess = function(id)
 
     end
 
+    if fail == true then
+        return
+    end
+
     if id == 2 then
         --Satiation
 
@@ -843,10 +847,6 @@ SlashCo.OfferingVoteSuccess = function(id)
     end
 
     SlashCo.LobbyData.VotedOffering = 0
-
-    if fail == true then
-        return
-    end
 
     SlashCo.LobbyData.Offering = id
 

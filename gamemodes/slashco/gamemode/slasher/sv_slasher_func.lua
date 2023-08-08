@@ -232,6 +232,7 @@ SlashCo.StopChase = function(slasher)
 	slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
+	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 
 	timer.Simple(0.25, function()
 		if not IsValid(slasher) then
@@ -248,6 +249,10 @@ SlashCo.StopChase = function(slasher)
 end
 
 SlashCo.StartChaseMode = function(slasher)
+	if slasher.ChaseActivationCooldown > 0 then
+		return
+	end
+
 	if not slasher:GetNWBool("CanChase") then
 		return
 	end
@@ -257,18 +262,13 @@ SlashCo.StartChaseMode = function(slasher)
 		return
 	end
 
-	if slasher.ChaseActivationCooldown > 0 then
-		return
-	end
-	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
-
 	slasher:LagCompensation(true)
 	local trace = slasher:GetEyeTrace()
 	slasher:LagCompensation(false)
 
 	local target
 	local isFound = false
-	local dist = slasher:SlasherValue("ChaseRange", 600)
+	local dist = slasher:SlasherValue("ChaseRange", 1000)
 	if trace.Entity:IsPlayer() and trace.Entity:Team() == TEAM_SURVIVOR
 			and slasher:GetPos():Distance(trace.Entity:GetPos()) < dist then
 
@@ -307,6 +307,7 @@ SlashCo.StartChaseMode = function(slasher)
 
 	slasher:SetNWBool("InSlasherChaseMode", true)
 	slasher.CurrentChaseTick = 0
+	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 	slasher:SetRunSpeed(slasher:SlasherValue("ChaseSpeed"))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ChaseSpeed"))
 	PlayGlobalSound(slasher:SlasherValue("ChaseMusic"), 95, slasher)
