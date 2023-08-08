@@ -129,7 +129,7 @@ function ENT:RunBehaviour()
 
 				coroutine.wait(0.05)
 			else
-				coroutine.wait(1)
+				coroutine.wait(4)
 			end -- Walk to a random place
 			--self:StartActivity( ACT_IDLE )
 		end
@@ -213,10 +213,12 @@ function ENT:HandleStuck()
 			end
 		end
 
+		--[[
 		if lim == 120 then
 			self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 			self:Remove()
 		end
+		--]]
 
 		coroutine.wait(0.05)
 		lim = math.Clamp(lim + 0.5, 1, 120)
@@ -298,4 +300,9 @@ function ENT:Use(activator)
 
 	self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 	self:Remove()
+end
+
+function ENT:OnKilled(dmginfo)
+	self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+	hook.Run("OnNPCKilled", self, dmginfo:GetAttacker(), dmginfo:GetInflictor())
 end

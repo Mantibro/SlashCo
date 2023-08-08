@@ -744,7 +744,7 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, range, offs
 	local err_hullhit = 0
 	local offset_local = ent:GetForward() * offset
 	local success
-	for i = 0, 250 do
+	for i = 0, 350 do
 		local randPos = vector_up * math.random(min_range, range)
 		randPos:Rotate(AngleRand())
 		randPos.z = randPos.z / 2 + height_offset * 2
@@ -806,51 +806,12 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, range, offs
 		return pos
 	end
 
-	print(string.format("TRACE LOCATOR FAILURE -- line fails: %d; hull fails: %d", err_linehit, err_hullhit))
 	if g_SlashCoDebug then
+		print(string.format("TRACE LOCATOR FAILURE -- line fails: %d; hull fails: %d", err_linehit, err_hullhit))
 		debugoverlay.Line(linePos, pos - Vector(0, 0, 200), 4, Color(0, 0, 255), true)
 		debugoverlay.Cross(linePos, 40, 4, Color(255, 0, 0), true)
 		debugoverlay.Cross(pos, 20, 4, Color(0, 128, 255), true)
 	end
-
-	--[[
-	::RELOCATE::
-
-	if err > 250 then print("TRACE LOCATOR FAILURE.") return end
-
-	local x_s = math.random(-range,range)
-	local y_s = math.random(-range,range)
-
-	if math.abs(x_s) < min_range then y_s = min_range + math.random(0,range-min_range) end
-	if math.abs(y_s) < min_range then y_s = min_range + math.random(0,range-min_range) end
-
-	pos = ent:LocalToWorld(offset_local + Vector((x_s) ,y_s , height_offset * 50))
-
-	local tr_l = util.TraceLine( {
-		start = pos,
-		endpos = pos - Vector(0,0,1000),
-	} )
-
-	if not tr_l.Hit then err = err+1 goto RELOCATE end
-
-	local mins, maxs = ent:WorldSpaceAABB()
-	local tr = util.TraceHull( {
-		start = pos,
-		endpos = pos + Vector(0,0,tr_l.HitPos[3] - height_offset),
-		maxs = maxs, --Vector(18,18,72),
-		mins = mins, --Vector(-18,-18,0),
-	} )
-
-	if tr.Hit then err = err+1 goto RELOCATE end
-
-	--pos = tr_l.HitPos
-
-	debugoverlay.Cross(pos - Vector(0,0,1000), 20, 4, Color(0, 0, 255), true)
-	debugoverlay.Cross(pos, 40, 4, Color(255, 0, 255), true)
-	debugoverlay.Line(pos, pos - Vector(0,0,1000), 4, Color(0, 0, 255), true)
-
-	return pos
-	--]]
 end
 
 SlashCo.ClearDatabase = function()
