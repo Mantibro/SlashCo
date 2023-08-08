@@ -18,10 +18,38 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 
 	local target = ply
 	if args[1] then
+		target = nil
+
 		if tonumber(args[1]) then
-			target = Player(args[1])
-		else
+			target = Player(tonumber(args[1]))
+
+			if not IsValid(target) then
+				target = player.GetBySteamID64(args[1])
+			end
+		end
+
+		if not IsValid(target) then
 			target = player.GetBySteamID(args[1])
+		end
+
+		if not IsValid(target) then
+			local targetSelect, tooMany
+			for _, v in ipairs(player.GetAll()) do
+				if string.find(v:Nick(), args[1]) then
+					if targetSelect then
+						tooMany = true
+						break
+					end
+					targetSelect = v
+				end
+			end
+			if tooMany then
+				ply:ChatPrint("There's more than one player your arguments apply to.")
+				return
+			end
+			if targetSelect then
+				target = targetSelect
+			end
 		end
 
 		if not IsValid(target) then
@@ -69,12 +97,45 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		return
 	end
 
+	if not SlashCoSlashers[args[1]] then
+		ply:ChatPrint("That slasher doesn't exist.")
+		return
+	end
+
 	local target = ply
 	if args[2] then
+		target = nil
+
 		if tonumber(args[2]) then
-			target = Player(args[2])
-		else
+			target = Player(tonumber(args[2]))
+
+			if not IsValid(target) then
+				target = player.GetBySteamID64(args[2])
+			end
+		end
+
+		if not IsValid(target) then
 			target = player.GetBySteamID(args[2])
+		end
+
+		if not IsValid(target) then
+			local targetSelect, tooMany
+			for _, v in ipairs(player.GetAll()) do
+				if string.find(v:Nick(), args[2]) then
+					if targetSelect then
+						tooMany = true
+						break
+					end
+					targetSelect = v
+				end
+			end
+			if tooMany then
+				ply:ChatPrint("There's more than one player your arguments apply to.")
+				return
+			end
+			if targetSelect then
+				target = targetSelect
+			end
 		end
 
 		if not IsValid(target) then
@@ -94,18 +155,21 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 	target:Spawn()
 end, function(cmd, args)
 	--this is for autocomplete
-	args = string.lower(string.Trim(args))
+	local preArg = string.Trim(args)
+	args = string.lower(preArg)
 	local tbl = table.GetKeys(SlashCoSlashers)
 
 	local tbl1 = {}
+	local elem
 	for _, v in ipairs(tbl) do
 		--find every item that matches what's inputted
 		if string.find(string.lower(v), args) then
 			table.insert(tbl1, cmd .. " " .. v)
+			elem = v
 		end
 	end
 
-	if #tbl1 == 1 then
+	if #tbl1 == 1 and preArg == elem then
 		tbl1[1] = tbl1[1] .. " [steamid/userid]"
 	end
 
