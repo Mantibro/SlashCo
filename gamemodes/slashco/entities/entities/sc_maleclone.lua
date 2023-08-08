@@ -41,7 +41,7 @@ function ENT:RunBehaviour()
 		coroutine.yield()
 		-- The function is done here, but will start back at the top of the loop and make the bot walk somewhere else
 
-		if self:GetPos()[3] < -2000 then
+		if self:GetPos()[3] < -16000 then
 			self:Remove()
 			SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0, 0, 0))
 		end

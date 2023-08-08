@@ -835,10 +835,6 @@ SlashCo.OfferingVoteSuccess = function(id)
 
     end
 
-    if fail == true then
-        return
-    end
-
     if id == 2 then
         --Satiation
 
@@ -856,7 +852,9 @@ SlashCo.OfferingVoteSuccess = function(id)
         SlashCo.EndOfferingVote(play)
     end
 
-    SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
+    if not fail then
+        SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
+    end
 
 end
 
