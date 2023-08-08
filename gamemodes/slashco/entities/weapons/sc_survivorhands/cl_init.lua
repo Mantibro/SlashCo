@@ -189,7 +189,9 @@ function SWEP:DrawWorldModel()
 		v = SlashCoItems[item].WorldModel
 	end
 	if not v then
-		self.heldEntityWorld:SetNoDraw(true)
+		if IsValid(self.heldEntityWorld) then
+			self.heldEntityWorld:SetNoDraw(true)
+		end
 		self:SetHoldType("normal")
 		return
 	end
@@ -202,7 +204,7 @@ function SWEP:DrawWorldModel()
 	if itemH and SlashCoItems[itemH] and SlashCoItems[itemH].WorldModelHolstered then
 		self:RenderModel(SlashCoItems[itemH].WorldModelHolstered, self.heldEntityHolstered, self.Owner, nil, nil, itemH)
 		self.Owner:ItemFunction2("OnRenderHolstered", itemH, self.heldEntityHolstered)
-	else
+	elseif IsValid(self.heldEntityWorld) then
 		self.heldEntityHolstered:SetNoDraw(true)
 	end
 end
