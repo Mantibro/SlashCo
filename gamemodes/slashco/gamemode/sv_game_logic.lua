@@ -715,20 +715,6 @@ SlashCo.SpawnCurConfig = function(isDebug)
 		SlashCo.CurRound.ItemCount = SlashCo.CurRound.ItemCount + SlashCo.CurRound.OfferingData.ItemMod + SlashCo.CurRound.Difficulty
 		local item_count = ((SlashCo.MAXPLAYERS + 1) - math.floor((diff + 1) / 2)) - #SlashCo.CurRound.SlasherData.AllSurvivors
 
-		SlashCo.CurRound.GasCanCount = SlashCo.CurRound.GasCanCount + slashergasmod
-		if SlashCo.CurRound.GasCanCount < 2 then
-			SlashCo.CurRound.GasCanCount = 2
-		end
-
-		--Initialize spawn points
-		local genSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GeneratorCount,
-				#(SlashCo.CurConfig.Generators.Spawnpoints))
-		local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
-		if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
-			gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount,
-					#(SlashCo.CurConfig.Offerings.Exposure.Spawnpoints))
-		end
-
 		local possibleItemSpawnpoints = SlashCo.CurConfig.Items.Spawnpoints
 		if SlashCo.CurConfig.Items.IncludeGasCanSpawns then
 			for i = 1, #(SlashCo.CurConfig.GasCans.Spawnpoints) do
@@ -788,6 +774,20 @@ SlashCo.SpawnCurConfig = function(isDebug)
 			end
 
 			slashergasmod = slashergasmod + SlashCo.CurRound.Slashers[p:SteamID64()].GasCanMod
+		end
+
+		SlashCo.CurRound.GasCanCount = SlashCo.CurRound.GasCanCount + slashergasmod
+		if SlashCo.CurRound.GasCanCount < 2 then
+			SlashCo.CurRound.GasCanCount = 2
+		end
+
+		--Initialize spawn points
+		local genSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GeneratorCount,
+				#(SlashCo.CurConfig.Generators.Spawnpoints))
+		local gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount, #(SlashCo.CurConfig.GasCans.Spawnpoints))
+		if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
+			gasSpawns = SlashCo.GetSpawnpoints(SlashCo.CurRound.GasCanCount,
+					#(SlashCo.CurConfig.Offerings.Exposure.Spawnpoints))
 		end
 
 		local spawnableItems = {}
