@@ -48,30 +48,31 @@ function ENT:Touch(otherEnt)
 
 		local gasCan = ents.Create("prop_physics")
 
-        gasCan:SetModel(SlashCoItems.GasCan.Model)
-        gasCan:SetMoveType(MOVETYPE_NONE)
-        gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-        gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
-        gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
-        gasCan:SetParent(self)
+		gasCan:SetModel(SlashCoItems.GasCan.Model)
+		gasCan:SetMoveType(MOVETYPE_NONE)
+		gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
+		gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
+		gasCan:SetParent(self)
 
 		self.FuelingCan = gasCan
 
-        SlashCo.SpawnSlasher()
-    elseif not self.MakingItem and not self.HasBattery and class == "sc_battery" and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-33.59, 13.2, 53.7))) < 26 then
-        otherEnt:Remove()
+		SlashCo.SpawnSlasher()
+	elseif not self.MakingItem and not self.HasBattery and class == "sc_battery" and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-33.59,
+			13.2, 53.7))) < 26 then
+		otherEnt:Remove()
 
 		local battery = ents.Create("prop_physics")
 		self.HasBattery = battery
 
-        battery:SetModel(SlashCoItems.Battery.Model)
-        battery:SetMoveType(MOVETYPE_NONE)
-        battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-        battery:SetPos(self:LocalToWorld(Vector(-33.59, 13.2, 53.7)))
-        battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
-        battery:SetParent(self)
-        battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-        battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+		battery:SetModel(SlashCoItems.Battery.Model)
+		battery:SetMoveType(MOVETYPE_NONE)
+		battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		battery:SetPos(self:LocalToWorld(Vector(-33.59, 13.2, 53.7)))
+		battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+		battery:SetParent(self)
+		battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
+		battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
 
 		SlashCo.SpawnSlasher()
 	end
@@ -93,14 +94,14 @@ function ENT:MakeBattery(model)
 	local battery = ents.Create("prop_physics")
 	self.HasBattery = IsValid(battery)
 
-    battery:SetModel(model)
-    battery:SetMoveType(MOVETYPE_NONE)
-    battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-    battery:SetPos(self:LocalToWorld(Vector(-33.59, 13.2, 53.7)))
-    battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
-    battery:SetParent(self)
-    battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-    battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+	battery:SetModel(model)
+	battery:SetMoveType(MOVETYPE_NONE)
+	battery:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+	battery:SetPos(self:LocalToWorld(Vector(-33.59, 13.2, 53.7)))
+	battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
+	battery:SetParent(self)
+	battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
+	battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
 
 	SlashCo.SpawnSlasher()
 end
@@ -109,12 +110,12 @@ function ENT:MakeGasCan(model)
 	self.MakingItem = nil
 	local gasCan = ents.Create("prop_physics")
 
-    gasCan:SetModel(model)
-    gasCan:SetMoveType(MOVETYPE_NONE)
-    gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-    gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
-    gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
-    gasCan:SetParent(self)
+	gasCan:SetModel(model)
+	gasCan:SetMoveType(MOVETYPE_NONE)
+	gasCan:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+	gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
+	gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
+	gasCan:SetParent(self)
 
 	self.FuelingCan = gasCan
 
@@ -155,6 +156,10 @@ function ENT:Use(activator, _, _)
 				self:MakeGasCan(self.ItemModel)
 			end)
 
+			if IsValid(self.SpawnedAt) then
+				self.SpawnedAt:TriggerOutput("OnInsertFuel", activator)
+			end
+
 			activator:SecondaryItemFunction("OnFuel", self)
 			SlashCo.RemoveItem(activator, true)
 		elseif activator:ItemValue("IsBattery", false, true) and not self.HasBattery then
@@ -163,6 +168,10 @@ function ENT:Use(activator, _, _)
 			timer.Simple(0.25, function()
 				self:MakeBattery(self.ItemModel)
 			end)
+
+			if IsValid(self.SpawnedAt) then
+				self.SpawnedAt:TriggerOutput("OnBattery", activator)
+			end
 
 			activator:SecondaryItemFunction("OnBattery", self)
 			SlashCo.RemoveItem(activator, true)
@@ -179,12 +188,19 @@ function ENT:SlasherHint()
 end
 
 function ENT:SlasherObserve()
+	local observed
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if v:GetEyeTrace().Entity == self and (not v.GenCooldown or CurTime() - v.GenCooldown > 3) then
 			timer.Remove(self:GetCreationID() .. "_slasherHint_" .. v:UserID())
 			SlashCo.SendValue(v, "genProg", self, self.HasBattery, self.CansRemaining or SlashCo.GasCansPerGenerator)
 			v.GenCooldown = CurTime()
+
+			observed = true
 		end
+	end
+
+	if observed and IsValid(self.SpawnedAt) then
+		self.SpawnedAt:TriggerOutput("OnSlasherObserved", self.CurrentPourer)
 	end
 end
 
@@ -217,16 +233,19 @@ function ENT:Think()
 		self:StopSound("slashco/generator_fill.wav")
 		return
 	end
-    local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
-    self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25 + fuelprog * 40)))
-    self.FuelingCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035 + fuelprog * 10)))
+	local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
+	self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25 + fuelprog * 40)))
+	self.FuelingCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035 + fuelprog * 10)))
 
 	if CurTime() >= self.TimeUntilFueled then
-
 		SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal = SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal + 5
 
 		if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
 			SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal = SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal + (#team.GetPlayers(TEAM_SLASHER) * 15)
+		end
+
+		if IsValid(self.SpawnedAt) then
+			self.SpawnedAt:TriggerOutput("OnFueled", self.CurrentPourer)
 		end
 
 		self.IsFueling = false
@@ -261,20 +280,18 @@ function ENT:Think()
 		--//start generator if ready//--
 
 		if self.CansRemaining <= 0 and self.HasBattery and not self.IsRunning then
-			self.IsRunning = true
+			if IsValid(self.SpawnedAt) then
+				self.SpawnedAt:TriggerOutput("OnComplete", self.CurrentPourer)
+			end
 
+			self.IsRunning = true
 			self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
 
 			timer.Simple(6.4, function()
-
 				PlayGlobalSound("slashco/generator_loop.wav", 85, self, 1)
-
 			end)
-
 		elseif self.HasBattery and self.CansRemaining > 0 then
-
 			self:EmitSound("slashco/generator_failstart.wav", 85, 100, 1)
-
 		end
 
 		self.FuelingCan = nil

@@ -691,6 +691,8 @@ SlashCo.SpawnCurConfig = function(isDebug)
 			return
 		end
 
+		SlashCo.RoundStarted = true
+
 		local slashergasmod = 0
 
 		local diff = SlashCo.CurRound.Difficulty
