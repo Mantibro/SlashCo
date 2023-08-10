@@ -62,7 +62,7 @@ end
 function ENT:Enter(ent)
 	ent.LimitBrush = self
 
-	if SERVER and self.SpeedEffect and self.SpeedEffect >= 0 then
+	if SERVER and ent:Team() == TEAM_SURVIVOR and self.SpeedEffect and self.SpeedEffect >= 0 then
 		local priority = 14
 		if self.SpeedEffect > 200 and ent:Team() == TEAM_SURVIVOR then
 			priority = 5
@@ -82,7 +82,7 @@ function ENT:Leave(ent)
 	ent.LimitBrush = nil
 	self.PlayersInside[ent] = nil
 
-	if SERVER then
+	if SERVER and ent:Team() == TEAM_SURVIVOR then
 		ent:RemoveSpeedEffect("limitedZone")
 	end
 
@@ -94,6 +94,7 @@ end
 
 function ENT:Touch(ent)
 	if not ent:IsPlayer() or ent.LimitBrush ~= self then
+		self:StartTouch(ent) --helps for when a player exits a limited zone to immediately enter another
 		return
 	end
 
