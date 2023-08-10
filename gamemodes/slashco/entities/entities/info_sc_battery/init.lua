@@ -5,18 +5,20 @@ function ENT:ExtraKeyValue1(key, value)
 	local key1 = string.lower(key)
 	if key1 == "generator" then
 		local gens = ents.FindByName(value)
-		local gen
-		if not table.IsEmpty(gens) then
-			gen = gens[1]
-		end
-		if not IsValid(gen) then
-			return
+		if table.IsEmpty(gens) then
+			gens = ents.FindByClass("info_sc_generator")
+
+			if table.IsEmpty(gens) then
+				return
+			end
 		end
 
-		self.Generator = gen
-		gen.BatterySpawns = gen.BatterySpawns or {}
-		gen.BatterySpawns[self] = true
-		--table.insert(gen.BatterySpawns, self)
+		self.Generators = gens
+		for _, v in ipairs(gens) do
+			v.BatterySpawns = v.BatterySpawns or {}
+			v.BatterySpawns[self] = true
+		end
+
 		return
 	end
 end

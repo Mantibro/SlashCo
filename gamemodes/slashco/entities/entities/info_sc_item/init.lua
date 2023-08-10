@@ -7,4 +7,8 @@ function ENT:ExtraKeyValue1(key, value)
 		self.IsGasCanSpawn = tonumber(value) == 1
 		return
 	end
+	if key1 == "item" then
+		self.Item = value
+		return
+	end
 end
