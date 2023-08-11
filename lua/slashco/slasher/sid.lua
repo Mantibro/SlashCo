@@ -25,6 +25,7 @@ SLASHER.ProTip = "Sid_tip"
 SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
+SLASHER.ItemToSpawn = "Cookie"
 
 SLASHER.PickUpAttempt = function()
 	return false

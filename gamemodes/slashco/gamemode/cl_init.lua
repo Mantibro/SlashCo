@@ -78,6 +78,7 @@ include("ui/slasher_stock/cl_slasher_control.lua")
 include("ui/slasher_stock/cl_slasher_meter.lua")
 include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
+include("cl_limitedzone.lua")
 
 CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
 CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true,

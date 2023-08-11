@@ -169,6 +169,7 @@ SlashCo.ItemPickUp = function(ply, item, itid)
 
 	if IsValid(itemEnt.SpawnedAt) then
 		itemEnt.SpawnedAt:TriggerOutput("OnPickedUp", ply)
+		itemEnt.SpawnedAt.SpawnedEntity = nil
 	end
 
 	SlashCo.ChangeSurvivorItem(ply, itid)

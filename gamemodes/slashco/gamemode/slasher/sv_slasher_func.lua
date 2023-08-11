@@ -100,7 +100,8 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 	--The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (1 - 10)
 	local totalProgress = 0
 	for _, v in ipairs(gens) do
-		totalProgress = totalProgress + (SlashCo.GasCansPerGenerator - (v.CansRemaining or SlashCo.GasCansPerGenerator)) + ((v.HasBattery and 1) or 0)
+		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+		totalProgress = totalProgress + (gasPerGen - (v.CansRemaining or gasPerGen)) + ((v.HasBattery and 1) or 0)
 	end
 	if SlashCo.CurRound.GameProgress > -1 then
 		SlashCo.CurRound.GameProgress = totalProgress

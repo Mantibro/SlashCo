@@ -45,7 +45,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local v3 = slasher.SlasherValue3 --Watched
 	local v4 = slasher.SlasherValue4 --Stalk time
 
-	slasher.SlasherValue3 = BoolToNumber(slasher:GetNWBool("WatcherWatched"))
+	slasher.SlasherValue3 = slasher:GetNWBool("WatcherWatched") and 1 or 0
 
 	if not slasher:GetNWBool("WatcherRage") then
 		if v1 > 0 then

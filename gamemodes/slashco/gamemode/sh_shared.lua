@@ -17,7 +17,9 @@ CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_player
 
 SlashCo = SlashCo or {}
 
-SlashCo.GasCansPerGenerator = 4 --Number of gas cans required to fill up a generator
+SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator
+SlashCo.GasCans = 8 --Default number of generators
+SlashCo.Generators = 2 --Default number of generators
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
 
@@ -52,10 +54,6 @@ function GM:CreateTeams()
 
 	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235))
 end
-
---[[function GM:PlayerSelectTeamSpawn(team, ply)
-	
-end]]
 
 local DoorSlamWhitelist = {
 	["models/props_c17/door03_left.mdl"] = true,

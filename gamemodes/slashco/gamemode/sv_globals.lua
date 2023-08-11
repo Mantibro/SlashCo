@@ -24,7 +24,6 @@ end
 SlashCo.MAXPLAYERS = 7
 
 SlashCo.LobbyData = {
-
 	LOBBYSTATE = 0,
 	Offering = 0,
 	ButtonDoorPrimary = NULL,
@@ -93,7 +92,7 @@ SlashCo.ResetCurRoundData = function()
 		Helicopter = 0,
 		SlashersToBeSpawned = {},
 		Slashers = {},
-		GeneratorCount = 2,
+		--GeneratorCount = 2,
 		GasCanCount = 8,
 		ItemCount = 6,
 		roundOverToggle = false, --weird
@@ -110,6 +109,7 @@ SlashCo.ResetCurRoundData()
 SlashCo.PlayerData = SlashCo.PlayerData or {} --Holds all loaded playerdata
 
 --Spawn a generator
+--[[
 SlashCo.CreateGenerator = function(pos, ang)
 	local Ent = ents.Create("sc_generator")
 
@@ -125,14 +125,16 @@ SlashCo.CreateGenerator = function(pos, ang)
 
 	return Ent:EntIndex()
 end
+--]]
 
 --Spawn a gas can
-SlashCo.CreateGasCan = function(pos, ang, test)
+-- [[
+SlashCo.CreateGasCan = function(pos, ang)
 	local Ent = ents.Create("sc_gascan")
 
 	if not IsValid(Ent) then
 		MsgC(Color(255, 50, 50),
-				"[SlashCo] Something went wrong when trying to create an exposure gas can at (" .. tostring(pos) .. "), entity was NULL.\n")
+				"[SlashCo] Something went wrong when trying to create a gas can at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
 
@@ -147,8 +149,10 @@ SlashCo.CreateGasCan = function(pos, ang, test)
 
 	return Ent
 end
+--]]
 
 --Spawn a gas can (testing only for exposure spawnpoints)
+--[[
 SlashCo.CreateGasCanE = function(pos, ang)
 	local Ent = ents.Create("sc_gascan")
 
@@ -168,6 +172,7 @@ SlashCo.CreateGasCanE = function(pos, ang)
 
 	return id
 end
+--]]
 
 --Spawn an Item( or any entity, including slasher entities )
 SlashCo.CreateItem = function(class, pos, ang)
@@ -200,6 +205,7 @@ SlashCo.CreateItem = function(class, pos, ang)
 end
 
 --Spawn a battery
+--[[
 SlashCo.CreateBattery = function(pos, ang)
 	local Ent = ents.Create("sc_battery")
 
@@ -215,7 +221,9 @@ SlashCo.CreateBattery = function(pos, ang)
 
 	return Ent
 end
+--]]
 
+--[[
 SlashCo.CreateGenerators = function(spawnpoints, testconfig)
 	for k, v in ipairs(spawnpoints) do
 		local pos = SlashCo.CurConfig.Generators.Spawnpoints[v].pos
@@ -297,6 +305,7 @@ SlashCo.CreateBatteriesE = function(spawnpoints)
 		end
 	end
 end
+--]]
 
 --Spawn the helicopter 
 SlashCo.CreateHelicopter = function(pos, ang)
@@ -312,11 +321,8 @@ SlashCo.CreateHelicopter = function(pos, ang)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
 
-	local id = Ent:EntIndex()
-
-	SlashCo.CurRound.Helicopter = id
-
-	return id
+	SlashCo.CurRound.Helicopter = Ent:EntIndex()
+	return Ent
 end
 
 --Spawn the item stash 
@@ -377,7 +383,6 @@ SlashCo.CreateRadio = function(pos, ang)
 end
 
 SlashCo.RemoveAllCurRoundEnts = function()
-
 	local gens = ents.FindByClass("sc_generator")
 	for _, v in ipairs(gens) do
 		local can = v.FuelingCan --make sure any attached cans and bats go too
@@ -426,7 +431,6 @@ SlashCo.GoToLobby = function()
 end
 
 SlashCo.SummonEscapeHelicopter = function(distress)
-
 	if SlashCo.CurRound.EscapeHelicopterSummoned then
 		return true
 	end
@@ -442,13 +446,10 @@ SlashCo.SummonEscapeHelicopter = function(distress)
 	SlashCo.CurRound.EscapeHelicopterSummoned = true
 
 	--[[
-
-			Once both Generators have been activated, a timer will start which will determine when the rescue helicopter will arrive.
-			Difficulty 0 - 30-60 seconds
-			Difficulty 1,2 - 30-100 seconds
-			Difficulty 3 - 30-140 seconds
-
-
+		Once both Generators have been activated, a timer will start which will determine when the rescue helicopter will arrive.
+		Difficulty 0 - 30-60 seconds
+		Difficulty 1,2 - 30-100 seconds
+		Difficulty 3 - 30-140 seconds
 	]]
 
 	local delay = 30 + math.random(0, 30 + (SlashCo.CurRound.Difficulty * 20))
@@ -456,46 +457,36 @@ SlashCo.SummonEscapeHelicopter = function(distress)
 	print("[SlashCo] Generators On. The Helicopter will arrive in " .. delay .. " seconds.")
 
 	timer.Simple(delay, function()
-
-		local entID = SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterSpawnPosition, Angle(0, 0, 0))
+		local ent = SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterSpawnPosition, Angle(0, 0, 0))
 
 		SlashCo.EscapeVoicePrompt()
-
 		timer.Simple(0.1, function()
-
-			SlashCo.HelicopterGoAboveLand(entID)
-
+			SlashCo.HelicopterGoAboveLand(ent)
 		end)
 
 		net.Start("mantislashcoHelicopterMusic")
 		net.Broadcast()
-
 	end)
-
 end
 
-SlashCo.HelicopterGoAboveLand = function(id)
+SlashCo.HelicopterGoAboveLand = function(ent)
+	local target = SlashCo.SelectSpawnsNoForce(ents.FindByClass("info_sc_helicopter"))
+	if not IsValid(target) then
+		SlashCo.Abort("Missing helicopter landing entities")
+		return
+	end
+	local pos = target:GetPos() - Vector(0, 0, 70)
 
-	local rand = math.random(1, #SlashCo.CurConfig.Helicopter.Spawnpoints) --The Landing position is randomized
-
-	local pos = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].pos
-	--local ang = SlashCo.CurConfig.Helicopter.Spawnpoints[rand].ang
-
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1], pos[2], pos[3] + 1000)
-
-	local delay = math.sqrt(ents.GetByIndex(id):GetPos():Distance(Vector(pos[1], pos[2], pos[3] + 1000))) / 5
+	SlashCo.CurRound.HelicopterTargetPosition = pos + Vector(0, 0, 1000)
+	local delay = math.sqrt(ent:GetPos():Distance(pos + Vector(0, 0, 1000))) / 5
 
 	timer.Simple(delay, function()
-
 		SlashCo.HelicopterLand(pos)
-
 	end)
-
 end
 
 SlashCo.HelicopterLand = function(pos)
-
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(pos[1], pos[2], pos[3])
+	SlashCo.CurRound.HelicopterTargetPosition = pos
 
 	timer.Simple(math.random(4, 6), function()
 		SlashCo.HelicopterRadioVoice(3)
@@ -511,49 +502,35 @@ SlashCo.HelicopterLand = function(pos)
 	print("[SlashCo] Helicopter set to abandon players in " .. tostring(abandon) .. " seconds.")
 
 	timer.Simple(abandon, function()
-
 		SlashCo.HelicopterTakeOff()
 		SlashCo.SurvivorWinFinish()
-
 	end)
-
 end
 
 SlashCo.HelicopterTakeOff = function()
-
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],
 			SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
 
 	timer.Simple(9, function()
-
 		SlashCo.HelicopterFinalLeave()
-
 	end)
-
 end
 
 SlashCo.HelicopterTakeOffIntro = function()
-
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],
 			SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
 
 	timer.Simple(9, function()
-
 		SlashCo.HelicopterLeaveForIntro()
-
 	end)
-
 end
 
 SlashCo.HelicopterFinalLeave = function()
-
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
 			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3])
-
 end
 
 SlashCo.HelicopterLeaveForIntro = function()
-
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
 			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3])
 
@@ -573,48 +550,37 @@ SlashCo.HelicopterLeaveForIntro = function()
 		heli:StopSound("slashco/helicopter_rotors_close.wav")
 
 		timer.Simple(0.05, function()
-
-			heli:StopSound("slashco/helicopter_engine_distant.wav")
-			heli:StopSound("slashco/helicopter_rotors_distant.wav")
-			heli:StopSound("slashco/helicopter_engine_close.wav")
-			heli:StopSound("slashco/helicopter_rotors_close.wav")
-
+			if IsValid(heli) then
+				heli:StopSound("slashco/helicopter_engine_distant.wav")
+				heli:StopSound("slashco/helicopter_rotors_distant.wav")
+				heli:StopSound("slashco/helicopter_engine_close.wav")
+				heli:StopSound("slashco/helicopter_rotors_close.wav")
+			end
 			SlashCo.RemoveHelicopter()
 
 			net.Start("mantislashcoMapAmbientPlay")
 			net.Broadcast()
-
 		end)
-
 	end)
-
 end
 
 SlashCo.UpdateHelicopterSeek = function(pos)
-
 	SlashCo.CurRound.HelicopterTargetPosition = pos
-
 end
 
 SlashCo.RemoveHelicopter = function()
-
 	local ent = ents.GetByIndex(SlashCo.CurRound.Helicopter)
-
 	if IsValid(ent) then
 		ent:Remove()
 	end
-
 end
 
 SlashCo.TraceHullLocator = function()
-
 	--Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player or npc.
 
 	local height_offset = 10
 	local size = SCInfo.Maps[game.GetMap()].SIZE
-
 	local range = 3500 * size
-
 	local pos = Vector(0, 0, h)
 
 	:: RELOCATE ::
@@ -646,11 +612,9 @@ SlashCo.TraceHullLocator = function()
 	pos = tr_l.HitPos
 
 	return pos
-
 end
 
 SlashCo.RadialTester = function(ent, dist, secondary)
-
 	local last_best_angle = 0
 	local last_greatest_distance = 0
 
@@ -669,30 +633,21 @@ SlashCo.RadialTester = function(ent, dist, secondary)
 		end
 
 		if (tr.HitPos - tr.StartPos):Length() > last_greatest_distance then
-
 			last_greatest_distance = (tr.HitPos - tr.StartPos):Length()
-
 			last_best_angle = ang
-
 		end
-
 	end
 
 	return last_best_angle
-
 end
 
 SlashCo.LocalizedTraceHullLocator = function(ent, input_range)
-
 	--Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
 
 	local height_offset = 10
-	local size = SCInfo.Maps[game.GetMap()].SIZE
-
+	--local size = SCInfo.Maps[game.GetMap()].SIZE
 	local range = input_range
-
 	local pos = Vector(0, 0, h)
-
 	local err = 0
 
 	:: RELOCATE ::
@@ -815,19 +770,11 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, range, offs
 end
 
 SlashCo.ClearDatabase = function()
-
 	if SERVER then
-
 		print("[SlashCo] Clearing Database. . .")
 
 		sql.Query("DROP TABLE slashco_table_basedata;")
 		sql.Query("DROP TABLE slashco_table_survivordata;")
 		sql.Query("DROP TABLE slashco_table_slasherdata;")
-
 	end
-
-end
-
-function BoolToNumber(bool)
-	return bool and 1 or 0
 end

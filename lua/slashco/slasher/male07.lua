@@ -316,6 +316,14 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
+SLASHER.OnItemSpawn = function()
+	local diff = SlashCo.CurRound.Difficulty
+
+	for _ = 1, (math.random(0, 6) + (10 * SCInfo.Maps[game.GetMap()].SIZE) + (diff * 4)) do
+		SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), angle_zero)
+	end
+end
+
 SLASHER.Footstep = function(ply)
 	if SERVER then
 		if ply:GetModel() == "models/hunter/plates/plate.mdl" then

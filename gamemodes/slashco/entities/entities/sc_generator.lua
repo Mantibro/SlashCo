@@ -43,7 +43,8 @@ function ENT:Touch(otherEnt)
 	end
 
 	local class = otherEnt:GetClass()
-	if not self.MakingItem and not self.FuelingCan and class == "sc_gascan" and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	if not self.MakingItem and not self.FuelingCan and class == "sc_gascan" and (self.CansRemaining or gasPerGen) > 0 then
 		otherEnt:Remove()
 
 		local gasCan = ents.Create("prop_physics")
@@ -77,7 +78,8 @@ function ENT:Touch(otherEnt)
 		SlashCo.SpawnSlasher()
 	end
 
-	if (self.CansRemaining or SlashCo.GasCansPerGenerator) <= 0 and self.HasBattery and not self.IsRunning then
+	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	if (self.CansRemaining or gasPerGen) <= 0 and self.HasBattery and not self.IsRunning then
 		self.IsRunning = true
 		local delay = 6
 		self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
@@ -148,8 +150,9 @@ function ENT:Use(activator, _, _)
 		self:EmitSound("slashco/generator_fill.wav")
 	elseif not self.MakingItem then
 		self:SlasherHint()
+		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 		if activator:ItemValue("IsFuel", false,
-				true) and not self.FuelingCan and (self.CansRemaining or SlashCo.GasCansPerGenerator) > 0 then
+				true) and not self.FuelingCan and (self.CansRemaining or gasPerGen) > 0 then
 			self.MakingItem = true
 			self.ItemModel = activator:ItemValue("Model", false, true)
 			timer.Simple(0.25, function()
@@ -189,10 +192,11 @@ end
 
 function ENT:SlasherObserve()
 	local observed
+	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if v:GetEyeTrace().Entity == self and (not v.GenCooldown or CurTime() - v.GenCooldown > 3) then
 			timer.Remove(self:GetCreationID() .. "_slasherHint_" .. v:UserID())
-			SlashCo.SendValue(v, "genProg", self, self.HasBattery, self.CansRemaining or SlashCo.GasCansPerGenerator)
+			SlashCo.SendValue(v, "genProg", self, self.HasBattery, self.CansRemaining or gasPerGen)
 			v.GenCooldown = CurTime()
 
 			observed = true
@@ -256,7 +260,8 @@ function ENT:Think()
 		self.CurrentPourer = nil
 		self:StopSound("slashco/generator_fill.wav")
 
-		self.CansRemaining = (self.CansRemaining or SlashCo.GasCansPerGenerator) - 1
+		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+		self.CansRemaining = (self.CansRemaining or gasPerGen) - 1
 
 		--//discard gas can//--
 

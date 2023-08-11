@@ -50,6 +50,13 @@ SC_LOADEDITEMS = true
 
 ---remainder of init code
 
+SlashCo.SpawnableItems = {}
+for k, v in pairs(SlashCoItems) do
+	if v.IsSpawnable then
+		table.insert(SlashCo.SpawnableItems, k)
+	end
+end
+
 local PLAYER = FindMetaTable("Player")
 
 ---gives a player an effect

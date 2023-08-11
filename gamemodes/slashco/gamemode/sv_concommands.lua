@@ -177,8 +177,7 @@ end, function(cmd, args)
 end)
 
 concommand.Add("slashco_run_curconfig", function(_, _, _)
-	SlashCo.LoadCurRoundTeams()
-	SlashCo.SpawnCurConfig()
+	SlashCo.StartRound()
 end, nil, "Start a normal round with current configs.", FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_itempicker", function(ply)
@@ -199,8 +198,7 @@ concommand.Add("slashco_debug_run_curconfig", function(ply)
 	end
 
 	g_SlashCoDebug = true
-	SlashCo.LoadCurRoundTeams()
-	SlashCo.SpawnCurConfig(true)
+	SlashCo.StartRound()
 end, nil, "Start a debug round with current configs.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_run_survivor", function(ply, _, _)
@@ -214,21 +212,15 @@ concommand.Add("slashco_debug_run_survivor", function(ply, _, _)
 	end
 
 	g_SlashCoDebug = true
-	for _, k in ipairs(player.GetAll()) do
-		k:SetTeam(TEAM_SURVIVOR)
-		k:Spawn()
-		print(k:Name() .. " now Survivor")
-	end
-
-	timer.Simple(0.05, function()
-		print("[SlashCo] Now proceeding with Spawns...")
-
-		SlashCo.PrepareSlasherForSpawning()
-
-		SlashCo.SpawnPlayers()
+	timer.Simple(0.5, function()
+		for _, k in ipairs(player.GetAll()) do
+			k:SetTeam(TEAM_SURVIVOR)
+			k:Spawn()
+			print(k:Name() .. " now Survivor")
+		end
 	end)
 
-	SlashCo.SpawnCurConfig(true)
+	SlashCo.StartRound(true)
 end, nil, "Start a debug round where everyone is a survivor.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 --//datatest//--

@@ -1,5 +1,3 @@
---TODO: effects
-
 ENT.Type = "brush"
 
 function ENT:Initialize()
@@ -33,6 +31,10 @@ function ENT:KeyValue(key, value)
 		self.Damage = tonumber(value)
 		return
 	end
+	if key1 == "health_limit" then
+		self.HealthLimit = tonumber(value)
+		return
+	end
 	if key1 == "speed_effect" then
 		self.SpeedEffect = tonumber(value)
 		return
@@ -62,13 +64,15 @@ end
 function ENT:Enter(ent)
 	ent.LimitBrush = self
 
-	if SERVER and ent:Team() == TEAM_SURVIVOR and self.SpeedEffect and self.SpeedEffect >= 0 then
+	if ent:Team() == TEAM_SURVIVOR and self.SpeedEffect and self.SpeedEffect >= 0 then
 		local priority = 14
 		if self.SpeedEffect > 200 and ent:Team() == TEAM_SURVIVOR then
 			priority = 5
 		end
 		ent:AddSpeedEffect("limitedZone", self.SpeedEffect, priority)
 	end
+
+	SlashCo.SendValue(ent, "limitedZone", self.Effect or 1)
 
 	self:TriggerOutput("OnEnter", ent)
 	if table.IsEmpty(self.PlayersInside) then
@@ -82,15 +86,50 @@ function ENT:Leave(ent)
 	ent.LimitBrush = nil
 	self.PlayersInside[ent] = nil
 
-	if SERVER and ent:Team() == TEAM_SURVIVOR then
+	if ent:Team() == TEAM_SURVIVOR then
 		ent:RemoveSpeedEffect("limitedZone")
 	end
+
+	SlashCo.SendValue(ent, "limitedZone", 0)
 
 	self:TriggerOutput("OnExit", ent)
 	if table.IsEmpty(self.PlayersInside) then
 		self:TriggerOutput("OnExitAll", ent)
 	end
 end
+
+local damageSounds = {
+	[1] = function(ent, damage)
+		--default
+		if damage <= 10 then
+			ent:EmitSound("physics/flesh/flesh_impact_bullet" .. math.random(1, 5) .. ".wav")
+		elseif damage >= ent:Health() then
+			ent:EmitSound("physics/flesh/flesh_bloody_break.wav")
+		else
+			ent:EmitSound("physics/flesh/flesh_strider_impact_bullet" .. math.random(1, 3) .. ".wav")
+		end
+	end,
+	[2] = function(ent, damage)
+		--blizzard
+		if damage >= ent:Health() and damage > 10 then
+			ent:EmitSound("physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
+		else
+			ent:EmitSound("physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
+		end
+	end,
+	[3] = function(ent)
+		--poison
+		ent:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
+	end,
+	[4] = function(ent, damage)
+		--blood
+		if damage >= ent:Health() and damage > 10 then
+			ent:EmitSound("physics/flesh/flesh_bloody_break.wav")
+		else
+			ent:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
+		end
+	end
+}
 
 function ENT:Touch(ent)
 	if not ent:IsPlayer() or ent.LimitBrush ~= self then
@@ -111,14 +150,25 @@ function ENT:Touch(ent)
 		return
 	end
 
-	if CLIENT then
-		return
-	end
-
 	if self.Damage and self.Damage > 0 and ent:Team() == TEAM_SURVIVOR and
 			(not ent.ZoneCooldown or CurTime() - ent.ZoneCooldown > 3) then
 
-		ent:TakeDamage(self.Damage, self, self)
+		if ent.ZoneCooldown and CurTime() - ent.ZoneCooldown < 4 then
+			local realDamage = self.Damage
+			if self.healthLimit and ent:Health() - realDamage <= self.HealthLimit then
+				realDamage = ent:Health() - self.HealthLimit
+			end
+
+			if realDamage > 0 then
+				local effect = self.Effect or 1
+				if damageSounds[effect] then
+					damageSounds[effect](ent, realDamage)
+				else
+					damageSounds[1](ent, realDamage)
+				end
+				ent:TakeDamage(realDamage, self, self)
+			end
+		end
 		ent.ZoneCooldown = CurTime()
 	end
 end

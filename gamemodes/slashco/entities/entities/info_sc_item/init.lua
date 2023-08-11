@@ -12,3 +12,17 @@ function ENT:ExtraKeyValue1(key, value)
 		return
 	end
 end
+
+function ENT:OnSpawn()
+	local item
+	if self.Item and SlashCoItems[self.Item] then
+		item = self.Item
+	else
+		item = SlashCo.SpawnableItems[math.random(1, #SlashCo.SpawnableItems)]
+	end
+	self.Item = nil
+
+	local id = SlashCo.CreateItem(SlashCoItems[item].EntClass, self:GetPos(), self:GetAngles())
+	SlashCo.CurRound.Items[id] = true
+	return Entity(id)
+end

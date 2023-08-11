@@ -30,6 +30,10 @@ function ENT:KeyValue(key, value)
 		self.Weight = tonumber(value)
 		return
 	end
+	if key1 == "delete" then
+		self.DeleteOnSpawn = tonumber(value) == 1
+		return
+	end
 
 	self:ExtraKeyValue(key, value)
 end
@@ -60,11 +64,13 @@ function ENT:OnSpawn()
 	--override me!
 end
 
-function ENT:Spawn()
+function ENT:SpawnEnt()
 	local ent = self:OnSpawn()
-	self.Entity = self.Entity or ent
-	if IsValid(self.Entity) then
-		self.Entity.SpawnedAt = self
+	self.SpawnedEntity = ent or self.SpawnedEntity
+	self:TriggerOutput("OnSpawn", self.SpawnedEntity)
+	if self.DeleteOnSpawn then
+		self:Remove()
+	elseif IsValid(self.SpawnedEntity) then
+		self.SpawnedEntity.SpawnedAt = self
 	end
-	self:TriggerOutput("OnSpawn", self.Entity)
 end

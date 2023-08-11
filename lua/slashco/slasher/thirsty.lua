@@ -25,6 +25,7 @@ SLASHER.ProTip = "Thirsty_tip"
 SLASHER.SpeedRating = "★☆☆☆☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
+SLASHER.ItemToSpawn = "MilkJug"
 
 SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))

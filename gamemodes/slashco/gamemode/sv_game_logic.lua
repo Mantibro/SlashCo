@@ -62,7 +62,7 @@ SlashCo.LoadCurRoundData = function()
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>>>>
 
 
-		--Survivors don't necessarily have to join in time, as the game can continue with at least 1. (TODO)
+		--Survivors don't necessarily have to join in time, as the game can continue with at least 1.
 		--TODO: timer which starts the game premature if some survivors don't join in time.
 
 		local query = sql.Query("SELECT * FROM slashco_table_survivordata; ")
@@ -151,7 +151,6 @@ SlashCo.AwaitExpectedPlayers = function()
 			print("[SlashCo] All players connected. Starting in 15 seconds. . .")
 			SlashCo.CurRound.SlasherData.GameReadyToBegin = true
 			SlashCo.RoundBeginTimer()
-			table.Empty(SlashCo.CurRound.ExpectedPlayers)
 		end
 	end
 end
@@ -163,6 +162,7 @@ SlashCo.RoundBeginTimer = function()
 	end)
 end
 
+--[[
 SlashCo.LoadCurRoundTeams = function()
 	local becameCovenant = 0
 	local spawn_queue = 0
@@ -302,12 +302,6 @@ SlashCo.LoadCurRoundTeams = function()
 			:: NIGHTMARE_SKIPPART ::
 		end
 
-		--local id1 = slashers[1].Slashers
-		--[[local id2 = 0
-		if slashers[2] ~= nil then
-			id2 = slashers[2].Slashers
-		end]]
-
 		:: NIGHTMARE_SKIPALL ::
 
 		timer.Simple(0.1, function()
@@ -319,15 +313,18 @@ SlashCo.LoadCurRoundTeams = function()
 		SlashCo.EndRound()
 	end
 end
+--]]
 
+--[[
 SlashCo.SpawnPlayers = function()
 	spawn_queue = 1
 
 	for i, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		timer.Simple(FrameTime()*spawn_queue, function()
+		timer.Simple(FrameTime() * spawn_queue, function()
 
 			local pos = Vector(SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[1],
-					SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[2], SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[3])
+					SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[2],
+					SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].pos[3])
 			local ang = Angle(0, SlashCo.CurConfig.Spawnpoints.Survivor[spawn_queue].ang, 0)
 
 			ply:SetPos(pos)
@@ -337,7 +334,9 @@ SlashCo.SpawnPlayers = function()
 		spawn_queue = spawn_queue + 1
 	end
 end
+--]]
 
+--[[
 SlashCo.RespawnPlayer = function(ply, hp)
 	local i = math.random(1, #SlashCo.CurConfig.Spawnpoints.Survivor)
 
@@ -355,13 +354,17 @@ SlashCo.RespawnPlayer = function(ply, hp)
 	ply:SetAngles(ang)
 	ply:SetHealth(hp)
 end
+--]]
 
 --Returns whether a config for the given map exists or not
+--[[
 SlashCo.CheckMap = function(map)
 	return file.Exists("slashco/configs/maps/" .. map .. ".lua", "LUA")
 end
+--]]
 
 --Loads a config file and return its contents as a table from JSON
+--[[
 SlashCo.LoadMap = function(map)
 	if not SlashCo.CheckMap(map) then
 		return nil
@@ -369,8 +372,10 @@ SlashCo.LoadMap = function(map)
 
 	return util.JSONToTable(file.Read("slashco/configs/maps/" .. map .. ".lua", "LUA")) or nil
 end
+--]]
 
 --Algorithm found on reddit from u/skeeto, adapted to GLua functions
+--[[
 local function permute(lim)
 	-- Operate on nearest power of 2 up
 	local n = math.ceil(math.log(lim) / math.log(2))
@@ -405,8 +410,10 @@ local function permute(lim)
 		end
 	end
 end
+--]]
 
 --Gets a list of randomly generated unique spawnpoints
+--[[
 SlashCo.GetSpawnpoints = function(amount, limit)
 	local outRand = {}
 
@@ -427,8 +434,10 @@ SlashCo.GetSpawnpoints = function(amount, limit)
 
 	return outRand
 end
+--]]
 
 --Check the given map to make sure the config is usable
+--[[
 SlashCo.ValidateMap = function(map)
 	local valid = true
 
@@ -546,6 +555,7 @@ SlashCo.ValidateMap = function(map)
 
 	return valid
 end
+--]]
 
 local roundEnding
 SlashCo.EndRound = function()
@@ -661,12 +671,15 @@ SlashCo.RoundHeadstart = function()
 		return
 	end
 
-	for _ = 1, (6 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
+	local gens = ents.FindByClass("sc_generator")
+	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 
-		local gens = ents.FindByClass("sc_generator")
-		local random = math.random(#gens)
-		gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or SlashCo.GasCansPerGenerator) - 1, 0,
-				SlashCo.GasCansPerGenerator)
+	if table.IsEmpty(gens) then
+		return
+	end
+	for _ = 1, (6 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
+		local random = math.random(1, #gens)
+		gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or gasPerGen) - 1, 0, gasPerGen)
 	end
 end
 
@@ -674,12 +687,11 @@ SlashCo.SurvivorWinFinish = function()
 	local delay = 16
 
 	timer.Simple(delay, function()
-
 		SlashCo.EndRound()
-
 	end)
 end
 
+--[[
 SlashCo.SpawnCurConfig = function(isDebug)
 	SlashCo.RemoveAllCurRoundEnts()
 	--SlashCo.ResetCurRoundData()
@@ -834,7 +846,9 @@ SlashCo.SpawnCurConfig = function(isDebug)
 		timer.Simple(8, function()
 			SlashCo.HelicopterTakeOffIntro()
 
-			if not isDebug then SlashCo.ClearDatabase() end --Everything was loaded, clear the database.
+			if not isDebug then
+				SlashCo.ClearDatabase()
+			end --Everything was loaded, clear the database.
 		end)
 
 		timer.Simple(math.random(2, 4), function()
@@ -855,14 +869,15 @@ SlashCo.SpawnCurConfig = function(isDebug)
 		end
 	end
 end
+--]]
 
 --Used to test configs for conflicts.
 --Run lua_run SlashCo.TestConfig
 
+--[[
 concommand.Add("debug_config", function(_, _, _)
 	SlashCo.TestConfig()
 end)
-
 SlashCo.TestConfig = function()
 	SlashCo.RemoveAllCurRoundEnts()
 	--SlashCo.ResetCurRoundData()
@@ -917,3 +932,4 @@ SlashCo.TestConfig = function()
 	--net.WriteTable(send) --I'm so sorry for using this, I'm just too lazy.
 	net.Broadcast()
 end
+--]]
