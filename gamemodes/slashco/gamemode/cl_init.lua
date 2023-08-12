@@ -632,8 +632,8 @@ net.Receive("mantislashcoHelicopterVoice", function()
 
 end)
 
-local AmbientMusic = nil
-local AmbientLength = nil
+local AmbientMusic
+local AmbientLength
 local AmbientVol = 1
 
 net.Receive("mantislashcoMapAmbientPlay", function()
@@ -653,7 +653,7 @@ function SlashCoMapAmbience()
 	end
 
 	sound.PlayFile(snd, "noplay", function(music, errCode, errStr)
-		if (IsValid(music)) then
+		if IsValid(music) then
 			AmbientMusic = music
 			AmbientMusic:Play()
 

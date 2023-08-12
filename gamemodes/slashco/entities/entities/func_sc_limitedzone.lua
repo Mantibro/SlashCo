@@ -128,6 +128,14 @@ local damageSounds = {
 		else
 			ent:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
 		end
+	end,
+	[6] = function(ent, damage)
+		--black snow
+		if damage >= ent:Health() and damage > 10 then
+			ent:EmitSound("physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
+		else
+			ent:EmitSound("physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
+		end
 	end
 }
 
@@ -155,7 +163,7 @@ function ENT:Touch(ent)
 
 		if ent.ZoneCooldown and CurTime() - ent.ZoneCooldown < 4 then
 			local realDamage = self.Damage
-			if self.healthLimit and ent:Health() - realDamage <= self.HealthLimit then
+			if self.HealthLimit and ent:Health() - realDamage <= self.HealthLimit then
 				realDamage = ent:Health() - self.HealthLimit
 			end
 

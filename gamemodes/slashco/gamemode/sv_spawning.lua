@@ -191,10 +191,10 @@ function SlashCo.SpawnGasCans()
 end
 
 local function itemCondForced(ent)
-	return SlashCo.DefaultConditionsForced(ent) and not ent.Item ~= ""
+	return SlashCo.DefaultConditionsForced(ent) and (not ent.Item or not SlashCoItems[ent.Item])
 end
 local function itemCondNonForced(ent)
-	return SlashCo.DefaultConditionsNonForced(ent) and not ent.Item ~= ""
+	return SlashCo.DefaultConditionsNonForced(ent) and (not ent.Item or not SlashCoItems[ent.Item])
 end
 
 ---Spawn items for the round

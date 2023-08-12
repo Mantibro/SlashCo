@@ -1,5 +1,80 @@
+local ambiences = {
+	[1] = "ambient/wind/wind_loop_005.wav",
+	[2] = "ambient/windwinter.wav",
+	[3] = "ambient/wind/wind_loop_006.wav",
+	[4] = "ambient/wind/wind_loop_002.wav",
+	[5] = "ambient/wind/wind_loop_003.wav",
+	[6] = "ambient/windwinter.wav",
+}
+
+g_SCLoadedSounds = {} --set as global to protect against lua restarts
+local function readSound(fileName)
+	local sound
+	local filter
+	if not g_SCLoadedSounds[fileName] then
+		sound = CreateSound(game.GetWorld(), fileName, filter)
+		if sound then
+			sound:SetSoundLevel(0)
+			g_SCLoadedSounds[fileName] = { sound, filter }
+		end
+	else
+		sound = g_SCLoadedSounds[fileName][1]
+		filter = g_SCLoadedSounds[fileName][2]
+	end
+	if sound then
+		sound:Stop()
+		sound:Play()
+		sound:ChangeVolume(0)
+		sound:ChangeVolume(1, 1)
+	end
+	return sound
+end
+
+local zoneAmbience, snd
 hook.Add("scValue_limitedZone", "SlashCoLimitedZone", function(effect)
 	local ply = LocalPlayer()
+
+	-- [[ soundpatch method
+	if ambiences[effect] then
+		timer.Remove("fadeOut")
+		if snd ~= ambiences[effect] then
+			print(ambiences[effect])
+			if zoneAmbience then
+				zoneAmbience:FadeOut(1)
+			end
+
+			zoneAmbience = readSound(ambiences[effect])
+			snd = ambiences[effect]
+		end
+	elseif zoneAmbience then
+		timer.Create("fadeOut", 0.05, 1, function()
+			zoneAmbience:FadeOut(1)
+			snd = nil
+			zoneAmbience = nil
+		end)
+	end
+	--]]
+
+	--[[ playfile method
+	if ambiences[effect] and snd ~= ambiences[effect] then
+		if IsValid(zoneAmbience) then
+			zoneAmbience:Stop()
+		end
+		snd = ambiences[effect]
+		sound.PlayFile("sound/" .. ambiences[effect], "noplay", function(music, errCode, errStr)
+			if IsValid(music) then
+				zoneAmbience = music
+				zoneAmbience:EnableLooping(true)
+				zoneAmbience:Play()
+			else
+				print("[SlashCo] Error playing zone ambience!", errCode, errStr)
+			end
+		end)
+	elseif IsValid(zoneAmbience) then
+		zoneAmbience:Stop()
+		snd = nil
+	end
+	--]]
 
 	ply.ZoneEffect = effect
 	if not ply.FogColor then
@@ -18,46 +93,136 @@ hook.Add("scValue_limitedZone", "SlashCoLimitedZone", function(effect)
 		ply.DefaultFogMode = render.GetFogMode()
 
 		if ply.DefaultFogMode == MATERIAL_FOG_NONE then
-			ply.FogColor = {255, 255, 255}
-			ply.DefaultFogColor = {255, 255, 255}
+			ply.FogColor = { 255, 255, 255 }
+			ply.DefaultFogColor = { 255, 255, 255 }
 			ply.FogStart, ply.FogEnd = 2000, 2000
 			ply.DefaultFogStart, ply.DefaultFogEnd = 2000, 2000
 			return
 		end
 
-		ply.FogColor = {render.GetFogColor()}
-		ply.DefaultFogColor = {render.GetFogColor()}
+		ply.FogColor = { render.GetFogColor() }
+		ply.DefaultFogColor = { render.GetFogColor() }
 		ply.FogStart, ply.FogEnd = render.GetFogDistances()
 		ply.DefaultFogStart, ply.DefaultFogEnd = render.GetFogDistances()
 	end
 end)
 
-local fogSettings = {
+local particleSettings = {
 	[1] = {
-		color = {0, 0, 0},
-		_start = 0,
-		_end = 500
+		texture = "effects/slime1",
+		distance = 150,
+		particle = function(part, delta)
+			part:SetDieTime(1)
+			part:SetStartSize((1 + math.random() * 1) * delta)
+			part:SetEndSize(0)
+			part:SetStartAlpha(delta * 192)
+			part:SetEndAlpha(0)
+			part:SetColor(0, 0, 0)
+		end
 	},
 	[2] = {
-		color = {255, 255, 255},
+		texture = "sprites/dot",
+		distance = 200,
+		particle = function(part, delta)
+			part:SetDieTime(1)
+			part:SetStartSize((2 + math.random() * 3) * delta)
+			part:SetEndSize(0)
+			part:SetColor(delta * 255, delta * 255, delta * 255)
+			part:SetGravity(Vector(0, 0, -250))
+			part:SetVelocity(VectorRand() * 100 - Vector(100, 100, 250))
+		end
+	},
+	[3] = {
+		texture = "effects/slime1",
+		distance = 200,
+		particle = function(part, delta)
+			part:SetDieTime(1)
+			part:SetStartSize((1 + math.random() * 1) * delta)
+			part:SetEndSize(0)
+			part:SetStartAlpha(delta * 192)
+			part:SetEndAlpha(0)
+			part:SetColor(96, 96, 96)
+			part:SetGravity(Vector(0, 0, 50))
+			part:SetVelocity(VectorRand() * 50 + Vector(0, 0, 50))
+		end
+	},
+	[4] = {
+		texture = "sprites/dot",
+		distance = 200,
+		particle = function(part, delta)
+			part:SetDieTime(1)
+			part:SetColor(128 + math.random() * 96, math.random() * 96, math.random() * 96)
+			part:SetStartSize((0.5 + math.random() * 1) * delta)
+			part:SetEndSize(0)
+			part:SetGravity(vector_origin)
+			part:SetVelocity(VectorRand() * 75)
+		end
+	},
+	[6] = {
+		texture = "effects/slime1",
+		distance = 200,
+		particle = function(part, delta)
+			part:SetDieTime(1)
+			part:SetStartSize((2 + math.random() * 3) * delta)
+			part:SetEndSize(0)
+			part:SetStartAlpha(delta * 192)
+			part:SetEndAlpha(delta * 192)
+			part:SetColor(0, 0, 0)
+			part:SetGravity(Vector(0, 0, -250))
+			part:SetVelocity(VectorRand() * 100 - Vector(100, 100, 250))
+		end
+	}
+}
+
+local delta = 0
+hook.Add("Think", "SlashCoZoneParticles", function()
+	if not LocalPlayer().ZoneEffect or not particleSettings[LocalPlayer().ZoneEffect] then
+		delta = 0
+		return
+	end
+
+	delta = math.Clamp(Lerp(0.005, delta, 1), 0, 1)
+	local settings = particleSettings[LocalPlayer().ZoneEffect]
+	local pos = LocalPlayer():WorldSpaceCenter()
+	local emitter = ParticleEmitter(pos)
+	local part = emitter:Add(settings.texture, pos + VectorRand(-settings.distance, settings.distance))
+	if part then
+		settings.particle(part, delta)
+	end
+	emitter:Finish()
+end)
+
+local fogSettings = {
+	[1] = {
+		color = { 0, 0, 0 },
+		_start = 0,
+		_end = 750
+	},
+	[2] = {
+		color = { 255, 255, 255 },
 		_start = 0,
 		_end = 500
 	},
 	[3] = {
-		color = {64, 255, 0},
+		color = { 16, 64, 0 },
 		_start = 0,
 		_end = 2000
 	},
 	[4] = {
-		color = {255, 0, 0},
+		color = { 255, 0, 0 },
 		_start = 0,
 		_end = 1000
 	},
 	[5] = {
-		color = {192, 192, 192},
+		color = { 192, 192, 192 },
 		_start = 0,
 		_end = 2000
 	},
+	[6] = {
+		color = { 0, 0, 0 },
+		_start = 0,
+		_end = 300
+	}
 }
 
 local function renderFog(scale)
@@ -123,9 +288,9 @@ local colorSettings = {
 		["$pp_colour_addr"] = 0,
 		["$pp_colour_addg"] = 0,
 		["$pp_colour_addb"] = 0,
-		["$pp_colour_brightness"] = -0.1,
-		["$pp_colour_contrast"] = 1,
-		["$pp_colour_colour"] = 1,
+		["$pp_colour_brightness"] = -0.15,
+		["$pp_colour_contrast"] = 1.1,
+		["$pp_colour_colour"] = 0.75,
 		["$pp_colour_mulr"] = 0,
 		["$pp_colour_mulg"] = 0,
 		["$pp_colour_mulb"] = 0
@@ -136,7 +301,7 @@ local colorSettings = {
 		["$pp_colour_addb"] = 0,
 		["$pp_colour_brightness"] = 0.1,
 		["$pp_colour_contrast"] = 0.75,
-		["$pp_colour_colour"] = 1,
+		["$pp_colour_colour"] = 0.75,
 		["$pp_colour_mulr"] = 0,
 		["$pp_colour_mulg"] = 0,
 		["$pp_colour_mulb"] = 0
@@ -146,7 +311,7 @@ local colorSettings = {
 		["$pp_colour_addg"] = 0.1,
 		["$pp_colour_addb"] = 0,
 		["$pp_colour_brightness"] = 0,
-		["$pp_colour_contrast"] = 1,
+		["$pp_colour_contrast"] = 1.1,
 		["$pp_colour_colour"] = 1,
 		["$pp_colour_mulr"] = 0,
 		["$pp_colour_mulg"] = 0,
@@ -157,9 +322,9 @@ local colorSettings = {
 		["$pp_colour_addg"] = 0,
 		["$pp_colour_addb"] = 0,
 		["$pp_colour_brightness"] = 0,
-		["$pp_colour_contrast"] = 1,
+		["$pp_colour_contrast"] = 0.5,
 		["$pp_colour_colour"] = 1,
-		["$pp_colour_mulr"] = 0,
+		["$pp_colour_mulr"] = 0.2,
 		["$pp_colour_mulg"] = 0,
 		["$pp_colour_mulb"] = 0
 	},
@@ -170,6 +335,17 @@ local colorSettings = {
 		["$pp_colour_brightness"] = 0,
 		["$pp_colour_contrast"] = 1,
 		["$pp_colour_colour"] = 1,
+		["$pp_colour_mulr"] = 0,
+		["$pp_colour_mulg"] = 0,
+		["$pp_colour_mulb"] = 0
+	},
+	[6] = {
+		["$pp_colour_addr"] = 0,
+		["$pp_colour_addg"] = 0,
+		["$pp_colour_addb"] = 0,
+		["$pp_colour_brightness"] = -0.15,
+		["$pp_colour_contrast"] = 1.1,
+		["$pp_colour_colour"] = 0.75,
 		["$pp_colour_mulr"] = 0,
 		["$pp_colour_mulg"] = 0,
 		["$pp_colour_mulb"] = 0

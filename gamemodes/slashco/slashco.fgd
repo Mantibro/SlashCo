@@ -71,6 +71,7 @@
         3 : "Poison"
         4 : "Blood"
         5 : "Fog"
+        6 : "Black Snow"
     ]
     disabled(choices) : "Disabled" : 0 : "If disabled, this area has no effect." =
     [
