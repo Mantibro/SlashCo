@@ -108,25 +108,6 @@ SlashCo.ResetCurRoundData()
 
 SlashCo.PlayerData = SlashCo.PlayerData or {} --Holds all loaded playerdata
 
---Spawn a generator
---[[
-SlashCo.CreateGenerator = function(pos, ang)
-	local Ent = ents.Create("sc_generator")
-
-	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
-				"[SlashCo] Something went wrong when trying to create a generator at (" .. tostring(pos) .. "), entity was NULL.\n")
-		return nil
-	end
-
-	Ent:SetPos(pos)
-	Ent:SetAngles(ang)
-	Ent:Spawn()
-
-	return Ent:EntIndex()
-end
---]]
-
 --Spawn a gas can
 -- [[
 SlashCo.CreateGasCan = function(pos, ang)
@@ -148,29 +129,6 @@ SlashCo.CreateGasCan = function(pos, ang)
 	end
 
 	return Ent
-end
---]]
-
---Spawn a gas can (testing only for exposure spawnpoints)
---[[
-SlashCo.CreateGasCanE = function(pos, ang)
-	local Ent = ents.Create("sc_gascan")
-
-	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
-				"[SlashCo] Something went wrong when trying to create a gas can at (" .. tostring(pos) .. "), entity was NULL.\n")
-		return nil
-	end
-
-	Ent:SetPos(pos)
-	Ent:SetAngles(ang)
-	Ent:Spawn()
-	Ent:SetColor(Color(255, 0, 0, 255))
-
-	local id = Ent:EntIndex()
-	table.insert(SlashCo.CurRound.ExposureSpawns, id)
-
-	return id
 end
 --]]
 
@@ -203,109 +161,6 @@ SlashCo.CreateItem = function(class, pos, ang)
 
 	return id
 end
-
---Spawn a battery
---[[
-SlashCo.CreateBattery = function(pos, ang)
-	local Ent = ents.Create("sc_battery")
-
-	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
-				"[SlashCo] Something went wrong when trying to create a battery at (" .. tostring(pos) .. "), entity was NULL.\n")
-		return nil
-	end
-
-	Ent:SetPos(pos)
-	Ent:SetAngles(ang)
-	Ent:Spawn()
-
-	return Ent
-end
---]]
-
---[[
-SlashCo.CreateGenerators = function(spawnpoints, testconfig)
-	for k, v in ipairs(spawnpoints) do
-		local pos = SlashCo.CurConfig.Generators.Spawnpoints[v].pos
-		local ang = SlashCo.CurConfig.Generators.Spawnpoints[v].ang
-
-		local entID = SlashCo.CreateGenerator(Vector(pos[1], pos[2], pos[3]),
-				Angle(ang[1], ang[2], ang[3])) --local entID =
-
-		if testconfig then
-			Entity(entID):SetNWInt("SpawnPoint_ID", k)
-		end
-	end
-end
-
-SlashCo.CreateGasCans = function(spawnpoints, testconfig)
-	for k, v in ipairs(spawnpoints) do
-		local pos = SlashCo.CurConfig.GasCans.Spawnpoints[v].pos
-		local ang = SlashCo.CurConfig.GasCans.Spawnpoints[v].ang
-
-		if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
-			--Exposure Offering Spawnpoints
-			pos = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].pos
-			ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].ang
-		end
-
-		local ent = SlashCo.CreateGasCan(Vector(pos[1], pos[2], pos[3]), Angle(ang[1], ang[2], ang[3]))
-
-		if testconfig then
-			ent:SetNWInt("SpawnPoint_ID", k)
-		end
-	end
-end
-
---Testing only function for exposure spawnpoints
-SlashCo.CreateGasCansE = function(spawnpoints)
-	for _, v in ipairs(spawnpoints) do
-		local pos = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].pos
-		local ang = SlashCo.CurConfig.Offerings.Exposure.Spawnpoints[v].ang
-
-		SlashCo.CreateGasCanE(Vector(pos[1], pos[2], pos[3]), Angle(ang[1], ang[2], ang[3]))
-	end
-end
-
-SlashCo.CreateItems = function(spawnpoints, item, testconfig)
-	for k, v in ipairs(spawnpoints) do
-		local pos = SlashCo.CurConfig.Items.Spawnpoints[v].pos
-		local ang = SlashCo.CurConfig.Items.Spawnpoints[v].ang
-
-		local id = SlashCo.CreateItem(item, Vector(pos[1], pos[2], pos[3]), Angle(ang[1], ang[2], ang[3]))
-		SlashCo.CurRound.Items[id] = true
-
-		if testconfig then
-			Entity(id):SetNWInt("SpawnPoint_ID", k)
-		end
-	end
-end
-
-SlashCo.CreateBatteries = function(spawnpoints)
-	for _, v in ipairs(spawnpoints) do
-		local rand = math.random(1, #(SlashCo.CurConfig.Batteries.Spawnpoints[v]))
-		local pos = SlashCo.CurConfig.Batteries.Spawnpoints[v][rand].pos
-		local ang = SlashCo.CurConfig.Batteries.Spawnpoints[v][rand].ang
-
-		SlashCo.CreateBattery(Vector(pos[1], pos[2], pos[3]), Angle(ang[1], ang[2], ang[3]))
-	end
-end
-
---For testing configs only, spawns batteries in ever possible spot.
-SlashCo.CreateBatteriesE = function(spawnpoints)
-	for k, v in ipairs(spawnpoints) do
-		for J = 1, #(SlashCo.CurConfig.Batteries.Spawnpoints[v]) do
-			local pos = SlashCo.CurConfig.Batteries.Spawnpoints[v][J].pos
-			local ang = SlashCo.CurConfig.Batteries.Spawnpoints[v][J].ang
-
-			local bat = SlashCo.CreateBattery(Vector(pos[1], pos[2], pos[3]), Angle(ang[1], ang[2], ang[3]))
-
-			--bat:SetNWInt("SpawnPoint_ID_BatteryGenerator", k)
-			bat:SetNWInt("SpawnPoint_ID", J)
-		end
-	end
-end
---]]
 
 --Spawn the helicopter 
 SlashCo.CreateHelicopter = function(pos, ang)
@@ -699,19 +554,10 @@ SlashCo.LocalizedTraceHullLocatorAdvanced = function(ent, min_range, range, offs
 	local err_hullhit = 0
 	local offset_local = ent:GetForward() * offset
 	local success
-	for i = 0, 350 do
+	for _ = 0, 350 do
 		local randPos = vector_up * math.random(min_range, range)
 		randPos:Rotate(AngleRand())
 		randPos.z = randPos.z / 2 + height_offset * 2
-
-		--[[
-		local randPos = VectorRand(-range, range)
-		for k, v in pairs(randPos:ToTable()) do
-			if math.abs(v) < min_range then
-				randPos[k] = min_range + math.random(0,range - min_range)
-			end
-		end
-		--]]
 
 		pos = ent:LocalToWorld(offset_local + randPos)
 

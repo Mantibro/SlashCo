@@ -862,19 +862,6 @@ function PANEL:MakeGenEntry(gen, i, model)
 		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5,
 				(YWiggle + entry.YSpin + (i * 360 / (gasPerGen + 1))) % 360, 5))
 	end
-	--entry.angle = angle
-
-	--[[
-	entry.DefaultPos = {
-		x + (gen:GetWide() / 2) - math.cos(angle) * 50 - (entry:GetWide() / 2),
-		y + (gen:GetTall() / 2) + math.sin(angle) * 50 - (entry:GetTall() / 2)
-	}
-	entry.CenteredPos = {
-		(ScrW() / 2) - math.cos(angle) * 100 - (entry:GetWide()),
-		(ScrH() / 2) + math.sin(angle) * 100 - (entry:GetTall())
-	}
-	entry:SetPos(unpack(entry.DefaultPos))
-	--]]
 end
 
 ---internal: shows the generator display up top

@@ -134,7 +134,7 @@ SLASHER.OnSecondaryFire = function(slasher)
 	end
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+SLASHER.OnMainAbilityFire = function()
 end
 
 SLASHER.OnSpecialAbilityFire = function(slasher)

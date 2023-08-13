@@ -50,22 +50,6 @@ local function printLeftBehind(rescued) --survivors,
 		end
 	end
 
-	--[[
-	local plysLeftBehind = table.Copy(survivors)
-	for k, ply in pairs(plysLeftBehind) do
-		if not IsValid(ply) or ply:Team() ~= TEAM_SURVIVOR then
-			table.remove(plysLeftBehind, k)
-			continue
-		end
-		for _, v in ipairs(rescued) do
-			if IsValid(v) and ply:UserID() == v:UserID() then
-				table.remove(plysLeftBehind, k)
-				break
-			end
-		end
-	end
-	--]]
-
 	local neatString, count = printPlayersNeatly(plysLeftBehind)
 	if count <= 0 then
 		return

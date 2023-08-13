@@ -319,31 +319,21 @@ hook.Add("OnPlayerChangedTeam", "octoSlashCoOnPlayerChangedTeam", function(ply, 
 	-- Here's an immediate respawn thing by default. If you want to
 	-- re-create something more like CS or some shit you could probably
 	-- change to a spectator or something while dead.
-	if (newteam == TEAM_SPECTATOR) then
-
+	if newteam == TEAM_SPECTATOR then
 		-- If we changed to spectator mode, respawn where we are
 		local Pos = ply:EyePos()
 		ply:Spawn()
 		ply:SetPos(Pos)
-
-	elseif (oldteam == TEAM_SPECTATOR) then
-
+	elseif oldteam == TEAM_SPECTATOR then
 		-- If we're changing from spectator, join the game
 		ply:Spawn()
-
-	else
-
-		-- If we're straight up changing teams just hang
-		-- around until we're ready to respawn onto the
-		-- team that we chose
-
 	end
 
-	--PrintMessage( HUD_PRINTTALK, Format( "%s joined '%s'", ply:Nick(), team.GetName( newteam ) ) )
-
+	if g_SlashCoDebug then
+		PrintMessage(HUD_PRINTTALK, Format("%s joined '%s'", ply:Nick(), team.GetName(newteam)))
+	end
 
 	--Ready Message
-
 	SlashCo.BroadcastGlobalData()
 end)
 
@@ -399,12 +389,11 @@ local Think = function()
 		end
 
 		local allRunning = true
-		if runningCount < 2 then
+		if runningCount < GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) then
 			allRunning = false
 		end
 
 		--//drainage//--
-
 		if SlashCo.CurRound.OfferingData.CurrentOffering == 3 then
 			local totalCansRemaining = 0
 			local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
@@ -418,19 +407,22 @@ local Think = function()
 
 			if engine.TickCount() % math.floor(240 / engine.TickInterval()) == 0 then
 				local random = math.random(#gens)
-				gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or gasPerGen) + 1,
-						0, gasperGen)
+				gens[random]:ChangeCanProgress(-1)
+				--gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or gasPerGen) + 1, 0, gasPerGen)
 			end
 		end
 
 		--//helicopters//--
-
 		if allRunning and not SlashCo.CurRound.EscapeHelicopterSummoned then
 			--(SPAWN HELICOPTER)
 
 			local failed = SlashCo.SummonEscapeHelicopter()
-
 			if not failed then
+				local settingsEnt = SlashCo.SettingsEntity()
+				if settingsEnt then
+					settingsEnt:TriggerOutput("OnAllGeneratorsComplete", settingsEnt)
+				end
+
 				SlashCo.CurRound.DistressBeaconUsed = false
 			end
 		end

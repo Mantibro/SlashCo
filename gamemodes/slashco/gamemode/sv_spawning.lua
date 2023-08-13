@@ -77,7 +77,7 @@ function SlashCo.SelectSpawnsNoForce(elements, amount, conditions, forceTable)
 		end
 
 		local random = SlashCo.GetWeightedRandom(weightedTable)
-		for k, v in SortedPairsByValue(weightedTable) do
+		for k, v in pairs(weightedTable) do
 			random = random - v
 			if random <= 0 then
 				table.insert(selected, k)

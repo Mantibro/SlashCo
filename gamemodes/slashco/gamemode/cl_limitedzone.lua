@@ -7,47 +7,25 @@ local ambiences = {
 	[6] = "ambient/windwinter.wav",
 }
 
-g_SCLoadedSounds = {} --set as global to protect against lua restarts
-local function readSound(fileName)
-	local sound
-	local filter
-	if not g_SCLoadedSounds[fileName] then
-		sound = CreateSound(game.GetWorld(), fileName, filter)
-		if sound then
-			sound:SetSoundLevel(0)
-			g_SCLoadedSounds[fileName] = { sound, filter }
-		end
-	else
-		sound = g_SCLoadedSounds[fileName][1]
-		filter = g_SCLoadedSounds[fileName][2]
-	end
-	if sound then
-		sound:Stop()
-		sound:Play()
-		sound:ChangeVolume(0)
-		sound:ChangeVolume(1, 1)
-	end
-	return sound
-end
-
 local zoneAmbience, snd
 hook.Add("scValue_limitedZone", "SlashCoLimitedZone", function(effect)
 	local ply = LocalPlayer()
 
 	-- [[ soundpatch method
 	if ambiences[effect] then
-		timer.Remove("fadeOut")
+		timer.Remove("SCFadeOut")
 		if snd ~= ambiences[effect] then
-			print(ambiences[effect])
 			if zoneAmbience then
 				zoneAmbience:FadeOut(1)
 			end
 
-			zoneAmbience = readSound(ambiences[effect])
+			zoneAmbience = SlashCo.ReadSound(ambiences[effect])
+			zoneAmbience:ChangeVolume(0)
+			zoneAmbience:ChangeVolume(1, 1)
 			snd = ambiences[effect]
 		end
 	elseif zoneAmbience then
-		timer.Create("fadeOut", 0.05, 1, function()
+		timer.Create("SCFadeOut", 0.1, 1, function()
 			zoneAmbience:FadeOut(1)
 			snd = nil
 			zoneAmbience = nil

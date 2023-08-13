@@ -40,12 +40,10 @@ net.Receive("mantislashcoGiveMasterDatabase", function(_, _)
 	local t = net.ReadTable()
 	data_load = t
 
-	if data_load ~= nil and data_load ~= false then
-
+	if data_load then
 		CL_srvwin_count = data_load[1].SurvivorRoundsWon
 		CL_slswin_count = data_load[1].SlasherRoundsWon
 		CL_points = data_load[1].Points
-
 	end
 end)
 
@@ -128,7 +126,6 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 		end
 
 		LocalPlayer().BenadrylIntensity = LocalPlayer().BenadrylIntensity + (RealFrameTime() / 277)
-
 		if LocalPlayer().BenadrylIntensity > 1 then
 			LocalPlayer().BenadrylIntensity = -1
 		end
@@ -328,7 +325,6 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 end)
 
 net.Receive("mantislashcoGiveSlasherData", function()
-
 	local SlasherTable = net.ReadTable()
 	if not LocalPlayer():IsValid() then
 		return
@@ -342,11 +338,9 @@ net.Receive("mantislashcoGiveSlasherData", function()
 	if LocalPlayer():Team() == TEAM_SLASHER then
 		hook.Run("BaseSlasherHUD")
 	end
-
 end)
 
 net.Receive("mantislashcoGlobalSound", function()
-
 	local t = net.ReadTable()
 
 	EmitSound(t.SoundPath, LocalPlayer():GetPos(), t.Entity:EntIndex(), CHAN_AUTO, t.Volume, t.SndLevel)
@@ -359,7 +353,6 @@ local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
 local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
 hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
-
 	if game.GetMap() == "sc_lobby" then
 		return
 	end
@@ -381,16 +374,12 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 		--Survivor team visualization before game start
 
 		for x = 1, #team.GetPlayers(TEAM_SPECTATOR) do
-
 			if team.GetPlayers(TEAM_SPECTATOR)[x]:SteamID64() == SurvivorTeam[i].id then
-
 				surface.SetMaterial(SurvivorIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
 				goto SKIP
-
 			end
-
 		end
 
 		if LocalPlayer():SteamID64() == SurvivorTeam[i].id then
@@ -404,23 +393,18 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 		:: SKIP ::
 
 		xoffset = xoffset + 100
-
 	end
 
 	for i = 1, #SlasherTeam do
 		--Slashers visualization before game start
 
 		for x = 1, #team.GetPlayers(TEAM_SPECTATOR) do
-
 			if team.GetPlayers(TEAM_SPECTATOR)[x]:SteamID64() == SlasherTeam[i].s_id then
-
 				surface.SetMaterial(KillIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset + 50, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
 				goto SKIP
-
 			end
-
 		end
 
 		surface.SetMaterial(KillDisabledIcon)
@@ -429,48 +413,36 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 		:: SKIP ::
 
 		xoffset = xoffset + 100
-
 	end
 
 	if GameReady == true then
-
 		draw.SimpleText(SlashCo.Language("player_ready"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-
 	else
-
 		draw.SimpleText(SlashCo.Language("player_await"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
 				TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
 
 	end
-
 end)
 
 net.Receive("mantislashcoSendGlobalInfoTable", function()
-
 	SCInfo = net.ReadTable()
-
 end)
 
 net.Receive("mantislashcoBriefing", function()
-
 	BriefingTable = net.ReadTable()
-
 end)
 
+local b_tick = -500
 hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
-
 	if game.GetMap() ~= "sc_lobby" then
 		return
 	end
 
 	do
-
 		local ent = table.Random(ents.FindByClass("sc_offertable"))
-
 		local angle = ent:LocalToWorldAngles(Angle(0, 90, 90))
-
 		local pos = ent:LocalToWorld(Vector(5, 0, 110))
 
 		cam.Start3D2D(pos, angle, 0.15)
@@ -493,37 +465,28 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		-- Draw some text
 		draw.SimpleText(text, "LobbyFont1", -tW / 2, 0, color_white)
 		cam.End3D2D()
-
 	end
 
 	do
-
 		local angle = Angle(0, -90, 90)
-
 		local pos = Vector(-133, 400, 80)
 
 		if BriefingTable == nil then
 			return
 		end
 
-		if b_tick == nil then
-			b_tick = -500
-		end
 		b_tick = b_tick + 0.5
 
 		local s_id = BriefingTable.ID
 		local s_cls = BriefingTable.CLS
 		local s_dng = BriefingTable.DNG
 		local s_n = BriefingTable.NAME
-
 		local pro_tip = BriefingTable.TIP
 
 		cam.Start3D2D(pos, angle, 0.09)
 
 		local monitorsize = 1300
-
 		local txtcolor = color_white
-
 		local s_cls_t = SlashCo.Language(TranslateSlasherClass(s_cls))
 		local s_dng_t = SlashCo.Language(TranslateDangerLevel(s_dng))
 
@@ -579,20 +542,15 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		local icondrawid = 0
 
 		if b_tick > 200 then
-
 			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2,
 					color_white)
 
 			if s_id ~= nil and s_id ~= 0 then
 				icondrawid = s_id
 			end
-
 		else
-
 			draw.SimpleText("...", "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
-
 			icondrawid = 0
-
 		end
 
 		local MainIcon = Material("slashco/ui/icons/slasher/s_" .. icondrawid)
@@ -601,13 +559,10 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		surface.SetMaterial(MainIcon)
 		surface.DrawTexturedRect(150, 90, monitorsize / 3, monitorsize / 3)
 		cam.End3D2D()
-
 	end
-
 end)
 
 net.Receive("mantislashcoHelicopterVoice", function()
-
 	local t = net.ReadUInt(4)
 
 	if t == 1 then
@@ -629,7 +584,6 @@ net.Receive("mantislashcoHelicopterVoice", function()
 		LocalPlayer():EmitSound("slashco/helipilot/helipilot_beacon" .. math.random(1, 5) .. ".mp3", 100)
 		return
 	end
-
 end)
 
 local AmbientMusic
@@ -668,7 +622,29 @@ function SlashCoMapAmbience()
 	end)
 end
 
-local BenadrylSound = nil
+local BenadrylSound
+local CreateShadowPerson = function(pos, ang)
+	if not LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
+		return
+	end
+
+	local Ent = ents.CreateClientside("sc_shadowman")
+
+	if not IsValid(Ent) then
+		MsgC(Color(255, 50, 50),
+				"[SlashCo] Something went wrong when trying to create a " .. class .. " at (" .. tostring(pos) .. "), entity was NULL.\n")
+		return nil
+	end
+
+	Ent:SetPos(pos)
+	Ent:SetAngles(ang)
+	Ent:Spawn()
+	Ent:Activate()
+
+	local id = Ent:EntIndex()
+
+	return id
+end
 
 hook.Add("Think", "amb_vol", function()
 	if g_AmbientStop then
@@ -726,37 +702,11 @@ hook.Add("Think", "amb_vol", function()
 					math.random(50, 50)), Angle(0, math.random(1, 360), 0))
 			LocalPlayer().ShadowManTick = CurTime()
 		end
-
-
 	elseif IsValid(BenadrylSound) then
 		BenadrylSound:Stop()
 		BenadrylSound = nil
 	end
-
 end)
-
-CreateShadowPerson = function(pos, ang)
-	if not LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
-		return
-	end
-
-	local Ent = ents.CreateClientside("sc_shadowman")
-
-	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
-				"[SlashCo] Something went wrong when trying to create a " .. class .. " at (" .. tostring(pos) .. "), entity was NULL.\n")
-		return nil
-	end
-
-	Ent:SetPos(pos)
-	Ent:SetAngles(ang)
-	Ent:Spawn()
-	Ent:Activate()
-
-	local id = Ent:EntIndex()
-
-	return id
-end
 
 hook.Add("HUDPaint", "MiscItemVisions", function()
 	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
@@ -764,7 +714,6 @@ hook.Add("HUDPaint", "MiscItemVisions", function()
 	end
 
 	if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
-
 		if not LocalPlayer().BenadrylVisionTick then
 			LocalPlayer().BenadrylVisionTick = 10
 		end
@@ -792,11 +741,9 @@ hook.Add("HUDPaint", "MiscItemVisions", function()
 		end
 
 		LocalPlayer().BenadrylVisionTick = LocalPlayer().BenadrylVisionTick - (RealFrameTime() * 1)
-
 	end
 
 	if LocalPlayer():GetNWBool("JugCurseActivate") then
-
 		local Overlay = Material("slashco/ui/overlays/jug_freeze")
 
 		if LocalPlayer().JugFrame < 61 then
@@ -813,17 +760,36 @@ hook.Add("HUDPaint", "MiscItemVisions", function()
 		end
 
 		LocalPlayer().JugFrame = LocalPlayer().JugFrame + RealFrameTime() * 30
-
 		if LocalPlayer().JugFrame < 120 then
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0 - (ScrW() / 6), ScrW(), ScrW())
 		end
-
 	else
 		LocalPlayer().JugFrame = 0
 	end
 end)
+
+g_SCLoadedSounds = {} --set as global to protect against lua restarts
+function SlashCo.ReadSound(fileName)
+	local sound
+	local filter
+	if not g_SCLoadedSounds[fileName] then
+		sound = CreateSound(game.GetWorld(), fileName, filter)
+		if sound then
+			sound:SetSoundLevel(0)
+			g_SCLoadedSounds[fileName] = { sound, filter }
+		end
+	else
+		sound = g_SCLoadedSounds[fileName][1]
+		filter = g_SCLoadedSounds[fileName][2]
+	end
+	if sound then
+		sound:Stop()
+		sound:Play()
+	end
+	return sound
+end
 
 SC_CLIENT_LOADED = true
 

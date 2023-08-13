@@ -20,6 +20,7 @@ SlashCo = SlashCo or {}
 SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator
 SlashCo.GasCans = 8 --Default number of generators
 SlashCo.Generators = 2 --Default number of generators
+SlashCo.GensNeeded = 2 --Default number of generators needed
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
 

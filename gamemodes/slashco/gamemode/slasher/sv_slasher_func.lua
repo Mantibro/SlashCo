@@ -87,7 +87,6 @@ end
 
 
 --On-Tick Behaviour
-
 hook.Add("Tick", "HandleSlasherAbilities", function()
 	local gens = ents.FindByClass("sc_generator")
 	if #gens < 1 then
@@ -97,15 +96,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 	local SO = SlashCo.CurRound.OfferingData.SO
 
 	--Calculate the Game Progress Value
-	--The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (1 - 10)
-	local totalProgress = 0
-	for _, v in ipairs(gens) do
-		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
-		totalProgress = totalProgress + (gasPerGen - (v.CansRemaining or gasPerGen)) + ((v.HasBattery and 1) or 0)
-	end
-	if SlashCo.CurRound.GameProgress > -1 then
-		SlashCo.CurRound.GameProgress = totalProgress
-	end
+	--The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (0 - 10)
 
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		local slasher = v
@@ -171,6 +162,41 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 
 		slasher:SlasherFunction("OnTickBehaviour")
 	end
+
+	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then
+		return
+	end
+
+	if SlashCo.CurRound.GameProgress <= -1 then
+		return
+	end
+
+	local needed = GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded)
+	local genProgs = {}
+	for k, v in ipairs(gens) do
+		genProgs[k] = v.Progress
+	end
+
+	local progress = 0
+	for i = 1, needed do
+		local maxProg, progVal = 0
+		for k, v in ipairs(genProgs) do
+			if maxProg < v then
+				maxProg = v
+				progVal = k
+			end
+		end
+
+		if maxProg == 0 then
+			break
+		end
+
+		progress = progress + maxProg
+		table.remove(genProgs, progVal)
+	end
+
+	progress = progress * (2 / needed) --scale to needed
+	SlashCo.CurRound.GameProgress = math.ceil(progress)
 end)
 
 SlashCo.Jumpscare = function(slasher, target)
@@ -182,12 +208,6 @@ SlashCo.Jumpscare = function(slasher, target)
 		return
 	end
 
-	--[[
-	slasher:LagCompensation(true)
-	local target = slasher:GetEyeTrace().Entity
-	slasher:LagCompensation(false)
-	--]]
-
 	if not IsValid(target) or not target:IsPlayer() then
 		return
 	end
@@ -196,7 +216,8 @@ SlashCo.Jumpscare = function(slasher, target)
 		return
 	end
 
-	if slasher:GetPos():Distance(target:GetPos()) > slasher:SlasherValue("KillDistance", 135) and not target:GetNWBool("SurvivorBeingJumpscared") then
+	if slasher:GetPos():Distance(target:GetPos()) > slasher:SlasherValue("KillDistance",
+			135) and not target:GetNWBool("SurvivorBeingJumpscared") then
 		return
 	end
 
