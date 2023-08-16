@@ -137,8 +137,8 @@
 @PointClass base(SCForcible) studio("models/props_vehicles/generatortrailer01.mdl") = info_sc_generator : "SC: A potential spawn point for a generator."
 [
     // Outputs
-    output OnFueled(void) : "Fired when this generator has had another gas can inserted into it."
-    output OnInsertFuel(void) : "Fired when this generator has had a battery inserted into it."
+    output OnFueled(void) : "Fired when this generator has had a gas can fully poured into it."
+    output OnInsertFuel(void) : "Fired when this generator has had a gas can inserted into it."
     output OnBattery(void) : "Fired when this generator has had a battery inserted into it."
     output OnComplete(void) : "Fired when this generator is powered on."
     output OnSlasherObserved(void) : "Fired when a slasher looks at this generator. This fires every 3 seconds a slasher is looking."
@@ -150,10 +150,10 @@
 @PointClass base(Targetname) iconsprite("editor/scripted_sentence.vmt") = info_sc_settings : "SC: Configure the map's settings. Only one of this entity may exist on the map."
 [
     // Keys
-    generators_needed(integer) : "Generators Needed" : 2 : "The number of generators that need to be powered for the round to each end state. This value should never be above the amount of generators spawned."
-    generators_spawned(integer) : "Generators Spawned" : 2 : "The number of generators spawned in the map."
-    gascans_needed(integer) : "Gas Cans Needed" : 4 : "The number of gas cans needed to fully fuel each generator."
-    gascans_spawned(integer) : "Gas Cans Spawned" : 8 : "The default number of gas cans spawned in the map. This value should never be below the generators spawned multiplied by the amount of gas cans needed."
+    generators_needed(integer) : "Generators Needed" : -1 : "The number of generators that need to be powered for the round to each end state. This value should never be above the amount of generators spawned. Set to -1 for the gamemode default (normally 2)"
+    generators_spawned(integer) : "Generators Spawned" : -1 : "The number of generators spawned in the map. Set to -1 for the gamemode default (normally 2)."
+    gascans_needed(integer) : "Gas Cans Needed" : -1 : "The number of gas cans needed to fully fuel each generator. Set to -1 for the gamemode default (normally 4)"
+    gascans_spawned(integer) : "Gas Cans Spawned" : -1 : "The default number of gas cans spawned in the map. This value should never be below the generators spawned multiplied by the amount of gas cans needed. Set to -1 for the gamemode default (normally 8)"
 
     // Inputs
     input set_generators_needed(integer) : "Set the number of generators needed for the round to each the end state. This cannot be changed mid-round."

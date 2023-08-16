@@ -11,6 +11,10 @@ function ENT:KeyValue(key, value)
 		self:StoreOutput(key, value)
 		return
 	end
+	if tonumber(value) < 0 then
+		return
+	end
+
 	local key1 = string.lower(key)
 	if key1 == "generators_needed" then
 		SetGlobal2Int("SlashCoGeneratorsNeeded", tonumber(value))
@@ -38,7 +42,10 @@ function ENT:AcceptInput(name, activator, _, value)
 
 	--do not let the entity change anything if the round already started
 	if SlashCo and SlashCo.RoundStarted then
-		return true
+		return
+	end
+	if tonumber(value) < 0 then
+		return
 	end
 
 	local name1 = string.lower(name)
