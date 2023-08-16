@@ -102,10 +102,7 @@
         1 : "Yes"
         0 : "No"
     ]
-    stuff_to_know(choices) : "" : "Some SlashCo items will teleport the player to a random position (such as the baby). This entity as well as info_sc_player_teleport helps refine how that random position is picked. This is all optional--the random teleport system will work without it."
-    [
-        0 : ""
-    ]
+    stuff_to_know(integer) : "Stuff To Know" : 0 : "Some SlashCo items will teleport the player to a random position (such as the baby). This entity as well as info_sc_player_teleport helps refine how that random position is picked. This is all optional--the random teleport system will work without it."
 ]
 
 ///////////////////////
@@ -121,10 +118,7 @@
 @PointClass base(PlayerClass, SCForcible) studio("models/editor/playerstart.mdl") = info_sc_player_slasher : "SC: Spawn point for slashers." []
 @PointClass base(PlayerClass, SCSpawn) studio("models/editor/playerstart.mdl") = info_sc_player_teleport : "SC: A possible position for players to teleport to. This is for any item or ability that might teleport someone."
 [
-    stuff_to_know(choices) : "" : "Some SlashCo items will teleport the player to a random position (such as the baby). This entity as well as func_sc_teleportzone helps refine how that random position is picked. This is all optional--the random teleport system will work without it."
-    [
-        0 : ""
-    ]
+    stuff_to_know(integer) : "Stuff To Know" : 0 : "Some SlashCo items will teleport the player to a random position (such as the baby). This entity as well as func_sc_teleportzone helps refine how that random position is picked. This is all optional--the random teleport system will work without it."
 ]
 
 @PointClass base(SCItem) studio("models/props_junk/MetalBucket01a.mdl") = info_sc_item : "SC: A potential spawn point for an item."
