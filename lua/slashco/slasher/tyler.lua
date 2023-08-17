@@ -50,7 +50,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
 
-	local ms = SCInfo.Maps[game.GetMap()].SIZE
+	local ms = SlashCo.MapSize --SCInfo.Maps[game.GetMap()].SIZE
 
 	if v1 == 0 then
 		--Specter

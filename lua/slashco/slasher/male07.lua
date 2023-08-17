@@ -319,7 +319,8 @@ end
 SLASHER.OnItemSpawn = function()
 	local diff = SlashCo.CurRound.Difficulty
 
-	for _ = 1, (math.random(0, 6) + (10 * SCInfo.Maps[game.GetMap()].SIZE) + (diff * 4)) do
+	--SCInfo.Maps[game.GetMap()].SIZE
+	for _ = 1, (math.random(0, 6) + (10 * SlashCo.MapSize) + (diff * 4)) do
 		SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), angle_zero)
 	end
 end

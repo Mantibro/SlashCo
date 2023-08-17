@@ -1,4 +1,4 @@
-SlashCo = {}
+SlashCo = SlashCo or {}
 
 SlashCo.CurConfig = {}
 
@@ -430,6 +430,7 @@ SlashCo.RemoveHelicopter = function()
 	end
 end
 
+--[[
 SlashCo.TraceHullLocator = function()
 	--Repeatedly positioning a TraceHull to a random position to find a spot with enough space for a player or npc.
 
@@ -468,6 +469,7 @@ SlashCo.TraceHullLocator = function()
 
 	return pos
 end
+--]]
 
 SlashCo.RadialTester = function(ent, dist, secondary)
 	local last_best_angle = 0

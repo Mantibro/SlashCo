@@ -178,18 +178,20 @@ for _, v in ipairs(map_configs) do
 		SCInfo.Maps[mapid] = {}
 		SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
 		SCInfo.Maps[mapid].DEFAULT = config_table.Manifest.Default
-		SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
+		--SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size --deprecated
 		SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
 
 		if SERVER then
 			SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
 		end
 
+		--[[ deprecated
 		SCInfo.Maps[mapid].LEVELS = {}
 
 		for ky, lvl in ipairs(config_table.Manifest.Levels) do
 			SCInfo.Maps[mapid].LEVELS[ky] = lvl
 		end
+		]]--
 
 		game_playable = true
 	end

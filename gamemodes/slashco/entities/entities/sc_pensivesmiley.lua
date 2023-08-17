@@ -119,7 +119,7 @@ function ENT:RunBehaviour()
 				self.GotStuck = nil
 				if pos then
 					local result = self:MoveToPos(pos, {
-						draw = g_SlashCoDebug,
+						draw = g_SlashCoDebug and GetConVar("developer"):GetBool(),
 						maxage = 10,
 						tolerance = 50,
 						lookahead = 600

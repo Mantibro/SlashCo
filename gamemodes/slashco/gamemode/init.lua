@@ -26,6 +26,7 @@ AddCSLuaFile("cl_limitedzone.lua")
 include("sv_globals.lua")
 include("sh_shared.lua")
 include("sv_spawning.lua")
+include("sv_teleporting.lua")
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
 include("sv_player.lua")
@@ -72,9 +73,7 @@ hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
 end)
 
 --Initialize global variable to hold functions.
-if not SlashCo then
-	SlashCo = {}
-end
+SlashCo = SlashCo or {}
 
 function GM:Initialize()
 	--If there is no data folder then make one.

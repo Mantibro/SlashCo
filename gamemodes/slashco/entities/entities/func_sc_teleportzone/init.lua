@@ -8,3 +8,13 @@ function ENT:ExtraKeyValue(key, value)
 		return
 	end
 end
+
+function ENT:Initialize()
+	self.TimerIndex = math.random(1000000000)
+end
+
+function ENT:OnSpawn()
+	timer.Create("SlashCoSpawn_" .. self.TimerIndex, 1, 1, function()
+		self.SpawnedEntity = nil
+	end)
+end
