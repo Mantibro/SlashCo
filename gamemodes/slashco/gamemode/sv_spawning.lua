@@ -521,6 +521,9 @@ hook.Add("PlayerSelectSpawn", "RandomSpawn", function(ply, transition)
 
 	if elements and not table.IsEmpty(elements) then
 		local ent = SlashCo.SelectSpawns(elements)
+		if not IsValid(ent) then
+			return
+		end
 		ent.SpawnedEntity = ply
 		ent:SpawnEnt()
 		return ent
