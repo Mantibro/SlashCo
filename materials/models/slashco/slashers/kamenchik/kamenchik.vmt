@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/kamenchik/kamenchik"
+	"$halflambert" 1
+	"$alphatest" 1
+}
