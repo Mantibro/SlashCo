@@ -148,11 +148,18 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 	SlashCo.ApplySlasherToPlayer(target)
 	SlashCo.OnSlasherSpawned(target)
 
-	ply:ChatPrint("New Slasher successfully assigned.")
-	SlashCo.DropAllItems(target)
-	target:StripWeapons()
-	target:SetTeam(TEAM_SLASHER)
-	target:Spawn()
+	timer.Simple(0.25, function()
+		if not IsValid(target) then
+			return
+		end
+		if IsValid(ply) then
+			ply:ChatPrint("New Slasher successfully assigned.")
+		end
+		SlashCo.DropAllItems(target)
+		target:StripWeapons()
+		target:SetTeam(TEAM_SLASHER)
+		target:Spawn()
+	end)
 end, function(cmd, args)
 	--this is for autocomplete
 	local preArg = string.Trim(args)

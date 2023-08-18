@@ -40,6 +40,18 @@ function PANEL:Init()
 	left:SetWide(420)
 	left:Dock(LEFT)
 	--]]
+
+	self.SlasherName = LocalPlayer():GetNWString("Slasher", "none")
+	timer.Create("SlashCo_ResetSlasherHud", 1, 0, function()
+		if not IsValid(self) then
+			timer.Remove("SlashCo_ResetSlasherHud")
+			return
+		end
+
+		if LocalPlayer():GetNWString("Slasher", "none") ~= self.SlasherName then
+			SlashCo.InitSlasherHud()
+		end
+	end)
 end
 
 ---[SLASHER DISPLAY]---
