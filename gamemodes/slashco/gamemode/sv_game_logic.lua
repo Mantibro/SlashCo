@@ -443,6 +443,26 @@ SlashCo.ValidateMap = function(map)
 		ErrorNoHalt("[SlashCo] This map's JSON has an error in it and could not be read, this map will not be playable!\n")
 		return false
 	end
+	if not json.Generators then
+		ErrorNoHalt("[SlashCo] This map is missing the Generators table in its config!\n")
+		return false
+	end
+	if not json.Generators.Count then
+		ErrorNoHalt("[SlashCo] This map is missing Generators.Count in its config!\n")
+		return false
+	end
+	if not json.Items then
+		ErrorNoHalt("[SlashCo] This map is missing the Items table in its config!\n")
+		return false
+	end
+	if not json.Items.Spawnpoints then
+		ErrorNoHalt("[SlashCo] This map is missing the Items.Spawnpoints table in its config!\n")
+		return false
+	end
+	if not json.Helicopter then
+		ErrorNoHalt("[SlashCo] This map is missing the Helicopter table in its config!\n")
+		return false
+	end
 
 	if SlashCo.CurRound.OfferingData.CurrentOffering > 0 then
 		SlashCo.CurRound.OfferingData.GasCanMod = SCInfo.Offering[SlashCo.CurRound.OfferingData.CurrentOffering].GasCanMod
