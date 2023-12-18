@@ -649,6 +649,34 @@ SlashCo.TraceHullLocator = function()
 
 end
 
+SlashCo.RandomPosLocator = function()
+
+	local navtable = navmesh.GetAllNavAreas()
+
+	::RELOCATE::
+
+	local navdata = navtable[math.random(1, #navtable)]
+
+	local NW = navdata:GetCorner( 0 )
+	local SE = navdata:GetCorner( 2 )
+
+	local pos = Vector(math.random(NW[1], SE[1]),math.random(NW[2], SE[2]), 2 + math.max(NW[3], SE[3]))
+
+	local tr = util.TraceHull({
+		start = pos + Vector(0, 0, 1),
+		endpos = pos,
+		maxs = Vector(12, 12, 72),
+		mins = Vector(-12, -12, 0),
+	})
+
+	if tr.Hit then
+		goto RELOCATE
+	end
+
+	return pos
+
+end
+
 SlashCo.RadialTester = function(ent, dist, secondary)
 
 	local last_best_angle = 0
