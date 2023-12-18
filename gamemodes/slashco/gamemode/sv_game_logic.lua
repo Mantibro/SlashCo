@@ -789,7 +789,7 @@ SlashCo.SpawnCurConfig = function(isDebug)
 				local diff1 = SlashCo.CurRound.Difficulty
 
 				for _ = 1, (math.random(0, 6) + (10 * SCInfo.Maps[game.GetMap()].SIZE) + (diff1 * 4)) do
-					SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), angle_zero)
+					SlashCo.CreateItem("sc_maleclone", SlashCo.RandomPosLocator(), angle_zero)
 				end
 			end
 

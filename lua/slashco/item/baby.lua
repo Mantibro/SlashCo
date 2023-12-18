@@ -40,7 +40,7 @@ ITEM.OnUse = function(ply)
                     local slasher = team.GetPlayers(TEAM_SLASHER)[#team.GetPlayers(TEAM_SLASHER)]
 
                     if IsValid(slasher) then
-                        slasher:SetPos(SlashCo.TraceHullLocator())
+                        slasher:SetPos(SlashCo.RandomPosLocator())
                         slasher:EmitSound("slashco/survivor/baby_use.mp3")
                     end
                     
@@ -48,7 +48,7 @@ ITEM.OnUse = function(ply)
                 end
             end
 
-            ply:SetPos(SlashCo.TraceHullLocator())
+            ply:SetPos(SlashCo.RandomPosLocator())
 
         end
     end)
