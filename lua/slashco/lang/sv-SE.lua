@@ -125,9 +125,6 @@ SlashCo.LangTable["ItemRemaining"] = "ÅTERSTÅENDE"
 
 SlashCo.LangTable["MapGuaranteeDesc"] = "Muta helikopterpiloten att åka till en plats du väljer---den som betalar mest vinner. Priset ökar med varje påföljande köp."
 
-
-
-
 SlashCo.LangTable["Alcohol"] = "\"Månsken\""
 SlashCo.LangTable["Alcohol_desc"] = "Olyckligt."
 
@@ -217,7 +214,6 @@ Kryptid:
 Förmågor av Kryptider är enkla och lätta att förstå. Dom består sig utav relativt enkla sätt att
 hjälpa dig med att döda överlevarna.
 
-
 Demon:
 En demons förmågor beror på föremålen dom har konsumerat, som sedan kommer uppstå runt omkring kartan, och ibland under visa tider i
 Spelets Framsteg, betyder att Demonens mål är att inte bara att döda men också att hitta och konsumera produkter 
@@ -304,7 +300,6 @@ SlashCo.LangTable["Abomignat_disablecrawling"] = "stäng av krypning"
 SlashCo.LangTable["Abomignat_slashcharge"] = "Snabbt rus"
 SlashCo.LangTable["Abomignat_lunge"] = "kasta sig"
 
-
 --Amogus
 SlashCo.LangTable["Amogus"] = "BlandOss"
 SlashCo.LangTable["Amogus_desc"] = [[Bedragaren som är mästaren av bedrägeri och gömma sig och att gömma sig i klar sikt.
@@ -320,8 +315,6 @@ SlashCo.LangTable["Amogus_survivor_disguise"] = "maskera sig som en överlevare"
 SlashCo.LangTable["Amogus_gas_disguise"] = "maskera sig som en bensindunk"
 SlashCo.LangTable["Amogus_un_disguise"] = "avslöja dig själv"
 
-
-
 --Bababooey
 SlashCo.LangTable["Bababooey"] = "Babapoojken"
 SlashCo.LangTable["Bababooey_desc"] = [[Han specialiserar sig med förmågor som illusioner för att kunna ta
@@ -336,9 +329,6 @@ SlashCo.LangTable["Bababooey_disableinvis"] = "sträng av osynlighet"
 SlashCo.LangTable["Bababooey_setclone"] = "sätt klon"
 SlashCo.LangTable["Bababooey_clonetrip"] = "En Babapoojke Klon har blivit aktiverad!"
 
-
-
-
 --Borgmire
 SlashCo.LangTable["Borgmire"] = "Borgarn"
 SlashCo.LangTable["Borgmire_desc"] = [[Denna råstarka Jagare kan övermanna överlevare med extrem styrka.
@@ -349,9 +339,6 @@ SlashCo.LangTable["Borgmire_tip"] = "-Borgarn blir lätt trött under långa jak
 
 SlashCo.LangTable["Borgmire_punch"] = "tvärslå"
 SlashCo.LangTable["Borgmire_throw"] = "kasta"
-
-
-
 
 --The Covenant (WIP)
 SlashCo.LangTable["Covenant"] = "Svarta Häxan"
@@ -377,9 +364,6 @@ SlashCo.LangTable["Criminal_summonclones"] = "kalla in kloner"
 SlashCo.LangTable["Criminal_unsummonclones"] = "kalla bort kloner"
 SlashCo.LangTable["Criminal_rage"] = "rå damp"
 
-
-
-
 --Dolphinman
 SlashCo.LangTable["Dolphinman"] = "Delfinmannen"
 SlashCo.LangTable["Dolphinman_desc"] = [[Delfinmannen använder tålamod och väntar tills överlevare kommer till honom.
@@ -392,9 +376,6 @@ SlashCo.LangTable["Dolphinman_tip"] = "-Denna Jagare verkar inte möta överleva
 SlashCo.LangTable["Dolphinman_cannothide"] = "Du kan ej gömma dig här. En Överlevare är för nära."
 SlashCo.LangTable["Dolphinman_hide"] = "Gömma sig"
 SlashCo.LangTable["Dolphinman_hunt"] = "jaga"
-
-
-
 
 --FreeSmiley
 SlashCo.LangTable["FreeSmiley"] = "Gratis Glädje Langarn"
@@ -411,9 +392,6 @@ SlashCo.LangTable["FreeSmiley_zanydeal"] = "ge en Fundersamare"
 SlashCo.LangTable["FreeSmiley_pensivedeal"] = "ge en Gycklare"
 SlashCo.LangTable["FreeSmiley_nodeal"] = "ingen handel"
 
-
-
-
 --Leuonard
 SlashCo.LangTable["Leuonard"] = "Leonard"
 SlashCo.LangTable["Leuonard_desc"] = [[En ostabil Jagare som växer sig starkare under tiden.
@@ -424,8 +402,6 @@ SlashCo.LangTable["Leuonard_desc"] = [[En ostabil Jagare som växer sig starkare
 SlashCo.LangTable["Leuonard_tip"] = "-Denna jagare värkar tycka om gosedjur."
 
 SlashCo.LangTable["Leuonard_roid"] = "v*ldta"
-
-
 
 --Male_07
 SlashCo.LangTable["Male07"] = "Man_07"
@@ -438,8 +414,6 @@ SlashCo.LangTable["Male07_tip"] = "-Denna Jagare är okroppslig och kan besitta 
 SlashCo.LangTable["Male07_possess"] = "besitta klon"
 SlashCo.LangTable["Male07_unpossess"] = "sluta besitta klon"
 SlashCo.LangTable["Male07_slash"] = "attackera"
-
-
 
 --Manspider
 SlashCo.LangTable["Manspider"] = "Manspindeln"
@@ -455,9 +429,6 @@ SlashCo.LangTable["Manspider_yourprey"] = "ditt bete: "
 SlashCo.LangTable["Manspider_awaitprey"] = "väntar på bete"
 SlashCo.LangTable["Manspider_abandonnest"] = "dissa boet"
 
-
-
-
 --Princess
 SlashCo.LangTable["Princess"] = "Prinsessa"
 SlashCo.LangTable["Princess_desc"] = [[Ett odjur som älskar att brutalt tugga på barn.
@@ -470,9 +441,6 @@ SlashCo.LangTable["Princess_tip"] = "-Denna jagare kan bli lurad med bebisar."
 SlashCo.LangTable["Princess_sniff"] = "sniffa"
 SlashCo.LangTable["Princess_maul"] = "bit"
 SlashCo.LangTable["Princess_aggro"] = "damp"
-
-
-
 
 --Sid
 SlashCo.LangTable["Sid"] = "Sid"
@@ -490,9 +458,6 @@ SlashCo.LangTable["Sid_eatcookie"] = "ät kaka"
 SlashCo.LangTable["Sid_equipgun"] = "ta tag i pistolen"
 SlashCo.LangTable["Sid_unequipgun"] = "ta bort pistolen"
 
-
-
-
 --Speedrunner
 SlashCo.LangTable["Speedrunner"] = "Löparen"
 SlashCo.LangTable["Speedrunner_desc"] = [[Denna Jagare snabbhet ökas stadigt under tiden.
@@ -505,9 +470,6 @@ SlashCo.LangTable["Speedrunner_tip"] = "-Denna Jagare blir snabbare under tiden.
 
 SlashCo.LangTable["Speedrunner_speed"] = "snabbhet"
 SlashCo.LangTable["Speedrunner_sacrifice"] = "rng offer"
-
-
-
 
 --Thirsty
 SlashCo.LangTable["Thirsty"] = "Törstis"
@@ -522,9 +484,6 @@ SlashCo.LangTable["Thirsty_drinkmilk"] = "drick mjölk"
 SlashCo.LangTable["Thirsty_milkies"] = "mjölkisar"
 SlashCo.LangTable["Thirsty_thirst"] = "törst"
 
-
-
-
 --Trollge
 SlashCo.LangTable["Trollge"] = "Trollet"
 SlashCo.LangTable["Trollge_desc"] = [[Den blodtörstiga jagare där ens krafter växer genom all blod han har samlat.
@@ -537,9 +496,6 @@ SlashCo.LangTable["Trollge_tip"] = "-Hans ögonsikt verkar bara kunna se rörand
 SlashCo.LangTable["Trollge_dash"] = "kasta sig"
 SlashCo.LangTable["Trollge_claw"] = "riva"
 SlashCo.LangTable["Trollge_blood"] = "blod"
-
-
-
 
 --Tyler
 SlashCo.LangTable["Tyler"] = "Tyler"
@@ -555,9 +511,6 @@ SlashCo.LangTable["Tyler_destroyer"] = "Tyler, Förstöraren"
 SlashCo.LangTable["Tyler_manifest"] = "manifestera"
 SlashCo.LangTable["Tyler_hiding"] = "(gömmer sig)"
 SlashCo.LangTable["Tyler_destroy"] = "förgör"
-
-
-
 
 --Watcher
 SlashCo.LangTable["Watcher"] = "Kikaren"
