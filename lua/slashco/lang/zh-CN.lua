@@ -1,6 +1,6 @@
 --[[
 
-    Language: zh-CN, (simplified Chinese), (简体中文)
+    Language: zh-CN, (Simplified Chinese), (简体中文)
     Translator: 随波逐流
 
 ]]
