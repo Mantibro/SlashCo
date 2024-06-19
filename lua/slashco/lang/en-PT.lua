@@ -125,9 +125,6 @@ SlashCo.LangTable["ItemRemaining"] = "REMAININ'"
 
 SlashCo.LangTable["MapGuaranteeDesc"] = "Bribe th' galleon's captain t' go t' a location o' yer choosin'--highest payer wins. Price increases wit' each consecutive purchase."
 
-
-
-
 SlashCo.LangTable["Alcohol"] = "\"Moonshine\""
 SlashCo.LangTable["Alcohol_desc"] = "Unfortunate."
 
@@ -296,7 +293,6 @@ SlashCo.LangTable["disable crawling"] = "disable crawlin'"
 SlashCo.LangTable["slash charge"] = "slash charge"
 SlashCo.LangTable["lunge"] = "lunge"
 
-
 --Amogus
 SlashCo.LangTable["Amogus"] = "Amogus"
 SlashCo.LangTable["Amogus_desc"] = [[Th' Imposter Loch Ness who is th' master o' deception n' hidin' in plain sight.
@@ -312,8 +308,6 @@ SlashCo.LangTable["Amogus_survivor_disguise"] = "disguise as pirate"
 SlashCo.LangTable["disguise as fuel"] = "disguise as rum"
 SlashCo.LangTable["reveal yourself"] = "reveal yerself"
 
-
-
 --Bababooey
 SlashCo.LangTable["Bababooey"] = "Bababooey"
 SlashCo.LangTable["Bababooey_desc"] = [[Th' Phantom Loch Ness which specialises in illusion abilities t' catch pirates off-guard.
@@ -327,9 +321,6 @@ SlashCo.LangTable["disable invisibility"] = "disable invisibility"
 SlashCo.LangTable["set clone"] = "set clone"
 SlashCo.LangTable["Bababooey_clonetrip"] = "A Bababooey Clone has been tripped!"
 
-
-
-
 --Borgmire
 SlashCo.LangTable["Borgmire"] = "Borgmire"
 SlashCo.LangTable["Borgmire_desc"] = [[Th' Brute Loch Ness who can overpower pirates wit' overwhelmin' strength.
@@ -340,9 +331,6 @@ SlashCo.LangTable["Borgmire_tip"] = "-This Loch Ness seems t' suffer from exhaus
 
 SlashCo.LangTable["punch"] = "punch"
 SlashCo.LangTable["throw"] = "throw"
-
-
-
 
 --The Covenant (WIP)
 SlashCo.LangTable["Covenant"] = "Th' Covenant"
@@ -369,9 +357,6 @@ SlashCo.LangTable["summon clones"] = "summon clones"
 SlashCo.LangTable["unsummon clones"] = "unsummon clones"
 SlashCo.LangTable["rage"] = "rage"
 
-
-
-
 --Dolphinman
 SlashCo.LangTable["Dolphinman"] = "Dolphinman"
 SlashCo.LangTable["Dolphinman_desc"] = [[Th' Patient Loch Ness who waits fer survivors t' come t' him.
@@ -384,9 +369,6 @@ SlashCo.LangTable["Dolphinman_tip"] = "-This Loch Ness does not appear t' approa
 SlashCo.LangTable["Dolphinman_cannothide"] = "You cannot hide here. A pirate be too close."
 SlashCo.LangTable["hide"] = "hide"
 SlashCo.LangTable["hunt"] = "hunt"
-
-
-
 
 --FreeSmiley
 SlashCo.LangTable["FreeSmiley"] = "Free Smiley Dealer"
@@ -403,9 +385,6 @@ SlashCo.LangTable["deal a zany"] = "deal a zany"
 SlashCo.LangTable["deal a pensive"] = "deal a pensive"
 SlashCo.LangTable["no deal"] = "no deal"
 
-
-
-
 --Leuonard
 SlashCo.LangTable["Leuonard"] = "Leuonard"
 SlashCo.LangTable["Leuonard_desc"] = [[Th' Unstable Loch Ness whose overwhlemin' power grows wit' time.
@@ -416,8 +395,6 @@ SlashCo.LangTable["Leuonard_desc"] = [[Th' Unstable Loch Ness whose overwhlemin'
 SlashCo.LangTable["Leuonard_tip"] = "-This Loch Ness seems t' have a fondness fer plush dogs."
 
 SlashCo.LangTable["Leuonard_roid"] = "r**e"
-
-
 
 --Male_07
 SlashCo.LangTable["Male07"] = "Male_07"
@@ -430,8 +407,6 @@ SlashCo.LangTable["Male07_tip"] = "-This Loch Ness is incorporeal n' can possess
 SlashCo.LangTable["possess vessel"] = "possess vessel"
 SlashCo.LangTable["unpossess vessel"] = "unpossess vessel"
 SlashCo.LangTable["slash"] = "slash"
-
-
 
 --Manspider
 SlashCo.LangTable["Manspider"] = "Manspider"
@@ -447,9 +422,6 @@ SlashCo.LangTable["Manspider_yourprey"] = "yer prey: "
 SlashCo.LangTable["waiting for prey"] = "waitin' fer prey"
 SlashCo.LangTable["abandon nest"] = "abandon ship"
 
-
-
-
 --Princess
 SlashCo.LangTable["Princess"] = "Princess"
 SlashCo.LangTable["Princess_desc"] = [[Th' Feral Loch Ness who mauls lassies.
@@ -462,9 +434,6 @@ SlashCo.LangTable["Princess_tip"] = "-This Loch Ness can be distracted wit' Babi
 SlashCo.LangTable["sniff"] = "sniff"
 SlashCo.LangTable["maul"] = "maul"
 SlashCo.LangTable["aggro"] = "aggro"
-
-
-
 
 --Sid
 SlashCo.LangTable["Sid"] = "Sid"
@@ -482,9 +451,6 @@ SlashCo.LangTable["eat cookie"] = "eat cookie"
 SlashCo.LangTable["equip gun"] = "equip flintlock"
 SlashCo.LangTable["unequip gun"] = "unequip flintlock"
 
-
-
-
 --Speedrunner
 SlashCo.LangTable["Speedrunner"] = "Speedrunner"
 SlashCo.LangTable["Speedrunner_desc"] = [[Th' Speed Loch Ness whose speed grows at a constant rate over time.
@@ -498,9 +464,6 @@ SlashCo.LangTable["Speedrunner_tip"] = "-This Loch Ness grows exceptionally fast
 SlashCo.LangTable["speed"] = "speed"
 SlashCo.LangTable["rng sacrifice"] = "rng sacrifice"
 
-
-
-
 --Thirsty
 SlashCo.LangTable["Thirsty"] = "Thirsty"
 SlashCo.LangTable["Thirsty_desc"] = [[Th' Milk Loch Ness whose abilities depend on his level o' Thirst.
@@ -513,9 +476,6 @@ SlashCo.LangTable["Thirsty_tip"] = "-This Loch Ness is heavily linked wit' Milk 
 SlashCo.LangTable["drink milk"] = "drink milk"
 SlashCo.LangTable["milkies"] = "milkies"
 SlashCo.LangTable["thirst"] = "thirst"
-
-
-
 
 --Trollge
 SlashCo.LangTable["Trollge"] = "Trollge"
@@ -531,9 +491,6 @@ SlashCo.LangTable["dash"] = "dash"
 SlashCo.LangTable["claw"] = "claw"
 SlashCo.LangTable["claw"] = "blood"
 
-
-
-
 --Tyler
 SlashCo.LangTable["Tyler"] = "Tyler"
 SlashCo.LangTable["Tyler_desc"] = [[Th' Balance Loch Ness who controls th' progress o' th' round.
@@ -548,9 +505,6 @@ SlashCo.LangTable["Tyler_destroyer"] = "Tyler, Th' Destroyer"
 SlashCo.LangTable["(hiding)"] = "(hidin')"
 SlashCo.LangTable["manifest"] = "manifest"
 SlashCo.LangTable["destroy"] = "destroy"
-
-
-
 
 --Watcher
 SlashCo.LangTable["Watcher"] = "Watcher"

@@ -299,7 +299,6 @@ SlashCo.LangTable["disable crawling"] = "Прекратить ползать"
 SlashCo.LangTable["slash charge"] = "Рывок"
 SlashCo.LangTable["lunge"] = "Выпад"
 
-
 --Amogus
 SlashCo.LangTable["Amogus"] = "Амогус"
 SlashCo.LangTable["Amogus_desc"] = [[Убийца-Предатель, являющийся мастером обмана и скрытности
@@ -315,8 +314,6 @@ SlashCo.LangTable["Amogus_survivor_disguise"] = "Стать Рабочим"
 SlashCo.LangTable["disguise as fuel"] = "Стать Канистрой"
 SlashCo.LangTable["reveal yourself"] = "Раскрыть себя"
 
-
-
 --Bababooey
 SlashCo.LangTable["Bababooey"] = "Бабабуй"
 SlashCo.LangTable["Bababooey_desc"] = [[Фантомный убийца, специализирущийся на илюзорных способностях для поимки Рабочих врасплох
@@ -329,8 +326,6 @@ SlashCo.LangTable["enable invisibility"] = "Включить невидимос�
 SlashCo.LangTable["disable invisibility"] = "Выключить невидимость"
 SlashCo.LangTable["set clone"] = "Установить клона"
 
-
-
 --Borgmire
 SlashCo.LangTable["Borgmire"] = "Киборг-убийца"
 SlashCo.LangTable["Borgmire_desc"] = [[Грубый Убийца, убивающий Рабочих своей невероятной силой
@@ -341,8 +336,6 @@ SlashCo.LangTable["Borgmire_tip"] = "-Убийца кажется страдае
 
 SlashCo.LangTable["punch"] = "удар"
 SlashCo.LangTable["throw"] = "кинуть"
-
-
 
 --Пока что не трогать Covenant
 --The Covenant (WIP)
@@ -367,9 +360,6 @@ SlashCo.LangTable["summon clones"] = "призвать клонов"
 SlashCo.LangTable["unsummon clones"] = "отозвать клонов"
 SlashCo.LangTable["rage"] = "ярость"
 
-
-
-
 --Dolphinman
 SlashCo.LangTable["Dolphinman"] = "Дельфин-человек"
 SlashCo.LangTable["Dolphinman_desc"] = [[Терпиливый Убийца, ожидающий прихода Рабочих.
@@ -382,9 +372,6 @@ SlashCo.LangTable["Dolphinman_tip"] = "-Убийца не приближаетс
 SlashCo.LangTable["Dolphinman_cannothide"] = "Вы не можете сдесь спрятатся. Рабочие слишком близко."
 SlashCo.LangTable["hide"] = "спрятаться"
 SlashCo.LangTable["hunt"] = "охотиться"
-
-
-
 
 --FreeSmiley
 SlashCo.LangTable["FreeSmiley"] = "Дилер бесплатных смайликов"
@@ -401,9 +388,6 @@ SlashCo.LangTable["deal a zany"] = "сделка с Занни"
 SlashCo.LangTable["deal a pensive"] = "сделка с Пэнсив"
 SlashCo.LangTable["no deal"] = "нет сделке"
 
-
-
-
 --Leuonard
 SlashCo.LangTable["Leuonard"] = "Леонард"
 SlashCo.LangTable["Leuonard_desc"] = [[Нестабильный убийца, чья ужасающая сила растет со временем.
@@ -414,8 +398,6 @@ SlashCo.LangTable["Leuonard_desc"] = [[Нестабильный убийца, ч
 SlashCo.LangTable["Leuonard_tip"] = "-У этого убийцы похоже зависимость от плюшевых собак."
 
 SlashCo.LangTable["Leuonard_roid"] = "на****вать"
-
-
 
 --Male_07
 SlashCo.LangTable["Male07"] = "Male_07"
@@ -428,8 +410,6 @@ SlashCo.LangTable["Male07_tip"] = "-Этот убийца бестелестен
 SlashCo.LangTable["possess vessel"] = "вселится в сосуд"
 SlashCo.LangTable["unpossess vessel"] = "отбросить сосуд"
 SlashCo.LangTable["slash"] = "ударить"
-
-
 
 --Manspider
 SlashCo.LangTable["Manspider"] = "Паук-человек"
@@ -445,9 +425,6 @@ SlashCo.LangTable["Manspider_yourprey"] = "ваша жертва: "
 SlashCo.LangTable["waiting for prey"] = "ожидание жертвы"
 SlashCo.LangTable["abandon nest"] = "покинуть гнездо"
 
-
-
-
 --Princess
 SlashCo.LangTable["Princess"] = "Принцесса"
 SlashCo.LangTable["Princess_desc"] = [[Дикая убийца, убивающая детей.
@@ -460,9 +437,6 @@ SlashCo.LangTable["Princess_tip"] = "-Этого Убийцу можно отв�
 SlashCo.LangTable["sniff"] = "нюхать"
 SlashCo.LangTable["maul"] = "терзать"
 SlashCo.LangTable["aggro"] = "агрессия"
-
-
-
 
 --Sid
 SlashCo.LangTable["Sid"] = "Сид"
@@ -480,9 +454,6 @@ SlashCo.LangTable["eat cookie"] = "Съесть печенье"
 SlashCo.LangTable["equip gun"] = "Взять пистолет"
 SlashCo.LangTable["unequip gun"] = "Спрятать пистолет"
 
-
-
-
 --Speedrunner
 SlashCo.LangTable["Speedrunner"] = "Спидраннер"
 SlashCo.LangTable["Speedrunner_desc"] = [[Скоростной Убийца, чья скорость растёт со временем.
@@ -494,9 +465,6 @@ SlashCo.LangTable["Speedrunner_tip"] = "-Этот Убийца становит�
 
 SlashCo.LangTable["speed"] = "скорость"
 SlashCo.LangTable["rng sacrifice"] = "rng sacrifice"
-
-
-
 
 --Thirsty
 SlashCo.LangTable["Thirsty"] = "Молочник"
@@ -511,9 +479,6 @@ SlashCo.LangTable["drink milk"] = "пить молоко"
 SlashCo.LangTable["milkies"] = "молоко"
 SlashCo.LangTable["thirst"] = "жажда"
 
-
-
-
 --Trollge
 SlashCo.LangTable["Trollge"] = "Троллдж"
 SlashCo.LangTable["Trollge_desc"] = [[Кровожадный Убийца, чья сила растёт при накоплении крови.
@@ -526,9 +491,6 @@ SlashCo.LangTable["Trollge_tip"] = "-Похоже, что его зрение о
 SlashCo.LangTable["dash"] = "рывок"
 SlashCo.LangTable["claw"] = "когти"
 SlashCo.LangTable["claw"] = "кровь"
-
-
-
 
 --Tyler
 SlashCo.LangTable["Tyler"] = "Тайлер"
@@ -544,9 +506,6 @@ SlashCo.LangTable["Tyler_destroyer"] = "Уничтожитель Тайлер"
 SlashCo.LangTable["manifest"] = "появиться"
 SlashCo.LangTable["(hiding)"] = "(прячется)"
 SlashCo.LangTable["destroy"] = "уничтожачь"
-
-
-
 
 --Watcher
 SlashCo.LangTable["Watcher"] = "Большой Брат"
