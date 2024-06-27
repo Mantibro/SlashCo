@@ -94,17 +94,6 @@
     output OnExitAll(void) : "Fired when all affected players exit this zone."
 ]
 
-@SolidClass base(SCSpawn) = func_sc_teleportzone : "SC: Specify a zone that defines how players can teleport. Inclusive zones are placed into the same chance pool as specific teleport points."
-[
-    // Keys
-    exclusive(choices) : "Exclusive" : 0 : "If true, this area excludes possible places that players can teleport to. Otherwise, this is an area players can *only* teleport to. Exclusive zones aren't as useful if you are using inclusive zones or specific points." =
-    [
-        1 : "Yes"
-        0 : "No"
-    ]
-    stuff_to_know(integer) : "Stuff To Know" : 0 : "Some SlashCo items will teleport the player to a random position (such as the baby). This entity as well as info_sc_player_teleport helps refine how that random position is picked. This is all optional--the random teleport system will work without it. The true 'zone' for this entity will be it's axis-aligned bounding box."
-]
-
 ///////////////////////
 //  Point  Entities  //
 ///////////////////////
@@ -116,10 +105,6 @@
 @PointClass base(Angles, PlayerClass, SCForcible) studio("models/editor/playerstart.mdl") = info_sc_player_employee : "SC: Spawn point for SlashCo employees." []
 @PointClass base(Angles, PlayerClass, SCForcible) studio("models/editor/playerstart.mdl") = info_sc_player_survivor : "SC: Spawn point for SlashCo employees. Alias of info_sc_player_employee" []
 @PointClass base(Angles, PlayerClass, SCForcible) studio("models/editor/playerstart.mdl") = info_sc_player_slasher : "SC: Spawn point for slashers." []
-@PointClass base(Angles, PlayerClass, SCSpawn) studio("models/editor/playerstart.mdl") = info_sc_player_teleport : "SC: A possible position for players to teleport to. This is for any item or ability that might teleport someone."
-[
-    stuff_to_know(integer) : "Stuff To Know" : 0 : "Some SlashCo items will teleport the player to a random position (such as the baby). This entity as well as func_sc_teleportzone helps refine how that random position is picked. This is all optional--the random teleport system will work without it."
-]
 
 @PointClass base(Angles, SCItem) studio("models/props_junk/MetalBucket01a.mdl") = info_sc_item : "SC: A potential spawn point for an item."
 [

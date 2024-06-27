@@ -4,6 +4,8 @@ local blue = Color(0, 0, 255)
 
 local vecBase = { "x", "y", "z" }
 
+--TODO: replace this
+
 local height_offset = 25
 local mins, maxs = Vector(-18, -18, 0), Vector(18, 18, 72)
 local function traceHullCheck(center, min, max, limit)
@@ -81,45 +83,6 @@ local function init()
 	SlashCo.MapSize = math.ceil(SlashCo.MaxVec:Distance(SlashCo.MinVec) / 20000)
 end
 hook.Add("InitPostEntity", "SlashCo_InitMapMesh", init)
-
---[[ surfs method, heavily favors regions with more cut up brushes
-local function randomPosition()
-	for i = 1, 25 do
-		local id = math.random(1, #SlashCo.MapSurfs)
-		local surf = SlashCo.MapSurfs[id]
-		local verts = surf:GetVertices()
-		local dir = (verts[3] - verts[1]):Cross(verts[2] - verts[1])
-		local norm = dir / dir:Length()
-		local pos = (verts[1] + verts[2] + verts[3]) / 3
-		local start = pos + norm * 36
-
-		local tr_l = util.TraceLine({
-			start = start,
-			endpos = start - Vector(0, 0, 2048),
-		})
-
-		if not tr_l.Hit or i == 25 then
-			table.remove(SlashCo.MapSurfs, id) --take out incompatible surf
-			continue
-		elseif i < 25 then
-			start = tr_l.HitPos + Vector(0, 0, height_offset)
-		end
-
-		local tr = util.TraceHull({
-			start = start,
-			endpos = start,
-			maxs = maxs,
-			mins = mins
-		})
-
-		if not tr.Hit or i == 25 then -- if can't find suitable spot, let it clip into the surface
-			return tr.HitPos
-		else
-			table.remove(SlashCo.MapSurfs, id) --take out incompatible surf
-		end
-	end
-end
-]]--
 
 -- [[ random vector method, more intensive due to being more likely to fail, but better randomness
 local function randomPosition()
