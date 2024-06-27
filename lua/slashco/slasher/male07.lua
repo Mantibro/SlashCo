@@ -321,7 +321,7 @@ SLASHER.OnItemSpawn = function()
 
 	--SCInfo.Maps[game.GetMap()].SIZE
 	for _ = 1, (math.random(0, 6) + (10 * SlashCo.MapSize) + (diff * 4)) do
-		SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), angle_zero)
+		SlashCo.CreateItem("sc_maleclone", SlashCo.RandomPosLocator(), angle_zero)
 	end
 end
 

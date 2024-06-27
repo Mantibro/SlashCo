@@ -1,34 +1,107 @@
-local yellow = Color(255, 255, 0, 16)
-local red = Color(255, 0, 0)
-local blue = Color(0, 0, 255)
+local ENTITY = FindMetaTable("Entity")
 
-local vecBase = { "x", "y", "z" }
+--- return a random position that something can spawn at
+function SlashCo.RandomPosLocator()
+	local navtable = navmesh.GetAllNavAreas()
 
---TODO: replace this
+	for i = 1, 150 do
+		local navdata = navtable[math.random(1, #navtable)]
+
+		local NW = navdata:GetCorner( 0 )
+		local SE = navdata:GetCorner( 2 )
+
+		local pos = Vector(math.random(NW[1], SE[1]),math.random(NW[2], SE[2]), 2 + math.max(NW[3], SE[3]))
+
+		local tr = util.TraceHull({
+			start = pos + Vector(0, 0, 1),
+			endpos = pos,
+			maxs = Vector(12, 12, 72),
+			mins = Vector(-12, -12, 0),
+		})
+
+		if not tr.Hit then
+			return pos
+		end
+	end
+end
+
+--- for compat with things that still use the old name
+SlashCo.TraceHullLocator = SlashCo.RandomPosLocator
+
+--- teleport an entity to a random positon
+function ENTITY:RandomTeleport(add)
+	if not IsValid(self) then
+		return
+	end
+
+	local vec = SlashCo.RandomPosLocator()
+
+	if not vec then
+		return
+	end
+
+	if not add then
+		add = vector_origin
+	end
+
+	local ang = Angle(0, math.Rand(-180, 180), 0)
+
+	if g_SlashCoDebug then
+		debugoverlay.Cross(vec + add, 20, 20, blue, true)
+	end
+
+	self:SetPos(vec + add)
+	self:DropToFloor()
+	if self:IsPlayer() then
+		self:SetEyeAngles(ang)
+	else
+		self:SetAngles(ang)
+	end
+end
 
 local height_offset = 25
-local mins, maxs = Vector(-18, -18, 0), Vector(18, 18, 72)
-local function traceHullCheck(center, min, max, limit)
-	limit = limit or 100
+local up = Vector(0, 0, height_offset)
+local down = Vector(0, 0, -200)
+function SlashCo.LocalizedTraceHullLocator(ent, min_range, range, offset)
+	if not offset then
+		offset = 0
+	end
+
+	if not range then
+		range = min_range
+		min_range = math.min(25, min_range)
+	end
+
+	--Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
+
 	local pos = vector_origin
+	local linePos = vector_origin
+	local err_linehit = 0
 	local err_hullhit = 0
+	local offset_local = ent:GetForward() * offset
 	local success
-	for _ = 0, limit do
-		for _, v in pairs(vecBase) do
-			pos[v] = center[v] + math.Rand(center[v] - min[v], center[v] - max[v])
-		end
+	for _ = 0, 350 do
+		local randPos = vector_up * math.random(min_range, range)
+		randPos:Rotate(AngleRand())
+		randPos.z = randPos.z / 2 + height_offset * 2
+
+		pos = ent:LocalToWorld(offset_local + randPos)
 
 		local tr_l = util.TraceLine({
 			start = pos,
-			endpos = pos - Vector(0, 0, 2048),
+			endpos = pos + down,
 		})
 
 		if not tr_l.Hit then
+			err_linehit = err_linehit + 1
 			continue
 		end
 
-		pos = tr_l.HitPos + Vector(0, 0, height_offset)
+		linePos = pos
+		pos = tr_l.HitPos + up
 
+		local mins, maxs = ent:WorldSpaceAABB()
+		mins.z = 0
 		local tr = util.TraceHull({
 			start = pos,
 			endpos = pos,
@@ -42,7 +115,7 @@ local function traceHullCheck(center, min, max, limit)
 		end
 
 		--be less specific if it's not working out
-		if err_hullhit > limit * 0.66 and not tr.HitNonWorld then
+		if err_hullhit > 125 and not tr.HitNonWorld then
 			success = true
 			break
 		end
@@ -50,117 +123,23 @@ local function traceHullCheck(center, min, max, limit)
 		err_hullhit = err_hullhit + 1
 	end
 
-	return pos
-end
-
---SlashCo.MapSurfs = SlashCo.MapSurfs or {}
-local function init()
-	local verts = {}
-	for _, v in ipairs(game.GetWorld():GetBrushSurfaces()) do
-		if v:IsNoDraw() or v:IsSky() or v:IsWater() then
-			continue
-		end
-		local verts1 = v:GetVertices()
-		table.Add(verts, verts1)
-
-		--if #verts1 >= 3 then
-		--	table.insert(SlashCo.MapSurfs, v)
-		--end
-	end
-
-	local amt = #verts
-	for i = 1, amt - 1 do
-		OrderVectors(verts[i], verts[i + 1])
-	end
-	SlashCo.MaxVec = verts[amt]
-
-	for i = 2, amt - 1 do
-		OrderVectors(verts[amt - i], verts[amt - i + 1])
-	end
-	SlashCo.MinVec = verts[1]
-
-	SlashCo.MidVec = (SlashCo.MaxVec + SlashCo.MinVec) / 2
-	SlashCo.MapSize = math.ceil(SlashCo.MaxVec:Distance(SlashCo.MinVec) / 20000)
-end
-hook.Add("InitPostEntity", "SlashCo_InitMapMesh", init)
-
--- [[ random vector method, more intensive due to being more likely to fail, but better randomness
-local function randomPosition()
-	return traceHullCheck(SlashCo.MidVec, SlashCo.MinVec, SlashCo.MaxVec, 350)
-end
---]]
-
---[[
-timer.Create("scTestTeleportZones", 1, 0, function()
-	if SlashCo.MaxVec then
-		debugoverlay.Cross(SlashCo.MaxVec, 20, 20, red, true)
-		debugoverlay.Cross(SlashCo.MinVec, 20, 20, red, true)
-		debugoverlay.Cross(SlashCo.MidVec, 20, 20, red, true)
-	end
-	local randomPos = randomPosition()
-	if randomPos then
-		debugoverlay.Cross(randomPosition(), 20, 20, blue, true)
-	else
-		print(randomPos)
-	end
-end)
---]]
-
-function SlashCo.TraceHullLocator()
-	return randomPosition()
-end
-
-local function teleCondForced(ent)
-	return SlashCo.DefaultConditionsForced(ent) and not ent.IsExclusive
-end
-local function teleCondNonForced(ent)
-	return SlashCo.DefaultConditionsNonForced(ent) and not ent.IsExclusive
-end
-
-function SlashCo.RandomTeleport(target)
-	if not IsValid(target) then
-		return
-	end
-
-	local elements = ents.FindByClass("func_sc_teleportzone")
-	table.Add(elements, ents.FindByClass("info_sc_player_teleport"))
-	local ent = SlashCo.SelectSpawns(elements, nil, teleCondForced, teleCondNonForced)
-
-	local vec, ang
-	if not IsValid(ent) then
-		vec = randomPosition()
-		ang = Angle(0, math.Rand(-180, 180), 0)
-	elseif ent:GetClass() == "func_sc_teleportzone" then
-		vec = traceHullCheck(ent:OBBCenter(), ent:WorldSpaceAABB())
-		ang = Angle(0, math.Rand(-180, 180), 0)
-
+	if success then
 		if g_SlashCoDebug then
-			local min, max = ent:WorldSpaceAABB()
-			debugoverlay.Box(ent:GetPos(), min, max, 20, yellow)
+			debugoverlay.Line(linePos, pos - Vector(0, 0, 200), 4, Color(0, 0, 255), true)
+			debugoverlay.Cross(linePos, 40, 4, Color(255, 0, 255), true)
+			debugoverlay.Cross(pos, 20, 4, Color(0, 128, 255), true)
 		end
 
-		ent.SpawnedEntity = target
-		ent:SpawnEnt()
-	else
-		vec, ang = ent:GetPos(), ent:GetAngles()
-
-		ent.SpawnedEntity = target
-		ent:SpawnEnt()
-	end
-
-	if not vec then
-		return
+		return pos
 	end
 
 	if g_SlashCoDebug then
-		debugoverlay.Cross(vec, 20, 20, blue, true)
-	end
-
-	target:SetPos(vec)
-	target:DropToFloor()
-	if target:IsPlayer() then
-		target:SetEyeAngles(ang)
-	else
-		target:SetAngles(ang)
+		print(string.format("TRACE LOCATOR FAILURE -- line fails: %d; hull fails: %d", err_linehit, err_hullhit))
+		debugoverlay.Line(linePos, pos - Vector(0, 0, 200), 4, Color(0, 0, 255), true)
+		debugoverlay.Cross(linePos, 40, 4, Color(255, 0, 0), true)
+		debugoverlay.Cross(pos, 20, 4, Color(0, 128, 255), true)
 	end
 end
+
+--- for compat with things that still use the old function
+SlashCo.LocalizedTraceHullLocatorAdvanced = SlashCo.LocalizedTraceHullLocator

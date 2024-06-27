@@ -12,7 +12,7 @@ if SERVER then
 		end
 
 		if activator:GetNWBool("CurseOfTheJug") and self:GetNWBool("JugCursed") then
-			self:SetPos(SlashCo.TraceHullLocator() + Vector(0, 0, 50))
+			self:RandomTeleport(Vector(0, 0, 50))
 			self:SetNWBool("JugCursed", false)
 
 			activator:SetNWBool("JugCurseActivate", true)

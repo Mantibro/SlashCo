@@ -22,7 +22,7 @@ function ENT:RunBehaviour()
 		self:StartActivity(ACT_WALK)            -- Walk animation
 		self.loco:SetDesiredSpeed(100)        -- Walk speed
 
-		local pos = SlashCo.TraceHullLocator()
+		local pos = SlashCo.RandomPosLocator()
 		if g_SlashCoDebug then
 			debugoverlay.Cross(pos, 40, 30, Color(0, 255, 255), true)
 		end
@@ -43,7 +43,7 @@ function ENT:RunBehaviour()
 
 		if self:GetPos()[3] < -16000 then
 			self:Remove()
-			SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0, 0, 0))
+			SlashCo.CreateItem("sc_maleclone", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 		end
 	end
 end
@@ -86,7 +86,7 @@ function ENT:HandleStuck()
 		end
 
 		if lim == 100 then
-			pos = SlashCo.TraceHullLocator()
+			pos = SlashCo.RandomPosLocator()
 			if pos then
 				self:SetPos(pos)
 				break
