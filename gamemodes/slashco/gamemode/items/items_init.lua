@@ -50,6 +50,13 @@ SC_LOADEDITEMS = true
 
 ---remainder of init code
 
+SlashCo.SpawnableItems = {}
+for k, v in pairs(SlashCoItems) do
+	if v.IsSpawnable then
+		table.insert(SlashCo.SpawnableItems, k)
+	end
+end
+
 local PLAYER = FindMetaTable("Player")
 
 ---gives a player an effect
@@ -210,27 +217,6 @@ for _, v in ipairs(item_patches) do
 end
 
 ---this is a little outdated lol
---[[local spawnableItems = {}
-for k, v in pairs(SlashCoItems) do
-    if v.ReplacesWorldProps then
-        spawnableItems[v.Model] = k
-    end
-end
-
-hook.Add("InitPostEntity", "SlashCo_ReplaceCinderBlocks", function()
-    for _, v in ipairs(ents.FindByClass("prop_physics")) do
-        local item = spawnableItems[v:GetModel()]
-        if item then
-            local it_pos = v:GetPos()
-            local it_ang = v:GetAngles()
-            local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, it_pos, it_ang)
-            SlashCo.CurRound.Items[droppedItem] = true
-            Entity(droppedItem):SetCollisionGroup(COLLISION_GROUP_NONE)
-            v:Remove()
-        end
-    end
-end)]]
-
 --[[ all values for functions:
 local SlashCoItems = SlashCoItems
 

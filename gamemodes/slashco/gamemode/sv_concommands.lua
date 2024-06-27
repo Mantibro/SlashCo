@@ -148,11 +148,18 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 	SlashCo.ApplySlasherToPlayer(target)
 	SlashCo.OnSlasherSpawned(target)
 
-	ply:ChatPrint("New Slasher successfully assigned.")
-	SlashCo.DropAllItems(target)
-	target:StripWeapons()
-	target:SetTeam(TEAM_SLASHER)
-	target:Spawn()
+	timer.Simple(0.25, function()
+		if not IsValid(target) then
+			return
+		end
+		if IsValid(ply) then
+			ply:ChatPrint("New Slasher successfully assigned.")
+		end
+		SlashCo.DropAllItems(target)
+		target:StripWeapons()
+		target:SetTeam(TEAM_SLASHER)
+		target:Spawn()
+	end)
 end, function(cmd, args)
 	--this is for autocomplete
 	local preArg = string.Trim(args)
@@ -177,8 +184,7 @@ end, function(cmd, args)
 end)
 
 concommand.Add("slashco_run_curconfig", function(_, _, _)
-	SlashCo.LoadCurRoundTeams()
-	SlashCo.SpawnCurConfig()
+	SlashCo.StartRound()
 end, nil, "Start a normal round with current configs.", FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_itempicker", function(ply)
@@ -199,8 +205,7 @@ concommand.Add("slashco_debug_run_curconfig", function(ply)
 	end
 
 	g_SlashCoDebug = true
-	SlashCo.LoadCurRoundTeams()
-	SlashCo.SpawnCurConfig(true)
+	SlashCo.StartRound()
 end, nil, "Start a debug round with current configs.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_run_survivor", function(ply, _, _)
@@ -214,21 +219,15 @@ concommand.Add("slashco_debug_run_survivor", function(ply, _, _)
 	end
 
 	g_SlashCoDebug = true
-	for _, k in ipairs(player.GetAll()) do
-		k:SetTeam(TEAM_SURVIVOR)
-		k:Spawn()
-		print(k:Name() .. " now Survivor")
-	end
-
-	timer.Simple(0.05, function()
-		print("[SlashCo] Now proceeding with Spawns...")
-
-		SlashCo.PrepareSlasherForSpawning()
-
-		SlashCo.SpawnPlayers()
+	timer.Simple(0.5, function()
+		for _, k in ipairs(player.GetAll()) do
+			k:SetTeam(TEAM_SURVIVOR)
+			k:Spawn()
+			print(k:Name() .. " now Survivor")
+		end
 	end)
 
-	SlashCo.SpawnCurConfig(true)
+	SlashCo.StartRound(true)
 end, nil, "Start a debug round where everyone is a survivor.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 --//datatest//--

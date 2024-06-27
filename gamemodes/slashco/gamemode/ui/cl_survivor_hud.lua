@@ -9,6 +9,7 @@ local FuelingCan
 local IsFueling
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
 local global_pings = {}
+local healthIndicatorShift = 0
 
 local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
@@ -270,17 +271,18 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			--start the damage indicator time
 			prevHp1 = math.Clamp(hp, 0, 100)
 			ShowDamage = true
-			SetTime = CurTime() + 2.1
+			SetTime = CurTime() + 2
+			healthIndicatorShift = CurTime()
 		end
 	elseif hp < prevHp1 then
 		--reset indicator time if more damage is taken
 		prevHp1 = math.Clamp(hp, 0, 100)
-		SetTime = CurTime() + 2.1
+		SetTime = CurTime() + 2
 	end
 
 	aHp = Lerp(FrameTime() * 3, (aHp or 100), hp)
-	local displayPrevHpBar = (CurTime() % 0.7 > 0.35) and math.Round(math.Clamp(((prevHp or 100) - hp) / maxHp, 0,
-			1) * 26.9) or 0
+	local displayPrevHpBar = ((CurTime() - healthIndicatorShift) % 0.7 < 0.35)
+			and math.Round(math.Clamp(((prevHp or 100) - hp) / maxHp, 0, 1) * 26.9) or 0
 	local parsed
 
 	if hp >= 25 or not GetConVar("slashcohud_show_lowhealth"):GetBool() then

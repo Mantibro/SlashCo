@@ -25,6 +25,7 @@ SLASHER.ProTip = "Princess_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
+SLASHER.ItemToSpawn = "Baby"
 
 SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 50))

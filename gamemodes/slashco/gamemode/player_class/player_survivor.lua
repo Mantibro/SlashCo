@@ -14,7 +14,7 @@ PLAYER.SlowWalkSpeed = 100
 PLAYER.WalkSpeed = 200
 PLAYER.RunSpeed = 300
 PLAYER.StartHealth = 100
-PLAYER.MaxHealth = 200
+PLAYER.MaxHealth = 100
 PLAYER.Achievements = {}
 PLAYER.Inventory = {}
 

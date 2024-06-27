@@ -44,7 +44,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local v2 = slasher.SlasherValue2 --Speed Gain multiplier
 	local v3 = slasher.SlasherValue3 --max speed allowed
 
-	local ms = SCInfo.Maps[game.GetMap()].SIZE
+	local ms = SlashCo.MapSize --SCInfo.Maps[game.GetMap()].SIZE
 
 	local size_multiplier = (((5 - ms) / 10) + ((ms - 1) / 15))
 

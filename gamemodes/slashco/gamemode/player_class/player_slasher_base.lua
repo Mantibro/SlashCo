@@ -16,12 +16,14 @@ function PLAYER:Loadout()
 	self.Player:RemoveAllAmmo()
 end
 
+--[[ doesn't seem to function, since this would have errored
 function PLAYER:SetModel()
 	local modelname = SlashCoSlashers[self.Player:GetNWBool("Slasher")].Model
 	util.PrecacheModel(modelname)
 	self.Player:SetModel(modelname)
 	self.Player:SetCanWalk(false)
 end
+--]]
 
 if CLIENT then
 	function PLAYER:Init()

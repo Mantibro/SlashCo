@@ -27,7 +27,7 @@ function ENT:RunBehaviour()
 			debugoverlay.Cross(pos, 40, 30, Color(0, 255, 255), true)
 		end
 		self:MoveToPos(pos, {
-			draw = g_SlashCoDebug,
+			draw = g_SlashCoDebug and GetConVar("developer"):GetBool(),
 			repath = 6,
 			lookahead = 600
 		}) -- Walk to a random place

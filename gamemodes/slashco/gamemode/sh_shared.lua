@@ -17,7 +17,10 @@ CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_player
 
 SlashCo = SlashCo or {}
 
-SlashCo.GasCansPerGenerator = 4 --Number of gas cans required to fill up a generator
+SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator
+SlashCo.GasCans = 8 --Default number of generators
+SlashCo.Generators = 2 --Default number of generators
+SlashCo.GensNeeded = 2 --Default number of generators needed
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
 
@@ -52,10 +55,6 @@ function GM:CreateTeams()
 
 	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235))
 end
-
---[[function GM:PlayerSelectTeamSpawn(team, ply)
-	
-end]]
 
 local DoorSlamWhitelist = {
 	["models/props_c17/door03_left.mdl"] = true,
@@ -179,18 +178,20 @@ for _, v in ipairs(map_configs) do
 		SCInfo.Maps[mapid] = {}
 		SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
 		SCInfo.Maps[mapid].DEFAULT = config_table.Manifest.Default
-		SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
+		--SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size --deprecated
 		SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
 
 		if SERVER then
 			SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
 		end
 
+		--[[ deprecated
 		SCInfo.Maps[mapid].LEVELS = {}
 
 		for ky, lvl in ipairs(config_table.Manifest.Levels) do
 			SCInfo.Maps[mapid].LEVELS[ky] = lvl
 		end
+		]]--
 
 		game_playable = true
 	end

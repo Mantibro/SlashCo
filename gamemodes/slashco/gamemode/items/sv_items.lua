@@ -165,9 +165,15 @@ SlashCo.ItemPickUp = function(ply, item, itid)
 		return
 	end
 
-	SlashCo.ChangeSurvivorItem(ply, itid)
+	local itemEnt = ents.GetByIndex(item)
 
-	ents.GetByIndex(item):Remove()
+	if IsValid(itemEnt.SpawnedAt) then
+		itemEnt.SpawnedAt:TriggerOutput("OnPickedUp", ply)
+		itemEnt.SpawnedAt.SpawnedEntity = nil
+	end
+
+	SlashCo.ChangeSurvivorItem(ply, itid)
+	itemEnt:Remove()
 
 	return true
 end
