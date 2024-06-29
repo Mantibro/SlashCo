@@ -7,10 +7,10 @@ function SlashCo.RandomPosLocator()
 	for i = 1, 150 do
 		local navdata = navtable[math.random(1, #navtable)]
 
-		local NW = navdata:GetCorner( 0 )
-		local SE = navdata:GetCorner( 2 )
+		local NW = navdata:GetCorner(0)
+		local SE = navdata:GetCorner(2)
 
-		local pos = Vector(math.random(NW[1], SE[1]),math.random(NW[2], SE[2]), 2 + math.max(NW[3], SE[3]))
+		local pos = Vector(math.random(NW[1], SE[1]), math.random(NW[2], SE[2]), 2 + math.max(NW[3], SE[3]))
 
 		local tr = util.TraceHull({
 			start = pos + Vector(0, 0, 1),
@@ -25,7 +25,7 @@ function SlashCo.RandomPosLocator()
 	end
 end
 
---- for compat with things that still use the old name
+--- for compat with things that still use the old function
 SlashCo.TraceHullLocator = SlashCo.RandomPosLocator
 
 --- teleport an entity to a random positon
@@ -59,46 +59,57 @@ function ENTITY:RandomTeleport(add)
 	end
 end
 
-local height_offset = 25
-local up = Vector(0, 0, height_offset)
+local up = Vector(0, 0, 25)
 local down = Vector(0, 0, -200)
-function SlashCo.LocalizedTraceHullLocator(ent, min_range, range, offset)
+
+---Get a position near an entity that it can be near
+--minRange - minimum distance away
+--range - maximum distance away
+--offset - offset the center of the search this many units way from the entity in the direction they are looking
+--If offset it unspecified, it defaults to 0
+--If range is unspecified, minRange becomes the range value and the minimum range becomes 25
+function ENTITY:LocalRandomPosition(minRange, range, offset)
+	SlashCo.LocalizedTraceHullLocator(self, minRange, range, offset)
+end
+
+--- for compat with things that still use the old function
+function SlashCo.LocalizedTraceHullLocator(ent, minRange, range, offset)
 	if not offset then
 		offset = 0
 	end
 
 	if not range then
-		range = min_range
-		min_range = math.min(25, min_range)
+		range = minRange
+		minRange = math.min(25, minRange)
 	end
 
 	--Repeatedly positioning a TraceHull to a random localized position to find a spot with enough space for a player or npc.
 
 	local pos = vector_origin
 	local linePos = vector_origin
-	local err_linehit = 0
-	local err_hullhit = 0
-	local offset_local = ent:GetForward() * offset
+	local errorLineHit = 0
+	local errorHullHit = 0
+	local offsetLocal = ent:GetForward() * offset
 	local success
 	for _ = 0, 350 do
-		local randPos = vector_up * math.random(min_range, range)
+		local randPos = vector_up * math.random(minRange, range)
 		randPos:Rotate(AngleRand())
-		randPos.z = randPos.z / 2 + height_offset * 2
+		randPos.z = randPos.z / 2 + 50
 
-		pos = ent:LocalToWorld(offset_local + randPos)
+		pos = ent:LocalToWorld(offsetLocal + randPos)
 
-		local tr_l = util.TraceLine({
+		local trLine = util.TraceLine({
 			start = pos,
 			endpos = pos + down,
 		})
 
-		if not tr_l.Hit then
-			err_linehit = err_linehit + 1
+		if not trLine.Hit then
+			errorLineHit = errorLineHit + 1
 			continue
 		end
 
 		linePos = pos
-		pos = tr_l.HitPos + up
+		pos = trLine.HitPos + up
 
 		local mins, maxs = ent:WorldSpaceAABB()
 		mins.z = 0
@@ -115,12 +126,12 @@ function SlashCo.LocalizedTraceHullLocator(ent, min_range, range, offset)
 		end
 
 		--be less specific if it's not working out
-		if err_hullhit > 125 and not tr.HitNonWorld then
+		if errorHullHit > 125 and not tr.HitNonWorld then
 			success = true
 			break
 		end
 
-		err_hullhit = err_hullhit + 1
+		errorHullHit = errorHullHit + 1
 	end
 
 	if success then
@@ -134,7 +145,7 @@ function SlashCo.LocalizedTraceHullLocator(ent, min_range, range, offset)
 	end
 
 	if g_SlashCoDebug then
-		print(string.format("TRACE LOCATOR FAILURE -- line fails: %d; hull fails: %d", err_linehit, err_hullhit))
+		print(string.format("TRACE LOCATOR FAILURE -- line fails: %d; hull fails: %d", errorLineHit, errorHullHit))
 		debugoverlay.Line(linePos, pos - Vector(0, 0, 200), 4, Color(0, 0, 255), true)
 		debugoverlay.Cross(linePos, 40, 4, Color(255, 0, 0), true)
 		debugoverlay.Cross(pos, 20, 4, Color(0, 128, 255), true)

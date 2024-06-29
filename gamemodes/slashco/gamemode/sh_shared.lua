@@ -160,7 +160,7 @@ SCInfo.Maps = {
 	},
 }
 
-local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
+local configs, _ = file.Find("slashco/configs/maps/*", "LUA")
 
 local game_playable = false
 
@@ -168,33 +168,31 @@ if SERVER then
 	SCInfo.MinimumMapPlayers = 6
 end
 
-for _, v in ipairs(map_configs) do
-	if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
-		local config_table = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
-		local mapid = string.Replace(v, ".lua", "")
+for _, v in ipairs(configs) do
+	local config = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
+	local mapid = string.Replace(v, ".lua", "")
 
-		if SCInfo.Maps[mapid] then continue end
+	SCInfo.Maps[mapid] = SCInfo.Maps[mapid] or {}
 
-		SCInfo.Maps[mapid] = {}
-		SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
-		SCInfo.Maps[mapid].DEFAULT = config_table.Manifest.Default
-		--SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size --deprecated
-		SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
-
-		if SERVER then
-			SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
+	if type(config.Manifest) == "table" then
+		if config.Manifest.DoNotUseThisConfig then
+			SCInfo.Maps[mapid] = nil
+			continue
 		end
 
-		--[[ deprecated
-		SCInfo.Maps[mapid].LEVELS = {}
-
-		for ky, lvl in ipairs(config_table.Manifest.Levels) do
-			SCInfo.Maps[mapid].LEVELS[ky] = lvl
-		end
-		]]--
-
-		game_playable = true
+		SCInfo.Maps[mapid].NAME = config.Manifest.Name or "Unspecified Map Name"
+		SCInfo.Maps[mapid].DEFAULT = config.Manifest.Default --wtf does this do...
+		SCInfo.Maps[mapid].MIN_PLAYERS = config.Manifest.MinimumPlayers or 1
+	else
+		SCInfo.Maps[mapid].NAME = "Unspecified Map Name"
+		SCInfo.Maps[mapid].MIN_PLAYERS = 1
 	end
+
+	if SERVER then
+		SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
+	end
+
+	game_playable = true
 end
 
 if SERVER and not game_playable then

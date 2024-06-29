@@ -177,8 +177,7 @@ function SlashCo.SpawnGasCans()
 		end
 	end
 
-	local gasCansToSpawn = SlashCo.SelectSpawns(gasCanSpawns, gasCanCount, nil, nil,
-			true)
+	local gasCansToSpawn = SlashCo.SelectSpawns(gasCanSpawns, gasCanCount, nil, nil, true)
 
 	if table.IsEmpty(gasCansToSpawn) then
 		SlashCo.Abort("Missing gas can spawn entities")
@@ -274,6 +273,21 @@ function SlashCo.SetHelicopterPositions()
 	SlashCo.CurRound.HelicopterIntroPosition = intro:GetPos() - Vector(0, 0, 70)
 	SlashCo.CurRound.HelicopterIntroAngle = intro:GetAngles()
 	SlashCo.CurRound.HelicopterSpawnPosition = spawn:GetPos() - Vector(0, 0, 70)
+end
+
+local slasherSpawned
+
+function SlashCo.SpawnSlasher()
+	if slasherSpawned then
+		return
+	end
+
+	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		p:SetTeam(TEAM_SLASHER)
+		p:Spawn()
+	end
+
+	slasherSpawned = true
 end
 
 ---Set up players for the round
@@ -422,6 +436,162 @@ function SlashCo.SetupPlayers()
 	:: NIGHTMARE_SKIPALL ::
 end
 
+local function makeEnt(class, config)
+	if not istable(config.pos) then
+		return
+	end
+
+	local ent = ents.Create(class)
+	ent:SetPos(config.pos)
+
+	if isnumber(config.ang) then
+		ent:SetAngles(Angle(0, config.ang, 0))
+	elseif istable(config.ang) then
+		ent:SetAngles(Angle(config.ang[1], config.ang[2], config.ang[3]))
+	else
+		ent:SetAngles(angle_zero)
+	end
+
+	if isnumber(config.Weight) then
+		ent.Weight = config.Weight
+	end
+
+	if config.Forced then
+		ent.Forced = true
+	end
+
+	ent:Spawn()
+
+	return ent
+end
+
+local function convertLegacyConfig(name, skip)
+	local config = util.JSONToTable(file.Read("slashco/configs/maps/" .. name, "LUA"))
+
+	if not istable(config) then
+		print(string.format("Aborting the legacy config for %s due to being invalid", name))
+		return
+	end
+
+	if config.DoNotUseThisConfig then
+		return
+	end
+
+	if skip and not config.AlwaysAddLegacySettings then
+		return
+	end
+
+	if istable(config.Spawnpoints) then
+		if istable(config.Spawnpoints.Slasher) then
+			for _, v in ipairs(config.Spawnpoints.Slasher) do
+				makeEnt("info_sc_player_slasher", v)
+			end
+		end
+		if istable(config.Spawnpoints.Survivor) then
+			for _, v in ipairs(config.Spawnpoints.Survivor) do
+				makeEnt("info_sc_player_slasher", v)
+			end
+		end
+	end
+
+	local gens = {}
+	if istable(config.Generators) then
+		if isnumber(config.Generators.Count) then
+			SetGlobal2Int("SlashCoGeneratorsToSpawn", config.Generators.Count)
+		end
+
+		if isnumber(config.Generators.Needed) then
+			SetGlobal2Int("SlashCoGeneratorsNeeded", config.Generators.Needed)
+		end
+
+		if istable(config.Generators.Spawnpoints) then
+			for k, v in ipairs(config.Generators.Spawnpoints) do
+				local ent = makeEnt("info_sc_generator", v)
+
+				if IsValid(ent) then
+					gens[k] = ent
+				end
+			end
+		end
+	end
+	if istable(config.Helicopter) then
+		if istable(config.Helicopter.IntroLocation) then
+			makeEnt("info_sc_helicopter_intro", config.Helicopter.IntroLocation)
+		end
+
+		if istable(config.Helicopter.StartLocation) then
+			makeEnt("info_sc_helicopter_start", config.Helicopter.StartLocation)
+		end
+
+		if istable(config.Helicopter.Spawnpoints) then
+			for _, v in ipairs(config.Helicopter.Spawnpoints) do
+				makeEnt("info_sc_helicopter", v)
+			end
+		end
+	end
+	if istable(config.GasCans) then
+		if isnumber(config.GasCans.Count) then
+			SetGlobal2Int("SlashCoGasCansToSpawn", config.Generators.Count)
+		end
+
+		if isnumber(config.GasCans.NeededPerGenerator) then
+			SetGlobal2Int("SlashCoGasCansPerGenerator", config.GasCans.NeededPerGenerator)
+		end
+
+		if istable(config.GasCans.Spawnpoints) then
+			for _, v in ipairs(config.GasCans.Spawnpoints) do
+				makeEnt("info_sc_gascan", v)
+			end
+		end
+	end
+	if istable(config.Items) and istable(config.Items.Spawnpoints) then
+		for _, v in ipairs(config.Items.Spawnpoints) do
+			local ent = makeEnt("info_sc_item", v)
+
+			if config.Items.IncludeGasCanSpawns and IsValid(ent) then
+				ent.IsGasCanSpawn = true
+			end
+		end
+	end
+	if istable(config.Batteries) and istable(config.Batteries.Spawnpoints) then
+		for k, v in ipairs(config.Batteries.Spawnpoints) do
+			if not istable(v) then
+				continue
+			end
+
+			for _, v1 in ipairs(v) do
+				local ent = makeEnt("info_sc_battery", v1)
+
+				if IsValid(ent) and gens[k] then
+					gens[k].BatterySpawns = gens[k].BatterySpawns or {}
+					gens[k].BatterySpawns[ent] = true
+				end
+			end
+		end
+	end
+	if istable(config.Offerings) and istable(config.Offerings.Exposure) and istable(config.Offerings.Exposure.Spawnpoints) then
+		for _, v in ipairs(config.Offerings.Exposure.Spawnpoints) do
+			makeEnt("info_sc_gascanexposed", v)
+		end
+	end
+end
+
+---Add spawning entities from the legacy config if it exists
+function SlashCo.LegacySetup()
+	local configs, configDirs = file.Find(string.format("slashco/configs/maps/%s", game.GetMap()), "LUA")
+	local skip = IsValid(SlashCo.SettingsEntity())
+
+	for _, v in ipairs(configs) do
+		convertLegacyConfig(v, skip)
+	end
+
+	for _, v in ipairs(configDirs) do
+		for _, v1 in ipairs(v) do
+			convertLegacyConfig(v1, skip)
+		end
+	end
+end
+
 ---main body of round starting function
 local function startRound(noSetup)
 	SlashCo.RoundStarted = true
@@ -500,6 +670,8 @@ function SlashCo.StartRound(noSetup)
 	if settingsEnt then
 		settingsEnt:TriggerOutput("OnPreRoundStarted", settingsEnt, settingsEnt, #SlashCo.CurRound.ExpectedPlayers)
 	end
+
+	SlashCo.LegacySetup()
 
 	timer.Simple(0.5, function()
 		startRound(noSetup)

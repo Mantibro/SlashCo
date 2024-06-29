@@ -1,4 +1,12 @@
 {
+	"Manifest": {
+		"Name": "Dead City",
+		"Author": "Manti",
+		"Default": true,
+		"MinimumPlayers": 4,
+		"AlwaysAddLegacySettings": false,
+		"DoNotUseThisConfig": true
+	},
 	"Spawnpoints": {
 		"Slasher": {
 			"1": {

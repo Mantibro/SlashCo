@@ -37,38 +37,6 @@ SlashCo.PrepareSlasherForSpawning = function()
 	end
 end
 
-local SlasherSpawned
-
-SlashCo.SpawnSlasher = function()
-	if SERVER then
-		if not SlasherSpawned then
-			print("[SlashCo] Spawning Slasher...")
-
-			if SlashCo.CurRound.SlashersToBeSpawned then
-				for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
-					local rand = math.random(1, #SlashCo.CurConfig.Spawnpoints.Slasher)
-
-					local pos = Vector(SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[1],
-							SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[2],
-							SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[3])
-					local ang = Angle(0, SlashCo.CurConfig.Spawnpoints.Slasher[rand].ang, 0)
-
-					p:SetTeam(TEAM_SLASHER)
-					p:Spawn()
-					p:SetPos(pos)
-					p:SetAngles(ang)
-
-					SlashCo.OnSlasherSpawned(p)
-				end
-
-				SlasherSpawned = true
-			else
-				print("[SlashCo] Error! Cannot spawn Slasher as they are not prepared for spawning or the player was not assigned correctly!")
-			end
-		end
-	end
-end
-
 SlashCo.OnSlasherSpawned = function(ply)
 	ply:SetRunSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
 	ply:SetWalkSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
