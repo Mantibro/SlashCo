@@ -79,7 +79,7 @@ include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("cl_limitedzone.lua")
 
-CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for Survivors.", 0, 1)
+CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
 CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
 		"SlashCo Survivor Playermodel")
 
@@ -165,16 +165,16 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 	end
 
 	LocalPlayer():ItemFunction("Screenspace")
-	DrawBokehDOF(0.5, 1, 12)
+	DrawBokehDOF(0.35, 1, 12)
 	DrawSharpen(5, 0.15)
-	DrawBloom(0.5, 2, 9, 9, 1, 1, 1, 1, 1)
+	DrawBloom(0.85, 2, 9, 9, 1, 1, 1, 1, 1)
 
 	local hp = LocalPlayer():Health()
 	if hp < 30 then
 		fx_t = fx_t + RealFrameTime() * 0.25
 		DrawBokehDOF(12, 0.4, 4 - math.sin(fx_t) * (3 - (hp / 10)))
 		DrawColorModify({
-			["$pp_colour_addr"] = math.sin(fx_t) * (0.05) * (1 - (hp / 30)),
+			["$pp_colour_addr"] = math.sin(fx_t) * 0.05 * (1 - (hp / 30)),
 			["$pp_colour_addg"] = 0,
 			["$pp_colour_addb"] = 0,
 			["$pp_colour_brightness"] = 0,
@@ -216,7 +216,7 @@ local colors = {
 }
 
 ---draw halos; can only be used in the below function
-function SlashCo.DrawHalo(ents, color, passes, noZ)
+function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	if not g_SlashCoDrawingHalos then
 		error("Using SlashCo.DrawHalo illegally", 2)
 		return
@@ -232,7 +232,7 @@ function SlashCo.DrawHalo(ents, color, passes, noZ)
 	if noZ == nil then
 		noZ = true
 	end
-	halo.Add(ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil,
+	halo.Add(_ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil,
 			noZ)
 end
 
