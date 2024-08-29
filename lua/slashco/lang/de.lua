@@ -125,9 +125,6 @@ SlashCo.LangTable["ItemRemaining"] = "VERBLIEBEN"
 
 SlashCo.LangTable["MapGuaranteeDesc"] = "Besteche den Hubschrauberfahrer, damit er zu einem Ort deiner Wahl fliegt--der Höchstzahler gewinnt. Der Preis steigt mit jedem weiteren Einkauf."
 
-
-
-
 SlashCo.LangTable["Alcohol"] = "\"Moonshine\""
 SlashCo.LangTable["Alcohol_desc"] = "Unglücklich."
 
@@ -303,7 +300,6 @@ SlashCo.LangTable["Abomignat_disablecrawling"] = "Crawling deaktivieren"
 SlashCo.LangTable["Abomignat_slashcharge"] = "Schrägstrichladung"
 SlashCo.LangTable["Abomignat_lunge"] = "Ausfallschritt"
 
-
 --Amogus
 SlashCo.LangTable["Amogus"] = "Amogus"
 SlashCo.LangTable["Amogus_desc"] = [[Der Betrüger Slasher ist ein Meister der Täuschung und des Versteckens.
@@ -319,8 +315,6 @@ SlashCo.LangTable["Amogus_survivor_disguise"] = "als Überlebender tarnen"
 SlashCo.LangTable["Amogus_gas_disguise"] = "als Benzinkanister tarnen"
 SlashCo.LangTable["Amogus_un_disguise"] = "enthülle dich"
 
-
-
 --Bababooey
 SlashCo.LangTable["Bababooey"] = "Bababooey"
 SlashCo.LangTable["Bababooey_desc"] = [[Der Phantom Slasher, der sich auf Illusionsfähigkeiten spezialisiert, um die Überlebende zu überrumpeln.
@@ -334,9 +328,6 @@ SlashCo.LangTable["Bababooey_disableinvis"] = "Unsichtbarkeit deaktivieren"
 SlashCo.LangTable["Bababooey_setclone"] = "Klon setzen"
 SlashCo.LangTable["Bababooey_clonetrip"] = "Ein Bababooey Klon wurde ausgelöst!"
 
-
-
-
 --Borgmire
 SlashCo.LangTable["Borgmire"] = "Borgmire"
 SlashCo.LangTable["Borgmire_desc"] = [[Der Brute Slasher, der Überlebende mit überwältigender Kraft überwältigen kann.
@@ -347,9 +338,6 @@ SlashCo.LangTable["Borgmire_tip"] = "-Dieser Slasher scheint bei langen Verfolgu
 
 SlashCo.LangTable["Borgmire_punch"] = "Schlag"
 SlashCo.LangTable["Borgmire_throw"] = "Wurf"
-
-
-
 
 --The Covenant (WIP)
 SlashCo.LangTable["Covenant"] = "The Covenant"
@@ -376,9 +364,6 @@ SlashCo.LangTable["Criminal_summonclones"] = "Klone herbeirufen"
 SlashCo.LangTable["Criminal_unsummonclones"] = "Klone abberufen"
 SlashCo.LangTable["Criminal_rage"] = "wut"
 
-
-
-
 --Dolphinman
 SlashCo.LangTable["Dolphinman"] = "Delphinmann"
 SlashCo.LangTable["Dolphinman_desc"] = [[Der geduldige Slasher, der auf Überlebende wartet, die zu ihm kommen.
@@ -391,9 +376,6 @@ SlashCo.LangTable["Dolphinman_tip"] = "-Dieser Slasher scheint sich seinen Opfer
 SlashCo.LangTable["Dolphinman_cannothide"] = "Du kannst dich hier nicht verstecken. Ein Überlebender ist zu nah."
 SlashCo.LangTable["Dolphinman_hide"] = "Verstecken"
 SlashCo.LangTable["Dolphinman_hunt"] = "Jagd"
-
-
-
 
 --FreeSmiley
 SlashCo.LangTable["FreeSmiley"] = "Free Smiley Dealer"
@@ -410,9 +392,6 @@ SlashCo.LangTable["FreeSmiley_zanydeal"] = "Deal einen verrückten"
 SlashCo.LangTable["FreeSmiley_pensivedeal"] = "Deal einen nachdenklichen"
 SlashCo.LangTable["FreeSmiley_nodeal"] = "kein Deal"
 
-
-
-
 --Leuonard
 SlashCo.LangTable["Leuonard"] = "Leuonard"
 SlashCo.LangTable["Leuonard_desc"] = [[Der instabile Slasher, der im Laufe der Zeit immer mächtiger wird.
@@ -423,8 +402,6 @@ SlashCo.LangTable["Leuonard_desc"] = [[Der instabile Slasher, der im Laufe der Z
 SlashCo.LangTable["Leuonard_tip"] = "-Dieser Slasher scheint eine Vorliebe für Plüschhunde zu haben."
 
 SlashCo.LangTable["Leuonard_roid"] = "r**e"
-
-
 
 --Male_07
 SlashCo.LangTable["Male07"] = "Male_07"
@@ -437,8 +414,6 @@ SlashCo.LangTable["Male07_tip"] = "-Dieser Slasher ist körperlos und kann von G
 SlashCo.LangTable["Male07_possess"] = "Gefäß besitzen"
 SlashCo.LangTable["Male07_unpossess"] = "Gefäß loslassen"
 SlashCo.LangTable["Male07_slash"] = "Schrägstrich"
-
-
 
 --Manspider
 SlashCo.LangTable["Manspider"] = "Manspider"
@@ -454,9 +429,6 @@ SlashCo.LangTable["Manspider_yourprey"] = "deine Beute: "
 SlashCo.LangTable["Manspider_awaitprey"] = "in Erwartung von Beute"
 SlashCo.LangTable["Manspider_abandonnest"] = "das Nest verlassen"
 
-
-
-
 --Princess
 SlashCo.LangTable["Princess"] = "Princess"
 SlashCo.LangTable["Princess_desc"] = [[Der wilde Slasher, der Kinder zerfleischt.
@@ -469,9 +441,6 @@ SlashCo.LangTable["Princess_tip"] = "-Dieser Slasher kann mit Babies abgelenkt w
 SlashCo.LangTable["Princess_sniff"] = "schnüffeln"
 SlashCo.LangTable["Princess_maul"] = "zerfleischen"
 SlashCo.LangTable["Princess_aggro"] = "aggro"
-
-
-
 
 --Sid
 SlashCo.LangTable["Sid"] = "Sid"
@@ -489,9 +458,6 @@ SlashCo.LangTable["Sid_eatcookie"] = "Keks essen"
 SlashCo.LangTable["Sid_equipgun"] = "Waffe ausrüsten"
 SlashCo.LangTable["Sid_unequipgun"] = "Waffe abrüsten"
 
-
-
-
 --Speedrunner
 SlashCo.LangTable["Speedrunner"] = "Speedrunner"
 SlashCo.LangTable["Speedrunner_desc"] = [[Der Speed Slasher, bei dem die Geschwindigkeit mit der Zeit immer weiter ansteigt.
@@ -505,9 +471,6 @@ SlashCo.LangTable["Speedrunner_tip"] = "-Dieser Slasher wächst mit der Zeit au�
 SlashCo.LangTable["Speedrunner_speed"] = "Geschwindigkeit"
 SlashCo.LangTable["Speedrunner_sacrifice"] = "RNG-Opfer"
 
-
-
-
 --Thirsty
 SlashCo.LangTable["Thirsty"] = "Thirsty"
 SlashCo.LangTable["Thirsty_desc"] = [[Der Milch Slasher, der seine Fähigkeiten von seinem Durstlevel abhängig hat.
@@ -520,9 +483,6 @@ SlashCo.LangTable["Thirsty_tip"] = "-Dieser Slasher ist schwer mit Milch Krügen
 SlashCo.LangTable["Thirsty_drinkmilk"] = "Milch trinken"
 SlashCo.LangTable["Thirsty_milkies"] = "milkies"
 SlashCo.LangTable["Thirsty_thirst"] = "Durst"
-
-
-
 
 --Trollge
 SlashCo.LangTable["Trollge"] = "Trollge"
@@ -538,9 +498,6 @@ SlashCo.LangTable["Trollge_dash"] = "Dash"
 SlashCo.LangTable["Trollge_claw"] = "Kralle"
 SlashCo.LangTable["Trollge_blood"] = "Blut"
 
-
-
-
 --Tyler
 SlashCo.LangTable["Tyler"] = "Tyler"
 SlashCo.LangTable["Tyler_desc"] = [[Der Balance Slasher, der den Verlauf der Runde kontrolliert.
@@ -555,9 +512,6 @@ SlashCo.LangTable["Tyler_destroyer"] = "Tyler, der Zerstörer"
 SlashCo.LangTable["Tyler_manifest"] = "manifestieren"
 SlashCo.LangTable["Tyler_hiding"] = "(Verstecken)"
 SlashCo.LangTable["Tyler_destroy"] = "zerstöre"
-
-
-
 
 --Watcher
 SlashCo.LangTable["Watcher"] = "Watcher"

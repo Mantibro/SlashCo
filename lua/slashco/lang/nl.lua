@@ -125,9 +125,6 @@ SlashCo.LangTable["ItemRemaining"] = "RESTERENDE"
 
 SlashCo.LangTable["MapGuaranteeDesc"] = "Koop de piloot om en kies een locatie--de hoogste bieder wint. De prijs stijgt met elke aankoop"
 
-
-
-
 SlashCo.LangTable["Alcohol"] = "\"Het enge drankje\""
 SlashCo.LangTable["Alcohol_desc"] = "Jammer."
 
@@ -287,7 +284,6 @@ SlashCo.LangTable["Abomignat_disablecrawling"] = "deactiveer kruipmodus"
 SlashCo.LangTable["Abomignat_slashcharge"] = "klauw aanval"
 SlashCo.LangTable["Abomignat_lunge"] = "sprong"
 
-
 --Amogus
 SlashCo.LangTable["Amogus"] = "Ondrons"
 SlashCo.LangTable["Amogus_desc"] = [[De Verdachte Engerd die als meester van bedrog zich onder je bevindt.
@@ -303,8 +299,6 @@ SlashCo.LangTable["Amogus_survivor_disguise"] = "vermom als overlevende"
 SlashCo.LangTable["Amogus_gas_disguise"] = "vermom als jerrycan"
 SlashCo.LangTable["Amogus_un_disguise"] = "onthul jezelf"
 
-
-
 --Bababooey
 SlashCo.LangTable["Bababooey"] = "Bababoewie"
 SlashCo.LangTable["Bababooey_desc"] = [[De Spookachtige Engerd die met behulp van illusies de Overlevenden kan laten schrikken.
@@ -318,9 +312,6 @@ SlashCo.LangTable["Bababooey_disableinvis"] = "deactiveer onzichtbaarheid"
 SlashCo.LangTable["Bababooey_setclone"] = "zet kloon neer"
 SlashCo.LangTable["Bababooey_clonetrip"] = "Een Bababoewie Kloon is gevonden!"
 
-
-
-
 --Borgmire
 SlashCo.LangTable["Borgmire"] = "Slijkchine"
 SlashCo.LangTable["Borgmire_desc"] = [[De Woeste Engerd die Overlevenden gemakkelijk aan kan met zijn enorme kracht. 
@@ -331,9 +322,6 @@ SlashCo.LangTable["Borgmire_tip"] = "-Deze Engerd wordt moe van lange achtervolg
 
 SlashCo.LangTable["Borgmire_punch"] = "stomp"
 SlashCo.LangTable["Borgmire_throw"] = "gooi"
-
-
-
 
 --The Covenant (WIP)
 SlashCo.LangTable["Covenant"] = "Het Genootschap"
@@ -360,9 +348,6 @@ SlashCo.LangTable["Criminal_summonclones"] = "gebruik klonen"
 SlashCo.LangTable["Criminal_unsummonclones"] = "verwijder klonen"
 SlashCo.LangTable["Criminal_rage"] = "woede"
 
-
-
-
 --Dolphinman
 SlashCo.LangTable["Dolphinman"] = "Dolfijnentemmer"
 SlashCo.LangTable["Dolphinman_desc"] = [[De Geduldige Engerd die wacht tot Overlevenden naar hem toe komen.
@@ -375,9 +360,6 @@ SlashCo.LangTable["Dolphinman_tip"] = "-Deze Engerd gaat niet uit zichzelf naar 
 SlashCo.LangTable["Dolphinman_cannothide"] = "Hier kan je je niet verstoppen. Er is een Overlevende dichtbij."
 SlashCo.LangTable["Dolphinman_hide"] = "verstop"
 SlashCo.LangTable["Dolphinman_hunt"] = "jacht"
-
-
-
 
 --FreeSmiley
 SlashCo.LangTable["FreeSmiley"] = "Gratis Glimlach Gever"
@@ -393,9 +375,6 @@ SlashCo.LangTable["FreeSmiley_zanydeal"] = "geef een zot"
 SlashCo.LangTable["FreeSmiley_pensivedeal"] = "geef een peinzend"
 SlashCo.LangTable["FreeSmiley_nodeal"] = "niks geven"
 
-
-
-
 --Leuonard
 SlashCo.LangTable["Leuonard"] = "Leonhard"
 SlashCo.LangTable["Leuonard_desc"] = [[De Onstabiele Engerd die steeds sterker wordt.
@@ -406,8 +385,6 @@ SlashCo.LangTable["Leuonard_desc"] = [[De Onstabiele Engerd die steeds sterker w
 SlashCo.LangTable["Leuonard_tip"] = "-Deze Engerd houdt van speelgoedhondjes."
 
 SlashCo.LangTable["Leuonard_roid"] = "verkr*cht"
-
-
 
 --Male_07
 SlashCo.LangTable["Male07"] = "Man_07"
@@ -420,8 +397,6 @@ SlashCo.LangTable["Male07_tip"] = "-Deze Engerd is als een geest en gebruikt bez
 SlashCo.LangTable["Male07_possess"] = "bezit man"
 SlashCo.LangTable["Male07_unpossess"] = "laat man los"
 SlashCo.LangTable["Male07_slash"] = "sla"
-
-
 
 --Manspider
 SlashCo.LangTable["Manspider"] = "Mannelijke Spin"
@@ -437,9 +412,6 @@ SlashCo.LangTable["Manspider_yourprey"] = "jouw prooi: "
 SlashCo.LangTable["Manspider_awaitprey"] = "wachten op prooi"
 SlashCo.LangTable["Manspider_abandonnest"] = "laat nest achter"
 
-
-
-
 --Princess
 SlashCo.LangTable["Princess"] = "Prinses"
 SlashCo.LangTable["Princess_desc"] = [[De Wilde Engerd die kinderen oppeuzelt.
@@ -452,9 +424,6 @@ SlashCo.LangTable["Princess_tip"] = "-Deze Engerd kan afgeleid worden met Baby's
 SlashCo.LangTable["Princess_sniff"] = "snuif"
 SlashCo.LangTable["Princess_maul"] = "verslind"
 SlashCo.LangTable["Princess_aggro"] = "agressie"
-
-
-
 
 --Sid
 SlashCo.LangTable["Sid"] = "Sid"
@@ -472,9 +441,6 @@ SlashCo.LangTable["Sid_eatcookie"] = "eet koekje"
 SlashCo.LangTable["Sid_equipgun"] = "houd pistool vast"
 SlashCo.LangTable["Sid_unequipgun"] = "stop pistool weg"
 
-
-
-
 --Speedrunner
 SlashCo.LangTable["Speedrunner"] = "Droom"
 SlashCo.LangTable["Speedrunner_desc"] = [[De Snelle Engerd wiens snelheid steeds groter wordt.
@@ -486,9 +452,6 @@ SlashCo.LangTable["Speedrunner_tip"] = "-Deze Engerd wordt steeds sneller."
 
 SlashCo.LangTable["Speedrunner_speed"] = "snelheid"
 SlashCo.LangTable["Speedrunner_sacrifice"] = "rng offer"
-
-
-
 
 --Thirsty
 SlashCo.LangTable["Thirsty"] = "Dorst"
@@ -503,9 +466,6 @@ SlashCo.LangTable["Thirsty_drinkmilk"] = "drink melk"
 SlashCo.LangTable["Thirsty_milkies"] = "melkjes"
 SlashCo.LangTable["Thirsty_thirst"] = "dorst"
 
-
-
-
 --Trollge
 SlashCo.LangTable["Trollge"] = "Trollge"
 SlashCo.LangTable["Trollge_desc"] = [[Deze Bloeddorstige Engerd groeit in kracht met het bloed dat hij verzamelt.
@@ -518,9 +478,6 @@ SlashCo.LangTable["Trollge_tip"] = "-Trollge ziet alleen bewegende dingen."
 SlashCo.LangTable["Trollge_dash"] = "ren"
 SlashCo.LangTable["Trollge_claw"] = "klauw"
 SlashCo.LangTable["Trollge_blood"] = "bloed"
-
-
-
 
 --Tyler
 SlashCo.LangTable["Tyler"] = "Tyler"
@@ -537,9 +494,6 @@ SlashCo.LangTable["Tyler_hiding"] = "(aan het verstoppen)"
 SlashCo.LangTable["Tyler_manifest"] = "verschijn"
 SlashCo.LangTable["Tyler_destroy"] = "vernietig"
 
-
-
-
 --Watcher
 SlashCo.LangTable["Watcher"] = "Waarnemer"
 SlashCo.LangTable["Watcher_desc"] = [[De Observerende Engerd wiens kracht van zijn zicht afhangt.
@@ -554,7 +508,6 @@ SlashCo.LangTable["Watcher_fullsurveillance"] = "volledig toezicht"
 SlashCo.LangTable["Watcher_watched"] = "JE WORDT BEKEKEN"
 SlashCo.LangTable["Watcher_observe"] = "OVERLEVENDE AAN HET BEKIJKEN. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "STALK TIJD: "
-
 
 SlashCo.LangTable["Beacon_already_on_way"] = "De Helikopter is al onderweg."
 SlashCo.LangTable["Beacon_already_active"] = "Er is al een Noodbaken gebruikt."
