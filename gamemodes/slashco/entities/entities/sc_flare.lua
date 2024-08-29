@@ -30,19 +30,16 @@ end
 if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
-
 	end
 
 	function ENT:Think()
-
 		if self:GetNWBool("FlareActive") then
-
 			local intensity = intensity or 0
 
 			intensity = intensity + (FrameTime() * 300)
 
 			local dlight = DynamicLight(self:EntIndex() + 999968)
-			if (dlight) then
+			if dlight then
 				dlight.pos = self:GetPos()
 				dlight.r = 180
 				dlight.g = 100
@@ -52,8 +49,6 @@ if CLIENT then
 				dlight.Size = 180 + math.sin(intensity) * 20
 				dlight.DieTime = CurTime() + 0.1
 			end
-
 		end
-
 	end
 end

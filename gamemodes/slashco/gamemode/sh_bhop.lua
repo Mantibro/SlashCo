@@ -5,11 +5,11 @@ local function limitSpeed(ply, data)
 		return
 	end
 
-	local baseSpeed = ply:GetRunSpeed()
+	local baseSpeed = ply:GetRunSpeed() * max:GetFloat()
 	local curSpeed = data:GetVelocity():Length()
 
-	if curSpeed > baseSpeed * max:GetFloat() then
-		data:SetVelocity((data:GetVelocity() * baseSpeed * max:GetFloat()) / curSpeed)
+	if curSpeed > baseSpeed then
+		data:SetVelocity((data:GetVelocity() * baseSpeed) / curSpeed)
 	end
 end
 

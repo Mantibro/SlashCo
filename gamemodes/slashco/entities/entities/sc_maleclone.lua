@@ -13,7 +13,7 @@ function ENT:Initialize()
 	end
 
 	self:SetModel("models/Humans/Group01/male_07.mdl")
-	self.CollideSwitch = 3
+	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 end
 
 function ENT:RunBehaviour()
@@ -101,30 +101,6 @@ function ENT:HandleStuck()
 	self.loco:ClearStuck()
 end
 
-function ENT:Think()
-	if SERVER then
-		if self.CollideSwitch > 0 then
-			self:SetNotSolid(true)
-			self.CollideSwitch = self.CollideSwitch - FrameTime()
-		else
-			self:SetNotSolid(false)
-		end
-
-		local tr = util.TraceLine({
-			start = self:GetPos() + Vector(0, 0, 50),
-			endpos = self:GetPos() + self:GetForward() * 10000,
-			filter = self
-		})
-
-		if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
-				not tr.Entity.IsOpen and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
-
-			tr.Entity:Use(self)
-			self.UseCooldown = CurTime()
-		end
-	end
-end
-
 function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
@@ -132,5 +108,22 @@ end
 if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
+	end
+
+	return
+end
+
+function ENT:Think()
+	local tr = util.TraceLine({
+		start = self:GetPos() + Vector(0, 0, 50),
+		endpos = self:GetPos() + self:GetForward() * 10000,
+		filter = self
+	})
+
+	if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+			not tr.Entity.IsOpen and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
+
+		tr.Entity:Use(self)
+		self.UseCooldown = CurTime()
 	end
 end

@@ -8,8 +8,8 @@ ITEM.Price = 35
 ITEM.Description = "Baby_desc"
 ITEM.CamPos = Vector(50,0,0)
 ITEM.DisplayColor = function(ply)
-    local setcolor = 360-math.Clamp(ply:Health(),0,100) * 1.2
-    local color = HSVToColor(setcolor,1,0.5)
+    local setcolor = 360 - math.Clamp(ply:Health(), 0, 100) * 1.2
+    local color = HSVToColor(setcolor, 1, 0.5)
 
     return color.r, color.g, color.b, color.a
 end

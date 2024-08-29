@@ -280,7 +280,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		SetTime = CurTime() + 2
 	end
 
-	aHp = Lerp(FrameTime() * 3, (aHp or 100), hp)
+	aHp = Lerp(FrameTime() * 3, aHp or 100, hp)
 	local displayPrevHpBar = ((CurTime() - healthIndicatorShift) % 0.7 < 0.35)
 			and math.Round(math.Clamp(((prevHp or 100) - hp) / maxHp, 0, 1) * 26.9) or 0
 	local parsed
@@ -335,7 +335,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 		local clone = ents.FindByClass("sc_crimclone")[s]
 		if clone:GetNWBool("MainRageClone") then
 			local tlight = DynamicLight(clone:EntIndex() + 1)
-			if (tlight) then
+			if tlight then
 				tlight.pos = clone:LocalToWorld(Vector(0, 0, 20))
 				tlight.r = 255
 				tlight.g = 0
@@ -366,7 +366,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 
 		if slasher:GetNWBool("TylerFlash") then
 			local dlight = DynamicLight(slasher:EntIndex())
-			if (dlight) then
+			if dlight then
 				dlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
 				dlight.r = 255
 				dlight.g = 0
@@ -383,7 +383,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 		end
 
 		local dlight = DynamicLight(slasher:EntIndex())
-		if (dlight) then
+		if dlight then
 			dlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
 			dlight.r = 255
 			dlight.g = 0

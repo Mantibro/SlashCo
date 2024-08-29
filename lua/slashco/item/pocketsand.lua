@@ -8,34 +8,29 @@ ITEM.Price = 30
 ITEM.Description = "PocketSand_desc"
 ITEM.CamPos = Vector(50,0,0)
 ITEM.DisplayColor = function(ply)
-    local setcolor = 360-math.Clamp(ply:Health(),0,100)*1.2
-    local color = HSVToColor(setcolor,1,0.5)
+    local setcolor = 360 - math.Clamp(ply:Health(), 0, 100) * 1.2
+    local color = HSVToColor(setcolor, 1, 0.5)
 
     return color.r, color.g, color.b, color.a
 end
 ITEM.IsSpawnable = true
 ITEM.OnUse = function(ply)
-
     if #team.GetPlayers(TEAM_SLASHER) > 1 then return true end
 
     local found = false
 
     for i = 1, #team.GetPlayers(TEAM_SLASHER) do
-
         local s = team.GetPlayers(TEAM_SLASHER)[i]
 
         if s:GetPos():Distance(ply:GetPos()) < 120 then
-
             local tr = util.TraceLine( {
                 start = s:EyePos(),
-                endpos = ply:GetPos()+Vector(0,0,50),
+                endpos = ply:GetPos() + Vector(0,0,50),
                 filter = slasher
             } )
 
             if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SLASHER then found = tr.Entity goto FOUNDMAN end
-
         end
-
     end
 
     ::FOUNDMAN::
@@ -44,7 +39,7 @@ ITEM.OnUse = function(ply)
 
     found:SetNWBool("SlasherBlinded", true)
 
-    ply:EmitSound("slashco/survivor/pocketsand_throw"..math.random(1,2)..".mp3")
+    ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1,2) .. ".mp3")
     ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
 
     timer.Simple(8, function()

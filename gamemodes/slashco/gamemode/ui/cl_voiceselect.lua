@@ -28,7 +28,6 @@ local voiceText = {
 }
 
 function PANEL:Init()
-
     local voices = {}
 
     self:SetSize(ScrW(), ScrH())
@@ -66,7 +65,7 @@ function PANEL:Init()
     local voiceCursor = vgui.Create("DLabel", self)
     voiceCursor:SetSize(100,50)
     voiceCursor:SetFont("TVCD")
-    voiceCursor:SetText( "[  ]" )
+    voiceCursor:SetText("[  ]")
 
     self.VoiceCursor = voiceCursor
     self.Voices = voices
@@ -84,7 +83,7 @@ function PANEL:Think()
 
     local say = self.Voices.say
     if say:DistanceFrom(x, y) < 100 then
-        say:SetText( "[ "..say.Prompt.." ]" )
+        say:SetText("[ " .. say.Prompt .. " ]")
         self.CursorSelect = false
         say:SetTextColor(say.Prompt == SlashCo.Language("vocal_cancel") and red or color_white)
     else
@@ -93,21 +92,21 @@ function PANEL:Think()
         say:SetText(SlashCo.Language("vocal_cancel"))
     end
 
-    for _, v in ipairs( self.Voices ) do
-        if v:DistanceFrom( x, y ) < 100 then
-            v:SetText( "[ "..v.Prompt.." ]" )
+    for _, v in ipairs(self.Voices) do
+        if v:DistanceFrom(x, y) < 100 then
+            v:SetText("[ " .. v.Prompt .. " ]")
             v:SetTextColor(green)
             self.CursorSelect = v.snd
         else
-            v:SetText( v.Prompt )
+            v:SetText(v.Prompt)
             v:SetTextColor(color_white)
         end
     end
 
     if self.CursorSelect == nil then
-        self.VoiceCursor:SetText( "[  ]" )
+        self.VoiceCursor:SetText("[  ]")
     else
-        self.VoiceCursor:SetText( "" )
+        self.VoiceCursor:SetText("")
     end
 end
 

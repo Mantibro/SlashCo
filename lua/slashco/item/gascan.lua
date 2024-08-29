@@ -7,7 +7,7 @@ ITEM.EntClass = "sc_gascan"
 ITEM.Icon = "slashco/ui/icons/items/item_1"
 ITEM.Price = 0
 ITEM.Description = "GasCan_desc"
-ITEM.CamPos = Vector(80,0,0)
+ITEM.CamPos = Vector(80, 0, 0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = false
 ITEM.IsFuel = true
@@ -29,7 +29,7 @@ ITEM.OnPickUp = function(ply)
     ply:AddSpeedEffect("gas", 200, 10)
 end
 ITEM.EquipSound = function()
-    return "slashco/survivor/gascan_pickup"..math.random(1, 3)..".wav"
+    return "slashco/survivor/gascan_pickup" .. math.random(1, 3) .. ".wav"
 end
 ITEM.ViewModel = {
     model = "models/props_junk/metalgascan.mdl",
