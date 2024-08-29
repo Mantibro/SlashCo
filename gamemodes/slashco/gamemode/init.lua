@@ -21,9 +21,13 @@ AddCSLuaFile("ui/slasher_stock/cl_slasher_control.lua")
 AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
 AddCSLuaFile("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 AddCSLuaFile("ui/cl_projector.lua")
+AddCSLuaFile("cl_limitedzone.lua")
+AddCSLuaFile("sh_bhop.lua")
 
 include("sv_globals.lua")
 include("sh_shared.lua")
+include("sv_spawning.lua")
+include("sv_teleporting.lua")
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
 include("sv_player.lua")
@@ -41,9 +45,9 @@ include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
+include("sh_bhop.lua")
 
 local SlashCo = SlashCo or {}
-local SlashCoItems = SlashCoItems or {}
 
 --[[
 
@@ -71,18 +75,7 @@ hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
 end)
 
 --Initialize global variable to hold functions.
-if not SlashCo then
-	SlashCo = {}
-end
-
-SlashCo.SpawnableItems = {}
-
-for _, p in SortedPairs(SlashCoItems) do
-	if p.IsSpawnable then
-		table.insert(SlashCo.SpawnableItems, p.EntClass)
-		--SlashCo.SpawnableItems[1 + #SlashCo.SpawnableItems] = p.EntClass
-	end
-end
+SlashCo = SlashCo or {}
 
 function GM:Initialize()
 	--If there is no data folder then make one.
@@ -327,31 +320,21 @@ hook.Add("OnPlayerChangedTeam", "octoSlashCoOnPlayerChangedTeam", function(ply, 
 	-- Here's an immediate respawn thing by default. If you want to
 	-- re-create something more like CS or some shit you could probably
 	-- change to a spectator or something while dead.
-	if (newteam == TEAM_SPECTATOR) then
-
+	if newteam == TEAM_SPECTATOR then
 		-- If we changed to spectator mode, respawn where we are
 		local Pos = ply:EyePos()
 		ply:Spawn()
 		ply:SetPos(Pos)
-
-	elseif (oldteam == TEAM_SPECTATOR) then
-
+	elseif oldteam == TEAM_SPECTATOR then
 		-- If we're changing from spectator, join the game
 		ply:Spawn()
-
-	else
-
-		-- If we're straight up changing teams just hang
-		-- around until we're ready to respawn onto the
-		-- team that we chose
-
 	end
 
-	--PrintMessage( HUD_PRINTTALK, Format( "%s joined '%s'", ply:Nick(), team.GetName( newteam ) ) )
-
+	if g_SlashCoDebug then
+		PrintMessage(HUD_PRINTTALK, Format("%s joined '%s'", ply:Nick(), team.GetName(newteam)))
+	end
 
 	--Ready Message
-
 	SlashCo.BroadcastGlobalData()
 end)
 
@@ -364,7 +347,6 @@ hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
 
 		SlashCo.LoadCurRoundData()
 		SlashCo.CurRound.GameProgress = -1
-
 	end
 end)
 
@@ -408,17 +390,16 @@ local Think = function()
 		end
 
 		local allRunning = true
-		if runningCount < 2 then
+		if runningCount < GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) then
 			allRunning = false
 		end
 
 		--//drainage//--
-
 		if SlashCo.CurRound.OfferingData.CurrentOffering == 3 then
-
 			local totalCansRemaining = 0
+			local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 			for _, v in ipairs(gens) do
-				totalCansRemaining = totalCansRemaining + (v.CansRemaining or SlashCo.GasCansPerGenerator)
+				totalCansRemaining = totalCansRemaining + (v.CansRemaining or gasPerGen)
 			end
 
 			if #ents.FindByClass("sc_gascan") <= totalCansRemaining then
@@ -427,31 +408,29 @@ local Think = function()
 
 			if engine.TickCount() % math.floor(240 / engine.TickInterval()) == 0 then
 				local random = math.random(#gens)
-				gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or SlashCo.GasCansPerGenerator) + 1,
-						0, SlashCo.GasCansPerGenerator)
+				gens[random]:ChangeCanProgress(-1)
+				--gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or gasPerGen) + 1, 0, gasPerGen)
 			end
-
 		end
 
 		--//helicopters//--
-
 		if allRunning and not SlashCo.CurRound.EscapeHelicopterSummoned then
-
 			--(SPAWN HELICOPTER)
 
 			local failed = SlashCo.SummonEscapeHelicopter()
-
 			if not failed then
+				local settingsEnt = SlashCo.SettingsEntity()
+				if settingsEnt then
+					settingsEnt:TriggerOutput("OnAllGeneratorsComplete", settingsEnt)
+				end
+
 				SlashCo.CurRound.DistressBeaconUsed = false
 			end
-
 		end
 
 		--//duality condition//--
 		if SlashCo.CurRound.OfferingData.CurrentOffering == 4 then
-
 			if runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
-
 				--(SPAWN HELICOPTER)
 
 				local failed = SlashCo.SummonEscapeHelicopter()
@@ -459,14 +438,11 @@ local Think = function()
 				if not failed then
 					SlashCo.CurRound.DistressBeaconUsed = false
 				end
-
 			end
-
 		end
 
 		--Go back to lobby if everyone dies.
 		if team.NumPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
-
 			SlashCo.EndRound()
 
 			SlashCo.CurRound.roundOverToggle = false
@@ -474,9 +450,7 @@ local Think = function()
 
 		--Benadryl
 		for _, plr in ipairs(player.GetAll()) do
-
 			if plr:Team() ~= TEAM_SURVIVOR then
-
 				if plr:GetNWBool("SurvivorBenadryl") then
 					plr:SetNWBool("SurvivorBenadryl", false)
 				end
@@ -484,9 +458,7 @@ local Think = function()
 				if plr:GetNWBool("SurvivorBenadrylFull") then
 					plr:SetNWBool("SurvivorBenadrylFull", false)
 				end
-
 			end
-
 		end
 	end
 end
@@ -503,7 +475,7 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 
 	local pid = ply:SteamID64()
 	local data = {}
-	
+
 	--Don't load playerdata if it's already loaded
 	if SlashCo.PlayerData[ply:SteamID64()] ~= nil then
 		return

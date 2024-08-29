@@ -22,12 +22,12 @@ function ENT:RunBehaviour()
 		self:StartActivity(ACT_WALK)            -- Walk animation
 		self.loco:SetDesiredSpeed(100)        -- Walk speed
 
-		local pos = SlashCo.TraceHullLocator()
+		local pos = SlashCo.RandomPosLocator()
 		if g_SlashCoDebug then
 			debugoverlay.Cross(pos, 40, 30, Color(0, 255, 255), true)
 		end
 		self:MoveToPos(pos, {
-			draw = g_SlashCoDebug,
+			draw = g_SlashCoDebug and GetConVar("developer"):GetBool(),
 			repath = 6,
 			lookahead = 600
 		}) -- Walk to a random place
@@ -41,9 +41,9 @@ function ENT:RunBehaviour()
 		coroutine.yield()
 		-- The function is done here, but will start back at the top of the loop and make the bot walk somewhere else
 
-		if self:GetPos()[3] < -2000 then
+		if self:GetPos()[3] < -16000 then
 			self:Remove()
-			SlashCo.CreateItem("sc_maleclone", SlashCo.TraceHullLocator(), Angle(0, 0, 0))
+			SlashCo.CreateItem("sc_maleclone", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 		end
 	end
 end
@@ -86,7 +86,7 @@ function ENT:HandleStuck()
 		end
 
 		if lim == 100 then
-			pos = SlashCo.TraceHullLocator()
+			pos = SlashCo.RandomPosLocator()
 			if pos then
 				self:SetPos(pos)
 				break

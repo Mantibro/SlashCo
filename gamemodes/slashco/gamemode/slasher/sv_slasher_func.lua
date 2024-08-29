@@ -37,38 +37,6 @@ SlashCo.PrepareSlasherForSpawning = function()
 	end
 end
 
-local SlasherSpawned
-
-SlashCo.SpawnSlasher = function()
-	if SERVER then
-		if not SlasherSpawned then
-			print("[SlashCo] Spawning Slasher...")
-
-			if SlashCo.CurRound.SlashersToBeSpawned then
-				for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
-					local rand = math.random(1, #SlashCo.CurConfig.Spawnpoints.Slasher)
-
-					local pos = Vector(SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[1],
-							SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[2],
-							SlashCo.CurConfig.Spawnpoints.Slasher[rand].pos[3])
-					local ang = Angle(0, SlashCo.CurConfig.Spawnpoints.Slasher[rand].ang, 0)
-
-					p:SetTeam(TEAM_SLASHER)
-					p:Spawn()
-					p:SetPos(pos)
-					p:SetAngles(ang)
-
-					SlashCo.OnSlasherSpawned(p)
-				end
-
-				SlasherSpawned = true
-			else
-				print("[SlashCo] Error! Cannot spawn Slasher as they are not prepared for spawning or the player was not assigned correctly!")
-			end
-		end
-	end
-end
-
 SlashCo.OnSlasherSpawned = function(ply)
 	ply:SetRunSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
 	ply:SetWalkSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
@@ -87,7 +55,6 @@ end
 
 
 --On-Tick Behaviour
-
 hook.Add("Tick", "HandleSlasherAbilities", function()
 	local gens = ents.FindByClass("sc_generator")
 	if #gens < 1 then
@@ -97,14 +64,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 	local SO = SlashCo.CurRound.OfferingData.SO
 
 	--Calculate the Game Progress Value
-	--The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (1 - 10)
-	local totalProgress = 0
-	for _, v in ipairs(gens) do
-		totalProgress = totalProgress + (SlashCo.GasCansPerGenerator - (v.CansRemaining or SlashCo.GasCansPerGenerator)) + ((v.HasBattery and 1) or 0)
-	end
-	if SlashCo.CurRound.GameProgress > -1 then
-		SlashCo.CurRound.GameProgress = totalProgress
-	end
+	--The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (0 - 10)
 
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		local slasher = v
@@ -170,6 +130,41 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 
 		slasher:SlasherFunction("OnTickBehaviour")
 	end
+
+	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then
+		return
+	end
+
+	if SlashCo.CurRound.GameProgress <= -1 then
+		return
+	end
+
+	local needed = GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded)
+	local genProgs = {}
+	for k, v in ipairs(gens) do
+		genProgs[k] = v.Progress
+	end
+
+	local progress = 0
+	for i = 1, needed do
+		local maxProg, progVal = 0
+		for k, v in ipairs(genProgs) do
+			if maxProg < v then
+				maxProg = v
+				progVal = k
+			end
+		end
+
+		if maxProg == 0 then
+			break
+		end
+
+		progress = progress + maxProg
+		table.remove(genProgs, progVal)
+	end
+
+	progress = progress * (2 / needed) --scale to needed
+	SlashCo.CurRound.GameProgress = math.ceil(progress)
 end)
 
 SlashCo.Jumpscare = function(slasher, target)
@@ -181,12 +176,6 @@ SlashCo.Jumpscare = function(slasher, target)
 		return
 	end
 
-	--[[
-	slasher:LagCompensation(true)
-	local target = slasher:GetEyeTrace().Entity
-	slasher:LagCompensation(false)
-	--]]
-
 	if not IsValid(target) or not target:IsPlayer() then
 		return
 	end
@@ -195,7 +184,8 @@ SlashCo.Jumpscare = function(slasher, target)
 		return
 	end
 
-	if slasher:GetPos():Distance(target:GetPos()) > slasher:SlasherValue("KillDistance", 135) and not target:GetNWBool("SurvivorBeingJumpscared") then
+	if slasher:GetPos():Distance(target:GetPos()) > slasher:SlasherValue("KillDistance",
+			135) and not target:GetNWBool("SurvivorBeingJumpscared") then
 		return
 	end
 
@@ -232,6 +222,7 @@ SlashCo.StopChase = function(slasher)
 	slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
+	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 
 	timer.Simple(0.25, function()
 		if not IsValid(slasher) then
@@ -248,6 +239,10 @@ SlashCo.StopChase = function(slasher)
 end
 
 SlashCo.StartChaseMode = function(slasher)
+	if slasher.ChaseActivationCooldown > 0 then
+		return
+	end
+
 	if not slasher:GetNWBool("CanChase") then
 		return
 	end
@@ -257,18 +252,13 @@ SlashCo.StartChaseMode = function(slasher)
 		return
 	end
 
-	if slasher.ChaseActivationCooldown > 0 then
-		return
-	end
-	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
-
 	slasher:LagCompensation(true)
 	local trace = slasher:GetEyeTrace()
 	slasher:LagCompensation(false)
 
 	local target
 	local isFound = false
-	local dist = slasher:SlasherValue("ChaseRange", 600)
+	local dist = slasher:SlasherValue("ChaseRange", 1000)
 	if trace.Entity:IsPlayer() and trace.Entity:Team() == TEAM_SURVIVOR
 			and slasher:GetPos():Distance(trace.Entity:GetPos()) < dist then
 
@@ -307,6 +297,7 @@ SlashCo.StartChaseMode = function(slasher)
 
 	slasher:SetNWBool("InSlasherChaseMode", true)
 	slasher.CurrentChaseTick = 0
+	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 	slasher:SetRunSpeed(slasher:SlasherValue("ChaseSpeed"))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ChaseSpeed"))
 	PlayGlobalSound(slasher:SlasherValue("ChaseMusic"), 95, slasher)

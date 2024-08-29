@@ -844,10 +844,6 @@ SlashCo.OfferingVoteSuccess = function(id)
 
     SlashCo.LobbyData.VotedOffering = 0
 
-    if fail == true then
-        return
-    end
-
     SlashCo.LobbyData.Offering = id
 
     timer.Destroy("OfferingVoteTimer")
@@ -856,7 +852,9 @@ SlashCo.OfferingVoteSuccess = function(id)
         SlashCo.EndOfferingVote(play)
     end
 
-    SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
+    if not fail then
+        SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
+    end
 
 end
 

@@ -27,7 +27,7 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 
 SLASHER.OnSpawn = function(slasher)
-	SlashCo.CreateItem("sc_dogg", SlashCo.TraceHullLocator(), Angle(0, 0, 0))
+	SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 	slasher.soundon = 0
 	slasher:SetNWBool("CanKill", true)
 	slasher:SetNWBool("CanChase", true)
@@ -109,7 +109,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 				slasher:SetBodygroup(1, 0)
 				slasher:Freeze(false)
 
-				SlashCo.CreateItem("sc_dogg", SlashCo.TraceHullLocator(), Angle(0, 0, 0))
+				SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 
 				slasher:StopSound("slashco/slasher/leuonard_grunt_loop.wav")
 				slasher:EmitSound("slashco/slasher/leuonard_grunt_finish.mp3")

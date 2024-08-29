@@ -34,25 +34,19 @@ local function printRescued(rescued)
 	return SlashCo.Language(count == 1 and "RescuedOnlyOne" or "Rescued", neatString)
 end
 
-local function printLeftBehind(survivors, rescued)
-	local plysLeftBehind = table.Copy(survivors)
-	for k, ply in pairs(plysLeftBehind) do
-		if not IsValid(ply) then
-			table.remove(plysLeftBehind, k)
-			continue
-		end
-		if ply:Team() ~= TEAM_SURVIVOR then
-			table.remove(plysLeftBehind, k)
-			continue
-		end
-		for _, v in ipairs(rescued) do
-			if not IsValid(v) then
-				continue
-			end
-			if ply:UserID() == v:UserID() then
-				table.remove(plysLeftBehind, k)
+local function printLeftBehind(rescued) --survivors,
+	local plysLeftBehind = {}
+	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		local isRescued
+		for _, v1 in ipairs(rescued) do
+			if v == v1 then
+				isRescued = true
 				break
 			end
+		end
+
+		if not isRescued then
+			table.insert(plysLeftBehind, v)
 		end
 	end
 
@@ -88,7 +82,7 @@ local function teamSummary(lines, survivors, rescued)
 		table.insert(lines, rescuedString)
 	end
 
-	local leftBehindString = printLeftBehind(survivors, rescued)
+	local leftBehindString = printLeftBehind(rescued) --survivors,
 	if leftBehindString then
 		table.insert(lines, leftBehindString)
 	end
@@ -192,7 +186,7 @@ local stringTable = {
 			SlashCo.Language("Difficulty", difficultyTable[info[5]]),
 		}
 		if info[6] ~= "Regular" then
-			table.insert(lines, SlashCo.Language("Offering_name", difficultyTable[info[6]]))
+			table.insert(lines, SlashCo.Language("Offering_name", info[6]))
 		end
 
 		return lines

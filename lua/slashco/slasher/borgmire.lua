@@ -124,6 +124,8 @@ SLASHER.OnPrimaryFire = function(slasher)
 				return
 			end
 
+			SlashCo.BustDoor(slasher, target, 60000)
+
 			if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) or target:GetClass() == "prop_ragdoll" then
 				local o = Vector(0, 0, 0)
 
@@ -137,8 +139,6 @@ SLASHER.OnPrimaryFire = function(slasher)
 				util.Effect("BloodImpact", bloodfx)
 
 				target:EmitSound("slashco/slasher/borgmire_hit" .. math.random(1, 2) .. ".mp3")
-
-				SlashCo.BustDoor(slasher, target, 60000)
 			end
 		end)
 

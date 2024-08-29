@@ -40,6 +40,18 @@ function PANEL:Init()
 	left:SetWide(420)
 	left:Dock(LEFT)
 	--]]
+
+	self.SlasherName = LocalPlayer():GetNWString("Slasher", "none")
+	timer.Create("SlashCo_ResetSlasherHud", 1, 0, function()
+		if not IsValid(self) then
+			timer.Remove("SlashCo_ResetSlasherHud")
+			return
+		end
+
+		if LocalPlayer():GetNWString("Slasher", "none") ~= self.SlasherName then
+			SlashCo.InitSlasherHud()
+		end
+	end)
 end
 
 ---[SLASHER DISPLAY]---
@@ -843,7 +855,8 @@ function PANEL:MakeGenEntry(gen, i, model)
 		end
 	end)
 
-	entry.angle = math.pi / ((SlashCo.GasCansPerGenerator + 1) / 2) * i
+	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	entry.angle = math.pi / ((gasPerGen + 1) / 2) * i
 	--local x, y = gen:GetPos()
 
 	function entry.Think()
@@ -859,21 +872,8 @@ function PANEL:MakeGenEntry(gen, i, model)
 	function entry.LayoutEntity(_, ent)
 		local YWiggle = math.sin(CurTime()) * 10
 		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5,
-				(YWiggle + entry.YSpin + (i * 360 / (SlashCo.GasCansPerGenerator + 1))) % 360, 5))
+				(YWiggle + entry.YSpin + (i * 360 / (gasPerGen + 1))) % 360, 5))
 	end
-	--entry.angle = angle
-
-	--[[
-	entry.DefaultPos = {
-		x + (gen:GetWide() / 2) - math.cos(angle) * 50 - (entry:GetWide() / 2),
-		y + (gen:GetTall() / 2) + math.sin(angle) * 50 - (entry:GetTall() / 2)
-	}
-	entry.CenteredPos = {
-		(ScrW() / 2) - math.cos(angle) * 100 - (entry:GetWide()),
-		(ScrH() / 2) + math.sin(angle) * 100 - (entry:GetTall())
-	}
-	entry:SetPos(unpack(entry.DefaultPos))
-	--]]
 end
 
 ---internal: shows the generator display up top
@@ -895,12 +895,12 @@ function PANEL:MakeGeneratorsCard()
 		gen:SetDistance(400)
 		self:ModelFog(gen)
 
-		gen.CansRemaining = SlashCo.GasCansPerGenerator
+		gen.CansRemaining = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 
 		gen.Entries = {}
 		PANEL:MakeGenEntry(gen, 0, "models/items/car_battery01.mdl")
 
-		for i = 1, SlashCo.GasCansPerGenerator do
+		for i = 1, gen.CansRemaining do
 			PANEL:MakeGenEntry(gen, i)
 		end
 
@@ -1072,7 +1072,8 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 		if panel.CansRemainingNew then
 			playSound = true
 
-			for i = 2, 1 + SlashCo.GasCansPerGenerator - panel.CansRemainingNew do
+			local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+			for i = 2, 1 + gasPerGen - panel.CansRemainingNew do
 				if 5 - i < panel.CansRemaining then
 					panel.Entries[i].Spin:Start(1)
 				end

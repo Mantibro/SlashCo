@@ -44,7 +44,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local v2 = slasher.SlasherValue2 --Speed Gain multiplier
 	local v3 = slasher.SlasherValue3 --max speed allowed
 
-	local ms = SCInfo.Maps[game.GetMap()].SIZE
+	local ms = SlashCo.MapSize --SCInfo.Maps[game.GetMap()].SIZE
 
 	local size_multiplier = (((5 - ms) / 10) + ((ms - 1) / 15))
 
@@ -66,6 +66,15 @@ end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
 	SlashCo.Jumpscare(slasher, target)
+end
+
+-- the great ability
+SLASHER.RandomTPCans = function()
+	for _, ent in ipairs(ents.FindByClass("sc_gascan")) do
+		ent:RandomTeleport(Vector(0, 0, 50))
+		ent:GetPhysicsObject():ApplyForceCenter(Vector((math.random() - 0.5) * 100,
+				(math.random() - 0.5) * 100, (math.random() - 0.5) * 100))
+	end
 end
 
 SLASHER.OnMainAbilityFire = function(slasher)
@@ -103,14 +112,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 				PlayGlobalSound("slashco/slasher/speedrunner_2.wav", 100, slasher)
 				slasher.SlasherValue2 = 2
 				slasher.SlasherValue3 = 275
-
-				-- the great ability
-				for _, ent in ipairs(ents.FindByClass("sc_gascan")) do
-					ent:SetPos(SlashCo.TraceHullLocator() + Vector(0, 0, 50))
-					ent:SetAngles(Angle(math.random(0, 360), math.random(0, 360), math.random(0, 360)))
-					ent:GetPhysicsObject():ApplyForceCenter(Vector((math.random() - 0.5) * 100,
-							(math.random() - 0.5) * 100, (math.random() - 0.5) * 100))
-				end
+				SLASHER.RandomTPCans()
 
 				return
 			end
@@ -121,14 +123,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 				slasher.SlasherValue2 = 4
 				slasher.SlasherValue3 = 450
 				slasher:SetBodygroup(1, 1)
-
-				-- the great ability
-				for _, ent in ipairs(ents.FindByClass("sc_gascan")) do
-					ent:SetPos(SlashCo.TraceHullLocator() + Vector(0, 0, 50))
-					ent:SetAngles(Angle(math.random(0, 360), math.random(0, 360), math.random(0, 360)))
-					ent:GetPhysicsObject():ApplyForceCenter(Vector((math.random() - 0.5) * 200,
-							(math.random() - 0.5) * 200, (math.random() - 0.5) * 200))
-				end
+				SLASHER.RandomTPCans()
 
 				return
 			end

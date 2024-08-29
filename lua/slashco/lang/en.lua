@@ -531,3 +531,12 @@ SlashCo.LangTable["full surveillance"] = "full surveillance"
 SlashCo.LangTable["Watcher_watched"] = "YOU ARE BEING WATCHED"
 SlashCo.LangTable["Watcher_observe"] = "OBSERVING A SURVIVOR. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "STALK TIME: "
+
+--THE BRICKLAYER
+SlashCo.LangTable["Kamenchik"] = "THE BRICKLAYER"
+SlashCo.LangTable["Kamenchik_desc"] = [[The Overwhelming Slasher who works for 3 days with no salary.
+
+-THE BRICKLAYER must steal and eat bread to upkeep his inhuman strength.
+-.
+-.]]
+SlashCo.LangTable["Kemenchik_tip"] = "-You may as well give up."

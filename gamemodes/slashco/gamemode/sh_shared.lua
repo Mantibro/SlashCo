@@ -17,7 +17,10 @@ CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_player
 
 SlashCo = SlashCo or {}
 
-SlashCo.GasCansPerGenerator = 4 --Number of gas cans required to fill up a generator
+SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator
+SlashCo.GasCans = 8 --Default number of generators
+SlashCo.Generators = 2 --Default number of generators
+SlashCo.GensNeeded = 2 --Default number of generators needed
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
 
@@ -52,10 +55,6 @@ function GM:CreateTeams()
 
 	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235))
 end
-
---[[function GM:PlayerSelectTeamSpawn(team, ply)
-	
-end]]
 
 local DoorSlamWhitelist = {
 	["models/props_c17/door03_left.mdl"] = true,
@@ -161,7 +160,7 @@ SCInfo.Maps = {
 	},
 }
 
-local map_configs, _ = file.Find("slashco/configs/maps/*", "LUA")
+local configs, _ = file.Find("slashco/configs/maps/*", "LUA")
 
 local game_playable = false
 
@@ -169,31 +168,34 @@ if SERVER then
 	SCInfo.MinimumMapPlayers = 6
 end
 
-for _, v in ipairs(map_configs) do
-	if v ~= "template.lua" and v ~= "rp_deadcity.lua" then
-		local config_table = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
-		local mapid = string.Replace(v, ".lua", "")
-
-		if SCInfo.Maps[mapid] then continue end
-
-		SCInfo.Maps[mapid] = {}
-		SCInfo.Maps[mapid].NAME = config_table.Manifest.Name
-		SCInfo.Maps[mapid].DEFAULT = config_table.Manifest.Default
-		SCInfo.Maps[mapid].SIZE = config_table.Manifest.Size
-		SCInfo.Maps[mapid].MIN_PLAYERS = config_table.Manifest.MinimumPlayers
-
-		if SERVER then
-			SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
-		end
-
-		SCInfo.Maps[mapid].LEVELS = {}
-
-		for ky, lvl in ipairs(config_table.Manifest.Levels) do
-			SCInfo.Maps[mapid].LEVELS[ky] = lvl
-		end
-
-		game_playable = true
+for _, v in ipairs(configs) do
+	local config = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
+	if not config then
+		continue
 	end
+
+	local mapid = string.Replace(v, ".lua", "")
+	SCInfo.Maps[mapid] = SCInfo.Maps[mapid] or {}
+
+	if type(config.Manifest) == "table" then
+		if config.Manifest.DoNotUseThisConfig then
+			SCInfo.Maps[mapid] = nil
+			continue
+		end
+
+		SCInfo.Maps[mapid].NAME = config.Manifest.Name or "Unspecified Map Name"
+		SCInfo.Maps[mapid].DEFAULT = config.Manifest.Default --wtf does this do...
+		SCInfo.Maps[mapid].MIN_PLAYERS = config.Manifest.MinimumPlayers or 1
+	else
+		SCInfo.Maps[mapid].NAME = "Unspecified Map Name"
+		SCInfo.Maps[mapid].MIN_PLAYERS = 1
+	end
+
+	if SERVER then
+		SCInfo.MinimumMapPlayers = math.min(SCInfo.Maps[mapid].MIN_PLAYERS, SCInfo.MinimumMapPlayers)
+	end
+
+	game_playable = true
 end
 
 if SERVER and not game_playable then
