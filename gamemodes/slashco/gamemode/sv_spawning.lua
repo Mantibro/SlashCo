@@ -151,7 +151,6 @@ function SlashCo.SpawnGenerators()
 	for _, v in pairs(gensToSpawn) do
 		local spawn = SlashCo.SelectSpawns(table.GetKeys(v.BatterySpawns))
 		spawn:SpawnEnt()
-		print(">>>>> spawned battery")
 	end
 
 	SlashCo.Spawn(gensToSpawn)
