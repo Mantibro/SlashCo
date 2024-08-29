@@ -22,6 +22,7 @@ AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
 AddCSLuaFile("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 AddCSLuaFile("ui/cl_projector.lua")
 AddCSLuaFile("cl_limitedzone.lua")
+AddCSLuaFile("sh_bhop.lua")
 
 include("sv_globals.lua")
 include("sh_shared.lua")
@@ -44,6 +45,7 @@ include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
+include("sh_bhop.lua")
 
 local SlashCo = SlashCo or {}
 

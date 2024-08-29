@@ -170,8 +170,11 @@ end
 
 for _, v in ipairs(configs) do
 	local config = util.JSONToTable(file.Read("slashco/configs/maps/" .. v, "LUA"))
-	local mapid = string.Replace(v, ".lua", "")
+	if not config then
+		continue
+	end
 
+	local mapid = string.Replace(v, ".lua", "")
 	SCInfo.Maps[mapid] = SCInfo.Maps[mapid] or {}
 
 	if type(config.Manifest) == "table" then

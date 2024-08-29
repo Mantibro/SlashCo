@@ -2,7 +2,7 @@
 	"Manifest": {
 		"comment": "Every setting in this individual config is optional, but all maps need a name and spawnpoints to work.",
 		"Name": "Template",
-		"Author": "Manti, Octo",
+		"Author": "Manti, Octo, textstack",
 		"Default": true,
 		"MinimumPlayers": 1,
 		"aalComment": "AlwaysAddLegacySettings - Maps with SlashCo entities will ignore all legacy config positions/settings. This option bypasses this.",

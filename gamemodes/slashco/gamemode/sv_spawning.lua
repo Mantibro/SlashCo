@@ -151,6 +151,7 @@ function SlashCo.SpawnGenerators()
 	for _, v in pairs(gensToSpawn) do
 		local spawn = SlashCo.SelectSpawns(table.GetKeys(v.BatterySpawns))
 		spawn:SpawnEnt()
+		print(">>>>> spawned battery")
 	end
 
 	SlashCo.Spawn(gensToSpawn)
@@ -430,7 +431,6 @@ function SlashCo.SetupPlayers()
 				:: covenant_member ::
 			end
 		end
-
 		:: NIGHTMARE_SKIPPART ::
 	end
 	:: NIGHTMARE_SKIPALL ::
@@ -442,7 +442,7 @@ local function makeEnt(class, config)
 	end
 
 	local ent = ents.Create(class)
-	ent:SetPos(config.pos)
+	ent:SetPos(Vector(unpack(config.pos)))
 
 	if isnumber(config.ang) then
 		ent:SetAngles(Angle(0, config.ang, 0))
@@ -489,7 +489,7 @@ local function convertLegacyConfig(name, skip)
 		end
 		if istable(config.Spawnpoints.Survivor) then
 			for _, v in ipairs(config.Spawnpoints.Survivor) do
-				makeEnt("info_sc_player_slasher", v)
+				makeEnt("info_sc_player_employee", v)
 			end
 		end
 	end
@@ -516,6 +516,7 @@ local function convertLegacyConfig(name, skip)
 	end
 	if istable(config.Helicopter) then
 		if istable(config.Helicopter.IntroLocation) then
+			config.Helicopter.IntroLocation.pos[3] = config.Helicopter.IntroLocation.pos[3] + 70
 			makeEnt("info_sc_helicopter_intro", config.Helicopter.IntroLocation)
 		end
 
@@ -525,6 +526,7 @@ local function convertLegacyConfig(name, skip)
 
 		if istable(config.Helicopter.Spawnpoints) then
 			for _, v in ipairs(config.Helicopter.Spawnpoints) do
+				v.pos[2] = v.pos[2] + 70
 				makeEnt("info_sc_helicopter", v)
 			end
 		end
@@ -578,19 +580,21 @@ end
 
 ---Add spawning entities from the legacy config if it exists
 function SlashCo.LegacySetup()
-	local configs, configDirs = file.Find(string.format("slashco/configs/maps/%s", game.GetMap()), "LUA")
+	local configs, configDirs = file.Find(string.format("slashco/configs/maps/%s.lua", game.GetMap()), "LUA")
 	local skip = IsValid(SlashCo.SettingsEntity())
-
 	for _, v in ipairs(configs) do
 		convertLegacyConfig(v, skip)
 	end
 
 	for _, v in ipairs(configDirs) do
 		for _, v1 in ipairs(v) do
+			print(v1)
 			convertLegacyConfig(v1, skip)
 		end
 	end
 end
+
+hook.Add("InitPostEntity", "LegacySetupSpawns", SlashCo.LegacySetup)
 
 ---main body of round starting function
 local function startRound(noSetup)
@@ -670,8 +674,6 @@ function SlashCo.StartRound(noSetup)
 	if settingsEnt then
 		settingsEnt:TriggerOutput("OnPreRoundStarted", settingsEnt, settingsEnt, #SlashCo.CurRound.ExpectedPlayers)
 	end
-
-	SlashCo.LegacySetup()
 
 	timer.Simple(0.5, function()
 		startRound(noSetup)
