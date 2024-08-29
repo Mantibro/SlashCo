@@ -587,7 +587,6 @@ function SlashCo.LegacySetup()
 
 	for _, v in ipairs(configDirs) do
 		for _, v1 in ipairs(v) do
-			print(v1)
 			convertLegacyConfig(v1, skip)
 		end
 	end

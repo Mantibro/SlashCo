@@ -19,7 +19,7 @@ function HeadBob(pl, pos, ang, fov)
 
 	if pl:IsOnGround() then
 		if pl:KeyDown(IN_FORWARD) or pl:KeyDown(IN_BACK) or pl:KeyDown(IN_MOVELEFT) or pl:KeyDown(IN_MOVERIGHT) then
-			HBPosZ = HBPosZ + (pl:GetVelocity():Length()/17) * FrameTime()
+			HBPosZ = HBPosZ + (pl:GetVelocity():Length() / 17) * FrameTime()
 			PitchReset = false
 
 			--if HBPitch == nil then HBPitch = 0 end
