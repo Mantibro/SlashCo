@@ -271,7 +271,7 @@ SlashCo.EndRound = function()
 	end)
 end
 
-SlashCo.RoundHeadstart = function()
+function SlashCo.RoundHeadstart()
 	if #SlashCo.CurRound.SlasherData.AllSurvivors > (SlashCo.MAXPLAYERS - 2) then
 		return
 	end

@@ -18,7 +18,7 @@ CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_player
 SlashCo = SlashCo or {}
 
 SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator
-SlashCo.GasCans = 8 --Default number of generators
+SlashCo.GasCans = 8 --Default number of gas cans
 SlashCo.Generators = 2 --Default number of generators
 SlashCo.GensNeeded = 2 --Default number of generators needed
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators

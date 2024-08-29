@@ -339,22 +339,29 @@ end, function(cmd, args)
 	return tbl1
 end, "Give yourself an item", FCVAR_CHEAT)
 
-concommand.Add("slashco_debug_printents", function(ply)
+concommand.Add("slashco_debug_printents", function(ply, _, args)
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
 		doPrint(ply, "Only admins can use debug commands!")
 		return
 	end
 
-	local genCount, gasCanCount, batteryCount, otherCount = 0, 0, 0, 0
+	local prefix = args[1] or "sc_"
+	local prefLength = string.len(prefix)
 
+	local genCount, gasCanCount, batteryCount, otherCount = 0, 0, 0, 0
+	local cansNeeded, batsNeeded = 0, 0
 	for k, v in ents.Iterator() do
 		local class = v:GetClass()
-		if string.Left(class, 3) ~= "sc_" then
+		if string.Left(class, prefLength) ~= prefix then
 			continue
 		end
 
 		if class == "sc_generator" then
 			genCount = genCount + 1
+			cansNeeded = cansNeeded + (v.CansRemaining or GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen))
+			if not v.HasBattery then
+				batsNeeded = batsNeeded + 1
+			end
 		elseif class == "sc_gascan" then
 			gasCanCount = gasCanCount + 1
 		elseif class == "sc_battery" then
@@ -370,9 +377,14 @@ concommand.Add("slashco_debug_printents", function(ply)
 
 		local space = string.rep(" ", 16 - string.len(class))
 
-		doPrint(ply, string.format("%s%s\t%s       \t%s       \t%s", class, space, x, y, z))
+		doPrint(ply, string.format("%s%s\t%s %s %s", class, space, x, y, z))
 	end
 
-	local totalCount = genCount + gasCanCount + batteryCount + otherCount
-	doPrint(ply, string.format("total: %s, gens: %s, cans: %s, bats: %s, other: %s", totalCount, genCount, gasCanCount, batteryCount, otherCount))
-end, FCVAR_CHEAT + FCVAR_PROTECTED)
+	if prefix == "sc_" then
+		local totalCount = genCount + gasCanCount + batteryCount + otherCount
+		doPrint(ply, string.format("total: %s, gens: %s, cans: %s, bats: %s, other: %s", totalCount, genCount, gasCanCount, batteryCount, otherCount))
+		doPrint(ply, string.format("cans needed: %s, bats needed: %s", cansNeeded, batsNeeded))
+	else
+		doPrint(ply, string.format("total: %s", otherCount))
+	end
+end, nil, "Print all slashco ents on the map", FCVAR_CHEAT + FCVAR_PROTECTED)

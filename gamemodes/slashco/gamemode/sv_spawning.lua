@@ -532,7 +532,7 @@ local function convertLegacyConfig(name, skip)
 	end
 	if istable(config.GasCans) then
 		if isnumber(config.GasCans.Count) then
-			SetGlobal2Int("SlashCoGasCansToSpawn", config.Generators.Count)
+			SetGlobal2Int("SlashCoGasCansToSpawn", config.GasCans.Count)
 		end
 
 		if isnumber(config.GasCans.NeededPerGenerator) then
