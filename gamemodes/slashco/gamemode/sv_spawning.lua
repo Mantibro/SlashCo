@@ -525,7 +525,7 @@ local function convertLegacyConfig(name, skip)
 
 		if istable(config.Helicopter.Spawnpoints) then
 			for _, v in ipairs(config.Helicopter.Spawnpoints) do
-				v.pos[2] = v.pos[2] + 70
+				v.pos[3] = v.pos[3] + 70
 				makeEnt("info_sc_helicopter", v)
 			end
 		end
