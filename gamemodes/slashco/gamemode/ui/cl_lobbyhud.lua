@@ -35,26 +35,19 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 		lobby_music:Stop()
 	end
 
-	local point_count = 0
-
-	if data_load ~= nil and data_load ~= false then
-		point_count = data_load[1].Points
-	end
-
 	local scrW, scrH = ScrW(), ScrH()
-
 	local point_count = CL_points or 0
 
 	--LobbyFont1
-	draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
-			"TVCD", ScrW() * 0.025, (ScrH() * 0.05), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
-
-	if StateOfLobby == nil or StateOfLobby < 1 then
-		draw.SimpleText("[,] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
-				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	end
-
 	if LocalPlayer():Team() == TEAM_LOBBY then
+		draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
+				"TVCD", ScrW() * 0.025, ScrH() * 0.05, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+
+		if StateOfLobby == nil or StateOfLobby < 1 then
+			draw.SimpleText("[,] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
+					color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+		end
+
 		draw.SimpleText("[R] " .. SlashCo.Language("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end

@@ -57,7 +57,7 @@ function PANEL:Init()
         element.Prompt = v.prompt
         element.snd = v.snd
 
-        local angle = rad * (k+0.5)
+        local angle = rad * (k + 0.5)
         element:SetPos((self:GetWide() / 2) + math.sin(angle) * 300 - (element:GetWide() / 2),
                 (self:GetTall() / 2) + math.cos(angle) * 150 - (element:GetTall() / 2))
     end
