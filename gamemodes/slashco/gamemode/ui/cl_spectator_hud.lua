@@ -30,9 +30,9 @@ local function spinSkull(r)
 	local shift2 = (math.cos(r) > 0) and math.cos(r) or (math.cos(r + math.pi))
 
 	render.SetMaterial(logo_mat)
-	cam.Start3D(vector_origin, Angle(90, 0, 0), 55)
+	cam.Start3D(Vector(-136, 0, 0), Angle(90, 0, 0), 55)
 		render.SuppressEngineLighting(true)
-		render.DrawQuadEasy(Vector(135, 0, -600), Vector(0, shift1, shift2), 100, 100, color_white, flip)
+		render.DrawQuadEasy(Vector(0, 0, -600), Vector(0, shift1, shift2), 100, 100, color_white, flip)
 		render.SuppressEngineLighting(false)
 	cam.End3D()
 end

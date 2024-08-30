@@ -15,24 +15,24 @@ function DrawThePlayermodelSelectorBox()
 	if IsValid(pmSelectFrame) then return end
 
 	pmSelectFrame = vgui.Create("DFrame")
-	pmSelectFrame:SetTitle( SlashCo.Language("playermodel_choose") )
+	pmSelectFrame:SetTitle(SlashCo.Language("playermodel_choose"))
 
 	local val = 1
 	for c = 0, 2 do
 		for i = 0, 2 do
 			local item = vgui.Create("SpawnIcon", pmSelectFrame)
 			function item.DoClick()
-				PlayerModelChosen("models/slashco/survivor/male_0"..val..".mdl")
+				PlayerModelChosen("models/slashco/survivor/male_0" .. val .. ".mdl")
 				HidePlayermodelSelection()
 			end
 			item:SetSize(80, 80)
-			item:SetPos(5 + i*80, 29 + c*80)
-			item:SetModel("models/slashco/survivor/male_0"..val..".mdl")
-			item:SetTooltip("Male 0"..val)
-			val = val+1
+			item:SetPos(5 + i * 80, 29 + c * 80)
+			item:SetModel("models/slashco/survivor/male_0" .. val .. ".mdl")
+			item:SetTooltip("Male 0" .. val)
+			val = val + 1
 		end
 	end
-	
+
 	pmSelectFrame.btnMaxim:Hide()
 	pmSelectFrame.btnMinim:Hide()
 	pmSelectFrame.lblTitle:SetFont("TVCD")
@@ -68,7 +68,7 @@ function DrawThePlayermodelSelectorBox()
 		self.lblTitle:SetSize(self:GetWide() - 25 - titlePush, 20)
 	end
 
-	pmSelectFrame:SetSize(80*3+10, 80*3+24+10)
+	pmSelectFrame:SetSize(80 * 3 + 10, 80 * 3 + 24 + 10)
 	pmSelectFrame:Center()
 	pmSelectFrame:MakePopup()
 	pmSelectFrame:SetKeyboardInputEnabled(false)
