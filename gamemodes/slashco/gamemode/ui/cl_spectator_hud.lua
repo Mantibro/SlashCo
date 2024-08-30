@@ -135,7 +135,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 		return
 	end
 
-	if CurTime() - GetGlobalFloat("SCStartTime", 99999999999999) > SlashCo.GhostPingDelay then
+	if GetGlobalBool("SpectatorsCanPing") then
 		draw.SimpleText(SlashCo.Language("surv_ping", "MMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 230, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
 
