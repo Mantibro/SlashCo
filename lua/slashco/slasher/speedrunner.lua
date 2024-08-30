@@ -46,10 +46,10 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	local ms = SlashCo.MapSize --SCInfo.Maps[game.GetMap()].SIZE
 
-	local size_multiplier = (((5 - ms) / 10) + ((ms - 1) / 15))
+	local size_multiplier = ((5 - ms) / 10) + ((ms - 1) / 15)
 
 	if v1 < v3 then
-		slasher.SlasherValue1 = v1 + ( (((FrameTime() * (size_multiplier)) * (v2))) * (1 + SO) ) * 1.35
+		slasher.SlasherValue1 = v1 + FrameTime() * size_multiplier * v2 * (1 + SO) * 1.35
 	end
 
 	slasher:SetRunSpeed(50 + slasher.SlasherValue1)
@@ -169,7 +169,19 @@ SLASHER.Footstep = function()
 	return true
 end
 
+local function bhop(cmd)
+	local lply = LocalPlayer()
+	if not IsValid(lply) then return end
+	if not lply:Alive() then return end
+
+	if bit.band(cmd:GetButtons(), IN_JUMP) == 2 and lply:GetMoveType() ~= MOVETYPE_NOCLIP and lply:WaterLevel() <= 1 and not lply:OnGround() then
+		cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_JUMP)))
+	end
+end
+
 SLASHER.InitHud = function(_, hud)
+	hook.Add("CreateMove", "SpeedRunnerBhop", bhop)
+
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_15"))
 	hud:SetTitle("Speedrunner")
 

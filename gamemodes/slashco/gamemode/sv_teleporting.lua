@@ -154,3 +154,30 @@ end
 
 --- for compat with things that still use the old function
 SlashCo.LocalizedTraceHullLocatorAdvanced = SlashCo.LocalizedTraceHullLocator
+
+--Determines map size
+local function init()
+	local verts = {}
+	for _, v in ipairs(game.GetWorld():GetBrushSurfaces()) do
+		if v:IsNoDraw() or v:IsSky() or v:IsWater() then
+			continue
+		end
+		local verts1 = v:GetVertices()
+		table.Add(verts, verts1)
+	end
+
+	local amt = #verts
+	for i = 1, amt - 1 do
+		OrderVectors(verts[i], verts[i + 1])
+	end
+	SlashCo.MaxVec = verts[amt]
+
+	for i = 2, amt - 1 do
+		OrderVectors(verts[amt - i], verts[amt - i + 1])
+	end
+	SlashCo.MinVec = verts[1]
+
+	SlashCo.MidVec = (SlashCo.MaxVec + SlashCo.MinVec) / 2
+	SlashCo.MapSize = math.ceil(SlashCo.MaxVec:Distance(SlashCo.MinVec) / 20000)
+end
+hook.Add("InitPostEntity", "SlashCo_InitMapMesh", init)

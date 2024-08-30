@@ -218,7 +218,7 @@ SLASHER.Footstep = function(ply)
 end
 
 local hideIcons = {
-	["hide"] = Material("slashco/ui/icons/slasher/s_16"),
+	["default"] = Material("slashco/ui/icons/slasher/s_16"),
 	["unhide"] = Material("slashco/ui/icons/slasher/s_10_a1"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
