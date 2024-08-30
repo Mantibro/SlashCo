@@ -117,7 +117,14 @@ function PLAYER:SurvivorPing()
 		ExpiryTime = 0
 	}
 
-	if self:GetNWBool("SurvivorBenadrylFull") then
+	ping_info.Player = self
+
+	if self:Team() == TEAM_SPECTATOR then
+		ping_info.Type = "GHOST"
+		look = trace.HitPos
+		ping_info.ExpiryTime = 5
+		ping_info.Player = nil
+	elseif self:GetNWBool("SurvivorBenadrylFull") then
 		ping_info.Type = "SLASHER"
 		look = trace.HitPos
 		ping_info.ExpiryTime = 5
@@ -158,7 +165,10 @@ function PLAYER:SurvivorPing()
 	end
 
 	if ping_info.Type == "DEAD BODY" then
-		player.GetBySteamID64(look.SurvivorSteamID):SetNWBool("ConfirmedDead", true)
+		local deadguy = player.GetBySteamID64(look.SurvivorSteamID)
+		if IsValid(deadguy) then
+			deadguy:SetNWBool("ConfirmedDead", true)
+		end
 	end
 
 	if typeCheck[ping_info.Type] then
@@ -179,10 +189,11 @@ function PLAYER:SurvivorPing()
 	end
 
 	ping_info.Entity = look
-	ping_info.Player = self
 	net.Start("mantislashcoSurvivorPings")
 	net.WriteTable(ping_info)
-	net.Send(team.GetPlayers(TEAM_SURVIVOR))
+	local players = team.GetPlayers(TEAM_SURVIVOR)
+	table.Add(players, team.GetPlayers(TEAM_SPECTATOR))
+	net.Send(players)
 end
 
 function PLAYER:SlamDoor(door_ent)

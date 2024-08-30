@@ -8,75 +8,13 @@ local prevHp, SetTime, ShowDamage, prevHp1, aHp, TimeToFuel, TimeUntilFueled
 local FuelingCan
 local IsFueling
 local maxHp = 100 --ply:GetMaxHealth() seems to be 200
-local global_pings = {}
 local healthIndicatorShift = 0
-
-local red = Color(255, 64, 64)
-local green = Color(64, 255, 64)
-local blue = Color(64, 64, 255)
-
-local function FindPos(search)
-	if IsEntity(search) then
-		return search:WorldSpaceCenter()
-	elseif isvector(search) then
-		return search
-	end
-
-	return vector_origin
-end
-
-local pingType = {
-	ITEM = function(v)
-		return v.Name or "Item"
-	end,
-	SURVIVOR = function(v)
-		return v.SurvivorName, blue
-	end,
-	SLASHER = function()
-		return nil, red
-	end,
-	GENERATOR = function()
-		return nil, green
-	end
-}
 
 net.Receive("mantislashcoGasPourProgress", function()
 	TimeToFuel = net.ReadUInt(8)
 	FuelingCan = net.ReadEntity()
 	IsFueling = net.ReadBool()
 	TimeUntilFueled = net.ReadFloat()
-end)
-
-local function removePing(key)
-	global_pings[key] = nil
-	--table.RemoveByValue(global_pings, key)
-end
-
-net.Receive("mantislashcoSurvivorPings", function()
-	local ping = net.ReadTable()
-
-	for k, v in pairs(global_pings) do
-		local pn = v
-		if pn.Player == ping.Player then
-			removePing(k)
-			break
-		end
-	end
-
-	if ping.Type == "GENERATOR" then
-		LocalPlayer():EmitSound("slashco/ping_generator.mp3")
-	elseif ping.Type ~= "LOOK HERE" and ping.Type ~= "LOOK AT THIS" then
-		LocalPlayer():EmitSound("slashco/ping_item.mp3")
-	end
-
-	ping.ID = math.random(2 ^ 31 - 1)
-	global_pings[ping.ID] = ping
-
-	if ping.ExpiryTime and ping.ExpiryTime > 0 then
-		timer.Simple(ping.ExpiryTime, function()
-			removePing(ping.ID)
-		end)
-	end
 end)
 
 hook.Add("DrawOverlay", "SlashCoVHS", function()
@@ -149,7 +87,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			local width = parsedTotal:GetWidth()
 			local xClamp = math.Clamp(genPos.x, ScrW() * 0.025 + width / 2, ScrW() * 0.975 - width / 2)
 			local yClamp = math.Clamp(genPos.y, ScrH() * 0.05 + 24, ScrH() * 0.95 - 51)
-			local half = math.Clamp((gas * 8), 0, 8) % 1 >= 0.5
+			local half = math.Clamp(gas * 8, 0, 8) % 1 >= 0.5
 
 			surface.SetDrawColor(0, 128, 0, fade)
 			surface.DrawRect(xClamp - width / 2 + 2, yClamp - 13, width, 27)
@@ -174,54 +112,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 						TEXT_ALIGN_CENTER)
 			end
 		end
-	end
-
-	--ping display
-	for k, v in pairs(global_pings) do
-		if v.Entity == nil then
-			removePing(k)
-			continue
-		end
-
-		if type(v.Entity) ~= "Vector" and not IsValid(v.Entity) then
-			removePing(k)
-			continue
-		end
-
-		if not IsValid(v.Player) then
-			removePing(k)
-			continue
-		end
-
-		local showText, textColor, pos
-		if pingType[v.Type] then
-			showText, textColor, pos = pingType[v.Type](v)
-		end
-		showText = showText or v.Type or "INVALID"
-		textColor = textColor or color_white
-		pos = pos or (FindPos(v.Entity)):ToScreen()
-
-		draw.SimpleText(v.Player:GetName(), "TVCD_small", pos.x, pos.y - 25, Color(255, 255, 255, 180),
-				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-		draw.SimpleText("[" .. SlashCo.Language(showText) .. "]", "TVCD", pos.x, pos.y, textColor, TEXT_ALIGN_CENTER,
-				TEXT_ALIGN_CENTER)
-	end
-
-	for _, v in ipairs(ents.FindByClass("sc_flare")) do
-		if not v:GetNWBool("FlareActive") then
-			continue
-		end
-
-		local fl_pos = v:WorldSpaceCenter():ToScreen()
-
-		draw.SimpleText(v:GetNWString("FlareDropperName"), "TVCD_small", fl_pos.x, fl_pos.y - 25,
-				Color(255, 255, 255, 180),
-				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, textColor, TEXT_ALIGN_CENTER,
-				TEXT_ALIGN_CENTER)
-		draw.SimpleText(tostring(math.floor(LocalPlayer():GetPos():Distance(v:GetPos()) * 0.0254)) .. " m",
-				"TVCD_small", fl_pos.x, fl_pos.y + 25, Color(255, 255, 255, 180),
-				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 
 	--//item selection crosshair//--

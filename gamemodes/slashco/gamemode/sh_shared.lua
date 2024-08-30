@@ -23,6 +23,7 @@ SlashCo.Generators = 2 --Default number of generators
 SlashCo.GensNeeded = 2 --Default number of generators needed
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
+SlashCo.GhostPingDelay = 480
 
 local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
 for _, v in ipairs(lang_files) do

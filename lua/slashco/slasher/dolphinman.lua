@@ -70,7 +70,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 				local tr = util.TraceLine({
 					start = slasher:EyePos(),
 					endpos = s:GetPos() + Vector(0, 0, 40),
-					filter = slasher
+					filter = slasher,
+					mask = MASK_VISIBLE
 				})
 
 				if tr.Entity == s then

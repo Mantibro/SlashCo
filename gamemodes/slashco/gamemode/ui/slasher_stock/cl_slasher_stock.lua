@@ -234,7 +234,7 @@ function PANEL:SetControlText(key, text, dontSetIcon)
 end
 
 ---set a control's "enabled" state (disabled controls are darker)
----if enabled, the control will set its icon to "<text>" as long asdontSetIcon is nil/false
+---if enabled, the control will set its icon to "<text>" as long as dontSetIcon is nil/false
 ---if disabled, the control will set its icon to "d/<text>" as long as dontSetIcon is nil/false
 function PANEL:SetControlEnabled(key, state, dontSetIcon)
 	if not self.Controls[key] then

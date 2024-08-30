@@ -64,6 +64,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
+		slasher:SetImpervious(true)
 	elseif v1 == 1 then
 		--Human mode
 
@@ -74,6 +75,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 		slasher:SetNWBool("CanKill", true)
 		slasher:SetNWBool("CanChase", true)
+		slasher:SetImpervious(false)
 
 		if slasher.CurrentChaseTick == 99 then
 			slasher.CurrentChaseTick = 0
@@ -87,6 +89,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		eyesight_final = 5
 
 		slasher:SetNWBool("CanKill", false)
+		slasher:SetImpervious(false)
 	end
 
 	if slasher:GetNWBool("InSlasherChaseMode") then

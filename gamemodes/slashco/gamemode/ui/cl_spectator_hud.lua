@@ -135,9 +135,13 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 		return
 	end
 
+	if CurTime() - GetGlobalFloat("SCStartTime", 99999999999999) > SlashCo.GhostPingDelay then
+		draw.SimpleText(SlashCo.Language("surv_ping", "MMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 230, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	end
+
 	draw.SimpleText("[" .. SlashCo.Language("spectating") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.05, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-	draw.SimpleText(SlashCo.Language("hide_info", "Q"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 260, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("hide_info", "Q"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 290, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("toggle_halo", "ALT"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("toggle_halo_gas", "E"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("player_follow", "LMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
@@ -185,29 +189,23 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 	end
 
 	if key == 262144 then
-
 		showHalos = not showHalos
 		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
 		Sndd:ChangePitch(100, 0)
-
 	end
 
 	if key == 32 then
-
 		showGasCanHalos = not showGasCanHalos
 		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
 		Sndd:ChangePitch(100, 0)
-
 	end
-
 end)
 
 hook.Add("Think", "Spectator_Vision_Light", function()
-
 	if vision == nil then
 		vision = false
 	end
@@ -226,7 +224,7 @@ hook.Add("Think", "Spectator_Vision_Light", function()
 	--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright )
 
 	local dlight = DynamicLight(LocalPlayer():EntIndex() + 984)
-	if (dlight) then
+	if dlight then
 		dlight.pos = LocalPlayer():GetShootPos()
 		dlight.r = 255
 		dlight.g = 255
@@ -259,25 +257,21 @@ local cutscene_views = {
 		Stop = {Vector(440, 886, 281), Angle(-21, -143,0)},
 		Speed = 0.5
 	},
-
 	{
 		Start = {Vector(844, 930, 148), Angle(27, -89, 0)},
 		Stop = {Vector(401,932, 148), Angle(22, -49,0)},
 		Speed = 0.7
 	},
-
 	{
 		Start = {Vector(-71, 642, 20), Angle(-5, 155, 0)},
 		Stop = {Vector(-707, 644, 22), Angle(-5, 155, 0)},
 		Speed = 1
 	},
-
 	{
 		Start = {Vector(-88, 112, 127), Angle(11, -151, 0)},
 		Stop = {Vector(-86, -422, 50), Angle(3, 135,0)},
 		Speed = 1
 	},
-
 	{
 		Start = {Vector(490, -80, 53), Angle(-11,-68, 0)},
 		Stop = {Vector(815, -94, 63), Angle(-9, -118,0)},
@@ -289,7 +283,6 @@ local cur_pos = Vector(0,0,0)
 local cur_ang = Angle(0,0,0)
 
 hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
-
 	if game.GetMap() ~= "sc_lobby" then
 		return
 	end
@@ -314,7 +307,6 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 		local fraction = 1-(cur_dist / total_dist)
 		cur_ang.pitch = cutscene_views[cur_scene].Start[2].pitch + ( (cutscene_views[cur_scene].Stop[2].pitch - cutscene_views[cur_scene].Start[2].pitch) * (fraction/360) )
 		cur_ang.yaw = cutscene_views[cur_scene].Start[2].yaw + ( (cutscene_views[cur_scene].Stop[2].yaw - cutscene_views[cur_scene].Start[2].yaw) * (fraction/360) )
-
 	else
 		cur_scene = math.random(1, #cutscene_views)
 		cur_pos = cutscene_views[cur_scene].Start[1]

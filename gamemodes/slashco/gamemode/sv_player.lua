@@ -126,7 +126,12 @@ local PLAYER = FindMetaTable("Player")
 
 function PLAYER:SetImpervious(state)
 	if state then
+		if self.IsImpervious then
+			return
+		end
+
 		self:SetCustomCollisionCheck(true)
+		self.IsImpervious = true
 
 		local userid = self:UserID()
 		hook.Add("ShouldCollide", "SlashCoImpervious_" .. userid, function(ent1, ent2)
@@ -153,7 +158,12 @@ function PLAYER:SetImpervious(state)
 			end
 		end)
 	else
+		if not self.IsImpervious then
+			return
+		end
+
 		self:SetCustomCollisionCheck(false)
+		self.IsImpervious = nil
 		hook.Remove("ShouldCollide", "SlashCoImpervious_" .. self:UserID())
 	end
 end

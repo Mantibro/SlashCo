@@ -56,8 +56,13 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	if slasher:GetVelocity():Length() > 5 then
 		slasher:SetNWBool("CanKill", false)
-	else
-		slasher:SetNWBool("CanKill", true)
+		timer.Remove("CriminalStandStill_" .. slasher:UserID())
+	elseif not timer.Exists("CriminalStandStill_" .. slasher:UserID()) then
+		timer.Create("CriminalStandStill_" .. slasher:UserID(), 0.7, 1, function()
+			if IsValid(slasher) then
+				slasher:SetNWBool("CanKill", true)
+			end
+		end)
 	end
 
 	if slasher:GetNWBool("CriminalCloning") then
@@ -200,6 +205,7 @@ SLASHER.InitHud = function(_, hud)
 	hud:ChaseAndKill(true)
 	hud:AddControl("RMB", "summon clones", Material("slashco/ui/icons/slasher/s_12_a1"))
 	hud:TieControlText("RMB", "CriminalCloning", "unsummon clones", "summon clones")
+	hud:SetControlText("summon clones")
 	hud:AddControl("F", "rage", Material("slashco/ui/icons/slasher/s_12_1"))
 	hud:SetControlVisible("F", false)
 
@@ -208,7 +214,7 @@ SLASHER.InitHud = function(_, hud)
 		local rage = LocalPlayer():GetNWBool("CriminalRage")
 		if rage ~= hud.prevRage then
 			hud:SetAvatar(rage and "rage" or "default")
-			hud:SetControlActive(not rage)
+			hud:SetControlEnabled("F", not rage)
 			hud.prevRage = rage
 		end
 

@@ -23,6 +23,7 @@ AddCSLuaFile("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 AddCSLuaFile("ui/cl_projector.lua")
 AddCSLuaFile("cl_limitedzone.lua")
 AddCSLuaFile("sh_bhop.lua")
+AddCSLuaFile("ui/cl_pings.lua")
 
 include("sv_globals.lua")
 include("sh_shared.lua")
@@ -46,6 +47,7 @@ include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
 include("sh_bhop.lua")
+include("sv_ghostping.lua")
 
 local SlashCo = SlashCo or {}
 
@@ -115,7 +117,7 @@ hook.Add("AllowPlayerPickup", "PickupNotSpectator", function(ply, ent)
 		return ply:SlasherFunction("PickUpAttempt", ent)
 	end
 
-	return (ply:Team() ~= TEAM_SPECTATOR)
+	return ply:Team() ~= TEAM_SPECTATOR
 end)
 
 --lag-compensated eye trace for use in slasher functions

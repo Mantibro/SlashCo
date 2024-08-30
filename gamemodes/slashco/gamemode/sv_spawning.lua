@@ -600,6 +600,13 @@ local function startRound(noSetup)
 	GAMEMODE.State = GAMEMODE.States.IN_GAME
 	SlashCo.CurRound.GameProgress = 0
 
+	SetGlobalFloat("SCStartTime", CurTime())
+	timer.Simple(SlashCo.GhostPingDelay, function()
+		for _, v in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
+			v:ChatPrint("Spectators can now ping for survivors.")
+		end
+	end)
+
 	if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
 		SlashCo.CurRound.OfferingData.ItemMod = -2
 	end
