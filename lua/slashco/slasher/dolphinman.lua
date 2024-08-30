@@ -127,7 +127,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 				slasher:StopSound("slashco/slasher/dolfin_call_far.wav")
 				for i = 1, 8 do
 					--WHY THE FUCK DO I HAVE TO DO THIS HOLY SHIT
-					timer.Simple((i / 10), function()
+					timer.Simple(i / 10, function()
 						slasher:StopSound("slashco/slasher/dolfin_call.wav")
 						slasher:StopSound("slashco/slasher/dolfin_call_far.wav")
 					end)
@@ -168,7 +168,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		return
 	end
 
-	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") and slasher.SlasherValue1 > 5 then
+	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") and slasher.SlasherValue1 >= 5 then
 		slasher:SetNWBool("DolphinInHiding", false)
 
 		slasher.SlasherValue1 = slasher.SlasherValue1 - math.floor(slasher.SlasherValue1 / 2)
@@ -217,17 +217,34 @@ SLASHER.Footstep = function(ply)
 	end
 end
 
+local hideIcons = {
+	["hide"] = Material("slashco/ui/icons/slasher/s_16"),
+	["unhide"] = Material("slashco/ui/icons/slasher/s_10_a1"),
+	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
+}
+
 SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_16"))
 	hud:SetTitle("Dolphinman")
 
-	hud:AddControl("R", "hide", Material("slashco/ui/icons/slasher/s_16"))
+	hud:AddControl("R", "hide", hideIcons)
 	hud:ChaseAndKill(true)
 	hud:TieControlVisible("LMB", "DolphinInHiding", true, true, false)
-	hud:TieControlVisible("R", { "DolphinHunting", "DolphinInHiding" }, false, true, false)
+	hud:TieControlVisible("R", "DolphinHunting", true, true, false)
+	hud:TieControlText("R", "DolphinInHiding", "unhide", "hide", true)
 
 	hud:AddMeter("hunt")
 	hud:TieMeterInt("hunt", "DolphinHunt")
+
+	hud.prevHide = LocalPlayer():GetNWBool("DolphinInHiding") and (LocalPlayer():GetNWBool("DolphinFound") or LocalPlayer():GetNWInt("DolphinHunt") < 5)
+	function hud.AlsoThink()
+		local hide = not LocalPlayer():GetNWBool("DolphinInHiding") or (not LocalPlayer():GetNWBool("DolphinFound") and LocalPlayer():GetNWInt("DolphinHunt") >= 5)
+
+		if hud.prevHide ~= hide then
+			hud:SetControlEnabled("R", hide)
+			hud.prevHide = hide
+		end
+	end
 end
 
 if CLIENT then

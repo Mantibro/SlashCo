@@ -603,7 +603,7 @@ local function startRound(noSetup)
 	SetGlobalFloat("SCStartTime", CurTime())
 	timer.Simple(SlashCo.GhostPingDelay, function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
-			v:ChatPrint("Spectators can now ping for survivors.")
+			v:ChatText("spectators_can_ping")
 		end
 	end)
 

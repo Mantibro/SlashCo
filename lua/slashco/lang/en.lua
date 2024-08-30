@@ -540,3 +540,6 @@ SlashCo.LangTable["Kamenchik_desc"] = [[The Overwhelming Slasher who works for 3
 -.
 -.]]
 SlashCo.LangTable["Kemenchik_tip"] = "-You may as well give up."
+
+SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
+SlashCo.LangTable["unhide"] = "unhide"

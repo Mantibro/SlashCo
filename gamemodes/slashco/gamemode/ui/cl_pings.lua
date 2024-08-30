@@ -3,7 +3,7 @@ local global_pings = {}
 local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
 local blue = Color(64, 64, 255)
-local gray = Color(192, 192, 192)
+local transp = Color(255, 255, 255, 180)
 
 local pingType = {
 	ITEM = function(v)
@@ -19,7 +19,7 @@ local pingType = {
 		return nil, green
 	end,
 	GHOST = function()
-		return "?????", gray
+		return "?????", transp
 	end
 }
 
@@ -95,7 +95,7 @@ hook.Add("HUDPaint", "PingDisplay", function()
 		pos = pos or (findPos(v.Entity)):ToScreen()
 
 		if IsValid(v.Player) then
-			draw.SimpleText(v.Player:GetName(), "TVCD_small", pos.x, pos.y - 25, Color(255, 255, 255, 180),
+			draw.SimpleText(v.Player:GetName(), "TVCD_small", pos.x, pos.y - 25, transp,
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 
