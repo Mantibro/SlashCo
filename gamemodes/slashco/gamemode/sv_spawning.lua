@@ -199,8 +199,7 @@ function SlashCo.SpawnGasCans()
 		gasCanCount = baseCount + SlashCo.MapSize
 	end
 
-	gasCanCount = gasCanCount + (3 - SlashCo.CurRound.Difficulty)
-	gasCanCount = math.max(gasCanCount, baseCount)
+	gasCanCount = math.max(gasCanCount + (3 - SlashCo.CurRound.Difficulty), baseCount)
 
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		gasCanCount = gasCanCount + p:SlasherValue("GasCanMod", 0)

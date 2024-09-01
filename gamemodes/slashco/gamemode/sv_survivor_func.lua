@@ -64,10 +64,6 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, button)
 
 	survivorButtons(ply, button)
 
-	if game.GetMap() == "sc_lobby" then
-		return
-	end
-
 	--Covenant Tackle
 	if ply:GetNWBool("SurvivorTackled") then
 		if button == KEY_D or button == KEY_A and ply.LastTackleStruggleKey ~= button then
