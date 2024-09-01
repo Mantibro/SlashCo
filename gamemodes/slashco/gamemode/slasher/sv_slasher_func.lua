@@ -27,7 +27,7 @@ SlashCo.PrepareSlasherForSpawning = function()
 
 	if SERVER then
 		local delay = 1
-		delay = 1 + ((4 - SlashCo.CurRound.Difficulty)) * 20
+		delay = 1 + (4 - SlashCo.CurRound.Difficulty) * 20
 
 		print("[SlashCo] Slasher set to spawn in " .. delay .. " seconds.")
 
@@ -76,7 +76,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 			slasher.CurrentChaseTick = 99
 		end
 
-		if slasher.ChaseActivationCooldown > 0 then
+		if slasher.ChaseActivationCooldown and slasher.ChaseActivationCooldown > 0 then
 			slasher.ChaseActivationCooldown = slasher.ChaseActivationCooldown - FrameTime()
 		end
 
@@ -239,7 +239,7 @@ SlashCo.StopChase = function(slasher)
 end
 
 SlashCo.StartChaseMode = function(slasher)
-	if slasher.ChaseActivationCooldown > 0 then
+	if slasher.ChaseActivationCooldown and slasher.ChaseActivationCooldown > 0 then
 		return
 	end
 
