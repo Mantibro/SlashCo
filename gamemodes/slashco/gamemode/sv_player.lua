@@ -1,10 +1,10 @@
 --local SlashCo = SlashCo
 
-function GM:PlayerSwitchWeapon(_, _, _)
+function GM:PlayerSwitchWeapon()
 	return false
 end
 
-function GM:PlayerInitialSpawn(ply, _)
+function GM:PlayerInitialSpawn(ply)
 	if game.GetMap() == "sc_lobby" then
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()

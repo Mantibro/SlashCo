@@ -262,13 +262,13 @@ if CLIENT then
 				end
 
 				local r_bone = math.random(1, v:GetBoneCount() - 1)
-				local cur_off = v.AllBones[r_bone].Offset
+				--local cur_off = v.AllBones[r_bone].Offset
 
-				v.AllBones[r_bone].Offset = v.AllBones[r_bone].Offset + Vector(((math.random() - 0.5)),
-						((math.random() - 0.5)), ((math.random() - 0.5)))
+				v.AllBones[r_bone].Offset = v.AllBones[r_bone].Offset + Vector((math.random() - 0.5),
+						math.random() - 0.5, math.random() - 0.5)
 				if v.AllBones[r_bone].Offset:Length() > 3 then
-					v.AllBones[r_bone].Offset = Vector((math.random() - 0.5), (math.random() - 0.5),
-							(math.random() - 0.5))
+					v.AllBones[r_bone].Offset = Vector(math.random() - 0.5, math.random() - 0.5,
+							math.random() - 0.5)
 				end
 
 				local intensity = 0
@@ -312,7 +312,9 @@ if CLIENT then
 						continue
 					end
 
-					v:ManipulateBonePosition(b, v.AllBones[b].Offset * 2 * intensity)
+					if v.AllBones[b] and v.AllBones[b].Offset then
+						v:ManipulateBonePosition(b, v.AllBones[b].Offset * 2 * intensity)
+					end
 				end
 			end
 

@@ -158,15 +158,28 @@ end
 
 ---Spawn gas cans for the round
 function SlashCo.SpawnGasCans()
-	local gasCanCount = GetGlobal2Int("SlashCoGasCansToSpawn", SlashCo.GasCans)
+	local gasCanCount = GetGlobal2Int("SlashCoGasCansToSpawn", -1)
+	local cansPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gens = GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators)
+
+	-- auto-determine can count
+	if gasCanCount == -1 then
+		gasCanCount = SlashCo.MapSize + cansPerGen * gens
+		gasCanCount = gasCanCount + (3 - SlashCo.CurRound.Difficulty) + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors)
+	end
+
+	gasCanCount = math.max(gasCanCount, cansPerGen * gens)
 
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		gasCanCount = gasCanCount + p:SlasherValue("GasCanMod", 0)
 	end
+
+	gasCanCount = gasCanCount + SlashCo.CurRound.OfferingData.GasCanMod - SlashCo.CurRound.SurvivorData.GasCanMod
 	gasCanCount = math.max(gasCanCount, 2)
 
 	local gasCanSpawns
 	if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
+		gasCanCount = math.min(gasCanCount, cansPerGen * gens)
 		gasCanSpawns = ents.FindByClass("info_sc_gascanexposed")
 	else
 		gasCanSpawns = ents.FindByClass("info_sc_gascan")

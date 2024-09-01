@@ -2,14 +2,13 @@ if game.GetMap() ~= "sc_lobby" then
 	return
 end
 
---local TimeLeft, StateOfLobby, LobbyInfoTable, data_load
 local longest_name, plynum, lobby_music
 
 local grey = Color(128, 128, 128)
 local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
 
-local TimeLeft, StateOfLobby, LobbyInfoTable, data_load
+local TimeLeft, StateOfLobby, LobbyInfoTable
 
 net.Receive("mantislashcoLobbyTimerTime", function(_, _)
 	TimeLeft = net.ReadUInt(6)
@@ -38,11 +37,11 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	local scrW, scrH = ScrW(), ScrH()
 	local point_count = CL_points or 0
 
-	--LobbyFont1
-	if LocalPlayer():Team() == TEAM_LOBBY then
-		draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
+	draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
 				"TVCD", ScrW() * 0.025, ScrH() * 0.05, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
+	--LobbyFont1
+	if LocalPlayer():Team() == TEAM_LOBBY then
 		if StateOfLobby == nil or StateOfLobby < 1 then
 			draw.SimpleText("[,] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
 					color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)

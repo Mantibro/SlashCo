@@ -1,4 +1,4 @@
-net.Receive("mantislashcoOfferingVoteOut", function(_, _)
+net.Receive("mantislashcoOfferingVoteOut", function()
 	local t = net.ReadTable()
 
 	offeror_name = player.GetBySteamID64(t.ply):GetName()
@@ -16,10 +16,9 @@ net.Receive("mantislashcoOfferingVoteOut", function(_, _)
 	end
 
 	show_vote_screen = true
-
 end)
 
-net.Receive("mantislashcoOfferingEndVote", function(_, _)
+net.Receive("mantislashcoOfferingEndVote", function()
 	local t = net.ReadTable()
 
 	if t.ply ~= LocalPlayer():SteamID64() then
@@ -27,29 +26,23 @@ net.Receive("mantislashcoOfferingEndVote", function(_, _)
 	end
 
 	show_vote_screen = false
-
 end)
 
-net.Receive("mantislashcoOfferingVoteFinished", function(_, _)
+net.Receive("mantislashcoOfferingVoteFinished", function()
 	local t = net.ReadTable()
 
 	offering_vote_result = t.r
 
 	show_offering_result_screen = true
-
 end)
 
 hook.Add("HUDPaint", "OfferingVoteHUD", function()
-
 	local ply = LocalPlayer()
 
 	if show_offering_result_screen == true then
-
 		if offerjingle_antispam == nil then
-
 			surface.PlaySound("slashco/music/slashco_offering_" .. offering_vote_result .. ".mp3")
 			offerjingle_antispam = true
-
 		end
 
 		stop_lobbymusic = true
@@ -72,7 +65,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 		end
 
 		draw.SimpleText(SlashCo.Language("offervote_success", SlashCo.Language("Offering_name", offering_name)),
-				"LobbyFont2", ScrW() * 0.5, (ScrH() * 0.5), Color(255, 255, 255, math.abs(o_tick)), TEXT_ALIGN_CENTER,
+				"LobbyFont2", ScrW() * 0.5, ScrH() * 0.5, Color(255, 255, 255, math.abs(o_tick)), TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_TOP)
 	end
 
@@ -85,9 +78,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 	end
 
 	draw.SimpleText(SlashCo.Language("offervote_1", offeror_name, SlashCo.Language("Offering_name", offering_name)),
-			"LobbyFont1", ScrW() * 0.5, (ScrH() * 0.27), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			"LobbyFont1", ScrW() * 0.5, ScrH() * 0.27, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
-	draw.SimpleText("[F4]", "TVCD", ScrW() * 0.5, (ScrH() * 0.33), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-
-
+	draw.SimpleText("[F4]", "TVCD", ScrW() * 0.5, ScrH() * 0.33, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 end)

@@ -155,12 +155,8 @@ end
 
 SLASHER.OnMainAbilityFire = function(slasher)
 	if not slasher:GetNWBool("DolphinHunting") and not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
-		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-			if s:GetPos():Distance(slasher:GetPos()) < 1000 then
-				slasher:ChatText("Dolphinman_cannothide")
-				return
-			end
+		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
+			return
 		end
 
 		slasher:SetNWBool("DolphinInHiding", true)
@@ -231,14 +227,15 @@ SLASHER.InitHud = function(_, hud)
 	hud:ChaseAndKill(true)
 	hud:TieControlVisible("LMB", "DolphinInHiding", true, true, false)
 	hud:TieControlVisible("R", "DolphinHunting", true, true, false)
-	hud:TieControlText("R", "DolphinInHiding", "unhide", "hide", true)
+	hud:TieControlText("R", "DolphinInHiding", "unhide", "hide", true, false)
 
 	hud:AddMeter("hunt")
 	hud:TieMeterInt("hunt", "DolphinHunt")
 
-	hud.prevHide = LocalPlayer():GetNWBool("DolphinInHiding") and (LocalPlayer():GetNWBool("DolphinFound") or LocalPlayer():GetNWInt("DolphinHunt") < 5)
+	hud.prevHide = -1
 	function hud.AlsoThink()
 		local hide = not LocalPlayer():GetNWBool("DolphinInHiding") or (not LocalPlayer():GetNWBool("DolphinFound") and LocalPlayer():GetNWInt("DolphinHunt") >= 5)
+		hide = SlashCo.IsPositionLegalForSlashers(LocalPlayer():GetPos()) and hide
 
 		if hud.prevHide ~= hide then
 			hud:SetControlEnabled("R", hide)

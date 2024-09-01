@@ -80,6 +80,10 @@ end
 SLASHER.OnSpecialAbilityFire = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 
+	if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
+		return
+	end
+
 	if slasher.SlasherValue1 > 0 then
 		return
 	end
@@ -180,8 +184,8 @@ SLASHER.InitHud = function(_, hud)
 	hud:ChaseAndKill()
 	hud:AddControl("F", "deal a zany", dealTable)
 
-	hud.prevDeal = LocalPlayer():GetNWInt("SmileySummonSelect")
-	hud.prevDealAllow = LocalPlayer():GetNWInt("SmileySummonCooldown") < 0.1
+	hud.prevDeal = -1
+	hud.prevDealAllow = -1
 	function hud.AlsoThink()
 		local deal = LocalPlayer():GetNWInt("SmileySummonSelect")
 		if deal ~= hud.prevDeal then
@@ -193,6 +197,12 @@ SLASHER.InitHud = function(_, hud)
 			end
 
 			hud.prevDeal = deal
+		end
+
+		local canDeal = SlashCo.IsPositionLegalForSlashers(LocalPlayer():GetPos())
+		if canDeal ~= hud.prevCanDeal then
+			hud:SetControlEnabled("F", canDeal)
+			hud.prevCanDeal = canDeal
 		end
 
 		local cooldown = LocalPlayer():GetNWInt("SmileySummonCooldown")

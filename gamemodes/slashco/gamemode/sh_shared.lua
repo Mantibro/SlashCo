@@ -18,7 +18,6 @@ CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_player
 SlashCo = SlashCo or {}
 
 SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator
-SlashCo.GasCans = 8 --Default number of gas cans
 SlashCo.Generators = 2 --Default number of generators
 SlashCo.GensNeeded = 2 --Default number of generators needed
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
@@ -40,7 +39,6 @@ function GM:Initialize()
 end
 
 function GM:CreateTeams()
-
 	if not GAMEMODE.TeamBased then
 		return
 	end
@@ -76,77 +74,37 @@ end
 
 SCInfo = {}
 
-SCInfo.RoundEnd = {
-
-	{
-		On = "The assignment was successful.",
-		Off = "The assignment was unsuccessful.",
-		DB = "The assignment was only partially successful."
-	},
-
-	{
-		FullTeam = "All of the dispatched SlashCo Workers were rescued.",
-		NonFullTeam = "Not all of the dispatched SlashCo Workers could be rescued.",
-		AlivePlayers = " were reported present on the rescue helicopter.",
-		DeadPlayers = " could not make it out alive.",
-		LeftBehindPlayers = " had to be left behind.",
-		Fail = "The dispatched SlashCo Workers could not be rescued.",
-		OnlyOneAlive = " was the only one to survive.",
-	},
-
-	{
-		Loss = " are now presumed either dead or missing in action.",
-		LossOnlyOne = " is now presumed either dead or missing in action.",
-		LossComplete = "The Dispatched SlashCo Workers are now presumed either dead or missing in action.",
-		DBWin = " had to be rescued before the assignment could be completed."
-	}
-
-}
-
 SCInfo.Offering = {
-
 	{
 		Name = "Exposure",
 		Rarity = 1,
-		Description = "Will make Gas Cans easier to find,\nBut\nYou will not find more than you need.",
 		GasCanMod = 0
 	},
-
 	{
 		Name = "Satiation",
 		Rarity = 1,
-		Description = "The Slasher will be a Demon,\nand its items will be scarce,\nBut\nThe items will have greater effect.",
 		GasCanMod = 0
 	},
-
 	{
 		Name = "Drainage",
 		Rarity = 2,
-		Description = "Gas cans will be plentiful,\nBut\nGenerators will leak fuel over time.",
 		GasCanMod = 6
 	},
-
 	{
 		Name = "Duality",
 		Rarity = 3,
-		Description = "Only one generator will need to be powered,\nBut\nYou will face two Slashers.",
 		GasCanMod = 0
 	},
-
 	{
 		Name = "Singularity",
 		Rarity = 3,
-		Description = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful.",
 		GasCanMod = 6
 	},
-
 	{
 		Name = "Nightmare",
 		Rarity = 3,
-		Description = "The Helicopter will come rescue you regardless of Generators.\nFueling Generators will come with a massively increased Point bonus.\nBut\nSurvivors and Slasher will switch sides.",
 		GasCanMod = 0
 	}
-
 }
 
 SCInfo.Maps = {
@@ -207,4 +165,23 @@ if SERVER and not game_playable then
 Download the Maps at the Gamemode's workshop page under the "Required Items" section.]])
 		end
 	end)
+end
+
+-- determine if a position is far enough away from generators and survivors
+function SlashCo.IsPositionLegalForSlashers(pos, dist)
+	dist = dist or 1000
+
+	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if v:GetPos():Distance(pos) < dist then
+			return false
+		end
+	end
+
+	for _, v in ipairs(ents.FindInSphere(pos, dist)) do
+		if v:GetClass() == "sc_generator" then
+			return false
+		end
+	end
+
+	return true
 end

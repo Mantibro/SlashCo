@@ -249,11 +249,7 @@ function ENT:Think()
 		self.TimeUntilFueled = nil
 		self.CurrentPourer = nil
 		self:StopSound("slashco/generator_fill.wav")
-
-		--local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 		self:ChangeCanProgress(1)
-		--self.CansRemaining = (self.CansRemaining or gasPerGen) - 1
-		--self.Progress = self.Progress + 1
 
 		--//discard gas can//--
 
