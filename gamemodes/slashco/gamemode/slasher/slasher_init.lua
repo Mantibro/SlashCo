@@ -122,14 +122,14 @@ if CLIENT then
 		--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright )
 
 		local dlight = DynamicLight(LocalPlayer():EntIndex())
-		if (dlight) then
+		if dlight then
 			dlight.pos = LocalPlayer():GetShootPos()
 			dlight.r = 50 + (Eyesight * 2)
 			dlight.g = 50 + (Eyesight * 2)
 			dlight.b = 50 + (Eyesight * 2)
-			dlight.brightness = Eyesight / 50
+			dlight.brightness = 0.1 + Eyesight / 50
 			dlight.Decay = 1000
-			dlight.Size = 250 * Eyesight
+			dlight.Size = 70 + 250 * Eyesight
 			dlight.DieTime = CurTime() + 1
 		end
 
@@ -143,6 +143,7 @@ if CLIENT then
 		if timeSinceLast > 0.2 then
 			timeSinceLast = 0
 		end
+
 		--Survivor Step Notice
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			local survivor = v
