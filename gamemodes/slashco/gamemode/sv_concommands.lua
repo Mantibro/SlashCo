@@ -2,6 +2,10 @@ local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
 
 local function doPrint(ply, text)
+	if not text then
+		return
+	end
+
 	if IsValid(ply) and ply:IsPlayer() then
 		ply:ChatPrint(text)
 	else
