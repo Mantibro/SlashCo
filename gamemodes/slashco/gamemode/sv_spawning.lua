@@ -162,13 +162,15 @@ function SlashCo.SpawnGasCans()
 	local cansPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 	local gens = GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators)
 
+	local baseCount = SlashCo.BaseCans or (cansPerGen * gens)
+
 	-- auto-determine can count
 	if gasCanCount == -1 then
-		gasCanCount = SlashCo.MapSize + cansPerGen * gens
-		gasCanCount = gasCanCount + (3 - SlashCo.CurRound.Difficulty) + (4 - #SlashCo.CurRound.SlasherData.AllSurvivors)
+		gasCanCount = SlashCo.MapSize + baseCount
+		gasCanCount = gasCanCount + (3 - SlashCo.CurRound.Difficulty) + (3 - #SlashCo.CurRound.SlasherData.AllSurvivors)
 	end
 
-	gasCanCount = math.max(gasCanCount, cansPerGen * gens)
+	gasCanCount = math.max(gasCanCount, baseCount)
 
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		gasCanCount = gasCanCount + p:SlasherValue("GasCanMod", 0)
@@ -179,7 +181,7 @@ function SlashCo.SpawnGasCans()
 
 	local gasCanSpawns
 	if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
-		gasCanCount = math.min(gasCanCount, cansPerGen * gens)
+		gasCanCount = math.min(gasCanCount, baseCount)
 		gasCanSpawns = ents.FindByClass("info_sc_gascanexposed")
 	else
 		gasCanSpawns = ents.FindByClass("info_sc_gascan")
@@ -545,8 +547,10 @@ local function convertLegacyConfig(name, skip)
 		end
 	end
 	if istable(config.GasCans) then
-		if isnumber(config.GasCans.Count) then
+		if config.GasCans.CountIsDirect and isnumber(config.GasCans.Count) then
 			SetGlobal2Int("SlashCoGasCansToSpawn", config.GasCans.Count)
+		else
+			SlashCo.BaseCans = config.GasCans.Count
 		end
 
 		if isnumber(config.GasCans.NeededPerGenerator) then

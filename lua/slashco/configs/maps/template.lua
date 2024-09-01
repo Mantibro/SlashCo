@@ -35,6 +35,9 @@
 		}
 	},
 	"Generators": {
+		"cdComment": "CountIsDirect - Set to false or remove this line to allow the gamemode to add more gascans beyond what Count specifies.",
+		"cdComment1": "This exists for compatability."
+		"CountIsDirect": true
 		"cComment": "Count - Number of generators that spawn.",
 		"comment": "When set to -1, the game will use the default setting. Alternatively, remove this line entirely.",
 		"Count": -1,
