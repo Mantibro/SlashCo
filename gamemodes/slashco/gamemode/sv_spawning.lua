@@ -285,6 +285,7 @@ function SlashCo.SpawnSlasher()
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		p:SetTeam(TEAM_SLASHER)
 		p:Spawn()
+		SlashCo.OnSlasherSpawned(p)
 	end
 
 	slasherSpawned = true

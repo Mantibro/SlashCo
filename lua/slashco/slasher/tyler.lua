@@ -41,11 +41,11 @@ end
 SLASHER.OnTickBehaviour = function(slasher)
 	--local SO = SlashCo.CurRound.OfferingData.SO
 
-	local v1 = slasher.SlasherValue1 or 0 --State
-	local v2 = slasher.SlasherValue2 or 0 --Time Spent as Creator or destroyer
+	local v1 = slasher.SlasherValue1 --State
+	local v2 = slasher.SlasherValue2 --Time Spent as Creator or destroyer
 	--local v3 = slasher.SlasherValue3 --Times Found
-	local v4 = slasher.SlasherValue4 or 0 --Destruction power
-	local v5 = slasher.SlasherValue5 or 0 --Destoyer Blink
+	local v4 = slasher.SlasherValue4 --Destruction power
+	local v5 = slasher.SlasherValue5 --Destoyer Blink
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
