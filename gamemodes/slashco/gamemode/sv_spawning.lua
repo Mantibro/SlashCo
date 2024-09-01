@@ -163,6 +163,9 @@ function SlashCo.SpawnGasCans()
 	local gens = GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators)
 
 	local baseCount = SlashCo.BaseCans or (cansPerGen * gens)
+	if baseCount < 0 then
+		baseCount = cansPerGen * gens
+	end
 
 	-- auto-determine can count
 	if gasCanCount == -1 then
