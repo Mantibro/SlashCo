@@ -381,7 +381,7 @@ concommand.Add("slashco_debug_printents", function(ply, _, args)
 
 		local space = string.rep(" ", 16 - string.len(class))
 
-		doPrint(ply, string.format("%s%s\t%s %s %s", class, space, x, y, z))
+		doPrint(ply, string.format("%s%s\t%s %s %s\t%s", class, space, x, y, z, v:GetName()))
 	end
 
 	if prefix == "sc_" then
@@ -405,20 +405,31 @@ concommand.Add("slashco_debug_printbats", function(ply)
 		return
 	end
 
+	local count = 0
+
 	for k, v in ipairs(batSpawns) do
-		doPrint(ply, ">> battery spawn #" .. k .. ":")
+		count = count + 1
 
 		local x, y, z = v:GetPos():Unpack()
 		x = math.Round(x, 3)
 		y = math.Round(y, 3)
 		z = math.Round(z, 3)
-		doPrint(ply, string.format("%s %s %s", x, y, z))
+		doPrint(ply, string.format("battery spawn #%s: %s %s %s %s", k, x, y, z, v:GetName()))
 
 		local gens = v.Generators
 		if not gens then
 			doPrint(ply, "no associated generators")
 			continue
 		end
-		PrintTable(gens)
+
+		for k1, v1 in ipairs(gens) do
+			local x1, y1, z1 = v1:GetPos():Unpack()
+			x1 = math.Round(x1, 3)
+			y1 = math.Round(y1, 3)
+			z1 = math.Round(z1, 3)
+			doPrint(ply, string.format("\tgen #%s: %s %s %s %s", k1, x1, y1, z1, v1:GetName()))
+		end
 	end
-end, nil, "Print all slashco ents on the map", FCVAR_CHEAT + FCVAR_PROTECTED)
+
+	doPrint(ply, string.format("total: %s", count))
+end, nil, "Print all battery spawns and their associated generators", FCVAR_CHEAT + FCVAR_PROTECTED)
