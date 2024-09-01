@@ -271,24 +271,6 @@ SlashCo.EndRound = function()
 	end)
 end
 
-function SlashCo.RoundHeadstart()
-	if #SlashCo.CurRound.SlasherData.AllSurvivors > (SlashCo.MAXPLAYERS - 2) then
-		return
-	end
-
-	local gens = ents.FindByClass("sc_generator")
-	if table.IsEmpty(gens) then
-		return
-	end
-
-	--for maps with smaller gas-per-can amounts, this can sometimes select generators that are already full
-	--not fixing this, it's intended now hehehehehehehhehe
-	for _ = 1, (6 - #SlashCo.CurRound.SlasherData.AllSurvivors) do
-		local random = math.random(1, #gens)
-		gens[random]:ChangeCanProgress(1)
-	end
-end
-
 SlashCo.SurvivorWinFinish = function()
 	local delay = 16
 

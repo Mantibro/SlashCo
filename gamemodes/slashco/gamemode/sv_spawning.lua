@@ -156,6 +156,33 @@ function SlashCo.SpawnGenerators()
 	SlashCo.Spawn(gensToSpawn)
 end
 
+---Auto-fills some gas cans at the start of the round if there are too few players
+local function roundHeadstart()
+	if #SlashCo.CurRound.SlasherData.AllSurvivors > (SlashCo.MAXPLAYERS - 2) then
+		return
+	end
+
+	local gens = ents.FindByClass("sc_generator")
+	if table.IsEmpty(gens) then
+		return
+	end
+
+	local cans = 5 - #SlashCo.CurRound.SlasherData.AllSurvivors
+	if cans < 0 then
+		return
+	end
+
+	local fuelled = 0
+	for _ = 1, cans do
+		local random = math.random(1, #gens)
+		if not gens[random]:ChangeCanProgress(1) then
+			fuelled = fuelled + 1
+		end
+	end
+
+	SlashCo.HeadStartCans = fuelled
+end
+
 ---Spawn gas cans for the round
 function SlashCo.SpawnGasCans()
 	local gasCanCount = GetGlobal2Int("SlashCoGasCansToSpawn", -1)
@@ -169,10 +196,10 @@ function SlashCo.SpawnGasCans()
 
 	-- auto-determine can count
 	if gasCanCount == -1 then
-		gasCanCount = SlashCo.MapSize + baseCount
-		gasCanCount = gasCanCount + (3 - SlashCo.CurRound.Difficulty) + (3 - #SlashCo.CurRound.SlasherData.AllSurvivors)
+		gasCanCount = baseCount + SlashCo.MapSize
 	end
 
+	gasCanCount = gasCanCount + (3 - SlashCo.CurRound.Difficulty)
 	gasCanCount = math.max(gasCanCount, baseCount)
 
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
@@ -181,6 +208,8 @@ function SlashCo.SpawnGasCans()
 
 	gasCanCount = gasCanCount + SlashCo.CurRound.OfferingData.GasCanMod - SlashCo.CurRound.SurvivorData.GasCanMod
 	gasCanCount = math.max(gasCanCount, 2)
+
+	gasCanCount = gasCanCount - (SlashCo.HeadStartCans or 0)
 
 	local gasCanSpawns
 	if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
@@ -649,6 +678,11 @@ local function startRound(noSetup)
 	end
 
 	SlashCo.SpawnGenerators()
+
+	if SlashCo.CurRound.OfferingData.CurrentOffering ~= 6 then
+		roundHeadstart()
+	end
+
 	SlashCo.SpawnGasCans()
 	SlashCo.SpawnItems()
 
@@ -676,8 +710,6 @@ local function startRound(noSetup)
 				SlashCo.CurRound.DistressBeaconUsed = false
 			end
 		end)
-	else
-		SlashCo.RoundHeadstart()
 	end
 
 	local settingsEnt = SlashCo.SettingsEntity()

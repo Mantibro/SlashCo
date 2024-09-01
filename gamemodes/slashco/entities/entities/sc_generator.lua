@@ -37,6 +37,8 @@ function ENT:ChangeCanProgress(amount)
 	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 	self.CansRemaining = math.Clamp((self.CansRemaining or gasPerGen) - amount, 0, gasPerGen)
 	self.Progress = math.Clamp((gasPerGen - self.CansRemaining) * (4 / gasPerGen), 0, 4) + (self.HasBattery and 1 or 0)
+
+	return self.CansRemaining == 0
 end
 
 function ENT:SendData(ply)
@@ -129,7 +131,7 @@ function ENT:CheckProgress(dontFailStart)
 	end
 end
 
-function ENT:Use(activator, _, _)
+function ENT:Use(activator)
 	if activator:Team() ~= TEAM_SURVIVOR or activator:GetPos():Distance(self:GetPos()) > 100 then
 		return
 	end
@@ -180,7 +182,7 @@ end
 
 function ENT:SlasherHint()
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		timer.Create(self:GetCreationID() .. "_slasherHint_" .. v:UserID(), 20, 0, function()
+		timer.Create(self:GetCreationID() .. "_slasherHint_" .. v:UserID(), 15, 0, function()
 			SlashCo.SendValue(v, "genHint", self)
 		end)
 	end
