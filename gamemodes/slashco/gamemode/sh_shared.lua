@@ -160,7 +160,7 @@ end
 if SERVER and not game_playable then
 	timer.Simple(30, function()
 		for _, play in ipairs(player.GetAll()) do
-			play:ChatPrint([[[SlashCo] WARNING! There are no maps mounted! The Gamemode is not playable!
+			play:ChatPrint([[[SlashCo] WARNING! There are no maps mounted! The gamemode is not playable!
                 
 Download the Maps at the Gamemode's workshop page under the "Required Items" section.]])
 		end
@@ -169,7 +169,7 @@ end
 
 -- determine if a position is far enough away from generators and survivors
 function SlashCo.IsPositionLegalForSlashers(pos, dist)
-	dist = dist or 1000
+	dist = dist or (600 + GetGlobal2Int("SlashCoMapSize") * 150)
 
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		if v:GetPos():Distance(pos) < dist then

@@ -178,6 +178,7 @@ local function init()
 	SlashCo.MinVec = verts[1]
 
 	SlashCo.MidVec = (SlashCo.MaxVec + SlashCo.MinVec) / 2
-	SlashCo.MapSize = math.ceil(SlashCo.MaxVec:Distance(SlashCo.MinVec) / 20000)
+	SlashCo.MapSize = math.ceil(SlashCo.MaxVec:Distance(SlashCo.MinVec) / 12500)
+	SetGlobal2Int("SlashCoMapSize", SlashCo.MapSize)
 end
 hook.Add("InitPostEntity", "SlashCo_InitMapMesh", init)
