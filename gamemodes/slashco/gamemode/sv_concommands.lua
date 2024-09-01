@@ -392,3 +392,33 @@ concommand.Add("slashco_debug_printents", function(ply, _, args)
 		doPrint(ply, string.format("total: %s", otherCount))
 	end
 end, nil, "Print all slashco ents on the map", FCVAR_CHEAT + FCVAR_PROTECTED)
+
+concommand.Add("slashco_debug_printbats", function(ply)
+	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+		doPrint(ply, "Only admins can use debug commands!")
+		return
+	end
+
+	local batSpawns = ents.FindByClass("info_sc_battery")
+	if table.IsEmpty(batSpawns) then
+		doPrint(ply, "No battery spawns on the map")
+		return
+	end
+
+	for k, v in ipairs(batSpawns) do
+		doPrint(ply, ">> battery spawn #" .. k .. ":")
+
+		local x, y, z = v:GetPos():Unpack()
+		x = math.Round(x, 3)
+		y = math.Round(y, 3)
+		z = math.Round(z, 3)
+		doPrint(ply, string.format("%s %s %s", x, y, z))
+
+		local gens = v.Generators
+		if not gens then
+			doPrint(ply, "no associated generators")
+			continue
+		end
+		PrintTable(gens)
+	end
+end, nil, "Print all slashco ents on the map", FCVAR_CHEAT + FCVAR_PROTECTED)

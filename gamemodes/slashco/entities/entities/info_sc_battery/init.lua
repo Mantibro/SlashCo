@@ -2,7 +2,7 @@ ENT.Type = "point"
 ENT.Base = "sc_forciblespawnbase"
 
 function ENT:Initialize()
-	timer.Simple(0.25, function()
+	timer.Simple(4, function()
 		if IsValid(self) and not self.Generators then
 			local gens = ents.FindByClass("info_sc_generator")
 
