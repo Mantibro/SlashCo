@@ -15,9 +15,7 @@ ITEM.OnFootstep = function()
     return true
 end
 ITEM.OnSwitchFrom = function(ply)
-    timer.Simple(0.18, function()
-        ply:RemoveSpeedEffect("rock")
-    end)
+    ply:RemoveSpeedEffect("rock")
 end
 ITEM.OnPickUp = function(ply)
     ply:AddSpeedEffect("rock", 200, 10)

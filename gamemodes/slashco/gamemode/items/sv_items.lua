@@ -66,7 +66,6 @@ SlashCo.DropItem = function(ply)
 	end
 
 	if SlashCoItems[item] and SlashCoItems[item].OnDrop then
-
 		local time = 0.18
 		if SlashCoItems[item].IsSecondary then
 			ply:ViewPunch(Angle(-6, 0, 0))
@@ -76,12 +75,12 @@ SlashCo.DropItem = function(ply)
 			ply:ViewPunch(Angle(-2, 0, 0))
 			ply:SetNWString("item", "none")
 		end
-		timer.Simple(time, function()
+		timer.Create("SlashCoItemSwitch_" .. ply:UserId(), time, 1, function()
 			if not IsValid(ply) then
 				return
 			end
 
-			ply:ItemFunction2("OnSwitchFrom", item, self)
+			ply:ItemFunction2("OnSwitchFrom", item)
 
 			local height, dontDrop, dontPush = ply:ItemFunction2("OnDrop", item)
 			if dontDrop then
@@ -113,19 +112,15 @@ end
 SlashCo.RemoveItem = function(ply, isSec)
 	local slot = isSec and "item2" or "item"
 	local item = ply:GetNWString(slot, "none")
-	timer.Simple(isSec and 0.25 or 0.18, function()
-		if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
-			SlashCoItems[item].OnSwitchFrom(ply)
+	timer.Create("SlashCoItemSwitch_" .. ply:UserId(), isSec and 0.25 or 0.18, 1, function()
+		if IsValid(ply) then
+			ply:ItemFunction2("OnSwitchFrom", item)
 		end
 	end)
 	ply:SetNWString(slot, "none")
 end
 
 SlashCo.ChangeSurvivorItem = function(ply, id)
-	if CLIENT then
-		return
-	end
-
 	if SlashCoItems[id] then
 		if SlashCoItems[id].OnPickUp then
 			SlashCoItems[id].OnPickUp(ply)
@@ -133,15 +128,11 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 
 		if SlashCoItems[id].IsSecondary then
 			local item = ply:GetNWString("item2", "none")
-			if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
-				SlashCoItems[item].OnSwitchFrom(ply)
-			end
+			ply:ItemFunction2("OnSwitchFrom", item)
 			ply:SetNWString("item2", id)
 		else
 			local item = ply:GetNWString("item", "none")
-			if (SlashCoItems[item] and SlashCoItems[item].OnSwitchFrom) then
-				SlashCoItems[item].OnSwitchFrom(ply)
-			end
+			ply:ItemFunction2("OnSwitchFrom", item)
 			ply:SetNWString("item", id)
 		end
 
@@ -156,12 +147,12 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 end
 
 SlashCo.ItemPickUp = function(ply, item, itid)
-	if CLIENT then
+	if SlashCoItems[itid].IsSecondary and ply:GetNWString("item2", "none") ~= "none"
+			or not SlashCoItems[itid].IsSecondary and ply:GetNWString("item", "none") ~= "none" then
 		return
 	end
 
-	if SlashCoItems[itid].IsSecondary and ply:GetNWString("item2", "none") ~= "none"
-			or not SlashCoItems[itid].IsSecondary and ply:GetNWString("item", "none") ~= "none" then
+	if timer.Exists("SlashCoItemSwitch_" .. ply:UserId()) then
 		return
 	end
 

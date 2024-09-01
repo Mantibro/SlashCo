@@ -18,9 +18,7 @@ ITEM.OnDrop = function(ply)
     return 45
 end
 ITEM.OnSwitchFrom = function(ply)
-    timer.Simple(0.25, function()
-        ply:RemoveSpeedEffect("gas")
-    end)
+    ply:RemoveSpeedEffect("gas")
 end
 ITEM.OnBuy = function(_)
     SlashCo.LobbyData.SurvivorGasMod = SlashCo.LobbyData.SurvivorGasMod + 1

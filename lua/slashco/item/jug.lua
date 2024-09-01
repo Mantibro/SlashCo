@@ -12,9 +12,7 @@ ITEM.OnDrop = function()
 end
 
 ITEM.OnSwitchFrom = function(ply)
-    timer.Simple(0.18, function()
-        ply:RemoveSpeedEffect("jug")
-    end)
+    ply:RemoveSpeedEffect("jug")
 end
 ITEM.OnPickUp = function(ply)
     if ply:GetNWBool("CurseOfTheJug") then
