@@ -279,8 +279,8 @@ local cutscene_views = {
 	}
 }
 local cur_scene = nil
-local cur_pos = Vector(0,0,0)
-local cur_ang = Angle(0,0,0)
+local cur_pos = Vector(0, 0, 0)
+local cur_ang = Angle(0, 0, 0)
 
 hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 	if game.GetMap() ~= "sc_lobby" then

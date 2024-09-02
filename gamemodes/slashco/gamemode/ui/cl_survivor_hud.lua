@@ -36,17 +36,15 @@ local function drawItemDisplay(item, notUsable, shift)
 		return 0
 	end
 
-	local dash = notUsable and "vv" or "--"
-	local space = "   "
+	local dash = notUsable and "vvv" or "---"
 	local defaultColor = { 0, 0, 128 }
 
 	if SlashCoItems[item].IsSecondary then
-		dash = string.sub(dash, 2)
-		space = "  "
+		dash = string.sub(dash, 1, 1)
 		defaultColor = { 0, 128, 0 }
 	end
 
-	local str = string.format("<font=TVCD>%s%s%s%s%s</font>", dash, space, string.upper(SlashCo.Language(item)), space, dash)
+	local str = string.format("<font=TVCD>%s  %s  %s</font>", dash, string.upper(SlashCo.Language(item)), dash)
 	local parsedItem = markup.Parse(str)
 	surface.SetDrawColor(LocalPlayer():ItemFunction2OrElse("DisplayColor", item, defaultColor))
 	surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
@@ -62,7 +60,7 @@ local function drawItemDisplay(item, notUsable, shift)
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		offset = 30
 	end
-	if not ply:ItemFunction2("PreDrop", item) then
+	if not LocalPlayer():ItemFunction2("PreDrop", item) then
 		draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end

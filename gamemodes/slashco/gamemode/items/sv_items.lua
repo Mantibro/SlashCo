@@ -74,6 +74,7 @@ SlashCo.DropItem = function(ply)
 		return
 	end
 
+	local slot = "item"
 	local time = 0.18
 	if SlashCoItems[item].IsSecondary then
 		local dontDrop1 = ply:ItemFunction("PreDropSecondary", item)
@@ -84,12 +85,13 @@ SlashCo.DropItem = function(ply)
 		ply:ViewPunch(Angle(-6, 0, 0))
 		ply:SetNWString("item2", "none")
 		time = 0.25
+		slot = "item2"
 	else
 		ply:ViewPunch(Angle(-2, 0, 0))
 		ply:SetNWString("item", "none")
 	end
 
-	timer.Create("SlashCoItemSwitch_" .. ply:UserID(), time, 1, function()
+	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), time, 1, function()
 		if not IsValid(ply) then
 			return
 		end
@@ -121,14 +123,13 @@ SlashCo.DropItem = function(ply)
 		end
 	end)
 
-	ply.LastDroppedItem = item
 	ply.LastDroppedItemTime = CurTime()
 end
 
 SlashCo.RemoveItem = function(ply, isSec)
 	local slot = isSec and "item2" or "item"
 	local item = ply:GetNWString(slot, "none")
-	timer.Create("SlashCoItemSwitch_" .. ply:UserID(), isSec and 0.25 or 0.18, 1, function()
+	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), isSec and 0.25 or 0.18, 1, function()
 		if IsValid(ply) then
 			ply:ItemFunction2("OnSwitchFrom", item)
 		end
@@ -168,11 +169,12 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 		return
 	end
 
-	if ply.LastDroppedItem == item and CurTime() - ply.LastDroppedItemTime < 1 then
+	if ply.LastDroppedItemTime and CurTime() - ply.LastDroppedItemTime < 1 then
 		return
 	end
 
-	if timer.Exists("SlashCoItemSwitch_" .. ply:UserID()) then
+	local slot = SlashCoItems[item].IsSecondary and "item2" or "item"
+	if timer.Exists(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID())) then
 		return
 	end
 
@@ -181,14 +183,16 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 		return
 	end
 
-	local dontPickup1 = ply:SecondaryItemFunction("PrePickUpPrimary", item)
-	if dontPickup1 then
-		return
-	end
-
-	local dontPickup2 = ply:ItemFunction("PrePickUpSecondary", item)
-	if dontPickup2 then
-		return
+	if slot == "item" then
+		local dontPickup1 = ply:SecondaryItemFunction("PrePickUpPrimary", item)
+		if dontPickup1 then
+			return
+		end
+	else
+		local dontPickup2 = ply:ItemFunction("PrePickUpSecondary", item)
+		if dontPickup2 then
+			return
+		end
 	end
 
 	local itemEnt = ents.GetByIndex(itemindex)
