@@ -393,6 +393,10 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		return
 	end
 
+	if slasher:WaterLevel() > 1 then
+		return
+	end
+
 	slasher.SlasherValue1 = 1
 	slasher:SetColor(Color(255, 255, 255, 255))
 	slasher:DrawShadow(true)
@@ -452,12 +456,23 @@ SLASHER.InitHud = function(_, hud)
 
 	hud.prevState = -1
 	hud.destroyEnabled = true
+	hud.prevWater = -1
 	function hud.AlsoThink()
 		local state = LocalPlayer():GetNWInt("TylerState")
+		if state == 0 then
+			local isInWater = LocalPlayer():WaterLevel() > 1
+			if hud.prevWater ~= isInWater then
+				if isInWater then
+					hud:SetControlEnabled("R", false)
+				else
+					hud:SetControlEnabled("R", true)
+				end
+			end
+		end
+
 		if state ~= hud.prevState then
 			if state == 0 then
 				hud:SetControlVisible("R", true)
-				hud:SetControlEnabled("R", true)
 				hud:SetControlText("R", "manifest")
 			elseif state == 1 then
 				hud:SetControlVisible("R", true)

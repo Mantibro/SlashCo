@@ -58,7 +58,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 			timer.Simple(10, function()
 				slasher:SetNWBool("DolphinFound", false)
 				slasher:SetNWBool("DolphinInHiding", false)
-
 				slasher:SetNWBool("DolphinHunting", true)
 			end)
 		end
