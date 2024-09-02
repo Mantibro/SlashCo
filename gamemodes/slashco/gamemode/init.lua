@@ -65,9 +65,8 @@ Extra credits: undo, Jim, DarkGrey
 
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
-CreateConVar("slashco_force_difficulty", 0, FCVAR_NONE,
-		"Have the gamemode force a certan difficulty. (0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)", 0,
-		4)
+--CreateConVar("slashco_force_difficulty", 0, FCVAR_NONE,
+--		"Have the gamemode force a certan difficulty. (0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)", 0, 4)
 
 hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
 	if ply:Team() == TEAM_SURVIVOR then

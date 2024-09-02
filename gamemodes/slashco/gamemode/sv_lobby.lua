@@ -4,7 +4,6 @@ local SlashCoItems = SlashCoItems
 --//actual real code//--
 
 local function lobbySaveCurData()
-
     local diff = SlashCo.LobbyData.SelectedDifficulty
     local offer = SlashCo.LobbyData.Offering
     local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
@@ -12,7 +11,6 @@ local function lobbySaveCurData()
     local slashers = {}
 
     if SERVER then
-
         --Clear the database before saving
         --RunConsoleCommand("debug_datatest_delete")
 
@@ -27,30 +25,23 @@ local function lobbySaveCurData()
                 --Check if the random id of slasher has the appropriate class for the difficulty
 
                 --The difficulty allows for any class.
-
             else
-
                 if SlashCo.LobbyData.SelectedSlasherInfo.CLS ~= SlashCoSlashers[rand_name].Class then
                     goto retry
                 end --the random slasher's class does not match.
-
             end
 
             if SlashCo.LobbyData.SelectedSlasherInfo.DNG == 0 then
                 --Check if the random id of slasher has the appropriate danger level for the difficulty
 
                 --The difficulty allows for any danger level.
-
             else
-
                 if SlashCo.LobbyData.SelectedSlasherInfo.DNG ~= SlashCoSlashers[rand_name].DangerLevel then
                     goto retry
                 end --the random slasher's danger level does not match.
-
             end
 
             SlashCo.ChooseTheSlasherLobby(rand_name)
-
         end
 
         local slasher1id = SlashCo.LobbyData.PickedSlasher
@@ -64,7 +55,6 @@ local function lobbySaveCurData()
             sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary TEXT , SlasherIDSecondary TEXT , SurviorGasMod NUMBER);")
             sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
             sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
-
         end
 
         local allSurvivors = team.GetPlayers(TEAM_SURVIVOR)
@@ -73,9 +63,7 @@ local function lobbySaveCurData()
                 --Save the Current Survivors to the database
 
                 table.insert(survivors, { steamid = allSurvivors[i]:SteamID64() })
-
             end
-
         end
 
         local allSpectators = team.GetPlayers(TEAM_SPECTATOR)
@@ -92,20 +80,14 @@ local function lobbySaveCurData()
                                     end]]
 
                 if allSpectators[i]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
-
                     --If the Spectator is the Slasher, save them as the Slasher
                     table.insert(slashers, { steamid = allSpectators[i]:SteamID64() })
-
                 end
-
             end
-
         end
 
         if SlashCo.LobbyData.AssignedSlashers[2] ~= nil then
-
             table.insert(slashers, { steamid = SlashCo.LobbyData.AssignedSlashers[2].steamid })
-
         end
 
         --Major data dump
@@ -119,20 +101,15 @@ local function lobbySaveCurData()
                 item = p:GetNWString("item", "none")
             end
             sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. p:SteamID64() .. ", " .. sql.SQLStr(item) .. " );")
-
         end
 
         if #slashers > 0 then
-
             for i = 1, #slashers do
                 --Save the Current Slashers to the database
 
                 sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( " .. slashers[i].steamid .. " );")
-
             end
-
         else
-
             print("[SlashCo] Error! No assigned Slasher(s) to database! Restarting the lobby...")
 
             --RunConsoleCommand("debug_datatest_delete")
@@ -141,7 +118,6 @@ local function lobbySaveCurData()
             --	ply:SetTeam(TEAM_SPECTATOR)
             --	ply:Spawn()
             --end
-
         end
 
         print(sql.LastError())
@@ -149,9 +125,7 @@ local function lobbySaveCurData()
         print("DATA SAVED.")
 
         SlashCo.ChangeMap(SlashCo.LobbyData.SelectedMap)
-
     end
-
 end
 
 --Only run this and the removePlayerFromLobby function using the GM:PlayerChangedTeam hook: https://wiki.facepunch.com/gmod/GM:PlayerChangedTeam
@@ -192,7 +166,6 @@ function getReadyState(ply)
             return SlashCo.LobbyData.Players[_].readyState
         end
     end
-
 end
 
 function isPlyOfferer(ply)
@@ -205,7 +178,6 @@ function isPlyOfferer(ply)
     end
 
     return false
-
 end
 
 function lobbyReady()
@@ -220,7 +192,6 @@ function lobbyReady()
 end
 
 function broadcastLobbyInfo()
-
     net.Start("mantislashcoGiveLobbyInfo")
     net.WriteTable(SlashCo.LobbyData.Players)
     net.Broadcast()
@@ -232,7 +203,6 @@ function broadcastLobbyInfo()
         net.Broadcast()
 
     end
-
 end
 
 function GM:PlayerChangedTeam(ply, oldTeam, newTeam)
@@ -243,11 +213,9 @@ function GM:PlayerChangedTeam(ply, oldTeam, newTeam)
     if newTeam == TEAM_SPECTATOR and oldTeam ~= TEAM_SPECTATOR then
         removePlayerFromLobby(ply)
     end
-
 end
 
 local function lobbyChooseItem(plyid, id)
-
     SlashCo.BroadcastGlobalData()
 
     --Change the survivor's chosen item.
@@ -257,7 +225,6 @@ local function lobbyChooseItem(plyid, id)
     if SlashCoItems[id].OnBuy then
         SlashCoItems[id].OnBuy()
     end
-
 end
 
 --				***Begin the post-ready timer***
@@ -291,20 +258,16 @@ local function lobbyLeaveTimer()
 end
 
 local function BeginSlasherSelection()
-
     print("Slasher Selecting!")
 
     net.Start("mantiSlashCoPickingSlasher")
     net.WriteTable({ slashersteamid = SlashCo.LobbyData.AssignedSlashers[1].steamid, slashID = SlashCo.LobbyData.SelectedSlasherInfo.ID, slashClass = SlashCo.LobbyData.SelectedSlasherInfo.CLS, slashDanger = SlashCo.LobbyData.SelectedSlasherInfo.DNG })
     net.Broadcast()
-
 end
 
 --				***Assign the values for the incoming Round***
 local function lobbyRoundSetup()
-
     if SERVER then
-
         SlashCo.BroadcastGlobalData()
 
         for _, play in ipairs(player.GetAll()) do
@@ -314,14 +277,14 @@ local function lobbyRoundSetup()
 
         SlashCo.LobbyData.SelectedDifficulty = math.random(0, 3) --Randomizing the Difficulty
 
-        if GetConVar("slashco_force_difficulty"):GetInt() > 0 then
-            SlashCo.LobbyData.SelectedDifficulty = GetConVar("slashco_force_difficulty"):GetInt() - 1
+        local diff = GetConVar("slashco_force_difficulty"):GetInt()
+        if diff > 0 then
+            SlashCo.LobbyData.SelectedDifficulty = diff - 1
         end
 
         --Difficulty-based Slasher Selection:
 
         if SlashCo.LobbyData.SelectedDifficulty == 0 then
-
             local rand_name = GetRandomSlasher()
 
             SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
@@ -331,15 +294,10 @@ local function lobbyRoundSetup()
             SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlashers[rand_name].ProTip
 
             SlashCo.LobbyData.PickedSlasher = rand_name
-
         elseif SlashCo.LobbyData.SelectedDifficulty == 1 then
-
             SlashCo.LobbyData.SelectedSlasherInfo.CLS = math.random(1, 3)
-
         elseif SlashCo.LobbyData.SelectedDifficulty == 2 then
-
             SlashCo.LobbyData.SelectedSlasherInfo.DNG = math.random(1, 3)
-
         end
 
         --SlashCo.LobbyData.DeathwardsLeft = 2 - SlashCo.LobbyData.SelectedDifficulty
@@ -348,17 +306,12 @@ local function lobbyRoundSetup()
             --Setup for assigning that players' in-game teams
 
             if SlashCo.LobbyData.Players[i].readyState == 1 then
-
                 table.insert(SlashCo.LobbyData.PotentialSurvivors, { steamid = SlashCo.LobbyData.Players[i].steamid })
                 print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.Players[i].steamid):GetName() .. " now is a potential Survivor.")
-
             elseif SlashCo.LobbyData.Players[i].readyState == 2 then
-
                 table.insert(SlashCo.LobbyData.PotentialSlashers, { steamid = SlashCo.LobbyData.Players[i].steamid })
                 print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.Players[i].steamid):GetName() .. " now is a potential Slasher.")
-
             end
-
         end
 
         if SlashCo.LobbyData.PotentialSurvivors[1] ~= nil or SlashCo.LobbyData.PotentialSlashers[1] ~= nil then
@@ -370,67 +323,43 @@ local function lobbyRoundSetup()
                 local randid = math.random(1, #SlashCo.LobbyData.PotentialSurvivors)
 
                 for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
-
                     if i == randid then
-
                         table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
                         print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Slasher.")
-
                     else
-
                         table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
                         print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Survivor.")
-
                     end
-
                 end
-
             elseif SlashCo.LobbyData.PotentialSurvivors[1] == nil then
                 --If no none readied as Survivor, the slasher will be randomly picked from the slasher-ready players.
 
                 local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
 
                 for i = 1, #SlashCo.LobbyData.PotentialSlashers do
-
                     if i == randid then
-
                         table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-
                     else
-
                         table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-
                     end
-
                 end
-
             else
                 --If the ready states are mixed, pick the slasher from slasher-ready players.
 
                 local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
 
                 for i = 1, #SlashCo.LobbyData.PotentialSlashers do
-
                     if i == randid then
-
                         table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-
                     else
-
                         table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-
                     end
-
                 end
 
                 for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
-
                     table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
-
                 end
-
             end
-
         end
 
         if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == 4 then
@@ -460,7 +389,6 @@ local function lobbyRoundSetup()
 
             local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
             p:ChatText("second_slasher")
-
         end
 
         --Finalize teams
@@ -477,7 +405,6 @@ local function lobbyRoundSetup()
                 ply:Spawn()
 
                 print("Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
-
             end
 
             for i = 1, #SlashCo.LobbyData.AssignedSlashers do
@@ -487,9 +414,7 @@ local function lobbyRoundSetup()
 
                 ply:SetTeam(TEAM_SPECTATOR)
                 ply:Spawn()
-
             end
-
         end
 
         --Assign the map randomly
@@ -498,20 +423,17 @@ local function lobbyRoundSetup()
         if SlashCo.LobbyData.SelectedDifficulty > 0 then
             BeginSlasherSelection()
         end
-
     end
-
 end
 
 net.Receive("mantiSlashCoSelectSlasher", function()
-
     if SERVER then
         rec_id = net.ReadTable()
         print("[SlashCo] Received. (" .. rec_id.pick .. ")")
         SlashCo.ChooseTheSlasherLobby(rec_id.pick)
     end
-
 end)
+
 SlashCo.ChooseTheSlasherLobby = function(id)
     if SERVER then
         SlashCo.LobbyData.PickedSlasher = id
@@ -580,7 +502,6 @@ function LobbyVendorVoice(item)
     else
         vendor:EmitSound("slashco/itemvendor/itemvendor_generic"..math.random(1,12)..".mp3")
     end
-
 end
 
 local MapForceCost = 50
@@ -617,7 +538,6 @@ end)
 
 local lobby_tick
 hook.Add("Tick", "LobbyTickEvent", function()
-
     if game.GetMap() ~= "sc_lobby" then
         return
     end
@@ -636,15 +556,12 @@ hook.Add("Tick", "LobbyTickEvent", function()
     local num_o = #SlashCo.LobbyData.Offerors
 
     if num_o > 0 and SlashCo.LobbyData.Offering < 1 then
-
         if num_o > (num / 2) then
             SlashCo.OfferingVoteSuccess(SlashCo.LobbyData.VotedOffering)
         end
-
     end
 
     if SlashCo.LobbyData.LOBBYSTATE < 1 then
-
         local seek = seek
 
         if num < 2 then
@@ -687,11 +604,9 @@ hook.Add("Tick", "LobbyTickEvent", function()
         end
 
         seek = 0
-
     end
 
     if SlashCo.LobbyData.LOBBYSTATE == 1 then
-
         local minx = -60
         local maxx = 60
         local miny = 640
@@ -720,19 +635,14 @@ hook.Add("Tick", "LobbyTickEvent", function()
         if all_players_in and SERVER then
             RunConsoleCommand("lobby_debug_transition")
         end
-
     end
-
 end)
 
 hook.Add("PlayerDisconnected", "Playerleave", function(ply)
     --If a player disconnects after the Lobby stage is underway, reset the lobby.
     if game.GetMap() == "sc_lobby" then
-
         if SlashCo.LobbyData.LOBBYSTATE > 0 then
-
             if ply:Team() == TEAM_SURVIVOR then
-
                 ply:ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
                 if SERVER then
                     RunConsoleCommand("lobby_reset")
@@ -743,11 +653,9 @@ hook.Add("PlayerDisconnected", "Playerleave", function(ply)
                     play:SetTeam(TEAM_SPECTATOR)
                     play:Spawn()
                 end
-
             end
 
             if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or (SlashCo.LobbyData.AssignedSlashers[2] ~= nil and ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid) then
-
                 ply:ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
                 if SERVER then
                     RunConsoleCommand("lobby_reset")
@@ -757,21 +665,16 @@ hook.Add("PlayerDisconnected", "Playerleave", function(ply)
                     play:SetTeam(TEAM_SPECTATOR)
                     play:Spawn()
                 end
-
             end
-
         end
 
         if ply:Team() == TEAM_LOBBY then
             removePlayerFromLobby(ply)
         end
-
     end
-
 end)
 
 function lobbyFinish()
-
     if SlashCo.LobbyData.LOBBYSTATE == 4 then
         return
     end
@@ -781,13 +684,10 @@ function lobbyFinish()
     SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1], SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 500)
 
     timer.Simple(8, function()
-
         SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1] + 5000, SlashCo.CurRound.HelicopterTargetPosition[2] + 4000, SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
-
     end)
 
     timer.Simple(15, function()
-
         SlashCo.StartGameIntro()
 
         lobbyLeaveTimer()
@@ -798,13 +698,10 @@ function lobbyFinish()
         heli:StopSound("slashco/helicopter_rotors_distant.wav")
         heli:StopSound("slashco/helicopter_engine_close.wav")
         heli:StopSound("slashco/helicopter_rotors_close.wav")
-
     end)
-
 end
 
 SlashCo.OfferingVoteFail = function()
-
     SlashCo.LobbyData.Offering = 0
     SlashCo.LobbyData.VotedOffering = 0
     table.Empty(SlashCo.LobbyData.Offerors)
@@ -813,33 +710,27 @@ SlashCo.OfferingVoteFail = function()
         play:ChatText("offervote_not_success")
         SlashCo.EndOfferingVote(play)
     end
-
 end
 
 SlashCo.OfferingVoteSuccess = function(id)
-
     local fail = false
 
     if id == 4 then
         --Duality
 
         if #team.GetPlayers(TEAM_SPECTATOR) < 1 then
-
             for _, play in ipairs(player.GetAll()) do
                 play:ChatText("offervote_duality_fail")
                 SlashCo.EndOfferingVote(play)
                 fail = true
             end
-
         end
-
     end
 
     if id == 2 then
         --Satiation
 
         SlashCo.LobbyData.SelectedSlasherInfo.CLS = 2
-
     end
 
     SlashCo.LobbyData.VotedOffering = 0
@@ -855,13 +746,11 @@ SlashCo.OfferingVoteSuccess = function(id)
     if not fail then
         SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
     end
-
 end
 
 --//lobby concommands//--
 
 concommand.Add("lobby_debug_proceed", function(ply, _, _)
-
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
@@ -871,7 +760,6 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
     end
 
     if SERVER then
-
         SlashCo.LobbyData.LOBBYSTATE = 1
 
         local doors = ents.FindByName("Slashco_Elev_Shutter")
@@ -906,13 +794,10 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
         SlashCo.LobbyData.SelectedSlasherInfo.TIP = "--//--"
 
         lobbyRoundSetup()
-
     end
-
 end)
 
 concommand.Add("lobby_debug_transition", function(ply, _, _)
-
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
@@ -922,7 +807,6 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
     end
 
     if SERVER then
-
         SlashCo.LobbyData.LOBBYSTATE = 2
 
         local doors = ents.FindByName("Slashco_Elev_Shutter")
@@ -931,7 +815,6 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
         doors[3]:Fire("Open")
 
         timer.Simple(3, function()
-
             local elevator = table.Random(ents.FindByName("Slashco_Elev"))
             elevator:Fire("Open")
 
@@ -943,13 +826,10 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
             net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
             net.Broadcast()
         end
-
     end
-
 end)
 
 concommand.Add("lobby_debug_brief", function(ply, _, _)
-
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
@@ -959,7 +839,6 @@ concommand.Add("lobby_debug_brief", function(ply, _, _)
     end
 
     if SERVER then
-
         SlashCo.LobbyData.LOBBYSTATE = 3
 
         local doors = ents.FindByName("Slashco_Elev_Exit")
@@ -971,13 +850,10 @@ concommand.Add("lobby_debug_brief", function(ply, _, _)
             net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
             net.Broadcast()
         end
-
     end
-
 end)
 
 concommand.Add("timer_start", function(ply, _, _)
-
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
@@ -987,15 +863,11 @@ concommand.Add("timer_start", function(ply, _, _)
     end
 
     if SERVER then
-
         lobbyReadyTimer(30)
-
     end
-
 end)
 
 concommand.Add("lobby_reset", function(ply, _, _)
-
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
@@ -1005,7 +877,6 @@ concommand.Add("lobby_reset", function(ply, _, _)
     end
 
     if SERVER then
-
         SlashCo.LobbyData.LOBBYSTATE = 0
 
         table.Empty(SlashCo.LobbyData.Players)
@@ -1027,13 +898,10 @@ concommand.Add("lobby_reset", function(ply, _, _)
         end
 
         ply:ChatPrint("(Debug) Lobby reset.")
-
     end
-
 end)
 
 concommand.Add("lobby_openitems", function(ply, _, _)
-
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
@@ -1043,18 +911,14 @@ concommand.Add("lobby_openitems", function(ply, _, _)
     end
 
     if SERVER then
-
         local door = table.Random(ents.FindByName("door_itembox"))
         if IsValid(door) then
             door:Fire("Open")
         end
-
     end
-
 end)
 
 concommand.Add("lobby_leave", function(ply, _, _)
-
     if IsValid(ply) then
         if ply:IsPlayer() then
             if not ply:IsAdmin() then
@@ -1064,13 +928,10 @@ concommand.Add("lobby_leave", function(ply, _, _)
     end
 
     if SERVER then
-
         SlashCo.ClearDatabase()
 
         timer.Simple(1, function()
             lobbySaveCurData()
         end)
-
     end
-
 end)

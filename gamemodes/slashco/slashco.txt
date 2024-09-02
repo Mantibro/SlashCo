@@ -11,20 +11,23 @@
 	{
 		1
 		{
-			"name"		"slashco_force_difficulty"
-			"text"		"Difficulty"
-			"help"		"Have the gamemode force a certan difficulty. (0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)"
-			"type"		"Numeric"
-			"default"	"0"
+			"name"			"slashco_force_difficulty"
+			"text"			"Difficulty"
+			"help"			"Have the gamemode force a certan difficulty. (0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)"
+			"type"			"Numeric"
+			"default"		"0"
+			"singleplayer"	"1"
 		}
 
 		2
 		{
-			"name"		"slashco_max_bhop_speed"
-			"text"		"Max bunnyhopping speed"
-			"help"		"Max speed a player can bunnyhop to, as a multiple of their run speed."
-			"type"		"Numeric"
-			"default"	"1"
+			"name"			"slashco_max_bhop_speed"
+			"text"			"Max bunnyhopping speed"
+			"help"			"Max speed a player can bunnyhop to, as a multiple of their run speed."
+			"type"			"Numeric"
+			"default"		"1"
+			"singleplayer"	"1"
+			"replicate"		"1"
 		}
 	}
 }
