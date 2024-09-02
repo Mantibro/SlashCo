@@ -75,7 +75,7 @@ SlashCo.DropItem = function(ply)
 			ply:ViewPunch(Angle(-2, 0, 0))
 			ply:SetNWString("item", "none")
 		end
-		timer.Create("SlashCoItemSwitch_" .. ply:UserId(), time, 1, function()
+		timer.Create("SlashCoItemSwitch_" .. ply:UserID(), time, 1, function()
 			if not IsValid(ply) then
 				return
 			end
@@ -112,7 +112,7 @@ end
 SlashCo.RemoveItem = function(ply, isSec)
 	local slot = isSec and "item2" or "item"
 	local item = ply:GetNWString(slot, "none")
-	timer.Create("SlashCoItemSwitch_" .. ply:UserId(), isSec and 0.25 or 0.18, 1, function()
+	timer.Create("SlashCoItemSwitch_" .. ply:UserID(), isSec and 0.25 or 0.18, 1, function()
 		if IsValid(ply) then
 			ply:ItemFunction2("OnSwitchFrom", item)
 		end
@@ -152,7 +152,7 @@ SlashCo.ItemPickUp = function(ply, item, itid)
 		return
 	end
 
-	if timer.Exists("SlashCoItemSwitch_" .. ply:UserId()) then
+	if timer.Exists("SlashCoItemSwitch_" .. ply:UserID()) then
 		return
 	end
 
