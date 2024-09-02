@@ -13,8 +13,6 @@ include("player_class/player_survivor.lua")
 include("player_class/player_slasher_base.lua")
 include("player_class/player_lobby.lua")
 
-CreateConVar("slashco_player_cycle", "0", FCVAR_REPLICATED) --local cycle_players =
-
 SlashCo = SlashCo or {}
 
 SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator

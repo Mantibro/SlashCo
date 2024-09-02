@@ -65,9 +65,8 @@ Extra credits: undo, Jim, DarkGrey
 
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
-CreateConVar("slashco_map_default", 0, FCVAR_NONE, "Allow the gamemode to access all configured maps.", 0, 1)
 CreateConVar("slashco_force_difficulty", 0, FCVAR_NONE,
-		"Have the gamemode force a certan difficulty.(0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)", 0,
+		"Have the gamemode force a certan difficulty. (0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)", 0,
 		4)
 
 hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
