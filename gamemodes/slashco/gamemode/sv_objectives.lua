@@ -55,3 +55,14 @@ function SlashCo.RemoveObjective(name)
 		end
 	end
 end
+
+---set every unpassed optional objective to failed
+function SlashCo.FailOptionalObjectives()
+	for _, v in ipairs(objectives) do
+		if v.status == SlashCo.ObjStatus.INCOMPLETE and SlashCo.Objectives[v.name].optional then
+			v.status = SlashCo.ObjStatus.FAILED
+		end
+	end
+
+	SlashCo.CannotCompleteOptionalObjectives = true
+end

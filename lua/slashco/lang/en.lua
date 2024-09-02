@@ -533,7 +533,7 @@ SlashCo.LangTable["Watcher_observe"] = "OBSERVING A SURVIVOR. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "STALK TIME: "
 
 --THE BRICKLAYER
-SlashCo.LangTable["Kamenchik"] = "THE BRICKLAYER"
+SlashCo.LangTable["Kamenchik"] = "THE BRICKLAYER"(
 SlashCo.LangTable["Kamenchik_desc"] = [[The Overwhelming Slasher who works for 3 days with no salary.
 
 -THE BRICKLAYER must steal and eat bread to upkeep his inhuman strength.
@@ -548,3 +548,13 @@ SlashCo.LangTable["objective_generators"] = "POWER %s GENERATORS"
 SlashCo.LangTable["objective_generator"] = "POWER 1 GENERATOR"
 SlashCo.LangTable["objective_heliwait"] = "WAIT FOR THE HELICOPTER"
 SlashCo.LangTable["objective_helicopter"] = "GET IN THE HELICOPTER"
+
+--optional objectives
+SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) CLEAN UP %s PIECES OF GARBAGE" --item spawns
+SlashCo.LangTable["objective_trash"] = "(OPTIONAL) CLEAN UP 1 PIECE OF GARBAGE"
+SlashCo.LangTable["objective_mops"] = "(OPTIONAL) MOP %s SPILLS" --gen spawns
+SlashCo.LangTable["objective_mop"] = "(OPTIONAL) MOP 1 SPILL"
+SlashCo.LangTable["objective_traps"] = "(OPTIONAL) RESET %s MOUSETRAPS" --battery spawns
+SlashCo.LangTable["objective_trap"] = "(OPTIONAL) RESET 1 MOUSETRAP"
+SlashCo.LangTable["objective_pages"] = "(OPTIONAL) COLLECT %s DOCUMENTS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "(OPTIONAL) COLLECT 1 DOCUMENT"

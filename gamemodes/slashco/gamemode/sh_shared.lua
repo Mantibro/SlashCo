@@ -189,7 +189,23 @@ SlashCo.Objectives = {
 		hasCount = true
 	},
 	helicopter = {},
-	heliwait = {}
+	heliwait = {},
+	trash = {
+		hasCount = true,
+		optional = true
+	},
+	mop = {
+		hasCount = true,
+		optional = true
+	},
+	trap = {
+		hasCount = true,
+		optional = true
+	},
+	page = {
+		hasCount = true,
+		optional = true
+	},
 }
 
 SlashCo.ObjStatus = {
