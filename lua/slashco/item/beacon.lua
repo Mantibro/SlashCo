@@ -40,11 +40,11 @@ ITEM.OnUse = function(ply)
                     ply.BeaconWarning = true
                     timer.Simple(3, function() ply.BeaconWarning = false end)
                     return true
-                else 
+                else
                     local ent = SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
                     Entity(ent).DoArming = true
                     Entity(ent):SetNWBool("ArmingBeacon", true)
-                    return 
+                    return
                 end
             else --instant because alone
                 SlashCo.CurRound.DistressBeaconUsed = true

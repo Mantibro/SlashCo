@@ -108,13 +108,12 @@ hook.Add("HUDShouldDraw", "DisableDefaultHUD", function(name)
 	return not disable[name]
 end)
 
-function GM:DrawDeathNotice(_, _)
+function GM:DrawDeathNotice()
 	return false
 end
 
 local fx_t = 0
 
-local rand = 0
 hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
 		return

@@ -31,41 +31,105 @@ hook.Add("DrawOverlay", "SlashCoVHS", function()
 	end
 end)
 
-local function drawItemDisplay(item, notUsable, shift)
-	if not SlashCoItems[item] then
-		return 0
+local objectives = {}
+
+net.Receive("SlashCoUpdateObjectives", function()
+	objectives = {}
+	local count = net.ReadUInt(8)
+	for i = 1, count do
+		local name = net.ReadString()
+		if not SlashCo.Objectives[name] then
+			continue
+		end
+
+		local obj = {}
+		obj.name = name
+		obj.status = net.ReadUInt(4)
+
+		if SlashCo.Objectives[name].hasCount then
+			obj.count = net.ReadUInt(16)
+		end
+
+		table.insert(objectives, obj)
+	end
+end)
+
+local function drawObjectives()
+	if table.IsEmpty(objectives) then
+		return
 	end
 
+	local shift = 0
+	for k, v in ipairs(objectives) do
+		local count = 1
+		if SlashCo.Objectives[v.name].hasCount then
+			count = v.count or count
+		end
+
+		local langText = SlashCo.Language("objective_" .. v.name .. (count > 1 and "s" or ""), count)
+
+		local complete = " "
+		local r, g, b = 255, 255, 255
+		if v.status == SlashCo.ObjStatus.FAILED then
+			r, g, b = 255, 64, 64
+		elseif v.status == SlashCo.ObjStatus.COMPLETE then
+			complete = "X"
+		end
+
+		local str = string.format("<font=TVCD_small><color=%s,%s,%s>[%s] %s</color></font>", r, g, b, complete, langText)
+		local parsedItem = markup.Parse(str)
+
+		parsedItem:Draw(ScrW() * 0.975 - 4, ScrH() * 0.05 + shift, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP)
+
+		if v.status == SlashCo.ObjStatus.FAILED then
+			surface.SetDrawColor(255, 64, 64, 128)
+			surface.DrawRect(ScrW() * 0.975 - 8 - parsedItem:GetWidth(), ScrH() * 0.05 + shift + 6, parsedItem:GetWidth() + 8, 2)
+		end
+
+		shift = shift + 14 + 8
+	end
+end
+
+local function drawItemDisplay(item, notUsable, moveUp, shift)
+	if not SlashCoItems[item] then
+		return false, 0
+	end
+
+	shift = shift or 0
+	local y = moveUp and 35 or 0
+
 	local dash = notUsable and "vvv" or "---"
+	local space = "   "
 	local defaultColor = { 0, 0, 128 }
 
 	if SlashCoItems[item].IsSecondary then
 		dash = string.sub(dash, 1, 1)
 		defaultColor = { 0, 128, 0 }
+		space = "  "
 	end
 
-	local str = string.format("<font=TVCD>%s  %s  %s</font>", dash, string.upper(SlashCo.Language(item)), dash)
+	local str = string.format("<font=TVCD>%s%s%s%s%s</font>", dash, space, string.upper(SlashCo.Language(item)), space, dash)
 	local parsedItem = markup.Parse(str)
 	surface.SetDrawColor(LocalPlayer():ItemFunction2OrElse("DisplayColor", item, defaultColor))
-	surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
-	parsedItem:Draw(ScrW() * 0.975 - 4 - shift, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.95 - 24 - y, parsedItem:GetWidth() + 8, 27)
+	parsedItem:Draw(ScrW() * 0.975 - 4 - shift, ScrH() * 0.95 - y, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
 	if notUsable then
-		return parsedItem:GetWidth() + 48
+		return true, parsedItem:GetWidth() + 48
 	end
 
 	local offset = 0
 	if SlashCoItems[item].OnUse then
-		draw.SimpleText(SlashCo.Language("item_use", "R"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30,
+		draw.SimpleText(SlashCo.Language("item_use", "R"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - y,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-		offset = 30
+		offset = 27
 	end
 	if not LocalPlayer():ItemFunction2("PreDrop", item) then
-		draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset,
+		draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset - y,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
 
-	return parsedItem:GetWidth() + 48
+	return true, parsedItem:GetWidth() + 48
 end
 
 local function selectCrosshair(hitPos)
@@ -227,8 +291,10 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		return
 	end
 
-	local shift = drawItemDisplay(ply:GetNWString("item", "none"), ply:GetNWString("item2", "none") ~= "none", 0)
-	drawItemDisplay(ply:GetNWString("item2", "none"), nil, shift)
+	drawObjectives()
+
+	local moveUp = drawItemDisplay(ply:GetNWString("item", "none"), ply:GetNWString("item2", "none") ~= "none")
+	drawItemDisplay(ply:GetNWString("item2", "none"), nil, moveUp)
 
 	local hitPos = LocalPlayer():GetShootPos()
 	gasFuelMeter(hitPos)

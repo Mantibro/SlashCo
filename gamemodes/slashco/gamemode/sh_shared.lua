@@ -183,3 +183,17 @@ function SlashCo.IsPositionLegalForSlashers(pos, dist)
 
 	return true
 end
+
+SlashCo.Objectives = {
+	generator = {
+		hasCount = true
+	},
+	helicopter = {},
+	heliwait = {}
+}
+
+SlashCo.ObjStatus = {
+	INCOMPLETE = 0,
+	COMPLETE = 1,
+	FAILED = 2
+}

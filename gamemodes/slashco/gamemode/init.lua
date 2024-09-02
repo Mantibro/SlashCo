@@ -48,6 +48,7 @@ include("sh_doors.lua")
 include("sh_chattext.lua")
 include("sh_bhop.lua")
 include("sv_ghostping.lua")
+include("sv_objectives.lua")
 
 local SlashCo = SlashCo or {}
 
@@ -429,15 +430,18 @@ local Think = function()
 		end
 
 		--//duality condition//--
-		if SlashCo.CurRound.OfferingData.CurrentOffering == 4 then
-			if runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
-				--(SPAWN HELICOPTER)
+		if SlashCo.CurRound.OfferingData.CurrentOffering == 4 and runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
+			--(SPAWN HELICOPTER)
 
-				local failed = SlashCo.SummonEscapeHelicopter()
+			local failed = SlashCo.SummonEscapeHelicopter()
 
-				if not failed then
-					SlashCo.CurRound.DistressBeaconUsed = false
+			if not failed then
+				local settingsEnt = SlashCo.SettingsEntity()
+				if settingsEnt then
+					settingsEnt:TriggerOutput("OnAllGeneratorsComplete", settingsEnt)
 				end
+
+				SlashCo.CurRound.DistressBeaconUsed = false
 			end
 		end
 

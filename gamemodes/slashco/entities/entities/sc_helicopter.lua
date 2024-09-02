@@ -245,6 +245,9 @@ if SERVER then
 		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount == team.NumPlayers(TEAM_SURVIVOR)
 				and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch_full == nil then
 
+			SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.COMPLETE)
+			SlashCo.SendObjectives()
+
 			SlashCo.SurvivorWinFinish()
 			SlashCo.HelicopterTakeOff()
 			self.switch_full = true
@@ -266,6 +269,9 @@ if SERVER then
 					return true
 				end
 
+				SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.COMPLETE)
+				SlashCo.SendObjectives()
+
 				SlashCo.HelicopterTakeOff()
 				SlashCo.SurvivorWinFinish()
 			end)
@@ -286,6 +292,9 @@ if SERVER then
 				if self.switch_full == true then
 					return true
 				end
+
+				SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.COMPLETE)
+				SlashCo.SendObjectives()
 
 				SlashCo.HelicopterTakeOff()
 				SlashCo.SurvivorWinFinish()

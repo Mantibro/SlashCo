@@ -293,9 +293,16 @@ SlashCo.SummonEscapeHelicopter = function(distress)
 	timer.Simple(math.random(2, 5), function()
 		if distress then
 			SlashCo.HelicopterRadioVoice(4)
+
+			SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.FAILED)
 		else
 			SlashCo.HelicopterRadioVoice(2)
+
+			SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.COMPLETE)
 		end
+
+		SlashCo.UpdateObjective("heliwait", SlashCo.ObjStatus.INCOMPLETE)
+		SlashCo.SendObjectives()
 	end)
 
 	SlashCo.CurRound.EscapeHelicopterSummoned = true
@@ -345,6 +352,10 @@ SlashCo.HelicopterLand = function(pos)
 
 	timer.Simple(math.random(4, 6), function()
 		SlashCo.HelicopterRadioVoice(3)
+
+		SlashCo.UpdateObjective("heliwait", SlashCo.ObjStatus.COMPLETE)
+		SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.INCOMPLETE)
+		SlashCo.SendObjectives()
 	end)
 
 	--Will the Helicopter Abandon players?
@@ -357,6 +368,9 @@ SlashCo.HelicopterLand = function(pos)
 	print("[SlashCo] Helicopter set to abandon players in " .. tostring(abandon) .. " seconds.")
 
 	timer.Simple(abandon, function()
+		SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.FAILED)
+		SlashCo.SendObjectives()
+
 		SlashCo.HelicopterTakeOff()
 		SlashCo.SurvivorWinFinish()
 	end)

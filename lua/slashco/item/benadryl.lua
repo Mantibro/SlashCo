@@ -7,76 +7,76 @@ ITEM.Price = 60
 ITEM.Description = "Benadryl_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.DisplayColor = function()
-    return 128, 48, 0, 255
+	return 128, 48, 0, 255
 end
 ITEM.OnUse = function(ply)
-    ply:EmitSound("slashco/survivor/benadryl_eat.mp3")
+	ply:EmitSound("slashco/survivor/benadryl_eat.mp3")
 
-    timer.Simple(60, function() 
-        if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-            ply:SetNWBool("SurvivorBenadryl", true)
-        end
+	timer.Simple(60, function()
+		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+			ply:SetNWBool("SurvivorBenadryl", true)
+		end
 
-        timer.Simple(60, function() 
-            if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-                ply:SetNWBool("SurvivorBenadrylFull", true)
-            end
-        end)
-    
-        timer.Simple(480, function() 
-            if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-                ply:SetNWBool("SurvivorBenadrylFull", false)
-            end
-        end)
-    
-        timer.Simple(535, function() 
-            if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-                ply:SetNWBool("SurvivorBenadryl", false)
-            end
-        end)
-    end)
+		timer.Simple(60, function()
+			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+				ply:SetNWBool("SurvivorBenadrylFull", true)
+			end
+		end)
+
+		timer.Simple(480, function()
+			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+				ply:SetNWBool("SurvivorBenadrylFull", false)
+			end
+		end)
+
+		timer.Simple(535, function()
+			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+				ply:SetNWBool("SurvivorBenadryl", false)
+			end
+		end)
+	end)
 end
 ITEM.ViewModel = {
-    model = ITEM.Model,
-    pos = Vector(64, 0, -6),
-    angle = Angle(180, 20, 90),
-    size = Vector(0.5, 0.5, 0.5),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	model = ITEM.Model,
+	pos = Vector(64, 0, -6),
+	angle = Angle(180, 20, 90),
+	size = Vector(0.5, 0.5, 0.5),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-    model = ITEM.Model,
-    bone = "ValveBiped.Bip01_Pelvis",
-    pos = Vector(10, 2, 5),
-    angle = Angle(110, -80, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	model = ITEM.Model,
+	bone = "ValveBiped.Bip01_Pelvis",
+	pos = Vector(10, 2, 5),
+	angle = Angle(110, -80, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModel = {
-    holdtype = "slam",
-    model = ITEM.Model,
-    bone = "ValveBiped.Bip01_R_Hand",
-    pos = Vector(1, 4.5, -1),
-    angle = Angle(180, 0, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	holdtype = "slam",
+	model = ITEM.Model,
+	bone = "ValveBiped.Bip01_R_Hand",
+	pos = Vector(1, 4.5, -1),
+	angle = Angle(180, 0, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 
 SlashCo.RegisterItem(ITEM, "Benadryl")
 
 if SERVER then
-    hook.Add("Think", "Benadryl", function()
+	hook.Add("Think", "Benadryl", function()
 		for _, ply in ipairs(player.GetAll()) do
 			if ply:Team() ~= TEAM_SURVIVOR then
 				if ply:GetNWBool("SurvivorBenadryl") then
@@ -88,13 +88,14 @@ if SERVER then
 				end
 			end
 		end
-    end)
+	end)
 
-    return
+	return
 end
 
+local rand = 0
 hook.Add("RenderScreenspaceEffects", "Benadryl", function()
-    if LocalPlayer():GetNWBool("SurvivorBenadryl") then
+	if LocalPlayer():GetNWBool("SurvivorBenadryl") then
 		if not LocalPlayer().BenadrylIntensity then
 			LocalPlayer().BenadrylIntensity = RealFrameTime()
 		end
@@ -104,31 +105,31 @@ hook.Add("RenderScreenspaceEffects", "Benadryl", function()
 			LocalPlayer().BenadrylIntensity = -1
 		end
 
-		local fuck = math.min(math.abs(LocalPlayer().BenadrylIntensity) * 2, 1)
+		local freaker = math.min(math.abs(LocalPlayer().BenadrylIntensity) * 2, 1)
 		rand = rand + (math.random() / 3)
 		local contrast = 3.5 + math.sin((CurTime() + rand) / 10) * 3
 		local bloom = 3 + math.cos((CurTime() + rand) / 2) * 1
 		local bloom2 = 3 + math.cos((CurTime() + rand) / 4) * 1
 		local bokeh = -3 + math.cos((CurTime() + rand) / 20) * 4
 
-		DrawBloom(0.5, fuck * bloom * 1.5, fuck * bloom2 * 9, fuck * bloom2 * 9, 1, 8, 2, 2, 2)
-		DrawBokehDOF(12 * fuck, fuck * bokeh, 4 * fuck)
+		DrawBloom(0.5, freaker * bloom * 1.5, freaker * bloom2 * 9, freaker * bloom2 * 9, 1, 8, 2, 2, 2)
+		DrawBokehDOF(12 * freaker, freaker * bokeh, 4 * freaker)
 
 		local tab = {
 			["$pp_colour_addr"] = 0,
 			["$pp_colour_addg"] = 0,
 			["$pp_colour_addb"] = 0,
 			["$pp_colour_brightness"] = 0,
-			["$pp_colour_contrast"] = 1 + (fuck * contrast),
-			["$pp_colour_colour"] = 1 - fuck,
+			["$pp_colour_contrast"] = 1 + (freaker * contrast),
+			["$pp_colour_colour"] = 1 - freaker,
 			["$pp_colour_mulr"] = 0,
 			["$pp_colour_mulg"] = 0,
 			["$pp_colour_mulb"] = 0
 		}
 
 		DrawColorModify(tab)
-		DrawMotionBlur(fuck * 0.75 + (contrast * 0.08), fuck * 0.8, fuck * 0.07)
-		DrawSharpen(fuck * bloom, fuck * bloom)
+		DrawMotionBlur(freaker * 0.75 + (contrast * 0.08), freaker * 0.8, freaker * 0.07)
+		DrawSharpen(freaker * bloom, freaker * bloom)
 	else
 		LocalPlayer().BenadrylIntensity = 0
 	end
@@ -159,7 +160,7 @@ local CreateShadowPerson = function(pos, ang)
 end
 
 hook.Add("Think", "Benadryl", function()
-    if LocalPlayer():GetNWBool("SurvivorBenadryl") then
+	if LocalPlayer():GetNWBool("SurvivorBenadryl") then
 		if not BenadrylSound then
 			sound.PlayFile("sound/slashco/benadryl_base.mp3", "noplay", function(music, errCode, errStr)
 				if IsValid(music) then
@@ -201,7 +202,7 @@ hook.Add("Think", "Benadryl", function()
 end)
 
 hook.Add("HUDPaint", "Benadryl", function()
-    if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
+	if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
 		if not LocalPlayer().BenadrylVisionTick then
 			LocalPlayer().BenadrylVisionTick = 10
 		end

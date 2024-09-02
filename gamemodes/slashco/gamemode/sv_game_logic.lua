@@ -175,7 +175,6 @@ SlashCo.EndRound = function()
 
 	local delay = 20
 
-	local survivorsWon = true
 	local SurvivorCount = team.NumPlayers(TEAM_SURVIVOR)
 	if SurvivorCount == 0 then
 		--All Survivors are Dead
