@@ -32,15 +32,23 @@ hook.Add("DrawOverlay", "SlashCoVHS", function()
 end)
 
 local function drawItemDisplay(item, notUsable, shift)
-	if not SlashCoItems[item or "none"] then
+	if not SlashCoItems[item] then
 		return 0
 	end
 
 	local dash = notUsable and "vv" or "--"
+	local space = "   "
+	local defaultColor = { 0, 0, 128 }
 
-	local str = string.format("<font=TVCD>%s   %s   %s</font>", dash, string.upper(SlashCo.Language(item)), dash)
+	if SlashCoItems[item].IsSecondary then
+		dash = string.sub(dash, 2)
+		space = "  "
+		defaultColor = { 0, 128, 0 }
+	end
+
+	local str = string.format("<font=TVCD>%s%s%s%s%s</font>", dash, space, string.upper(SlashCo.Language(item)), space, dash)
 	local parsedItem = markup.Parse(str)
-	surface.SetDrawColor(LocalPlayer():ItemFunction2OrElse("DisplayColor", item, { 0, 0, 128 }))
+	surface.SetDrawColor(LocalPlayer():ItemFunction2OrElse("DisplayColor", item, defaultColor))
 	surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
 	parsedItem:Draw(ScrW() * 0.975 - 4 - shift, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 

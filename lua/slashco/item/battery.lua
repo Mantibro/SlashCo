@@ -11,9 +11,6 @@ ITEM.IsBattery = true
 ITEM.OnDrop = function(ply)
 	return 55
 end
-ITEM.DisplayColor = function()
-	return 0, 128, 0, 255
-end
 ITEM.ViewModel = {
 	model = "models/items/car_battery01.mdl",
 	pos = Vector(63, 0, 0),

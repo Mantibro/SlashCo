@@ -14,9 +14,6 @@ ITEM.IsFuel = true
 ITEM.MaxAllowed = function()
 	return 2
 end
-ITEM.DisplayColor = function()
-	return 0, 128, 0, 255
-end
 ITEM.OnDrop = function(ply)
 	return 45
 end
