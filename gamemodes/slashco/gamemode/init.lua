@@ -449,19 +449,6 @@ local Think = function()
 
 			SlashCo.CurRound.roundOverToggle = false
 		end
-
-		--Benadryl
-		for _, plr in ipairs(player.GetAll()) do
-			if plr:Team() ~= TEAM_SURVIVOR then
-				if plr:GetNWBool("SurvivorBenadryl") then
-					plr:SetNWBool("SurvivorBenadryl", false)
-				end
-
-				if plr:GetNWBool("SurvivorBenadrylFull") then
-					plr:SetNWBool("SurvivorBenadrylFull", false)
-				end
-			end
-		end
 	end
 end
 
