@@ -42,11 +42,13 @@ if SERVER then
 
 		SlashCo.ItemPickUp(activator, self:EntIndex(), self.PrintName)
 
+		--[[
 		if self:IsPlayerHolding() then
 			return
 		end
 
 		activator:PickupObject(self)
+		--]]
 	end
 
 	return

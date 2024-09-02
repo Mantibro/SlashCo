@@ -9,8 +9,6 @@ ITEM.Description = "Rock_desc"
 ITEM.CamPos = Vector(50,0,0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true
-ITEM.OnDrop = function(ply)
-end
 ITEM.OnFootstep = function()
     return true
 end

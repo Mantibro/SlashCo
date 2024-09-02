@@ -7,8 +7,6 @@ ITEM.Price = 5
 ITEM.Description = "Brick_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ReplacesWorldProps = true
-ITEM.OnDrop = function(ply)
-end
 ITEM.DisplayColor = function()
     return 128, 48, 0, 255
 end

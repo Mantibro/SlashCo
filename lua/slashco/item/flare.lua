@@ -17,8 +17,6 @@ ITEM.OnUse = function(ply)
     Entity( flare ):EmitSound("weapons/flaregun/burn.wav")
     SlashCo.CurRound.Items[flare] = true
 end
-ITEM.OnDrop = function()
-end
 ITEM.ViewModel = {
     model = "models/slashco/items/flare.mdl",
     pos = Vector(64, 2, -5),

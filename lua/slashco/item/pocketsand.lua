@@ -46,8 +46,6 @@ ITEM.OnUse = function(ply)
         found:SetNWBool("SlasherBlinded", false)
     end)
 end
-ITEM.OnDrop = function(ply)
-end
 ITEM.ViewModel = {
     model = "models/slashco/items/pocketsand.mdl",
     pos = Vector(64, 0, -6),

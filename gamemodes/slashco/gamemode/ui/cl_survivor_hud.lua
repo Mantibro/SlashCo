@@ -54,7 +54,7 @@ local function drawItemDisplay(item, notUsable, shift)
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		offset = 30
 	end
-	if SlashCoItems[item].OnDrop then
+	if not ply:ItemFunction2("PreDrop", item) then
 		draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end

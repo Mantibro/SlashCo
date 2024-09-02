@@ -47,8 +47,6 @@ ITEM.OnUse = function(ply)
         end
     end)
 end
-ITEM.OnDrop = function(ply)
-end
 ITEM.ViewModel = {
     model = "models/props_c17/doll01.mdl",
     pos = Vector(64, 0, -6),

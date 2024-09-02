@@ -8,7 +8,28 @@ ITEM.Description = "Jug_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true
-ITEM.OnDrop = function()
+
+ITEM.PrePickUpSecondary = function(ply, item)
+    if item ~= "GasCan" then
+        return
+    end
+
+    if not ply:GetNWBool("CurseOfTheJug") or not self:GetNWBool("JugCursed") then
+        return
+    end
+
+    self:RandomTeleport(Vector(0, 0, 50))
+    self:SetNWBool("JugCursed", false)
+
+    ply:SetNWBool("JugCurseActivate", true)
+
+    timer.Simple(6, function()
+        if IsValid(ply) then
+            ply:SetNWBool("JugCurseActivate", false)
+        end
+    end)
+
+    return true
 end
 
 ITEM.OnSwitchFrom = function(ply)

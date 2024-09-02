@@ -12,8 +12,6 @@ ITEM.OnUse = function(ply)
     ply:EmitSound("slashco/survivor/soda_drink"..math.random(1,2)..".mp3")
     ply:AddEffect("Invisibility", 30)
 end
-ITEM.OnDrop = function(ply)
-end
 ITEM.ViewModel = {
     model = "models/props_junk/PopCan01a.mdl",
     pos = Vector(64, 0, -6),

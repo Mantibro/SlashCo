@@ -11,8 +11,6 @@ ITEM.MaxAllowed = function()
 	return 2
 end
 ITEM.IsSpawnable = true
-ITEM.OnDrop = function()
-end
 ITEM.OnDie = function(ply)
 	ply:EmitSound("slashco/survivor/deathward.mp3")
 	ply:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")

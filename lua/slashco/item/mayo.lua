@@ -15,8 +15,6 @@ ITEM.OnUse = function(ply)
 
     ply:EmitSound("slashco/survivor/eat_mayo.mp3")
 end
-ITEM.OnDrop = function(ply)
-end
 ITEM.ViewModel = {
     model = "models/props_lab/jar01a.mdl",
     pos = Vector(64, 0, -6),

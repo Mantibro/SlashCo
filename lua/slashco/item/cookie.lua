@@ -13,8 +13,6 @@ ITEM.OnUse = function(ply)
     SlashCoSlashers.Sid.SidRage(ply)
     ply:AddEffect("FuelSpeed", 30)
 end
-ITEM.OnDrop = function(ply)
-end
 ITEM.ViewModel = {
     model = "models/slashco/items/cookie.mdl",
     bone = "ValveBiped.Bip01_Spine4",

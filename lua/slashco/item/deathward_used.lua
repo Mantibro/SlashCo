@@ -9,6 +9,9 @@ ITEM.IsSpawnable = false
 ITEM.DisplayColor = function()
     return 128, 0, 0, 255
 end
+ITEM.PreDrop = function()
+    return true
+end
 ITEM.ViewModel = {
     model = "models/slashco/items/deathward.mdl",
     pos = Vector(64, 0, -6),

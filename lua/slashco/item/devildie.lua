@@ -90,8 +90,6 @@ ITEM.OnUse = function(ply)
         end
     end)
 end
-ITEM.OnDrop = function(ply)
-end
 ITEM.ViewModel = {
     model = "models/slashco/items/devildie.mdl",
     pos = Vector(64, 0, -6),

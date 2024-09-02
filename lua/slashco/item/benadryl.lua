@@ -6,8 +6,6 @@ ITEM.EntClass = "sc_benadryl"
 ITEM.Price = 60
 ITEM.Description = "Benadryl_desc"
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.OnDrop = function(ply)
-end
 ITEM.DisplayColor = function()
     return 128, 48, 0, 255
 end

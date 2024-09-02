@@ -15,8 +15,6 @@ ITEM.OnUse = function(ply)
     SlashCoSlashers.Thirsty.ThirstyRage(ply)
     ply:AddEffect("Speed", 15)
 end
-ITEM.OnDrop = function(ply)
-end
 ITEM.ViewModel = {
     model = "models/props_junk/garbage_milkcarton001a.mdl",
     pos = Vector(64, 0, -6),

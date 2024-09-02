@@ -65,52 +65,64 @@ SlashCo.DropItem = function(ply)
 		item = ply:GetNWString("item", "none")
 	end
 
-	if SlashCoItems[item] and SlashCoItems[item].OnDrop then
-		local time = 0.18
-		if SlashCoItems[item].IsSecondary then
-			ply:ViewPunch(Angle(-6, 0, 0))
-			ply:SetNWString("item2", "none")
-			time = 0.25
-		else
-			ply:ViewPunch(Angle(-2, 0, 0))
-			ply:SetNWString("item", "none")
+	if not SlashCoItems[item] then
+		return
+	end
+
+	local dontDrop = ply:ItemFunction2("PreDrop", item)
+	if dontDrop then
+		return
+	end
+
+	local time = 0.18
+	if SlashCoItems[item].IsSecondary then
+		local dontDrop1 = ply:ItemFunction("PreDropSecondary", item)
+		if dontDrop1 then
+			return
 		end
 
-		timer.Create("SlashCoItemSwitch_" .. ply:UserID(), time, 1, function()
-			if not IsValid(ply) then
-				return
-			end
-
-			ply:ItemFunction2("OnSwitchFrom", item)
-
-			local height, dontDrop, dontPush = ply:ItemFunction2("OnDrop", item)
-			if dontDrop then
-				return
-			end
-
-			local droppeditem = SlashCo.CreateItem(SlashCoItems[item].EntClass,
-					ply:LocalToWorld(Vector(0, 0, height or 60)),
-					ply:LocalToWorldAngles(Angle(0, 0, 0)))
-			local ent = Entity(droppeditem)
-			local phys = ent:GetPhysicsObject()
-
-			if not dontPush and IsValid(phys) then
-				phys:SetVelocity(ply:GetAimVector() * 250)
-				local randomvec = Vector(0, 0, 0)
-				randomvec:Random(-1000, 1000)
-				phys:SetAngleVelocity(randomvec)
-			end
-
-			ply:ItemFunction2("ItemDropped", item, ent, phys)
-
-			if not SlashCoItems[item].IsSecondary then
-				SlashCo.CurRound.Items[droppeditem] = true
-			end
-		end)
-
-		ply.LastDroppedItem = item
-		ply.LastDroppedItemTime = CurTime()
+		ply:ViewPunch(Angle(-6, 0, 0))
+		ply:SetNWString("item2", "none")
+		time = 0.25
+	else
+		ply:ViewPunch(Angle(-2, 0, 0))
+		ply:SetNWString("item", "none")
 	end
+
+	timer.Create("SlashCoItemSwitch_" .. ply:UserID(), time, 1, function()
+		if not IsValid(ply) then
+			return
+		end
+
+		local height, dontDrop1, dontPush = ply:ItemFunction2("OnDrop", item)
+		if dontDrop1 then
+			return
+		end
+
+		ply:ItemFunction2("OnSwitchFrom", item)
+
+		local droppeditem = SlashCo.CreateItem(SlashCoItems[item].EntClass,
+				ply:LocalToWorld(Vector(0, 0, height or 60)),
+				ply:LocalToWorldAngles(Angle(0, 0, 0)))
+		local ent = Entity(droppeditem)
+		local phys = ent:GetPhysicsObject()
+
+		if not dontPush and IsValid(phys) then
+			phys:SetVelocity(ply:GetAimVector() * 250)
+			local randomvec = Vector(0, 0, 0)
+			randomvec:Random(-1000, 1000)
+			phys:SetAngleVelocity(randomvec)
+		end
+
+		ply:ItemFunction2("ItemDropped", item, ent, phys)
+
+		if not SlashCoItems[item].IsSecondary then
+			SlashCo.CurRound.Items[droppeditem] = true
+		end
+	end)
+
+	ply.LastDroppedItem = item
+	ply.LastDroppedItemTime = CurTime()
 end
 
 SlashCo.RemoveItem = function(ply, isSec)
@@ -161,6 +173,21 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 	end
 
 	if timer.Exists("SlashCoItemSwitch_" .. ply:UserID()) then
+		return
+	end
+
+	local dontPickup = ply:ItemFunction2("PrePickUp", item)
+	if dontPickup then
+		return
+	end
+
+	local dontPickup1 = ply:SecondaryItemFunction("PrePickUpPrimary", item)
+	if dontPickup1 then
+		return
+	end
+
+	local dontPickup2 = ply:ItemFunction("PrePickUpSecondary", item)
+	if dontPickup2 then
 		return
 	end
 

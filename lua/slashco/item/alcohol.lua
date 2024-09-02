@@ -11,8 +11,6 @@ ITEM.OnUse = function(ply)
 	ply:EmitSound("slashco/survivor/soda_drink" .. math.random(1, 2) .. ".mp3")
 	ply:AddEffect("Buzzed", 45)
 end
-ITEM.OnDrop = function()
-end
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(62, 0, -6),
