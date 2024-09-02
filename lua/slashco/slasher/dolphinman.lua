@@ -106,13 +106,14 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-
+			slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 		else
 			--you're fucking dead
 
 			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
+			slasher:SetNWInt("Slasher_Perception", SLASHER.Perception * 1.5 ^ (slasher.DolphinKills or 0))
 
 			hunt_boost = 1
 
@@ -147,6 +148,7 @@ end
 SLASHER.OnPrimaryFire = function(slasher, target)
 	if SlashCo.Jumpscare(slasher, target) then
 		slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 25)
+		slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 	end
 end
 

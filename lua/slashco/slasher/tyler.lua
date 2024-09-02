@@ -542,9 +542,9 @@ if CLIENT then
 			local Overlay = Material("slashco/ui/overlays/tyler_static")
 			local DestroyerFace = Material("slashco/ui/overlays/tyler_destroyer_face")
 
-			Overlay:SetFloat("$alpha", math.Rand(0.2, 0.23))
+			Overlay:SetFloat("$alpha", math.Rand(0.1, 0.12))
 
-			DestroyerFace:SetFloat("$alpha", math.Rand(0, 0.1))
+			DestroyerFace:SetFloat("$alpha", math.Rand(0, 0.07))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)

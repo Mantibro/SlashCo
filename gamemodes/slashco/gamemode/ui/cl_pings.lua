@@ -99,7 +99,7 @@ hook.Add("HUDPaint", "PingDisplay", function()
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 
-		draw.SimpleText("[" .. SlashCo.Language(showText) .. "]", "TVCD", pos.x, pos.y, textColor, TEXT_ALIGN_CENTER,
+		draw.SimpleText("[" .. string.upper(SlashCo.Language(showText)) .. "]", "TVCD", pos.x, pos.y, textColor, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
 	end
 

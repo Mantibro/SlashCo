@@ -104,7 +104,7 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 	end
 end)
 
-hook.Add("PlayerFootstep", "SurvivorFootstep", function(ply, _, _, _, _, _)
+hook.Add("PlayerFootstep", "SurvivorFootstep", function(ply)
 	--pos, foot, sound, volume, rf
 	if ply:Team() == TEAM_SURVIVOR and ply:ItemFunction("OnFootstep") then
 		return true

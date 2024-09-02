@@ -35,7 +35,7 @@ SLASHER.PickUpAttempt = function()
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+	--local SO = SlashCo.CurRound.OfferingData.SO
 
 	v1 = slasher.SlasherValue1 --Main Slash Cooldown
 	v2 = slasher.SlasherValue2 --Forward charge

@@ -14,7 +14,8 @@ function SlashCo.SendObjectives()
 			net.WriteUInt(v.count, 16)
 		end
 	end
-	net.Broadcast()
+
+	net.Send(team.GetPlayers(TEAM_SURVIVOR))
 end
 
 ---add or update an objective
