@@ -11,7 +11,7 @@ function HeadBob(pl, pos, ang, fov)
 	if pl:Team() ~= TEAM_SURVIVOR or pl:GetNWBool("SurvivorSidExecution") then return end
 	if noHeadbob:GetBool() then return end
 
-	local velCoef = (pl:GetVelocity():Length() / 300)
+	local velCoef = pl:GetVelocity():Length() / 300
 	local v = {}
 	v.pos = pos
 	v.ang = ang
@@ -21,9 +21,6 @@ function HeadBob(pl, pos, ang, fov)
 		if pl:KeyDown(IN_FORWARD) or pl:KeyDown(IN_BACK) or pl:KeyDown(IN_MOVELEFT) or pl:KeyDown(IN_MOVERIGHT) then
 			HBPosZ = HBPosZ + (pl:GetVelocity():Length() / 17) * FrameTime()
 			PitchReset = false
-
-			--if HBPitch == nil then HBPitch = 0 end
-			--if HBRoll == nil then HBRoll = 0 end
 
 			HBPitch = (HBPitch or 0) + (pl:GetVelocity():Length() / 17) * FrameTime() --/17
 			HBRoll = (HBRoll or 0) + (pl:GetVelocity():Length() / 25) * FrameTime() --/25

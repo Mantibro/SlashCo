@@ -18,7 +18,7 @@ net.Receive("mantislashcoGasPourProgress", function()
 end)
 
 hook.Add("DrawOverlay", "SlashCoVHS", function()
-	if IsValid(LocalPlayer()) and LocalPlayer():Team() ~= TEAM_SURVIVOR then
+	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
 		return
 	end
 
@@ -31,13 +31,81 @@ hook.Add("DrawOverlay", "SlashCoVHS", function()
 	end
 end)
 
-hook.Add("HUDPaint", "SurvivorHUD", function()
-	local ply = LocalPlayer()
+local function drawItemDisplay(item, notUsable, shift)
+	if not SlashCoItems[item or "none"] then
+		return 0
+	end
 
-	if ply:Team() ~= TEAM_SURVIVOR then
+	local dash = notUsable and "vv" or "--"
+
+	local str = string.format("<font=TVCD>%s   %s   %s</font>", dash, string.upper(SlashCo.Language(item)), dash)
+	local parsedItem = markup.Parse(str)
+	surface.SetDrawColor(LocalPlayer():ItemFunction2OrElse("DisplayColor", item, { 0, 0, 128 }))
+	surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
+	parsedItem:Draw(ScrW() * 0.975 - 4 - shift, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+
+	if notUsable then
+		return parsedItem:GetWidth() + 48
+	end
+
+	local offset = 0
+	if SlashCoItems[item].OnUse then
+		draw.SimpleText(SlashCo.Language("item_use", "R"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30,
+				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+		offset = 30
+	end
+	if SlashCoItems[item].OnDrop then
+		draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset,
+				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	end
+
+	return parsedItem:GetWidth() + 48
+end
+
+local function selectCrosshair(hitPos)
+	for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
+		if v.IsSelectable and not (IsFueling and FuelingCan == v) then
+			local gasPos = v:WorldSpaceCenter()
+			local trace = util.QuickTrace(hitPos, gasPos - hitPos, LocalPlayer())
+			if not trace.Hit or trace.Entity == v then
+				local realDistance = hitPos:Distance(gasPos)
+				gasPos = gasPos:ToScreen()
+				local centerDistance = math.Distance(ScrW() / 2, ScrH() / 2, gasPos.x, gasPos.y)
+				draw.SimpleText("[", "Indicator", gasPos.x - centerDistance / 2 - 12, gasPos.y,
+						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
+						TEXT_ALIGN_CENTER)
+				draw.SimpleText("]", "Indicator", gasPos.x + centerDistance / 2 + 12, gasPos.y,
+						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
+						TEXT_ALIGN_CENTER)
+
+				if realDistance < 200 and centerDistance < 25 then
+					draw.SimpleText(SlashCo.Language("surv_ping", "MMB"), "TVCD", ScrW() / 2, ScrH() / 2 + 100,
+							color_white, TEXT_ALIGN_CENTER,
+							TEXT_ALIGN_CENTER)
+				end
+			end
+		end
+	end
+end
+
+local function slamIndicator()
+	if LocalPlayer():GetVelocity():Length() <= 250 then
 		return
 	end
 
+	local lookent = LocalPlayer():GetEyeTrace().Entity
+	if not IsValid(lookent) or lookent:GetClass() ~= "prop_door_rotating" or not SlashCo.CheckDoorWL(lookent) then
+		return
+	end
+
+	if lookent:GetPos():Distance(LocalPlayer():GetPos()) >= 150 or lookent.IsOpen then
+		return
+	end
+
+	draw.SimpleText(SlashCo.Language("door_slam", "LMB"), "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+end
+
+local function gasFuelMeter(hitPos)
 	local gas
 	if IsFueling then
 		gas = (TimeUntilFueled - CurTime()) / TimeToFuel
@@ -48,32 +116,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		end
 	end
 
-	--//item display//--
-
-	local HeldItem = ply:GetNWString("item", "none")
-	if SlashCoItems[HeldItem or "none"] then
-		local parsedItem = markup.Parse("<font=TVCD>---     " .. string.upper(SlashCo.Language(HeldItem)) .. "     ---</font>")
-		surface.SetDrawColor(ply:ItemFunctionOrElse("DisplayColor", { 0, 0, 128 }))
-		surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - 8, ScrH() * 0.95 - 24, parsedItem:GetWidth() + 8, 27)
-		parsedItem:Draw(ScrW() * 0.975 - 4, ScrH() * 0.95, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-
-		local offset = 0
-		if SlashCoItems[HeldItem].OnUse then
-			draw.SimpleText(SlashCo.Language("item_use", "R"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30,
-					color_white, TEXT_ALIGN_RIGHT,
-					TEXT_ALIGN_BOTTOM)
-			offset = 30
-		end
-		if SlashCoItems[HeldItem].OnDrop then
-			draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - 4, ScrH() * 0.95 - 30 - offset,
-					color_white,
-					TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-		end
-	end
-
-	--//gas fuel meter//--
-
-	local hitPos = ply:GetShootPos()
 	if IsFueling and IsValid(FuelingCan) then
 		local genPos = FuelingCan:GetPos()
 		local realDistance = hitPos:Distance(genPos)
@@ -100,49 +142,10 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 			IsFueling = false
 		end
 	end
+end
 
-	--//prompts for items//--
-
-	if LocalPlayer():GetVelocity():Length() > 250 and game.GetMap() ~= "sc_lobby" then
-		local lookent = LocalPlayer():GetEyeTrace().Entity
-		if IsValid(lookent) and lookent:GetClass() == "prop_door_rotating" and SlashCo.CheckDoorWL(lookent) then
-			if lookent:GetPos():Distance(LocalPlayer():GetPos()) < 150 and not lookent.IsOpen then
-				draw.SimpleText(SlashCo.Language("door_slam", "LMB"), "TVCD", ScrW() / 2, ScrH() / 2, color_white,
-						TEXT_ALIGN_CENTER,
-						TEXT_ALIGN_CENTER)
-			end
-		end
-	end
-
-	--//item selection crosshair//--
-
-	for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
-		if v.IsSelectable and not (IsFueling and FuelingCan == v) then
-			local gasPos = v:WorldSpaceCenter()
-			local trace = util.QuickTrace(hitPos, gasPos - hitPos, ply)
-			if not trace.Hit or trace.Entity == v then
-				local realDistance = hitPos:Distance(gasPos)
-				gasPos = gasPos:ToScreen()
-				local centerDistance = math.Distance(ScrW() / 2, ScrH() / 2, gasPos.x, gasPos.y)
-				draw.SimpleText("[", "Indicator", gasPos.x - centerDistance / 2 - 12, gasPos.y,
-						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
-						TEXT_ALIGN_CENTER)
-				draw.SimpleText("]", "Indicator", gasPos.x + centerDistance / 2 + 12, gasPos.y,
-						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
-						TEXT_ALIGN_CENTER)
-
-				if realDistance < 200 and centerDistance < 25 then
-					draw.SimpleText(SlashCo.Language("surv_ping", "MMB"), "TVCD", ScrW() / 2, ScrH() / 2 + 100,
-							color_white, TEXT_ALIGN_CENTER,
-							TEXT_ALIGN_CENTER)
-				end
-			end
-		end
-	end
-
-	--//health//--
-
-	local hp = ply:Health()
+local function hpMeter()
+	local hp = LocalPlayer():Health()
 
 	if hp > (prevHp or 100) then
 		--reset damage indicator upon healing
@@ -209,6 +212,24 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 	end
 
 	parsed:Draw(ScrW() * 0.025 + 4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+end
+
+hook.Add("HUDPaint", "SurvivorHUD", function()
+	local ply = LocalPlayer()
+
+	if ply:Team() ~= TEAM_SURVIVOR then
+		return
+	end
+
+	local shift = drawItemDisplay(ply:GetNWString("item", "none"), ply:GetNWString("item2", "none") ~= "none", 0)
+	drawItemDisplay(ply:GetNWString("item2", "none"), nil, shift)
+
+	local hitPos = LocalPlayer():GetShootPos()
+	gasFuelMeter(hitPos)
+	selectCrosshair(hitPos)
+
+	hpMeter()
+	slamIndicator()
 end)
 
 hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)
@@ -242,7 +263,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 		local slasher = team.GetPlayers(TEAM_SLASHER)[s]
 		if slasher:GetNWBool("TrollgeStage2") then
 			local tlight = DynamicLight(slasher:EntIndex() + 1)
-			if (tlight) then
+			if tlight then
 				tlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
 				tlight.r = 255
 				tlight.g = 0

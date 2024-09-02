@@ -13,9 +13,6 @@ ITEM.OnUse = function(ply)
 end
 ITEM.OnDrop = function()
 end
-ITEM.DisplayColor = function()
-	return 0, 128, 0, 255
-end
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(62, 0, -6),

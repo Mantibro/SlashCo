@@ -75,6 +75,7 @@ SlashCo.DropItem = function(ply)
 			ply:ViewPunch(Angle(-2, 0, 0))
 			ply:SetNWString("item", "none")
 		end
+
 		timer.Create("SlashCoItemSwitch_" .. ply:UserID(), time, 1, function()
 			if not IsValid(ply) then
 				return
@@ -106,6 +107,9 @@ SlashCo.DropItem = function(ply)
 				SlashCo.CurRound.Items[droppeditem] = true
 			end
 		end)
+
+		ply.LastDroppedItem = item
+		ply.LastDroppedItemTime = CurTime()
 	end
 end
 
@@ -146,9 +150,13 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 	end
 end
 
-SlashCo.ItemPickUp = function(ply, item, itid)
-	if SlashCoItems[itid].IsSecondary and ply:GetNWString("item2", "none") ~= "none"
-			or not SlashCoItems[itid].IsSecondary and ply:GetNWString("item", "none") ~= "none" then
+SlashCo.ItemPickUp = function(ply, itemindex, item)
+	if SlashCoItems[item].IsSecondary and ply:GetNWString("item2", "none") ~= "none"
+			or not SlashCoItems[item].IsSecondary and ply:GetNWString("item", "none") ~= "none" then
+		return
+	end
+
+	if ply.LastDroppedItem == item and CurTime() - ply.LastDroppedItemTime < 1 then
 		return
 	end
 
@@ -156,14 +164,14 @@ SlashCo.ItemPickUp = function(ply, item, itid)
 		return
 	end
 
-	local itemEnt = ents.GetByIndex(item)
+	local itemEnt = ents.GetByIndex(itemindex)
 
 	if IsValid(itemEnt.SpawnedAt) then
 		itemEnt.SpawnedAt:TriggerOutput("OnPickedUp", ply)
 		itemEnt.SpawnedAt.SpawnedEntity = nil
 	end
 
-	SlashCo.ChangeSurvivorItem(ply, itid)
+	SlashCo.ChangeSurvivorItem(ply, item)
 	itemEnt:Remove()
 
 	return true

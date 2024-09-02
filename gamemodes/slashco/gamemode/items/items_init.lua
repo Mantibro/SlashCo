@@ -179,6 +179,18 @@ function PLAYER:ItemFunction2(funcName, item, ...)
 	end
 end
 
+function PLAYER:ItemFunction2OrElse(funcName, item, fallback, ...)
+	if not SlashCoItems[item] or not SlashCoItems[item][funcName] then
+		return unpack(fallback)
+	end
+
+	local val = { SlashCoItems[item][funcName](self, ...) }
+	if val[1] then
+		return unpack(val)
+	end
+	return unpack(fallback)
+end
+
 ---internal: checks effect function first before checking the specified slot
 function PLAYER:ItemFunctionInternal(value, slot, ...)
 	local effect = self:GetNWString("itemEffect", "none")
