@@ -277,7 +277,7 @@ local function lobbyRoundSetup()
 
         SlashCo.LobbyData.SelectedDifficulty = math.random(0, 3) --Randomizing the Difficulty
 
-        local diff = GetConVar("slashco_force_difficulty"):GetInt()
+        local diff = math.min(GetConVar("slashco_force_difficulty"):GetInt(), 4)
         if diff > 0 then
             SlashCo.LobbyData.SelectedDifficulty = diff - 1
         end

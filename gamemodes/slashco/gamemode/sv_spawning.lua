@@ -189,26 +189,26 @@ function SlashCo.SpawnGasCans()
 	local cansPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
 	local gens = GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators)
 
+	-- base count is for compatibility with older configs
 	local baseCount = SlashCo.BaseCans or (cansPerGen * gens)
 	if baseCount < 0 then
 		baseCount = cansPerGen * gens
 	end
 
-	-- auto-determine can count
-	if gasCanCount == -1 then
+	-- auto-determine unmodified can count
+	if gasCanCount < 0 then
 		gasCanCount = baseCount + SlashCo.MapSize
 	end
-
-	gasCanCount = math.max(gasCanCount + (3 - SlashCo.CurRound.Difficulty), baseCount)
 
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		gasCanCount = gasCanCount + p:SlasherValue("GasCanMod", 0)
 	end
 
-	gasCanCount = gasCanCount + SlashCo.CurRound.OfferingData.GasCanMod - SlashCo.CurRound.SurvivorData.GasCanMod
-	gasCanCount = math.max(gasCanCount, 2)
-
-	gasCanCount = gasCanCount - (SlashCo.HeadStartCans or 0)
+	local diffMod = 3 - SlashCo.CurRound.Difficulty
+	local offeringMod = SlashCo.CurRound.OfferingData.GasCanMod
+	local headStartMod = -(SlashCo.HeadStartCans or 0)
+	local survivorMod = -SlashCo.CurRound.SurvivorData.GasCanMod
+	gasCanCount = math.max(gasCanCount + offeringMod + headStartMod + survivorMod + diffMod, SlashCo.MapSize)
 
 	local gasCanSpawns
 	if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
@@ -315,7 +315,7 @@ function SlashCo.SetHelicopterPositions()
 		return
 	end
 
-	--vectors are dropped a little to make the hammer entity more accurate
+	--vectors are dropped a little to make the hammer model more accurate
 	SlashCo.CurRound.HelicopterIntroPosition = intro:GetPos() - Vector(0, 0, 70)
 	SlashCo.CurRound.HelicopterIntroAngle = intro:GetAngles()
 	SlashCo.CurRound.HelicopterSpawnPosition = spawn:GetPos() - Vector(0, 0, 70)
