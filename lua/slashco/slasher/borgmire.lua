@@ -102,6 +102,10 @@ SLASHER.OnTickBehaviour = function(slasher)
 end
 
 SLASHER.OnPrimaryFire = function(slasher)
+	if slasher:GetNWBool("BorgmireThrow") then
+		return
+	end
+
 	local SO = SlashCo.CurRound.OfferingData.SO
 
 	if slasher.SlasherValue2 < 0.01 then

@@ -812,7 +812,7 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
         local doors = ents.FindByName("Slashco_Elev_Shutter")
         doors[1]:Fire("Close")
         doors[2]:Fire("Close")
-        doors[3]:Fire("Open")
+        doors[3]:Fire("Close")
 
         timer.Simple(3, function()
             local elevator = table.Random(ents.FindByName("Slashco_Elev"))
