@@ -204,6 +204,11 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 		SlashCo.BustDoor(slasher, target, 20000)
 
+		timer.Simple(1.3, function()
+			slasher:SetNWBool("AbomignatSlashing", false)
+			slasher:Freeze(false)
+		end)
+
 		if target:IsPlayer() then
 			if target:Team() ~= TEAM_SURVIVOR then
 				return
@@ -218,11 +223,6 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 			target:EmitSound("slashco/slasher/trollge_hit.wav")
 		end
-
-		timer.Simple(1.3, function()
-			slasher:SetNWBool("AbomignatSlashing", false)
-			slasher:Freeze(false)
-		end)
 	end
 
 	timer.Create(slasher:EntIndex() .. "_AbomignatSlash", 1, 1, SlashFinish)
