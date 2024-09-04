@@ -152,7 +152,7 @@ function SLASHER.HandleDOT(slasher, target)
 		return
 	end
 
-	timer.Create("AbomignatHit_" .. target:UserID(), 0.5, target.AbomignatProcs, function()
+	timer.Create("AbomignatHit_" .. target:UserID(), 1, target.AbomignatProcs, function()
 		if not IsValid(target) or target:Team() == TEAM_SPECTATOR then
 			return
 		end
