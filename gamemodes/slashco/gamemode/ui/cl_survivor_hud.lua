@@ -22,7 +22,7 @@ hook.Add("DrawOverlay", "SlashCoVHS", function()
 		return
 	end
 
-	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
+	if not LocalPlayer().Team or LocalPlayer():Team() ~= TEAM_SURVIVOR then
 		return
 	end
 
