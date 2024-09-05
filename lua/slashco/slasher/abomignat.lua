@@ -144,20 +144,20 @@ hook.Add("PlayerDeath", "AbomignatCountKills", function(victim, _, attacker)
 end)
 
 function SLASHER.HandleDOT(slasher, target)
-	target.AbomignatProcs = target.AbomignatProcs or 0
+	target.AbomignatProcs = target.AbomignatProcs or 6
 
 	if timer.Exists("AbomignatHit_" .. target:UserID()) then
-		target:TakeDamage(9999, slasher, slasher)
+		target:TakeDamage(99999, slasher, slasher)
 		target:EmitSound("physics/flesh/flesh_bloody_break.wav")
 		return
 	end
 
-	timer.Create("AbomignatHit_" .. target:UserID(), 1, target.AbomignatProcs, function()
+	timer.Create("AbomignatHit_" .. target:UserID(), 0.75, target.AbomignatProcs, function()
 		if not IsValid(target) or target:Team() == TEAM_SPECTATOR then
 			return
 		end
 
-		target:TakeDamage(7, slasher, slasher)
+		target:TakeDamage(3, slasher, slasher)
 
 		local vPoint = target:GetPos() + Vector(0, 0, 50)
 		local bloodfx = EffectData()
@@ -195,7 +195,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 		slasher:Freeze(true)
 		slasher.SlasherValue2 = 0
 
-		local damage = 25 + slasher.AbomignatKills * 10
+		local damage = 15 + slasher.AbomignatKills * 10
 
 		slasher:LagCompensation(true)
 		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
