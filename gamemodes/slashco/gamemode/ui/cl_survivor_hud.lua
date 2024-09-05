@@ -18,6 +18,10 @@ net.Receive("mantislashcoGasPourProgress", function()
 end)
 
 hook.Add("DrawOverlay", "SlashCoVHS", function()
+	if not IsValid(LocalPlayer()) then
+		return
+	end
+
 	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
 		return
 	end
