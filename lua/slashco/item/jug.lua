@@ -9,17 +9,19 @@ ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true
 
-ITEM.PrePickUpSecondary = function(ply, item)
+ITEM.PrePickUpSecondary = function(ply, item, id)
     if item ~= "GasCan" then
         return
     end
 
-    if not ply:GetNWBool("CurseOfTheJug") or not self:GetNWBool("JugCursed") then
+    local ent = Entity(id)
+
+    if not ply:GetNWBool("CurseOfTheJug") or not ent:GetNWBool("JugCursed") then
         return
     end
 
-    self:RandomTeleport(Vector(0, 0, 50))
-    self:SetNWBool("JugCursed", false)
+    ent:RandomTeleport(Vector(0, 0, 50))
+    ent:SetNWBool("JugCursed", false)
 
     ply:SetNWBool("JugCurseActivate", true)
 

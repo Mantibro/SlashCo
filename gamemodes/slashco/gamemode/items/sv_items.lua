@@ -178,18 +178,18 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 		return
 	end
 
-	local dontPickup = ply:ItemFunction2("PrePickUp", item)
+	local dontPickup = ply:ItemFunction2("PrePickUp", item, itemindex)
 	if dontPickup then
 		return
 	end
 
 	if slot == "item" then
-		local dontPickup1 = ply:SecondaryItemFunction("PrePickUpPrimary", item)
+		local dontPickup1 = ply:SecondaryItemFunction("PrePickUpPrimary", item, itemindex)
 		if dontPickup1 then
 			return
 		end
 	else
-		local dontPickup2 = ply:ItemFunction("PrePickUpSecondary", item)
+		local dontPickup2 = ply:ItemFunction("PrePickUpSecondary", item, itemindex)
 		if dontPickup2 then
 			return
 		end
