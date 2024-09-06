@@ -541,6 +541,7 @@ SlashCo.LangTable["Kamenchik_desc"] = [[The Overwhelming Slasher who works for 3
 -.]]
 SlashCo.LangTable["Kemenchik_tip"] = "-You may as well give up."
 
+--misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide"
 SlashCo.LangTable["cant_fuel"] = "[ALREADY FULL]"
@@ -561,3 +562,26 @@ SlashCo.LangTable["objective_traps"] = "(OPTIONAL) RESET %s MOUSETRAPS" --batter
 SlashCo.LangTable["objective_trap"] = "(OPTIONAL) RESET 1 MOUSETRAP"
 SlashCo.LangTable["objective_pages"] = "(OPTIONAL) COLLECT %s DOCUMENTS" --gascan spawns
 SlashCo.LangTable["objective_page"] = "(OPTIONAL) COLLECT 1 DOCUMENT"
+
+--points summary
+SlashCo.LangTable["point_summary"] = "POINTS EARNED"
+SlashCo.LangTable["point_total"] = "TOTAL POINTS: %s"
+
+SlashCo.LangTable["points_slasher_kill"] = "[%s] KILLING" --slashers
+SlashCo.LangTable["points_slasher_demon"] = "[%s] FULLY SATIATED"
+
+SlashCo.LangTable["points_slasher_win"] = "[%s] ALL EMPLOYEES KILLED" --slasher objective thwarting
+SlashCo.LangTable["points_slasher_escape"] = "[%s] MISSION ABORTED"
+SlashCo.LangTable["points_slasher_perfect"] = "[%s] MISSION RUINED"
+
+SlashCo.LangTable["points_objective"] = "[%s] MAIN OBJECTIVE COMPLETE" --objectives
+SlashCo.LangTable["points_optional"] = "[%s] SECONDARY OBJECTIVE COMPLETE"
+SlashCo.LangTable["points_escape"] = "[%s] SUCCESSFUL MISSION ESCAPE"
+
+SlashCo.LangTable["points_all_survive"] = "[%s] ALL EMPLOYEES SURVIVED" --survival status
+SlashCo.LangTable["points_last_survive"] = "[%s] ONLY EMPLOYEE REMAINING"
+SlashCo.LangTable["points_left_behind"] = "[%s] LEFT BEHIND"
+SlashCo.LangTable["points_survive"] = "[%s] SURVIVED"
+
+SlashCo.LangTable["points_item"] = "[%s] ITEM BUY-BACK" --misc points
+SlashCo.LangTable["points_fast"] = "[%s] SWIFT SUCCESS"
