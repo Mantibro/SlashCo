@@ -219,28 +219,41 @@ SlashCo.EndRound = function()
 			end
 		end
 	end
+
+	if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
+		local winners = {}
+
+		--Add to stats of the remaining survivors' wins.
+		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
+			if not IsValid(v) then
+				return
+			end
+
+			local plyID = v:SteamID64()
+
+			SlashCoDatabase.UpdateStats(plyID, "SurvivorRoundsWon", 1)
+			v:SetPoints("survive")
+			winners[v] = true
+		end
+
+		if table.Count(winners) == 1 then
+			for k, _ in pairs(winners) do
+				k:SetPoints("last_survive")
+			end
+		end
+
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not winners[v] then
+				v:SetPoints("left_behind")
+			end
+		end
+	end
+
 	print("[SlashCo] Round over, returning to lobby in " .. tostring(delay) .. " seconds.")
 
 	timer.Simple(delay, function()
 		SlashCo.RemoveHelicopter()
-
-		if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
-			--Add to stats of the remaining survivors' wins.
-			for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
-				local plyID = v:SteamID64()
-
-				SlashCoDatabase.UpdateStats(plyID, "SurvivorRoundsWon", 1)
-				SlashCo.PlayerData[plyID].PointsTotal = SlashCo.PlayerData[plyID].PointsTotal + 25
-			end
-		end
-
-		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-			local man = v.id
-
-			if IsValid(player.GetBySteamID64(man)) then
-				SlashCoDatabase.UpdateStats(man, "Points", SlashCo.PlayerData[man].PointsTotal)
-			end
-		end
+		SlashCo.CommitPoints()
 
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		for i = 1, #survivors do

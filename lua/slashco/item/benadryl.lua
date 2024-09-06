@@ -10,6 +10,7 @@ ITEM.DisplayColor = function()
 	return 128, 48, 0, 255
 end
 ITEM.OnUse = function(ply)
+	ply:AddPoints("benadryl")
 	ply:EmitSound("slashco/survivor/benadryl_eat.mp3")
 
 	timer.Simple(60, function()

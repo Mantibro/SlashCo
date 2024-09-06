@@ -331,6 +331,11 @@ function SlashCo.SpawnSlasher()
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		p:SetTeam(TEAM_SLASHER)
 		p:Spawn()
+
+		if not SlashCo.NotPerfect then
+			p:SetPoints("slasher_perfect")
+		end
+
 		SlashCo.OnSlasherSpawned(p)
 	end
 

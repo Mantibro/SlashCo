@@ -143,6 +143,37 @@ SlashCo.StartGameIntro = function()
 	})
 end
 
+local pointState = {
+	[0] = function(ply)
+		ply:SetPoints("all_survive")
+		ply:SetPoints("objective")
+	end,
+	[1] = function(ply)
+		ply:SetPoints("objective")
+	end,
+	[2] = function(ply)
+		ply:SetPoints("objective")
+	end,
+	[3] = function() end,
+	[4] = function(ply)
+		ply:SetPoints("escape")
+	end
+}
+
+local pointStateSlasher = {
+	[0] = function(ply) end,
+	[1] = function(ply) end,
+	[2] = function(ply)
+		ply:SetPoints("slasher_win")
+	end,
+	[3] = function(ply)
+		ply:SetPoints("slasher_win")
+	end,
+	[4] = function(ply)
+		ply:SetPoints("slasher_escape")
+	end
+}
+
 --[[ state value:
 	0 - (If won with all players alive)
 	1 - (If won with players dead or ones that havent made it to the helicopter in time)
@@ -160,6 +191,12 @@ SlashCo.RoundOverScreen = function(state)
 		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
 			if ply:SteamID64() == v.id then
 				table.insert(goodSurvivorTable, ply)
+				pointState[state](ply)
+			end
+		end
+		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
+			if ply:SteamID64() == v.id then
+				pointStateSlasher[state](ply)
 			end
 		end
 	end

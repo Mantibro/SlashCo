@@ -195,7 +195,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 		slasher:Freeze(true)
 		slasher.SlasherValue2 = 0
 
-		local damage = 15 + slasher.AbomignatKills * 10
+		local damage = 15 + slasher.AbomignatKills * 12
 
 		slasher:LagCompensation(true)
 		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),

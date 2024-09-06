@@ -38,6 +38,14 @@ function ENT:ChangeCanProgress(amount)
 	self.CansRemaining = math.Clamp((self.CansRemaining or gasPerGen) - amount, 0, gasPerGen)
 	self.Progress = math.Clamp((gasPerGen - self.CansRemaining) * (4 / gasPerGen), 0, 4) + (self.HasBattery and 1 or 0)
 
+	if self.CansRemaining == 0 then
+		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			v:RemovePointsKey("slasher_perfect")
+		end
+
+		SlashCo.NotPerfect = true
+	end
+
 	return self.CansRemaining == 0
 end
 
@@ -243,10 +251,10 @@ function ENT:Think()
 	self.FuelingCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035 + fuelprog * 10)))
 
 	if CurTime() >= self.TimeUntilFueled then
-		SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal = SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal + 5
-
 		if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
-			SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal = SlashCo.PlayerData[self.CurrentPourer:SteamID64()].PointsTotal + (#team.GetPlayers(TEAM_SLASHER) * 15)
+			self.CurrentPourer:AddPoints("working", 5 + (#team.GetPlayers(TEAM_SLASHER) * 15))
+		else
+			self.CurrentPourer:AddPoints("working")
 		end
 
 		if IsValid(self.SpawnedAt) then
