@@ -544,6 +544,8 @@ SlashCo.LangTable["Kemenchik_tip"] = "-You may as well give up."
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide"
+SlashCo.LangTable["max pensives"] = "destroy all pensives"
+SlashCo.LangTable["max zanies"] = "destroy all zanies"
 SlashCo.LangTable["cant_fuel"] = "[ALREADY FULL]"
 SlashCo.LangTable["cant_power"] = "[ALREADY HAS A BATTERY]"
 
@@ -585,3 +587,5 @@ SlashCo.LangTable["points_survive"] = "[%s] SURVIVED"
 
 SlashCo.LangTable["points_item"] = "[%s] ITEM BUY-BACK" --misc points
 SlashCo.LangTable["points_fast"] = "[%s] SWIFT SUCCESS"
+SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
+SlashCo.LangTable["points_working"] = "[%s] DOING YOUR JOB"

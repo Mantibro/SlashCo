@@ -162,7 +162,7 @@ function ENT:ChaseEnemy(options)
 	while path:IsValid() and self:HaveEnemy() do
 		if path:GetAge() > 0.1 then
 			-- Since we are following the player we have to constantly remake the path
-			path:Compute(self, self:GetEnemy():GetPos())-- Compute the path towards the enemy's position again
+			path:Compute(self, self:GetEnemy():GetPos()) -- Compute the path towards the enemy's position again
 		end
 		path:Update(self)                                -- This function moves the bot along the path
 

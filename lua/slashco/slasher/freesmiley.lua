@@ -87,6 +87,16 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	if slasher.SlasherValue1 > 0 then
 		return
 	end
+
+	local zanies = ents.FindByClass("sc_zanysmiley")
+	if slasher.SlasherValue2 == 0 and #zanies >= 2 then
+		for _, v in ipairs(zanies) do
+			v:Use(slasher)
+		end
+
+		return
+	end
+
 	slasher.SlasherValue1 = 50 - (SO * 25)
 
 	slasher:SetNWBool("FreeSmileySummoning", true)
@@ -168,6 +178,8 @@ end
 local dealTable = {
 	["deal a zany"] = Material("slashco/ui/icons/slasher/s_13_a1"),
 	["deal a pensive"] = Material("slashco/ui/icons/slasher/s_13_a2"),
+	["max zanies"] = Material("slashco/ui/icons/slasher/s_0"),
+	["max pensives"] = Material("slashco/ui/icons/slasher/s_0"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
@@ -186,16 +198,28 @@ SLASHER.InitHud = function(_, hud)
 
 	hud.prevDeal = -1
 	hud.prevDealAllow = -1
+	hud.prevNumZanies = -1
 	function hud.AlsoThink()
 		local deal = LocalPlayer():GetNWInt("SmileySummonSelect")
-		if deal ~= hud.prevDeal then
-			hud:ShakeControl("R")
+		local numZanies
+		if deal == 0 then
+			numZanies = (#ents.FindByClass("sc_zanysmiley") >= 2)
+		end
+
+		if numZanies ~= hud.prevNumZanies or deal ~= hud.prevDeal then
 			if deal == 0 then
-				hud:SetControlText("F", "deal a zany")
+				if numZanies then
+					hud:SetControlText("F", "max zanies")
+				else
+					hud:ShakeControl("R")
+					hud:SetControlText("F", "deal a zany")
+				end
 			else
+				hud:ShakeControl("R")
 				hud:SetControlText("F", "deal a pensive")
 			end
 
+			hud.prevNumZanies = numZanies
 			hud.prevDeal = deal
 		end
 

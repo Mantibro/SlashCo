@@ -1,7 +1,30 @@
 local PLAYER = FindMetaTable("Player")
 
+local pointAmounts = {
+    slasher_kill = 10,
+    slasher_demon = 10,
+    slasher_win = 25,
+    slasher_escape = 10,
+    slasher_perfect = 15,
+    objective = 25,
+    optional = 10,
+    escape = 10,
+    all_survive = 15,
+    last_survive = 5,
+    left_behind = 5,
+    survive = 10,
+    item = 10,
+    fast = 5,
+    benadryl = 15,
+    working = 5
+}
+
 ---adds points the player will earn at game end
 function PLAYER:AddPoints(key, amount)
+    if not amount then
+        amount = pointAmounts[key] or 5
+    end
+
     self.PointsToEarn = self.PointsToEarn or {}
     self.PointsToEarn[key] = self.PointsToEarn[key] or {}
 
@@ -9,6 +32,30 @@ function PLAYER:AddPoints(key, amount)
 
     if SERVER then
         SlashCo.SendValue(self, "addPoints", key, amount)
+    end
+end
+
+---set a point type the player will earn at game end
+function PLAYER:SetPoints(key, amount, num)
+    if not self.PointsToEarn then
+        return
+    end
+
+    if not amount then
+        amount = pointAmounts[key] or 5
+    end
+
+    self.PointsToEarn = self.PointsToEarn or {}
+    self.PointsToEarn[key] = {}
+
+    num = num or 1
+
+    for i = 1, num do
+        table.insert(self.PointsToEarn[key], amount)
+    end
+
+    if SERVER then
+        SlashCo.SendValue(self, "setPoints", key, amount, num)
     end
 end
 
@@ -74,4 +121,8 @@ end)
 
 hook.Add("scValue_removePointsKey", "RemovePointsKey", function(key)
     LocalPlayer():RemovePointsKey(key)
+end)
+
+hook.Add("scValue_setPoints", "SetPoints", function(key, amount, num)
+    LocalPlayer():SetPoints(key, amount, num)
 end)

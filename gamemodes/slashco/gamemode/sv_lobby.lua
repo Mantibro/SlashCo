@@ -496,11 +496,11 @@ function LobbyVendorVoice(item)
     local vendor = ents.FindByClass( "sc_itemstash" )[1]
 
     if item == "DeathWard" then
-        vendor:EmitSound("slashco/itemvendor/itemvendor_deathward"..math.random(1,5)..".mp3")
+        vendor:EmitSound("slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
     elseif item == "Brick" then
-        vendor:EmitSound("slashco/itemvendor/itemvendor_brick"..math.random(1,5)..".mp3")
+        vendor:EmitSound("slashco/itemvendor/itemvendor_brick" .. math.random(1,5) .. ".mp3")
     else
-        vendor:EmitSound("slashco/itemvendor/itemvendor_generic"..math.random(1,12)..".mp3")
+        vendor:EmitSound("slashco/itemvendor/itemvendor_generic" .. math.random(1,12) .. ".mp3")
     end
 end
 
@@ -555,10 +555,8 @@ hook.Add("Tick", "LobbyTickEvent", function()
     local num = #SlashCo.LobbyData.Players
     local num_o = #SlashCo.LobbyData.Offerors
 
-    if num_o > 0 and SlashCo.LobbyData.Offering < 1 then
-        if num_o > (num / 2) then
-            SlashCo.OfferingVoteSuccess(SlashCo.LobbyData.VotedOffering)
-        end
+    if num_o > 0 and SlashCo.LobbyData.Offering < 1 and num_o > (num / 2) then
+        SlashCo.OfferingVoteSuccess(SlashCo.LobbyData.VotedOffering)
     end
 
     if SlashCo.LobbyData.LOBBYSTATE < 1 then
@@ -585,17 +583,17 @@ hook.Add("Tick", "LobbyTickEvent", function()
         end
 
         if seek <= (num / 2) and SlashCo.LobbyData.ReadyTimerStarted == true then
-            timer.Destroy("AllReadyLobby")
+            timer.Remove("AllReadyLobby")
             SlashCo.LobbyData.ReadyTimerStarted = false
         end
 
         if seek >= num then
-            timer.Destroy("AllReadyLobby")
+            timer.Remove("AllReadyLobby")
             RunConsoleCommand("lobby_debug_proceed")
         end
 
         if (num < 2 or seek <= (num / 2)) and SlashCo.LobbyData.ReadyTimerStarted then
-            timer.Destroy("AllReadyLobby")
+            timer.Remove("AllReadyLobby")
             SlashCo.LobbyData.ReadyTimerStarted = false
 
             net.Start("mantislashcoLobbyTimerTime")
@@ -624,8 +622,6 @@ hook.Add("Tick", "LobbyTickEvent", function()
             local y = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid):GetPos()[2]
 
             if (x > minx and x < maxx) and (y > miny and y < maxy) then
-                --good
-            else
                 all_players_in = false
                 break
             end
@@ -715,15 +711,11 @@ end
 SlashCo.OfferingVoteSuccess = function(id)
     local fail = false
 
-    if id == 4 then
-        --Duality
-
-        if #team.GetPlayers(TEAM_SPECTATOR) < 1 then
-            for _, play in ipairs(player.GetAll()) do
-                play:ChatText("offervote_duality_fail")
-                SlashCo.EndOfferingVote(play)
-                fail = true
-            end
+    if id == 4 and #team.GetPlayers(TEAM_SPECTATOR) < 1 then
+        for _, play in ipairs(player.GetAll()) do
+            play:ChatText("offervote_duality_fail")
+            SlashCo.EndOfferingVote(play)
+            fail = true
         end
     end
 
@@ -737,7 +729,7 @@ SlashCo.OfferingVoteSuccess = function(id)
 
     SlashCo.LobbyData.Offering = id
 
-    timer.Destroy("OfferingVoteTimer")
+    timer.Remove("OfferingVoteTimer")
 
     for _, play in ipairs(player.GetAll()) do
         SlashCo.EndOfferingVote(play)
@@ -751,12 +743,8 @@ end
 --//lobby concommands//--
 
 concommand.Add("lobby_debug_proceed", function(ply, _, _)
-    if IsValid(ply) then
-        if ply:IsPlayer() then
-            if not ply:IsAdmin() then
-                return
-            end
-        end
+    if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+        return
     end
 
     if SERVER then
@@ -798,12 +786,8 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
 end)
 
 concommand.Add("lobby_debug_transition", function(ply, _, _)
-    if IsValid(ply) then
-        if ply:IsPlayer() then
-            if not ply:IsAdmin() then
-                return
-            end
-        end
+    if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+        return
     end
 
     if SERVER then
@@ -830,12 +814,8 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
 end)
 
 concommand.Add("lobby_debug_brief", function(ply, _, _)
-    if IsValid(ply) then
-        if ply:IsPlayer() then
-            if not ply:IsAdmin() then
-                return
-            end
-        end
+    if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+        return
     end
 
     if SERVER then
@@ -854,12 +834,8 @@ concommand.Add("lobby_debug_brief", function(ply, _, _)
 end)
 
 concommand.Add("timer_start", function(ply, _, _)
-    if IsValid(ply) then
-        if ply:IsPlayer() then
-            if not ply:IsAdmin() then
-                return
-            end
-        end
+    if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+        return
     end
 
     if SERVER then
@@ -868,12 +844,8 @@ concommand.Add("timer_start", function(ply, _, _)
 end)
 
 concommand.Add("lobby_reset", function(ply, _, _)
-    if IsValid(ply) then
-        if ply:IsPlayer() then
-            if not ply:IsAdmin() then
-                return
-            end
-        end
+    if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+        return
     end
 
     if SERVER then
@@ -889,7 +861,7 @@ concommand.Add("lobby_reset", function(ply, _, _)
         SlashCo.LobbyData.ButtonDoorSecondaryClose = table.Random(ents.FindByName("door_lobby_secondary"))
         SlashCo.LobbyData.ButtonDoorSecondaryClose:Fire("Close")
 
-        timer.Destroy("AllReadyLobby")
+        timer.Remove("AllReadyLobby")
 
         if SERVER then
             net.Start("mantislashcoGiveLobbyStatus")
@@ -902,12 +874,8 @@ concommand.Add("lobby_reset", function(ply, _, _)
 end)
 
 concommand.Add("lobby_openitems", function(ply, _, _)
-    if IsValid(ply) then
-        if ply:IsPlayer() then
-            if not ply:IsAdmin() then
-                return
-            end
-        end
+    if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+        return
     end
 
     if SERVER then
@@ -919,12 +887,8 @@ concommand.Add("lobby_openitems", function(ply, _, _)
 end)
 
 concommand.Add("lobby_leave", function(ply, _, _)
-    if IsValid(ply) then
-        if ply:IsPlayer() then
-            if not ply:IsAdmin() then
-                return
-            end
-        end
+    if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+        return
     end
 
     if SERVER then
