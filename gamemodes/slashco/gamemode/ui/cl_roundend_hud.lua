@@ -1,3 +1,45 @@
+local function showPointSummary()
+	local stuff = {}
+
+	local pKeys = LocalPlayer():GetPointsKeys()
+	if table.IsEmpty(pKeys) then
+		table.insert(stuff, "point_nil")
+	else
+		table.insert(stuff, "point_total")
+		table.Add(stuff, pKeys)
+	end
+
+	table.insert(stuff, "point_summary")
+
+	local shift = 0
+	for _, v in ipairs(stuff) do
+		local langText
+		if v == "point_summary" or v == "point_nil" then
+			langText = SlashCo.Language(v)
+		elseif v == "point_total" then
+			langText = SlashCo.Language(v, LocalPlayer():GetTotalPoints())
+		else
+			local amount, num = LocalPlayer():GetPoints(v)
+			if amount > 0 then
+				amount = "+" .. amount
+			end
+
+			langText = SlashCo.Language("points_" .. v, amount)
+
+			if num > 1 then
+				langText = langText .. " x" .. num
+			end
+		end
+
+		local str = string.format("<font=TVCD_small>%s</font>", langText)
+		local parsedItem = markup.Parse(str)
+
+		parsedItem:Draw(ScrW() * 0.025 + 4, ScrH() * 0.95 - shift, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+
+		shift = shift + 14 + 8
+	end
+end
+
 local function printPlayersNeatly(players)
 	local count = #players
 	if count == 0 then
@@ -238,6 +280,8 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 		return
 	end
 
+	local cur = CurTime()
+
 	local linesPlay = table.Reverse(lines)
 	local panel = vgui.Create("Panel") --GetHUDPanel():Add("Panel")
 	panel:Dock(FILL)
@@ -246,6 +290,10 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	function panel.Paint()
 		surface.SetDrawColor(0, 0, 0)
 		panel:DrawFilledRect()
+
+		if CurTime() - cur > 2 then
+			showPointSummary()
+		end
 	end
 
 	timer.Simple(0, function()

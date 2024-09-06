@@ -566,8 +566,9 @@ SlashCo.LangTable["objective_pages"] = "(OPTIONAL) COLLECT %s DOCUMENTS" --gasca
 SlashCo.LangTable["objective_page"] = "(OPTIONAL) COLLECT 1 DOCUMENT"
 
 --points summary
-SlashCo.LangTable["point_summary"] = "POINTS EARNED"
+SlashCo.LangTable["point_summary"] = "- POINTS EARNED -"
 SlashCo.LangTable["point_total"] = "TOTAL POINTS: %s"
+SlashCo.LangTable["point_nil"] = "NONE!"
 
 SlashCo.LangTable["points_slasher_kill"] = "[%s] KILLING" --slashers
 SlashCo.LangTable["points_slasher_demon"] = "[%s] FULLY SATIATED"

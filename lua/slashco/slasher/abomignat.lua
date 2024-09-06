@@ -144,7 +144,7 @@ hook.Add("PlayerDeath", "AbomignatCountKills", function(victim, _, attacker)
 end)
 
 function SLASHER.HandleDOT(slasher, target)
-	target.AbomignatProcs = target.AbomignatProcs or 6
+	target.AbomignatProcs = target.AbomignatProcs or 6 + slasher.AbomignatKills
 
 	if timer.Exists("AbomignatHit_" .. target:UserID()) then
 		target:TakeDamage(99999, slasher, slasher)
@@ -195,7 +195,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 		slasher:Freeze(true)
 		slasher.SlasherValue2 = 0
 
-		local damage = 15 + slasher.AbomignatKills * 12
+		local damage = 15 + slasher.AbomignatKills * 10
 
 		slasher:LagCompensation(true)
 		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),

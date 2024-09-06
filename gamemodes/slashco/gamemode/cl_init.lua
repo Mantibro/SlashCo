@@ -71,6 +71,7 @@ include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
 include("sh_bhop.lua")
+include("sh_roundpoints.lua")
 
 include("ui/cl_projector.lua")
 include("ui/cl_voiceselect.lua")

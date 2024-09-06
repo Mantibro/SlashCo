@@ -51,6 +51,10 @@ SlashCo.OnSlasherSpawned = function(ply)
 	ply.SlasherValue5 = 0
 
 	ply:SlasherFunction("OnSpawn")
+
+	if not SlashCo.NotPerfect then
+		p:SetPoints("slasher_perfect")
+	end
 end
 
 
