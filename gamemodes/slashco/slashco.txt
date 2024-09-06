@@ -13,9 +13,9 @@
 		{
 			"name"			"slashco_force_difficulty"
 			"text"			"Difficulty"
-			"help"			"Have the gamemode force a certan difficulty. (0 - random, 1 - EASY, 2 - NOVICE, 3 - INTERMEDIATE, 4 - HARD)"
+			"help"			"Have the gamemode force a certan difficulty. (-1 - random, 0 - EASY, 1 - NOVICE, 2 - INTERMEDIATE, 3 - HARD)"
 			"type"			"Numeric"
-			"default"		"0"
+			"default"		"-1"
 			"singleplayer"	"1"
 		}
 

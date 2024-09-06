@@ -80,12 +80,12 @@ include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("cl_limitedzone.lua")
 
-CreateClientConVar("slashcohud_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
-CreateClientConVar("cl_slashco_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
+CreateClientConVar("slashco_cl_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
+CreateClientConVar("slashco_cl_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
 		"SlashCo Survivor Playermodel")
 
 --[[
-cvars.AddChangeCallback("cl_slashco_playermodel", function(_, _, newVal)
+cvars.AddChangeCallback("slashco_cl_playermodel", function(_, _, newVal)
 	if newVal ~= "models/slashco/survivor/male_0*.mdl" then
 		--print("[SlashCo] Bad Playermodel. It will be randomized instead.")
 	end
@@ -119,7 +119,7 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 		return
 	end
 
-	if GetConVar("slashcohud_disable_pp"):GetBool() then
+	if GetConVar("slashco_cl_disable_pp"):GetBool() then
 		return
 	end
 

@@ -8,7 +8,7 @@ local function HidePlayermodelSelection()
 end
 
 local function PlayerModelChosen(mod)
-	RunConsoleCommand("cl_slashco_playermodel", mod)
+	RunConsoleCommand("slashco_cl_playermodel", mod)
 end
 
 function DrawThePlayermodelSelectorBox()

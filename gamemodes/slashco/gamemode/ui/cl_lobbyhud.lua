@@ -30,7 +30,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 		lobbymusic_antispam = true
 	end
 
-	if IsValid(obby_music) and stop_lobbymusic then
+	if IsValid(lobby_music) and stop_lobbymusic then
 		lobby_music:Stop()
 	end
 

@@ -1,11 +1,6 @@
 AddCSLuaFile()
 SlashCo = SlashCo or {}
 
-local LoadedSounds
-if CLIENT then
-	LoadedSounds = {} -- this table caches existing CSoundPatches
-end
-
 local typeMap = {
 	[0] = "string",
 	"number",

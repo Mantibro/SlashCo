@@ -157,8 +157,12 @@ function ENT:Use(activator)
 	elseif not self.MakingItem then
 		self:SlasherHint()
 		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
-		if activator:ItemValue("IsFuel", false,
-				true) and not self.FuelingCan and (self.CansRemaining or gasPerGen) > 0 then
+		if activator:ItemValue("IsFuel", false, true) then
+			if self.FuelingCan or (self.CansRemaining or gasPerGen) <= 0 then
+				SlashCo.SendValue(activator, "cantFuel")
+				return
+			end
+
 			self.MakingItem = true
 			self.ItemModel = activator:ItemValue("Model", false, true)
 			timer.Simple(0.25, function()
@@ -167,7 +171,12 @@ function ENT:Use(activator)
 
 			activator:SecondaryItemFunction("OnFuel", self)
 			SlashCo.RemoveItem(activator, true)
-		elseif activator:ItemValue("IsBattery", false, true) and not self.HasBattery then
+		elseif activator:ItemValue("IsBattery", false, true) then
+			if self.HasBattery then
+				SlashCo.SendValue(activator, "cantPower")
+				return
+			end
+
 			self.MakingItem = true
 			self.ItemModel = activator:ItemValue("Model", false, true)
 			timer.Simple(0.25, function()

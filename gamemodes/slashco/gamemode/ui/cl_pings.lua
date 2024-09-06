@@ -37,8 +37,10 @@ local function findPos(search)
 	return vector_origin
 end
 
-net.Receive("mantislashcoSurvivorPings", function()
-	local ping = net.ReadTable()
+local function antiDupePings(ping)
+	if not ping.Player then
+		return
+	end
 
 	for k, v in pairs(global_pings) do
 		if v.Player == ping.Player then
@@ -46,6 +48,12 @@ net.Receive("mantislashcoSurvivorPings", function()
 			break
 		end
 	end
+end
+
+net.Receive("mantislashcoSurvivorPings", function()
+	local ping = net.ReadTable()
+
+	antiDupePings(ping)
 
 	if ping.Type == "GENERATOR" then
 		LocalPlayer():EmitSound("slashco/ping_generator.mp3")

@@ -169,19 +169,7 @@ SLASHER.Footstep = function()
 	return true
 end
 
-local function bhop(cmd)
-	local lply = LocalPlayer()
-	if not IsValid(lply) then return end
-	if not lply:Alive() then return end
-
-	if bit.band(cmd:GetButtons(), IN_JUMP) == 2 and lply:GetMoveType() ~= MOVETYPE_NOCLIP and lply:WaterLevel() <= 1 and not lply:OnGround() then
-		cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_JUMP)))
-	end
-end
-
 SLASHER.InitHud = function(_, hud)
-	hook.Add("CreateMove", "SpeedRunnerBhop", bhop)
-
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_15"))
 	hud:SetTitle("Speedrunner")
 

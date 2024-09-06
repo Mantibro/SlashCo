@@ -17,4 +17,20 @@ if SERVER then
 	hook.Add("SetupMove", "RestrictBhopping", limitSpeed)
 else
 	hook.Add("Move", "RestrictBhopping", limitSpeed)
+
+	function bhop(cmd)
+		if max:GetFloat() < 0 or max:GetFloat() > 1 then
+			return
+		end
+
+		local lply = LocalPlayer()
+		if not IsValid(lply) then return end
+		if not lply:Alive() then return end
+
+		if bit.band(cmd:GetButtons(), IN_JUMP) == 2 and lply:GetMoveType() ~= MOVETYPE_NOCLIP and lply:WaterLevel() <= 1 and not lply:OnGround() then
+			cmd:SetButtons(bit.band(cmd:GetButtons(), bit.bnot(IN_JUMP)))
+		end
+	end
+
+	hook.Add("CreateMove", "AutoBhop", bhop)
 end

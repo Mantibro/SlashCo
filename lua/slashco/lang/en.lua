@@ -543,7 +543,10 @@ SlashCo.LangTable["Kemenchik_tip"] = "-You may as well give up."
 
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide"
+SlashCo.LangTable["cant_fuel"] = "[ALREADY FULL]"
+SlashCo.LangTable["cant_power"] = "[ALREADY HAS A BATTERY]"
 
+--main objectives
 SlashCo.LangTable["objective_generators"] = "POWER %s GENERATORS"
 SlashCo.LangTable["objective_generator"] = "POWER 1 GENERATOR"
 SlashCo.LangTable["objective_heliwait"] = "WAIT FOR THE HELICOPTER"

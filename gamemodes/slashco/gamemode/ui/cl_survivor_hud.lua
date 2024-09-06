@@ -1,14 +1,39 @@
-CreateClientConVar("slashcohud_show_lowhealth", 1, true, false,
+CreateClientConVar("slashco_cl_show_lowhealth", 1, true, false,
 		"Whether to display the survivor's hud as blinking yellow when at low health.", 0, 1)
-CreateClientConVar("slashcohud_show_healthvalue", 0, true, false,
+CreateClientConVar("slashco_cl_show_healthvalue", 0, true, false,
 		"Whether to display the value of the survivor's health on their hud.", 0, 1)
 
 local SlashCoItems = SlashCoItems
 local prevHp, SetTime, ShowDamage, prevHp1, aHp, TimeToFuel, TimeUntilFueled
 local FuelingCan
 local IsFueling
-local maxHp = 100 --ply:GetMaxHealth() seems to be 200
+local maxHp = 100
 local healthIndicatorShift = 0
+
+local screenMessage
+
+hook.Add("scValue_cantFuel", "CantFuel", function()
+	screenMessage = "cant_fuel"
+	timer.Create("ScreenMessage", 1.5, 1, function()
+		screenMessage = nil
+	end)
+end)
+
+hook.Add("scValue_cantPower", "CantPower", function()
+	screenMessage = "cant_power"
+	timer.Create("ScreenMessage", 1.5, 1, function()
+		screenMessage = nil
+	end)
+end)
+
+local function showScreenMessage()
+	if not screenMessage then
+		return
+	end
+
+	local parsedItem = markup.Parse("<font=TVCD>" .. SlashCo.Language(screenMessage) .. "</font>")
+	parsedItem:Draw(ScrW() / 2, ScrH() / 2, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+end
 
 net.Receive("mantislashcoGasPourProgress", function()
 	TimeToFuel = net.ReadUInt(8)
@@ -252,7 +277,7 @@ local function hpMeter()
 			and math.Round(math.Clamp(((prevHp or 100) - hp) / maxHp, 0, 1) * 26.9) or 0
 	local parsed
 
-	if hp >= 25 or not GetConVar("slashcohud_show_lowhealth"):GetBool() then
+	if hp >= 25 or not GetConVar("slashco_cl_show_lowhealth"):GetBool() then
 		local hpOver = math.Clamp(hp - maxHp, 0, 100)
 		local hpAdjust = math.Clamp(hp, 0, 100) - hpOver
 		local displayHpBar = math.Round(math.Clamp(hpAdjust / maxHp, 0, 1) * 27)
@@ -276,7 +301,7 @@ local function hpMeter()
 
 	local hpLength = markup.Parse("<font=TVCD>" .. SlashCo.Language("HP") .. "</font>"):GetWidth()
 
-	if not GetConVar("slashcohud_show_healthvalue"):GetBool() then
+	if not GetConVar("slashco_cl_show_healthvalue"):GetBool() then
 		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 376 + hpLength, 27)
 	else
 		local displayHp = math.Round(aHp)
@@ -295,8 +320,6 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		return
 	end
 
-	drawObjectives()
-
 	local moveUp = drawItemDisplay(ply:GetNWString("item", "none"), ply:GetNWString("item2", "none") ~= "none")
 	drawItemDisplay(ply:GetNWString("item2", "none"), nil, moveUp)
 
@@ -306,6 +329,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 
 	hpMeter()
 	slamIndicator()
+	drawObjectives()
+	showScreenMessage()
 end)
 
 hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)

@@ -29,7 +29,7 @@ function PLAYER:Loadout()
 end
 
 function PLAYER:SetModel()
-	local cl_modelname = self.Player:GetInfo("cl_slashco_playermodel")
+	local cl_modelname = self.Player:GetInfo("slashco_cl_playermodel")
 	local allow = false
 
 	for i = 1, 9 do
