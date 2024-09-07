@@ -145,7 +145,10 @@ end
 
 local pointState = {
 	[0] = function(ply)
-		ply:SetPoints("all_survive")
+		if #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
+			ply:SetPoints("all_survive")
+		end
+
 		ply:SetPoints("objective")
 	end,
 	[1] = function(ply)

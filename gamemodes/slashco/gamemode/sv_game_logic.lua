@@ -236,7 +236,7 @@ SlashCo.EndRound = function()
 			winners[v] = true
 		end
 
-		if table.Count(winners) == 1 then
+		if #SlashCo.CurRound.SlasherData.AllSurvivors > 1 and table.Count(winners) == 1 then
 			for k, _ in pairs(winners) do
 				k:SetPoints("last_survive")
 			end

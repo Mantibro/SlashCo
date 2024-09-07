@@ -52,7 +52,7 @@ SlashCo.OnSlasherSpawned = function(ply)
 
 	ply:SlasherFunction("OnSpawn")
 
-	if not SlashCo.NotPerfect then
+	if not SlashCo.NotPerfect and GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) > 1 then
 		p:SetPoints("slasher_perfect")
 	end
 end

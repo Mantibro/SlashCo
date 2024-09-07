@@ -1,4 +1,4 @@
-local function showPointSummary()
+local function showPointSummary(cur)
 	local stuff = {}
 
 	local pKeys = LocalPlayer():GetPointsKeys()
@@ -12,7 +12,11 @@ local function showPointSummary()
 	table.insert(stuff, "point_summary")
 
 	local shift = 0
-	for _, v in ipairs(stuff) do
+	for k, v in ipairs(stuff) do
+		if CurTime() - cur < 2 + k * 0.25 then
+			break
+		end
+
 		local langText
 		if v == "point_summary" or v == "point_nil" then
 			langText = SlashCo.Language(v)
@@ -291,8 +295,8 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 		surface.SetDrawColor(0, 0, 0)
 		panel:DrawFilledRect()
 
-		if CurTime() - cur > 2 then
-			showPointSummary()
+		if stateTable[state] ~= "intro" and CurTime() - cur > 2 then
+			showPointSummary(cur)
 		end
 	end
 
