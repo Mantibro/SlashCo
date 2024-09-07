@@ -105,6 +105,10 @@ end
 
 ---Selects a number of spawns from a sequential table of them, with priority for forced spawns
 function SlashCo.SelectSpawns(elements, amount, conditionsForced, conditionsNonForced, forceTable)
+	if amount and amount <= 0 then
+		return
+	end
+
 	conditionsForced = conditionsForced or SlashCo.DefaultConditionsForced
 	conditionsNonForced = conditionsNonForced or SlashCo.DefaultConditionsNonForced
 	local entries, missed = SlashCo.SelectSpawnsNoForce(elements, amount, conditionsForced, forceTable)
@@ -121,6 +125,10 @@ end
 
 ---Activate a list of spawn points
 function SlashCo.Spawn(elements, spawnFunc)
+	if not elements then
+		return
+	end
+
 	for _, v in ipairs(elements) do
 		if v.SpawnEnt then
 			if spawnFunc then
