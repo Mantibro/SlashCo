@@ -11,10 +11,12 @@ local function showPointSummary(cur)
 
 	table.insert(stuff, "point_summary")
 
+	local totalEntries = #stuff
+
 	local shift = 0
 	for k, v in ipairs(stuff) do
-		if CurTime() - cur < 2 + k * 0.25 then
-			break
+		if CurTime() - cur < 2 + (totalEntries - k) * 0.25 then
+			continue
 		end
 
 		local langText
