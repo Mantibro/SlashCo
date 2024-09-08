@@ -29,8 +29,9 @@ SLASHER.DiffRating = "★★★★★"
 SLASHER.OnSpawn = function(slasher)
 	PlayGlobalSound("slashco/slasher/speedrunner_1.wav", 100, slasher)
 	slasher:SetNWBool("CanKill", true)
+	slasher.SlasherValue1 = 100
 	slasher.SlasherValue2 = 1
-	slasher.SlasherValue3 = 235
+	slasher.SlasherValue3 = 285
 end
 
 SLASHER.PickUpAttempt = function()
@@ -44,17 +45,14 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local v2 = slasher.SlasherValue2 --Speed Gain multiplier
 	local v3 = slasher.SlasherValue3 --max speed allowed
 
-	local ms = SlashCo.MapSize --SCInfo.Maps[game.GetMap()].SIZE
-
-	local size_multiplier = ((5 - ms) / 10) + ((ms - 1) / 15)
-
 	if v1 < v3 then
-		slasher.SlasherValue1 = v1 + FrameTime() * size_multiplier * v2 * (1 + SO) * 1.35
+		local mapSizeMod = (0.75 / SlashCo.MapSize) + 0.25
+		slasher.SlasherValue1 = v1 + FrameTime() * mapSizeMod * v2 * (1 + SO)
 	end
 
-	slasher:SetRunSpeed(50 + slasher.SlasherValue1)
-	slasher:SetWalkSpeed(50 + slasher.SlasherValue1)
-	slasher:SetSlowWalkSpeed(50 + slasher.SlasherValue1)
+	slasher:SetRunSpeed(slasher.SlasherValue1)
+	slasher:SetWalkSpeed(slasher.SlasherValue1)
+	slasher:SetSlowWalkSpeed(slasher.SlasherValue1)
 
 	if slasher:GetNWInt("SpeedrunnerSpeed") ~= math.floor(v1) then
 		slasher:SetNWInt("SpeedrunnerSpeed", math.floor(v1))
@@ -65,7 +63,9 @@ SLASHER.OnTickBehaviour = function(slasher)
 end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
-	SlashCo.Jumpscare(slasher, target)
+	if SlashCo.Jumpscare(slasher, target) then
+		slasher.SlasherValue1 = math.min(slasher.SlasherValue1 + 50, slasher.SlasherValue3)
+	end
 end
 
 -- the great ability
@@ -105,13 +105,13 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 			slasher:Freeze(false)
 
-			slasher.SlasherValue1 = 0
+			slasher.SlasherValue1 = 100
 
 			if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
 				slasher:SetNWBool("SpeedrunnerSacrificeOne", true)
 				PlayGlobalSound("slashco/slasher/speedrunner_2.wav", 100, slasher)
 				slasher.SlasherValue2 = 2
-				slasher.SlasherValue3 = 275
+				slasher.SlasherValue3 = 325
 				SLASHER.RandomTPCans()
 
 				return
@@ -121,7 +121,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 				slasher:SetNWBool("SpeedrunnerSacrificeTwo", true)
 				PlayGlobalSound("slashco/slasher/speedrunner_3.wav", 100, slasher)
 				slasher.SlasherValue2 = 4
-				slasher.SlasherValue3 = 450
+				slasher.SlasherValue3 = 500
 				slasher:SetBodygroup(1, 1)
 				SLASHER.RandomTPCans()
 
@@ -137,17 +137,13 @@ SLASHER.Animator = function(ply, veloc)
 
 	if ply:IsOnGround() then
 		if anim_vel > 1 then
-			if anim_vel < 100 then
+			if anim_vel < 150 then
 				ply.CalcSeqOverride = ply:LookupSequence("slow")
 				ply:SetPoseParameter("runner_speed", move_vel[1] / 200)
-			end
-
-			if anim_vel >= 150 and anim_vel < 320 then
+			elseif anim_vel < 300 then
 				ply.CalcSeqOverride = ply:LookupSequence("fast")
 				ply:SetPoseParameter("runner_speed", move_vel[1] / 250)
-			end
-
-			if anim_vel >= 320 then
+			else
 				ply.CalcSeqOverride = ply:LookupSequence("fastest")
 				ply:SetPoseParameter("runner_speed", move_vel[1] / 100)
 			end
@@ -187,12 +183,12 @@ SLASHER.InitHud = function(_, hud)
 		local sac2 = LocalPlayer():GetNWBool("SpeedrunnerSacrificeTwo")
 		if sac2 ~= hud.prevSac2 or sac1 ~= hud.prevSac1 then
 			if sac2 then
-				hud:SetMeterMax("speed", 450)
+				hud:SetMeterMax("speed", 500)
 				hud:SetControlVisible("R", false)
 			elseif sac1 then
-				hud:SetMeterMax("speed", 275)
+				hud:SetMeterMax("speed", 325)
 			else
-				hud:SetMeterMax("speed", 235)
+				hud:SetMeterMax("speed", 285)
 			end
 
 			hud.prevSac1 = sac1
@@ -252,7 +248,7 @@ if CLIENT then
 				local r_bone = math.random(1, v:GetBoneCount() - 1)
 				--local cur_off = v.AllBones[r_bone].Offset
 
-				v.AllBones[r_bone].Offset = v.AllBones[r_bone].Offset + Vector((math.random() - 0.5),
+				v.AllBones[r_bone].Offset = v.AllBones[r_bone].Offset + Vector(math.random() - 0.5,
 						math.random() - 0.5, math.random() - 0.5)
 				if v.AllBones[r_bone].Offset:Length() > 3 then
 					v.AllBones[r_bone].Offset = Vector(math.random() - 0.5, math.random() - 0.5,
@@ -308,7 +304,7 @@ if CLIENT then
 
 			if v:GetNWBool("SpeedrunnerSacrificeTwo") then
 				local tlight = DynamicLight(v:EntIndex() + 965)
-				if (tlight) then
+				if tlight then
 					tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
 					tlight.r = 80
 					tlight.g = 255

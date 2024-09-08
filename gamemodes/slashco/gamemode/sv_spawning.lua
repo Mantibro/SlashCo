@@ -106,6 +106,9 @@ end
 ---Selects a number of spawns from a sequential table of them, with priority for forced spawns
 function SlashCo.SelectSpawns(elements, amount, conditionsForced, conditionsNonForced, forceTable)
 	if amount and amount <= 0 then
+		if forceTable then
+			return {}, 0
+		end
 		return
 	end
 
