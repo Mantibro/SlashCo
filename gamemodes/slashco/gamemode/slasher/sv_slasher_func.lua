@@ -228,6 +228,8 @@ SlashCo.StopChase = function(slasher)
 	slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 
+	timer.Remove("SlashCoEndChase_" .. slasher:UserID())
+
 	timer.Simple(0.25, function()
 		if not IsValid(slasher) then
 			return
@@ -298,6 +300,16 @@ SlashCo.StartChaseMode = function(slasher)
 			return
 		end
 	end
+
+	local duration = slasher:SlasherValue("ChaseDuration", 10) * 10 + 45
+	local curSlasher = slasher:GetNWString("Slasher")
+	timer.Create("SlashCoEndChase_" .. slasher:UserID(), duration, 1, function()
+		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= curSlasher then
+			return
+		end
+
+		SlashCo.StopChase(slasher)
+	end)
 
 	slasher:SetNWBool("InSlasherChaseMode", true)
 	slasher.CurrentChaseTick = 0

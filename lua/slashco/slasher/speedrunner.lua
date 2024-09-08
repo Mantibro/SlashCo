@@ -161,8 +161,8 @@ SLASHER.Animator = function(ply, veloc)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function()
-	return true
+SLASHER.Footstep = function(ply)
+	return ply:GetNWBool("SpeedrunnerSacrificeTwo")
 end
 
 SLASHER.InitHud = function(_, hud)
