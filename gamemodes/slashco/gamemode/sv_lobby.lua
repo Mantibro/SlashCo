@@ -197,11 +197,9 @@ function broadcastLobbyInfo()
     net.Broadcast()
 
     if timer.TimeLeft("AllReadyLobby") ~= nil then
-
         net.Start("mantislashcoLobbyTimerTime")
         net.WriteUInt(math.floor(timer.TimeLeft("AllReadyLobby")), 6)
         net.Broadcast()
-
     end
 end
 
@@ -393,7 +391,6 @@ local function lobbyRoundSetup()
 
         --Finalize teams
         if SlashCo.LobbyData.AssignedSurvivors[1] ~= nil and SlashCo.LobbyData.AssignedSlashers[1] ~= nil then
-
             --print(player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[1].steamid):GetName() .. player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid):GetName())
 
             for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
@@ -612,20 +609,21 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
         local all_players_in = true
 
-        if #SlashCo.LobbyData.AssignedSurvivors < 1 then
+        if table.IsEmpty(SlashCo.LobbyData.AssignedSurvivors) then
             return
         end
 
         for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
-
-            local x = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid):GetPos()[1]
-            local y = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid):GetPos()[2]
+            local pos = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid):GetPos()
+            local x = pos[1]
+            local y = pos[2]
 
             if (x > minx and x < maxx) and (y > miny and y < maxy) then
-                all_players_in = false
-                break
+                continue
             end
 
+            all_players_in = false
+            break
         end
 
         if all_players_in and SERVER then
@@ -764,11 +762,10 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
                 lobbyPlayerReadying(ply1, 1)
             end
         end
-        if SERVER then
-            net.Start("mantislashcoGiveLobbyStatus")
-            net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
-            net.Broadcast()
-        end
+
+        net.Start("mantislashcoGiveLobbyStatus")
+        net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+        net.Broadcast()
 
         table.Empty(SlashCo.LobbyData.PotentialSlashers)
         table.Empty(SlashCo.LobbyData.PotentialSurvivors)
