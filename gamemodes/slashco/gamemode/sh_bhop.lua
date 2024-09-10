@@ -19,7 +19,7 @@ else
 	hook.Add("Move", "RestrictBhopping", limitSpeed)
 
 	function bhop(cmd)
-		if max:GetFloat() < 0 or max:GetFloat() > 1 then
+		if max:GetFloat() >= 0 and max:GetFloat() <= 1 then
 			return
 		end
 
