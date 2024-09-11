@@ -72,6 +72,7 @@ include("sh_doors.lua")
 include("sh_chattext.lua")
 include("sh_bhop.lua")
 include("sh_roundpoints.lua")
+include("sh_canbeseen.lua")
 
 include("ui/cl_projector.lua")
 include("ui/cl_voiceselect.lua")
@@ -623,22 +624,6 @@ function SlashCo.ReadSound(fileName)
 	end
 	return sound
 end
-
-hook.Add("Think", "hidePlayersIfCannotSee", function()
-	for _, ply in player.Iterator() do
-		local seeable = ply:CanBeSeen()
-		if ply.Seeable ~= seeable then
-			pac.TogglePartDrawing(ply, seeable)
-			ply.Seeable = seeable
-		end
-	end
-end)
-
-hook.Add("PrePlayerDraw", "hidePlayersIfCannotSee", function(ply)
-	if not ply:CanBeSeen() then
-		return true
-	end
-end)
 
 SC_CLIENT_LOADED = true
 

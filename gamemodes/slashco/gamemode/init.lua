@@ -25,6 +25,7 @@ AddCSLuaFile("cl_limitedzone.lua")
 AddCSLuaFile("sh_bhop.lua")
 AddCSLuaFile("ui/cl_pings.lua")
 AddCSLuaFile("sh_roundpoints.lua")
+AddCSLuaFile("sh_canbeseen.lua")
 
 include("sv_globals.lua")
 include("sh_shared.lua")
@@ -51,6 +52,7 @@ include("sh_bhop.lua")
 include("sv_ghostping.lua")
 include("sv_objectives.lua")
 include("sh_roundpoints.lua")
+include("sh_canbeseen.lua")
 
 local SlashCo = SlashCo or {}
 
