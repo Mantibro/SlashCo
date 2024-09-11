@@ -240,11 +240,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		util.PrecacheModel(modelname)
 		slasher:SetModel(modelname)
 
-		slasher:SetColor(Color(0, 0, 0, 0))
-		slasher:DrawShadow(false)
-		slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 		slasher:SetNoDraw(true)
-		--slasher:SetPos(slasher:GetPos() + Vector(0, 0, 60))
 
 		SlashCo.CreateItem("sc_maleclone", slasher:GetPos(), slasher:GetAngles())
 

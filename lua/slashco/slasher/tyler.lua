@@ -28,9 +28,6 @@ SLASHER.DiffRating = "★★★★☆"
 
 SLASHER.OnSpawn = function(slasher)
 	slasher.SlasherValue1 = 0
-	slasher:SetColor(Color(0, 0, 0, 0))
-	slasher:DrawShadow(false)
-	slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 	slasher:SetNoDraw(true)
 end
 
@@ -144,9 +141,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 				slasher.SlasherValue3 = slasher.SlasherValue3 + 1
 				slasher.SlasherValue5 = 0
 				slasher:Freeze(false)
-				slasher:SetColor(Color(0, 0, 0, 0))
-				slasher:DrawShadow(false)
-				slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 				slasher:SetNoDraw(true)
 			end)
 		end
@@ -224,9 +218,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 				slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
 			end)
 
-			slasher:SetColor(Color(0, 0, 0, 0))
-			slasher:DrawShadow(false)
-			slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 			slasher:SetNoDraw(true)
 			slasher:SetNWBool("TylerFlash", false)
 
@@ -247,15 +238,9 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 
 		if v5 <= 0.5 then
-			slasher:SetColor(Color(0, 0, 0, 0))
-			slasher:DrawShadow(false)
-			slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 			slasher:SetNoDraw(true)
 			slasher:SetNWBool("TylerFlash", false)
 		else
-			slasher:SetColor(Color(255, 255, 255, 255))
-			slasher:DrawShadow(true)
-			slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 			slasher:SetNoDraw(false)
 			slasher:SetNWBool("TylerFlash", true)
 		end
@@ -330,9 +315,6 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 				slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")
 			end)
 
-			slasher:SetColor(Color(0, 0, 0, 0))
-			slasher:DrawShadow(false)
-			slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 			slasher:SetNoDraw(true)
 			slasher:SetNWBool("TylerFlash", false)
 		end

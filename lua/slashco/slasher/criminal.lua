@@ -36,9 +36,6 @@ SLASHER.OnSpawn = function(slasher)
 	clone:Spawn()
 	clone:Activate()
 
-	slasher:SetColor(Color(0, 0, 0, 0))
-	slasher:DrawShadow(false)
-	slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 	slasher:SetNoDraw(true)
 end
 

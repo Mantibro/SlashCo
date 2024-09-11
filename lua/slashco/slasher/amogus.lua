@@ -210,9 +210,6 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 
 			slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
-			slasher:SetColor(Color(0, 0, 0, 0))
-			slasher:DrawShadow(false)
-			slasher:SetRenderMode(RENDERMODE_TRANSALPHA)
 			slasher:SetNoDraw(true)
 
 			local g = ents.Create("prop_physics")

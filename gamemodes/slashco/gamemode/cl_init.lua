@@ -624,6 +624,22 @@ function SlashCo.ReadSound(fileName)
 	return sound
 end
 
+hook.Add("Think", "hidePlayersIfCannotSee", function()
+	for _, ply in player.Iterator() do
+		local seeable = ply:CanBeSeen()
+		if ply.Seeable ~= seeable then
+			pac.TogglePartDrawing(ply, seeable)
+			ply.Seeable = seeable
+		end
+	end
+end)
+
+hook.Add("PrePlayerDraw", "hidePlayersIfCannotSee", function(ply)
+	if not ply:CanBeSeen() then
+		return true
+	end
+end)
+
 SC_CLIENT_LOADED = true
 
 ---load patch files; these are specifically intended to modify existing addon code

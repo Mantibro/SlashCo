@@ -297,7 +297,6 @@ function ENT:Think()
 
 		local attacked = player.GetBySteamID64(self.AttackedPlayer)
 		attacked:AddSpeedEffect("smiley", 50, 15)
-
 		attacked:SetNWBool("MarkedBySmiley", true)
 
 		if self.AttackEngage == false then
@@ -309,7 +308,6 @@ function ENT:Think()
 				end
 
 				attacked:RemoveSpeedEffect("smiley")
-
 				attacked:SetNWBool("MarkedBySmiley", false)
 
 				self:Remove()

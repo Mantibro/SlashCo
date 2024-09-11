@@ -377,8 +377,10 @@ SLASHER.InitHud = function(_, hud)
 end
 
 SLASHER.ClientSideEffect = function()
-	for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-		local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
+	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not ply:CanBeSeen() then
+			continue
+		end
 
 		if not LocalPlayer():GetNWBool("TrollgeStage2") then
 			local l_ang = math.abs(ply:EyeAngles()[1]) + math.abs(ply:EyeAngles()[2]) + math.abs(ply:EyeAngles()[3])

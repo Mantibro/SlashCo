@@ -71,6 +71,8 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, button)
 			ply.TackleStruggle = ply.TackleStruggle or 0
 			ply.TackleStruggle = ply.TackleStruggle + 1
 		end
+
+		return
 	end
 
 	local lookent = ply:GetEyeTrace().Entity
@@ -270,7 +272,7 @@ function slamDoor(door_ent, pos)
 	end
 
 	timer.Simple(0.5, function()
-		if IsValid( door_ent ) then
+		if IsValid(door_ent) then
 			door_ent:Fire("SetSpeed", oldSpeed) --100
 			door_ent:SetKeyValue("opendir", "0")
 		end

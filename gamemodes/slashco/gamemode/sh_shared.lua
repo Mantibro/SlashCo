@@ -213,3 +213,53 @@ SlashCo.ObjStatus = {
 	COMPLETE = 1,
 	FAILED = 2
 }
+
+local ENTITY = FindMetaTable("Entity")
+local PLAYER = FindMetaTable("Player")
+
+ENTITY.OldSetNoDraw = ENTITY.OldSetNoDraw or ENTITY.SetNoDraw
+
+function ENTITY:SetNoDraw(state, dontCount)
+	self:OldSetNoDraw(state)
+
+	if not dontCount then
+		self.Invisible = state
+	end
+end
+
+function PLAYER:CanBeSeen()
+	local _team = self:Team()
+	if _team == TEAM_SURVIVOR then
+		local override = self:ItemFunction("CanBeSeen")
+		if override ~= nil then
+			return override
+		end
+	elseif _team == TEAM_SLASHER then
+		local override = self:SlasherFunction("CanBeSeen")
+		if override ~= nil then
+			return override
+		end
+	elseif _team == TEAM_SPECTATOR then
+		return false
+	end
+
+	if self.Invisible then
+		return false
+	end
+
+	return true
+end
+
+if CLIENT then
+	return
+end
+
+hook.Add("Think", "hidePlayersIfCannotSee", function()
+	for _, ply in player.Iterator() do
+		local seeable = ply:CanBeSeen()
+		if ply.Seeable ~= seeable then
+			ply:SetNoDraw(not seeable, true)
+			ply.Seeable = seeable
+		end
+	end
+end)

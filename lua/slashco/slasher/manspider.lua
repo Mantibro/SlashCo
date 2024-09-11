@@ -323,6 +323,10 @@ SLASHER.InitHud = function(_, hud)
 		if target ~= hud.prevTarget then
 			if target == "" then
 				for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+					if not ply:CanBeSeen() then
+						continue
+					end
+
 					ply:SetMaterial("")
 					ply:SetColor(color_white)
 					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
@@ -331,6 +335,10 @@ SLASHER.InitHud = function(_, hud)
 			else
 				local targetEnt
 				for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+					if not ply:CanBeSeen() then
+						continue
+					end
+
 					if ply:SteamID64() == target then
 						targetEnt = ply
 						ply:SetMaterial("lights/white")

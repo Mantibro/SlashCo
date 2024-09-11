@@ -117,8 +117,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		timer.Simple(1, function()
 			--Delay for entering invisibility
 
-			slasher:SetMaterial("Models/effects/vol_light001")
-			slasher:SetColor(Color(0, 0, 0, 0))
+			slasher:SetNoDraw(true)
 
 			PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130, slasher)
 
@@ -141,7 +140,6 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 			end
 
 			if slasher:GetPos():Distance(target:GetPos()) < 150 then
-
 				slasher:SetNWBool("BababooeySpooking", true)
 				slasher.SlasherValue2 = 2
 				slasher.SlasherValue3 = 2
@@ -166,8 +164,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 
 		:: SPOOKAPPEAR ::
 
-		slasher:SetMaterial("")
-		slasher:SetColor(Color(255, 255, 255, 255))
+		slasher:SetNoDraw(false)
 
 		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
 		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
