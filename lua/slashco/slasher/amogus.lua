@@ -169,7 +169,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		slasher:SetColor(Color(255, 255, 255, 255))
 		slasher:DrawShadow(true)
 		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
-		slasher:SetNoDraw(false)
+		slasher:SetVisible(true)
 
 		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
 		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
@@ -210,7 +210,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 
 			slasher:EmitSound("slashco/slasher/amogus_sus.mp3")
 
-			slasher:SetNoDraw(true)
+			slasher:SetVisible(false)
 
 			local g = ents.Create("prop_physics")
 

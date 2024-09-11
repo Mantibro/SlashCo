@@ -36,7 +36,7 @@ SLASHER.OnSpawn = function(slasher)
 	clone:Spawn()
 	clone:Activate()
 
-	slasher:SetNoDraw(true)
+	slasher:SetVisible(false)
 end
 
 SLASHER.PickUpAttempt = function(ply)

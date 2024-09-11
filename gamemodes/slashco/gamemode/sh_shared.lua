@@ -214,18 +214,7 @@ SlashCo.ObjStatus = {
 	FAILED = 2
 }
 
-local ENTITY = FindMetaTable("Entity")
 local PLAYER = FindMetaTable("Player")
-
-ENTITY.OldSetNoDraw = ENTITY.OldSetNoDraw or ENTITY.SetNoDraw
-
-function ENTITY:SetNoDraw(state, dontCount)
-	self:OldSetNoDraw(state)
-
-	if not dontCount then
-		self.Invisible = state
-	end
-end
 
 function PLAYER:CanBeSeen()
 	local _team = self:Team()
@@ -243,7 +232,7 @@ function PLAYER:CanBeSeen()
 		return false
 	end
 
-	if self.Invisible then
+	if not self:GetNWBool("SlashCoVisible", true) then
 		return false
 	end
 
@@ -254,11 +243,17 @@ if CLIENT then
 	return
 end
 
+function PLAYER:SetVisible(state)
+	self:SetNWBool("SlashCoVisible", state)
+end
+
+local invis = Color(0, 0, 0, 0)
 hook.Add("Think", "hidePlayersIfCannotSee", function()
 	for _, ply in player.Iterator() do
 		local seeable = ply:CanBeSeen()
 		if ply.Seeable ~= seeable then
-			ply:SetNoDraw(not seeable, true)
+			ply:SetColor(seeable and color_white or invis)
+			ply:SetNoDraw(not seeable)
 			ply.Seeable = seeable
 		end
 	end

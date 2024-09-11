@@ -117,7 +117,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		timer.Simple(1, function()
 			--Delay for entering invisibility
 
-			slasher:SetNoDraw(true)
+			slasher:SetVisible(false)
 
 			PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130, slasher)
 
@@ -164,7 +164,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 
 		:: SPOOKAPPEAR ::
 
-		slasher:SetNoDraw(false)
+		slasher:SetVisible(true)
 
 		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
 		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
