@@ -36,24 +36,21 @@ end
 -- Returns true if we have an enemy
 ----------------------------------------------------
 function ENT:HaveEnemy()
-	-- If our current enemy is valid
-	if self:GetEnemy() and IsValid(self:GetEnemy()) then
-		-- If the enemy is too far
-		if self:GetRangeTo(self:GetEnemy():GetPos()) > self.LoseTargetDist then
-			-- FindEnemy() will return true if an enemy is found, making this function return true
+	local enemy = self:GetEnemy()
+	if enemy and IsValid(enemy) then
+		if self:GetRangeTo(enemy:GetPos()) > self.LoseTargetDist then
 			return self:FindEnemy()
-			-- If the enemy is dead( we have to check if its a player before we use Alive() )
-		elseif self:GetEnemy():IsPlayer() and not self:GetEnemy():Alive() then
-			return self:FindEnemy()        -- Return false if the search finds nothing
 		end
-		-- The enemy is neither too far nor too dead so we can return true
-		return true
-	else
-		-- The enemy isn't valid so lets look for a new one
-		return self:FindEnemy()
-	end
-end
 
+		if enemy:IsPlayer() and (not enemy:Alive() or not enemy:CanBeSeen()) then
+			return self:FindEnemy()
+		end
+
+		return true
+	end
+
+	return self:FindEnemy()
+end
 ----------------------------------------------------
 -- ENT:FindEnemy()
 -- Returns true and sets our enemy if we find one
