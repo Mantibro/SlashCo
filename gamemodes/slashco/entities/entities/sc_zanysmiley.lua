@@ -59,10 +59,9 @@ end
 function ENT:FindEnemy()
 	-- Search around us for entities
 	-- This can be done any way you want eg. ents.FindInCone() to replicate eyesight
-	local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
 	-- Here we loop through every entity the above search finds and see if it's the one we want
-	for _, v in ipairs(_ents) do
-		if (v:IsPlayer() and v:Team() == TEAM_SURVIVOR) then
+	for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
+		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR then
 			-- We found one so lets set it as our enemy and return true
 
 			local tr = util.TraceLine({
@@ -73,15 +72,19 @@ function ENT:FindEnemy()
 
 			if tr.Entity == v then
 				self:SetEnemy(v)
+
 				return true
 			else
 				self:SetEnemy(nil)
+
 				return false
 			end
 		end
 	end
+
 	-- We found nothing so we will set our enemy as nil (nothing) and return false
 	self:SetEnemy(nil)
+
 	return false
 end
 
@@ -96,7 +99,7 @@ function ENT:RunBehaviour()
 			self:EmitSound("slashco/slasher/zany_attack.mp3")
 			self.loco:FaceTowards(self:GetEnemy():GetPos())    -- Face our enemy
 			--self:StartActivity( ACT_WALK )			-- Set the animation
-			self.loco:SetDesiredSpeed(400)        -- Set the speed that we will be moving at. Don't worry, the animation will speed up/slow down to match
+			self.loco:SetDesiredSpeed(350)        -- Set the speed that we will be moving at. Don't worry, the animation will speed up/slow down to match
 			self.loco:SetAcceleration(900)            -- We are going to run at the enemy quickly, so we want to accelerate really fast
 			self:ChaseEnemy()                        -- The new function like MoveToPos that will be looked at soon.
 			self.loco:SetAcceleration(400)            -- Set this back to its default since we are done chasing the enemy
@@ -153,7 +156,7 @@ function ENT:ChaseEnemy(options)
 	while path:IsValid() and self:HaveEnemy() do
 		if path:GetAge() > 0.1 then
 			-- Since we are following the player we have to constantly remake the path
-			path:Compute(self, self:GetEnemy():GetPos())-- Compute the path towards the enemy's position again
+			path:Compute(self, self:GetEnemy():GetPos()) -- Compute the path towards the enemy's position again
 		end
 		path:Update(self)                                -- This function moves the bot along the path
 
@@ -261,22 +264,19 @@ function ENT:Think()
 		self.UseCooldown = CurTime()
 	end
 
-	local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
-	for _, v in ipairs(_ents) do
-		if (v:IsPlayer() and v:Team() == TEAM_SURVIVOR) then
-			if not self:HaveEnemy() then
-				self:FindEnemy()
-			end
+	if not self:HaveEnemy() then
+		self:FindEnemy()
+	end
 
-			if v:GetPos():Distance(self:GetPos()) < 50 then
-				self:Remove()
-				v:TakeDamage(50, self, self)
+	for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
+		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(self:GetPos()) < 50 then
+			self:Remove()
+			v:TakeDamage(50, self, self)
+			v:SetNWBool("MarkedBySmiley", false)
+			timer.Simple(0.25, function()
 				v:SetNWBool("MarkedBySmiley", false)
-				timer.Simple(0.25, function()
-					v:SetNWBool("MarkedBySmiley", false)
-				end)
-				self:StopSound("slashco/slasher/zany_attack.mp3")
-			end
+			end)
+			self:StopSound("slashco/slasher/zany_attack.mp3")
 		end
 	end
 end
