@@ -9,7 +9,7 @@ ITEM.Description = "Soda_desc"
 ITEM.CamPos = Vector(30,0,0)
 ITEM.IsSpawnable = true
 ITEM.OnUse = function(ply)
-    ply:EmitSound("slashco/survivor/soda_drink"..math.random(1,2)..".mp3")
+    ply:EmitSound("slashco/survivor/soda_drink" .. math.random(1,2) .. ".mp3")
     ply:AddEffect("Invisibility", 30)
 end
 ITEM.ViewModel = {

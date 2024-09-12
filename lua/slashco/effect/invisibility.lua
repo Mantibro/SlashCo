@@ -9,6 +9,12 @@ end
 EFFECT.CanBeSeen = function()
 	return false
 end
+EFFECT.OnApplied = function(ply)
+	ply:AddSpeedEffect("invis", 250, 1)
+end
+EFFECT.OnExpired = function(ply)
+	ply:RemoveSpeedEffect("invis")
+end
 
 local colors = {
 	["$pp_colour_addr"] = 0,

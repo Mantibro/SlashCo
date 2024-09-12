@@ -6,7 +6,7 @@ EFFECT.Name = "Buzzed"
 EFFECT.ChangesSpeed = true
 EFFECT.FuelSpeed = 0.75
 EFFECT.OnApplied = function(ply)
-	ply:AddSpeedEffect("buzzEffect", 275, 12)
+	ply:AddSpeedEffect("buzzEffect", 275, 20)
 end
 EFFECT.OnExpired = function(ply)
 	ply:RemoveSpeedEffect("buzzEffect")
