@@ -323,6 +323,10 @@ SLASHER.InitHud = function(_, hud)
 				return
 			end
 
+			if not survivor:CanBeSeen() then
+				continue
+			end
+
 			local pos = (survivor:GetPos() + Vector(0, 0, 60)):ToScreen()
 			if pos.visible then
 				surface.SetMaterial(surveyNoticeIcon)

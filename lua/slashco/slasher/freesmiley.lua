@@ -253,6 +253,10 @@ SLASHER.InitHud = function(_, hud)
 		end
 
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not survivor:CanBeSeen() then
+				continue
+			end
+
 			if survivor:GetNWBool("MarkedBySmiley") then
 				local pos = survivor:WorldSpaceCenter():ToScreen()
 
