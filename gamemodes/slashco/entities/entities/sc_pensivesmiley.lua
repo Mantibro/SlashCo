@@ -14,7 +14,6 @@ function ENT:Initialize()
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 
 	self.CollideSwitch = 3
-	self.AttackedPlayer = ""
 	self.AttackEngage = false
 	self.LoseTargetDist = 1000    -- How far the enemy has to be before we lose them
 	self.SearchRadius = 700    -- How far to search for enemies
@@ -37,26 +36,27 @@ end
 ----------------------------------------------------
 function ENT:HaveEnemy()
 	local enemy = self:GetEnemy()
-	if enemy and IsValid(enemy) then
-		if self:GetRangeTo(enemy:GetPos()) > self.LoseTargetDist then
-			return self:FindEnemy()
-		end
-
-		if enemy:IsPlayer() and (not enemy:Alive() or not enemy:CanBeSeen()) then
-			return self:FindEnemy()
-		end
-
-		return true
+	if not IsValid(enemy) then
+		return self:FindEnemy()
 	end
 
-	return self:FindEnemy()
+	if self:GetRangeTo(enemy:GetPos()) > self.LoseTargetDist then
+		return self:FindEnemy()
+	end
+
+	if enemy:IsPlayer() and (not enemy:Alive() or not enemy:CanBeSeen()) then
+		return self:FindEnemy()
+	end
+
+	return true
 end
+
 ----------------------------------------------------
 -- ENT:FindEnemy()
 -- Returns true and sets our enemy if we find one
 ----------------------------------------------------
 function ENT:FindEnemy()
-	if self.AttackedPlayer ~= "" then
+	if IsValid(self.AttackedPlayer) then
 		return false
 	end
 
@@ -92,7 +92,7 @@ function ENT:RunBehaviour()
 	while true do
 		-- Lets use the above mentioned functions to see if we have/can find a enemy
 		self:StartActivity(ACT_IDLE)
-		if self.AttackedPlayer == "" then
+		if not IsValid(self.AttackedPlayer) then
 			if self:HaveEnemy() then
 				-- Now that we have a enemy, the code in this block will run
 				self:SetSequence(self:LookupSequence("attack"))
@@ -136,7 +136,7 @@ function ENT:RunBehaviour()
 			end
 		else
 			self:SetSequence(self:LookupSequence("attack"))
-			self.loco:FaceTowards(player.GetBySteamID64(self.AttackedPlayer):GetPos())    -- Face our enemy
+			self.loco:FaceTowards(self.AttackedPlayer:GetPos())    -- Face our enemy
 			coroutine.wait(math.Rand(12))
 		end
 		-- At this point in the code the bot has stopped chasing the player or finished walking to a random spot
@@ -175,7 +175,7 @@ function ENT:ChaseEnemy(options)
 		coroutine.yield()
 	end
 
-	if self.AttackedPlayer ~= "" then
+	if IsValid(self.AttackedPlayer) then
 		coroutine.yield()
 	end
 
@@ -271,28 +271,19 @@ function ENT:Think()
 		self.UseCooldown = CurTime()
 	end
 
-	if self.AttackedPlayer == "" then
-		local _ents = ents.FindInSphere(self:GetPos(), self.SearchRadius)
+	if not IsValid(self.AttackedPlayer) then
+		if not self:HaveEnemy() then
+			self:FindEnemy()
+		end
 
-		for _, v in ipairs(_ents) do
-			if (v:IsPlayer() and v:Team() == TEAM_SURVIVOR) then
-				if not self:HaveEnemy() then
-					self:FindEnemy()
-				end
-
-				if v:GetPos():Distance(self:GetPos()) < 150 then
-					self.AttackedPlayer = v:SteamID64()
-					self.Enemy = nil
-				end
+		for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
+			if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(self:GetPos()) < 150 then
+				self.AttackedPlayer = v
+				self.Enemy = nil
 			end
 		end
 	else
-		if not IsValid(player.GetBySteamID64(self.AttackedPlayer)) then
-			self.AttackedPlayer = ""
-			self.Enemy = nil
-		end
-
-		local attacked = player.GetBySteamID64(self.AttackedPlayer)
+		local attacked = self.AttackedPlayer
 		attacked:AddSpeedEffect("smiley", 50, 15)
 		attacked:SetNWBool("MarkedBySmiley", true)
 

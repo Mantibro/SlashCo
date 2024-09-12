@@ -35,19 +35,19 @@ end
 ----------------------------------------------------
 function ENT:HaveEnemy()
 	local enemy = self:GetEnemy()
-	if enemy and IsValid(enemy) then
-		if self:GetRangeTo(enemy:GetPos()) > self.LoseTargetDist then
-			return self:FindEnemy()
-		end
-
-		if enemy:IsPlayer() and (not enemy:Alive() or not enemy:CanBeSeen()) then
-			return self:FindEnemy()
-		end
-
-		return true
+	if not IsValid(enemy) then
+		return self:FindEnemy()
 	end
 
-	return self:FindEnemy()
+	if self:GetRangeTo(enemy:GetPos()) > self.LoseTargetDist then
+		return self:FindEnemy()
+	end
+
+	if enemy:IsPlayer() and (not enemy:Alive() or not enemy:CanBeSeen()) then
+		return self:FindEnemy()
+	end
+
+	return true
 end
 
 ----------------------------------------------------
