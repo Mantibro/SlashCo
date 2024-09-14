@@ -323,8 +323,8 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.CanSeeFlashlights = function()
-	return LocalPlayer():GetNWBool("TrollgeStage2")
+SLASHER.CanSeeFlashlights = function(ply)
+	return ply:GetNWBool("TrollgeStage2")
 end
 
 SLASHER.Footstep = function()
