@@ -323,6 +323,10 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
+SLASHER.CanSeeFlashlights = function()
+	return LocalPlayer():GetNWBool("TrollgeStage2")
+end
+
 SLASHER.Footstep = function()
 	return true
 end
@@ -389,8 +393,7 @@ SLASHER.ClientSideEffect = function()
 				ply.MonitorLook = 0
 			end
 
-			ply.LookSpeed = math.abs(ply.MonitorLook - l_ang) * 20
-
+			ply.LookSpeed = math.max(math.abs(ply.MonitorLook - l_ang) * 10, 50) - 50
 			ply.MonitorLook = l_ang
 
 			ply:SetMaterial("lights/white")

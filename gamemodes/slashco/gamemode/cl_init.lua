@@ -262,6 +262,17 @@ hook.Add("EntityRemoved", "DynamicFlashlight.PVS_Cache", function(entity)
 end)
 
 hook.Add("Think", "DynamicFlashlight.Rendering", function()
+	if not LocalPlayer():CanSeeFlashlights() then
+		for _, target in ipairs(cache) do
+			if target.DynamicFlashlight then
+				target.DynamicFlashlight:Remove()
+				target.DynamicFlashlight = nil
+			end
+		end
+
+		return
+	end
+
 	for _, target in ipairs(cache) do
 		if target:GetNWBool("DynamicFlashlight") then
 			if target.DynamicFlashlight then

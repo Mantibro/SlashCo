@@ -16,11 +16,24 @@ function PLAYER:CanBeSeen()
 		return false
 	end
 
-	if not self:GetNWBool("SlashCoVisible", true) then
-		return false
+	return self:GetNWBool("SlashCoVisible", true)
+end
+
+function PLAYER:CanSeeFlashlights()
+	local _team = self:Team()
+	if _team == TEAM_SURVIVOR then
+		local override = self:ItemFunction("CanSeeFlashlights")
+		if override ~= nil then
+			return override
+		end
+	elseif _team == TEAM_SLASHER then
+		local override = self:SlasherFunction("CanSeeFlashlights")
+		if override ~= nil then
+			return override
+		end
 	end
 
-	return true
+	return self:GetNWBool("SlashCoSeeFlashlights", true)
 end
 
 if CLIENT then
@@ -48,6 +61,10 @@ end
 
 function PLAYER:SetVisible(state)
 	self:SetNWBool("SlashCoVisible", state)
+end
+
+function PLAYER:SetCanSeeFlashlights(state)
+	self:SetNWBool("SlashCoSeeFlashlights", state)
 end
 
 local invis = Color(0, 0, 0, 0)

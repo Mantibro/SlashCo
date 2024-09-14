@@ -519,8 +519,6 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 		return
 	end
 
-	local pid = ply:SteamID64()
-
 	SlashCo.BroadcastMasterDatabaseForClient(ply)
 
 	if new == TEAM_SURVIVOR and SlashCo.PlayerData then
@@ -585,6 +583,7 @@ function GM:PlayerDeath(victim)
 			ragdoll:SetModel("models/player/corpse1.mdl")
 		end
 
+		ragdoll:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 		ragdoll:SetPos(victim:GetPos())
 		ragdoll:SetNoDraw(false)
 		ragdoll:Spawn()

@@ -602,11 +602,12 @@ SLASHER.InitHud = function(_, hud)
 				hud:TieControlText("RMB", "SidGunAimed", "lower gun", "aim", true, false)
 				hud:ShakeControl("F")
 				hud:SetControlEnabled("F", false)
-				hud:SetControlText("LMB", "shoot")
+				--hud:SetControlText("LMB", "shoot")
 				timer.Simple(0, function()
 					hud:SetControlEnabled("LMB", true)
 					hud:SetControlEnabled("RMB", false)
-					hud:TieControlVisible("LMB", "SidGunAimed", false, false, false)
+					hud:TieControlText("LMB", "SidGunAimed", "shoot", "kill survivor", true, false)
+					--hud:TieControlVisible("LMB", "SidGunAimed", false, false, false)
 				end)
 			else
 				if gunUses <= 0 then
@@ -695,15 +696,13 @@ SLASHER.SidRage = function(ply)
 
 		PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 95, slasher, 1)
 
-		for i = 1, #player.GetAll() do
-			local ply = player.GetAll()[i]
-			ply:SetNWBool("SidFuck", true)
+		for _, v in player.Iterator() do
+			v:SetNWBool("SidFuck", true)
 		end
 
 		timer.Simple(3, function()
-			for i = 1, #player.GetAll() do
-				local ply = player.GetAll()[i]
-				ply:SetNWBool("SidFuck", false)
+			for _, v in player.Iterator() do
+				v:SetNWBool("SidFuck", false)
 			end
 
 			PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85, slasher, 1)
