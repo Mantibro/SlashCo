@@ -54,10 +54,6 @@ SLASHER.DoSound = function(slasher)
 	end)
 end
 
-SLASHER.PickUpAttempt = function(ply)
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local v1 = slasher.SlasherValue1 --aggression  --please stop using globals like this
 	local v2 = slasher.SlasherValue2 --aggression threshold

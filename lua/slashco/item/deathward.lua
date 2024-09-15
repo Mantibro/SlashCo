@@ -15,7 +15,6 @@ ITEM.OnDie = function(ply)
 	ply:EmitSound("slashco/survivor/deathward.mp3")
 	ply:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")
 
-	--SlashCo.RespawnPlayer(ply)
 	SlashCo.ChangeSurvivorItem(ply, "DeathWardUsed")
 
 	return true

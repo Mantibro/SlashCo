@@ -30,10 +30,6 @@ SLASHER.OnSpawn = function(slasher)
 	SLASHER.DoSound(slasher)
 end
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.DoSound = function(slasher)
 	if slasher:GetNWBool("BababooeyInvisibility") then
 		slasher:EmitSound("slashco/slasher/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))

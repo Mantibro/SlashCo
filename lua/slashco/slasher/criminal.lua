@@ -39,10 +39,6 @@ SLASHER.OnSpawn = function(slasher)
 	slasher:SetVisible(false)
 end
 
-SLASHER.PickUpAttempt = function(ply)
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 

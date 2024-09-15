@@ -29,10 +29,6 @@ SLASHER.DiffRating = "★★★☆☆"
 SLASHER.OnSpawn = function(slasher)
 end
 
-SLASHER.PickUpAttempt = function(ply)
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)

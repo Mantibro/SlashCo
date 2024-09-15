@@ -32,10 +32,6 @@ SLASHER.OnSpawn = function(slasher)
 	SlashCo.PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50, slasher)
 end
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 

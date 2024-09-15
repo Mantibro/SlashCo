@@ -32,10 +32,6 @@ SLASHER.OnSpawn = function(slasher)
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
 end
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 	--local SatO = SlashCo.CurRound.OfferingData.SatO

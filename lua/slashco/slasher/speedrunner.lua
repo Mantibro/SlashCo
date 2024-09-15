@@ -34,10 +34,6 @@ SLASHER.OnSpawn = function(slasher)
 	slasher.SlasherValue3 = 285
 end
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 

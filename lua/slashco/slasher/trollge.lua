@@ -30,10 +30,6 @@ SLASHER.OnSpawn = function(slasher)
 	SlashCo.PlayGlobalSound("slashco/slasher/trollge_breathing.wav", 50, slasher)
 end
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local v1 = slasher.SlasherValue1 --Stage
 	local v2 = math.Clamp(slasher.SlasherValue2, 0, 2) --Claw cooldown

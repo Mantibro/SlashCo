@@ -32,10 +32,6 @@ SLASHER.OnSpawn = function(slasher)
 	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local v1 = slasher.SlasherValue1 --Summon Cooldown
 	local v2 = slasher.SlasherValue2 --Selected Summon

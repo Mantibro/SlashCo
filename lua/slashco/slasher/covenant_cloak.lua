@@ -26,10 +26,6 @@ SLASHER.SpeedRating = "★☆☆☆☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.TackleFail = function(slasher)
 	if IsValid(slasher) then
 		if slasher.TackledPlayer == nil then

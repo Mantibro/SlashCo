@@ -27,10 +27,6 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.ItemToSpawn = "Cookie"
 
-SLASHER.PickUpAttempt = function()
-	return false
-end
-
 SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 
@@ -602,12 +598,10 @@ SLASHER.InitHud = function(_, hud)
 				hud:TieControlText("RMB", "SidGunAimed", "lower gun", "aim", true, false)
 				hud:ShakeControl("F")
 				hud:SetControlEnabled("F", false)
-				--hud:SetControlText("LMB", "shoot")
 				timer.Simple(0, function()
 					hud:SetControlEnabled("LMB", true)
 					hud:SetControlEnabled("RMB", false)
-					hud:TieControlText("LMB", "SidGunAimed", "shoot", "kill survivor", true, false)
-					--hud:TieControlVisible("LMB", "SidGunAimed", false, false, false)
+					hud:TieControlText("LMB", "SidGunAimed", "shoot", "kill survivor", false, false)
 				end)
 			else
 				if gunUses <= 0 then

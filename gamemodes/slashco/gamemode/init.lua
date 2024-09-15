@@ -117,7 +117,12 @@ end
 
 hook.Add("AllowPlayerPickup", "PickupNotSpectator", function(ply, ent)
 	if ply:Team() == TEAM_SLASHER then
-		return ply:SlasherFunction("PickUpAttempt", ent)
+		local override = ply:SlasherFunction("PickUpAttempt", ent)
+		if override ~= nil then
+			return override
+		end
+
+		return false
 	end
 
 	return ply:Team() ~= TEAM_SPECTATOR

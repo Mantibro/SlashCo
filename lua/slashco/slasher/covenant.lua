@@ -32,10 +32,6 @@ SLASHER.OnSpawn = function(slasher)
 	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.PickUpAttempt = function(ply)
-	return false
-end
-
 SLASHER.SummonCovenantMembers = function()
 	for _, v in ipairs(SLASHER.PlayersToBecomePartOfCovenant) do
 		local clk = player.GetBySteamID64(v.steamid)

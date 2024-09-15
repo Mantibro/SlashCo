@@ -26,8 +26,8 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
-SLASHER.PickUpAttempt = function()
-	return false
+SLASHER.PickUpAttempt = function(ply)
+	return ply:GetNWBool("AmogusSurvivorDisguise")
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
