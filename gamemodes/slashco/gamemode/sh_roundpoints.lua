@@ -132,6 +132,8 @@ if SERVER then
     end
 
     hook.Add("PlayerDeath", "CountKills", function(_, _, attacker)
+        if not IsValid(attacker) then return end
+
         if attacker:Team() == TEAM_SLASHER then
             attacker:AddPoints("slasher_kill")
         end

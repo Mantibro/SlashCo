@@ -137,6 +137,7 @@ end
 
 hook.Add("PlayerDeath", "AbomignatCountKills", function(victim, _, attacker)
 	timer.Remove("AbomignatHit_" .. victim:UserID())
+	if not IsValid(attacker) then return end
 
 	if attacker:GetNWString("Slasher") == "Abomignat" then
 		attacker.AbomignatKills = (attacker.AbomignatKills or 0) + 1
