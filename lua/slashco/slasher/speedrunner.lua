@@ -42,7 +42,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local v3 = slasher.SlasherValue3 --max speed allowed
 
 	if v1 < v3 then
-		local mapSizeMod = (0.75 / SlashCo.MapSize) + 0.25
+		local mapSizeMod = (0.5 / SlashCo.MapSize) + 0.5
 		slasher.SlasherValue1 = v1 + FrameTime() * mapSizeMod * v2 * (1 + SO)
 	end
 

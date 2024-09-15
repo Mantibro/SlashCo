@@ -232,7 +232,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 			end
 
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-					Vector(-25, -25, -60), Vector(25, 25, 60),
+					Vector(-40, -40, -60), Vector(40, 40, 60),
 					math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4)), DMG_SLASH, 5, false)
 
 			if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
@@ -273,9 +273,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 					for i = 1, math.random(9, 10) do
 						timer.Simple((i / 8) * (0.7 + (math.random() * 0.3)), function()
-
-							if IsValid( slasher.victimragdoll ) then
-
+							if IsValid(slasher.victimragdoll) then
 								local vPoint = slasher.victimragdoll:GetPos()
 								local bloodfx = EffectData()
 								bloodfx:SetOrigin(vPoint)
@@ -285,20 +283,16 @@ SLASHER.OnPrimaryFire = function(slasher)
 									4) .. ".wav")
 								slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1,
 									5) .. ".wav")
-									
 							end
-
 						end)
 					end
 
 					timer.Simple(2, function()
-
 						slasher:SetNWBool("PrincessMaulingSurvivor", false)
 						slasher:SetNWBool("PrincessMaulingBase", false)
 						slasher:Freeze(false)
 
-						if IsValid( slasher.victimragdoll ) then
-
+						if IsValid(slasher.victimragdoll) then
 							slasher.ref_child:Remove()
 							slasher.victimragdoll:Remove()
 
@@ -321,7 +315,6 @@ SLASHER.OnPrimaryFire = function(slasher)
 									PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
 								end
 							end
-
 						end
 					end)
 				end
