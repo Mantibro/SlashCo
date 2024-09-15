@@ -643,6 +643,12 @@ function GM:PlayerDeath(victim)
 	end
 end
 
+function GM:PlayerSpray(ply)
+	if ply:Team() == TEAM_SPECTATOR then
+		return true
+	end
+end
+
 --Dynamic Flashlight by RiggsMacKay
 --https://github.com/RiggsMackay/Dynamic-Flashlight
 
