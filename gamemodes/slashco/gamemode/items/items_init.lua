@@ -203,17 +203,6 @@ function PLAYER:ItemFunctionInternal(value, slot, ...)
 		return SlashCoItems[item][value](self, ...)
 	end
 end
-
---might break physics idk
-hook.Add("ShouldCollide", "SlashCo_CinderBlockCollision", function(ent1, ent2)
-	if ent1:GetClass() == "sc_brick" and ent2:IsPlayer() and ent2:Team() == TEAM_SURVIVOR then
-		return false
-	end
-	if ent2:GetClass() == "sc_brick" and ent1:IsPlayer() and ent1:Team() == TEAM_SURVIVOR then
-		return false
-	end
-end)
-
 ---load patch files; these are specifically intended to modify existing addon code
 
 local effect_patches = file.Find("slashco/patch/effect/*.lua", "LUA")
