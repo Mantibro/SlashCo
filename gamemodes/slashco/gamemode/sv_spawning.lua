@@ -297,8 +297,10 @@ function SlashCo.SpawnItems()
 	end
 
 	local beacon = SlashCo.SelectSpawns(ents.FindByClass("info_sc_item"), 1, itemCondForced, itemCondNonForced)
-	beacon.Item = "Beacon"
-	beacon:SpawnEnt()
+	if IsValid(beacon) then
+		beacon.Item = "Beacon"
+		beacon:SpawnEnt()
+	end
 
 	--item count for everything else
 	local randomItemCount = SlashCo.MAXPLAYERS + 1 - math.floor((SlashCo.CurRound.Difficulty + 1) / 2) - #SlashCo.CurRound.SlasherData.AllSurvivors
