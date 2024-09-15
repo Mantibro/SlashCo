@@ -27,7 +27,7 @@ SLASHER.EyeRating = "★★★★☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
 SLASHER.OnSpawn = function(slasher)
-	PlayGlobalSound("slashco/slasher/abomignat_breathing.wav", 65, slasher)
+	SlashCo.PlayGlobalSound("slashco/slasher/abomignat_breathing.wav", 65, slasher)
 	slasher.AbomignatKills = 0
 end
 

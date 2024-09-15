@@ -35,7 +35,7 @@ util.AddNetworkString("mantislashcoHelicopterVoice")
 util.AddNetworkString("mantislashcoMapAmbientPlay")
 --util.AddNetworkString("mantislashcoSendMapForce")
 
-function PlayGlobalSound(sound, level, ent, vol)
+function SlashCo.PlayGlobalSound(sound, level, ent, vol)
 	if vol == nil then
 		vol = 1
 	end
@@ -50,6 +50,8 @@ function PlayGlobalSound(sound, level, ent, vol)
 		net.Broadcast()
 	end
 end
+
+PlayGlobalSound = SlashCo.PlayGlobalSound
 
 SlashCo.BroadcastLobbySlasherInformation = function()
 	net.Start("mantislashcoLobbySlasherInformation")

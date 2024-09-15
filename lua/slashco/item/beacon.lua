@@ -50,7 +50,7 @@ ITEM.OnUse = function(ply)
                 SlashCo.CurRound.DistressBeaconUsed = true
                 SlashCo.SummonEscapeHelicopter(true)
                 local ent = SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
-                PlayGlobalSound("slashco/survivor/distress_siren.wav", 98, Entity(ent))
+                SlashCo.PlayGlobalSound("slashco/survivor/distress_siren.wav", 98, Entity(ent))
 
                 return
             end

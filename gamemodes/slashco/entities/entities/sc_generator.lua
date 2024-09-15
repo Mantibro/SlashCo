@@ -132,7 +132,7 @@ function ENT:CheckProgress(dontFailStart)
 		self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
 
 		timer.Simple(6.4, function()
-			PlayGlobalSound("slashco/generator_loop.wav", 85, self, 1)
+			SlashCo.PlayGlobalSound("slashco/generator_loop.wav", 85, self, 1)
 		end)
 	elseif not dontFailStart and self.HasBattery and (self.CansRemaining or gasPerGen) > 0 then
 		self:EmitSound("slashco/generator_failstart.wav", 85, 100, 1)

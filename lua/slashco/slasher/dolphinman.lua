@@ -52,8 +52,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 		if SlashCo.CurRound.EscapeHelicopterSummoned then
 			slasher:SetNWBool("DolphinFound", true)
 
-			PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85, slasher)
-			PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 145, slasher)
+			SlashCo.PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85, slasher)
+			SlashCo.PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 145, slasher)
 
 			timer.Simple(10, function()
 				slasher:SetNWBool("DolphinFound", false)
@@ -76,8 +76,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 				if tr.Entity == s then
 					slasher:SetNWBool("DolphinFound", true)
 
-					PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85, slasher)
-					PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 145, slasher)
+					SlashCo.PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85, slasher)
+					SlashCo.PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 145, slasher)
 
 					timer.Simple(10, function()
 						slasher:SetNWBool("DolphinFound", false)

@@ -75,7 +75,7 @@ ITEM.OnUse = function(ply)
             ply:SetPos(slasher:LocalToWorld(Vector(100, 0, 10)))
             ply:AddEffect("Slowness", 5)
         elseif rand == 5 then
-            PlayGlobalSound("slashco/survivor/devildie_siren.mp3", 96, ply)
+            SlashCo.PlayGlobalSound("slashco/survivor/devildie_siren.mp3", 96, ply)
         elseif rand == 6 then
             ply:EmitSound("slashco/survivor/devildie_kill.mp3")
 

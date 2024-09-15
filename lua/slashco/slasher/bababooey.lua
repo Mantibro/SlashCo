@@ -119,7 +119,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 
 			slasher:SetVisible(false)
 
-			PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130, slasher)
+			SlashCo.PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130, slasher)
 
 			slasher:SetRunSpeed(200)
 			slasher:SetWalkSpeed(200)
