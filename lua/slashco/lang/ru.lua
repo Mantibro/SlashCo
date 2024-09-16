@@ -518,3 +518,53 @@ SlashCo.LangTable["full surveillance"] = "Тотальное наблюдени�
 SlashCo.LangTable["Watcher_watched"] = "ЗА ВАМИ СЛЕДЯТ"
 SlashCo.LangTable["Watcher_observe"] = "НАБЛЮДЕНИЕ ЗА РАБОЧИМ. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "ВРЕМЯ СЛЕЖКИ: "
+
+--misc from maptools
+SlashCo.LangTable["spectators_can_ping"] = "Наблюдатели теперь могут делать метки для выживших."
+SlashCo.LangTable["unhide"] = "показаться"
+SlashCo.LangTable["max pensives"] = "уничтожить всех печальных"
+SlashCo.LangTable["max zanies"] = "уничтожить всех смешных"
+SlashCo.LangTable["cant_fuel"] = "[УЖЕ ЗАПОЛНЕННО]"
+SlashCo.LangTable["cant_power"] = "[УЖЕ ЕСТЬ БАТАРЕЯ]"
+
+--main objectives
+SlashCo.LangTable["objective_generators"] = "ВКЛЮЧИТЕ %s ГЕНЕРАТОРА"
+SlashCo.LangTable["objective_generator"] = "ВКЛЮЧИТЕ 1 ГЕНЕРАТОР"
+SlashCo.LangTable["objective_heliwait"] = "ДОЖДИТЕСЬ ВЕРТОЛЁТА"
+SlashCo.LangTable["objective_helicopter"] = "ДОБЕРИТЕСЬ ДО ВЕРТОЛЁТА"
+
+--optional objectives
+SlashCo.LangTable["objective_trashs"] = "(ДОПОЛНИТЕЛЬНО) УБЕРИТЕ %s КУСКА МУСОРА" --item spawns
+SlashCo.LangTable["objective_trash"] = "(ДОПОЛНИТЕЛЬНО) УБЕРИТЕ 1 КУСОК МУСОРА"
+SlashCo.LangTable["objective_mops"] = "(ДОПОЛНИТЕЛЬНО) ПРОТРИТЕ %s КЛЯКС" --gen spawns
+SlashCo.LangTable["objective_mop"] = "(ДОПОЛНИТЕЛЬНО) ПРОТРИТЕ 1 КЛЯКСУ"
+SlashCo.LangTable["objective_traps"] = "(ДОПОЛНИТЕЛЬНО) ЗАВЕДИТЕ %s МЫШЕЛОВОК" --battery spawns
+SlashCo.LangTable["objective_trap"] = "(ДОПОЛНИТЕЛЬНО) ЗАВЕДИТЕ 1 МЫШЕЛОВКУ"
+SlashCo.LangTable["objective_pages"] = "(ДОПОЛНИТЕЛЬНО) СОБЕРИТЕ %s ДОКУМЕНТОВ" --gascan spawns
+SlashCo.LangTable["objective_page"] = "(ДОПОЛНИТЕЛЬНО) СОБЕРИТЕ 1 ДОКУМЕНТ"
+
+--points summary
+SlashCo.LangTable["point_summary"] = "- НАБРАНО ОЧКОВ -"
+SlashCo.LangTable["point_total"] = "ВСЕГО ОЧКОВ: %s"
+SlashCo.LangTable["point_nil"] = "НОЛЬ!"
+
+SlashCo.LangTable["points_slasher_kill"] = "[%s] УБИЙСТВА" --slashers
+SlashCo.LangTable["points_slasher_demon"] = "[%s] ПОЛНОЕ НАСЫЩЕНИЕ"
+
+SlashCo.LangTable["points_slasher_win"] = "[%s] ВСЕ РАБОЧИЕ УБИТЫ" --slasher objective thwarting
+SlashCo.LangTable["points_slasher_escape"] = "[%s] ЭКСТРЕННОЕ ЗАВЕРШЕНИЕ МИССИИ"
+SlashCo.LangTable["points_slasher_perfect"] = "[%s] МИССИЯ СОРВАНА"
+
+SlashCo.LangTable["points_objective"] = "[%s] ОСНОВНАЯ ЦЕЛЬ ВЫПОЛНЕНА" --objectives
+SlashCo.LangTable["points_optional"] = "[%s] ДОПОЛНИТЕЛЬНАЯ ЦЕЛЬ ВЫПОЛНЕНА"
+SlashCo.LangTable["points_escape"] = "[%s] УСПЕШНЫЙ ПОБЕГ"
+
+SlashCo.LangTable["points_all_survive"] = "[%s] ВСЕ РАБОЧИЕ ВЫЖИЛИ" --survival status
+SlashCo.LangTable["points_last_survive"] = "[%s] ПОСЛЕДНИЙ ОСТАВШИЙСЯ РАБОЧИЙ"
+SlashCo.LangTable["points_left_behind"] = "[%s] ОСТАВШИЙСЯ ПОЗАДИ"
+SlashCo.LangTable["points_survive"] = "[%s] ВЫЖИВШИЙ"
+
+SlashCo.LangTable["points_item"] = "[%s] ВОЗВРАЩЕНИЕ ПРЕДМЕТА" --misc points
+SlashCo.LangTable["points_fast"] = "[%s] БЫСТРОЕ ЗАВЕРШЕНИЕ РАБОТЫ"
+SlashCo.LangTable["points_benadryl"] = "[%s] БЕНАДРИЛ"
+SlashCo.LangTable["points_working"] = "[%s] ХОРОШАЯ РАБОТА"
