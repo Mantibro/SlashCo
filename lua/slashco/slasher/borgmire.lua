@@ -106,6 +106,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 	if slasher.SlasherValue2 < 0.01 then
 		slasher:SetNWBool("BorgmirePunch", false)
+		slasher.BorgPunching = true
 		timer.Remove("BorgmirePunchDecay")
 		slasher.SlasherValue2 = 2
 
@@ -155,6 +156,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 				end
 
 				slasher:SetNWBool("BorgmirePunch", false)
+				slasher.BorgPunching = false
 			end)
 		end)
 	end
@@ -165,6 +167,10 @@ SLASHER.OnSecondaryFire = function(slasher)
 end
 
 SLASHER.OnSpecialAbilityFire = function(slasher, target)
+	if slasher.BorgPunching then
+		return
+	end
+
 	local SO = SlashCo.CurRound.OfferingData.SO
 
 	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then
