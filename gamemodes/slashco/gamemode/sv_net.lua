@@ -12,14 +12,10 @@ util.AddNetworkString("mantislashcoSlasherChaseMode")
 util.AddNetworkString("mantislashcoSlasherKillPlayer")
 util.AddNetworkString("mantiSlashCoPickingSlasher")
 util.AddNetworkString("mantiSlashCoSelectSlasher")
---util.AddNetworkString("mantislashcoPickItem")
 util.AddNetworkString("mantislashcoSendLobbyItemGlobal")
 util.AddNetworkString("mantislashcoSendGlobalInfoTable")
 util.AddNetworkString("mantislashcoGlobalSound")
---util.AddNetworkString("mantislashcoGameIntro")
---util.AddNetworkString("mantislashcoRoundEnd")
 util.AddNetworkString("mantislashcoBriefing")
---util.AddNetworkString("mantislashcoBeginOfferingVote")
 util.AddNetworkString("mantislashcoOfferingVoteOut")
 util.AddNetworkString("mantislashcoVoteForOffering")
 util.AddNetworkString("mantislashcoOfferingEndVote")
@@ -30,27 +26,39 @@ util.AddNetworkString("mantislashcoHelicopterMusic")
 util.AddNetworkString("mantislashcoLobbySlasherInformation")
 util.AddNetworkString("mantislashcoSurvivorVoicePrompt")
 util.AddNetworkString("mantislashcoSurvivorPings")
---util.AddNetworkString("mantislashcoSurvivorPreparePing")
 util.AddNetworkString("mantislashcoHelicopterVoice")
 util.AddNetworkString("mantislashcoMapAmbientPlay")
---util.AddNetworkString("mantislashcoSendMapForce")
 
-function SlashCo.PlayGlobalSound(sound, level, ent, vol)
-	if vol == nil then
-		vol = 1
+local ENTITY = FindMetaTable("Entity")
+
+-- play a sound on an entity
+-- this function ensures the sound is played for everyone even if initially outside of the soundLevel range
+-- (unlike emitSound)
+function SlashCo.PlayGlobalSound(soundPath, soundLevel, ent, vol)
+	if not IsValid(ent) or type(soundPath) ~= "string" then
+		return
 	end
 
-	if SERVER then
-		ent:EmitSound(sound, 1, 1, 0)
-		--"Sounds must be precached serverside manually before they can be played.
-		--util.PrecacheSound does not work for this purpose, Entity:EmitSound does the trick"
+	vol = vol or 1
+	soundLevel = soundLevel or SNDLVL_NONE
 
-		net.Start("mantislashcoGlobalSound")
-		net.WriteTable({ SoundPath = sound, SndLevel = level, Entity = ent, Volume = vol })
-		net.Broadcast()
-	end
+	-- sound must be precached
+	ent:EmitSound(soundPath, 1, 1, 0)
+
+	net.Start("mantislashcoGlobalSound")
+	net.WriteString(soundPath)
+	net.WriteUInt(ent:EntIndex(), 13)
+	net.WriteUInt(soundLevel, 14)
+	net.WriteFloat(vol)
+	net.Broadcast()
 end
 
+-- possibly easier-to-use version of above
+function ENTITY:PlayGlobalSound(soundPath, soundLevel, vol)
+	SlashCo.PlayGlobalSound(soundPath, soundLevel, self, vol)
+end
+
+-- DEPRECATED avoid using this
 PlayGlobalSound = SlashCo.PlayGlobalSound
 
 SlashCo.BroadcastLobbySlasherInformation = function()
@@ -238,9 +246,9 @@ SlashCo.BroadcastMasterDatabaseForClient = function(ply)
 	net.Send(ply)
 end
 
-SlashCo.HelicopterRadioVoice = function(type)
+SlashCo.HelicopterRadioVoice = function(_type)
 	net.Start("mantislashcoHelicopterVoice")
-	net.WriteUInt(type, 4)
+	net.WriteUInt(_type, 4)
 	net.Broadcast()
 end
 

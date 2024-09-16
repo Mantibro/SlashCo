@@ -188,13 +188,9 @@ SLASHER.OnMainAbilityFire = function(slasher)
 end
 
 SLASHER.OnSpecialAbilityFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
-
 	if not slasher:GetNWBool("AmogusDisguising") and slasher.SlasherValue2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
-
 		slasher:SetNWBool("AmogusDisguising", true)
 		slasher:Freeze(true)
-
 		slasher:EmitSound("slashco/slasher/amogus_transform" .. math.random(1, 2) .. ".mp3")
 
 		slasher.SlasherValue2 = 4
