@@ -748,8 +748,6 @@ if CLIENT then
 			angles = ply:LocalToWorldAngles(Angle(0, -135, 0))
 
 			return GAMEMODE:CalcView(ply, pos, angles, fov)
-		else
-			return
 		end
 	end)
 end

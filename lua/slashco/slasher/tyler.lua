@@ -77,7 +77,13 @@ SLASHER.OnTickBehaviour = function(slasher)
 		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
 			slasher.TylerSongPickedID = math.random(1, 6)
 
-			slasher:PlayGlobalSound("slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3", 0, 0.8 - (slasher.SlasherValue3 * 0.12))
+			timer.Create("tylerSong_" .. slasher:UserID(), 3, 1, function()
+				if not IsValid(slasher) then
+					return
+				end
+
+				slasher:PlayGlobalSound("slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3", 0, 0.8 - (slasher.SlasherValue3 * 0.12))
+			end)
 		end
 
 		if v2 > 20 + ((ms * 35) - (v4 * 4)) then
@@ -375,8 +381,6 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 	slasher.SlasherValue1 = 1
 	slasher:SetColor(Color(255, 255, 255, 255))
-	slasher:DrawShadow(true)
-	slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 	slasher:SetVisible(true)
 end
 
@@ -405,6 +409,10 @@ SLASHER.Animator = function(ply)
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
+end
+
+SLASHER.Thirdperson = function(ply)
+	return ply:GetNWInt("TylerState") == 1
 end
 
 SLASHER.Footstep = function()
@@ -472,6 +480,7 @@ SLASHER.InitHud = function(_, hud)
 			else
 				hud:SetCrosshairAlpha(0)
 				timer.Simple(1, function()
+					if not IsValid(hud) then return end
 					hud:SetCrosshairEnabled(false)
 				end)
 			end

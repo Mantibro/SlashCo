@@ -26,6 +26,7 @@ AddCSLuaFile("sh_bhop.lua")
 AddCSLuaFile("ui/cl_pings.lua")
 AddCSLuaFile("sh_roundpoints.lua")
 AddCSLuaFile("sh_canbeseen.lua")
+AddCSLuaFile("cl_thirdperson.lua")
 
 include("sv_globals.lua")
 include("sh_shared.lua")

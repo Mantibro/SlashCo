@@ -9,7 +9,7 @@ SLASHER.Model = "models/slashco/slashers/manspider/manspider.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 5
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 296
+SLASHER.ChaseSpeed = 292
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
 SLASHER.KillDistance = 150
@@ -67,35 +67,33 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 	end
 
+	--[[
 	for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
 		--Switch Target if too close
 
 		local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-
 		local d = s:GetPos():Distance(slasher:GetPos())
 
-		if d < (150) then
+		if d < 150 then
 			local tr = util.TraceLine({
 				start = slasher:EyePos(),
 				endpos = s:GetPos() + Vector(0, 0, 40),
 				filter = slasher
 			})
 
-			if tr.Entity == s then
-				if slasher.SlasherValue1 ~= s:SteamID64() then
-					slasher.SlasherValue1 = s:SteamID64()
-					slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
-				end
+			if tr.Entity == s and slasher.SlasherValue1 ~= s:SteamID64() then
+				slasher.SlasherValue1 = s:SteamID64()
+				slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
 			end
 		end
 	end
+	--]]
 
 	if slasher:GetNWBool("ManspiderNested") then
 		--Find a survivor
 		slasher.SlasherValue3 = v3 + FrameTime()
 
 		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-
 			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
 
 			if s:GetPos():Distance(slasher:GetPos()) < (1000 + (v3 * 3) + (SO * 750)) then
@@ -128,7 +126,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 				local d = s:GetPos():Distance(slasher:GetPos())
 
-				if d < (1000) then
+				if d < 1000 then
 					local tr = util.TraceLine({
 						start = slasher:EyePos(),
 						endpos = s:GetPos() + Vector(0, 0, 40),
@@ -179,6 +177,10 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	else
 		SlashCo.Jumpscare(slasher, target)
 	end
+end
+
+SLASHER.Thirdperson = function(ply)
+	return ply:GetNWBool("ManspiderNested")
 end
 
 SLASHER.OnSecondaryFire = function(slasher)
@@ -293,6 +295,22 @@ SLASHER.Footstep = function(ply)
 	end
 end
 
+local mat = Material("lights/white")
+local function targetPaint(ply)
+	if not ply:CanBeSeen() then
+		return
+	end
+
+	cam.Start3D()
+	render.MaterialOverride(mat)
+	render.SetColorModulation(1, 0, 0)
+
+	ply:DrawModel()
+
+	render.SetColorModulation(1, 1, 1)
+	cam.End3D()
+end
+
 local nestTable = {
 	default = Material("slashco/ui/icons/slasher/s_9"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
@@ -318,35 +336,14 @@ SLASHER.InitHud = function(_, hud)
 		local target = LocalPlayer():GetNWString("ManspiderTarget")
 		if target ~= hud.prevTarget then
 			if target == "" then
-				for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-					if not ply:CanBeSeen() then
-						continue
-					end
-
-					ply:SetMaterial("")
-					ply:SetColor(color_white)
-					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
-				end
 				hook.Remove("HUDPaint", "SlashCoPreyReal")
 			else
 				local targetEnt
 				for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-					if not ply:CanBeSeen() then
-						continue
-					end
-
 					if ply:SteamID64() == target then
 						targetEnt = ply
-						ply:SetMaterial("lights/white")
-						ply:SetColor(Color(255, 0, 0, 255))
-						ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
-
-						continue
+						break
 					end
-
-					ply:SetMaterial("")
-					ply:SetColor(color_white)
-					ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
 				end
 
 				hook.Add("HUDPaint", "SlashCoPreyReal", function()
@@ -354,8 +351,10 @@ SLASHER.InitHud = function(_, hud)
 						hook.Remove("HUDPaint", "SlashCoPreyReal")
 					end
 
+					targetPaint(targetEnt)
+
 					local distColor = math.Clamp(LocalPlayer():GetPos():Distance(targetEnt:GetPos()), 0, 2048) / 16
-					draw.SimpleText("Your Prey: " .. targetEnt:Name(), "ItemFontTip",
+					draw.SimpleText("Your prey: " .. targetEnt:Name(), "ItemFontTip",
 							ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
 							TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				end)

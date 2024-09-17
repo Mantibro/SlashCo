@@ -78,7 +78,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 					timer.Simple(10, function()
 						slasher:SetNWBool("DolphinFound", false)
 						slasher:SetNWBool("DolphinInHiding", false)
-
 						slasher:SetNWBool("DolphinHunting", true)
 					end)
 				end
@@ -138,6 +137,10 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight + (hunt_boost * 5))
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception + (hunt_boost * 3))
+end
+
+SLASHER.Thirdperson = function(ply)
+	return ply:GetNWBool("DolphinInHiding")
 end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
