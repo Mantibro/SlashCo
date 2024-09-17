@@ -625,6 +625,7 @@ local function convertLegacyConfig(name, skip)
 
 			for _, v1 in ipairs(v) do
 				local ent = makeEnt("info_sc_battery", v1)
+				ent.Legacy = true
 				ent.Generators = { gens[k] }
 
 				if IsValid(ent) and gens[k] then

@@ -18,6 +18,10 @@ function ENT:Initialize()
 			return
 		end
 
+		if self.Legacy then
+			return
+		end
+
 		local gens
 
 		if self.GenToFind then
