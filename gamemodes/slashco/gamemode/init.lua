@@ -214,6 +214,7 @@ local function lobbyButtons(ply, button)
 		end
 	end
 end
+
 local function spectatorButtons(ply, button)
 	if button == 107 then
 		--Spectator Left Clicks
@@ -230,7 +231,7 @@ local function spectatorButtons(ply, button)
 			--Spectate the player aimed at
 			local ent = ply:GetEyeTrace().Entity
 
-			if ent:IsPlayer() then
+			if ent:IsValid() and (ent:IsPlayer() or ent.IsSelectable or ent.SurvivorSteamID) then
 				--Only allow spectators to spectate other players.
 				ply:SpectateEntity(ent)
 				ply:SetObserverMode(OBS_MODE_CHASE)
@@ -244,23 +245,29 @@ local function spectatorButtons(ply, button)
 		--Spectator Right Clicks
 		if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then
 			local ent = ply:GetObserverTarget()
-			for k, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-				if ply:GetObserverTarget() == v then
-					if (k + 1) >= team.NumPlayers(TEAM_SURVIVOR) then
-						ent = team.GetPlayers(TEAM_SURVIVOR)[1]
-					else
-						ent = team.GetPlayers(TEAM_SURVIVOR)[k + 1]
-					end
+			local targets = team.GetPlayers(TEAM_SURVIVOR)
+			table.Add(targets, team.GetPlayers(TEAM_SLASHER))
+			table.Add(targets, SlashCo.DeadBodies)
+
+			for k, v in ipairs(targets) do
+				if ply:GetObserverTarget() ~= v then
+					continue
+				end
+
+				if (k + 1) > #targets then
+					ent = targets[1]
+				else
+					ent = targets[k + 1]
 				end
 			end
 
-			if ent:IsPlayer() then
+			if IsValid(ent) then
 				ply:SpectateEntity(ent)
-				--ply:SetObserverMode( OBS_MODE_CHASE )
 			end
 		else
-			if IsValid(team.GetPlayers(TEAM_SURVIVOR)[1]) then
-				ply:SpectateEntity(team.GetPlayers(TEAM_SURVIVOR)[1])
+			local first = team.GetPlayers(TEAM_SURVIVOR)[1] or SlashCo.DeadBodies[1]
+			if IsValid(first) then
+				ply:SpectateEntity(first)
 				ply:SetObserverMode(OBS_MODE_CHASE)
 			end
 		end
@@ -279,6 +286,7 @@ local function spectatorButtons(ply, button)
 		return
 	end
 end
+
 local function slasherButtons(ply, button)
 	if button == 107 then
 		ply:SlasherFunction("OnPrimaryFire", lagTrace(ply))
@@ -297,6 +305,7 @@ local function slasherButtons(ply, button)
 		return
 	end --Special
 end
+
 function GM:PlayerButtonDown(ply, button)
 	if game.GetMap() == "sc_lobby" then
 		lobbyButtons(ply, button)
@@ -551,6 +560,8 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 	end
 end)
 
+SlashCo.DeadBodies = SlashCo.DeadBodies or {}
+
 function GM:PlayerDeath(victim)
 	if not IsValid(victim) then
 		return
@@ -592,8 +603,25 @@ function GM:PlayerDeath(victim)
 		ragdoll:SetPos(victim:GetPos())
 		ragdoll:SetNoDraw(false)
 		ragdoll:Spawn()
+		ragdoll:Activate()
 
-		local ang_offset = 0
+		local vel = victim:GetVelocity()
+		for i = 0, ragdoll:GetPhysicsObjectCount() - 1 do
+			local phys = ragdoll:GetPhysicsObjectNum(i)
+			if not IsValid(phys) then continue end
+
+			local boneid = ragdoll:TranslatePhysBoneToBone(i)
+			if boneid < 0 then continue end
+
+			local matrix = victim:GetBoneMatrix(boneid)
+			if not matrix then continue end
+
+			phys:SetPos(matrix:GetTranslation())
+			phys:SetAngles(matrix:GetAngles())
+			phys:AddVelocity(vel)
+		end
+
+		table.insert(SlashCo.DeadBodies, ragdoll)
 
 		if victim:GetNWBool("SurvivorDecapitate") then
 			ragdoll:ManipulateBoneScale(ragdoll:LookupBone("ValveBiped.Bip01_Head1"), Vector(0, 0, 0))
@@ -614,32 +642,17 @@ function GM:PlayerDeath(victim)
 			ang_offset = 180
 		end
 
-		ragdoll:SetAngles(Angle(0, victim:EyeAngles()[2] + ang_offset, 0))
-		local physCount = ragdoll:GetPhysicsObjectCount()
-
-		for i = 0, (physCount - 1) do
-			local PhysBone = ragdoll:GetPhysicsObjectNum(i)
-
-			if PhysBone:IsValid() then
-				PhysBone:SetVelocity(victim:GetVelocity() * 2)
-				PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
-
-				ragdoll:TranslatePhysBoneToBone(i) --local ragbone =
-				for b = 1, victim:GetBoneCount() do
-					local plybone = victim:TranslateBoneToPhysBone(b)
-
-					if plybone == PhysBone then
-						PhysBone:SetAngles(PhysBone:GetAngles(), plybone:GetAngles())
-					end
-				end
-			end
-		end
-
 		--...............
 
 		victim:SetTeam(TEAM_SPECTATOR)
-		victim:Spawn()
-		victim:SetPos(ragdoll:GetPos())
+		timer.Simple(0, function()
+			if IsValid(victim) and IsValid(ragdoll) then
+				victim:Spawn()
+				victim:SetPos(ragdoll:GetPos())
+				victim:SpectateEntity(ragdoll)
+				victim:SetObserverMode(OBS_MODE_CHASE)
+			end
+		end)
 	end
 end
 
