@@ -177,27 +177,25 @@ SlashCo.EndRound = function()
 
 	local SurvivorCount = team.NumPlayers(TEAM_SURVIVOR)
 	if SurvivorCount == 0 then
-		--All Survivors are Dead
-
-		survivorsWon = false
+		--All survivors are dead
 
 		if not SlashCo.CurRound.EscapeHelicopterSummoned or SlashCo.CurRound.DistressBeaconUsed then
-			--Assignment Failed
+			--Assignment failed
 
 			SlashCo.RoundOverScreen(3)
 		else
-			--Assignment Success
+			--Assignment success
 
 			SlashCo.RoundOverScreen(2)
 		end
 	else
-		--There are living Survivors
+		--There are living survivors
 
 		if SlashCo.CurRound.DistressBeaconUsed then
-			--Premature Win Distress Beacon
+			--Premature Win distress beacon
 
 			if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
-				--The Last survivor got to the helicopter
+				--The last survivor got to the helicopter
 
 				SlashCo.RoundOverScreen(4)
 			else
@@ -206,14 +204,15 @@ SlashCo.EndRound = function()
 				SlashCo.RoundOverScreen(3)
 			end
 		else
-			--Normal Win
+			--Normal win
 
-			if #SlashCo.CurRound.SlasherData.AllSurvivors >= SurvivorCount and SurvivorCount <= #SlashCo.CurRound.HelicopterRescuedPlayers then
+			local allSurvCount = #SlashCo.CurRound.SlasherData.AllSurvivors
+			if SurvivorCount >= allSurvCount and #SlashCo.CurRound.HelicopterRescuedPlayers >= allSurvCount then
 				--Everyone lived
 
 				SlashCo.RoundOverScreen(0)
 			else
-				--Not Everyone lived
+				--Not everyone lived
 
 				SlashCo.RoundOverScreen(1)
 			end
@@ -223,7 +222,7 @@ SlashCo.EndRound = function()
 	if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
 		local winners = {}
 
-		--Add to stats of the remaining survivors' wins.
+		--Add to stats of the remaining survivors' wins
 		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
 			if not IsValid(v) then
 				return
