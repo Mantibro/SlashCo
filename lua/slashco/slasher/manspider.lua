@@ -29,7 +29,7 @@ SLASHER.DiffRating = "★☆☆☆☆"
 SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
-	SlashCo.PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50, slasher)
+	slasher:PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50)
 end
 
 SLASHER.OnTickBehaviour = function(slasher)

@@ -27,7 +27,7 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
 
 SLASHER.OnSpawn = function(slasher)
-	SlashCo.PlayGlobalSound("slashco/slasher/trollge_breathing.wav", 50, slasher)
+	slasher:PlayGlobalSound("slashco/slasher/trollge_breathing.wav", 50)
 end
 
 local function stopDash(slasher)
@@ -91,7 +91,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("TrollgeTransition", true)
 		slasher:Freeze(true)
 		slasher:StopSound("slashco/slasher/trollge_breathing.wav")
-		SlashCo.PlayGlobalSound("slashco/slasher/trollge_transition.mp3", 125, slasher)
+		slasher:PlayGlobalSound("slashco/slasher/trollge_transition.mp3", 125)
 
 		for p = 1, #player.GetAll() do
 			local ply = player.GetAll()[p]
@@ -104,7 +104,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.SlasherValue1 = 1
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
-			SlashCo.PlayGlobalSound("slashco/slasher/trollge_stage1.wav", 60, slasher)
+			slasher:PlayGlobalSound("slashco/slasher/trollge_stage1.wav", 60)
 
 			slasher:SetRunSpeed(280)
 			slasher:SetWalkSpeed(150)
@@ -125,7 +125,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("TrollgeTransition", true)
 		slasher:Freeze(true)
 		slasher:StopSound("slashco/slasher/trollge_stage1.wav")
-		SlashCo.PlayGlobalSound("slashco/slasher/trollge_transition.mp3", 125, slasher)
+		slasher:PlayGlobalSound("slashco/slasher/trollge_transition.mp3", 125)
 
 		for i = 1, #player.GetAll() do
 			local ply = player.GetAll()[i]
@@ -142,7 +142,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.SlasherValue1 = 2
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
-			SlashCo.PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60, slasher)
+			slasher:PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60)
 
 			slasher:SetRunSpeed(450)
 			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
@@ -273,7 +273,7 @@ end
 SLASHER.OnMainAbilityFire = function(slasher)
 	if slasher.SlasherValue1 == 0 and not slasher:GetNWBool("TrollgeDashing") and slasher.SlasherValue2 == 0 then
 		slasher:SetNWBool("TrollgeDashing", true)
-		SlashCo.PlayGlobalSound("slashco/slasher/trollge_screech.mp3", 125, slasher)
+		slasher:PlayGlobalSound("slashco/slasher/trollge_screech.mp3", 125)
 		slasher:Freeze(true)
 		slasher.SlasherValue2 = 3
 		slasher.SlasherValue4 = 0

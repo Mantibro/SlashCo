@@ -32,30 +32,42 @@ util.AddNetworkString("mantislashcoMapAmbientPlay")
 local ENTITY = FindMetaTable("Entity")
 
 -- play a sound on an entity
--- this function ensures the sound is played for everyone even if initially outside of the soundLevel range
--- (unlike emitSound)
-function SlashCo.PlayGlobalSound(soundPath, soundLevel, ent, vol)
+-- this function ensures the sound is played for everyone unlike EmitSound
+function SlashCo.PlayGlobalSound(soundPath, soundLevel, ent, vol, permanent)
 	if not IsValid(ent) or type(soundPath) ~= "string" then
 		return
 	end
 
 	vol = vol or 1
-	soundLevel = soundLevel or SNDLVL_NONE
+	soundLevel = soundLevel or 0
 
 	-- sound must be precached
 	ent:EmitSound(soundPath, 1, 1, 0)
 
 	net.Start("mantislashcoGlobalSound")
+	net.WriteBool(false)
 	net.WriteString(soundPath)
 	net.WriteUInt(ent:EntIndex(), 13)
 	net.WriteUInt(soundLevel, 14)
 	net.WriteFloat(vol)
+	net.WriteBool(permanent)
 	net.Broadcast()
 end
 
 -- possibly easier-to-use version of above
-function ENTITY:PlayGlobalSound(soundPath, soundLevel, vol)
-	SlashCo.PlayGlobalSound(soundPath, soundLevel, self, vol)
+function ENTITY:PlayGlobalSound(soundPath, soundLevel, vol, permanent)
+	SlashCo.PlayGlobalSound(soundPath, soundLevel, self, vol, permanent)
+end
+
+ENTITY.OldStopSound = ENTITY.OldStopSound or ENTITY.StopSound
+function ENTITY:StopSound(soundPath)
+	self:OldStopSound(soundPath)
+
+	net.Start("mantislashcoGlobalSound")
+	net.WriteBool(true)
+	net.WriteString(soundPath)
+	net.WriteUInt(self:EntIndex(), 13)
+	net.Broadcast()
 end
 
 -- DEPRECATED avoid using this

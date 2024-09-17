@@ -27,7 +27,7 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★★"
 
 SLASHER.OnSpawn = function(slasher)
-	SlashCo.PlayGlobalSound("slashco/slasher/speedrunner_1.wav", 100, slasher)
+	slasher:PlayGlobalSound("slashco/slasher/speedrunner_1.wav", 100)
 	slasher:SetNWBool("CanKill", true)
 	slasher.SlasherValue1 = 100
 	slasher.SlasherValue2 = 1
@@ -113,7 +113,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 		if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
 			slasher:SetNWBool("SpeedrunnerSacrificeOne", true)
-			SlashCo.PlayGlobalSound("slashco/slasher/speedrunner_2.wav", 100, slasher)
+			slasher:PlayGlobalSound("slashco/slasher/speedrunner_2.wav", 100)
 			slasher.SlasherValue2 = 2
 			slasher.SlasherValue3 = 325
 			SLASHER.RandomTPCans()
@@ -123,7 +123,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 		if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
 			slasher:SetNWBool("SpeedrunnerSacrificeTwo", true)
-			SlashCo.PlayGlobalSound("slashco/slasher/speedrunner_3.wav", 100, slasher)
+			slasher:PlayGlobalSound("slashco/slasher/speedrunner_3.wav", 100)
 			slasher.SlasherValue2 = 4
 			slasher.SlasherValue3 = 500
 			slasher:SetBodygroup(1, 1)

@@ -27,7 +27,7 @@ local function survivorButtons(ply, button)
 		ply:SetNWBool("Taunt_MNR", true) --Monday Night
 		ply:SetNWBool("Taunt_Griddy", false)
 		ply:SetNWBool("Taunt_Cali", false)
-		ply:EmitSound("slashco/ping_item.mp3", SNDLVL_45dB, 80, 0.4)
+		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
 		return
 	end
 	if button == KEY_2 then
@@ -39,7 +39,7 @@ local function survivorButtons(ply, button)
 		ply:SetNWBool("Taunt_Griddy", true) --Hittin the griddy
 		ply:SetNWBool("Taunt_MNR", false)
 		ply:SetNWBool("Taunt_Cali", false)
-		ply:EmitSound("slashco/ping_item.mp3", SNDLVL_45dB, 80, 0.4)
+		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
 		return
 	end
 	if button == KEY_3 then
@@ -51,7 +51,7 @@ local function survivorButtons(ply, button)
 		ply:SetNWBool("Taunt_Cali", true) --California girls
 		ply:SetNWBool("Taunt_Griddy", false)
 		ply:SetNWBool("Taunt_MNR", false)
-		ply:EmitSound("slashco/ping_item.mp3", SNDLVL_45dB, 80, 0.4)
+		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
 		return
 	end
 end

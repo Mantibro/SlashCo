@@ -313,13 +313,69 @@ net.Receive("mantislashcoGiveSlasherData", function()
 	end
 end)
 
-net.Receive("mantislashcoGlobalSound", function()
-	local soundPath = net.ReadString()
-	local entID = net.ReadUInt(13)
+SlashCo.GlobalSounds = SlashCo.GlobalSounds or {}
+
+timer.Create("PermanentSounds", 1, 0, function()
+	for _, v in pairs(SlashCo.GlobalSounds) do
+		if not v.permanent then
+			continue
+		end
+
+		if not v.snd:IsPlaying() then
+			v.snd:Stop()
+			v.snd:Play()
+		end
+	end
+end)
+
+local function removeSound(soundPath, entID)
+	local entry = SlashCo.GlobalSounds[entID .. soundPath]
+	if not entry then
+		return
+	end
+
+	entry.permanent = false
+	entry.snd:Stop()
+end
+
+local function addSound(soundPath, entID)
 	local soundLevel = net.ReadUInt(14)
 	local vol = net.ReadFloat()
+	local permanent = net.ReadBool()
 
-	EmitSound(soundPath, LocalPlayer():GetPos(), entID, CHAN_AUTO, vol, soundLevel)
+	--EmitSound(soundPath, LocalPlayer():GetPos(), entID, CHAN_AUTO, vol, soundLevel)
+
+	local ent = Entity(entID)
+	if not IsValid(ent) then
+		return
+	end
+
+	local snd
+	if SlashCo.GlobalSounds[entID .. soundPath] then
+		snd = SlashCo.GlobalSounds[entID .. soundPath].snd
+	else
+		snd = CreateSound(ent, soundPath)
+	end
+
+	snd:SetSoundLevel(soundLevel)
+	snd:ChangeVolume(vol)
+
+	snd:Stop() -- it won't play again otherwise
+	snd:Play()
+
+	SlashCo.GlobalSounds[entID .. soundPath] = { snd = snd, permanent = permanent }
+end
+
+net.Receive("mantislashcoGlobalSound", function()
+	local isRemove = net.ReadBool()
+	local soundPath = net.ReadString()
+	local entID = net.ReadUInt(13)
+
+	if isRemove then
+		removeSound(soundPath, entID)
+	else
+		addSound(soundPath, entID)
+	end
 end)
 
 local KillIcon = Material("slashco/ui/icons/slasher/s_0")

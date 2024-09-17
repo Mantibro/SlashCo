@@ -316,7 +316,7 @@ SlashCo.StartChaseMode = function(slasher)
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 	slasher:SetRunSpeed(slasher:SlasherValue("ChaseSpeed"))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ChaseSpeed"))
-	SlashCo.PlayGlobalSound(slasher:SlasherValue("ChaseMusic"), 95, slasher)
+	slasher:PlayGlobalSound(slasher:SlasherValue("ChaseMusic"), 95)
 end
 
 SlashCo.BustDoor = function(slasher, target, force)

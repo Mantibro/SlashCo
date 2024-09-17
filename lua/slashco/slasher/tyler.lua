@@ -77,8 +77,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
 			slasher.TylerSongPickedID = math.random(1, 6)
 
-			SlashCo.PlayGlobalSound("slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3", 98, slasher,
-					0.8 - (slasher.SlasherValue3 * 0.12))
+			slasher:PlayGlobalSound("slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3", 0, 0.8 - (slasher.SlasherValue3 * 0.12))
 		end
 
 		if v2 > 20 + ((ms * 35) - (v4 * 4)) then
@@ -149,7 +148,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:Freeze(true)
 
 		if slasher.tyler_destroyer_entrance_antispam == nil then
-			SlashCo.PlayGlobalSound("slashco/slasher/tyler_alarm.wav", 110, slasher, 1)
+			slasher:PlayGlobalSound("slashco/slasher/tyler_alarm.wav")
 			if CLIENT then
 				slasher.TylerSong:Stop()
 				slasher.TylerSong = nil
@@ -172,8 +171,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 				slasher:StopSound("slashco/slasher/tyler_alarm.wav")
 			end) --idk man only works if i stop it twice shut up
 
-			SlashCo.PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 98, slasher, 1)
-			SlashCo.PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 101, slasher, 0.75)
+			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav")
+			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav")
 
 			slasher:Freeze(false)
 			slasher.SlasherValue1 = 3

@@ -153,9 +153,9 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 
 		if slasher.soundon > 0 then
-			SlashCo.PlayGlobalSound("slashco/slasher/leuonard_yell7.mp3", 98, slasher, 1)
-			SlashCo.PlayGlobalSound("slashco/slasher/leuonard_full_close.wav", 80, slasher, 1)
-			SlashCo.PlayGlobalSound("slashco/slasher/leuonard_full_far.wav", 125, slasher, 1)
+			slasher:PlayGlobalSound("slashco/slasher/leuonard_yell7.mp3", 100)
+			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_close.wav", 80)
+			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_far.wav", 125)
 			slasher.soundon = 0
 		end
 

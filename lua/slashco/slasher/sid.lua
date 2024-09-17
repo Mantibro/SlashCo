@@ -99,7 +99,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	if slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("SidGunLetterC") and slasher:GetNWBool("SidGunEquipped") then
 		slasher:SetNWBool("SidGunLetterC", true)
-		SlashCo.PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.wav", 95, slasher, 0.5)
+		slasher:PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.wav", 95, 0.5)
 	end
 
 	if slasher:GetNWInt("SidGunUses") ~= v1 then
@@ -143,9 +143,9 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 
 			slasher:SetNWBool("SidGunShoot", true)
 
-			SlashCo.PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
-			SlashCo.PlayGlobalSound("slashco/slasher/sid_shot.mp3", 85, slasher)
-			SlashCo.PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 78, slasher)
+			slasher:PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150)
+			slasher:PlayGlobalSound("slashco/slasher/sid_shot.mp3", 85)
+			slasher:PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 70)
 
 			slasher:FireBullets(
 					{
@@ -212,7 +212,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 				target:SetNWBool("SurvivorBeingJumpscared", true)
 				slasher:SetNWBool("CanChase", false)
 
-				SlashCo.PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 85, slasher, 1)
+				slasher:PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 85)
 
 				slasher:SetNWBool("SidExecuting", true)
 
@@ -255,7 +255,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 
 					target:SetNWBool("SurvivorBeingJumpscared", false)
 
-					SlashCo.PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150, slasher)
+					slasher:PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150)
 
 					slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
 					slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
@@ -688,7 +688,7 @@ SLASHER.SidRage = function(ply)
 
 		slasher.SlasherValue1 = slasher.SlasherValue1 + 2
 
-		SlashCo.PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 95, slasher, 1)
+		slasher:PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 95)
 
 		for _, v in player.Iterator() do
 			v:SetNWBool("SidFuck", true)
@@ -699,7 +699,7 @@ SLASHER.SidRage = function(ply)
 				v:SetNWBool("SidFuck", false)
 			end
 
-			SlashCo.PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85, slasher, 1)
+			slasher:PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85)
 		end)
 	end
 end

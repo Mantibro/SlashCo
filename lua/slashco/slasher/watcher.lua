@@ -201,7 +201,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	slasher.SlasherValue1 = 10 + (SO * 10)
 	slasher.SlasherValue2 = 100 - (SO * 35)
 
-	SlashCo.PlayGlobalSound("slashco/slasher/watcher_locate.mp3", 100, slasher, 1)
+	slasher:PlayGlobalSound("slashco/slasher/watcher_locate.mp3", 100)
 
 	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		p:SetNWBool("WatcherSurveyed", true)
@@ -229,7 +229,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	end
 
 	slasher:SetNWBool("WatcherRage", true)
-	SlashCo.PlayGlobalSound("slashco/slasher/watcher_rage.wav", 100, slasher, 1)
+	slasher:PlayGlobalSound("slashco/slasher/watcher_rage.wav", 100)
 end
 
 SLASHER.Animator = function(ply)
