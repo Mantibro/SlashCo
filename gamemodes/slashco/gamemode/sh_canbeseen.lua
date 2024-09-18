@@ -13,7 +13,7 @@ function PLAYER:CanBeSeen()
 			return override
 		end
 
-		if CLIENT and LocalPlayer():Team() == TEAM_SPECTATOR and self:SlasherValue("CannotbeSpectated") then
+		if CLIENT and LocalPlayer():Team() == TEAM_SPECTATOR and self:SlasherValue("CannotBeSpectated") then
 			return false
 		end
 	elseif _team == TEAM_SPECTATOR then
