@@ -145,6 +145,10 @@ end
 
 ---Tie the message of the control to a net variable
 function PANEL:TieText(netvar, enabledText, disabledText, doShake, fallback)
+	if fallback == nil then
+		fallback = false
+	end
+
 	self:TieFunc(netvar, function(pnl, state)
 		if state then
 			pnl:SetText(enabledText)

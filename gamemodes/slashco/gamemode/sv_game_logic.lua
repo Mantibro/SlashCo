@@ -278,7 +278,6 @@ SlashCo.EndRound = function()
 		timer.Simple(0.5, function()
 			SlashCo.GoToLobby()
 		end)
-		--print("tried to go to lobby (round end)")
 	end)
 end
 

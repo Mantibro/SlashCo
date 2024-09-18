@@ -76,6 +76,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
 			slasher.TylerSongPickedID = math.random(1, 6)
+			slasher:EmitSound("buttons/lever4.wav", nil, nil, 0.4)
 
 			timer.Create("tylerSong_" .. slasher:UserID(), 3, 1, function()
 				if not IsValid(slasher) then
@@ -380,7 +381,6 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end
 
 	slasher.SlasherValue1 = 1
-	slasher:SetColor(Color(255, 255, 255, 255))
 	slasher:SetVisible(true)
 end
 

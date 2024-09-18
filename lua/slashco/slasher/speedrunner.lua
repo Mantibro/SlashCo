@@ -43,7 +43,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	if v1 < v3 then
 		local mapSizeMod = (0.5 / SlashCo.MapSize) + 0.5
-		slasher.SlasherValue1 = v1 + FrameTime() * mapSizeMod * v2 * (1 + SO)
+		slasher.SlasherValue1 = v1 + FrameTime() * mapSizeMod * v2 * (1 + SO) * 0.66
 	end
 
 	slasher:SetRunSpeed(slasher.SlasherValue1)

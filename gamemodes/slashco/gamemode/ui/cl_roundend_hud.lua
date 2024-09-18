@@ -15,7 +15,7 @@ local function showPointSummary(cur)
 
 	local shift = 0
 	for k, v in ipairs(stuff) do
-		if CurTime() - cur < 2 + (totalEntries - k) * 0.25 then
+		if CurTime() - cur < 2 + (totalEntries - k) * 0.5 then
 			continue
 		end
 

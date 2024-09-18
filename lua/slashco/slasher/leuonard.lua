@@ -282,8 +282,8 @@ SLASHER.InitHud = function(_, hud)
 	hud:SetTitle("Leuonard")
 
 	hud:ChaseAndKill()
-	hud:TieControlVisible("LMB", "LeuonardFullRoid", true, false, false)
-	hud:TieControlVisible("RMB", "LeuonardFullRoid", true, false, false)
+	hud:TieControlVisible("LMB", "LeuonardFullRoid", true, false)
+	hud:TieControlVisible("RMB", "LeuonardFullRoid", true, false)
 
 	hud:AddMeter("r**e")
 	hud:TieMeterInt("r**e", "LeuonardRoid")

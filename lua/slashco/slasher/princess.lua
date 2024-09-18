@@ -55,13 +55,11 @@ SLASHER.DoSound = function(slasher)
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
-	local v1 = slasher.SlasherValue1 --aggression  --please stop using globals like this
+	local v1 = slasher.SlasherValue1 --aggression
 	local v2 = slasher.SlasherValue2 --aggression threshold
 
 	local eyesight = SLASHER.Eyesight
 	local perception = SLASHER.Perception
-
-	--local SO = SlashCo.CurRound.OfferingData.SO
 
 	if not slasher:GetNWBool("DemonPacified") then
 		slasher:SetNWBool("CanChase", true)
@@ -150,10 +148,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 					mauled_child:Remove()
 
 					slasher.SlasherValue2 = slasher.SlasherValue2 + math.random(15, 20)
-
 					slasher.SlasherValue1 = v1 - math.random(25, v1 + 26)
 				end)
-
 
 				---yeah
 
@@ -164,7 +160,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 					slasher:Freeze(false)
 					slasher:SetNWBool("PrincessMaulingChild", false)
-
 					slasher:SetNWBool("DemonPacified", true)
 
 					timer.Simple(math.random(10, 25), function()
@@ -204,6 +199,105 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", perception)
 end
 
+SLASHER.Maul = function(slasher, target)
+	timer.Remove("princessMaul_" .. slasher:UserID())
+	slasher:EmitSound("slashco/slasher/princess_bite.mp3")
+
+	local vPoint = target:GetPos()
+	local bloodfx = EffectData()
+	bloodfx:SetOrigin(vPoint)
+	util.Effect("BloodImpact", bloodfx)
+
+	if slasher.SlasherValue1 <= 99 then
+		return
+	end
+
+	SlashCo.StopChase(slasher)
+	slasher:SetNWBool("PrincessMaulingBase", false)
+
+	timer.Simple(FrameTime() * 3, function()
+		if not IsValid(slasher) or not IsValid(target) then
+			return
+		end
+
+		slasher:SetNWBool("PrincessMaulingSurvivor", true)
+		target:Kill()
+
+		timer.Simple(FrameTime() * 3, function()
+			if not IsValid(slasher) then
+				return
+			end
+
+			slasher.victimragdoll = target and (target.DeadBody or NULL)
+		end)
+	end)
+
+	slasher:EmitSound("slashco/slasher/princess_maul.mp3")
+
+	local pos = slasher:LocalToWorld(Vector(0, 10, -5))
+	local ang = slasher:LocalToWorldAngles(Angle(90, 0, 0))
+
+	slasher.ref_child = ents.Create("prop_physics")
+	slasher.ref_child:SetMoveType(MOVETYPE_NONE)
+	slasher.ref_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+	slasher.ref_child:SetModel(SlashCoItems.Baby.Model)
+	slasher.ref_child:SetPos(pos)
+	slasher.ref_child:SetAngles(ang)
+	slasher.ref_child:FollowBone(slasher, slasher:LookupBone("head"))
+
+	for i = 1, math.random(9, 10) do
+		timer.Simple((i / 8) * (0.7 + (math.random() * 0.3)), function()
+			if not IsValid(slasher.victimragdoll) then
+				return
+			end
+
+			local vPoint1 = slasher.victimragdoll:GetPos()
+			local bloodfx1 = EffectData()
+			bloodfx:SetOrigin(vPoint1)
+			util.Effect("BloodImpact", bloodfx1)
+
+			slasher.victimragdoll:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(2, 4) .. ".wav")
+			slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".wav")
+		end)
+	end
+
+	timer.Simple(2, function()
+		if not IsValid(slasher) then
+			return
+		end
+
+		slasher:SetNWBool("PrincessMaulingSurvivor", false)
+		slasher:SetNWBool("PrincessMaulingBase", false)
+
+		if not IsValid(slasher.victimragdoll) then
+			return
+		end
+
+		slasher.ref_child:Remove()
+		slasher.victimragdoll:Remove()
+
+		local pickedclean = ents.Create("prop_ragdoll")
+		pickedclean:SetModel("models/player/skeleton.mdl")
+		pickedclean:SetPos(slasher:LocalToWorld(Vector(30, 0, 40)))
+		pickedclean:SetNoDraw(false)
+		pickedclean:Spawn()
+		pickedclean:SetSkin(2)
+
+		pickedclean:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+
+		local physCount = pickedclean:GetPhysicsObjectCount()
+
+		for i = 0, (physCount - 1) do
+			local PhysBone = pickedclean:GetPhysicsObjectNum(i)
+
+			if PhysBone:IsValid() then
+				PhysBone:SetVelocity(slasher:GetForward() * 600)
+				PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
+			end
+		end
+	end)
+end
+
 SLASHER.OnPrimaryFire = function(slasher)
 	if slasher:GetNWBool("PrincessMaulingChild") then
 		return
@@ -214,124 +308,47 @@ SLASHER.OnPrimaryFire = function(slasher)
 	if slasher:GetNWBool("DemonPacified") then
 		return
 	end
+	if slasher:GetNWBool("PrincessMaulingBase") then
+		return
+	end
 
-	if not slasher:GetNWBool("PrincessMaulingBase") then
-		slasher:SetNWBool("PrincessMaulingBase", true)
+	if slasher.MaulTime and CurTime() - slasher.MaulTime < 2 then
+		return
+	end
+	slasher.MaulTime = CurTime()
 
-		slasher:EmitSound("slashco/slasher/princess_attack.mp3")
+	slasher:SetNWBool("PrincessMaulingBase", true)
+	slasher:EmitSound("slashco/slasher/princess_attack.mp3")
 
-		slasher:Freeze(true)
+	if slasher:IsOnGround() then
+		slasher:SetVelocity(slasher:GetForward() * 800)
+	else
+		slasher:SetVelocity(slasher:GetForward() * 200)
+	end
 
-		if slasher:IsOnGround() then
-			slasher:SetVelocity(slasher:GetForward() * 800)
+	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()
+		if not IsValid(slasher) then
+			return
 		end
 
-		timer.Simple(0.25, function()
-			if not IsValid(slasher) then
-				return
-			end
+		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
+				Vector(-40, -40, -60), Vector(40, 40, 60),
+				math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4)), DMG_SLASH, 5, false)
 
-			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-					Vector(-40, -40, -60), Vector(40, 40, 60),
-					math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4)), DMG_SLASH, 5, false)
+		if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
+			SLASHER.Maul(slasher, target)
+		end
+	end)
 
-			if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
-				slasher:EmitSound("slashco/slasher/princess_bite.mp3")
+	timer.Simple(0.7, function()
+		if not IsValid(slasher) then
+			return
+		end
 
-				local vPoint = target:GetPos()
-				local bloodfx = EffectData()
-				bloodfx:SetOrigin(vPoint)
-				util.Effect("BloodImpact", bloodfx)
-
-				if slasher.SlasherValue1 > 99 then
-					SlashCo.StopChase(slasher)
-
-					slasher:SetNWBool("PrincessMaulingBase", false)
-
-					timer.Simple(FrameTime() * 3, function()
-						slasher:SetNWBool("PrincessMaulingSurvivor", true)
-
-						target:Kill()
-
-						timer.Simple(FrameTime() * 3, function()
-							slasher.victimragdoll = target.DeadBody or NULL
-						end)
-					end)
-
-					slasher:EmitSound("slashco/slasher/princess_maul.mp3")
-
-					local pos = slasher:LocalToWorld(Vector(0, 10, -5))
-					local ang = slasher:LocalToWorldAngles(Angle(90, 0, 0))
-
-					slasher.ref_child = ents.Create("prop_physics")
-					slasher.ref_child:SetMoveType(MOVETYPE_NONE)
-					slasher.ref_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-					slasher.ref_child:SetModel(SlashCoItems.Baby.Model)
-					slasher.ref_child:SetPos(pos)
-					slasher.ref_child:SetAngles(ang)
-					slasher.ref_child:FollowBone(slasher, slasher:LookupBone("head"))
-
-					for i = 1, math.random(9, 10) do
-						timer.Simple((i / 8) * (0.7 + (math.random() * 0.3)), function()
-							if IsValid(slasher.victimragdoll) then
-								local vPoint = slasher.victimragdoll:GetPos()
-								local bloodfx = EffectData()
-								bloodfx:SetOrigin(vPoint)
-								util.Effect("BloodImpact", bloodfx)
-
-								slasher.victimragdoll:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(2,
-									4) .. ".wav")
-								slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1,
-									5) .. ".wav")
-							end
-						end)
-					end
-
-					timer.Simple(2, function()
-						slasher:SetNWBool("PrincessMaulingSurvivor", false)
-						slasher:SetNWBool("PrincessMaulingBase", false)
-						slasher:Freeze(false)
-
-						if IsValid(slasher.victimragdoll) then
-							slasher.ref_child:Remove()
-							slasher.victimragdoll:Remove()
-
-							local pickedclean = ents.Create("prop_ragdoll")
-							pickedclean:SetModel("models/player/skeleton.mdl")
-							pickedclean:SetPos(slasher:LocalToWorld(Vector(30, 0, 40)))
-							pickedclean:SetNoDraw(false)
-							pickedclean:Spawn()
-							pickedclean:SetSkin(2)
-
-							pickedclean:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
-
-							local physCount = pickedclean:GetPhysicsObjectCount()
-
-							for i = 0, (physCount - 1) do
-								local PhysBone = pickedclean:GetPhysicsObjectNum(i)
-
-								if PhysBone:IsValid() then
-									PhysBone:SetVelocity(slasher:GetForward() * 600)
-									PhysBone:AddAngleVelocity(-PhysBone:GetAngleVelocity())
-								end
-							end
-						end
-					end)
-				end
-			end
-		end)
-
-		timer.Simple(1, function()
-			if not IsValid(slasher) then
-				return
-			end
-
-			if not slasher:GetNWBool("PrincessMaulingSurvivor") then
-				slasher:SetNWBool("PrincessMaulingBase", false)
-				slasher:Freeze(false)
-			end
-		end)
-	end
+		if not slasher:GetNWBool("PrincessMaulingSurvivor") then
+			slasher:SetNWBool("PrincessMaulingBase", false)
+		end
+	end)
 end
 
 SLASHER.OnSecondaryFire = function(slasher)
@@ -368,7 +385,6 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		slasher:Freeze(false)
 
 		slasher:SlasherHudFunc("Sniff")
-		--slasher:SetNWInt("PrincessSniffed", slasher:GetNWInt("PrincessSniffed") + 1)
 	end)
 end
 

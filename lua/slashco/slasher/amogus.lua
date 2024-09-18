@@ -166,9 +166,6 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		util.PrecacheModel("models/slashco/slashers/amogus/amogus.mdl")
 		slasher:SetModel("models/slashco/slashers/amogus/amogus.mdl")
 
-		slasher:SetColor(Color(255, 255, 255, 255))
-		slasher:DrawShadow(true)
-		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		slasher:SetVisible(true)
 
 		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
@@ -321,7 +318,7 @@ SLASHER.InitHud = function(_, hud)
 	hud:TieControlText("R", "AmogusDisguised", "reveal yourself", "disguise as survivor", true)
 
 	local control = hud:GetControl("LMB")
-	control.prevSurvivor = LocalPlayer():GetNWBool("AmogusSurvivorDisguise")
+	control.prevSurvivor = -1
 	function control.AlsoThink()
 		local survivor = LocalPlayer():GetNWBool("AmogusSurvivorDisguise")
 		if survivor ~= control.prevSurvivor then

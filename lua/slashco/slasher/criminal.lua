@@ -197,7 +197,7 @@ SLASHER.InitHud = function(_, hud)
 
 	hud:ChaseAndKill(true)
 	hud:AddControl("RMB", "summon clones", Material("slashco/ui/icons/slasher/s_12_a1"))
-	hud:TieControlText("RMB", "CriminalCloning", "unsummon clones", "summon clones", nil, false)
+	hud:TieControlText("RMB", "CriminalCloning", "unsummon clones", "summon clones", nil)
 	hud:AddControl("F", "rage", Material("slashco/ui/icons/slasher/s_12_1"))
 	hud:SetControlVisible("F", false)
 

@@ -329,7 +329,7 @@ function PANEL:TieControlVisible(key, netvar, isInverse, doShake, fallback)
 	end
 
 	if fallback == nil then
-		fallback = true
+		fallback = false
 	end
 	isInverse = isInverse or false
 
@@ -380,7 +380,7 @@ function PANEL:ChaseAndKill(noChase, noKill)
 
 	self:AddControl("RMB", "start chasing", "chase")
 	self:TieControl("RMB", "CanChase")
-	self:TieControlText("RMB", "InSlasherChaseMode", "stop chasing", "start chasing", true, false)
+	self:TieControlText("RMB", "InSlasherChaseMode", "stop chasing", "start chasing", true)
 end
 
 ---shakes a control's icon a little

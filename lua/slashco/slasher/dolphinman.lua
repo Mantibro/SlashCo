@@ -225,9 +225,9 @@ SLASHER.InitHud = function(_, hud)
 
 	hud:AddControl("R", "hide", hideIcons)
 	hud:ChaseAndKill(true)
-	hud:TieControlVisible("LMB", "DolphinInHiding", true, true, false)
-	hud:TieControlVisible("R", "DolphinHunting", true, true, false)
-	hud:TieControlText("R", "DolphinInHiding", "unhide", "hide", true, false)
+	hud:TieControlVisible("LMB", "DolphinInHiding", true, true)
+	hud:TieControlVisible("R", "DolphinHunting", true, true)
+	hud:TieControlText("R", "DolphinInHiding", "unhide", "hide", true)
 
 	hud:AddMeter("hunt")
 	hud:TieMeterInt("hunt", "DolphinHunt")

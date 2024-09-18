@@ -281,7 +281,7 @@ SLASHER.InitHud = function(_, hud)
 	hud:ChaseAndKill()
 	hud:AddControl("F", "full surveillance", surveyTable)
 	hud:TieControl("R", "WatcherCanSurvey")
-	hud:TieControlVisible("R", "WatcherRage", true, true, false)
+	hud:TieControlVisible("R", "WatcherRage", true, true)
 
 	hud.prevSurveil = not canSurveil()
 	function hud.AlsoThink()
