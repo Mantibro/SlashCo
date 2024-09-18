@@ -77,8 +77,11 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
 			slasher.TylerSongPickedID = math.random(1, 6)
-			slasher:EmitSound("buttons/lever4.wav", nil, nil, 0.4)
+			slasher.TylerSongPickedID = "slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3"
+			slasher:EmitSound(slasher.TylerSongPickedID, 1, 1, 0)
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12))
 
+			--[[
 			timer.Create("tylerSong_" .. slasher:UserID(), 2, 1, function()
 				if not IsValid(slasher) then
 					return
@@ -86,18 +89,23 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 				slasher:PlayGlobalSound("slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3", 100, 0.8 - (slasher.SlasherValue3 * 0.12))
 			end)
+			--]]
 		end
 
 		if v2 > 20 + ((ms * 35) - (v4 * 4)) then
 			--Time ran out
 
-			local stop_song = slasher.TylerSongPickedID
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
 
-			slasher.SlasherValue1 = 2
-			slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
-			timer.Simple(0.1, function()
+			--[[
+			local stop_song = slasher.TylerSongPickedID
+				slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
+				timer.Simple(0.1, function()
 				slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
 			end)
+			--]]
+
+			slasher.SlasherValue1 = 2
 			slasher.TylerSongPickedID = nil
 		end
 
@@ -106,15 +114,17 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 			local surv = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-			local stop_song = slasher.TylerSongPickedID
-
 			if not slasher:GetNWBool("TylerCreating") and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
 				slasher:SetNWBool("TylerCreating", true)
 				slasher.SlasherValue2 = 0
+				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+				--[[
+				local stop_song = slasher.TylerSongPickedID
 				slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
 				timer.Simple(0.1, function()
 					slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
 				end)
+				--]]
 				slasher.TylerSongPickedID = nil
 			end
 		end
@@ -540,12 +550,15 @@ if CLIENT then
 			LocalPlayer().tyl_f = nil
 		end
 
+		if LocalPlayer():Team() == TEAM_SLASHER then
+			return
+		end
+
 		if LocalPlayer():GetNWBool("DisplayTylerTheDestroyerEffects") == true then
 			local Overlay = Material("slashco/ui/overlays/tyler_static")
 			local DestroyerFace = Material("slashco/ui/overlays/tyler_destroyer_face")
 
 			Overlay:SetFloat("$alpha", math.Rand(0.1, 0.12))
-
 			DestroyerFace:SetFloat("$alpha", math.Rand(0, 0.07))
 
 			surface.SetDrawColor(255, 255, 255, 255)
@@ -555,6 +568,53 @@ if CLIENT then
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(DestroyerFace)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+		end
+	end)
+
+	SlashCo.TylerSongs = SlashCo.TylerSongs or {}
+	hook.Add("scValue_tylSong", "SlashCoTylerSong", function(slasher, song, stop, maxVol)
+		if stop then
+			if not SlashCo.TylerSongs[song] then
+				return
+			end
+
+			SlashCo.TylerSongs[song].snd:Stop()
+			SlashCo.TylerSongs[song].shouldBePlaying = nil
+			return
+		end
+
+		local snd
+		if SlashCo.TylerSongs[song] then
+			snd = SlashCo.TylerSongs[song].snd
+		else
+			snd = CreateSound(LocalPlayer(), song)
+		end
+
+		snd:Stop()
+		snd:Play()
+		snd:ChangeVolume(0.01)
+
+		SlashCo.TylerSongs[song] = { ent = slasher, snd = snd, shouldBePlaying = true, maxVol = maxVol or 1 }
+	end)
+
+	timer.Create("TylerSongs", 0.5, 0, function()
+		for _, v in pairs(SlashCo.TylerSongs) do
+			if not IsValid(v.ent) then
+				v.snd:Stop()
+				v.shouldBePlaying = false
+				continue
+			end
+
+			if not v.snd:IsPlaying() then
+				if not v.shouldBePlaying then
+					continue
+				end
+
+				v.snd:Stop()
+				v.snd:Play()
+			end
+
+			v.snd:ChangeVolume(math.max(v.maxVol - EyePos():Distance(v.ent:GetPos()) * 0.0002 * (0.25 + 0.75 / GetGlobal2Int("SlashCoMapSize", 1)), 0.01), 0.4)
 		end
 	end)
 end

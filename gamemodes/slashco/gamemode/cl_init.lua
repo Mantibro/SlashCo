@@ -358,11 +358,11 @@ local function addSound(soundPath, entID)
 		snd = CreateSound(ent, soundPath)
 	end
 
-	snd:SetSoundLevel(soundLevel)
-	snd:ChangeVolume(vol)
-
 	snd:Stop() -- it won't play again otherwise
 	snd:Play()
+
+	snd:SetSoundLevel(soundLevel)
+	snd:ChangeVolume(vol)
 
 	SlashCo.GlobalSounds[entID .. soundPath] = { snd = snd, permanent = permanent }
 end
