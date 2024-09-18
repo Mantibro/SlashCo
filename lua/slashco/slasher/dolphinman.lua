@@ -145,6 +145,10 @@ SLASHER.Thirdperson = function(ply)
 end
 
 SLASHER.CanBeSeen = function(ply)
+	if SERVER then
+		return
+	end
+
 	if ply:GetNWBool("SlashCoVisible", true) and not ply:GetNWBool("DolphinInHiding") then
 		return true
 	end

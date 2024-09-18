@@ -80,31 +80,12 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.TylerSongPickedID = "slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3"
 			slasher:EmitSound(slasher.TylerSongPickedID, 1, 1, 0)
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12))
-
-			--[[
-			timer.Create("tylerSong_" .. slasher:UserID(), 2, 1, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				slasher:PlayGlobalSound("slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3", 100, 0.8 - (slasher.SlasherValue3 * 0.12))
-			end)
-			--]]
 		end
 
 		if v2 > 20 + ((ms * 35) - (v4 * 4)) then
 			--Time ran out
 
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
-
-			--[[
-			local stop_song = slasher.TylerSongPickedID
-				slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
-				timer.Simple(0.1, function()
-				slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
-			end)
-			--]]
-
 			slasher.SlasherValue1 = 2
 			slasher.TylerSongPickedID = nil
 		end
@@ -118,13 +99,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 				slasher:SetNWBool("TylerCreating", true)
 				slasher.SlasherValue2 = 0
 				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
-				--[[
-				local stop_song = slasher.TylerSongPickedID
-				slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
-				timer.Simple(0.1, function()
-					slasher:StopSound("slashco/slasher/tyler_song_" .. stop_song .. ".mp3")
-				end)
-				--]]
 				slasher.TylerSongPickedID = nil
 			end
 		end
@@ -426,6 +400,10 @@ SLASHER.Footstep = function()
 end
 
 SLASHER.CanBeSeen = function(ply)
+	if SERVER then
+		return
+	end
+
 	if ply:GetNWBool("SlashCoVisible", true) and ply:GetNWInt("TylerState") ~= 1 then
 		return true
 	end
