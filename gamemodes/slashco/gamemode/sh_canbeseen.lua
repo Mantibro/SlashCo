@@ -12,6 +12,10 @@ function PLAYER:CanBeSeen()
 		if override ~= nil then
 			return override
 		end
+
+		if CLIENT and LocalPlayer():Team() == TEAM_SPECTATOR and self:SlasherValue("CannotbeSpectated") then
+			return false
+		end
 	elseif _team == TEAM_SPECTATOR then
 		return false
 	end
@@ -36,14 +40,15 @@ function PLAYER:CanSeeFlashlights()
 	return self:GetNWBool("SlashCoSeeFlashlights", true)
 end
 
+local invis = Color(0, 0, 0, 0)
+
 if CLIENT then
 	hook.Add("Think", "hidePlayersIfCannotSee", function()
 		for _, ply in player.Iterator() do
 			local seeable = ply:CanBeSeen()
 			if ply.Seeable ~= seeable then
-				if pac then
-					pac.TogglePartDrawing(ply, seeable)
-				end
+				if pac then pac.TogglePartDrawing(ply, seeable) end
+				ply:SetColor(seeable and color_white or invis)
 
 				ply.Seeable = seeable
 			end
@@ -67,7 +72,6 @@ function PLAYER:SetCanSeeFlashlights(state)
 	self:SetNWBool("SlashCoSeeFlashlights", state)
 end
 
-local invis = Color(0, 0, 0, 0)
 hook.Add("Think", "hidePlayersIfCannotSee", function()
 	for _, ply in player.Iterator() do
 		local seeable = ply:CanBeSeen()

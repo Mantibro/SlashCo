@@ -194,8 +194,8 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	if noZ == nil then
 		noZ = true
 	end
-	halo.Add(_ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil,
-			noZ)
+
+	halo.Add(_ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil, noZ)
 end
 
 hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()

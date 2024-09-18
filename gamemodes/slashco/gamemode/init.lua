@@ -232,11 +232,20 @@ local function spectatorButtons(ply, button)
 			--Spectate the player aimed at
 			local ent = ply:GetEyeTrace().Entity
 
-			if ent:IsValid() and (ent:IsPlayer() or ent.IsSelectable or ent.SurvivorSteamID) then
-				--Only allow spectators to spectate other players.
-				ply:SpectateEntity(ent)
-				ply:SetObserverMode(OBS_MODE_CHASE)
+			if not IsValid(ent) then
+				return
 			end
+
+			if ent:IsPlayer() then
+				if ent:Team() == TEAM_SLASHER and ent:SlasherValue("CannotBeSpectated") then
+					return
+				end
+			elseif not ent.IsSelectable and not ent.SurvivorSteamID then
+				return
+			end
+
+			ply:SpectateEntity(ent)
+			ply:SetObserverMode(OBS_MODE_CHASE)
 		end
 
 		return
@@ -246,10 +255,7 @@ local function spectatorButtons(ply, button)
 		--Spectator Right Clicks
 		if IsValid(ply:GetObserverTarget()) and ply:GetObserverMode() ~= OBS_MODE_ROAMING then
 			local ent = ply:GetObserverTarget()
-			local targets = team.GetPlayers(TEAM_SURVIVOR)
-			table.Add(targets, team.GetPlayers(TEAM_SLASHER))
-			table.Add(targets, SlashCo.DeadBodies)
-
+			local targets = SlashCo.GetSpectatableSet()
 			for k, v in ipairs(targets) do
 				if ply:GetObserverTarget() ~= v then
 					continue
@@ -266,7 +272,7 @@ local function spectatorButtons(ply, button)
 				ply:SpectateEntity(ent)
 			end
 		else
-			local first = team.GetPlayers(TEAM_SURVIVOR)[1] or SlashCo.DeadBodies[1]
+			local first = SlashCo.GetSpectatableSet()[1]
 			if IsValid(first) then
 				ply:SpectateEntity(first)
 				ply:SetObserverMode(OBS_MODE_CHASE)
@@ -305,6 +311,19 @@ local function slasherButtons(ply, button)
 		ply:SlasherFunction("OnSpecialAbilityFire", lagTrace(ply))
 		return
 	end --Special
+end
+
+function SlashCo.GetSpectatableSet()
+	local targets = team.GetPlayers(TEAM_SURVIVOR)
+	table.Add(targets, SlashCo.DeadBodies)
+
+	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		if not v:SlasherValue("CannotBeSpectated") then
+			table.insert(targets, v)
+		end
+	end
+
+	return targets
 end
 
 function GM:PlayerButtonDown(ply, button)

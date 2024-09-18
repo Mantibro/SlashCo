@@ -25,6 +25,7 @@ SLASHER.ProTip = "Manspider_tip"
 SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
+SLASHER.CannotBeSpectated = true
 
 SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
@@ -161,6 +162,12 @@ end
 
 SLASHER.Thirdperson = function(ply)
 	return ply:GetNWBool("ManspiderNested")
+end
+
+SLASHER.CanBeSeen = function(ply)
+	if ply:GetNWBool("SlashCoVisible", true) and not ply:GetNWBool("ManspiderNested") then
+		return true
+	end
 end
 
 SLASHER.OnSecondaryFire = function(slasher)

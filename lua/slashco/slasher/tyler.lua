@@ -25,6 +25,7 @@ SLASHER.ProTip = "Tyler_tip"
 SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★★★★☆"
+SLASHER.CannotBeSpectated = true
 
 SLASHER.OnSpawn = function(slasher)
 	slasher.SlasherValue1 = 0
@@ -412,6 +413,12 @@ end
 
 SLASHER.Footstep = function()
 	return true
+end
+
+SLASHER.CanBeSeen = function(ply)
+	if ply:GetNWBool("SlashCoVisible", true) and ply:GetNWInt("TylerState") ~= 1 then
+		return true
+	end
 end
 
 local avatarTable = {

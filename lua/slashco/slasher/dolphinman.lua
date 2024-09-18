@@ -25,6 +25,7 @@ SLASHER.ProTip = "Dolphinman_tip"
 SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
+SLASHER.CannotBeSpectated = true
 
 SLASHER.OnTickBehaviour = function(slasher)
 	local v1 = slasher.SlasherValue1 --Hunt power
@@ -141,6 +142,12 @@ end
 
 SLASHER.Thirdperson = function(ply)
 	return ply:GetNWBool("DolphinInHiding")
+end
+
+SLASHER.CanBeSeen = function(ply)
+	if ply:GetNWBool("SlashCoVisible", true) and not ply:GetNWBool("DolphinInHiding") then
+		return true
+	end
 end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
