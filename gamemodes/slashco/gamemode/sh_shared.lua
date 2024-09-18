@@ -166,17 +166,21 @@ Download the Maps at the Gamemode's workshop page under the "Required Items" sec
 end
 
 -- determine if a position is far enough away from generators and survivors
-function SlashCo.IsPositionLegalForSlashers(pos, dist)
-	dist = dist or (600 + GetGlobal2Int("SlashCoMapSize") * 150)
+function SlashCo.IsPositionLegalForSlashers(pos, noSurvivorCheck, distFactor)
+	local dist = (600 + GetGlobal2Int("SlashCoMapSize") * 150) * (distFactor or 1)
 
-	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		if v:GetPos():Distance(pos) < dist then
+	for _, v in ipairs(ents.FindInSphere(pos, dist)) do
+		if v:GetClass() == "sc_generator" then
 			return false
 		end
 	end
 
-	for _, v in ipairs(ents.FindInSphere(pos, dist)) do
-		if v:GetClass() == "sc_generator" then
+	if noSurvivorCheck then
+		return true
+	end
+
+	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if v:GetPos():Distance(pos) < dist then
 			return false
 		end
 	end
