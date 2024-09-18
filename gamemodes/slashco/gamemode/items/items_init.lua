@@ -89,7 +89,10 @@ function PLAYER:ClearEffect()
 	if not self:EffectFunction("OnRemoved") then
 		self:EffectFunction("OnExpired")
 	end
-	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+	if self:GetNWString("itemEffect", "none") ~= "none" then
+		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+	end
+
 	self:SetNWString("itemEffect", "none")
 	timer.Remove("itemEffectExpire_" .. self:UserID())
 end

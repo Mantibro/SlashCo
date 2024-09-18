@@ -49,7 +49,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher:SetNWBool("DolphinFound", true)
 
 			slasher:PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85)
-			slasher:PlayGlobalSound("slashco/slasher/dolfin_call_far.wav")
+			slasher:PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 140)
 
 			timer.Simple(10, function()
 				slasher:SetNWBool("DolphinFound", false)
@@ -73,7 +73,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 					slasher:SetNWBool("DolphinFound", true)
 
 					slasher:PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85)
-					slasher:PlayGlobalSound("slashco/slasher/dolfin_call_far.wav")
+					slasher:PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 140)
 
 					timer.Simple(10, function()
 						slasher:SetNWBool("DolphinFound", false)

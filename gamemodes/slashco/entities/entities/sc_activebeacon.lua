@@ -20,7 +20,7 @@ local function ArmBeacon(ent)
 	if ent:GetNWBool("BeaconBroken") then return end
 
 	timer.Remove(ent:EntIndex() .. "_BeaconBlipSound")
-	ent:PlayGlobalSound("slashco/survivor/distress_siren.wav")
+	ent:PlayGlobalSound("slashco/survivor/distress_siren.wav", 100)
 	ent:SetNWBool("ArmingBeacon", false)
 	SlashCo.SummonEscapeHelicopter(true)
 	SlashCo.CurRound.DistressBeaconUsed = true
@@ -52,7 +52,7 @@ if SERVER then
 				ArmBeacon(self)
 			end)
 			timer.Create(self:EntIndex() .. "_BeaconBlipSound",3 , 0, function()
-				self:PlayGlobalSound("slashco/beacon_connect.mp3")
+				self:PlayGlobalSound("slashco/beacon_connect.mp3", 100)
 			end)
 			self.TimersStarted = true
 		end
