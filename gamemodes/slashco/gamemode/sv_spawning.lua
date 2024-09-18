@@ -372,6 +372,18 @@ function SlashCo.SetupPlayers()
 	local becameCovenant = 0
 	local spawn_queue = 0
 
+	timer.Simple(0.5, function()
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			for _, v1 in ipairs(survivors) do
+				if v1.Survivors == v:SteamID64() then
+					SlashCo.DropAllItems(v) -- if somehow a player grabs an item beforehand
+					SlashCo.ChangeSurvivorItem(v, v1.Item)
+					break
+				end
+			end
+		end
+	end)
+
 	for play = 1, #player.GetAll() do
 		--Assign the teams for the current round
 
@@ -428,18 +440,10 @@ function SlashCo.SetupPlayers()
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
-		local query = sql.Query("SELECT * FROM slashco_table_survivordata; ") --This table shouldn't be organized like this.
-
 		for i = 1, #survivors do
 			if id == survivors[i].Survivors then
 				playercur:SetTeam(TEAM_SURVIVOR)
 				playercur:Spawn()
-				for _, v in ipairs(query) do
-					if (v.Survivors == playercur:SteamID64()) then
-						SlashCo.ChangeSurvivorItem(playercur, v.Item)
-						break
-					end
-				end
 				print(playercur:Name() .. " now Survivor")
 
 				break
@@ -486,8 +490,6 @@ function SlashCo.SetupPlayers()
 				spawn_queue = spawn_queue + 1
 
 				table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
-
-				--table.insert(SlashCo.CurRound.SlasherData.AllSlashers, {s_id = playercur:SteamID64()})
 				:: covenant_member ::
 			end
 		end
