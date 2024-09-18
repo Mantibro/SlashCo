@@ -479,7 +479,7 @@ SLASHER.InitHud = function(_, hud)
 		end
 
 		local target = LocalPlayer():GetEyeTrace().Entity
-		local class = target:GetClass()
+		local class = IsValid(target) and target:GetClass()
 		if IsValid(target) and target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon")
 				and class ~= "sc_battery" and not target:GetNWBool("SurvivorBeingJumpscared") and
 				LocalPlayer():GetPos():Distance(target:GetPos()) < SLASHER.KillDistance then
