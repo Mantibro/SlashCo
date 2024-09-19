@@ -354,7 +354,7 @@ SlashCo.HelicopterLand = function(pos)
 		SlashCo.HelicopterRadioVoice(3)
 
 		SlashCo.UpdateObjective("heliwait", SlashCo.ObjStatus.COMPLETE)
-		SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.INCOMPLETE)
+		SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.INCOMPLETE, nil, true)
 		SlashCo.SendObjectives()
 	end)
 

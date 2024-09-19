@@ -19,7 +19,7 @@ function SlashCo.SendObjectives()
 end
 
 ---add or update an objective
-function SlashCo.UpdateObjective(name, status, count)
+function SlashCo.UpdateObjective(name, status, count, dontOverrideComplete)
 	if not SlashCo.Objectives[name] then
 		return
 	end
@@ -42,8 +42,13 @@ function SlashCo.UpdateObjective(name, status, count)
 	end
 
 	item.name = name
-	item.status = status or item.status
 	item.count = count or item.count
+
+	if dontOverrideComplete and item.status == SlashCo.ObjStatus.COMPLETE then
+		return
+	end
+
+	item.status = status or item.status
 end
 
 ---remove all objectives with a particular name

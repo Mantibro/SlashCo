@@ -226,8 +226,7 @@ SlashCo.EndRound = function()
 		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
 			if not IsValid(v) then continue end
 
-			local plyID = v:SteamID64()
-			SlashCoDatabase.UpdateStats(plyID, "SurvivorRoundsWon", 1)
+			SlashCoDatabase.UpdateStats(v:SteamID64(), "SurvivorRoundsWon", 1)
 
 			v:SetPoints("survive")
 			winners[v:UserID()] = true
@@ -277,10 +276,9 @@ SlashCo.EndRound = function()
 	end)
 end
 
+local delay1 = 16
 SlashCo.SurvivorWinFinish = function()
-	local delay = 16
-
-	timer.Simple(delay, function()
+	timer.Simple(delay1, function()
 		SlashCo.EndRound()
 	end)
 end
