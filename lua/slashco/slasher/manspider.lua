@@ -30,6 +30,7 @@ SLASHER.CannotBeSpectated = true
 SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
+	slasher.Jump = slasher:GetJumpPower()
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
@@ -73,9 +74,10 @@ SLASHER.OnTickBehaviour = function(slasher)
 		--Find a survivor
 		slasher.SlasherValue3 = v3 + FrameTime()
 
-		if slasher.NestSound ~= v3 then
+		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
 			slasher:StopSound("slashco/slasher/manspider_idle.wav")
-			slasher.NestSound = v3
+			slasher:SetJumpPower(0)
+			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
 
 		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -107,9 +109,10 @@ SLASHER.OnTickBehaviour = function(slasher)
 		--Not nested
 		slasher.SlasherValue3 = 0
 
-		if slasher.NestSound ~= v3 then
+		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
 			slasher:PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50)
-			slasher.NestSound = v3
+			slasher:SetJumpPower(slasher.Jump)
+			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
 
 		if v1 == "" then

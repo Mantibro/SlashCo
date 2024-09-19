@@ -27,6 +27,10 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.CannotBeSpectated = true
 
+SLASHER.OnSpawn = function(slasher)
+	slasher.Jump = slasher:GetJumpPower()
+end
+
 SLASHER.OnTickBehaviour = function(slasher)
 	local v1 = slasher.SlasherValue1 --Hunt power
 
@@ -35,6 +39,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.SO
 
 	if slasher:GetNWBool("DolphinInHiding") then
+		slasher:SetJumpPower(0)
 		slasher:SetRunSpeed(1)
 		slasher:SetWalkSpeed(1)
 		slasher:SetSlowWalkSpeed(1)
@@ -93,6 +98,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 		if not slasher:GetNWBool("CanKill") then
 			slasher:SetNWBool("CanKill", true)
 		end
+
+		slasher:SetJumpPower(slasher.Jump)
 
 		--urgh i can move yes lmao
 
