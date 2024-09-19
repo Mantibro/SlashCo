@@ -59,30 +59,31 @@ SLASHER.OnTickBehaviour = function(slasher)
 			end)
 		end
 
-		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-			if s:GetPos():Distance(slasher:GetPos()) < 500 then
-				local tr = util.TraceLine({
-					start = slasher:EyePos(),
-					endpos = s:GetPos() + Vector(0, 0, 40),
-					filter = slasher,
-					mask = MASK_VISIBLE
-				})
-
-				if tr.Entity == s then
-					slasher:SetNWBool("DolphinFound", true)
-
-					slasher:PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85)
-					slasher:PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 140)
-
-					timer.Simple(10, function()
-						slasher:SetNWBool("DolphinFound", false)
-						slasher:SetNWBool("DolphinInHiding", false)
-						slasher:SetNWBool("DolphinHunting", true)
-					end)
-				end
+		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if s:GetPos():Distance(slasher:GetPos()) >= 500 then
+				continue
 			end
+
+			local tr = util.TraceLine({
+				start = slasher:EyePos(),
+				endpos = s:WorldSpaceCenter(),
+				filter = slasher
+			})
+
+			if tr.Entity ~= s then
+				continue
+			end
+
+			slasher:SetNWBool("DolphinFound", true)
+
+			slasher:PlayGlobalSound("slashco/slasher/dolfin_call.wav", 85)
+			slasher:PlayGlobalSound("slashco/slasher/dolfin_call_far.wav", 140)
+
+			timer.Simple(10, function()
+				slasher:SetNWBool("DolphinFound", false)
+				slasher:SetNWBool("DolphinInHiding", false)
+				slasher:SetNWBool("DolphinHunting", true)
+			end)
 		end
 
 		if slasher:GetNWBool("CanKill") then
@@ -285,7 +286,7 @@ if CLIENT then
 
 			if v:GetNWBool("DolphinHunting") then
 				local tlight = DynamicLight(v:EntIndex() + 915)
-				if (tlight) then
+				if tlight then
 					tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
 					tlight.r = 249
 					tlight.g = 215

@@ -30,7 +30,6 @@ SLASHER.CannotBeSpectated = true
 SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
-	slasher:PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50)
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
@@ -53,7 +52,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("CanChase", false)
 		slasher:SetNWBool("CanKill", false)
 
-		if team.NumPlayers(TEAM_SURVIVOR) < 2 and team.NumPlayers(TEAM_SURVIVOR) > 0 then
+		local numP = team.NumPlayers(TEAM_SURVIVOR)
+		if numP < 2 and numP > 0 then
 			v1 = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
 
 			slasher:SetNWBool("CanChase", true)
@@ -63,7 +63,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("CanChase", true)
 		slasher:SetNWBool("CanKill", true)
 
-		if not IsValid(player.GetBySteamID64(v1)) or player.GetBySteamID64(v1):Team() ~= TEAM_SURVIVOR then
+		local s = player.GetBySteamID64(v1)
+		if not IsValid(s) or s:Team() ~= TEAM_SURVIVOR then
 			slasher.SlasherValue1 = ""
 		end
 	end
@@ -72,27 +73,33 @@ SLASHER.OnTickBehaviour = function(slasher)
 		--Find a survivor
 		slasher.SlasherValue3 = v3 + FrameTime()
 
-		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+		if slasher.NestSound ~= v3 then
+			slasher:StopSound("slashco/slasher/manspider_idle.wav")
+			slasher.NestSound = v3
+		end
 
-			if s:GetPos():Distance(slasher:GetPos()) < (1000 + (v3 * 3) + (SO * 750)) then
-				local tr = util.TraceLine({
-					start = slasher:EyePos(),
-					endpos = s:GetPos() + Vector(0, 0, 40),
-					filter = slasher,
-					mask = MASK_VISIBLE
-				})
-
-				if tr.Entity == s then
-					slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
-					slasher.SlasherValue1 = s:SteamID64()
-					slasher:SetNWBool("ManspiderNested", false)
-
-					slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-					slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-					slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-				end
+		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if s:GetPos():Distance(slasher:GetPos()) >= (1000 + (v3 * 3) + (SO * 750)) then
+				continue
 			end
+
+			local tr = util.TraceLine({
+				start = slasher:EyePos(),
+				endpos = s:WorldSpaceCenter(),
+				filter = slasher
+			})
+
+			if tr.Entity ~= s then
+				continue
+			end
+
+			slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
+			slasher.SlasherValue1 = s:SteamID64()
+			slasher:SetNWBool("ManspiderNested", false)
+
+			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 		end
 
 		slasher.SlasherValue4 = 0
@@ -100,28 +107,34 @@ SLASHER.OnTickBehaviour = function(slasher)
 		--Not nested
 		slasher.SlasherValue3 = 0
 
-		if v1 == "" then
-			for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-				local s = team.GetPlayers(TEAM_SURVIVOR)[i]
+		if slasher.NestSound ~= v3 then
+			slasher:PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50)
+			slasher.NestSound = v3
+		end
 
+		if v1 == "" then
+			for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 				local d = s:GetPos():Distance(slasher:GetPos())
 
-				if d < 1000 then
-					local tr = util.TraceLine({
-						start = slasher:EyePos(),
-						endpos = s:GetPos() + Vector(0, 0, 40),
-						filter = slasher,
-						mask = MASK_VISIBLE
-					})
+				if d >= 250 then
+					continue
+				end
 
-					if tr.Entity == s then
-						slasher.SlasherValue4 = v4 + (FrameTime() + ((1000 - d) / 10000)) + (SO * FrameTime())
+				local tr = util.TraceLine({
+					start = slasher:EyePos(),
+					endpos = s:WorldSpaceCenter(),
+					filter = slasher
+				})
 
-						if v4 > 100 then
-							slasher.SlasherValue1 = s:SteamID64()
-							slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
-						end
-					end
+				if tr.Entity ~= s then
+					continue
+				end
+
+				slasher.SlasherValue4 = v4 + (FrameTime() + ((1000 - d) / 10000)) + (SO * FrameTime())
+
+				if v4 > 100 then
+					slasher.SlasherValue1 = s:SteamID64()
+					slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
 				end
 			end
 		else
@@ -194,13 +207,8 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end
 
 	if not slasher:GetNWBool("ManspiderNested") then
-		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-			local s = team.GetPlayers(TEAM_SURVIVOR)[i]
-			if s:GetPos():Distance(slasher:GetPos()) < 1600 then
-
-				slasher:ChatPrint("Cannot Nest here, a Survivor is too close. . .")
-				return
-			end
+		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
+			return
 		end
 
 		slasher:SetNWBool("ManspiderNested", true)
@@ -320,9 +328,10 @@ SLASHER.InitHud = function(_, hud)
 	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/s_punch"))
 	hud:TieControlVisible("F", "InSlasherChaseMode", true, true, true)
 
-	hud.prevTarget = not LocalPlayer():GetNWString("ManspiderTarget")
-	hud.prevNested = not LocalPlayer():GetNWBool("ManspiderNested")
-	hud.prevLeave = not LocalPlayer():GetNWBool("ManspiderCanLeaveNest")
+	hud.prevTarget = -1
+	hud.prevNested = -1
+	hud.prevLeave = -1
+	hud.prevHide = -1
 	function hud.AlsoThink()
 		local target = LocalPlayer():GetNWString("ManspiderTarget")
 		if target ~= hud.prevTarget then
@@ -361,10 +370,18 @@ SLASHER.InitHud = function(_, hud)
 				hud:SetControlEnabled("R", false)
 			else
 				hud:SetControlText("R", "nest")
-				hud:SetControlEnabled("R", true)
 			end
 
 			hud.prevNested = nested
+		end
+
+		local hide = SlashCo.IsPositionLegalForSlashers(LocalPlayer():GetPos())
+		if hud.prevHide ~= hide then
+			if not nested then
+				hud:SetControlEnabled("R", hide)
+			end
+
+			hud.prevHide = hide
 		end
 
 		local canLeave = LocalPlayer():GetNWBool("ManspiderCanLeaveNest")
