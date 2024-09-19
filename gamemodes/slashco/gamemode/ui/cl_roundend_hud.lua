@@ -82,12 +82,13 @@ local function printRescued(rescued)
 	return SlashCo.Language(count == 1 and "RescuedOnlyOne" or "Rescued", neatString)
 end
 
-local function printLeftBehind(rescued) --survivors,
+local function printLeftBehind(rescued)
 	local plysLeftBehind = {}
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		local isRescued
 		for _, v1 in ipairs(rescued) do
-			if v == v1 then
+			if not IsValid(v1) then continue end
+			if v:UserID() == v1:UserID() then
 				isRescued = true
 				break
 			end
@@ -130,7 +131,7 @@ local function teamSummary(lines, survivors, rescued)
 		table.insert(lines, rescuedString)
 	end
 
-	local leftBehindString = printLeftBehind(rescued) --survivors,
+	local leftBehindString = printLeftBehind(rescued)
 	if leftBehindString then
 		table.insert(lines, leftBehindString)
 	end
@@ -285,6 +286,10 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	if table.IsEmpty(lines) then
 		return
 	end
+
+	print("- round end -")
+	PrintTable(survivors)
+	PrintTable(rescued)
 
 	local cur = CurTime()
 

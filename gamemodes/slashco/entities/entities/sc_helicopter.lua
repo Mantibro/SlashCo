@@ -81,8 +81,6 @@ if SERVER then
 		end
 
 		for _, v in ipairs(SatPlayers) do
-			--local id = activator:SteamID64()
-
 			if v == activator then
 				--If the steamid in this entry matches the one we're looking for, that means the player is already in the copter.
 				userEnteredAlready = true

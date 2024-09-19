@@ -212,7 +212,7 @@ SlashCo.RoundOverScreen = function(state)
 
 	--yucky yucky
 	local goodSurvivorTable = {}
-	for _, ply in ipairs(player.GetAll()) do
+	for _, ply in player.Iterator() do
 		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
 			if ply:SteamID64() == v.id then
 				table.insert(goodSurvivorTable, ply)
@@ -220,13 +220,19 @@ SlashCo.RoundOverScreen = function(state)
 			end
 		end
 		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
-			if ply:SteamID64() == v.id then
+			if ply:SteamID64() == v.s_id then
 				pointStateSlasher[state](ply)
 			end
 		end
 	end
 
-	SlashCo.SendValue(nil, "RoundEnd", state, goodSurvivorTable, SlashCo.CurRound.HelicopterRescuedPlayers)
+	local rescued = {}
+	for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
+		if not IsValid(v) then continue end
+		table.insert(rescued, v)
+	end
+
+	SlashCo.SendValue(nil, "RoundEnd", state, goodSurvivorTable, rescued)
 end
 
 SlashCo.BroadcastGlobalData = function()

@@ -163,6 +163,7 @@ SlashCo.RoundBeginTimer = function()
 end
 
 local roundEnding
+local delay = 20
 SlashCo.EndRound = function()
 	if g_SlashCoDebug then
 		return
@@ -173,9 +174,8 @@ SlashCo.EndRound = function()
 	end
 	roundEnding = true
 
-	local delay = 20
-
 	local SurvivorCount = team.NumPlayers(TEAM_SURVIVOR)
+	local heliCount = #SlashCo.CurRound.HelicopterRescuedPlayers
 	if SurvivorCount == 0 then
 		--All survivors are dead
 
@@ -194,7 +194,7 @@ SlashCo.EndRound = function()
 		if SlashCo.CurRound.DistressBeaconUsed then
 			--Premature Win distress beacon
 
-			if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
+			if heliCount > 0 then
 				--The last survivor got to the helicopter
 
 				SlashCo.RoundOverScreen(4)
@@ -207,7 +207,7 @@ SlashCo.EndRound = function()
 			--Normal win
 
 			local allSurvCount = #SlashCo.CurRound.SlasherData.AllSurvivors
-			if SurvivorCount >= allSurvCount and #SlashCo.CurRound.HelicopterRescuedPlayers >= allSurvCount then
+			if SurvivorCount >= allSurvCount and heliCount >= allSurvCount then
 				--Everyone lived
 
 				SlashCo.RoundOverScreen(0)
@@ -219,30 +219,26 @@ SlashCo.EndRound = function()
 		end
 	end
 
-	if #SlashCo.CurRound.HelicopterRescuedPlayers > 0 then
+	if heliCount > 0 then
 		local winners = {}
 
 		--Add to stats of the remaining survivors' wins
 		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
-			if not IsValid(v) then
-				return
-			end
+			if not IsValid(v) then continue end
 
 			local plyID = v:SteamID64()
-
 			SlashCoDatabase.UpdateStats(plyID, "SurvivorRoundsWon", 1)
+
 			v:SetPoints("survive")
-			winners[v] = true
+			winners[v:UserID()] = true
 		end
 
-		if #SlashCo.CurRound.SlasherData.AllSurvivors > 1 and table.Count(winners) == 1 then
-			for k, _ in pairs(winners) do
-				k:SetPoints("last_survive")
-			end
+		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
+			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetPoints("last_survive")
 		end
 
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not winners[v] then
+			if not winners[v:UserID()] then
 				v:SetPoints("left_behind")
 			end
 		end
