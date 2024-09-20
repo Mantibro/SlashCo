@@ -67,9 +67,9 @@ SLASHER.OnTickBehaviour = function(slasher)
 		--Deplete thirst
 
 		slasher.SlasherValue5 = 285 - (v1 * 10)
-		slasher.SlasherValue4 = 100 + (((v3 / (7 - v1))) + (v1 * 20)) * (0.8 + (SO * 0.5))
-		eyesight_final = 2 + ((v3 / (28.5 - (v1 * 4))))
-		perception_final = 1.0 + ((v3 / (44.5 - (v1 * 8))))
+		slasher.SlasherValue4 = 100 + ((v3 / (7 - v1)) + (v1 * 30)) * (0.8 + (SO * 0.5))
+		eyesight_final = 2 + (v3 / (28.5 - (v1 * 4)))
+		perception_final = 1.0 + (v3 / (44.5 - (v1 * 8)))
 		--Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
 		--His chase speed is greatest at low milk drank, and the more he drinks, it is converted to prowl speed.
 

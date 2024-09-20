@@ -149,7 +149,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWString("ManspiderTarget", v1)
 	end
 
-	if v3 > 100 then
+	if v3 > 50 then
 		if slasher:GetNWBool("ManspiderCanLeaveNest") ~= true then
 			slasher:SetNWBool("ManspiderCanLeaveNest", true)
 		end
