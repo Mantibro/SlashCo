@@ -288,10 +288,14 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	end
 
 	print("- round end -")
-	print("survivors:")
-	PrintTable(survivors)
-	print("rescued:")
-	PrintTable(rescued)
+	if survivors then
+		print("survivors:")
+		PrintTable(survivors)
+	end
+	if rescued then
+		print("rescued:")
+		PrintTable(rescued)
+	end
 
 	local cur = CurTime()
 
