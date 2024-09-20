@@ -92,7 +92,6 @@ function GM:Initialize()
 		--Return to the lobby if no game is in progress and we just loaded in.
 		if GAMEMODE.State ~= GAMEMODE.States.IN_GAME and game.GetMap() ~= "sc_lobby" then
 			SlashCo.GoToLobby()
-			--print("tried to go to lobby (bad state)")
 			GAMEMODE.State = GAMEMODE.States.LOBBY
 		else
 			GAMEMODE.State = GAMEMODE.States.IN_GAME
@@ -347,11 +346,10 @@ function GM:PlayerDeathSound()
 end
 
 function GM:PlayerShouldTakeDamage(ply, attacker)
-	if attacker:IsPlayer() or attacker:IsNPC() then
-		if attacker:Team() == ply:Team() then
-			return false
-		end
+	if (attacker:IsPlayer() or attacker:IsNPC()) and attacker:Team() == ply:Team() then
+		return false
 	end
+
 	return ply:Team() == TEAM_SURVIVOR
 end
 
@@ -536,7 +534,6 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
 	SlashCoDatabase.OnPlayerJoined(pid)
 
 	SlashCo.AwaitExpectedPlayers()
-
 	SlashCo.BroadcastGlobalData()
 
 	timer.Simple(2, function()

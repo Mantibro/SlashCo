@@ -182,7 +182,8 @@ local pointState = {
 	[3] = function() end,
 	[4] = function(ply)
 		ply:SetPoints("escape")
-	end
+	end,
+	[5] = function() end,
 }
 
 local pointStateSlasher = {
@@ -196,7 +197,8 @@ local pointStateSlasher = {
 	end,
 	[4] = function(ply)
 		ply:SetPoints("slasher_escape")
-	end
+	end,
+	[5] = function() end,
 }
 
 --[[ state value:

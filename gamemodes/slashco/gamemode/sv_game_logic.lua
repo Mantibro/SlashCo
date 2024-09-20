@@ -1,5 +1,16 @@
 SlashCo = SlashCo or {}
 
+function SlashCo.SinglePlayerSetup()
+	SlashCo.CurRound.Difficulty = math.random(0, 3)
+	SlashCo.CurRound.SurvivorData.GasCanMod = 0
+	SlashCo.CurRound.OfferingData.CurrentOffering = 0
+
+	hook.Add("PlayerInitialSpawn", "SinglePlayerSetup", function(ply)
+		table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = ply:SteamID64() })
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = ply:SteamID64(), GameContribution = 0 })
+	end)
+end
+
 SlashCo.LoadCurRoundData = function()
 	table.Empty(SlashCo.CurRound.ExpectedPlayers)
 	if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
@@ -103,6 +114,11 @@ SlashCo.LoadCurRoundData = function()
 			end)
 		end
 	else
+		if game.SinglePlayer() then
+			SlashCo.SinglePlayerSetup()
+			return
+		end
+
 		print("[SlashCo] Something went wrong while trying to load the round data from the Database! Restart imminent. (init)")
 		local baseTable = sql.TableExists("slashco_table_basedata") and "present" or "nil"
 		local survivorTable = sql.TableExists("slashco_table_survivordata") and "present" or "nil"
@@ -117,7 +133,7 @@ end
 
 SlashCo.AwaitExpectedPlayers = function()
 	if game.GetMap() ~= "sc_lobby" then
-		if #SlashCo.CurRound.ExpectedPlayers < 2 then
+		if not game.SinglePlayer() and #SlashCo.CurRound.ExpectedPlayers < 2 then
 			return
 		end --don't start with no data
 
@@ -157,7 +173,8 @@ end
 
 --				***Begin the round start timer***
 SlashCo.RoundBeginTimer = function()
-	timer.Create("GameStart", 15, 1, function()
+	local time = game.SinglePlayer() and 3 or 15
+	timer.Create("GameStart", time, 1, function()
 		RunConsoleCommand("slashco_run_curconfig")
 	end)
 end

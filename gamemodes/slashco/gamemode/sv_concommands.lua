@@ -220,11 +220,15 @@ concommand.Add("slashco_debug_run_survivor", function(ply)
 		return
 	end
 
+	SlashCo.CurRound.SlasherData.AllSurvivors = {}
+
 	g_SlashCoDebug = true
 	timer.Simple(0.5, function()
-		for _, k in ipairs(player.GetAll()) do
+		for _, k in player.Iterator() do
 			k:SetTeam(TEAM_SURVIVOR)
 			k:Spawn()
+
+			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = k:SteamID64(), GameContribution = 0 })
 			doPrint(ply, k:Name() .. " is now a survivor")
 		end
 	end)

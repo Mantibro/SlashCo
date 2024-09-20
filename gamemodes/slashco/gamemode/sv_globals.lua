@@ -109,7 +109,6 @@ SlashCo.ResetCurRoundData()
 SlashCo.PlayerData = SlashCo.PlayerData or {} --Holds all loaded playerdata
 
 --Spawn a gas can
--- [[
 SlashCo.CreateGasCan = function(pos, ang)
 	local Ent = ents.Create("sc_gascan")
 
@@ -130,7 +129,6 @@ SlashCo.CreateGasCan = function(pos, ang)
 
 	return Ent
 end
---]]
 
 --Spawn an Item( or any entity, including slasher entities )
 SlashCo.CreateItem = function(class, pos, ang)
@@ -150,19 +148,17 @@ SlashCo.CreateItem = function(class, pos, ang)
 	local id = Ent:EntIndex()
 
 	if class == "sc_babaclone" then
-		if SERVER then
-			SlashCo.CurRound.SlasherEntities[id] = {
-				activateWalk = false,
-				activateSpook = false,
-				PostActivation = false
-			}
-		end
+		SlashCo.CurRound.SlasherEntities[id] = {
+			activateWalk = false,
+			activateSpook = false,
+			PostActivation = false
+		}
 	end
 
 	return id
 end
 
---Spawn the helicopter 
+--Spawn the helicopter
 SlashCo.CreateHelicopter = function(pos, ang)
 	local Ent = ents.Create("sc_helicopter")
 
@@ -241,13 +237,9 @@ SlashCo.RemoveAllCurRoundEnts = function()
 	local gens = ents.FindByClass("sc_generator")
 	for _, v in ipairs(gens) do
 		local can = v.FuelingCan --make sure any attached cans and bats go too
-		--local bat = v.HasBattery --this returns a boolean
 		if IsValid(can) then
 			can:Remove()
 		end
-		--if IsValid(bat) then
-		--	bat:Remove()
-		--end
 		v:Remove()
 	end
 
@@ -268,7 +260,7 @@ SlashCo.RemoveAllCurRoundEnts = function()
 		v:Remove()
 	end
 
-	for I = 1, #(SlashCo.CurRound.ExposureSpawns) do
+	for I = 1, #SlashCo.CurRound.ExposureSpawns do
 		if IsValid(Entity(SlashCo.CurRound.ExposureSpawns[I])) then
 			Entity(SlashCo.CurRound.ExposureSpawns[I]):Remove()
 		end
@@ -276,9 +268,7 @@ SlashCo.RemoveAllCurRoundEnts = function()
 end
 
 SlashCo.ChangeMap = function(mapname)
-	if SERVER then
-		RunConsoleCommand("changelevel", mapname)
-	end
+	RunConsoleCommand("changelevel", mapname)
 end
 
 SlashCo.GoToLobby = function()

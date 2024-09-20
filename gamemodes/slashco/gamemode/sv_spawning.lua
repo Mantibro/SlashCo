@@ -351,10 +351,20 @@ function SlashCo.SpawnSlasher()
 	slasherSpawned = true
 end
 
+local function singlePlayerTable()
+	local tbl = {}
+
+	for _, v in player.Iterator() do
+		table.insert(tbl, { Survivors = v:SteamID64(), Item = "none" })
+	end
+
+	return tbl
+end
+
 ---Set up players for the round
 function SlashCo.SetupPlayers()
-	if not sql.TableExists("slashco_table_basedata") or not sql.TableExists("slashco_table_survivordata")
-			or not sql.TableExists("slashco_table_slasherdata") then
+	if not game.SinglePlayer() and (not sql.TableExists("slashco_table_basedata") or not sql.TableExists("slashco_table_survivordata")
+			or not sql.TableExists("slashco_table_slasherdata")) then
 
 		SlashCo.Abort("Missing SQL table data")
 		return
@@ -367,10 +377,10 @@ function SlashCo.SetupPlayers()
 
 	print("[SlashCo] Teams database loaded...")
 
-	local survivors = sql.Query("SELECT * FROM slashco_table_survivordata; ")
-	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ")
 	local becameCovenant = 0
 	local spawn_queue = 0
+	local survivors = sql.Query("SELECT * FROM slashco_table_survivordata; ") or singlePlayerTable()
+	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}
 
 	timer.Simple(0.5, function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
