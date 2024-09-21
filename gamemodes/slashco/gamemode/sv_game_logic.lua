@@ -267,13 +267,14 @@ SlashCo.EndRound = function()
 		SlashCo.RemoveHelicopter()
 		SlashCo.CommitPoints()
 
-		--[[
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
+		local slashers = team.GetPlayers(TEAM_SLASHER)
+
+		--[[
 		for i = 1, #survivors do
 			survivors[i]:SetTeam(TEAM_SPECTATOR)
 			survivors[i]:Spawn()
 		end
-		local slashers = team.GetPlayers(TEAM_SLASHER)
 		for i = 1, #slashers do
 			slashers[i]:SetTeam(TEAM_SPECTATOR)
 			slashers[i]:Spawn()

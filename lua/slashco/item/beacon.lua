@@ -25,7 +25,7 @@ ITEM.OnUse = function(ply)
 		if v.IsRunning then runningCount = runningCount + 1 end
 	end
 
-	for k, v in ipairs(ents.FindByClass( "sc_activebeacon")) do
+	for k, v in ipairs(ents.FindByClass("sc_activebeacon")) do
 		if not v:GetNWBool("BeaconBroken") then
 			ply:ChatText("Beacon_already_active")
 			return true
@@ -37,7 +37,8 @@ ITEM.OnUse = function(ply)
 		return true
 	end
 
-	if not SlashCo.CurRound.DistressBeaconUsed then
+	if SlashCo.CurRound.DistressBeaconUsed then
+		ply:ChatText("Beacon_already_active")
 		return true
 	end
 
