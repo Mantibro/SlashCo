@@ -492,7 +492,7 @@ local function pickItem(ply, item)
 end
 
 function LobbyVendorVoice(item)
-    local vendor = ents.FindByClass( "sc_itemstash" )[1]
+    local vendor = ents.FindByClass("sc_itemstash")[1]
 
     if item == "DeathWard" then
         vendor:EmitSound("slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
@@ -528,10 +528,12 @@ local function pickMap(ply, map)
 end
 
 hook.Add("scValue_pickItem", "slashCo_PickItem", function(ply, item)
+    if ply.CantBuy then return end
     pickItem(ply, item)
 end)
 
 hook.Add("scValue_pickMap", "slashCo_PickMap", function(ply, map)
+    if ply.CantBuy then return end
     pickMap(ply, map)
 end)
 
@@ -702,9 +704,9 @@ SlashCo.OfferingVoteFail = function()
     SlashCo.LobbyData.VotedOffering = 0
     table.Empty(SlashCo.LobbyData.Offerors)
 
-    for _, play in ipairs(player.GetAll()) do
-        play:ChatText("offervote_not_success")
-        SlashCo.EndOfferingVote(play)
+    for _, ply in player.Iterator() do
+        ply:ChatText("offervote_not_success")
+        SlashCo.EndOfferingVote(ply)
     end
 end
 
@@ -712,9 +714,9 @@ SlashCo.OfferingVoteSuccess = function(id)
     local fail = false
 
     if id == 4 and #team.GetPlayers(TEAM_SPECTATOR) < 1 then
-        for _, play in ipairs(player.GetAll()) do
-            play:ChatText("offervote_duality_fail")
-            SlashCo.EndOfferingVote(play)
+        for _, ply in player.Iterator() do
+            ply:ChatText("offervote_duality_fail")
+            SlashCo.EndOfferingVote(ply)
             fail = true
         end
     end
@@ -742,7 +744,7 @@ end
 
 --//lobby concommands//--
 
-concommand.Add("lobby_debug_proceed", function(ply, _, _)
+concommand.Add("lobby_debug_proceed", function(ply)
     if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
         return
     end
@@ -783,7 +785,7 @@ concommand.Add("lobby_debug_proceed", function(ply, _, _)
     end
 end)
 
-concommand.Add("lobby_debug_transition", function(ply, _, _)
+concommand.Add("lobby_debug_transition", function(ply)
     if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
         return
     end
@@ -810,7 +812,7 @@ concommand.Add("lobby_debug_transition", function(ply, _, _)
     end
 end)
 
-concommand.Add("lobby_debug_brief", function(ply, _, _)
+concommand.Add("lobby_debug_brief", function(ply)
     if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
         return
     end
@@ -830,7 +832,7 @@ concommand.Add("lobby_debug_brief", function(ply, _, _)
     end
 end)
 
-concommand.Add("timer_start", function(ply, _, _)
+concommand.Add("timer_start", function(ply)
     if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
         return
     end
@@ -840,11 +842,14 @@ concommand.Add("timer_start", function(ply, _, _)
     end
 end)
 
-concommand.Add("lobby_reset", function(ply, _, _)
+concommand.Add("lobby_reset", function(ply)
     if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
         return
     end
 
+    SlashCo.GoToLobby()
+
+    --[[
     if SERVER then
         SlashCo.LobbyData.LOBBYSTATE = 0
 
@@ -868,9 +873,10 @@ concommand.Add("lobby_reset", function(ply, _, _)
 
         ply:ChatPrint("(Debug) Lobby reset.")
     end
+    --]]
 end)
 
-concommand.Add("lobby_openitems", function(ply, _, _)
+concommand.Add("lobby_openitems", function(ply)
     if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
         return
     end
@@ -883,7 +889,7 @@ concommand.Add("lobby_openitems", function(ply, _, _)
     end
 end)
 
-concommand.Add("lobby_leave", function(ply, _, _)
+concommand.Add("lobby_leave", function(ply)
     if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
         return
     end

@@ -47,9 +47,9 @@ timer.Create("EnsureCorrectSpeed", 1, 0, function()
 end)
 
 hook.Add("PlayerDeath", "slashCoResetSpeedEffects", function(victim)
-	SlashCo.SpeedEffects[ply:UserID()] = {}
+	SlashCo.SpeedEffects[victim:UserID()] = {}
 end)
 
 hook.Add("PlayerSilentDeath", "slashCoResetSpeedEffectsSilent", function(victim)
-	SlashCo.SpeedEffects[ply:UserID()] = {}
+	SlashCo.SpeedEffects[victim:UserID()] = {}
 end)
