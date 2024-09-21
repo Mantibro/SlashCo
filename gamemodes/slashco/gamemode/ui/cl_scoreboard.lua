@@ -27,6 +27,11 @@ local PLAYER_LINE = {
 		self.Mute:SetSize(32, 32)
 		self.Mute:Dock(LEFT)
 
+		self.Shift = self:Add("Panel")
+		self.Shift:SetSize(32, 32)
+		self.Shift:Dock(LEFT)
+		self.Shift:Hide()
+
 		self.AvatarButton = self:Add("DButton")
 		self.AvatarButton:Dock(LEFT)
 		self.AvatarButton:SetSize(32, 32)
@@ -50,6 +55,7 @@ local PLAYER_LINE = {
 	Setup = function(self, pl)
 		if pl == LocalPlayer() then
 			self.Mute:Hide()
+			self.Shift:Show()
 		end
 
 		self.Player = pl

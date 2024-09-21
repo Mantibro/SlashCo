@@ -81,7 +81,7 @@ end
 
 function SlashCo.LobbyRoundData()
 	net.Start("mantislashcoSendRoundData")
-	net.WriteTable({ survivors = SlashCo.LobbyData.AssignedSurvivors, slashers = SlashCo.LobbyData.AssignedSlashers, offering = SlashCo.LobbyData.Offering })
+	net.WriteTable({ survivors = SlashCo.LobbyData.AssignedSurvivors, slashers = SlashCo.LobbyData.AssignedSlashers, offering = SCInfo.Offering[SlashCo.LobbyData.Offering].Name })
 	net.Broadcast()
 end
 
