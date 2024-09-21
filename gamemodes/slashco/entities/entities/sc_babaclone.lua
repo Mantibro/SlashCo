@@ -14,13 +14,17 @@ ENT.PingType = "SLASHER"
 
 ENT.AutomaticFrameAdvance = true
 
-function ENT:Initialize()
-	if SERVER then
+if SERVER then
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
+
+	function ENT:Initialize()
 		self:SetModel("models/slashco/slashers/baba/baba.mdl")
 		self:SetMoveType(MOVETYPE_NONE)
 		self:SetUseType(SIMPLE_USE)
 		self:DrawShadow(false)
-		self:SetColor(Color(0,0,0,0))
+		self:SetColor(Color(0, 0, 0, 0))
 		self:SetRenderMode(RENDERMODE_TRANSALPHA)
 
 		self:SetNWBool("CloneTripped", false)
@@ -31,18 +35,21 @@ function ENT:Initialize()
 			self:SetPlaybackRate(2)
 		end)
 	end
-end
 
-function ENT:Think()
-	if SERVER then
+	function ENT:Think()
+		if not SlashCo.CurRound.SlasherEntities[self:EntIndex()] then
+			self:Remove()
+			return
+		end
+
 		local tr = util.TraceLine({
-		start = self:LocalToWorld(Vector(0,0,40)),
-		endpos = self:LocalToWorld(Vector(0,0,40)) + self:GetForward() * 1150
+		start = self:LocalToWorld(Vector(0, 0, 40)),
+		endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetForward() * 1150
 		})
 
 		local ground = util.TraceLine({
-			start = self:LocalToWorld(Vector(0,0,40)),
-			endpos = self:LocalToWorld(Vector(0,0,40)) + self:GetUp() * -10000
+			start = self:LocalToWorld(Vector(0, 0, 40)),
+			endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetUp() * -10000
 		})
 
 		if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SURVIVOR and not self.activateWalk and SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook == false then
@@ -68,8 +75,8 @@ function ENT:Think()
 			self:SetPos(Vector(self:GetPos()[1],self:GetPos()[2],ground.HitPos[3]))
 
 			local etr = util.TraceLine({
-				start = self:LocalToWorld(Vector(0,0,40)),
-				endpos = self:LocalToWorld(Vector(0,0,40)) + self:GetForward() * 30
+				start = self:LocalToWorld(Vector(0, 0, 40)),
+				endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetForward() * 30
 			})
 
 			if etr.Hit then table.RemoveByValue(SlashCo.CurRound.SlasherEntities, self:EntIndex()) self:Remove()  end
@@ -112,13 +119,7 @@ function ENT:Think()
 		self:NextThink(CurTime())
 		return true
 	end
-end
-
-function ENT:UpdateTransmitState()
-	return TRANSMIT_ALWAYS
-end
-
-if CLIENT then
+else
 	function ENT:Draw()
 		self:DrawModel()
 	end

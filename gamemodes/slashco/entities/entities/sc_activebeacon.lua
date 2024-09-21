@@ -27,11 +27,11 @@ local function ArmBeacon(ent)
 	SlashCo.CurRound.DistressBeaconUsed = true
 end
 
-function ENT:UpdateTransmitState()
-	return TRANSMIT_ALWAYS
-end
-
 if SERVER then
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
+
 	function ENT:Initialize()
 		self:SetModel(SlashCoItems.Beacon.Model)
 		self:SetSolid(SOLID_VPHYSICS)
@@ -88,9 +88,7 @@ if SERVER then
 			end
 		end
 	end
-end
-
-if CLIENT then
+else
 	function ENT:Draw()
 		self:DrawModel()
 	end

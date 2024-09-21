@@ -496,7 +496,21 @@ hook.Add("PostGamemodeLoaded", "octoSlashCoPostGamemodeLoaded", function()
 	end)
 end)
 
-hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply, _)
+gameevent.Listen("player_activate")
+hook.Add("player_activate", "slashCoPreItem", function(data)
+	local ply = Player(data.userid)
+
+	if SlashCo.CurRound and SlashCo.CurRound.SlasherData and SlashCo.CurRound.SlasherData.AllSurvivors then
+		local id = ply:SteamID64()
+		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
+			if v.id == id then
+				SlashCo.SendValue(ply, "preItem", v.Item)
+			end
+		end
+	end
+end)
+
+hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
 	ply:SetTeam(TEAM_SPECTATOR)
 	ply:Spawn()
 

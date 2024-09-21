@@ -101,16 +101,16 @@ function ENT:HandleStuck()
 	self.loco:ClearStuck()
 end
 
-function ENT:UpdateTransmitState()
-	return TRANSMIT_ALWAYS
-end
-
 if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
 	end
 
 	return
+end
+
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
 end
 
 function ENT:Think()

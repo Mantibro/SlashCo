@@ -113,7 +113,7 @@ SlashCo.CreateGasCan = function(pos, ang)
 	local Ent = ents.Create("sc_gascan")
 
 	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
+		MsgC(Color(255, 64, 64),
 				"[SlashCo] Something went wrong when trying to create a gas can at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
@@ -135,7 +135,7 @@ SlashCo.CreateItem = function(class, pos, ang)
 	local Ent = ents.Create(class)
 
 	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
+		MsgC(Color(255, 64, 64),
 				"[SlashCo] Something went wrong when trying to create a " .. class .. " at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
@@ -145,17 +145,7 @@ SlashCo.CreateItem = function(class, pos, ang)
 	Ent:Spawn()
 	Ent:Activate()
 
-	local id = Ent:EntIndex()
-
-	if class == "sc_babaclone" then
-		SlashCo.CurRound.SlasherEntities[id] = {
-			activateWalk = false,
-			activateSpook = false,
-			PostActivation = false
-		}
-	end
-
-	return id
+	return Ent
 end
 
 --Spawn the helicopter
@@ -163,7 +153,7 @@ SlashCo.CreateHelicopter = function(pos, ang)
 	local Ent = ents.Create("sc_helicopter")
 
 	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
+		MsgC(Color(255, 64, 64),
 				"[SlashCo] Something went wrong when trying to create the helicopter at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
@@ -181,7 +171,7 @@ SlashCo.CreateItemStash = function(pos, ang)
 	local Ent = ents.Create("sc_itemstash")
 
 	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
+		MsgC(Color(255, 64, 64),
 				"[SlashCo] Something went wrong when trying to create the itemstash at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
@@ -200,7 +190,7 @@ SlashCo.CreateOfferTable = function(pos, ang)
 	local Ent = ents.Create("sc_offertable")
 
 	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
+		MsgC(Color(255, 64, 64),
 				"[SlashCo] Something went wrong when trying to create the offertable at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
@@ -219,7 +209,7 @@ SlashCo.CreateRadio = function(pos, ang)
 	local Ent = ents.Create("radio")
 
 	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
+		MsgC(Color(255, 64, 64),
 				"[SlashCo] Something went wrong when trying to create the offertable at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end

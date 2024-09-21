@@ -19,7 +19,7 @@ local function SetConfirm()
         return
     end
 
-    if not MGSelection and LocalPlayer():GetNWString("item", "none") ~= "none" or LocalPlayer():GetNWString("item2", "none") ~= "none" then
+    if not MGSelection and LocalPlayer():GetItem("item") ~= "none" or LocalPlayer():GetItem("item2") ~= "none" then
         BlockConfirm()
         return
     end
@@ -54,7 +54,7 @@ local function setItemLabel()
         local numRemain = SlashCoItems[selectedItem].MaxAllowed()
         local slot = SlashCoItems[selectedItem].IsSecondary and "item2" or "item"
         for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-            if v:GetNWString(slot, "none") == selectedItem then
+            if v:GetItem(slot) == selectedItem then
                 numRemain = numRemain - 1
             end
         end

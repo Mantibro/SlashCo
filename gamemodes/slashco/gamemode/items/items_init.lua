@@ -64,7 +64,7 @@ function PLAYER:AddEffect(value, duration)
 	if not self:EffectFunction("OnRemoved") then
 		self:EffectFunction("OnExpired")
 	end
-	self:SetNWString("itemEffect", value)
+	self:SetItem("itemEffect", value)
 	self:EffectFunction("OnApplied")
 	timer.Create("itemEffectExpire_" .. self:UserID(), duration, 1, function()
 		if not IsValid(self) then
@@ -72,13 +72,13 @@ function PLAYER:AddEffect(value, duration)
 		end
 		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 		self:EffectFunction("OnExpired")
-		self:SetNWString("itemEffect", "none")
+		self:SetItem("itemEffect", "none")
 	end)
 end
 
 ---calls the <funcName> function of a player's effect with passed args
 function PLAYER:EffectFunction(funcName, ...)
-	local effect = self:GetNWString("itemEffect", "none")
+	local effect = self:GetItem("itemEffect")
 	if SlashCoEffects[effect] and SlashCoEffects[effect][funcName] then
 		return SlashCoEffects[effect][funcName](self, ...)
 	end
@@ -89,24 +89,24 @@ function PLAYER:ClearEffect()
 	if not self:EffectFunction("OnRemoved") then
 		self:EffectFunction("OnExpired")
 	end
-	if self:GetNWString("itemEffect", "none") ~= "none" then
+	if self:GetItem("itemEffect") ~= "none" then
 		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 	end
 
-	self:SetNWString("itemEffect", "none")
+	self:SetItem("itemEffect", "none")
 	timer.Remove("itemEffectExpire_" .. self:UserID())
 end
 
 ---check the <valueName> value of a player's item in a specific slot
 --this doesn't include a team check because we assume that it's in a survivor-only context
 function PLAYER:ItemValue(valueName, fallback, isSecondary)
-	local effect = self:GetNWString("itemEffect", "none")
+	local effect = self:GetItem("itemEffect")
 	if SlashCoEffects[effect] and SlashCoEffects[effect][valueName] then
 		return SlashCoEffects[effect][valueName]
 	end
 
 	local slot = isSecondary and "item2" or "item"
-	local item = self:GetNWString(slot, "none")
+	local item = self:GetItem(slot)
 	if SlashCoItems[item] and SlashCoItems[item][valueName] then
 		return SlashCoItems[item][valueName]
 	end
@@ -118,15 +118,15 @@ end
 function PLAYER:ItemValue2(value, fallback, noEffect)
 	local item
 	if not noEffect then
-		item = self:GetNWString("itemEffect", "none")
+		item = self:GetItem("itemEffect")
 		if SlashCoItems[item] and SlashCoItems[item][value] then
 			return SlashCoItems[item][value]
 		end
 	end
 
-	item = self:GetNWString("item2", "none")
+	item = self:GetItem("item2")
 	if item == "none" then
-		item = self:GetNWString("item", "none")
+		item = self:GetItem("item")
 	end
 	if SlashCoItems[item] and SlashCoItems[item][value] then
 		return SlashCoItems[item][value]
@@ -137,7 +137,7 @@ end
 
 ---returns whether a player has a specific item
 function PLAYER:HasItem(item, isSecondary)
-	return self:GetNWString(isSecondary and "item2" or "item", "none") == item
+	return self:GetItem(isSecondary and "item2" or "item") == item
 end
 
 ---calls the <funcName> function of a player's item1 with passed args
@@ -194,14 +194,67 @@ function PLAYER:ItemFunction2OrElse(funcName, item, fallback, ...)
 	return unpack(fallback)
 end
 
+if SERVER then
+	function PLAYER:GetItem(slot)
+		return self:GetNWString(slot, "none")
+	end
+
+	function PLAYER:SetItem(slot, item)
+		self:SetNWString(slot, item)
+
+		if slot ~= "itemEffect" then
+			SlashCo.SendValue(self, "preItem", item, slot)
+		end
+	end
+else
+	SlashCo.PreItem = SlashCo.PreItem or "none"
+
+	hook.Add("scValue_preItem", "SlashCoPreItem", function(item, slot)
+		if not slot then
+			SlashCo.PreItem = item or "none"
+			return
+		end
+
+		if not SlashCoItems[SlashCo.PreItem] then
+			return
+		end
+
+		local isSecondary = slot == "item2"
+		local itemSecondary = SlashCoItems[SlashCo.PreItem].IsSecondary or false
+		if itemSecondary == isSecondary then
+			SlashCo.PreItem = "none"
+		end
+	end)
+
+	function PLAYER:GetItem(slot)
+		local item = self:GetNWString(slot, "none")
+
+		if SlashCo.PreItem == "none" or slot == "itemEffect" then
+			return item
+		end
+
+		local isSecondary = slot == "item2"
+		local itemSecondary = SlashCoItems[SlashCo.PreItem].IsSecondary or false
+		if itemSecondary == isSecondary then
+			if item == "none" and SlashCoItems[SlashCo.PreItem] then
+				return SlashCo.PreItem
+			end
+
+			SlashCo.PreItem = "none"
+		end
+
+		return item
+	end
+end
+
 ---internal: checks effect function first before checking the specified slot
 function PLAYER:ItemFunctionInternal(value, slot, ...)
-	local effect = self:GetNWString("itemEffect", "none")
+	local effect = self:GetItem("itemEffect")
 	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
 		return SlashCoEffects[effect][value](self, ...)
 	end
 
-	local item = self:GetNWString(slot, "none")
+	local item = self:GetItem(slot)
 	if SlashCoItems[item] and SlashCoItems[item][value] then
 		return SlashCoItems[item][value](self, ...)
 	end
@@ -219,50 +272,3 @@ for _, v in ipairs(item_patches) do
 	AddCSLuaFile("slashco/patch/item/" .. v)
 	include("slashco/patch/item/" .. v)
 end
-
----this is a little outdated lol
---[[ all values for functions:
-local SlashCoItems = SlashCoItems
-
-SlashCoItems.NameMePlease = {}
-SlashCoItems.NameMePlease.IsSecondary = false --optional, to let gascans and batteries not take up an item slot
-SlashCoItems.NameMePlease.Model = ""
-SlashCoItems.NameMePlease.Name = ""
-SlashCoItems.NameMePlease.Icon = ""
-SlashCoItems.NameMePlease.Price = 0 --don't include to remove from shop
-SlashCoItems.NameMePlease.Description = "" --optional if price isn't included
-SlashCoItems.NameMePlease.CamPos = Vector(0,0,0) --optional if price isn't included
-SlashCoItems.NameMePlease.MaxAllowed = function() --optional, return the number of allowed items (runs clientside; don't use SlashCo)
-    return 1
-end
-SlashCoItems.NameMePlease.DisplayColor = function(ply) --optional, color to display on the background of the name on player's hud (runs clientside; don't use SlashCo)
-    return 0, 0, 128, 255
-end
-SlashCoItems.NameMePlease.OnUse = function(ply) --optional, when pressing r, return true to disable removing the item
-end
-SlashCoItems.NameMePlease.OnDrop = function(ply) --optional, when pressing q
-end
-SlashCoItems.NameMePlease.OnDie = function(ply) --optional, on death (return true to disable ticking down a life)
-end
-SlashCoItems.NameMePlease.OnPickUp = function(ply) --optional, when received
-end
-SlashCoItems.NameMePlease.OnBuy = function(plyid) --optional, when buying from lobby store
-end
-SlashCoItems.NameMePlease.OnSwitchFrom = function(ply) --optional, when item is removed without dropping (NOT called when item is dropped)
-end
-SlashCoItems.NameMePlease.EquipSound = function() --optional, string return of sound to play when equipping the item
-end
-SlashCoItems.NameMePlease.ViewModel = { --optional (i guess), use the SWEP construction kit on the workshop to help set this up
-    model = "",
-    pos = Vector(64, 0, -6),
-    angle = Angle(45, -70, -120),
-    size = Vector(0.5, 0.5, 0.5),
-    color = color_white,
-    surpresslightning = false, --this name is stupid but that's what the construction kit outputs so we're keeping it
-    material = "",
-    skin = 0,
-    bodygroup = {}
-}
---^IMPORTANT: The item display will ALWAYS place the item on "ValveBiped.Bip01_Spine4", with viewmodel set to "models/weapons/c_arms.mdl"
-SlashCoItems.NameMePlease.WorldModel = {} --optional, similar to above but with choice of bone and holdtype
-]]

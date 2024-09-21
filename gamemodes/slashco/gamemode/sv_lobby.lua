@@ -96,9 +96,9 @@ local function lobbySaveCurData()
         for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
             --Save the Current Survivors to the database
 
-            local item = p:GetNWString("item2", "none")
+            local item = p:GetItem("item2")
             if item == "none" then
-                item = p:GetNWString("item", "none")
+                item = p:GetItem("item")
             end
             sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. p:SteamID64() .. ", " .. sql.SQLStr(item) .. " );")
         end
@@ -449,7 +449,7 @@ local function pickItem(ply, item)
         return
     end
 
-    if ply:GetNWString("item", "none") ~= "none" or ply:GetNWString("item2", "none") ~= "none" then
+    if ply:GetItem("item") ~= "none" or ply:GetItem("item2") ~= "none" then
         ply:ChatText("item_already_chosen")
         return
     end
@@ -464,7 +464,7 @@ local function pickItem(ply, item)
         local itemCount = 0
         local slot = SlashCoItems[item].IsSecondary and "item2" or "item"
         for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-            if v:GetNWString(slot, "none") == item then
+            if v:GetItem(slot) == item then
                 itemCount = itemCount + 1
             end
         end

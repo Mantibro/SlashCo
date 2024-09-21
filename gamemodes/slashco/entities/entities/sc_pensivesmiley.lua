@@ -238,11 +238,19 @@ function ENT:HandleStuck()
 	self.loco:ClearStuck()
 end
 
-function ENT:Think()
-	if CLIENT then
-		return
+if CLIENT then
+	function ENT:Draw()
+		self:DrawModel()
 	end
 
+	return
+end
+
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
+end
+
+function ENT:Think()
 	if self.CollideSwitch > 0 then
 		self:SetNotSolid(true)
 		self.CollideSwitch = self.CollideSwitch - FrameTime()
@@ -304,18 +312,6 @@ function ENT:Think()
 			self.AttackEngage = true
 		end
 	end
-end
-
-function ENT:UpdateTransmitState()
-	return TRANSMIT_ALWAYS
-end
-
-if CLIENT then
-	function ENT:Draw()
-		self:DrawModel()
-	end
-
-	return
 end
 
 function ENT:Use(activator)

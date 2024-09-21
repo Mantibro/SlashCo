@@ -33,18 +33,15 @@ SLASHER.OnSpawn = function(slasher)
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
-	--local SO = SlashCo.CurRound.OfferingData.SO
-
 	local v1 = slasher.SlasherValue1 --State
 	local v2 = slasher.SlasherValue2 --Time Spent as Creator or destroyer
-	--local v3 = slasher.SlasherValue3 --Times Found
 	local v4 = slasher.SlasherValue4 --Destruction power
 	local v5 = slasher.SlasherValue5 --Destoyer Blink
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
 
-	local ms = SlashCo.MapSize --SCInfo.Maps[game.GetMap()].SIZE
+	local ms = SlashCo.MapSize
 
 	if v1 == 0 then
 		--Specter
@@ -97,7 +94,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12))
 		end
 
-		if SlashCo.CurRound.EscapeHelicopterSummoned or v2 > 20 + ((ms * 35) - (v4 * 4)) then
+		if SlashCo.CurRound.EscapeHelicopterSummoned or v2 > 25 + ((ms * 25) - (v4 * 4)) then
 			--Time ran out
 
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
@@ -608,7 +605,7 @@ if CLIENT then
 				v.snd:Play()
 			end
 
-			v.snd:ChangeVolume(math.max(v.maxVol - EyePos():Distance(v.ent:GetPos()) * 0.0002 * (0.25 + 0.75 / GetGlobal2Int("SlashCoMapSize", 1)), 0.01), 0.4)
+			v.snd:ChangeVolume(math.max(v.maxVol - EyePos():Distance(v.ent:GetPos()) * 0.0002 * (0.5 + 0.5 / GetGlobal2Int("SlashCoMapSize", 1)), 0.01), 0.4)
 		end
 	end)
 end

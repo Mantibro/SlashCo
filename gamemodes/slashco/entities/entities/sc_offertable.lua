@@ -13,6 +13,10 @@ ENT.Instructions = ""
 ENT.PingType = "OFFERING TABLE"
 
 if SERVER then
+    function ENT:UpdateTransmitState()
+        return TRANSMIT_ALWAYS
+    end
+
     function ENT:Initialize()
         self:SetModel("models/slashco/other/lobby/offertable.mdl")
         self:SetSolid(SOLID_VPHYSICS)
@@ -66,8 +70,4 @@ else
     function ENT:Draw()
         self:DrawModel()
     end
-end
-
-function ENT:UpdateTransmitState()
-    return TRANSMIT_ALWAYS
 end

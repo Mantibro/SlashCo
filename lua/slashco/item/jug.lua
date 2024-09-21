@@ -51,7 +51,7 @@ end
 hook.Add("Think", "JugFunc", function()
 	if SERVER then
 		for _, surv in ipairs( team.GetPlayers(TEAM_SURVIVOR) ) do
-			if surv:GetNWString("item") ~= "Jug" then continue end
+			if surv:GetItem("item") ~= "Jug" then continue end
 
 			if surv:GetNWBool("CurseOfTheJug") then continue end
 

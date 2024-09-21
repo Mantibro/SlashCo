@@ -11,11 +11,11 @@ ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = true
 ITEM.OnUse = function(ply)
     local flare = SlashCo.CreateItem("sc_flare", ply:LocalToWorld( Vector(0, 0, 30) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
-    Entity( flare ):GetPhysicsObject():SetVelocity(ply:GetAimVector() * 400)
-    Entity( flare ):SetNWBool("FlareActive", true)
-    Entity( flare ):SetNWString("FlareDropperName", ply:Nick())
-    Entity( flare ):EmitSound("weapons/flaregun/burn.wav")
-    SlashCo.CurRound.Items[flare] = true
+    flare:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 400)
+    flare:SetNWBool("FlareActive", true)
+    flare:SetNWString("FlareDropperName", ply:Nick())
+    flare:EmitSound("weapons/flaregun/burn.wav")
+    SlashCo.CurRound.Items[flare:EntIndex()] = true
 end
 ITEM.ViewModel = {
     model = "models/slashco/items/flare.mdl",

@@ -268,8 +268,8 @@ function SlashCo.SpawnItems()
 			local it_pos = v:GetPos()
 			local it_ang = v:GetAngles()
 			local droppedItem = SlashCo.CreateItem(SlashCoItems[item].EntClass, it_pos, it_ang)
-			SlashCo.CurRound.Items[droppedItem] = true
-			Entity(droppedItem):SetCollisionGroup(COLLISION_GROUP_NONE)
+			SlashCo.CurRound.Items[droppedItem:EntIndex()] = true
+			droppedItem:SetCollisionGroup(COLLISION_GROUP_NONE)
 			v:Remove()
 		end
 	end

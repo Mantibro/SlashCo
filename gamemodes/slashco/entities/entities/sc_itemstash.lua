@@ -12,11 +12,11 @@ ENT.Purpose = "Supplying SlashCo workers with an item."
 ENT.Instructions = ""
 ENT.PingType = "ITEM STASH"
 
-function ENT:UpdateTransmitState()
-    return TRANSMIT_ALWAYS
-end
-
 if SERVER then
+    function ENT:UpdateTransmitState()
+        return TRANSMIT_ALWAYS
+    end
+
     function ENT:Initialize()
         self:SetModel("models/hunter/blocks/cube2x3x025.mdl")
         self:SetSolid(SOLID_VPHYSICS)
@@ -26,6 +26,7 @@ if SERVER then
         self:SetColor(Color(0, 0, 0, 0))
         self:SetRenderMode(RENDERMODE_TRANSCOLOR)
     end
+
     function ENT:Use(activator)
         if activator:Team() == TEAM_SURVIVOR and not activator.CantBuy then
             SlashCo.SendValue(activator, "openItemPicker")

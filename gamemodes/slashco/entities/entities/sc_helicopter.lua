@@ -58,6 +58,10 @@ function sign(number)
 end
 
 if SERVER then
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
+
 	function ENT:Use(activator)
 		local availabilityHeli = false
 		local userEnteredAlready
@@ -303,13 +307,7 @@ if SERVER then
 
 		return true -- Apply NextThink call
 	end
-end
-
-function ENT:UpdateTransmitState()
-	return TRANSMIT_ALWAYS
-end
-
-if CLIENT then
+else
 	function ENT:Draw()
 		self:DrawModel()
 	end

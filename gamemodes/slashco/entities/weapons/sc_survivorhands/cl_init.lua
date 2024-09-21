@@ -1,5 +1,5 @@
-include('shared.lua')
-include('slashco/gamemode/items/items_init.lua')
+include("shared.lua")
+include("slashco/gamemode/items/items_init.lua")
 
 function SWEP:Initialize()
 	self.heldEntity = ClientsideModel("models/props_junk/metalgascan.mdl", RENDER_GROUP_VIEW_MODEL_OPAQUE)
@@ -123,18 +123,19 @@ function SWEP:RenderModel(v, model, owner, flipVM, xPos, item)
 end
 
 function SWEP:ViewModelDrawn()
-	if not IsValid(self.Owner) then
+	local owner = self:GetOwner()
+	if not IsValid(owner) then
 		return
 	end
 
-	local vm = self.Owner:GetViewModel()
+	local vm = owner:GetViewModel()
 	if not IsValid(vm) then
 		return
 	end
 
-	local item = self.Owner:GetNWString("item2", "none")
+	local item = owner:GetItem("item2")
 	if item == "none" then
-		item = self.Owner:GetNWString("item", "none")
+		item = owner:GetItem("item")
 	end
 
 	local v
@@ -159,8 +160,6 @@ function SWEP:ViewModelDrawn()
 		self.xPos = Lerp(0.06, self.xPos or 55, v.pos.x)
 	end
 
-	--PrintTable(self.lastEquip)
-
 	if not v and not self.lastEquip then
 		return
 	end
@@ -168,20 +167,21 @@ function SWEP:ViewModelDrawn()
 
 	v.bone = "ValveBiped.Bip01_Spine4"
 	self:RenderModel(v, self.heldEntity, vm, true, self.xPos, item)
-	self.Owner:ItemFunction2("OnRenderHand", item, self.heldEntity)
+	owner:ItemFunction2("OnRenderHand", item, self.heldEntity)
 end
 
 function SWEP:DrawWorldModel()
-	if not IsValid(self.Owner) then
+	local owner = self:GetOwner()
+	if not IsValid(owner) then
 		return
 	end
 
-	local item = self.Owner:GetNWString("item2", "none")
+	local item = owner:GetItem("item2")
 	local itemH
 	if item == "none" then
-		item = self.Owner:GetNWString("item", "none")
+		item = owner:GetItem("item")
 	else
-		itemH = self.Owner:GetNWString("item", "none")
+		itemH = owner:GetItem("item")
 	end
 
 	local v
@@ -198,12 +198,12 @@ function SWEP:DrawWorldModel()
 
 	self:SetHoldType(v.holdtype)
 
-	self:RenderModel(v, self.heldEntityWorld, self.Owner, nil, nil, item)
-	self.Owner:ItemFunction2("OnRenderWorld", item, self.heldEntityWorld)
+	self:RenderModel(v, self.heldEntityWorld, owner, nil, nil, item)
+	owner:ItemFunction2("OnRenderWorld", item, self.heldEntityWorld)
 
 	if itemH and SlashCoItems[itemH] and SlashCoItems[itemH].WorldModelHolstered then
-		self:RenderModel(SlashCoItems[itemH].WorldModelHolstered, self.heldEntityHolstered, self.Owner, nil, nil, itemH)
-		self.Owner:ItemFunction2("OnRenderHolstered", itemH, self.heldEntityHolstered)
+		self:RenderModel(SlashCoItems[itemH].WorldModelHolstered, self.heldEntityHolstered, owner, nil, nil, itemH)
+		owner:ItemFunction2("OnRenderHolstered", itemH, self.heldEntityHolstered)
 	elseif IsValid(self.heldEntityHolstered) then
 		self.heldEntityHolstered:SetNoDraw(true)
 	end

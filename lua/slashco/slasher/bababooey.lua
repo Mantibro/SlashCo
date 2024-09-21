@@ -104,8 +104,6 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		slasher:SlasherHudFunc("SetAvatar", "invisible")
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", false)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
-		--slasher:SlasherHudFunc("SetControlIcon", "R", "invisible")
-		--slasher:SlasherHudFunc("ShakeControl", "R")
 
 		slasher.SlasherValue1 = 4
 		slasher:EmitSound("slashco/slasher/baba_hide.mp3")
@@ -126,8 +124,6 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		slasher:SlasherHudFunc("SetAvatar", "default")
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", true)
-		--slasher:SlasherHudFunc("SetControlIcon", "R", "default")
-		--slasher:SlasherHudFunc("ShakeControl", "R")
 
 		--Spook Appear
 		if IsValid(target) and target:IsPlayer() then
@@ -155,7 +151,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		:: SKIP ::
 
 		--Quiet appear
-		slasher.SlasherValue2 = math.random(3, (13 - (SO * 6)))
+		slasher.SlasherValue2 = math.random(3, 13 - (SO * 6))
 		slasher.SlasherValue1 = 8
 
 		:: SPOOKAPPEAR ::
@@ -173,7 +169,15 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	if #ents.FindByClass("sc_babaclone") > SO then
 		return
 	end
-	SlashCo.CreateItem("sc_babaclone", slasher:GetPos(), slasher:GetAngles())
+
+	local ent = SlashCo.CreateItem("sc_babaclone", slasher:GetPos(), slasher:GetAngles())
+	if IsValid(ent) then
+		SlashCo.CurRound.SlasherEntities[ent:EntIndex()] = {
+			activateWalk = false,
+			activateSpook = false,
+			PostActivation = false
+		}
+	end
 end
 
 SLASHER.Animator = function(ply)

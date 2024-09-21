@@ -22,7 +22,7 @@ function ENT:OnSpawn()
 	end
 	self.Item = nil
 
-	local id = SlashCo.CreateItem(SlashCoItems[item].EntClass, self:GetPos(), self:GetAngles())
-	SlashCo.CurRound.Items[id] = true
-	return Entity(id)
+	local ent = SlashCo.CreateItem(SlashCoItems[item].EntClass, self:GetPos(), self:GetAngles())
+	SlashCo.CurRound.Items[ent:EntIndex()] = true
+	return ent
 end

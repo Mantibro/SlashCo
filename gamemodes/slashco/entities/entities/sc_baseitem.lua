@@ -30,30 +30,22 @@ function ENT:Initialize()
 	end
 end
 
-function ENT:UpdateTransmitState()
-	return TRANSMIT_ALWAYS
-end
-
 if SERVER then
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
+
 	function ENT:Use(activator)
 		if activator:Team() ~= TEAM_SURVIVOR then
 			return
 		end
 
 		SlashCo.ItemPickUp(activator, self:EntIndex(), self.PrintName)
-
-		--[[
-		if self:IsPlayerHolding() then
-			return
-		end
-
-		activator:PickupObject(self)
-		--]]
 	end
 
 	return
-end
-
-function ENT:Draw()
-	self:DrawModel()
+else
+	function ENT:Draw()
+		self:DrawModel()
+	end
 end

@@ -32,40 +32,39 @@ ITEM.OnUse = function(ply)
 		end
 	end
 
-	if runningCount >= 1 then
-		if not SlashCo.CurRound.DistressBeaconUsed then
-			if team.NumPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
-				if not ply.BeaconWarning then
-					ply:ChatText("Beacon_confirm")
-					ply.BeaconWarning = true
-					timer.Simple(3, function() ply.BeaconWarning = false end)
-
-					return true
-				else
-					local ent = SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
-					if IsValid(ent) then
-						ent.DoArming = true
-						ent:SetNWBool("ArmingBeacon", true)
-						SlashCo.BeaconArming = true
-					end
-
-					return
-				end
-			else --instant because alone
-				SlashCo.CurRound.DistressBeaconUsed = true
-				SlashCo.SummonEscapeHelicopter(true)
-				local id = SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
-				local ent = Entity(id)
-				if IsValid(ent) then
-					ent:PlayGlobalSound("slashco/survivor/distress_siren.wav", 100)
-				end
-
-				return
-			end
-		end
-	else
+	if runningCount < 1 then
 		ply:ChatText("Beacon_unavailable")
 		return true
+	end
+
+	if not SlashCo.CurRound.DistressBeaconUsed then
+		return true
+	end
+
+	if not ply.BeaconWarning then
+		ply:ChatText("Beacon_confirm")
+		ply.BeaconWarning = true
+		timer.Simple(3, function()
+			if IsValid(ply) then
+				ply.BeaconWarning = false
+			end
+		end)
+
+		return true
+	end
+
+	if team.NumPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
+		local ent = SlashCo.CreateItem("sc_activebeacon", ply:WorldSpaceCenter(), Angle(0, 0, 0))
+		ent.DoArming = true
+		ent:DropToFloor()
+		ent:SetNWBool("ArmingBeacon", true)
+		SlashCo.BeaconArming = true
+	else --instant because alone
+		SlashCo.CurRound.DistressBeaconUsed = true
+		SlashCo.SummonEscapeHelicopter(true)
+		local ent = SlashCo.CreateItem("sc_activebeacon", ply:WorldSpaceCenter(), Angle(0, 0, 0))
+		ent:DropToFloor()
+		ent:PlayGlobalSound("slashco/survivor/distress_siren.wav", 100)
 	end
 end
 ITEM.ViewModel = {

@@ -38,8 +38,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 	local v3 = slasher.SlasherValue3 --Cooldown
 	local v4 = slasher.SlasherValue4 --Slash Cooldown
 
-	local prowl_final = SLASHER.ProwlSpeed
-	local chase_final = SLASHER.ChaseSpeed
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
 
@@ -161,24 +159,24 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			slasher:EmitSound("slashco/slasher/trollge_swing.wav")
 
 			if SERVER then
-				local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
+				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
 						Vector(-30, -40, -60), Vector(30, 40, 60), 50 + (SO * 50), DMG_SLASH, 2, false)
 
-				if not target:IsValid() then
+				if not target1:IsValid() then
 					return
 				end
 
-				if target:IsPlayer() then
-					if target:Team() ~= TEAM_SURVIVOR then
+				if target1:IsPlayer() then
+					if target1:Team() ~= TEAM_SURVIVOR then
 						return
 					end
 
-					local vPoint = target:GetPos() + Vector(0, 0, 50)
+					local vPoint = target1:GetPos() + Vector(0, 0, 50)
 					local bloodfx = EffectData()
 					bloodfx:SetOrigin(vPoint)
 					util.Effect("BloodImpact", bloodfx)
 
-					target:EmitSound("slashco/slasher/trollge_hit.wav")
+					target1:EmitSound("slashco/slasher/trollge_hit.wav")
 				end
 
 				SlashCo.BustDoor(slasher, target, 30000)
@@ -314,7 +312,6 @@ end
 SLASHER.OnItemSpawn = function()
 	local diff = SlashCo.CurRound.Difficulty
 
-	--SCInfo.Maps[game.GetMap()].SIZE
 	for _ = 1, (math.random(0, 6) + (10 * SlashCo.MapSize) + (diff * 4)) do
 		SlashCo.CreateItem("sc_maleclone", SlashCo.RandomPosLocator(), angle_zero)
 	end

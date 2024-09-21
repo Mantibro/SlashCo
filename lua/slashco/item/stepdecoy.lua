@@ -13,9 +13,9 @@ ITEM.OnUse = function(ply)
 
 	local decoy = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld(Vector(0, 0, 30)),
 			ply:LocalToWorldAngles(Angle(0, 0, 0)))
-	Entity(decoy):DropToFloor()
-	Entity(decoy):SetNWBool("StepDecoyActive", true)
-	SlashCo.CurRound.Items[decoy] = true
+	decoy:DropToFloor()
+	decoy:SetNWBool("StepDecoyActive", true)
+	SlashCo.CurRound.Items[decoy:EntIndex()] = true
 end
 ITEM.OnDrop = function(ply)
 	return 30, nil, true

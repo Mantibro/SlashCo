@@ -320,8 +320,8 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 		return
 	end
 
-	local moveUp = drawItemDisplay(ply:GetNWString("item", "none"), ply:GetNWString("item2", "none") ~= "none")
-	drawItemDisplay(ply:GetNWString("item2", "none"), nil, moveUp)
+	local moveUp = drawItemDisplay(ply:GetItem("item"), ply:GetItem("item2") ~= "none")
+	drawItemDisplay(ply:GetItem("item2"), nil, moveUp)
 
 	local hitPos = LocalPlayer():GetShootPos()
 	gasFuelMeter(hitPos)

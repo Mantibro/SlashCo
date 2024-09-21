@@ -18,9 +18,9 @@ SlashCo.UseItem = function(ply)
 		return
 	end
 
-	local item = ply:GetNWString("item2", "none")
+	local item = ply:GetItem("item2")
 	if item == "none" then
-		item = ply:GetNWString("item", "none")
+		item = ply:GetItem("item")
 	end
 
 	if SlashCoItems[item] and SlashCoItems[item].OnUse then
@@ -36,10 +36,7 @@ SlashCo.DropAllItems = function(ply, noEffect)
 		ply:ClearEffect()
 	end
 
-	if ply:GetNWString("item2", "none") ~= "none" then
-		SlashCo.DropItem(ply)
-	end
-
+	SlashCo.DropItem(ply)
 	SlashCo.DropItem(ply)
 end
 
@@ -60,12 +57,13 @@ SlashCo.DropItem = function(ply)
 		return
 	end
 
-	local item = ply:GetNWString("item2", "none")
+	local item = ply:GetItem("item2")
 	if item == "none" then
-		item = ply:GetNWString("item", "none")
+		item = ply:GetItem("item")
 	end
 
 	if not SlashCoItems[item] then
+		SlashCo.SendValue(ply, "preItem")
 		return
 	end
 
@@ -83,12 +81,12 @@ SlashCo.DropItem = function(ply)
 		end
 
 		ply:ViewPunch(Angle(-6, 0, 0))
-		ply:SetNWString("item2", "none")
+		ply:SetItem("item2", "none")
 		time = 0.25
 		slot = "item2"
 	else
 		ply:ViewPunch(Angle(-2, 0, 0))
-		ply:SetNWString("item", "none")
+		ply:SetItem("item", "none")
 	end
 
 	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), time, 1, function()
@@ -106,8 +104,7 @@ SlashCo.DropItem = function(ply)
 		local droppeditem = SlashCo.CreateItem(SlashCoItems[item].EntClass,
 				ply:LocalToWorld(Vector(0, 0, height or 60)),
 				ply:LocalToWorldAngles(Angle(0, 0, 0)))
-		local ent = Entity(droppeditem)
-		local phys = ent:GetPhysicsObject()
+		local phys = droppeditem:GetPhysicsObject()
 
 		if not dontPush and IsValid(phys) then
 			phys:SetVelocity(ply:GetAimVector() * 250)
@@ -116,10 +113,10 @@ SlashCo.DropItem = function(ply)
 			phys:SetAngleVelocity(randomvec)
 		end
 
-		ply:ItemFunction2("ItemDropped", item, ent, phys)
+		ply:ItemFunction2("ItemDropped", item, droppeditem, phys)
 
 		if not SlashCoItems[item].IsSecondary then
-			SlashCo.CurRound.Items[droppeditem] = true
+			SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
 		end
 	end)
 
@@ -128,13 +125,13 @@ end
 
 SlashCo.RemoveItem = function(ply, isSec)
 	local slot = isSec and "item2" or "item"
-	local item = ply:GetNWString(slot, "none")
+	local item = ply:GetItem(slot)
 	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), isSec and 0.25 or 0.18, 1, function()
 		if IsValid(ply) then
 			ply:ItemFunction2("OnSwitchFrom", item)
 		end
 	end)
-	ply:SetNWString(slot, "none")
+	ply:SetItem(slot, "none")
 end
 
 SlashCo.ChangeSurvivorItem = function(ply, id)
@@ -144,13 +141,13 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 		end
 
 		if SlashCoItems[id].IsSecondary then
-			local item = ply:GetNWString("item2", "none")
+			local item = ply:GetItem("item2")
 			ply:ItemFunction2("OnSwitchFrom", item)
-			ply:SetNWString("item2", id)
+			ply:SetItem("item2", id)
 		else
-			local item = ply:GetNWString("item", "none")
+			local item = ply:GetItem("item")
 			ply:ItemFunction2("OnSwitchFrom", item)
-			ply:SetNWString("item", id)
+			ply:SetItem("item", id)
 		end
 
 		if SlashCoItems[id].EquipSound then
@@ -159,13 +156,13 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 			ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
 		end
 	elseif id == "none" then
-		ply:SetNWString("item", "none")
+		ply:SetItem("item", "none")
 	end
 end
 
 SlashCo.ItemPickUp = function(ply, itemindex, item)
-	if SlashCoItems[item].IsSecondary and ply:GetNWString("item2", "none") ~= "none"
-			or not SlashCoItems[item].IsSecondary and ply:GetNWString("item", "none") ~= "none" then
+	if SlashCoItems[item].IsSecondary and ply:GetItem("item2") ~= "none"
+			or not SlashCoItems[item].IsSecondary and ply:GetItem("item") ~= "none" then
 		return
 	end
 

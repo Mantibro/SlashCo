@@ -34,8 +34,12 @@ function ENT:RunBehaviour()
 	end
 end
 
-function ENT:Think()
-	if SERVER then
+if SERVER then
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
+
+	function ENT:Think()
 		if self.AssignedSlasher == nil or not IsValid(player.GetBySteamID64(self.AssignedSlasher)) then
 			self:Remove()
 			return
@@ -43,57 +47,44 @@ function ENT:Think()
 
 		local rage_switch = player.GetBySteamID64(self.AssignedSlasher):GetNWBool("CriminalRage")
 
-		if self.IsMain == true then goto MAINCLONE end
+		if not self.IsMain then
+			if rage_switch then
+				self:SetColor(color_black)
+			else
+				self:SetColor(color_white)
+			end
 
-		if rage_switch then
-			self:SetColor(Color(0,0,0,255))
+			self.RandPos = self.RandPos - FrameTime()
+
+			if self.RandPos < 0.01 or player.GetBySteamID64(self.AssignedSlasher):GetPos():Distance(self:GetPos()) > 1200 then
+				local n_pos = SlashCo.LocalizedTraceHullLocator(player.GetBySteamID64(self.AssignedSlasher), 1000)
+
+				self:SetPos(n_pos)
+				self:SetAngles(Angle(0, math.random(0, 359), 0))
+
+				self.RandPos = math.random(1, 15)
+			end
 		else
-			self:SetColor(color_white)
-		end
-
-		self.RandPos = self.RandPos - FrameTime()
-
-		if self.RandPos < 0.01 or player.GetBySteamID64(self.AssignedSlasher):GetPos():Distance(self:GetPos()) > 1200 then
-			local n_pos = SlashCo.LocalizedTraceHullLocator(player.GetBySteamID64(self.AssignedSlasher), 1000)
-
-			self:SetPos(n_pos)
-			self:SetAngles(Angle(0,math.random(0,359),0))
-
-			self.RandPos = math.random(1, 15)
-		end
-
-		::MAINCLONE::
-
-		if self.IsMain == true then
-
 			local c_pos = player.GetBySteamID64(self.AssignedSlasher):GetPos()
 			local c_ang = player.GetBySteamID64(self.AssignedSlasher):GetAngles()
 
 			if player.GetBySteamID64(self.AssignedSlasher):GetVelocity():Length() < 5 then
-
 				self:SetPos(c_pos)
 				self:SetAngles(c_ang)
-
 			end
 
 			if rage_switch then
-				self:SetBodygroup(0,1)
+				self:SetBodygroup(0, 1)
 				self:SetSkin(1)
 				if not self:GetNWBool("MainRageClone") then self:SetNWBool("MainRageClone", true) end
 			else
-				self:SetBodygroup(0,0)
+				self:SetBodygroup(0, 0)
 				self:SetSkin(0)
 				if self:GetNWBool("MainRageClone") then self:SetNWBool("MainRageClone", false) end
 			end
 		end
 	end
-end
-
-function ENT:UpdateTransmitState()
-	return TRANSMIT_ALWAYS
-end
-
-if CLIENT then
+else
 	function ENT:Draw()
 		self:DrawModel()
 	end
