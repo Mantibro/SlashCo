@@ -80,8 +80,13 @@ SlashCo.BroadcastLobbySlasherInformation = function()
 end
 
 function SlashCo.LobbyRoundData()
+	local offering = ""
+	if SlashCo.LobbyData.Offering > 0 then
+		offering = SCInfo.Offering[SlashCo.LobbyData.Offering].Name
+	end
+
 	net.Start("mantislashcoSendRoundData")
-	net.WriteTable({ survivors = SlashCo.LobbyData.AssignedSurvivors, slashers = SlashCo.LobbyData.AssignedSlashers, offering = SCInfo.Offering[SlashCo.LobbyData.Offering].Name })
+	net.WriteTable({ survivors = SlashCo.LobbyData.AssignedSurvivors, slashers = SlashCo.LobbyData.AssignedSlashers, offering = offering })
 	net.Broadcast()
 end
 

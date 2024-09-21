@@ -11,9 +11,8 @@ surface.CreateFont("ScoreboardDefaultTitle", {
 	weight	= 800
 })
 
-
 net.Receive("mantislashcoSendRoundData", function()
-	PlayerData = net.ReadTable()
+	SlashCo.PlayerData = net.ReadTable()
 end)
 
 --
@@ -68,8 +67,7 @@ local PLAYER_LINE = {
 
 		self.Avatar:SetPlayer(pl)
 
-		if PlayerData == nil then
-			self:Think(self)
+		if not SlashCo.PlayerData then
 			return
 		end
 
@@ -78,11 +76,10 @@ local PLAYER_LINE = {
 			self.teamcolor = Color(64, 64, 192, 255)
 			self.teamorder = 1000
 
-			self:Think(self)
 			return
 		end
 
-		for _, v in ipairs(PlayerData.survivors) do
+		for _, v in ipairs(SlashCo.PlayerData.survivors) do
 			local check = v.id or v.steamid
 
 			if check == pl:SteamID64() then
@@ -95,12 +92,11 @@ local PLAYER_LINE = {
 					self.teamorder = 500
 				end
 
-				self:Think(self)
 				return
 			end
 		end
 
-		for _, v in ipairs(PlayerData.slashers) do
+		for _, v in ipairs(SlashCo.PlayerData.slashers) do
 			local check = v.s_id or v.steamid
 
 			if check == pl:SteamID64() then
@@ -108,7 +104,6 @@ local PLAYER_LINE = {
 				self.teamcolor = Color(255, 64, 64, 255)
 				self.teamorder = -500
 
-				self:Think(self)
 				return
 			end
 		end
@@ -221,15 +216,7 @@ local SCORE_BOARD = {
 		self.Scores = self:Add("DScrollPanel")
 		self.Scores:Dock(FILL)
 
-		local game_state = SlashCo.Language("InLobby")
-
-		if game.GetMap() ~= "sc_lobby" then
-			local offer = "Regular"
-			if PlayerData.offering ~= "" then offer = PlayerData.offering end
-			game_state = SlashCo.Language("InGame", offer)
-		end
-
-		self.StateName:SetText(game_state)
+		self.StateName:SetText("")
 
 		local mat = vgui.Create("Material", self)
 		mat:SetPos(0, 120)
@@ -240,7 +227,22 @@ local SCORE_BOARD = {
 		self:SetSize(500, ScrH() - 200)
 		self:SetPos(ScrW() / 2 - 250, 100)
 	end,
-	Reset = function()
+	Reset = function(self)
+		if SlashCo.PlayerData then
+			local game_state
+			if game.GetMap() == "sc_lobby" then
+				game_state = SlashCo.Language("InLobby")
+			else
+				if SlashCo.PlayerData.offering and SlashCo.PlayerData.offering ~= "" then
+					game_state = SlashCo.Language("InGame", SlashCo.PlayerData.offering)
+				else
+					game_state = SlashCo.Language("InGame", "Regular")
+				end
+			end
+
+			self.StateName:SetText(game_state)
+		end
+
 		local plyrs = player.GetAll()
 		for _, pl in ipairs(plyrs) do
 			if not IsValid(pl.ScoreEntry) then continue end
@@ -272,7 +274,7 @@ SCORE_BOARD = vgui.RegisterTable(SCORE_BOARD, "EditablePanel")
 	Desc: Sets the scoreboard to visible
 -----------------------------------------------------------]]
 function GM:ScoreboardShow()
-	if not IsValid(g_Scoreboard) and PlayerData ~= nil then
+	if not IsValid(g_Scoreboard) then
 		g_Scoreboard = vgui.CreateFromTable(SCORE_BOARD)
 	end
 
