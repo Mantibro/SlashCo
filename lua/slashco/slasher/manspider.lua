@@ -122,7 +122,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 				local d = s:GetPos():Distance(slasher:GetPos())
 
-				if d >= 250 then
+				if d >= 1000 then
 					continue
 				end
 
@@ -136,7 +136,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 					continue
 				end
 
-				slasher.SlasherValue4 = v4 + (FrameTime() + ((1000 - d) / 10000)) + (SO * FrameTime())
+				slasher.SlasherValue4 = v4 + (FrameTime() * ((1000 - d) / 2000)) + (SO * FrameTime())
 
 				if v4 > 100 then
 					slasher.SlasherValue1 = s:SteamID64()
