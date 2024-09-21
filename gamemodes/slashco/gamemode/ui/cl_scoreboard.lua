@@ -76,10 +76,10 @@ local PLAYER_LINE = {
 			return
 		end
 
-		for i = 1, #PlayerData.survivors do
-			local pot_s = player.GetBySteamID64(PlayerData.survivors[i].id)
+		for _, v in ipairs(PlayerData.survivors) do
+			local check = v.id or v.steamid
 
-			if pot_s == pl then
+			if check == pl:SteamID64() then
 				self.team_status = TEAM_SURVIVOR
 				self.teamcolor = Color(128, 128, 255, 255)
 				self.teamorder = 0
@@ -94,10 +94,10 @@ local PLAYER_LINE = {
 			end
 		end
 
-		for i = 1, #PlayerData.slashers do
-			local pot_s = player.GetBySteamID64(PlayerData.slashers[i].s_id)
+		for _, v in ipairs(PlayerData.slashers) do
+			local check = v.s_id or v.steamid
 
-			if pot_s == pl then
+			if check == pl:SteamID64() then
 				self.team_status = TEAM_SLASHER
 				self.teamcolor = Color(255, 64, 64, 255)
 				self.teamorder = -500
