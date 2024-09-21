@@ -79,6 +79,12 @@ SlashCo.BroadcastLobbySlasherInformation = function()
 	net.Broadcast()
 end
 
+function SlashCo.LobbyRoundData()
+	net.Start("mantislashcoSendRoundData")
+	net.WriteTable({ survivors = SlashCo.LobbyData.AssignedSurvivors, slashers = SlashCo.LobbyData.AssignedSlashers, offering = SlashCo.LobbyData.Offering })
+	net.Broadcast()
+end
+
 SlashCo.BroadcastCurrentRoundData = function(readygame)
 	net.Start("mantislashcoSendRoundData")
 	net.WriteTable({ survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData.OfferingName })

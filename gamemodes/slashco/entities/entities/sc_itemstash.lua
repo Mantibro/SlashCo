@@ -12,8 +12,12 @@ ENT.Purpose = "Supplying SlashCo workers with an item."
 ENT.Instructions = ""
 ENT.PingType = "ITEM STASH"
 
-function ENT:Initialize()
-    if SERVER then
+function ENT:UpdateTransmitState()
+    return TRANSMIT_ALWAYS
+end
+
+if SERVER then
+    function ENT:Initialize()
         self:SetModel("models/hunter/blocks/cube2x3x025.mdl")
         self:SetSolid(SOLID_VPHYSICS)
         self:PhysicsInit(SOLID_VPHYSICS)
@@ -22,21 +26,12 @@ function ENT:Initialize()
         self:SetColor(Color(0, 0, 0, 0))
         self:SetRenderMode(RENDERMODE_TRANSCOLOR)
     end
-end
-
-function ENT:Use(activator)
-    if SERVER then
-        if activator:Team() == TEAM_SURVIVOR then
+    function ENT:Use(activator)
+        if activator:Team() == TEAM_SURVIVOR and not activator.CantBuy then
             SlashCo.SendValue(activator, "openItemPicker")
         end
     end
-end
-
-function ENT:UpdateTransmitState()
-    return TRANSMIT_ALWAYS
-end
-
-if CLIENT then
+else
     function ENT:Draw()
         self:DrawModel()
     end

@@ -22,6 +22,7 @@ local function ArmBeacon(ent)
 	timer.Remove(ent:EntIndex() .. "_BeaconBlipSound")
 	ent:PlayGlobalSound("slashco/survivor/distress_siren.wav", 100)
 	ent:SetNWBool("ArmingBeacon", false)
+	SlashCo.BeaconArming = nil
 	SlashCo.SummonEscapeHelicopter(true)
 	SlashCo.CurRound.DistressBeaconUsed = true
 end
@@ -35,7 +36,7 @@ if SERVER then
 		self:SetModel(SlashCoItems.Beacon.Model)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
-		self:SetAngles(Angle(180,0,0))
+		self:SetAngles(Angle(180, 0, 0))
 	end
 
 	function ENT:Think()
@@ -73,6 +74,7 @@ if SERVER then
 				self:SetModel("models/props_c17/light_cagelight02_off.mdl")
 
 				self:SetNWBool("ArmingBeacon", false)
+				SlashCo.BeaconArming = nil
 				self:PhysicsInit(SOLID_VPHYSICS)
 				self:SetMoveType(MOVETYPE_VPHYSICS)
 
@@ -91,7 +93,6 @@ end
 if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
-
 	end
 
 	function ENT:Think()

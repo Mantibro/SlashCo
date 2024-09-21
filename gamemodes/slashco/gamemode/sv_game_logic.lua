@@ -1,6 +1,7 @@
 SlashCo = SlashCo or {}
 
 function SlashCo.SinglePlayerSetup()
+	g_SlashCoDebug = true
 	SlashCo.CurRound.Difficulty = math.random(0, 3)
 	SlashCo.CurRound.SurvivorData.GasCanMod = 0
 	SlashCo.CurRound.OfferingData.CurrentOffering = 0
@@ -266,6 +267,7 @@ SlashCo.EndRound = function()
 		SlashCo.RemoveHelicopter()
 		SlashCo.CommitPoints()
 
+		--[[
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		for i = 1, #survivors do
 			survivors[i]:SetTeam(TEAM_SPECTATOR)
@@ -276,6 +278,7 @@ SlashCo.EndRound = function()
 			slashers[i]:SetTeam(TEAM_SPECTATOR)
 			slashers[i]:Spawn()
 		end
+		--]]
 
 		if #survivors < 1 then
 			--Add to stats of the slasher's wins

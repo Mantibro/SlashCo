@@ -414,6 +414,8 @@ local function lobbyRoundSetup()
             end
         end
 
+        SlashCo.LobbyRoundData()
+
         --Assign the map randomly
         SlashCo.LobbyData.SelectedMap = GetRandomMap(#SlashCo.LobbyData.AssignedSurvivors)
 

@@ -10,7 +10,7 @@ local pointAmounts = {
     optional = 10, -- not implemented
     escape = 10, --
     all_survive = 10, --
-    last_survive = 5, --
+    last_survive = 3, --
     left_behind = 5, --
     survive = 15, --
     item = 10, -- not implemented
@@ -134,7 +134,7 @@ if SERVER then
     hook.Add("PlayerDeath", "CountKills", function(_, _, attacker)
         if not IsValid(attacker) then return end
 
-        if attacker:Team() == TEAM_SLASHER then
+        if attacker.Team and attacker:Team() == TEAM_SLASHER then
             attacker:AddPoints("slasher_kill")
         end
     end)

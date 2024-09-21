@@ -80,6 +80,8 @@ if SERVER then
 			activator:SetNWBool("DynamicFlashlight", false)
 		end
 
+		activator.CantBuy = true
+
 		for _, v in ipairs(SatPlayers) do
 			if v == activator then
 				--If the steamid in this entry matches the one we're looking for, that means the player is already in the copter.

@@ -195,6 +195,12 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 		noZ = true
 	end
 
+	for k, v in pairs(_ents) do
+		if IsValid(v) and v:IsPlayer() and not v:CanBeSeen() then
+			table.remove(_ents, k)
+		end
+	end
+
 	halo.Add(_ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil, noZ)
 end
 
@@ -215,7 +221,7 @@ hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
 		if showHalos then
 			SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
-			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER))
+			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER), "red")
 			if showGasCanHalos then
 				SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "gray")
 			end
@@ -275,7 +281,7 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 	end
 
 	for _, target in ipairs(cache) do
-		if target:GetNWBool("DynamicFlashlight") then
+		if target:GetNWBool("DynamicFlashlight") and target:CanBeSeen() then
 			if target.DynamicFlashlight then
 				local position = target:GetPos()
 				local newposition = Vector(position[1], position[2], position[3] + 40) + target:GetForward() * 20
@@ -621,7 +627,7 @@ end)
 
 local AmbientMusic
 local AmbientLength
-local AmbientVol = 1
+local AmbientVol = 0.8
 
 net.Receive("mantislashcoMapAmbientPlay", function()
 	timer.Simple(math.random(1, 8), function()
@@ -669,7 +675,7 @@ hook.Add("Think", "amb_vol", function()
 			AmbientVol = AmbientVol - RealFrameTime()
 		end
 	else
-		if AmbientVol < 1 then
+		if AmbientVol < 0.8 then
 			AmbientVol = AmbientVol + (RealFrameTime() / 100)
 		end
 	end

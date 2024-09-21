@@ -43,8 +43,11 @@ ITEM.OnUse = function(ply)
 					return true
 				else
 					local ent = SlashCo.CreateItem("sc_activebeacon", ply:GetPos(), Angle(0, 0, 0))
-					Entity(ent).DoArming = true
-					Entity(ent):SetNWBool("ArmingBeacon", true)
+					if IsValid(ent) then
+						ent.DoArming = true
+						ent:SetNWBool("ArmingBeacon", true)
+						SlashCo.BeaconArming = true
+					end
 
 					return
 				end

@@ -60,8 +60,23 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetImpervious(true)
 		final_perception = 6.0
+
+		if SlashCo.CurRound.EscapeHelicopterSummoned then
+			slasher.SlasherValue1 = 2
+		end
 	elseif v1 == 1 then
 		--Creator
+
+		if SlashCo.BeaconArming then
+			slasher.SlasherValue1 = 0
+			slasher.SlasherValue2 = 0
+			slasher.SlasherValue5 = 0
+			slasher:SetVisible(false)
+			if slasher.TylerSongPickedID then
+				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+				slasher.TylerSongPickedID = nil
+			end
+		end
 
 		slasher:SetImpervious(false)
 		slasher:SetNWBool("TylerFlash", false)
@@ -82,7 +97,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12))
 		end
 
-		if v2 > 20 + ((ms * 35) - (v4 * 4)) then
+		if SlashCo.CurRound.EscapeHelicopterSummoned or v2 > 20 + ((ms * 35) - (v4 * 4)) then
 			--Time ran out
 
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
@@ -285,6 +300,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			slasher:Freeze(false)
 			slasher.SlasherValue4 = slasher.SlasherValue4 + 1
 			slasher.SlasherValue1 = 0
+			slasher:SetVisible(false)
 
 			slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
 			slasher:StopSound("slashco/slasher/tyler_destroyer_whisper.wav")

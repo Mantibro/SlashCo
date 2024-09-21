@@ -9,7 +9,7 @@ SLASHER.Model = "models/slashco/slashers/manspider/manspider.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 5
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 292
+SLASHER.ChaseSpeed = 290
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
 SLASHER.KillDistance = 150
@@ -43,6 +43,9 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	if v2 > 0 then
 		slasher.SlasherValue2 = v2 - FrameTime()
+		slasher:SetNWBool("CanLeap", false)
+	else
+		slasher:SetNWBool("CanLeap", true)
 	end
 
 	if not isstring(v1) or v1 == 0 then
@@ -220,7 +223,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		slasher:SetWalkSpeed(1)
 		slasher:SetSlowWalkSpeed(1)
 	else
-		if slasher.SlasherValue3 > 100 then
+		if slasher.SlasherValue3 > 50 then
 			slasher:SetNWBool("ManspiderNested", false)
 
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
@@ -245,7 +248,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 		return
 	end
 
-	slasher.SlasherValue2 = 4
+	slasher.SlasherValue2 = 15
 
 	slasher:Freeze(true)
 	slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
@@ -299,7 +302,7 @@ end
 
 local mat = Material("lights/white")
 local function targetPaint(ply)
-	if not ply:CanBeSeen() then
+	if not IsValid(ply) or not ply:CanBeSeen() then
 		return
 	end
 
@@ -329,7 +332,8 @@ SLASHER.InitHud = function(_, hud)
 	hud:TieControlVisible("LMB", "CanKill")
 	hud:TieControlVisible("RMB", "CanChase")
 	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/s_punch"))
-	hud:TieControlVisible("F", "InSlasherChaseMode", true, true, true)
+	hud:TieControlVisible("F", "InSlasherChaseMode", true, false, true)
+	hud:TieControl("F", "CanLeap", false, true)
 
 	hud.prevTarget = -1
 	hud.prevNested = -1

@@ -10,7 +10,7 @@ SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 150
 SLASHER.ChaseSpeed = 290
-SLASHER.Perception = 0.65
+SLASHER.Perception = 1.0
 SLASHER.Eyesight = 2
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
@@ -322,8 +322,6 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 	if slasher:IsOnGround() then
 		slasher:SetVelocity(slasher:GetForward() * 800)
-	else
-		slasher:SetVelocity(slasher:GetForward() * 200)
 	end
 
 	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()
