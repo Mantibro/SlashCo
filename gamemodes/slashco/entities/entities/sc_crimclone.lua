@@ -15,6 +15,10 @@ function ENT:Initialize()
 	self:SetNotSolid(true)
 end
 
+function ENT:OnTakeDamage()
+	return 0
+end
+
 function ENT:RunBehaviour()
 	while true do							-- Here is the loop, it will run forever
 		if self.AssignedSlasher == nil or not IsValid(player.GetBySteamID64(self.AssignedSlasher)) then return end

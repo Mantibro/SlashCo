@@ -16,6 +16,10 @@ function ENT:Initialize()
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 end
 
+function ENT:OnTakeDamage()
+	return 0
+end
+
 function ENT:RunBehaviour()
 	while true do
 		-- Here is the loop, it will run forever
