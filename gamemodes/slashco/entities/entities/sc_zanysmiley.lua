@@ -91,7 +91,19 @@ function ENT:RunBehaviour()
 		-- Lets use the above mentioned functions to see if we have/can find a enemy
 		self:StartActivity(ACT_IDLE)
 		if self:HaveEnemy() then
-			self.Enemy:SetNWBool("MarkedBySmiley", true)
+			if not self.Enemy.BeenMarked then
+				self.Enemy:SetNWBool("MarkedBySmiley", true)
+				timer.Create("zanyMark_" .. self.Enemy:UserID(), 5, 1, function()
+					if not IsValid(self.Enemy) then
+						return
+					end
+
+					self.Enemy.BeenMarked = nil
+					self.Enemy:SetNWBool("MarkedBySmiley", false)
+				end)
+			end
+			self.Enemy.BeenMarked = true
+
 			-- Now that we have a enemy, the code in this block will run
 			self:SetSequence(self:LookupSequence("attack"))
 			self:EmitSound("slashco/slasher/zany_attack.mp3")
@@ -276,13 +288,12 @@ function ENT:Think()
 
 	for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
 		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(self:GetPos()) < 50 then
-			self:Remove()
 			v:TakeDamage(50, self, self)
 			v:SetNWBool("MarkedBySmiley", false)
-			timer.Simple(0.25, function()
-				v:SetNWBool("MarkedBySmiley", false)
-			end)
+			v.BeenMarked = nil
+			timer.Remove("zanyMark_" .. v:UserID())
 			self:StopSound("slashco/slasher/zany_attack.mp3")
+			self:Remove()
 		end
 	end
 end
