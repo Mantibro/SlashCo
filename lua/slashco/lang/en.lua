@@ -582,7 +582,7 @@ SlashCo.LangTable["points_optional"] = "[%s] OPTIONAL OBJECTIVE COMPLETE"
 SlashCo.LangTable["points_escape"] = "[%s] SUCCESSFUL MISSION ESCAPE"
 
 SlashCo.LangTable["points_all_survive"] = "[%s] ALL EMPLOYEES SURVIVED" --survival status
-SlashCo.LangTable["points_last_survive"] = "[%s] ONLY EMPLOYEE REMAINING"
+SlashCo.LangTable["points_last_survive"] = "[%s] LAST EMPLOYEE REMAINING"
 SlashCo.LangTable["points_left_behind"] = "[%s] LEFT BEHIND"
 SlashCo.LangTable["points_survive"] = "[%s] SURVIVED"
 

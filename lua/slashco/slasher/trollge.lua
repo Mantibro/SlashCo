@@ -320,7 +320,8 @@ SLASHER.Animator = function(ply)
 end
 
 SLASHER.CanSeeFlashlights = function(ply)
-	return ply:GetNWBool("TrollgeStage2")
+	return false
+	--return ply:GetNWBool("TrollgeStage2")
 end
 
 SLASHER.Footstep = function()

@@ -673,7 +673,7 @@ function GM:PlayerDeath(victim)
 			ang_offset = 180
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) == 1 then
+		if team.NumPlayers(TEAM_SURVIVOR) == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
 			team.GetPlayers(TEAM_SURVIVOR)[1]:SetPoints("last_survive")
 		end
 
