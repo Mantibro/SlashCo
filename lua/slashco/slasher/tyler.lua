@@ -57,10 +57,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetImpervious(true)
 		final_perception = 6.0
-
-		if SlashCo.CurRound.EscapeHelicopterSummoned then
-			slasher.SlasherValue1 = 2
-		end
 	elseif v1 == 1 then
 		--Creator
 
@@ -94,7 +90,13 @@ SLASHER.OnTickBehaviour = function(slasher)
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12))
 		end
 
-		if SlashCo.CurRound.EscapeHelicopterSummoned or v2 > 25 + ((ms * 25) - (v4 * 4)) then
+		if SlashCo.CurRound.EscapeHelicopterSummoned and v2 > 12 + ((ms * 12) - (v4 * 2)) then
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+			slasher.SlasherValue1 = 2
+			slasher.TylerSongPickedID = nil
+		end
+
+		if v2 > 25 + ((ms * 25) - (v4 * 4)) then
 			--Time ran out
 
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
@@ -152,7 +154,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:Freeze(true)
 
 		if slasher.tyler_destroyer_entrance_antispam == nil then
-			slasher:PlayGlobalSound("slashco/slasher/tyler_alarm.wav", 100)
+			SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", false, 0.8)
+			--slasher:PlayGlobalSound("slashco/slasher/tyler_alarm.wav", 100)
 			slasher.tyler_destroyer_entrance_antispam = 0
 		end
 
@@ -165,10 +168,13 @@ SLASHER.OnTickBehaviour = function(slasher)
 		if slasher.tyler_destroyer_entrance_antispam < (12 - decay) then
 			slasher.tyler_destroyer_entrance_antispam = slasher.tyler_destroyer_entrance_antispam + FrameTime()
 		else
+			SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", true)
+			--[[
 			slasher:StopSound("slashco/slasher/tyler_alarm.wav")
 			timer.Simple(0.1, function()
 				slasher:StopSound("slashco/slasher/tyler_alarm.wav")
 			end) --idk man only works if i stop it twice shut up
+			--]]
 
 			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 140)
 			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 140)
