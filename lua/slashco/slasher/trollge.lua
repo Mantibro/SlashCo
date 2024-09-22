@@ -144,7 +144,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher:Freeze(false)
 			slasher:PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60)
 
-			slasher:SetRunSpeed(450)
+			slasher:SetRunSpeed(550)
 			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
 			final_eyesight = 10
 
@@ -164,7 +164,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWInt("TrollgeStage", v1)
 	end
 
-	if v1 == 0 and slasher:GetNWBool("TrollgeDashing") then
+	if slasher:GetNWBool("TrollgeDashing") then
 		local target = nil
 
 		if not slasher:GetNWBool("TrollgeDashFinish") then
