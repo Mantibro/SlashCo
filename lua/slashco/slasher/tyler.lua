@@ -319,7 +319,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 
 			if target:IsPlayer() then
 				target:Freeze(false)
-				target:Kill()
+				target:TakeDamage(99999, slasher, slasher)
 			end
 
 			timer.Simple(FrameTime(), function()

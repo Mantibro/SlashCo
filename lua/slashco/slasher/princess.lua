@@ -9,7 +9,7 @@ SLASHER.Model = "models/slashco/slashers/princess/princess.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 290
+SLASHER.ChaseSpeed = 280
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 2
 SLASHER.KillDistance = 135
@@ -221,7 +221,7 @@ SLASHER.Maul = function(slasher, target)
 		end
 
 		slasher:SetNWBool("PrincessMaulingSurvivor", true)
-		target:Kill()
+		target:TakeDamage(99999, slasher, slasher)
 
 		timer.Simple(FrameTime() * 3, function()
 			if not IsValid(slasher) then

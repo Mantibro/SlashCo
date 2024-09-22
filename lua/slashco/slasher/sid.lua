@@ -284,7 +284,11 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 							return
 						end
 
-						target:Kill()
+						if IsValid(slasher) then
+							target:TakeDamage(99999, slasher, slasher)
+						else
+							target:Kill()
+						end
 					end)
 				end)
 

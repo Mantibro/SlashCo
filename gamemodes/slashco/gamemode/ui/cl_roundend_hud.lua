@@ -107,22 +107,20 @@ local function printLeftBehind(rescued)
 end
 
 local function printKilled(survivors, rescued)
-	local plysKilled = table.Copy(survivors)
-	for k, ply in pairs(plysKilled) do
-		if not IsValid(ply) then
-			table.remove(plysKilled, k)
-			continue
-		end
-		if ply:Team() == TEAM_SURVIVOR then
-			table.remove(plysKilled, k)
-		end
+	local plysKilled = {}
+	for k, ply in ipairs(survivors) do
+		if not IsValid(ply) then continue end
+		if ply:Team() == TEAM_SURVIVOR then continue end
+
 		for _, v in ipairs(rescued) do
 			if not IsValid(v) then continue end
 			if ply:UserID() == v:UserID() then
-				table.remove(plysKilled, k)
-				break
+				goto CONTINUE --needed to continue out of multiple loops
 			end
 		end
+
+		table.insert(plysKilled, ply)
+		:: CONTINUE ::
 	end
 
 	local neatString, count = printPlayersNeatly(plysKilled)
@@ -297,7 +295,7 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	local cur = CurTime()
 
 	local linesPlay = table.Reverse(lines)
-	local panel = vgui.Create("Panel") --GetHUDPanel():Add("Panel")
+	local panel = vgui.Create("Panel")
 	panel:Dock(FILL)
 	fadeIn(panel)
 

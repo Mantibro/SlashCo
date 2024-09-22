@@ -106,7 +106,11 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 		if IsValid(target) then
 			target:SetNWBool("SurvivorBeingJumpscared", false)
 			target:Freeze(false)
-			target:Kill()
+			if IsValid(slasher) then
+				target:TakeDamage(99999, slasher, slasher)
+			else
+				target:Kill()
+			end
 		end
 
 		if IsValid(slasher) then

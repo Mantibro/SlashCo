@@ -232,10 +232,8 @@ SlashCo.RoundOverScreen = function(state)
 				pointState[state](ply)
 			end
 		end
-		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
-			if ply:SteamID64() == v.s_id then
-				pointStateSlasher[state](ply)
-			end
+		if SlashCo.CurRound.Slashers[ply:SteamID64()] then
+			pointStateSlasher[state](ply)
 		end
 	end
 

@@ -203,7 +203,11 @@ SLASHER.OnTickBehaviour = function(slasher)
 							return
 						end
 
-						ent:Kill()
+						if IsValid(slasher) then
+							ent:TakeDamage(99999, slasher, slasher)
+						else
+							ent:Kill()
+						end
 					end)
 
 					timer.Simple(0.25, function()

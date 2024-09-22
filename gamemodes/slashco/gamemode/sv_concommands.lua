@@ -81,6 +81,8 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 		end
 	end
 
+	SlashCo.CurRound.Slashers[target:SteamID64()] = nil
+
 	if not found then
 		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = id, GameContribution = 0 })
 	end

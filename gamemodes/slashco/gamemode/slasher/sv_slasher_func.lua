@@ -208,7 +208,12 @@ SlashCo.Jumpscare = function(slasher, target)
 			target:SetNWBool("SurvivorJumpscare_" .. slasher:GetNWString("Slasher"), false)
 			target:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 			target:Freeze(false)
-			target:Kill()
+
+			if IsValid(slasher) then
+				target:TakeDamage(99999, slasher, slasher)
+			else
+				target:Kill()
+			end
 		end
 
 		if IsValid(slasher) then
