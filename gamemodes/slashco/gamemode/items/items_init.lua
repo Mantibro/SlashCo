@@ -202,9 +202,11 @@ if SERVER then
 	function PLAYER:SetItem(slot, item)
 		self:SetNWString(slot, item)
 
+		--[[
 		if slot ~= "itemEffect" then
 			SlashCo.SendValue(self, "preItem", item, slot)
 		end
+		--]]
 	end
 else
 	SlashCo.PreItem = SlashCo.PreItem or "none"

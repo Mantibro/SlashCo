@@ -172,7 +172,14 @@ end
 
 function SWEP:DrawWorldModel()
 	local owner = self:GetOwner()
-	if not IsValid(owner) then
+	if not IsValid(owner) or not owner:CanBeSeen() then
+		if IsValid(self.heldEntityWorld) then
+			self.heldEntityWorld:SetNoDraw(true)
+		end
+		if IsValid(self.heldEntityHolstered) then
+			self.heldEntityHolstered:SetNoDraw(true)
+		end
+
 		return
 	end
 
