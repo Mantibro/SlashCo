@@ -341,16 +341,10 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 end)
 
 local helimusic_antispam
-net.Receive("mantislashcoHelicopterMusic", function(_, _)
-
-	--[[ but what if le slashers le heard le music.........
-	if LocalPlayer():Team() == TEAM_SLASHER then
-		return
-	end
-	--]]
-
+local heli_music
+net.Receive("mantislashcoHelicopterMusic", function()
 	if not helimusic_antispam then
-		local heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
+		heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
 		heli_music:Play()
 		helimusic_antispam = true
 		g_AmbientStop = true

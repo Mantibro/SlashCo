@@ -144,7 +144,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher:Freeze(false)
 			slasher:PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60)
 
-			slasher:SetRunSpeed(550)
+			slasher:SetRunSpeed(475)
 			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
 			final_eyesight = 10
 

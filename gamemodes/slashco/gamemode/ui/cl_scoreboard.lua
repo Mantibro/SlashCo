@@ -87,7 +87,7 @@ local PLAYER_LINE = {
 				self.teamcolor = Color(128, 128, 255, 255)
 				self.teamorder = 0
 
-				if LocalPlayer():Team() == TEAM_SPECTATOR and pl:Team() == TEAM_SPECTATOR then
+				if LocalPlayer():Team() ~= TEAM_SURVIVOR and pl:Team() == TEAM_SPECTATOR then
 					self.teamcolor = Color(64, 64, 192, 255)
 					self.teamorder = 500
 				end

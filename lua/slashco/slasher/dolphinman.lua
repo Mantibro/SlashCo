@@ -38,7 +38,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	local SO = SlashCo.CurRound.OfferingData.SO
 
-	if slasher:GetNWBool("DolphinInHiding") then
+	if slasher:GetNWBool("DolphinInHiding") and not slasher:SetNWBool("DolphinFound") then
 		slasher:SetJumpPower(0)
 		slasher:SetRunSpeed(1)
 		slasher:SetWalkSpeed(1)
@@ -98,7 +98,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		if slasher:GetNWBool("CanKill") then
 			slasher:SetNWBool("CanKill", false)
 		end
-	else
+	elseif not slasher:GetNWBool("DolphinInHiding") then
 		if not slasher:GetNWBool("CanKill") then
 			slasher:SetNWBool("CanKill", true)
 		end
@@ -228,12 +228,9 @@ end
 SLASHER.Footstep = function(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/amogus_step" .. math.random(1, 3) .. ".wav", 75, 130)
-		return true
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 local hideIcons = {
@@ -257,8 +254,12 @@ SLASHER.InitHud = function(_, hud)
 
 	hud.prevHide = -1
 	function hud.AlsoThink()
-		local hide = not LocalPlayer():GetNWBool("DolphinInHiding") or (not LocalPlayer():GetNWBool("DolphinFound") and LocalPlayer():GetNWInt("DolphinHunt") >= 5)
-		hide = SlashCo.IsPositionLegalForSlashers(LocalPlayer():GetPos()) and hide
+		local hide
+		if LocalPlayer():GetNWBool("DolphinInHiding") then
+			hide = not LocalPlayer():GetNWBool("DolphinFound") and LocalPlayer():GetNWInt("DolphinHunt") >= 5
+		else
+			hide = SlashCo.IsPositionLegalForSlashers(LocalPlayer():GetPos())
+		end
 
 		if hud.prevHide ~= hide then
 			hud:SetControlEnabled("R", hide)

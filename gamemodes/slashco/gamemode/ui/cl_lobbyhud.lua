@@ -10,17 +10,26 @@ local green = Color(64, 255, 64)
 
 local TimeLeft, StateOfLobby, LobbyInfoTable
 
-net.Receive("mantislashcoLobbyTimerTime", function(_, _)
+net.Receive("mantislashcoLobbyTimerTime", function()
 	TimeLeft = net.ReadUInt(6)
 end)
 
-net.Receive("mantislashcoGiveLobbyStatus", function(_, _)
+net.Receive("mantislashcoGiveLobbyStatus", function()
 	StateOfLobby = net.ReadUInt(3)
 end)
 
-net.Receive("mantislashcoGiveLobbyInfo", function(_, _)
+net.Receive("mantislashcoGiveLobbyInfo", function()
 	LobbyInfoTable = net.ReadTable()
 end)
+
+hook.Add("HUDDrawTargetID", "lobbyNames", function()
+	if StateOfLobby and StateOfLobby < 1 then
+		return true
+	end
+end)
+
+local ReadyCheck = Material("slashco/ui/lobby_ready")
+local UnReadyCheck = Material("slashco/ui/lobby_unready")
 
 hook.Add("HUDPaint", "LobbyInfoText", function()
 	if stop_lobbymusic ~= true and (lobbymusic_antispam == nil or lobbymusic_antispam ~= true) then
@@ -51,12 +60,8 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
 
-	if StateOfLobby ~= nil and StateOfLobby < 1 then
-		local ReadyCheck = Material("slashco/ui/lobby_ready")
-		local UnReadyCheck = Material("slashco/ui/lobby_unready")
-
+	if StateOfLobby and StateOfLobby < 1 then
 		local Lobby_Players = {}
-
 		local isClientinLobby = false
 
 		local clientReadiness
@@ -94,13 +99,13 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 					scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
 			if TimeLeft ~= nil and TimeLeft > 0 and TimeLeft < 61 then
-				draw.SimpleText(tostring(TimeLeft), "LobbyFont2", scrW * 0.5, (scrH * 0.65), color_white,
+				draw.SimpleText(tostring(TimeLeft), "LobbyFont2", scrW * 0.5, scrH * 0.65, color_white,
 						TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 
 			local mul_y = 1
 
-			draw.SimpleText("[" .. plynum .. "/7] ", "TVCD", scrW * 0.025, (scrH * 0.22), color_white, TEXT_ALIGN_LEFT,
+			draw.SimpleText("[" .. plynum .. "/7] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
 					TEXT_ALIGN_TOP)
 
 			for i = 1, #Lobby_Players do
@@ -109,15 +114,15 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 				local iconsize = ScrW() / 45
 
 				surface.SetDrawColor(0, 0, 0)
-				surface.DrawRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18, (longest_name) + 65, 60)
+				surface.DrawRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, 60)
 				surface.SetDrawColor(50, 50, 50)
-				surface.DrawOutlinedRect(scrW * 0.018, ((scrH) * (pos_y * mul_y)) - 18, longest_name + 65, 60, 3)
+				surface.DrawOutlinedRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, 60, 3)
 
 				if string.len(Lobby_Players[i].Name) * 15 > longest_name then
 					longest_name = string.len(Lobby_Players[i].Name) * 15
 				end
 
-				draw.SimpleText(Lobby_Players[i].Name, "PlayersFont", scrW * 0.025, (scrH * (pos_y * mul_y)),
+				draw.SimpleText(Lobby_Players[i].Name, "PlayersFont", scrW * 0.025, scrH * (pos_y * mul_y),
 						color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 				local icon_pos_x = x_pos + longest_name
@@ -138,14 +143,14 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 			if clientReadiness then
 				if clientReadiness < 1 then
 					draw.SimpleText("       [" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025,
-							(scrH * 0.22), grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+							scrH * 0.22, grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == 1 then
 					draw.SimpleText("       [" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025, (scrH * 0.22),
+							string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025, scrH * 0.22,
 							green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == 2 then
 					draw.SimpleText("       [" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025, (scrH * 0.22), red,
+							string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025, scrH * 0.22, red,
 							TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				end
 			end
