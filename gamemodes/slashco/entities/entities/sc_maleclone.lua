@@ -52,57 +52,14 @@ function ENT:RunBehaviour()
 	end
 end
 
---make sure the hull is player-size
-local mins, maxs = Vector(-16, -16, 0), Vector(16, 16, 71)
 function ENT:HandleStuck()
-	self.GotStuck = true
-	local lim = 1
-	while true do
-		if not self.loco:IsStuck() then
-			self.loco:ClearStuck()
-			return
-		end
-
-		local pos = VectorRand(-lim, lim) + self:GetPos()
-		pos.z = pos.z / 5
-
-		local hullTrace = util.TraceHull({
-			start = pos,
-			endpos = pos,
-			mins = mins,
-			maxs = maxs
-		})
-
-		if g_SlashCoDebug then
-			debugoverlay.Box(pos, mins, maxs, 1, Color(255, 0, 0))
-			debugoverlay.Cross(pos, 40, 1, color_white, true)
-		end
-
-		if not hullTrace.Hit then
-			self:SetPos(pos)
-			break
-		end
-
-		--be less specific if it's not working out
-		if lim == 40 and not hullTrace.HitNonWorld then
-			self:SetPos(pos)
-			break
-		end
-
-		if lim == 100 then
-			pos = SlashCo.RandomPosLocator()
-			if pos then
-				self:SetPos(pos)
-				break
-			end
-		end
-
-		coroutine.wait(0.05)
-		lim = math.Clamp(lim + 0.5, 1, 100)
+	local justGo = SlashCo.RandomPosLocator()
+	if justGo then
+		self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
+		self.loco:ClearStuck()
+		self:SetPos(justGo)
+		return
 	end
-
-	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
-	self.loco:ClearStuck()
 end
 
 if CLIENT then
