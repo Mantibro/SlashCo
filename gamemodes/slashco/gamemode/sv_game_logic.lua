@@ -224,8 +224,7 @@ SlashCo.EndRound = function()
 		else
 			--Normal win
 
-			local allSurvCount = #SlashCo.CurRound.SlasherData.AllSurvivors
-			if SurvivorCount >= allSurvCount and heliCount >= allSurvCount then
+			if heliCount >= #SlashCo.CurRound.SlasherData.AllSurvivors then
 				--Everyone lived
 
 				SlashCo.RoundOverScreen(0)
@@ -269,17 +268,6 @@ SlashCo.EndRound = function()
 
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		local slashers = team.GetPlayers(TEAM_SLASHER)
-
-		--[[
-		for i = 1, #survivors do
-			survivors[i]:SetTeam(TEAM_SPECTATOR)
-			survivors[i]:Spawn()
-		end
-		for i = 1, #slashers do
-			slashers[i]:SetTeam(TEAM_SPECTATOR)
-			slashers[i]:Spawn()
-		end
-		--]]
 
 		if #survivors < 1 then
 			--Add to stats of the slasher's wins

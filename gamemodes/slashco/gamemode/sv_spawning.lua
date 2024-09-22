@@ -388,6 +388,7 @@ function SlashCo.SetupPlayers()
 				if v1.Survivors == v:SteamID64() then
 					SlashCo.DropAllItems(v) -- if somehow a player grabs an item beforehand
 					SlashCo.ChangeSurvivorItem(v, v1.Item)
+					SlashCo.SendValue(v, "preItem", v1.Item)
 					break
 				end
 			end

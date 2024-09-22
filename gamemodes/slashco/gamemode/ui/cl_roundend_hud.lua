@@ -106,7 +106,7 @@ local function printLeftBehind(rescued)
 	return SlashCo.Language(count == 1 and "LeftBehindOnlyOne" or "LeftBehind", neatString)
 end
 
-local function printKilled(survivors)
+local function printKilled(survivors, rescued)
 	local plysKilled = table.Copy(survivors)
 	for k, ply in pairs(plysKilled) do
 		if not IsValid(ply) then
@@ -115,6 +115,13 @@ local function printKilled(survivors)
 		end
 		if ply:Team() == TEAM_SURVIVOR then
 			table.remove(plysKilled, k)
+		end
+		for _, v in ipairs(rescued) do
+			if not IsValid(v) then continue end
+			if ply:UserID() == v:UserID() then
+				table.remove(plysKilled, k)
+				break
+			end
 		end
 	end
 
@@ -136,7 +143,7 @@ local function teamSummary(lines, survivors, rescued)
 		table.insert(lines, leftBehindString)
 	end
 
-	local killedString = printKilled(survivors)
+	local killedString = printKilled(survivors, rescued)
 	if killedString then
 		table.insert(lines, killedString)
 	end

@@ -65,6 +65,10 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 
 		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not s:CanBeSeen() then
+				continue
+			end
+
 			if s:GetPos():Distance(slasher:GetPos()) >= 500 then
 				continue
 			end
