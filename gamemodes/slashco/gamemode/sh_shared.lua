@@ -70,6 +70,10 @@ function SlashCo.CheckDoorWL(ent)
 	return DoorSlamWhitelist[ent:GetModel()]
 end
 
+function SlashCo.Dampen(speed, from, to)
+	return Lerp(1 - math.exp(-speed * FrameTime()), from, to)
+end
+
 SCInfo = {}
 
 SCInfo.Offering = {

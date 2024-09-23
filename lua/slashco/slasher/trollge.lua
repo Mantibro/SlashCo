@@ -387,12 +387,12 @@ function SLASHER.Visibility(ply)
 	local lAng = math.sqrt(eyeAng.p^2 + eyeAng.y^2 + eyeAng.r^2)
 	ply.MonitorLook = ply.MonitorLook or 0
 	ply.LookSpeed = math.max(math.abs(ply.MonitorLook - lAng) * 5, 30) - 30
-	ply.MonitorLook = (ply.MonitorLook * 10 + lAng) / 11
+	ply.MonitorLook = SlashCo.Dampen(8, ply.MonitorLook, lAng)
 
 	local lPos = (ply:GetPos() - ply:EyePos()):Length()
 	ply.MonitorPos = ply.MonitorPos or 0
 	ply.PosSpeed = math.abs(ply.MonitorPos - lPos) * 5
-	ply.MonitorPos = (ply.MonitorPos * 7 + lPos) / 8
+	ply.MonitorPos = SlashCo.Dampen(10, ply.MonitorPos, lPos)
 
 	return ply.LookSpeed + ply:GetVelocity():Length() + ply.PosSpeed
 end
