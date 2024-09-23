@@ -429,12 +429,12 @@ if CLIENT then
 			end
 
 			local tr = util.TraceLine({
-				start = LocalPlayer():EyePos(),
-				endpos = s:WorldSpaceCenter(),
-				filter = LocalPlayer()
+				start = s:EyePos(),
+				endpos = LocalPlayer():WorldSpaceCenter(),
+				filter = s
 			})
 
-			if tr.Entity ~= s then
+			if tr.Entity ~= LocalPlayer() then
 				continue
 			end
 
