@@ -72,6 +72,7 @@ if CLIENT then
 		end
 
 		render.SetBlend(num)
+		render.MaterialOverride("")
 		cam.End3D()
 	end
 

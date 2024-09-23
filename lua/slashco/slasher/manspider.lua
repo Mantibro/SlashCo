@@ -321,6 +321,7 @@ local function targetPaint(ply)
 	ply:DrawModel()
 
 	render.SetColorModulation(1, 1, 1)
+	render.MaterialOverride("")
 	cam.End3D()
 end
 
