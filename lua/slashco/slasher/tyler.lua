@@ -552,12 +552,6 @@ if CLIENT then
 			LocalPlayer().tyl_f = nil
 		end
 
-		iconTL = SlashCo.Dampen(7, iconTL, iconT)
-
-			surface.SetMaterial(eyeball)
-			surface.SetDrawColor(255, 255 - iconTL / 2, 255 - iconTL / 2, iconTL)
-			surface.DrawTexturedRect(ScrW() / 32, ScrW() / 32, ScrW() / 16, ScrW() / 16)
-
 		if LocalPlayer():Team() == TEAM_SLASHER then
 			return
 		end
