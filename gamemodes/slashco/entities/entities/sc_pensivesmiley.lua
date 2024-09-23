@@ -298,7 +298,7 @@ function ENT:Think()
 		if self.AttackEngage == false then
 			self:EmitSound("slashco/slasher/pensive_attack" .. math.random(1, 2) .. ".mp3")
 
-			timer.Simple(10, function()
+			timer.Simple(20, function()
 				if not IsValid(attacked) then
 					return
 				end

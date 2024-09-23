@@ -382,29 +382,74 @@ SLASHER.InitHud = function(_, hud)
 	end
 end
 
+function SLASHER.Visibility(ply)
+	local eyeAng = ply:EyeAngles()
+	local lAng = math.sqrt(eyeAng.p^2 + eyeAng.y^2 + eyeAng.r^2)
+	ply.MonitorLook = ply.MonitorLook or 0
+	ply.LookSpeed = math.max(math.abs(ply.MonitorLook - lAng) * 5, 30) - 30
+	ply.MonitorLook = (ply.MonitorLook * 10 + lAng) / 11
+
+	local lPos = (ply:GetPos() - ply:EyePos()):Length()
+	ply.MonitorPos = ply.MonitorPos or 0
+	ply.PosSpeed = math.abs(ply.MonitorPos - lPos) * 5
+	ply.MonitorPos = (ply.MonitorPos * 7 + lPos) / 8
+
+	return ply.LookSpeed + ply:GetVelocity():Length() + ply.PosSpeed
+end
+
 SLASHER.ClientSideEffect = function()
 	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		if not ply:CanBeSeen() then
 			continue
 		end
 
-		local l_ang = math.abs(ply:EyeAngles()[1]) + math.abs(ply:EyeAngles()[2]) + math.abs(ply:EyeAngles()[3])
-
-		if ply.MonitorLook == nil then
-			ply.MonitorLook = 0
-		end
-
-		ply.LookSpeed = math.max(math.abs(ply.MonitorLook - l_ang) * 5, 50) - 50
-		ply.MonitorLook = l_ang
-
 		ply:SetMaterial("lights/white")
-		ply:SetColor(Color(255, 255, 255, (ply.LookSpeed + ply:GetVelocity():Length()) * 3))
+		ply:SetColor(Color(255, 255, 255, SLASHER.Visibility(ply)))
 		ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
 	end
 end
 
 if CLIENT then
+	local eyeball = Material("slashco/ui/particle/eyeball.png")
+	local drawIcon
+
+	timer.Create("TrollgeDetect", 0.5, 0, function()
+		if not IsValid(LocalPlayer()) or not LocalPlayer().Team or LocalPlayer():Team() ~= TEAM_SURVIVOR then
+			return
+		end
+
+		drawIcon = false
+		for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			if s:GetNWString("Slasher") ~= "Trollge" or not s:CanBeSeen() then
+				continue
+			end
+
+			if s:GetPos():Distance(LocalPlayer():GetPos()) >= 1000 then
+				continue
+			end
+
+			local tr = util.TraceLine({
+				start = LocalPlayer():EyePos(),
+				endpos = s:WorldSpaceCenter(),
+				filter = LocalPlayer()
+			})
+
+			if tr.Entity ~= s then
+				continue
+			end
+
+			drawIcon = true
+			break
+		end
+	end)
+
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+		if drawIcon and LocalPlayer():CanBeSeen() then
+			surface.SetMaterial(eyeball)
+			surface.SetDrawColor(255, 255, 255, SLASHER.Visibility(LocalPlayer()))
+			surface.DrawTexturedRect(ScrW() / 2 - ScrW() / 32, ScrH() / 2 - ScrW() / 32, ScrW() / 16, ScrW() / 16)
+		end
+
 		if LocalPlayer():GetNWBool("SurvivorJumpscare_Trollge") == true then
 			if LocalPlayer().troll_f == nil then
 				LocalPlayer().troll_f = 0

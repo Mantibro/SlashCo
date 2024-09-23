@@ -87,11 +87,11 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.TylerSongPickedID = math.random(1, 6)
 			slasher.TylerSongPickedID = "slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3"
 			slasher:EmitSound(slasher.TylerSongPickedID, 1, 1, 0)
-			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12))
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12), true)
 		end
 
 		if SlashCo.CurRound.EscapeHelicopterSummoned and v2 > 12 + ((ms * 12) - (v4 * 2)) then
-			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
 			slasher.SlasherValue1 = 2
 			slasher.TylerSongPickedID = nil
 		end
@@ -99,7 +99,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		if v2 > 25 + ((ms * 25) - (v4 * 4)) then
 			--Time ran out
 
-			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
 			slasher.SlasherValue1 = 2
 			slasher.TylerSongPickedID = nil
 		end
@@ -527,6 +527,11 @@ SLASHER.InitHud = function(_, hud)
 end
 
 if CLIENT then
+	local eyeball = Material("slashco/ui/particle/eyeball.png")
+	local drawIcon
+	local iconT = 0
+	local iconTL = 0
+
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
 		if LocalPlayer():GetNWBool("SurvivorJumpscare_Tyler") == true then
 			if LocalPlayer().tyl_f == nil then
@@ -551,6 +556,14 @@ if CLIENT then
 			return
 		end
 
+		if drawIcon and LocalPlayer():Team() == TEAM_SURVIVOR then
+			iconTL = (iconTL * 10 + iconT) / 11
+
+			surface.SetMaterial(eyeball)
+			surface.SetDrawColor(255, 255, 255, iconTL)
+			surface.DrawTexturedRect(ScrW() / 32, ScrW() / 32, ScrW() / 16, ScrW() / 16)
+		end
+
 		if LocalPlayer():GetNWBool("DisplayTylerTheDestroyerEffects") == true then
 			local Overlay = Material("slashco/ui/overlays/tyler_static")
 			local DestroyerFace = Material("slashco/ui/overlays/tyler_destroyer_face")
@@ -569,8 +582,14 @@ if CLIENT then
 	end)
 
 	SlashCo.TylerSongs = SlashCo.TylerSongs or {}
-	hook.Add("scValue_tylSong", "SlashCoTylerSong", function(slasher, song, stop, maxVol)
+	hook.Add("scValue_tylSong", "SlashCoTylerSong", function(slasher, song, stop, maxVol, shouldDrawIcon)
 		if stop then
+			if shouldDrawIcon then
+				drawIcon = nil
+				iconT = 0
+				iconTL = 0
+			end
+
 			if not SlashCo.TylerSongs[song] then
 				return
 			end
@@ -587,16 +606,28 @@ if CLIENT then
 			snd = CreateSound(LocalPlayer(), song)
 		end
 
+		if shouldDrawIcon then
+			drawIcon = song
+			iconT = 0
+			iconTL = 0
+		end
+
 		snd:Stop()
 		snd:Play()
-		snd:ChangeVolume(0.01)
+		snd:ChangeVolume(0.02)
 
 		SlashCo.TylerSongs[song] = { ent = slasher, snd = snd, shouldBePlaying = true, maxVol = maxVol or 1 }
 	end)
 
 	timer.Create("TylerSongs", 0.5, 0, function()
-		for _, v in pairs(SlashCo.TylerSongs) do
+		for k, v in pairs(SlashCo.TylerSongs) do
 			if not IsValid(v.ent) then
+				if drawIcon == k then
+					drawIcon = nil
+					iconT = 0
+					iconTL = 0
+				end
+
 				v.snd:Stop()
 				v.shouldBePlaying = false
 				continue
@@ -611,7 +642,13 @@ if CLIENT then
 				v.snd:Play()
 			end
 
-			v.snd:ChangeVolume(math.max(v.maxVol - EyePos():Distance(v.ent:GetPos()) * 0.0002 * (0.5 + 0.5 / GetGlobal2Int("SlashCoMapSize", 1)), 0.01), 0.4)
+			local vol = math.max(v.maxVol - EyePos():Distance(v.ent:GetPos()) * 0.0002 * (0.5 + 0.5 / GetGlobal2Int("SlashCoMapSize", 1)), 0.02)
+
+			if drawIcon == k then
+				iconT = vol * 255
+			end
+
+			v.snd:ChangeVolume(vol, 0.4)
 		end
 	end)
 end
