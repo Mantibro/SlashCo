@@ -66,7 +66,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.SlasherValue5 = 0
 			slasher:SetVisible(false)
 			if slasher.TylerSongPickedID then
-				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
 				slasher.TylerSongPickedID = nil
 			end
 		end
@@ -112,7 +112,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			if not slasher:GetNWBool("TylerCreating") and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
 				slasher:SetNWBool("TylerCreating", true)
 				slasher.SlasherValue2 = 0
-				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
 				slasher.TylerSongPickedID = nil
 			end
 		end
