@@ -3,73 +3,47 @@ local ITEM = {}
 ITEM.Model = "models/slashco/items/jug.mdl"
 ITEM.Name = "Jug"
 ITEM.EntClass = "sc_jug"
-ITEM.Price = 15
+ITEM.Price = 10
 ITEM.Description = "Jug_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true
 
-ITEM.PrePickUpSecondary = function(ply, item, id)
-	if item ~= "GasCan" then
-		return
+ITEM.ItemDropped = function(ply, droppeditem)
+	if ply.JugTele then
+		timer.Remove("JugTele_" .. ply:UserID())
+		droppeditem:EmitSound("slashco/jug_curse.mp3", 75, 50)
+		ply.JugTele = false
 	end
-
-	local ent = Entity(id)
-
-	if not ply:GetNWBool("CurseOfTheJug") or not ent:GetNWBool("JugCursed") then
-		return
-	end
-
-	ent:RandomTeleport(Vector(0, 0, 50))
-	ent:SetNWBool("JugCursed", false)
-
-	ply:SetNWBool("JugCurseActivate", true)
-
-	timer.Simple(6, function()
-		if IsValid(ply) then
-			ply:SetNWBool("JugCurseActivate", false)
-		end
-	end)
-
-	return true
 end
-
 ITEM.OnSwitchFrom = function(ply)
 	ply:RemoveSpeedEffect("jug")
 end
+ITEM.PrePickUp = function(ply)
+	if not ply:GetNWBool("CurseOfTheJug") then
+		return
+	end
+
+	if ply.JugDropTimer and CurTime() - ply.JugDropTimer < 1 then
+		return true
+	end
+	ply.JugDropTimer = CurTime()
+
+	ply:EmitSound("slashco/jug_reject.mp3")
+
+	return true
+end
 ITEM.OnPickUp = function(ply)
 	if ply:GetNWBool("CurseOfTheJug") then
-		ply:EmitSound("slashco/jug_reject.mp3")
 		timer.Simple(0, function()
 			SlashCo.DropItem(ply)
 		end)
+
+		return
 	end
 
-	ply:AddSpeedEffect("jug", 310, 3)
+	ply:AddSpeedEffect("jug", 310, 1)
 end
-
-hook.Add("Think", "JugFunc", function()
-	if SERVER then
-		for _, surv in ipairs( team.GetPlayers(TEAM_SURVIVOR) ) do
-			if surv:GetItem("item") ~= "Jug" then continue end
-
-			if surv:GetNWBool("CurseOfTheJug") then continue end
-
-			local find = ents.FindInSphere(surv:GetPos(), 120)
-
-			for i = 1, #find do
-				local ent = find[i]
-
-				if ent:IsPlayer() and ent:Team() == TEAM_SLASHER then
-					surv:RandomTeleport()
-					surv:EmitSound("slashco/jug_curse.mp3")
-					SlashCo.RemoveItem(surv)
-					surv:SetNWBool("CurseOfTheJug", true)
-				end
-			end
-		end
-	end
-end)
 
 ITEM.ViewModel = {
 	model = ITEM.Model,
@@ -111,6 +85,83 @@ ITEM.WorldModel = {
 SlashCo.RegisterItem(ITEM, "Jug")
 
 if SERVER then
+	local function tele(ply, force)
+		if ply.JugTele and not force then
+			return
+		end
+		ply.JugTele = true
+
+		timer.Create("JugTele_" .. ply:UserID(), 2, 1, function()
+			if not IsValid(ply) then return end
+
+			ply.JugTele = false
+
+			if ply:GetItem("item") ~= "Jug" then return end
+
+			SlashCo.RemoveItem(ply)
+			ply:RandomTeleport()
+			ply:AddSpeedEffect("jugCurse", 290, 1)
+			ply:SetNWBool("CurseOfTheJug", true)
+			ply:EmitSound("slashco/jug_curse.mp3", 75, 70)
+		end)
+
+		ply:EmitSound("slashco/jug_curse.mp3")
+	end
+
+	concommand.Add("slashco_debug_jugtele", function(ply)
+		if not IsValid(ply) or not ply:IsPlayer() or not ply:IsAdmin() then
+			doPrint(ply, "Only admins can use debug commands!")
+			return
+		end
+
+		tele(ply, true)
+	end, nil, "Teleport as if you had triggered a jug.", FCVAR_CHEAT + FCVAR_PROTECTED)
+
+	hook.Add("Think", "JugFunc", function()
+		for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if surv:GetItem("item") ~= "Jug" then continue end
+			if surv:GetNWBool("CurseOfTheJug") then continue end
+
+			if surv:GetNWBool("SurvivorChased") then
+				tele(surv)
+				continue
+			end
+
+			for _, ent in ipairs(ents.FindInSphere(surv:GetPos(), 150)) do
+				if ent:IsPlayer() and ent:Team() == TEAM_SLASHER and ent:CanBeSeen() then
+					tele(surv)
+					break
+				end
+			end
+		end
+	end)
+
+	hook.Add("SlashCoItemPickUp", "JugCurse", function(ply, item, id)
+		if item ~= "GasCan" then
+			return
+		end
+
+		if not ply:GetNWBool("CurseOfTheJug") then
+			return
+		end
+
+		if math.random() < 0.5 then
+			return
+		end
+
+		local ent = Entity(id)
+		ent:RandomTeleport(Vector(0, 0, 50))
+		ply:SetNWBool("JugCurseActivate", true)
+
+		timer.Create("jugCurse_" .. ply:UserID(), 6, 1, function()
+			if IsValid(ply) then
+				ply:SetNWBool("JugCurseActivate", false)
+			end
+		end)
+
+		return true
+	end)
+
 	return
 end
 

@@ -10,7 +10,7 @@ EFFECT.CanBeSeen = function()
 	return false
 end
 EFFECT.OnApplied = function(ply)
-	ply:AddSpeedEffect("invis", 250, 1)
+	ply:AddSpeedEffect("invis", 250, 2)
 end
 EFFECT.OnExpired = function(ply)
 	ply:RemoveSpeedEffect("invis")

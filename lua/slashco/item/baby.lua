@@ -22,10 +22,10 @@ ITEM.OnUse = function(ply)
 
     ply:EmitSound("slashco/survivor/baby_use.mp3")
 
-    local deathchance = math.random(0, math.floor( ply:Health() / 5 ) )
+    local deathchance = math.random(0, math.floor(ply:Health() / 5))
     local hpafter = ply:Health() / 2
 
-    ply:SetHealth( hpafter )
+    ply:SetHealth(hpafter)
 
     timer.Simple(1, function()
         if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then

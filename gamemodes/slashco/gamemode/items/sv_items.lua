@@ -175,6 +175,11 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 		return
 	end
 
+	local dontPickupHook = hook.Run("SlashCoItemPickUp", ply, item, itemindex)
+	if dontPickupHook then
+		return
+	end
+
 	local dontPickup = ply:ItemFunction2("PrePickUp", item, itemindex)
 	if dontPickup then
 		return
@@ -192,7 +197,7 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 		end
 	end
 
-	local itemEnt = ents.GetByIndex(itemindex)
+	local itemEnt = Entity(itemindex)
 
 	if IsValid(itemEnt.SpawnedAt) then
 		itemEnt.SpawnedAt:TriggerOutput("OnPickedUp", ply)
