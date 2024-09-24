@@ -122,11 +122,6 @@ if SERVER then
 			if surv:GetItem("item") ~= "Jug" then continue end
 			if surv:GetNWBool("CurseOfTheJug") then continue end
 
-			if surv:GetNWBool("SurvivorChased") then
-				tele(surv)
-				continue
-			end
-
 			for _, ent in ipairs(ents.FindInSphere(surv:GetPos(), 150)) do
 				if ent:IsPlayer() and ent:Team() == TEAM_SLASHER and ent:CanBeSeen() then
 					tele(surv)

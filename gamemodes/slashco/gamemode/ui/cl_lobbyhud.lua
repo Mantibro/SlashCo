@@ -1,4 +1,8 @@
 if game.GetMap() ~= "sc_lobby" then
+	hook.Add("HUDDrawTargetID", "SlashCoLobbyNames", function()
+		return false
+	end)
+
 	return
 end
 
@@ -22,10 +26,8 @@ net.Receive("mantislashcoGiveLobbyInfo", function()
 	LobbyInfoTable = net.ReadTable()
 end)
 
-hook.Add("HUDDrawTargetID", "lobbyNames", function()
-	if StateOfLobby and StateOfLobby < 1 then
-		return true
-	end
+hook.Add("HUDDrawTargetID", "SlashCoLobbyNames", function()
+	return StateOfLobby and StateOfLobby < 1
 end)
 
 local ReadyCheck = Material("slashco/ui/lobby_ready")

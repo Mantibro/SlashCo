@@ -32,6 +32,10 @@ SLASHER.OnSpawn = function(slasher)
 	slasher:SetVisible(false)
 end
 
+SLASHER.HideTime = function(slasher)
+	slasher.TylerTime = 25 + SlashCo.MapSize * 25 - slasher.SlasherValue4 * 3 - team.NumPlayers(TEAM_SURVIVOR)
+end
+
 SLASHER.OnTickBehaviour = function(slasher)
 	local v1 = slasher.SlasherValue1 --State
 	local v2 = slasher.SlasherValue2 --Time Spent as Creator or destroyer
@@ -66,7 +70,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.SlasherValue5 = 0
 			slasher:SetVisible(false)
 			if slasher.TylerSongPickedID then
-				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
+				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
 				slasher.TylerSongPickedID = nil
 			end
 		end
@@ -84,24 +88,21 @@ SLASHER.OnTickBehaviour = function(slasher)
 		final_perception = 0.0
 
 		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
-			slasher.TylerSongPickedID = math.random(1, 6)
-			slasher.TylerSongPickedID = "slashco/slasher/tyler_song_" .. slasher.TylerSongPickedID .. ".mp3"
+			slasher.TylerSongPickedID = "slashco/slasher/tyler_song_" .. math.random(1, 6) .. ".mp3"
 			slasher:EmitSound(slasher.TylerSongPickedID, 1, 1, 0)
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, false, 0.8 - (slasher.SlasherValue3 * 0.12), true)
+			SLASHER.HideTime(slasher)
 		end
 
-		if SlashCo.CurRound.EscapeHelicopterSummoned and v2 > 12 + ((ms * 12) - (v4 * 2)) then
-			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
-			slasher.SlasherValue1 = 2
-			slasher.TylerSongPickedID = nil
+		if not slasher.TylerTime then
+			SLASHER.HideTime(slasher)
 		end
 
-		if v2 > 25 + ((ms * 25) - (v4 * 4)) then
-			--Time ran out
-
-			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
-			slasher.SlasherValue1 = 2
+		--Time ran out
+		if (SlashCo.CurRound.EscapeHelicopterSummoned and v2 > slasher.TylerTime / 2.5) or v2 > slasher.TylerTime then
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
 			slasher.TylerSongPickedID = nil
+			slasher.SlasherValue1 = 2
 		end
 
 		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
@@ -112,7 +113,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			if not slasher:GetNWBool("TylerCreating") and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
 				slasher:SetNWBool("TylerCreating", true)
 				slasher.SlasherValue2 = 0
-				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true, 0, true)
+				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
 				slasher.TylerSongPickedID = nil
 			end
 		end
@@ -155,7 +156,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 		if slasher.tyler_destroyer_entrance_antispam == nil then
 			SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", false, 0.8)
-			--slasher:PlayGlobalSound("slashco/slasher/tyler_alarm.wav", 100)
 			slasher.tyler_destroyer_entrance_antispam = 0
 		end
 
@@ -169,12 +169,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.tyler_destroyer_entrance_antispam = slasher.tyler_destroyer_entrance_antispam + FrameTime()
 		else
 			SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", true)
-			--[[
-			slasher:StopSound("slashco/slasher/tyler_alarm.wav")
-			timer.Simple(0.1, function()
-				slasher:StopSound("slashco/slasher/tyler_alarm.wav")
-			end) --idk man only works if i stop it twice shut up
-			--]]
 
 			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 140)
 			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 140)
@@ -330,7 +324,6 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 
 			timer.Simple(FrameTime(), function()
 				if not IsValid(target) then
-					print("how")
 					return
 				end
 
@@ -584,7 +577,7 @@ if CLIENT then
 	SlashCo.TylerSongs = SlashCo.TylerSongs or {}
 	hook.Add("scValue_tylSong", "SlashCoTylerSong", function(slasher, song, stop, maxVol, shouldDrawIcon)
 		if stop then
-			if shouldDrawIcon then
+			if shouldDrawIcon or drawIcon == song then
 				drawIcon = nil
 				iconT = 0
 				iconTL = 0

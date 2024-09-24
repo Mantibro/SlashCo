@@ -95,10 +95,6 @@ cvars.AddChangeCallback("slashco_cl_playermodel", function(_, _, newVal)
 end)
 --]]
 
-function GM:HUDDrawTargetID()
-	return false
-end
-
 SlashCoTestConfig = false
 
 local disable = {
