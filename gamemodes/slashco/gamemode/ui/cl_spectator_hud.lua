@@ -114,7 +114,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	if SlasherTeam then
 		for i = 1, #SlasherTeam do
-			if SlasherTeam[i].s_id == LocalPlayer():SteamID64() then
+			if SlasherTeam[i] and SlasherTeam[i].s_id == LocalPlayer():SteamID64() then
 				if LocalPlayer():GetNWString("Slasher") and LocalPlayer():GetNWString("Slasher") ~= show_slasher_anticipation then
 					local shower = "UNASSIGNED!"
 					if SlashCoSlashers[LocalPlayer():GetNWString("Slasher")] then
