@@ -13,7 +13,7 @@ ITEM.OnUse = function(ply)
 
     for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
         if s:GetPos():Distance(ply:GetPos()) > 200 then
-            return
+            continue
         end
 
         local tr = util.TraceLine({
