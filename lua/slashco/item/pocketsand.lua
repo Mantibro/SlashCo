@@ -6,44 +6,44 @@ ITEM.Name = "PocketSand"
 ITEM.Icon = "slashco/ui/icons/items/item_1"
 ITEM.Price = 30
 ITEM.Description = "PocketSand_desc"
-ITEM.CamPos = Vector(50,0,0)
-ITEM.DisplayColor = function(ply)
-    local setcolor = 360 - math.Clamp(ply:Health(), 0, 100) * 1.2
-    local color = HSVToColor(setcolor, 1, 0.5)
-
-    return color.r, color.g, color.b, color.a
-end
+ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
 ITEM.OnUse = function(ply)
-    if #team.GetPlayers(TEAM_SLASHER) > 1 then return true end
+    local found = {}
 
-    local found = false
+    for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+        if s:GetPos():Distance(ply:GetPos()) > 200 then
+            return
+        end
 
-    for i = 1, #team.GetPlayers(TEAM_SLASHER) do
-        local s = team.GetPlayers(TEAM_SLASHER)[i]
+        local tr = util.TraceLine({
+            start = ply:EyePos(),
+            endpos = s:WorldSpaceCenter(),
+            filter = ply
+        })
 
-        if s:GetPos():Distance(ply:GetPos()) < 120 then
-            local tr = util.TraceLine( {
-                start = s:EyePos(),
-                endpos = ply:GetPos() + Vector(0,0,50),
-                filter = slasher
-            } )
-
-            if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SLASHER then found = tr.Entity goto FOUNDMAN end
+        if tr.Entity == s then
+            table.insert(found, s)
+            break
         end
     end
 
-    ::FOUNDMAN::
+    if table.IsEmpty(found) then
+        return true
+    end
 
-    if found == false then return true end
+    for _, v in ipairs(found) do
+        v:SetNWBool("SlasherBlinded", true)
+    end
 
-    found:SetNWBool("SlasherBlinded", true)
-
-    ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1,2) .. ".mp3")
+    ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3")
     ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
 
     timer.Simple(8, function()
-        found:SetNWBool("SlasherBlinded", false)
+        for _, v in ipairs(found) do
+            if not IsValid(v) then continue end
+            v:SetNWBool("SlasherBlinded", false)
+        end
     end)
 end
 ITEM.ViewModel = {

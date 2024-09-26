@@ -38,7 +38,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	local SO = SlashCo.CurRound.OfferingData.SO
 
-	if slasher:GetNWBool("DolphinInHiding") and not slasher:SetNWBool("DolphinFound") then
+	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
 		slasher:SetJumpPower(0)
 		slasher:SetRunSpeed(1)
 		slasher:SetWalkSpeed(1)
@@ -69,7 +69,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 				continue
 			end
 
-			if s:GetPos():Distance(slasher:GetPos()) >= 500 then
+			if s:GetPos():Distance(slasher:GetPos()) > 500 then
 				continue
 			end
 
@@ -113,14 +113,12 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 		else
 			--you're fucking dead
 
 			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetNWInt("Slasher_Perception", SLASHER.Perception * 1.5 ^ (slasher.DolphinKills or 0))
 
 			hunt_boost = 1
 
@@ -149,7 +147,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight + (hunt_boost * 5))
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception + (hunt_boost * 3))
+	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception * 1.4 ^ (slasher.DolphinKills or 0) + (hunt_boost * 3))
 end
 
 SLASHER.Thirdperson = function(ply)
