@@ -24,7 +24,6 @@ ITEM.OnUse = function(ply)
 
         if tr.Entity == s then
             table.insert(found, s)
-            break
         end
     end
 
