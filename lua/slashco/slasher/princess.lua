@@ -312,7 +312,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 		return
 	end
 
-	if slasher.MaulTime and CurTime() - slasher.MaulTime < 2 then
+	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then
 		return
 	end
 	slasher.MaulTime = CurTime()

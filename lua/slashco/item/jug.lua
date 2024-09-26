@@ -91,12 +91,14 @@ if SERVER then
 		end
 		ply.JugTele = true
 
-		timer.Create("JugTele_" .. ply:UserID(), 2, 1, function()
+		timer.Create("JugTele_" .. ply:UserID(), 1, 1, function()
 			if not IsValid(ply) then return end
 
 			ply.JugTele = false
 
 			if ply:GetItem("item") ~= "Jug" then return end
+			if ply:Team() ~= TEAM_SURVIVOR then return end
+			if ply:GetNWBool("SurvivorBeingJumpscared") then return end
 
 			SlashCo.RemoveItem(ply)
 			ply:RandomTeleport()
@@ -122,7 +124,7 @@ if SERVER then
 			if surv:GetItem("item") ~= "Jug" then continue end
 			if surv:GetNWBool("CurseOfTheJug") then continue end
 
-			for _, ent in ipairs(ents.FindInSphere(surv:GetPos(), 150)) do
+			for _, ent in ipairs(ents.FindInSphere(surv:GetPos(), 250)) do
 				if ent:IsPlayer() and ent:Team() == TEAM_SLASHER and ent:CanBeSeen() then
 					tele(surv)
 					break
