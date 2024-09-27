@@ -170,8 +170,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 		else
 			SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", true)
 
-			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 140)
-			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 140)
+			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 140, nil, true)
+			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 140, nil, true)
 
 			slasher:Freeze(false)
 			slasher.SlasherValue1 = 3

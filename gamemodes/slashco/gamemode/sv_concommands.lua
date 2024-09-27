@@ -177,7 +177,6 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 
 	SlashCo.SelectSlasher(args[1], target:SteamID64())
 	SlashCo.ApplySlasherToPlayer(target)
-	SlashCo.OnSlasherSpawned(target)
 
 	timer.Simple(0.25, function()
 		if not IsValid(target) then
@@ -191,6 +190,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		target:SetTeam(TEAM_SLASHER)
 		target:Spawn()
 
+		SlashCo.OnSlasherSpawned(target)
 		SlashCo.BroadcastCurrentRoundData(false)
 	end)
 end, function(cmd, args)

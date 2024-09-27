@@ -441,9 +441,6 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 end
 
 SLASHER.Animator = function(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
-	local pac = ply:GetNWBool("DemonPacified")
-
 	local eating = ply:GetNWBool("SidEating")
 	local equipping_gun = ply:GetNWBool("SidGunEquipping")
 	local sid_executing = ply:GetNWBool("SidExecuting")
@@ -452,7 +449,6 @@ SLASHER.Animator = function(ply)
 	local aiming_gun = ply:GetNWBool("SidGunAiming")
 	local aimed_gun = ply:GetNWBool("SidGunAimed")
 	local gun_shooting = ply:GetNWBool("SidGunShoot")
-	local gun_rage = ply:GetNWBool("SidGunRage")
 
 	if gun_state then
 		gun_prefix = "g_"

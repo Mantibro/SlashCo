@@ -293,7 +293,7 @@ SLASHER.InitHud = function(_, hud)
 	end
 
 	function hud.TitleCard.Label:PaintOver()
-		draw.SimpleText("STALK TIME: " .. math.Round(LocalPlayer():GetNWInt("WatcherStalkTime")), "TVCD", 4, 18, red)
+		draw.SimpleText("STALK TIME: " .. math.Round(LocalPlayer():GetNWInt("WatcherStalkTime"), 1), "TVCD", 4, 18, red)
 	end
 
 	hook.Add("HUDPaint", "SlashCoWatcher", function()

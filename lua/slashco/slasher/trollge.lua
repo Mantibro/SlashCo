@@ -27,7 +27,7 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
 
 SLASHER.OnSpawn = function(slasher)
-	slasher:PlayGlobalSound("slashco/slasher/trollge_breathing.wav", 50)
+	slasher:PlayGlobalSound("slashco/slasher/trollge_breathing.wav", 50, nil, true)
 end
 
 local function stopDash(slasher)
@@ -104,7 +104,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.SlasherValue1 = 1
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
-			slasher:PlayGlobalSound("slashco/slasher/trollge_stage1.wav", 60)
+			slasher:PlayGlobalSound("slashco/slasher/trollge_stage1.wav", 60, nil, true)
 
 			slasher:SetRunSpeed(280)
 			slasher:SetWalkSpeed(150)
@@ -142,7 +142,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.SlasherValue1 = 2
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
-			slasher:PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60)
+			slasher:PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60, nil, true)
 
 			slasher:SetRunSpeed(450)
 			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)

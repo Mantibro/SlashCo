@@ -246,42 +246,43 @@ end
 local function hpMeter()
 	local hp = LocalPlayer():Health()
 
-	if hp > (prevHp or 100) then
+	if hp > (prevHp or maxHp) then
 		--reset damage indicator upon healing
-		prevHp = math.Clamp(hp, 0, 100)
+		prevHp = math.Clamp(hp, 0, maxHp)
 		SetTime = 0
 	end
 
 	if CurTime() >= (SetTime or 0) then
 		if ShowDamage then
 			--update prevHp once the indicator time is up
-			prevHp = math.Clamp(hp, 0, 100)
+			prevHp = math.Clamp(hp, 0, maxHp)
 			ShowDamage = false
 		end
 
 		if hp < (prevHp or 100) then
 			--start the damage indicator time
-			prevHp1 = math.Clamp(hp, 0, 100)
+			prevHp1 = math.Clamp(hp, 0, maxHp)
 			ShowDamage = true
 			SetTime = CurTime() + 2
 			healthIndicatorShift = CurTime()
 		end
 	elseif hp < prevHp1 then
 		--reset indicator time if more damage is taken
-		prevHp1 = math.Clamp(hp, 0, 100)
+		prevHp1 = math.Clamp(hp, 0, maxHp)
 		SetTime = CurTime() + 2
 	end
 
+	local prevHpBar = math.Round(math.Clamp(((prevHp or maxHp) - hp) / maxHp, 0, 1) * 26.9)
+
 	aHp = Lerp(FrameTime() * 3, aHp or 100, hp)
-	local displayPrevHpBar = ((CurTime() - healthIndicatorShift) % 0.7 < 0.35)
-			and math.Round(math.Clamp(((prevHp or 100) - hp) / maxHp, 0, 1) * 26.9) or 0
 	local parsed
 
 	if hp >= 25 or not GetConVar("slashco_cl_show_lowhealth"):GetBool() then
-		local hpOver = math.Clamp(hp - maxHp, 0, 100)
-		local hpAdjust = math.Clamp(hp, 0, 100) - hpOver
+		local hpOver = math.Clamp(hp - maxHp, 0, maxHp)
+		local hpAdjust = math.Clamp(hp, 0, maxHp) - hpOver
 		local displayHpBar = math.Round(math.Clamp(hpAdjust / maxHp, 0, 1) * 27)
 		local displayHpOverBar = math.Round(math.Clamp(hpOver / maxHp, 0, 1) * 27)
+		local displayPrevHpBar = ((CurTime() - healthIndicatorShift) % 0.7 < 0.35) and prevHpBar or 0
 		parsed = markup.Parse(string.format("<font=TVCD>%s <colour=0,255,255,255>%s</colour>%s<colour=255,0,0,255>%s</colour></font>",
 				SlashCo.Language("HP"),
 				string.rep("█", displayHpOverBar),
@@ -290,10 +291,11 @@ local function hpMeter()
 		))
 	else
 		local displayHpBar = (CurTime() % 0.7 > 0.35) and math.Round(math.Clamp(hp / maxHp, 0, 1) * 27) or 0
+		local displayPrevHpBar1 = (CurTime() % 0.7 > 0.35) and prevHpBar or 0
 		parsed = markup.Parse(string.format("<font=TVCD>%s <colour=255,255,0,255>%s</colour><colour=255,0,0,255>%s</colour></font>",
 				SlashCo.Language("HP"),
 				string.rep("█", displayHpBar),
-				string.rep("█", displayPrevHpBar)
+				string.rep("█", displayPrevHpBar1)
 		))
 	end
 

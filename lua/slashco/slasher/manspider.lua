@@ -117,7 +117,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher.SlasherValue3 = 0
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
-			slasher:PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50)
+			slasher:PlayGlobalSound("slashco/slasher/manspider_idle.wav", 50, nil, true)
 			slasher:SetJumpPower(slasher.Jump)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end

@@ -331,7 +331,23 @@ timer.Create("PermanentSounds", 1, 0, function()
 	end
 end)
 
+local function removeAllSounds(entID)
+	for _, v in pairs(SlashCo.GlobalSounds) do
+		if v.entID ~= entID then
+			continue
+		end
+
+		v.permanent = false
+		v.snd:Stop()
+	end
+end
+
 local function removeSound(soundPath, entID)
+	if soundPath == "" then
+		removeAllSounds(entID)
+		return
+	end
+
 	local entry = SlashCo.GlobalSounds[entID .. soundPath]
 	if not entry then
 		return
@@ -345,8 +361,6 @@ local function addSound(soundPath, entID)
 	local soundLevel = net.ReadUInt(14)
 	local vol = net.ReadFloat()
 	local permanent = net.ReadBool()
-
-	--EmitSound(soundPath, LocalPlayer():GetPos(), entID, CHAN_AUTO, vol, soundLevel)
 
 	local ent = Entity(entID)
 	if not IsValid(ent) then
@@ -366,7 +380,7 @@ local function addSound(soundPath, entID)
 	snd:SetSoundLevel(soundLevel)
 	snd:ChangeVolume(vol)
 
-	SlashCo.GlobalSounds[entID .. soundPath] = { snd = snd, permanent = permanent }
+	SlashCo.GlobalSounds[entID .. soundPath] = { snd = snd, permanent = permanent, entID = entID }
 end
 
 net.Receive("mantislashcoGlobalSound", function()

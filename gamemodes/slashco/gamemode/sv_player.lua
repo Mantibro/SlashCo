@@ -11,41 +11,46 @@ function GM:PlayerInitialSpawn(ply)
 	end
 end
 
-function GM:PlayerSpawn(player, transition)
-	if not IsValid(player) then
+function GM:PlayerSpawn(ply, transition)
+	if not IsValid(ply) then
 		return
 	end
 
-	player:CrosshairDisable()
+	ply:StopAllGlobalSounds()
+	ply:CrosshairDisable()
 
-	if player:Team() == TEAM_SURVIVOR then
-		player_manager.SetPlayerClass(player, "player_survivor")
-	elseif player:Team() == TEAM_SLASHER then
-		player_manager.SetPlayerClass(player, "player_slasher_base")
-	elseif player:Team() == TEAM_LOBBY then
-		player_manager.SetPlayerClass(player, "player_lobby")
-	end
+	if self.TeamBased then
+		local tm = ply:Team()
 
-	if self.TeamBased and (player:Team() == TEAM_SPECTATOR or player:Team() == TEAM_UNASSIGNED) then
-		self:PlayerSpawnAsSpectator(player)
-		return
+		if tm == TEAM_SPECTATOR or tm == TEAM_UNASSIGNED then
+			self:PlayerSpawnAsSpectator(ply)
+			return
+		end
+
+		if tm == TEAM_SURVIVOR then
+			player_manager.SetPlayerClass(ply, "player_survivor")
+		elseif tm == TEAM_SLASHER then
+			player_manager.SetPlayerClass(ply, "player_slasher_base")
+		elseif tm == TEAM_LOBBY then
+			player_manager.SetPlayerClass(ply, "player_lobby")
+		end
 	end
 
 	-- Stop observer mode
-	player:UnSpectate()
-	player:SetupHands()
+	ply:UnSpectate()
+	ply:SetupHands()
 
-	player_manager.OnPlayerSpawn(player, transition)
-	player_manager.RunClass(player, "Spawn")
+	player_manager.OnPlayerSpawn(ply, transition)
+	player_manager.RunClass(ply, "Spawn")
 
 	-- If we are in transition, do not touch player's weapons
 	if not transition then
 		-- Call item loadout function
-		hook.Call("PlayerLoadout", GAMEMODE, player)
+		hook.Call("PlayerLoadout", GAMEMODE, ply)
 	end
 
 	-- Set player model
-	hook.Call("PlayerSetModel", GAMEMODE, player)
+	hook.Call("PlayerSetModel", GAMEMODE, ply)
 end
 
 function GM:PlayerDeathThink(ply)

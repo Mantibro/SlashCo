@@ -59,6 +59,14 @@ function ENTITY:PlayGlobalSound(soundPath, soundLevel, vol, permanent)
 	SlashCo.PlayGlobalSound(soundPath, soundLevel, self, vol, permanent)
 end
 
+function ENTITY:StopAllGlobalSounds()
+	net.Start("mantislashcoGlobalSound")
+	net.WriteBool(true)
+	net.WriteString("")
+	net.WriteUInt(self:EntIndex(), 13)
+	net.Broadcast()
+end
+
 ENTITY.OldStopSound = ENTITY.OldStopSound or ENTITY.StopSound
 function ENTITY:StopSound(soundPath)
 	self:OldStopSound(soundPath)
