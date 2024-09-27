@@ -144,7 +144,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher:Freeze(false)
 			slasher:PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60)
 
-			slasher:SetRunSpeed(475)
+			slasher:SetRunSpeed(450)
 			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
 			final_eyesight = 10
 
@@ -209,6 +209,89 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
+end
+
+local function smoothVec(sp, from, to)
+	local x, y, z = from:Unpack()
+	local x1, y1, z1 = to:Unpack()
+
+	return Vector(SlashCo.Dampen(sp, x, x1), SlashCo.Dampen(sp, y, y1), SlashCo.Dampen(sp, z, z1))
+end
+
+SLASHER.Move = function(ply, mv)
+	if not ply:GetNWBool("TrollgeStage2") then return end
+
+	local vel = Vector() -- DO NOT replace with vector_origin
+	local ang = mv:GetMoveAngles()
+	local speed = ply:GetRunSpeed()
+	local f, r = 0, 0
+
+	-- movement keys
+
+	if mv:KeyDown(IN_JUMP) then
+		vel:Add(vector_up * speed)
+	end
+	if mv:KeyDown(IN_DUCK) then
+		vel:Add(vector_up * -speed)
+	end
+
+	local aF = (ang:Forward() * Vector(1, 1, 0)):GetNormalized()
+	if mv:KeyDown(IN_FORWARD) then
+		vel:Add(aF * speed)
+		f = f + 1
+	end
+	if mv:KeyDown(IN_BACK) then
+		vel:Add(aF * -speed)
+		f = f - 1
+	end
+
+	if mv:KeyDown(IN_MOVERIGHT) then
+		vel:Add(ang:Right() * speed)
+		r = r + 1
+	end
+	if mv:KeyDown(IN_MOVELEFT) then
+		vel:Add(ang:Right() * -speed)
+		r = r - 1
+	end
+
+	if math.abs(f) + math.abs(r) == 2 then
+		vel:Mul(0.707)
+	end
+
+	-- stay close to ground
+
+	local tr = util.TraceLine({
+		start = ply:GetPos(),
+		endpos = ply:GetPos() - vector_up * 500,
+		filter = ply
+	})
+
+	if tr.Fraction > 0.5 and vel.z > 0 then
+		vel.z = 0
+	end
+	if tr.Fraction > 0.65 then
+		vel.z = vel.z - speed * (tr.Fraction - 0.65) / 0.35
+	end
+
+	-- sprint/walk
+
+	local sp = 2.5
+	if mv:KeyDown(IN_SPEED) then
+		vel:Mul(1.5)
+		sp = 0.5
+	end
+	if mv:KeyDown(IN_WALK) then
+		vel:Mul(0.5)
+		sp = 6
+	end
+
+	-- apply
+
+	mv:SetVelocity(smoothVec(sp, mv:GetVelocity(), vel))
+	mv:SetOrigin(mv:GetOrigin() + mv:GetVelocity() * FrameTime())
+	ply:SetGroundEntity(NULL)
+
+	return true
 end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
@@ -321,7 +404,6 @@ end
 
 SLASHER.CanSeeFlashlights = function(ply)
 	return false
-	--return ply:GetNWBool("TrollgeStage2")
 end
 
 SLASHER.Footstep = function()
@@ -385,12 +467,12 @@ end
 function SLASHER.Visibility(ply)
 	local eyeAng = ply:EyeAngles()
 	local lAng = math.sqrt(eyeAng.p^2 + eyeAng.y^2 + eyeAng.r^2)
-	ply.MonitorLook = ply.MonitorLook or 0
+	ply.MonitorLook = ply.MonitorLook or lAng
 	ply.LookSpeed = math.max(math.abs(ply.MonitorLook - lAng) * 5, 30) - 30
 	ply.MonitorLook = SlashCo.Dampen(8, ply.MonitorLook, lAng)
 
 	local lPos = (ply:GetPos() - ply:EyePos()):Length()
-	ply.MonitorPos = ply.MonitorPos or 0
+	ply.MonitorPos = ply.MonitorPos or lPos
 	ply.PosSpeed = math.abs(ply.MonitorPos - lPos) * 5
 	ply.MonitorPos = SlashCo.Dampen(10, ply.MonitorPos, lPos)
 
@@ -400,6 +482,15 @@ end
 SLASHER.ClientSideEffect = function()
 	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		if not ply:CanBeSeen() then
+			ply.MonitorLook = nil
+			ply.MonitorPos = nil
+			continue
+		end
+		if ply:GetPos():Distance(LocalPlayer():GetPos()) >= 1000 then
+			ply.MonitorLook = nil
+			ply.MonitorPos = nil
+			ply:SetColor(color_transparent)
+			ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
 			continue
 		end
 

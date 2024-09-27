@@ -40,15 +40,13 @@ function PLAYER:CanSeeFlashlights()
 	return self:GetNWBool("SlashCoSeeFlashlights", true)
 end
 
-local invis = Color(0, 0, 0, 0)
-
 if CLIENT then
 	hook.Add("Think", "hidePlayersIfCannotSee", function()
 		for _, ply in player.Iterator() do
 			local seeable = ply:CanBeSeen()
 			if ply.Seeable ~= seeable then
 				if pac then pac.TogglePartDrawing(ply, seeable) end
-				ply:SetColor(seeable and color_white or invis)
+				ply:SetColor(seeable and color_white or color_transparent)
 
 				ply.Seeable = seeable
 			end

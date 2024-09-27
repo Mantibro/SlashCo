@@ -23,7 +23,7 @@ if SERVER then
         self:PhysicsInit(SOLID_VPHYSICS)
         self:SetMoveType(MOVETYPE_NONE)
         self:SetUseType(SIMPLE_USE)
-        self:SetColor(Color(0, 0, 0, 0))
+        self:SetColor(color_transparent)
         self:SetRenderMode(RENDERMODE_TRANSCOLOR)
     end
 

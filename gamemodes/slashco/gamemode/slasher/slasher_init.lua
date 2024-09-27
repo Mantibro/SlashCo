@@ -93,20 +93,24 @@ function GetRandomSlasher()
 end
 
 --Slasher Animation Controller
-hook.Add("CalcMainActivity", "SlasherAnimator", function(ply, vel)
-	if ply:Team() ~= TEAM_SLASHER then
-		return
-	end
-
+hook.Add("CalcMainActivity", "SlashCoSlasherAnimator", function(ply, vel)
+	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Animator", vel)
 end)
 
-hook.Add("PlayerFootstep", "SlasherFootstep", function(ply)
-	if ply:Team() ~= TEAM_SLASHER then
-		return
-	end
-
+hook.Add("PlayerFootstep", "SlashCoSlasherFootstep", function(ply)
+	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Footstep")
+end)
+
+hook.Add("Move", "SlashCoSlasherMove", function(ply, mv)
+	if ply:Team() ~= TEAM_SLASHER then return end
+	return ply:SlasherFunction("Move", mv)
+end)
+
+hook.Add("FinishMove", "SlashCoSlasherFinishMove", function(ply, mv)
+	if ply:Team() ~= TEAM_SLASHER then return end
+	return ply:SlasherFunction("FinishMove", mv)
 end)
 
 if CLIENT then

@@ -24,7 +24,7 @@ if SERVER then
 		self:SetMoveType(MOVETYPE_NONE)
 		self:SetUseType(SIMPLE_USE)
 		self:DrawShadow(false)
-		self:SetColor(Color(0, 0, 0, 0))
+		self:SetColor(color_transparent)
 		self:SetRenderMode(RENDERMODE_TRANSALPHA)
 
 		self:SetNWBool("CloneTripped", false)

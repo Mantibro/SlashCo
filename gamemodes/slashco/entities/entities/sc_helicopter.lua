@@ -161,7 +161,7 @@ if SERVER then
 
 		-- Visibles
 		vehicle:DrawShadow(false)
-		vehicle:SetColor(Color(0, 0, 0, 0))
+		vehicle:SetColor(color_transparent)
 		vehicle:SetRenderMode(RENDERMODE_TRANSALPHA)
 		vehicle:SetNoDraw(true)
 		vehicle.VehicleName = "Airboat Seat"

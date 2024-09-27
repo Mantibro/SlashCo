@@ -41,7 +41,7 @@ if SERVER then
             self.Offer:SetColor(Color(255, 255, 255, 255))
         else
             self.Offer:SetModel("")
-            self.Offer:SetColor(Color(0, 0, 0, 0))
+            self.Offer:SetColor(color_transparent)
             self.Offer:SetRenderMode(RENDERMODE_TRANSCOLOR)
         end
     end

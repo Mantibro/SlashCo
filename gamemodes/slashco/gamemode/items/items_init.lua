@@ -199,14 +199,20 @@ if SERVER then
 		return self:GetNWString(slot, "none")
 	end
 
+	-- slot can be omitted if desired
 	function PLAYER:SetItem(slot, item)
-		self:SetNWString(slot, item)
-
-		--[[
-		if slot ~= "itemEffect" then
-			SlashCo.SendValue(self, "preItem", item, slot)
+		if not slot then
+			if SlashCoItems[item] then
+				slot = SlashCoItems[item].IsSecondary and "item2" or "item"
+			elseif SlashCoEffects[item] then
+				slot = "itemEffect"
+			else
+				return
+			end
 		end
-		--]]
+
+		self:SetNWString(slot, item)
+		SlashCo.SendValue(self, "preItem", item) -- networking on nwvars can be slow, this acts as a backup
 	end
 else
 	SlashCo.PreItem = SlashCo.PreItem or "none"
@@ -231,7 +237,7 @@ else
 	function PLAYER:GetItem(slot)
 		local item = self:GetNWString(slot, "none")
 
-		if SlashCo.PreItem == "none" or slot == "itemEffect" then
+		if self ~= LocalPlayer() or SlashCo.PreItem == "none" or slot == "itemEffect" then
 			return item
 		end
 

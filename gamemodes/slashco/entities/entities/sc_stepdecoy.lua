@@ -24,7 +24,7 @@ function ENT:Initialize()
 		self.steppa:SetParent(self)
 		self.steppa:DrawShadow(false)
 		self.steppa:SetRenderMode(RENDERMODE_TRANSCOLOR)
-		self.steppa:SetColor(Color(0, 0, 0, 0))
+		self.steppa:SetColor(color_transparent)
 		self.steppa:SetModelScale(0.0001, 0.0001)
 
 		timer.Simple(0.1, function()
