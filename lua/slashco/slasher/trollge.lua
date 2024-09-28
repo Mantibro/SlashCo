@@ -211,17 +211,19 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
 
-local function smoothVec(sp, from, to)
-	local x, y, z = from:Unpack()
-	local x1, y1, z1 = to:Unpack()
-
-	return Vector(SlashCo.Dampen(sp, x, x1), SlashCo.Dampen(sp, y, y1), SlashCo.Dampen(sp, z, z1))
-end
-
 SLASHER.Move = function(ply, mv)
-	if not ply:GetNWBool("TrollgeStage2") then return end
+	if not ply:GetNWBool("TrollgeStage2") then
+		if ply.TrollgeMoveSet then
+			ply:SetGravity(ply.TrollgeGravity)
+			ply:SetHullDuck(ply.TrollgeDuckMin, ply.TrollgeDuckMax)
+			ply:SetViewOffsetDucked(ply.TrollgeViewDuck)
+			ply.TrollgeMoveSet = nil
+		end
 
-	local vel = Vector() -- DO NOT replace with vector_origin
+		return
+	end
+
+	local newVel = Vector() -- DO NOT replace with vector_origin
 	local ang = mv:GetMoveAngles()
 	local speed = ply:GetRunSpeed()
 	local f, r = 0, 0
@@ -229,33 +231,33 @@ SLASHER.Move = function(ply, mv)
 	-- movement keys
 
 	if mv:KeyDown(IN_JUMP) then
-		vel:Add(vector_up * speed)
+		newVel:Add(vector_up * speed)
 	end
 	if mv:KeyDown(IN_DUCK) then
-		vel:Add(vector_up * -speed)
+		newVel:Add(vector_up * -speed)
 	end
 
 	local aF = (ang:Forward() * Vector(1, 1, 0)):GetNormalized()
 	if mv:KeyDown(IN_FORWARD) then
-		vel:Add(aF * speed)
+		newVel:Add(aF * speed)
 		f = f + 1
 	end
 	if mv:KeyDown(IN_BACK) then
-		vel:Add(aF * -speed)
+		newVel:Add(aF * -speed)
 		f = f - 1
 	end
 
 	if mv:KeyDown(IN_MOVERIGHT) then
-		vel:Add(ang:Right() * speed)
+		newVel:Add(ang:Right() * speed)
 		r = r + 1
 	end
 	if mv:KeyDown(IN_MOVELEFT) then
-		vel:Add(ang:Right() * -speed)
+		newVel:Add(ang:Right() * -speed)
 		r = r - 1
 	end
 
 	if math.abs(f) + math.abs(r) == 2 then
-		vel:Mul(0.707)
+		newVel:Mul(0.707)
 	end
 
 	-- stay close to ground
@@ -266,32 +268,41 @@ SLASHER.Move = function(ply, mv)
 		filter = ply
 	})
 
-	if tr.Fraction > 0.5 and vel.z > 0 then
-		vel.z = 0
+	if tr.Fraction > 0.5 and newVel.z > 0 then
+		newVel.z = 0
 	end
 	if tr.Fraction > 0.65 then
-		vel.z = vel.z - speed * (tr.Fraction - 0.65) / 0.35
+		newVel.z = newVel.z - speed * (tr.Fraction - 0.65) / 0.35
 	end
 
 	-- sprint/walk
 
-	local sp = 2.5
+	local friction = 0.02
 	if mv:KeyDown(IN_SPEED) then
-		vel:Mul(1.5)
-		sp = 0.5
+		newVel:Mul(1.5)
+		friction = 0.007
 	end
 	if mv:KeyDown(IN_WALK) then
-		vel:Mul(0.5)
-		sp = 6
+		newVel:Mul(0.5)
+		friction = 0.08
 	end
 
 	-- apply
 
-	mv:SetVelocity(smoothVec(sp, mv:GetVelocity(), vel))
-	mv:SetOrigin(mv:GetOrigin() + mv:GetVelocity() * FrameTime())
+	local vel = mv:GetVelocity() * (1 - friction) + newVel * FrameTime() * friction * 66.666
+	mv:SetVelocity(vel)
 	ply:SetGroundEntity(NULL)
 
-	return true
+	if not ply.TrollgeMoveSet then
+		ply.TrollgeDuckMin, ply.TrollgeDuckMax = ply:GetHullDuck()
+		ply.TrollgeGravity = ply:GetGravity()
+		ply.TrollgeViewDuck = ply:GetViewOffsetDucked()
+
+		ply:SetGravity(0.00000000000000001)
+		ply:SetHullDuck(ply:GetHull())
+		ply:SetViewOffsetDucked(ply:GetViewOffset())
+		ply.TrollgeMoveSet = true
+	end
 end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
