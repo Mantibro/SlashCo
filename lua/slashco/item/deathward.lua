@@ -28,7 +28,7 @@ ITEM.OnPickUp = function(ply)
 	end
 
 	local userid = ply:UserID()
-	timer.Create("deathWardDamage_" .. userid, 45, 0, function()
+	timer.Create("deathWardDamage_" .. userid, 30, 0, function()
 		if not IsValid(ply) then
 			timer.Remove("deathWardDamage_" .. userid)
 			return
