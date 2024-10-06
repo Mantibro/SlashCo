@@ -529,3 +529,53 @@ SlashCo.LangTable["full surveillance"] = "full surveillance"
 SlashCo.LangTable["Watcher_watched"] = "YOU ARE BEING WATCHED"
 SlashCo.LangTable["Watcher_observe"] = "OBSERVING A SURVIVOR. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "STALK TIME: "
+
+--misc from maptools
+SlashCo.LangTable["spectators_can_ping"] = "Les spectateurs peuvent maintenant ping pour les survivants."
+SlashCo.LangTable["unhide"] = "sortir de sa cachette"
+SlashCo.LangTable["max pensives"] = "détruire tous les pensifs"
+SlashCo.LangTable["max zanies"] = "détruire tous les zanies"
+SlashCo.LangTable["cant_fuel"] = "[DÉJÀ REMPLI]"
+SlashCo.LangTable["cant_power"] = "[IL Y A DÉJÀ UNE BATTERIE]"
+
+--main objectives
+SlashCo.LangTable["objective_generators"] = "ALIMENTER %s GENERATEURS"
+SlashCo.LangTable["objective_generator"] = "ALIMENTER 1 GENERATEUR"
+SlashCo.LangTable["objective_heliwait"] = "ATTENDEZ L'HELICOPTÈRE"
+SlashCo.LangTable["objective_helicopter"] = "RENTRER DANS L'HELICOPTÈRE"
+
+--optional objectives
+SlashCo.LangTable["objective_trashs"] = "(FALCUTATIF) LAVER %s DES POUBELLES" --item spawns
+SlashCo.LangTable["objective_trash"] = "(FALCUTATIF) LAVER 1 POUBELLE"
+SlashCo.LangTable["objective_mops"] = "(FALCUTATIF) NETTOYER %s TÂCHES" --gen spawns
+SlashCo.LangTable["objective_mop"] = "(FALCUTATIF) NETTOYER 1 TÂCHE"
+SlashCo.LangTable["objective_traps"] = "(FALCUTATIF) REMETTRE %s SOURICIÈRES EN PLACE" --battery spawns
+SlashCo.LangTable["objective_trap"] = "(FALCUTATIF) REMETTRE 1 SOURICIÈRE EN PLACE"
+SlashCo.LangTable["objective_pages"] = "(FALCUTATIF) COLLECTER %s DOCUMENTS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "(FALCUTATIF) COLLECTER 1 DOCUMENT"
+
+--points summary
+SlashCo.LangTable["point_summary"] = "-POINTS GAGNÉS -"
+SlashCo.LangTable["point_total"] = "POINTS TOTAUX: %s"
+SlashCo.LangTable["point_nil"] = "AUCUN!"
+
+SlashCo.LangTable["points_slasher_kill"] = "[%s] TUÉS" --slashers
+SlashCo.LangTable["points_slasher_demon"] = "[%s] COMPLÉTEMENT RASSASIÉ"
+
+SlashCo.LangTable["points_slasher_win"] = "[%s] TOUS LES EMPLOYÉS ON ÉTAIT TUÉ" --slasher objective thwarting
+SlashCo.LangTable["points_slasher_escape"] = "[%s] MISSION ABORTÉE"
+SlashCo.LangTable["points_slasher_perfect"] = "[%s] MISSION RUINÉE"
+
+SlashCo.LangTable["points_objective"] = "[%s] OBJECTIF PRINCIPALE COMPLÉTER" --objectives
+SlashCo.LangTable["points_optional"] = "[%s] OBJECTIF FALCUTATIF COMPLÉTER"
+SlashCo.LangTable["points_escape"] = "[%s] EXTRACTION DE MISSION RÉUSSITE"
+
+SlashCo.LangTable["points_all_survive"] = "[%s] TOUS LES EMPLOYÉS ONT SURVÉCUS" --survival status
+SlashCo.LangTable["points_last_survive"] = "[%s] DERNIÈRE EMPLOYER RESTANT"
+SlashCo.LangTable["points_left_behind"] = "[%s] ABANDONÉ"
+SlashCo.LangTable["points_survive"] = "[%s] SURVÉCU"
+
+SlashCo.LangTable["points_item"] = "[%s] OBJET ACHETER-RETOUR" --misc points
+SlashCo.LangTable["points_fast"] = "[%s] SUCCÉS RAPIDE"
+SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
+SlashCo.LangTable["points_working"] = "[%s] FAIRE TON TRAVAIL"

@@ -543,8 +543,8 @@ SlashCo.LangTable["Kemenchik_tip"] = "-You may as well give up."
 
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
-SlashCo.LangTable["unhide"] = "unhide"
-SlashCo.LangTable["max pensives"] = "destroy all pensives"
+SlashCo.LangTable["unhide"] = "unhide" -- for dolphinman to unhide
+SlashCo.LangTable["max pensives"] = "destroy all pensives" -- for smiley dealer once he hits his limits
 SlashCo.LangTable["max zanies"] = "destroy all zanies"
 SlashCo.LangTable["cant_fuel"] = "[ALREADY FULL]"
 SlashCo.LangTable["cant_power"] = "[ALREADY HAS A BATTERY]"
