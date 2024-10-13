@@ -344,8 +344,6 @@ SlashCo.BustDoor = function(slasher, target, force)
 			filter = slasher
 		})
 
-		local trace = util.GetSurfaceData(tr.SurfaceProps).name
-
 		if not target:IsValid() then
 			return
 		end
@@ -366,12 +364,13 @@ SlashCo.BustDoor = function(slasher, target, force)
 		end
 		phys:ApplyForceCenter(slasher:GetForward() * force)
 
-		if trace == "wood" then
-			target:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
-		end
-
-		if trace == "metal" then
-			target:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+		local surf = util.GetSurfaceData(tr.SurfaceProps)
+		if surf then
+			if surf.name == "wood" then
+				target:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
+			elseif surf.name == "metal" then
+				target:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+			end
 		end
 
 		target:Remove()

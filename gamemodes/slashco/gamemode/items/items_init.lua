@@ -241,6 +241,10 @@ else
 			return item
 		end
 
+		if not SlashCoItems[SlashCo.PreItem] then
+			return item
+		end
+
 		local isSecondary = slot == "item2"
 		local itemSecondary = SlashCoItems[SlashCo.PreItem].IsSecondary or false
 		if itemSecondary == isSecondary then
