@@ -5,4 +5,3 @@ maps/sc_hospital.bsp
 maps/sc_redforest.bsp
 *.bak
 _workshop/**
-!_workshop/addon.json
