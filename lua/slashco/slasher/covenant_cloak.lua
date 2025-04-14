@@ -8,14 +8,14 @@ SLASHER.IsSelectable = false
 SLASHER.Model = "models/slashco/slashers/covenant/cloak.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
-SLASHER.ProwlSpeed = 100
+SLASHER.ProwlSpeed = 125
 SLASHER.ChaseSpeed = 297
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.91
-SLASHER.ChaseDuration = 10.0
+SLASHER.ChaseDuration = 30.0
 SLASHER.ChaseCooldown = 1
 SLASHER.JumpscareDuration = 1.5
 SLASHER.ChaseMusic = ""
@@ -25,6 +25,10 @@ SLASHER.ProTip = ""
 SLASHER.SpeedRating = "★☆☆☆☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
+
+SLASHER.OnSpawn = function(slasher)
+    slasher:SetNWBool("CanChase", true)
+end
 
 SLASHER.TackleFail = function(slasher)
 	if IsValid(slasher) then
@@ -63,6 +67,9 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 			slasher.TackledPlayer:SetNWBool("SurvivorTackled", false)
 			slasher:SetPos(slasher.TackledPlayer:GetPos() + Vector(0, 0, 80))
 			slasher.TackledPlayer = nil
+			timer.Simple(2.0, function()
+			    slasher:Freeze(false)
+		    end)
 		end
 	end
 
@@ -162,8 +169,22 @@ SLASHER.Animator = function(ply, veloc)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function()
-	return false
+SLASHER.Footstep = function(ply)
+	if SERVER then
+		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
+		return true
+	end
+
+	if CLIENT then
+		return true
+	end
+end
+
+SLASHER.InitHud = function(_, hud)
+    hud:SetAvatar(Material("slashco/ui/icons/slasher/s_covenantcloak"))
+	hud:SetTitle("CovenantCloak")
+	
+    hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/s_0"))
 end
 
 SlashCo.RegisterSlasher(SLASHER, "CovenantCloak")

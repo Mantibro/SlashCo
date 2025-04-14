@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/props_slashco/items/balkanboost/BalkanBoost"
+                "$surfaceprop" "Plastic"
+                "$envmap" "env_cubemap"
+                "$envmaptint" "[0.2 0.2 0.2]"
+}

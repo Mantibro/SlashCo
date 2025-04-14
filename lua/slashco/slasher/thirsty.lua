@@ -8,8 +8,8 @@ SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/thirsty/thirsty.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 2
-SLASHER.ProwlSpeed = 100
-SLASHER.ChaseSpeed = 260
+SLASHER.ProwlSpeed = 120
+SLASHER.ChaseSpeed = 280
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 2
 SLASHER.KillDistance = 150
@@ -30,6 +30,7 @@ SLASHER.ItemToSpawn = "MilkJug"
 SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
+	slasher:SetNWBool("FullMilks", false)
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
@@ -54,7 +55,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 		eyesight_final = 0
 		perception_final = 0
 
-		slasher.SlasherValue2 = v2 - (0.01 + (SO * 0.04))
+		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
 		slasher.SlasherValue3 = 0
@@ -84,6 +85,16 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher:SetRunSpeed(slasher.SlasherValue4)
 			slasher:SetWalkSpeed(slasher.SlasherValue4)
 		end
+	end
+	--Not thirsty anymore
+	if slasher.SlasherValue1 > 3 then
+	    slasher:SetNWBool("FullMilks", true)
+	end
+	
+	if slasher:GetNWBool("FullMilks") and not slasher:GetNWBool("DemonPacified") then
+	    slasher.SlasherValue3 = 0
+		eyesight_final = 4
+		perception_final = 2.0
 	end
 
 	slasher:SetNWInt("ThirstyThirst", math.floor(v3))
@@ -189,7 +200,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		slasher:SetNWBool("ThirstyDrinking", false)
 		slasher:SetNWBool("DemonPacified", true)
 
-		if slasher.SlasherValue1 < (4 + SatO) then
+		if slasher.SlasherValue1 < (6 + SatO) then
 			slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
 		end
 
@@ -260,7 +271,7 @@ SLASHER.InitHud = function(_, hud)
 	hud:AddControl("R", "drink milk", milkTable)
 	hud:ChaseAndKill()
 
-	hud:AddMeter("milkies", 4 + GetGlobalInt("SatO"), "", nil, true)
+	hud:AddMeter("milkies", 6 + GetGlobalInt("SatO"), "", nil, true)
 	hud:TieMeterInt("milkies", "ThirstyMilkDrank", true)
 
 	hud:AddMeter("thirst")

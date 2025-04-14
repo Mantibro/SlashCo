@@ -21,7 +21,7 @@ function GetRandomMap(ply_count)
 	return rand_name
 end
 
-SlashCo.MAXPLAYERS = 7
+SlashCo.MAXPLAYERS = 20
 
 SlashCo.LobbyData = {
 	LOBBYSTATE = 0,
@@ -102,6 +102,7 @@ SlashCo.ResetCurRoundData = function()
 		HelicopterRescuedPlayers = {}, --need opt
 		EscapeHelicopterSummoned = false,
 		DistressBeaconUsed = false,
+		EscapeHelicopterSpawn = false,
 	}
 end
 SlashCo.ResetCurRoundData()
@@ -296,6 +297,7 @@ SlashCo.SummonEscapeHelicopter = function(distress)
 	timer.Simple(delay, function()
 		local ent = SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterSpawnPosition, Angle(0, 0, 0))
 
+		SlashCo.CurRound.EscapeHelicopterSpawn = true
 		SlashCo.EscapeVoicePrompt()
 		timer.Simple(0.1, function()
 			SlashCo.HelicopterGoAboveLand(ent)

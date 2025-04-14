@@ -107,7 +107,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
 			local mul_y = 1
 
-			draw.SimpleText("[" .. plynum .. "/7] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
+			draw.SimpleText("[" .. plynum .. "/20] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
 					TEXT_ALIGN_TOP)
 
 			for i = 1, #Lobby_Players do

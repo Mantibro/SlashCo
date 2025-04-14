@@ -71,6 +71,10 @@ SLASHER.OnTickBehaviour = function(slasher)
 end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
+	if slasher:GetNWBool("AmogusFuelDisguise") then
+		return
+	end
+	
 	if not slasher:GetNWBool("AmogusSurvivorDisguise") then
 		SlashCo.Jumpscare(slasher, target)
 	end
@@ -217,7 +221,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 			g:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 			g:Spawn()
 
-			g:FollowBone(slasher, slasher:LookupBone("Hips"))
+			g:FollowBone(slasher, slasher:LookupBone("FootL"))
 
 			local id = g:EntIndex()
 			slasher.SlasherValue3 = id

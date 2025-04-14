@@ -3,28 +3,28 @@ local SLASHER = {}
 SLASHER.Name = "Abomignat"
 SLASHER.ID = 11
 SLASHER.Class = 1
-SLASHER.DangerLevel = 1
+SLASHER.DangerLevel = 2
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/abomignat/abomignat.mdl"
 SLASHER.GasCanMod = 0
-SLASHER.KillDelay = 5
-SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 293
+SLASHER.KillDelay = 2
+SLASHER.ProwlSpeed = 200
+SLASHER.ChaseSpeed = 325
 SLASHER.Perception = 0.5
 SLASHER.Eyesight = 6
 SLASHER.KillDistance = 150
 SLASHER.ChaseRange = 1400
 SLASHER.ChaseRadius = 0.82
-SLASHER.ChaseDuration = 5.0
+SLASHER.ChaseDuration = 7.0
 SLASHER.ChaseCooldown = 5
 SLASHER.JumpscareDuration = 2
 SLASHER.ChaseMusic = "slashco/slasher/abomignat_chase.wav"
 SLASHER.KillSound = ""
 SLASHER.Description = "Abomignat_desc"
 SLASHER.ProTip = "Abomignat_tip"
-SLASHER.SpeedRating = "★★★☆☆"
+SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★★★☆"
-SLASHER.DiffRating = "★☆☆☆☆"
+SLASHER.DiffRating = "★★☆☆☆"
 
 SLASHER.OnSpawn = function(slasher)
 	slasher:PlayGlobalSound("slashco/slasher/abomignat_breathing.wav", 65, nil, true)
@@ -52,7 +52,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	if slasher:GetNWBool("AbomignatLunging") then
 		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-				Vector(-15, -15, -60), Vector(15, 15, 60), 50, DMG_SLASH, 5, false)
+				Vector(-15, -15, -60), Vector(15, 15, 60), 100, DMG_SLASH, 5, false)
 
 		SlashCo.BustDoor(slasher, target, 25000)
 
@@ -84,9 +84,9 @@ SLASHER.OnTickBehaviour = function(slasher)
 	if slasher:GetNWBool("AbomignatCrawling") then
 		slasher:SetNWBool("CanChase", false)
 
-		slasher:SetSlowWalkSpeed(350)
-		slasher:SetWalkSpeed(350)
-		slasher:SetRunSpeed(350)
+		slasher:SetSlowWalkSpeed(400)
+		slasher:SetWalkSpeed(400)
+		slasher:SetRunSpeed(400)
 
 		SLASHER.Eyesight = 0
 		SLASHER.Perception = 0
@@ -181,7 +181,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end
 
 	slasher:SetNWBool("AbomignatSlashing", true)
-	slasher.SlasherValue1 = 6 - (SO * 3)
+	slasher.SlasherValue1 = 3 - (SO * 3)
 	slasher.SlasherValue2 = 6
 
 	slasher:EmitSound("slashco/slasher/abomignat_scream" .. math.random(1, 3) .. ".mp3")

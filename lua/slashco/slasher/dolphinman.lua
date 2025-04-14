@@ -7,7 +7,7 @@ SLASHER.DangerLevel = 2
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/dolphinman/dolphinman.mdl"
 SLASHER.GasCanMod = 0
-SLASHER.KillDelay = 0.25
+SLASHER.KillDelay = 0.50
 SLASHER.ProwlSpeed = 150
 SLASHER.ChaseSpeed = 315
 SLASHER.Perception = 1.0
@@ -166,7 +166,7 @@ end
 
 SLASHER.OnPrimaryFire = function(slasher, target)
 	if SlashCo.Jumpscare(slasher, target) then
-		slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 25)
+		slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 15)
 		slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 	end
 end
@@ -179,7 +179,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
 			return
 		end
-
+		
 		slasher:SetNWBool("DolphinInHiding", true)
 
 		return
@@ -188,7 +188,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") and slasher.SlasherValue1 >= 5 then
 		slasher:SetNWBool("DolphinInHiding", false)
 
-		slasher.SlasherValue1 = slasher.SlasherValue1 - math.floor(slasher.SlasherValue1 / 2)
+		slasher.SlasherValue1 = slasher.SlasherValue1 - math.floor(slasher.SlasherValue1 / 1.5)
 	end
 end
 

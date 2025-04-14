@@ -94,7 +94,7 @@ SlashCo.LangTable["Drainage"] = "Drainage"
 SlashCo.LangTable["Drainage_desc"] = "Gas cans will be plentiful,\nBut\nGenerators will leak fuel over time."
 
 SlashCo.LangTable["Duality"] = "Duality"
-SlashCo.LangTable["Duality_desc"] = "Only one generator will need to be powered,\nBut\nYou will face two Slashers."
+SlashCo.LangTable["Duality_desc"] = "You will face two Slashers."
 
 SlashCo.LangTable["Singularity"] = "Singularity"
 SlashCo.LangTable["Singularity_desc"] = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful."
@@ -133,6 +133,9 @@ SlashCo.LangTable["Alcohol_desc"] = "Unfortunate."
 
 SlashCo.LangTable["Baby"] = "The Baby"
 SlashCo.LangTable["Baby_desc"] = "Halve your health to teleport to a random location. At low health, using this item has a chance of killing you instantly. If you die to this item, the slasher will teleport instead."
+
+SlashCo.LangTable["BalkanBoost"] = "Balkan Boost"
+SlashCo.LangTable["BalkanBoost_desc"] = "I think the FDA is much too terrified to regulate this.\nUse at your own discretion.\nWhen you're going through hell, keep going."
 
 SlashCo.LangTable["Battery"] = "Battery"
 SlashCo.LangTable["Battery_desc"] = "A lead-acid battery that serves as a reusable source of electric current."
@@ -176,6 +179,9 @@ SlashCo.LangTable["Mayonnaise_desc"] = "Get a large boost to health."
 
 SlashCo.LangTable["MilkJug"] = "Milk Jug"
 SlashCo.LangTable["MilkJug_desc"] = "Gain a temporary boost in speed on use.\nA certain Slasher seems to really like this item."
+
+SlashCo.LangTable["NightVisionGoggles"] = "NightVision Goggles"
+SlashCo.LangTable["NightVisionGoggles_desc"] = "Gives you night vision."
 
 SlashCo.LangTable["PocketSand"] = "Pocket Sand"
 SlashCo.LangTable["PocketSand_desc"] = "Blinds a nearby slasher."
@@ -343,7 +349,7 @@ SlashCo.LangTable["Borgmire_tip"] = "-This Slasher seems to suffer from exhausti
 SlashCo.LangTable["punch"] = "punch"
 SlashCo.LangTable["throw"] = "throw"
 
---The Covenant (WIP)
+--The Covenant
 SlashCo.LangTable["Covenant"] = "The Covenant"
 SlashCo.LangTable["Covenant_desc"] = [[The Leader Slasher who commands his trusted Cloaks.
 
@@ -353,8 +359,8 @@ SlashCo.LangTable["Covenant_desc"] = [[The Leader Slasher who commands his trust
 SlashCo.LangTable["Covenant_tip"] = "-This Slasher can enlist others into its ranks."
 
 SlashCo.LangTable["CovenantCloak"] = "Covenant Cloak"
-
-SlashCo.LangTable["Rocks"] = "LTG Rocks"
+SlashCo.LangTable["CovenantRocks"] = "LTG Rocks"
+SlashCo.LangTable["covenant_member"] = "Sacrifice Soul"
 
 --Criminal
 SlashCo.LangTable["Criminal"] = "Criminal"

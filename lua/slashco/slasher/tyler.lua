@@ -30,10 +30,14 @@ SLASHER.CannotBeSpectated = true
 SLASHER.OnSpawn = function(slasher)
 	slasher.SlasherValue1 = 0
 	slasher:SetVisible(false)
+	slasher.PermaDestroyer = false
+	slasher.BeaconDestroyer = false
+	slasher.DestructorCucking = 0
 end
 
 SLASHER.HideTime = function(slasher)
-	slasher.TylerTime = 25 + SlashCo.MapSize * 25 - slasher.SlasherValue4 * 3 - team.NumPlayers(TEAM_SURVIVOR)
+	slasher.TylerTime = 25 + SlashCo.MapSize * 25 - slasher.SlasherValue4 * 3 - team.NumPlayers(TEAM_SURVIVOR) - (slasher.DestructorCucking)
+	print("Tyler transformation time: " .. slasher.TylerTime .. " resting " .. slasher.DestructorCucking)
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
@@ -64,17 +68,6 @@ SLASHER.OnTickBehaviour = function(slasher)
 	elseif v1 == 1 then
 		--Creator
 
-		if SlashCo.BeaconArming then
-			slasher.SlasherValue1 = 0
-			slasher.SlasherValue2 = 0
-			slasher.SlasherValue5 = 0
-			slasher:SetVisible(false)
-			if slasher.TylerSongPickedID then
-				SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
-				slasher.TylerSongPickedID = nil
-			end
-		end
-
 		slasher:SetImpervious(false)
 		slasher:SetNWBool("TylerFlash", false)
 		slasher:SetSlowWalkSpeed(1)
@@ -99,7 +92,21 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 
 		--Time ran out
-		if (SlashCo.CurRound.EscapeHelicopterSummoned and v2 > slasher.TylerTime / 2.5) or v2 > slasher.TylerTime then
+		if SlashCo.BeaconArming and not slasher.BeaconDestroyer then
+			slasher.BeaconDestroyer = true
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+			slasher.TylerSongPickedID = nil
+			slasher.SlasherValue1 = 2
+		end
+
+		if SlashCo.CurRound.EscapeHelicopterSpawn and not slasher.PermaDestroyer then
+			slasher.PermaDestroyer = true
+			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
+			slasher.TylerSongPickedID = nil
+			slasher.SlasherValue1 = 2
+		end
+
+		if v2 > slasher.TylerTime then
 			SlashCo.SendValue(nil, "tylSong", slasher, slasher.TylerSongPickedID, true)
 			slasher.TylerSongPickedID = nil
 			slasher.SlasherValue1 = 2
@@ -137,6 +144,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 					return
 				end
 
+				slasher.DestructorCucking = slasher.DestructorCucking + 8					
 				slasher:SetNWBool("TylerCreating", false)
 				slasher.SlasherValue1 = 0
 				slasher.SlasherValue2 = 0
@@ -154,31 +162,53 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher.TylerSongPickedID = nil
 		slasher:Freeze(true)
 
-		if slasher.tyler_destroyer_entrance_antispam == nil then
-			SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", false, 0.8)
-			slasher.tyler_destroyer_entrance_antispam = 0
-		end
-
-		local decay = v4 / 2
-
-		if v4 > 14 then
-			decay = 7
-		end
-
-		if slasher.tyler_destroyer_entrance_antispam < (12 - decay) then
-			slasher.tyler_destroyer_entrance_antispam = slasher.tyler_destroyer_entrance_antispam + FrameTime()
+		if slasher.PermaDestroyer then
+			if slasher.tyler_destroyer_entrance_antispam == nil then
+				SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_pre_last.wav", false, 1.0)
+				slasher.tyler_destroyer_entrance_antispam = 0
+				
+				timer.Simple(16.3, function()
+					if not IsValid(slasher) then
+						return
+					end
+					
+					SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_pre_last.wav", true, 1.0)
+					
+					slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_escape.wav", 80, nil, true)
+					
+					slasher:Freeze(false)
+					slasher.SlasherValue1 = 3
+					slasher:SetNWBool("TylerFlash", true)
+				end)
+			end
 		else
-			SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", true)
-
-			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 140, nil, true)
-			slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 140, nil, true)
-
-			slasher:Freeze(false)
-			slasher.SlasherValue1 = 3
-
-			for i = 1, #player.GetAll() do
-				local ply = player.GetAll()[i]
-				ply:SetNWBool("DisplayTylerTheDestroyerEffects", true)
+			if slasher.tyler_destroyer_entrance_antispam == nil then
+				SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", false, 0.8)
+				slasher.tyler_destroyer_entrance_antispam = 0
+			end
+	
+			local decay = v4 / 2
+	
+			if v4 > 14 then
+				decay = 7
+			end
+	
+			if slasher.tyler_destroyer_entrance_antispam < (12 - decay) then
+				slasher.tyler_destroyer_entrance_antispam = slasher.tyler_destroyer_entrance_antispam + FrameTime()
+			else
+				SlashCo.SendValue(nil, "tylSong", slasher, "slashco/slasher/tyler_alarm.wav", true)
+	
+				slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_theme.wav", 140, nil, true)
+				slasher:PlayGlobalSound("slashco/slasher/tyler_destroyer_whisper.wav", 140, nil, true)
+	
+				slasher:Freeze(false)
+				slasher.SlasherValue1 = 3
+				slasher.DestructorCucking = 0
+	
+				for i = 1, #player.GetAll() do
+					local ply = player.GetAll()[i]
+					ply:SetNWBool("DisplayTylerTheDestroyerEffects", true)
+				end
 			end
 		end
 
@@ -192,17 +222,21 @@ SLASHER.OnTickBehaviour = function(slasher)
 		final_perception = 0.0
 	elseif v1 == 3 then
 		--Destroyer
-
 		slasher:SetSlowWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
 		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
 		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+		if slasher.PermaDestroyer then
+			slasher:SetSlowWalkSpeed(500)
+			slasher:SetRunSpeed(500)
+			slasher:SetWalkSpeed(500)
+		end
 		slasher:SetNWBool("TylerTheCreator", false)
 		slasher:SetBodygroup(0, 1)
 		slasher.SlasherValue2 = v2 + FrameTime()
 		slasher:SetNWBool("CanKill", true)
 		final_perception = 2.0
 
-		if v2 > ((ms * 15) + 60 + (v4 * 10)) then
+		if v2 > ((ms * 15) + 60 + (v4 * 10)) and not slasher.PermaDestroyer then
 			slasher.SlasherValue1 = 0
 
 			slasher:StopSound("slashco/slasher/tyler_destroyer_theme.wav")
@@ -222,6 +256,30 @@ SLASHER.OnTickBehaviour = function(slasher)
 				ply:SetNWBool("DisplayTylerTheDestroyerEffects", false)
 			end
 		end
+
+		if slasher.PermaDestroyer then
+			slasher:SetNWBool("TylerFlash", true)
+			local find = ents.FindInSphere(slasher:GetPos(), 120)
+			for f = 1, #find do
+				local ent = find[f]
+	
+				if ent:GetClass() == "sc_gascan" then
+					ent:Remove()
+					slasher:Freeze(true)
+					slasher:SetNWBool("TylerCreating", true)
+					slasher:EmitSound("slashco/slasher/tyler_create.mp3")
+					
+					timer.Simple(3, function()
+						if not IsValid(slasher) then
+							return
+						end
+						
+						slasher:SetNWBool("TylerCreating", false)
+						slasher:Freeze(false)
+					end)
+				end
+			end
+		end
 	end
 
 	if v1 > 1 then
@@ -231,10 +289,15 @@ SLASHER.OnTickBehaviour = function(slasher)
 			slasher.SlasherValue5 = 0
 		end
 
-		if v5 <= 0.5 then
-			slasher:SetVisible(false)
-			slasher:SetNWBool("TylerFlash", false)
-		else
+		if not slasher.PermaDestroyer then
+			if v5 <= 0.5 then
+				slasher:SetVisible(false)
+				slasher:SetNWBool("TylerFlash", false)
+			else
+				slasher:SetVisible(true)
+				slasher:SetNWBool("TylerFlash", true)
+			end
+		else 
 			slasher:SetVisible(true)
 			slasher:SetNWBool("TylerFlash", true)
 		end
@@ -284,7 +347,12 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	end
 	slasher:Freeze(true)
 
-	slasher.KillDelayTick = SLASHER.KillDelay
+	if slasher.PermaDestroyer then
+		slasher.KillDelayTick = 2.2
+	else
+		slasher.KillDelayTick = SLASHER.KillDelay
+	end
+
 	slasher.SlasherValue2 = 0
 
 	timer.Simple(SlashCoSlashers[slasher:GetNWString("Slasher")].JumpscareDuration, function()
@@ -293,7 +361,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			ply:SetNWBool("DisplayTylerTheDestroyerEffects", false)
 		end
 
-		if IsValid(slasher) then
+		if IsValid(slasher) and not slasher.PermaDestroyer then
 			slasher:Freeze(false)
 			slasher.SlasherValue4 = slasher.SlasherValue4 + 1
 			slasher.SlasherValue1 = 0
@@ -311,6 +379,8 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			end)
 
 			slasher:SetNWBool("TylerFlash", false)
+		else
+			slasher:Freeze(false)
 		end
 
 		if IsValid(target) then
@@ -393,11 +463,18 @@ SLASHER.Animator = function(ply)
 			end
 		end
 	else
-		if ply:GetVelocity():LengthSqr() > 5 then
+		if ply:GetNWBool("TylerCreating") then
+			ply.CalcSeqOverride = ply:LookupSequence("create")
+			if ply.anim_antispam == nil or ply.anim_antispam == false then
+				ply:SetCycle(0)
+				ply.anim_antispam = true
+			end
+		else if ply:GetVelocity():LengthSqr() > 5 then
 			ply.CalcSeqOverride = ply:LookupSequence("destroyer walk")
 		else
 			ply.CalcSeqOverride = ply:LookupSequence("destroyer activated")
 		end
+	end
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
@@ -561,8 +638,10 @@ if CLIENT then
 			local Overlay = Material("slashco/ui/overlays/tyler_static")
 			local DestroyerFace = Material("slashco/ui/overlays/tyler_destroyer_face")
 
-			Overlay:SetFloat("$alpha", math.Rand(0.1, 0.12))
-			DestroyerFace:SetFloat("$alpha", math.Rand(0, 0.07))
+			--Overlay:SetFloat("$alpha", math.Rand(0.1, 0.12))
+			--DestroyerFace:SetFloat("$alpha", math.Rand(0, 0.07))
+			Overlay:SetFloat("$alpha", 0.1)
+			DestroyerFace:SetFloat("$alpha", 0.18)
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)

@@ -465,8 +465,8 @@ local Think = function()
 			end
 		end
 
-		--//duality condition//--
-		if SlashCo.CurRound.OfferingData.CurrentOffering == 4 and runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
+		--[[ //duality condition//--
+		--if SlashCo.CurRound.OfferingData.CurrentOffering == 4 and runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
 			--(SPAWN HELICOPTER)
 
 			local failed = SlashCo.SummonEscapeHelicopter()
@@ -479,7 +479,7 @@ local Think = function()
 
 				SlashCo.CurRound.DistressBeaconUsed = false
 			end
-		end
+		end]]
 
 		--Go back to lobby if everyone dies.
 		if team.NumPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then

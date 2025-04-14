@@ -173,12 +173,6 @@ end
 function SlashCo.IsPositionLegalForSlashers(pos, noSurvivorCheck, distFactor)
 	local dist = (600 + GetGlobal2Int("SlashCoMapSize", 1) * 150) * (distFactor or 1)
 
-	for _, v in ipairs(ents.FindInSphere(pos, dist)) do
-		if v:GetClass() == "sc_generator" then
-			return false
-		end
-	end
-
 	if noSurvivorCheck then
 		return true
 	end

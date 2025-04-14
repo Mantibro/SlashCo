@@ -207,6 +207,49 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 	end
 
+        local find = ents.FindInSphere(slasher:GetPos(), 60)
+
+		for f = 1, #find do
+			local ent = find[f]
+
+			if ent:GetClass() == "sc_balkanboost" then
+				--WHAT HAVE YOU DONE...
+				ent:Remove()
+				slasher.SlasherValue3 = 8
+		        slasher:SetNWBool("TrollgeTransition", true)
+		        slasher:Freeze(true)
+		        slasher:StopSound("slashco/slasher/trollge_breathing.wav")
+	 	        slasher:PlayGlobalSound("slashco/slasher/trollge_transition.mp3", 125)
+
+		        for i = 1, #player.GetAll() do
+			        local ply = player.GetAll()[i]
+			        ply:SetNWBool("DisplayTrollgeTransition", true)
+		        end
+
+		        timer.Simple(7, function()
+			        if not IsValid(slasher) then
+				        return
+			        end
+
+			        --transit
+			        slasher:StopSound("slashco/slasher/trollge_breathing.wav")
+			        slasher.SlasherValue1 = 2
+			        slasher:SetNWBool("TrollgeTransition", false)
+			        slasher:Freeze(false)
+			        slasher:PlayGlobalSound("slashco/slasher/trollge_stage6.wav", 60, nil, true)
+
+			        slasher:SetRunSpeed(450)
+			        slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+			        final_eyesight = 10
+					slasher:SetNWBool("CanKill", true)
+
+			        for i = 1, #player.GetAll() do
+				        local ply = player.GetAll()[i]
+				        ply:SetNWBool("DisplayTrollgeTransition", false)
+			        end
+		        end)
+		    end
+        end
 	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
@@ -474,6 +517,20 @@ SLASHER.InitHud = function(_, hud)
 		end
 	end
 end
+
+SLASHER.PreDrawHalos = function()
+	SlashCo.DrawHalo(ents.FindByClass("sc_balkanboost"), nil, 2, false)
+
+	local plyWithItem = {}
+	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if v:HasItem("BalkanBoost") then
+			table.insert(plyWithItem, v)
+		end
+	end
+
+	SlashCo.DrawHalo(plyWithItem, nil, 2, false)
+end
+
 
 function SLASHER.Visibility(ply)
 	local eyeAng = ply:EyeAngles()
