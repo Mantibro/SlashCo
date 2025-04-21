@@ -192,7 +192,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher, target)
 	slasher:EmitSound("slashco/slasher/throw.mp3")
 
 	target:Freeze(true)
-	slasher:Freeze(true)
+	slasher:Freeze(false)
 
 	target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
 
@@ -229,7 +229,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher, target)
 			return
 		end
 
-		slasher:Freeze(false)
+		--slasher:Freeze(false)
 		slasher:SetNWBool("BorgmireThrow", false)
 		slasher.ChaseActivationCooldown = 2
 	end)
