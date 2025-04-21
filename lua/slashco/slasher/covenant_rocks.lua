@@ -55,11 +55,9 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 		return
 	end
 	
-	if slasher:GetPos():Distance(target:GetPos()) >= 200 then
+	if slasher:GetPos():Distance(target:GetPos()) >= 55 then
 		return
 	end
-	
-	local SO = SlashCo.CurRound.OfferingData.SO
 
 	if slasher.SlasherValue1 < 0.01 then
 		slasher:SetNWBool("RockPunching", false)
@@ -73,19 +71,22 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			slasher:EmitSound("ambient/energy/spark"..tostring(math.random(1,6))..".wav", 100, 100, 0.25)
 
 			if SERVER then
-				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
-						Vector(-30, -30, -60), Vector(30, 30, 60), 25, DMG_SLASH, 5, false)
+				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 0)),
+						Vector(-30, -30, -60), Vector(30, 30, 60), 35, DMG_SLASH, 5, false)
 
 				if target1:IsPlayer() then
 					if target1:Team() ~= TEAM_SURVIVOR then
 						return
 					end
 
-					local vPoint = target1:GetPos() + Vector(0, 0, 50)
+					local vPoint = target1:GetPos()
 					local lightning = EffectData()
 					lightning:SetOrigin(vPoint)
-					lightning:SetMagnitude(10)
-					util.Effect("TeslaHitboxes", lightning)
+					lightning:SetMagnitude(6)
+					lightning:SetScale(1)
+			        lightning:SetNormal(Vector(55, 0, 1))
+			        lightning:SetRadius(100)
+					util.Effect( "Sparks", lightning )
 					target1:SetNWBool("MarkedByRocks", true)
 				end
 			end
