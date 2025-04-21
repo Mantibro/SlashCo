@@ -215,13 +215,13 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 
 			local g = ents.Create("prop_physics")
 
-			g:SetPos(slasher:GetPos() + Vector(0, 0, 15))
+			g:SetPos(slasher:GetPos() + Vector(-27, 0, 15))
 			g:SetAngles(slasher:GetAngles() + Angle(0, 90, 0))
 			g:SetModel(SlashCoItems.GasCan.Model)
 			g:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 			g:Spawn()
 
-			g:FollowBone(slasher, slasher:LookupBone("FootL"))
+			g:FollowBone(slasher, slasher:LookupBone("Hips"))
 
 			local id = g:EntIndex()
 			slasher.SlasherValue3 = id
@@ -230,6 +230,10 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 			slasher:SetWalkSpeed(200)
 		end)
 	end
+end
+
+SLASHER.Thirdperson = function(ply)
+	return ply:GetNWBool("AmogusFuelDisguise")
 end
 
 SLASHER.Animator = function(ply)
