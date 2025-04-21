@@ -252,9 +252,9 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 		return
 	end
 
-	--[[if not slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetNWBool("ManspiderNested") then
 		return
-	end]]
+	end
 
 	slasher.SlasherValue2 = 15
 
@@ -341,7 +341,7 @@ SLASHER.InitHud = function(_, hud)
 	hud:TieControlVisible("LMB", "CanKill")
 	hud:TieControlVisible("RMB", "CanChase")
 	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/s_punch"))
-	--hud:TieControlVisible("F", "InSlasherChaseMode", true, false, true)
+	hud:TieControlVisible("F", "ManspiderNested", true, false, false)
 	hud:TieControl("F", "CanLeap", false, true)
 
 	hud.prevTarget = -1
