@@ -9,13 +9,13 @@ SLASHER.Model = "models/slashco/slashers/covenant/rocks.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 297
+SLASHER.ChaseSpeed = 280
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 3
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 60.0
+SLASHER.ChaseDuration = 30.0
 SLASHER.ChaseCooldown = 1
 SLASHER.JumpscareDuration = 1.5
 SLASHER.ChaseMusic = ""
@@ -31,7 +31,7 @@ SLASHER.OnSpawn = function(slasher)
 end
 
 SLASHER.OnTickBehaviour = function(slasher)
-	local v1 = math.Clamp(slasher.SlasherValue1, 0, 2) --Punch cooldown
+	local v1 = math.Clamp(slasher.SlasherValue1, 0, 2) --Shock cooldown
 	slasher.SlasherValue1 = v1
 	
 	if v1 > 0 then
