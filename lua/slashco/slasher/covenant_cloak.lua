@@ -9,7 +9,7 @@ SLASHER.Model = "models/slashco/slashers/covenant/cloak.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 125
-SLASHER.ChaseSpeed = 297
+SLASHER.ChaseSpeed = 280
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
 SLASHER.KillDistance = 135
@@ -49,6 +49,9 @@ SLASHER.TackleFail = function(slasher)
 	end
 end
 
+local SURVIVOR_STUN_TIME = 1.2
+local SLASHER_STUN_TIME = 4.5
+
 SLASHER.OnTickBehaviour = function(slasher, target)
 	if IsValid(slasher.TackledPlayer) then
 		if not slasher:IsFrozen() then
@@ -78,12 +81,50 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 			slasher:SetVelocity(slasher:GetForward() * 70)
 		end
 
-		if IsValid(target) and target:IsPlayer() and target:Team() == TEAM_SURVIVOR and target:GetPos():Distance(slasher:GetPos()) < 100 then
-			slasher.TackledPlayer = target
-			slasher:SetNWBool("CloakTackling", false)
+		if SERVER and not slasher.TackledPlayer then
+			for _, ply in ipairs(ents.FindInSphere(slasher:GetPos(), 60)) do
+				if ply:IsPlayer() and ply:Team() == TEAM_SURVIVOR and not ply:GetNWBool("SurvivorTackled") then
+					slasher.TackledPlayer = ply
+					slasher:SetNWBool("CloakTackling", false)
+					slasher:SetNWBool("CloakTackle", false)
 
-			slasher.TackledPlayer:SetNWBool("SurvivorTackled", true)
-			slasher:SetNWInt("CloakTacklePosition", 1)
+					ply:SetNWBool("SurvivorTackled", true)
+					ply.SlashCo_PushDir = (ply:GetPos() - slasher:GetPos()):GetNormalized()
+				    ply:SetImpervious(true)
+					timer.Simple(SURVIVOR_STUN_TIME, function()
+						if IsValid(ply) then
+							ply:SetNWBool("SurvivorTackled", false)
+							ply:Freeze(false)
+							if IsValid(slasher) and slasher.TackledPlayer == ply then
+								slasher.TackledPlayer = nil
+							end
+							if ply.SlashCo_PushDir then
+								local pushStrength = 400
+								ply:SetVelocity(ply.SlashCo_PushDir * pushStrength + Vector(0,0,120))
+								ply.SlashCo_PushDir = nil
+							end
+
+							timer.Simple(2.2, function()
+								if IsValid(ply) then
+									ply:SetImpervious(false)
+								end
+							end)
+						end
+					end)
+
+					-- Stun slasher
+					slasher:Freeze(true)
+					slasher:SetImpervious(true)
+					timer.Simple(SLASHER_STUN_TIME, function()
+						if IsValid(slasher) then
+							slasher:Freeze(false)
+							slasher:SetImpervious(false)
+						end
+					end)
+
+					break
+				end
+			end
 		end
 
 		if IsValid(target) and target:GetPos():Distance(slasher:GetPos()) < 120 then
@@ -99,6 +140,14 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 end
 
 SLASHER.OnPrimaryFire = function(slasher)
+	if IsValid(slasher.TackledPlayer) then
+		return
+	end
+
+	if slasher:IsFrozen() then
+		return 
+	end
+
 	if not slasher:GetNWBool("CloakTackle") then
 		slasher:SetNWBool("CloakTackle", true)
 		slasher:SetNWBool("CloakTackling", true)
@@ -110,7 +159,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 
 		slasher:Freeze(true)
 
-		timer.Simple(0.5, function()
+		timer.Simple(0.8, function()
 			slasher:SetNWBool("CloakTackling", false)
 			--SLASHER.TackleFail(slasher)
 		end)
@@ -185,6 +234,28 @@ SLASHER.InitHud = function(_, hud)
 	hud:SetTitle("CovenantCloak")
 	
     hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/s_0"))
+	
+	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+	hook.Add("HUDPaint", "SlashCoZanySurvey", function()
+		if LocalPlayer():Team() ~= TEAM_SLASHER then
+			hook.Remove("HUDPaint", "SlashCoZanySurvey")
+		end
+
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not survivor:CanBeSeen() then
+				continue
+			end
+
+			if survivor:GetNWBool("MarkedByRocks") then
+				local pos = survivor:WorldSpaceCenter():ToScreen()
+
+				if pos.visible then
+					surface.SetMaterial(surveyNoticeIcon)
+					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
+				end
+			end
+		end
+	end)
 end
 
 SlashCo.RegisterSlasher(SLASHER, "CovenantCloak")
