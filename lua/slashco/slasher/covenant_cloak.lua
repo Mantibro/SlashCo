@@ -87,11 +87,11 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 					slasher.TackledPlayer = ply
 					slasher:SetNWBool("CloakTackling", false)
 					slasher:SetNWBool("CloakTackle", false)
-
+					
 					ply:SetNWBool("SurvivorTackled", true)
 					ply:SetNWBool("MarkedByCloaks", true)
 					ply.SlashCo_PushDir = (ply:GetPos() - slasher:GetPos()):GetNormalized()
-				    ply:SetImpervious(true)
+					
 					timer.Simple(SURVIVOR_STUN_TIME, function()
 						if IsValid(ply) then
 							ply:SetNWBool("SurvivorTackled", false)
@@ -105,9 +105,8 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 								ply.SlashCo_PushDir = nil
 							end
 
-							timer.Simple(2.2, function()
+							timer.Simple(10.0, function()
 								if IsValid(ply) then
-									ply:SetImpervious(false)
 									ply:SetNWBool("MarkedByCloaks", false)
 								end
 							end)
