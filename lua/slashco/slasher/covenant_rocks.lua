@@ -1,6 +1,6 @@
 local SLASHER = {}
 
-SLASHER.Name = "CovenantRocks"
+SLASHER.Name = "Covenant Rocks"
 SLASHER.ID = "covenantrocks"
 SLASHER.Class = 1
 SLASHER.DangerLevel = 1
@@ -9,13 +9,13 @@ SLASHER.Model = "models/slashco/slashers/covenant/rocks.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 280
+SLASHER.ChaseSpeed = 275
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 3
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 30.0
+SLASHER.ChaseDuration = 60.0
 SLASHER.ChaseCooldown = 1
 SLASHER.JumpscareDuration = 1.5
 SLASHER.ChaseMusic = ""
@@ -55,7 +55,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 		return
 	end
 	
-	if slasher:GetPos():Distance(target:GetPos()) >= 55 then
+	if slasher:GetPos():Distance(target:GetPos()) >= 137 then
 		return
 	end
 
@@ -71,7 +71,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			slasher:EmitSound("ambient/energy/spark"..tostring(math.random(1,6))..".wav", 100, 100, 0.25)
 
 			if SERVER then
-				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 0)),
+				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(137, 0, 0)),
 						Vector(-30, -30, -60), Vector(30, 30, 60), 35, DMG_SLASH, 5, false)
 
 				if target1:IsPlayer() then
@@ -87,7 +87,6 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			        lightning:SetNormal(Vector(55, 0, 1))
 			        lightning:SetRadius(100)
 					util.Effect( "Sparks", lightning )
-					target1:SetNWBool("MarkedByRocks", true)
 				end
 			end
 		end)
@@ -170,7 +169,7 @@ SLASHER.InitHud = function(_, hud)
 				continue
 			end
 
-			if survivor:GetNWBool("MarkedByRocks") then
+			if survivor:GetNWBool("MarkedByCloaks") then
 				local pos = survivor:WorldSpaceCenter():ToScreen()
 
 				if pos.visible then

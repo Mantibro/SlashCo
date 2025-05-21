@@ -9,13 +9,13 @@ SLASHER.Model = "models/slashco/slashers/covenant/cloak.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 125
-SLASHER.ChaseSpeed = 280
+SLASHER.ChaseSpeed = 275
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.91
-SLASHER.ChaseDuration = 30.0
+SLASHER.ChaseDuration = 60.0
 SLASHER.ChaseCooldown = 1
 SLASHER.JumpscareDuration = 1.5
 SLASHER.ChaseMusic = ""
@@ -89,6 +89,7 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 					slasher:SetNWBool("CloakTackle", false)
 
 					ply:SetNWBool("SurvivorTackled", true)
+					ply:SetNWBool("MarkedByCloaks", true)
 					ply.SlashCo_PushDir = (ply:GetPos() - slasher:GetPos()):GetNormalized()
 				    ply:SetImpervious(true)
 					timer.Simple(SURVIVOR_STUN_TIME, function()
@@ -107,6 +108,7 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 							timer.Simple(2.2, function()
 								if IsValid(ply) then
 									ply:SetImpervious(false)
+									ply:SetNWBool("MarkedByCloaks", false)
 								end
 							end)
 						end
@@ -246,7 +248,7 @@ SLASHER.InitHud = function(_, hud)
 				continue
 			end
 
-			if survivor:GetNWBool("MarkedByRocks") then
+			if survivor:GetNWBool("MarkedByCloaks") then
 				local pos = survivor:WorldSpaceCenter():ToScreen()
 
 				if pos.visible then

@@ -11,13 +11,13 @@ SLASHER.Model = "models/slashco/slashers/covenant/covenant.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 280
+SLASHER.ChaseSpeed = 275
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 3
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 30.0
+SLASHER.ChaseDuration = 60.0
 SLASHER.ChaseCooldown = 7
 SLASHER.JumpscareDuration = 2.0
 SLASHER.ChaseMusic = "slashco/slasher/covenant_chase.wav"
@@ -170,6 +170,10 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 end
 
 SLASHER.OnSecondaryFire = function(slasher)
+	if slasher:GetNWBool("InSlasherChaseMode") then
+	    return
+	end
+	
 	SlashCo.StartChaseMode(slasher)
 end
 
@@ -226,7 +230,7 @@ SLASHER.InitHud = function(_, hud)
 				continue
 			end
 
-			if survivor:GetNWBool("MarkedByRocks") then
+			if survivor:GetNWBool("MarkedByCloaks") then
 				local pos = survivor:WorldSpaceCenter():ToScreen()
 
 				if pos.visible then
