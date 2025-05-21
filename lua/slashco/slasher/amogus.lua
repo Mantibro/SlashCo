@@ -237,6 +237,8 @@ SLASHER.Thirdperson = function(ply)
 end
 
 SLASHER.Animator = function(ply)
+    local chase = ply:GetNWBool("InSlasherChaseMode")
+	
 	if ply:GetNWBool("AmogusSurvivorDisguise") then
 		return
 	end
