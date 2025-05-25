@@ -146,7 +146,7 @@ local selection = {
 		local rowSplit = 10 -- number of rows before it's split into a new one
 		local documents = {}
 		for _, document in SortedPairs(SlashCoDocumentTypes["Slasher"] or {}) do
-			local hasDocument = SlashCo.HasDocument(document.Name)
+			local hasDocument = SlashCo.HasDocument(document.Slasher or document.Name)
 			if DrawTextWithHitbox("[" .. string.upper(hasDocument and document.Name or " ??? ") .. "]", "TVCDMedium", w / 5 + (row * w / 2.1), (h / 18) * count, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 				pointer = count + (row * rowSplit) -- if we changed rows, we need to 
 			end
@@ -241,7 +241,7 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 	local additionalDescriptionRows = SplitTextIntoRows(document.AdditionalDescription, "TVCD", screenSize / 1.01)
 
 	local icon = Material("slashco/ui/icons/slasher/s_" .. slasher.ID)
-	selection["Slasher-" .. document.Name] = function(w, h)
+	selection["Slasher-" .. (document.Slasher or document.Name)] = function(w, h)
 		local row = 1
 		local rowSize = w / 32
 		draw.SimpleText("ENTRY: \"" .. slasher.Name .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
