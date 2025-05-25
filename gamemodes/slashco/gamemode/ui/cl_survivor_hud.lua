@@ -35,7 +35,7 @@ local function showScreenMessage()
 	parsedItem:Draw(ScrW() / 2, ScrH() / 2, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
 
-net.Receive("mantislashcoGasPourProgress", function()
+net.Receive("mantislashco_GasPourProgress", function()
 	TimeToFuel = net.ReadUInt(8)
 	FuelingCan = net.ReadEntity()
 	IsFueling = net.ReadBool()
@@ -43,11 +43,11 @@ net.Receive("mantislashcoGasPourProgress", function()
 end)
 
 hook.Add("DrawOverlay", "SlashCoVHS", function()
-	if not IsValid(LocalPlayer()) then
+	if not IsValid(GameData.LocalPlayer) then
 		return
 	end
 
-	if not LocalPlayer().Team or LocalPlayer():Team() ~= TEAM_SURVIVOR then
+	if not GameData.LocalPlayer.Team or GameData.LocalPlayer:Team() ~= TEAM_SURVIVOR then
 		return
 	end
 
@@ -139,7 +139,7 @@ local function drawItemDisplay(item, notUsable, moveUp, shift)
 
 	local str = string.format("<font=TVCD>%s%s%s%s%s</font>", dash, space, string.upper(SlashCo.Language(item)), space, dash)
 	local parsedItem = markup.Parse(str)
-	surface.SetDrawColor(LocalPlayer():ItemFunction2OrElse("DisplayColor", item, defaultColor))
+	surface.SetDrawColor(GameData.LocalPlayer:ItemFunction2OrElse("DisplayColor", item, defaultColor))
 	surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.95 - 24 - y, parsedItem:GetWidth() + 8, 27)
 	parsedItem:Draw(ScrW() * 0.975 - 4 - shift, ScrH() * 0.95 - y, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
@@ -153,7 +153,7 @@ local function drawItemDisplay(item, notUsable, moveUp, shift)
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		offset = 27
 	end
-	if not LocalPlayer():ItemFunction2("PreDrop", item) then
+	if not GameData.LocalPlayer:ItemFunction2("PreDrop", item) then
 		draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset - y,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
@@ -165,7 +165,7 @@ local function selectCrosshair(hitPos)
 	for _, v in pairs(ents.FindInSphere(hitPos, 100)) do
 		if v.IsSelectable and not (IsFueling and FuelingCan == v) then
 			local gasPos = v:WorldSpaceCenter()
-			local trace = util.QuickTrace(hitPos, gasPos - hitPos, LocalPlayer())
+			local trace = util.QuickTrace(hitPos, gasPos - hitPos, GameData.LocalPlayer)
 			if not trace.Hit or trace.Entity == v then
 				local realDistance = hitPos:Distance(gasPos)
 				gasPos = gasPos:ToScreen()
@@ -188,16 +188,16 @@ local function selectCrosshair(hitPos)
 end
 
 local function slamIndicator()
-	if LocalPlayer():GetVelocity():Length() <= 250 then
+	if GameData.LocalPlayer:GetVelocity():Length() <= 250 then
 		return
 	end
 
-	local lookent = LocalPlayer():GetEyeTrace().Entity
+	local lookent = GameData.LocalPlayer:GetEyeTrace().Entity
 	if not IsValid(lookent) or lookent:GetClass() ~= "prop_door_rotating" or not SlashCo.CheckDoorWL(lookent) then
 		return
 	end
 
-	if lookent:GetPos():Distance(LocalPlayer():GetPos()) >= 150 or lookent.IsOpen then
+	if lookent:GetPos():Distance(GameData.LocalPlayer:GetPos()) >= 150 or lookent.IsOpen then
 		return
 	end
 
@@ -244,7 +244,7 @@ local function gasFuelMeter(hitPos)
 end
 
 local function hpMeter()
-	local hp = LocalPlayer():Health()
+	local hp = GameData.LocalPlayer:Health()
 
 	if hp > (prevHp or maxHp) then
 		--reset damage indicator upon healing
@@ -316,7 +316,7 @@ local function hpMeter()
 end
 
 hook.Add("HUDPaint", "SurvivorHUD", function()
-	local ply = LocalPlayer()
+	local ply = GameData.LocalPlayer
 
 	if ply:Team() ~= TEAM_SURVIVOR then
 		return
@@ -325,7 +325,7 @@ hook.Add("HUDPaint", "SurvivorHUD", function()
 	local moveUp = drawItemDisplay(ply:GetItem("item"), ply:GetItem("item2") ~= "none")
 	drawItemDisplay(ply:GetItem("item2"), nil, moveUp)
 
-	local hitPos = LocalPlayer():GetShootPos()
+	local hitPos = GameData.LocalPlayer:GetShootPos()
 	gasFuelMeter(hitPos)
 	selectCrosshair(hitPos)
 
@@ -344,68 +344,70 @@ hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)
 	end
 end)
 
+local chaseLightOffset = Vector(0, 0, 20)
 hook.Add("Think", "Slasher_Chasing_Light", function()
-	for s = 1, #ents.FindByClass("sc_crimclone") do
+	local curTime = CurTime()
+	for s=1, #ents.FindByClass("sc_crimclone") do
 		local clone = ents.FindByClass("sc_crimclone")[s]
-		if clone:GetNWBool("MainRageClone") then
+		if clone:GetMainRageClone() then
 			local tlight = DynamicLight(clone:EntIndex() + 1)
 			if tlight then
-				tlight.pos = clone:LocalToWorld(Vector(0, 0, 20))
+				tlight.pos = clone:LocalToWorld(chaseLightOffset)
 				tlight.r = 255
 				tlight.g = 0
 				tlight.b = 255
 				tlight.brightness = 5
 				tlight.Decay = 1000
 				tlight.Size = 250
-				tlight.DieTime = CurTime() + 1
+				tlight.DieTime = curTime + 1
 			end
 		end
 	end
 
-	for s = 1, #team.GetPlayers(TEAM_SLASHER) do
+	for s=1, #team.GetPlayers(TEAM_SLASHER) do
 		local slasher = team.GetPlayers(TEAM_SLASHER)[s]
 		if slasher:GetNWBool("TrollgeStage2") then
 			local tlight = DynamicLight(slasher:EntIndex() + 1)
 			if tlight then
-				tlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
+				tlight.pos = slasher:LocalToWorld(chaseLightOffset)
 				tlight.r = 255
 				tlight.g = 0
 				tlight.b = 0
 				tlight.brightness = 5
 				tlight.Decay = 1000
 				tlight.Size = 2500
-				tlight.DieTime = CurTime() + 1
+				tlight.DieTime = curTime + 1
 			end
 		end
 
 		if slasher:GetNWBool("TylerFlash") then
 			local dlight = DynamicLight(slasher:EntIndex())
 			if dlight then
-				dlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
+				dlight.pos = slasher:LocalToWorld(chaseLightOffset)
 				dlight.r = 255
 				dlight.g = 0
 				dlight.b = 0
 				dlight.brightness = 8
 				dlight.Decay = 1000
 				dlight.Size = 300
-				dlight.DieTime = CurTime() + 1
+				dlight.DieTime = curTime + 1
 			end
 		end
 
 		if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage") then
-			return
+			continue
 		end
 
 		local dlight = DynamicLight(slasher:EntIndex())
 		if dlight then
-			dlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
+			dlight.pos = slasher:LocalToWorld(chaseLightOffset)
 			dlight.r = 255
 			dlight.g = 0
 			dlight.b = 0
 			dlight.brightness = 6
 			dlight.Decay = 1000
 			dlight.Size = 250
-			dlight.DieTime = CurTime() + 1
+			dlight.DieTime = curTime + 1
 		end
 	end
 end)

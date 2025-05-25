@@ -7,10 +7,10 @@ ITEM.Price = 35
 ITEM.Description = "LabMeat_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
-ITEM.OnDrop = function()
+function ITEM.OnDrop()
 	return nil, nil, true
 end
-ITEM.ItemDropped = function(ply, ent)
+function ITEM.ItemDropped(ply, ent)
 	local physCount = ent.ragdoll:GetPhysicsObjectCount()
 	for i = 0, (physCount - 1) do
 		local PhysBone = ent.ragdoll:GetPhysicsObjectNum(i)
@@ -21,12 +21,12 @@ ITEM.ItemDropped = function(ply, ent)
 		end
 	end
 end
-ITEM.OnUse = function(ply)
+function ITEM.OnUse(ply)
 	ply:EmitSound("slashco/survivor/benadryl_eat.mp3")
 	ply:EmitSound("slashco/slasher/amogus_transform" .. math.random(1, 2) .. ".mp3")
 	ply:AddEffect("Awareness", 120)
 end
-ITEM.OnSetModel = function(model)
+function ITEM.OnSetModel(model)
 	model:SetSequence(0)
 end
 ITEM.ViewModel = {

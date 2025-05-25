@@ -4,10 +4,10 @@ local EFFECT = {}
 
 EFFECT.Name = "Slowness"
 EFFECT.ChangesSpeed = true
-EFFECT.OnApplied = function(ply)
+function EFFECT.OnApplied(ply)
 	ply:AddSpeedEffect("slowEffect", 200, 12)
 end
-EFFECT.OnExpired = function(ply)
+function EFFECT.OnExpired(ply)
 	ply:RemoveSpeedEffect("slowEffect")
 end
 
@@ -23,7 +23,7 @@ local colors = {
 	["$pp_colour_mulb"] = 0
 }
 
-EFFECT.Screenspace = function()
+function EFFECT.Screenspace()
 	DrawColorModify(colors)
 end
 

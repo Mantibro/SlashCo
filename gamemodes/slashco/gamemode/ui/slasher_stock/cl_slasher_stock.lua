@@ -41,14 +41,14 @@ function PANEL:Init()
 	left:Dock(LEFT)
 	--]]
 
-	self.SlasherName = LocalPlayer():GetNWString("Slasher", "none")
+	self.SlasherName = GameData.LocalPlayer:GetNWString("Slasher", "none")
 	timer.Create("SlashCo_ResetSlasherHud", 1, 0, function()
 		if not IsValid(self) then
 			timer.Remove("SlashCo_ResetSlasherHud")
 			return
 		end
 
-		if LocalPlayer():GetNWString("Slasher", "none") ~= self.SlasherName then
+		if GameData.LocalPlayer:GetNWString("Slasher", "none") ~= self.SlasherName then
 			SlashCo.InitSlasherHud()
 		end
 	end)
@@ -336,13 +336,13 @@ function PANEL:TieControlVisible(key, netvar, isInverse, doShake, fallback)
 	local state = true
 	if type(netvar) == "table" then
 		for _, v in ipairs(netvar) do
-			if not LocalPlayer():GetNWBool(v, fallback) then
+			if not GameData.LocalPlayer:GetNWBool(v, fallback) then
 				state = false
 				break
 			end
 		end
 	else
-		state = LocalPlayer():GetNWBool(netvar, fallback)
+		state = GameData.LocalPlayer:GetNWBool(netvar, fallback)
 	end
 
 	self.ControlTies[key] = {
@@ -445,8 +445,8 @@ function PANEL:TieCrosshairEntity(entity, distance, control, netVars, settings)
 			varCheck = self:CheckNetVars(netVars.IsOr, netVars.InvertInput, unpack(netVars)) ~= netVars.InvertOutput
 		end
 
-		local ent = LocalPlayer():GetEyeTrace().Entity
-		if IsValid(ent) and ent:GetClass() == entity and LocalPlayer():GetPos():Distance(ent:GetPos()) < distance
+		local ent = GameData.LocalPlayer:GetEyeTrace().Entity
+		if IsValid(ent) and ent:GetClass() == entity and GameData.LocalPlayer:GetPos():Distance(ent:GetPos()) < distance
 				and varCheck then
 
 			if not self.GoCrosshair then
@@ -618,7 +618,7 @@ function PANEL:CheckNetVars(isOr, invertInput, ...)
 
 	local result = isOr
 	for _, v in pairs({ ... }) do
-		if LocalPlayer():GetNWBool(v, invertInput) ~= invertInput then
+		if GameData.LocalPlayer:GetNWBool(v, invertInput) ~= invertInput then
 			result = not result
 			break
 		end
@@ -668,7 +668,7 @@ function PANEL:MakeCrosshair()
 		nAlpha = math.Clamp(Lerp(0.04, nAlpha, self.CrosshairAlpha), 0, 255)
 
 		surface.SetDrawColor(255, 0, 0, nAlpha)
-		local vel = LocalPlayer():EyeAngles():Right():Dot(LocalPlayer():GetVelocity())
+		local vel = GameData.LocalPlayer:EyeAngles():Right():Dot(GameData.LocalPlayer:GetVelocity())
 		local ang = Angle(0, nAng, 0)
 		for i = 1, math.max(self.CrosshairProngs, 1) do
 			surface.DrawLine(
@@ -744,7 +744,7 @@ function PANEL:ModelFog(modelPanel)
 	end
 
 	function modelPanel.Think()
-		if LocalPlayer():GetEyeTrace().Entity == modelPanel.Entity then
+		if GameData.LocalPlayer:GetEyeTrace().Entity == modelPanel.Entity then
 			modelPanel:SetAmbientLight(grey)
 			modelPanel:SetDirectionalLight(BOX_TOP, color_white)
 			modelPanel:SetDirectionalLight(BOX_FRONT, color_white)
@@ -871,7 +871,7 @@ function PANEL:MakeGenEntry(gen, i, model)
 
 	function entry.LayoutEntity(_, ent)
 		local YWiggle = math.sin(CurTime()) * 10
-		ent:SetAngles(LocalPlayer():LocalEyeAngles() + Angle(5,
+		ent:SetAngles(GameData.LocalPlayer:LocalEyeAngles() + Angle(5,
 				(YWiggle + entry.YSpin + (i * 360 / (gasPerGen + 1))) % 360, 5))
 	end
 end
@@ -955,13 +955,13 @@ function PANEL:Think()
 		local val = true
 		if type(v.netvar) == "table" then
 			for _, v1 in ipairs(v.netvar) do
-				if LocalPlayer():GetNWBool(v1, v.fallback) then
+				if GameData.LocalPlayer:GetNWBool(v1, v.fallback) then
 					val = false
 					break
 				end
 			end
 		else
-			val = LocalPlayer():GetNWBool(v.netvar, v.fallback)
+			val = GameData.LocalPlayer:GetNWBool(v.netvar, v.fallback)
 		end
 
 		if val ~= v.prevVal then

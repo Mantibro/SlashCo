@@ -1,7 +1,7 @@
 --[[
 
-    Language: nl, (Dutch), (Nederlands)
-    Translator: Willem Oomkens, GGKirbyz2000, Kazzinkel, kram_2/Droom, Timon Jeruzalem
+	Language: nl, (Dutch), (Nederlands)
+	Translator: Willem Oomkens, GGKirbyz2000, Kazzinkel, kram_2/Droom, Timon Jeruzalem
 
 ]]
 

@@ -1,0 +1,5 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/star_filled"
+	"$translucent" 1
+}

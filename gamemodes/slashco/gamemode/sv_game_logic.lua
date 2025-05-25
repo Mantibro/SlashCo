@@ -12,7 +12,7 @@ function SlashCo.SinglePlayerSetup()
 	end)
 end
 
-SlashCo.LoadCurRoundData = function()
+function SlashCo.LoadCurRoundData()
 	table.Empty(SlashCo.CurRound.ExpectedPlayers)
 	if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
 		--Load relevant data from the database
@@ -42,7 +42,7 @@ SlashCo.LoadCurRoundData = function()
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
-		if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
 			--All survivors will become slashers.
 
 			local query = sql.Query("SELECT * FROM slashco_table_survivordata; ")
@@ -132,8 +132,8 @@ SlashCo.LoadCurRoundData = function()
 	end
 end
 
-SlashCo.AwaitExpectedPlayers = function()
-	if game.GetMap() ~= "sc_lobby" then
+function SlashCo.AwaitExpectedPlayers()
+	if not GameData.IsLobby then
 		if not game.SinglePlayer() and #SlashCo.CurRound.ExpectedPlayers < 2 then
 			return
 		end --don't start with no data
@@ -173,7 +173,7 @@ SlashCo.AwaitExpectedPlayers = function()
 end
 
 --				***Begin the round start timer***
-SlashCo.RoundBeginTimer = function()
+function SlashCo.RoundBeginTimer()
 	local time = game.SinglePlayer() and 3 or 15
 	timer.Create("GameStart", time, 1, function()
 		RunConsoleCommand("slashco_run_curconfig")
@@ -181,8 +181,8 @@ SlashCo.RoundBeginTimer = function()
 end
 
 local roundEnding
-local delay = 20
-SlashCo.EndRound = function()
+local lobbyDelay = 20 -- Time in seconds before players are returned to the lobby.
+function SlashCo.EndRound()
 	if g_SlashCoDebug then
 		return
 	end
@@ -192,7 +192,18 @@ SlashCo.EndRound = function()
 	end
 	roundEnding = true
 
-	local SurvivorCount = team.NumPlayers(TEAM_SURVIVOR)
+	local survivors = team.GetPlayers(TEAM_SURVIVOR)
+	for _, ply in ipairs(survivors) do
+		if ply:GetNW2Bool("QuickEscape") then
+			ply:AddPoints("quickescape")
+		end
+
+		if ply:GetNW2Bool("SlowEscape") then
+			ply:AddPoints("slowescape")
+		end
+	end
+
+	local SurvivorCount = #survivors
 	local heliCount = #SlashCo.CurRound.HelicopterRescuedPlayers
 	if SurvivorCount == 0 then
 		--All survivors are dead
@@ -200,11 +211,11 @@ SlashCo.EndRound = function()
 		if not SlashCo.CurRound.EscapeHelicopterSummoned or SlashCo.CurRound.DistressBeaconUsed then
 			--Assignment failed
 
-			SlashCo.RoundOverScreen(3)
+			SlashCo.RoundOverScreen(SlashCo.RoundState.LOST)
 		else
 			--Assignment success
 
-			SlashCo.RoundOverScreen(2)
+			SlashCo.RoundOverScreen(SlashCo.RoundState.WON_ALL_DEAD)
 		end
 	else
 		--There are living survivors
@@ -215,11 +226,11 @@ SlashCo.EndRound = function()
 			if heliCount > 0 then
 				--The last survivor got to the helicopter
 
-				SlashCo.RoundOverScreen(4)
+				SlashCo.RoundOverScreen(SlashCo.RoundState.WON_DISTRESS)
 			else
 				--Emergency rescue came and went, normal loss
 
-				SlashCo.RoundOverScreen(3)
+				SlashCo.RoundOverScreen(SlashCo.RoundState.LOST)
 			end
 		else
 			--Normal win
@@ -227,18 +238,17 @@ SlashCo.EndRound = function()
 			if heliCount >= #SlashCo.CurRound.SlasherData.AllSurvivors then
 				--Everyone lived
 
-				SlashCo.RoundOverScreen(0)
+				SlashCo.RoundOverScreen(SlashCo.RoundState.WON_ALL_ALIVE)
 			else
 				--Not everyone lived
 
-				SlashCo.RoundOverScreen(1)
+				SlashCo.RoundOverScreen(SlashCo.RoundState.WON_SOME_DEAD)
 			end
 		end
 	end
 
+	local winners = {}
 	if heliCount > 0 then
-		local winners = {}
-
 		--Add to stats of the remaining survivors' wins
 		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
 			if not IsValid(v) then continue end
@@ -246,7 +256,7 @@ SlashCo.EndRound = function()
 			SlashCoDatabase.UpdateStats(v:SteamID64(), "SurvivorRoundsWon", 1)
 
 			v:SetPoints("survive")
-			winners[v:UserID()] = true
+			winners[v:SteamID64()] = true
 		end
 
 		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
@@ -254,15 +264,18 @@ SlashCo.EndRound = function()
 		end
 
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not winners[v:UserID()] then
+			if not winners[v:SteamID64()] then
 				v:SetPoints("left_behind")
 			end
 		end
 	end
 
-	print("[SlashCo] Round over, returning to lobby in " .. tostring(delay) .. " seconds.")
+	SlashCo.State = SlashCo.States.ENDING
+	hook.Run("SlashCo:EndRound", winners)
 
-	timer.Simple(delay, function()
+	print("[SlashCo] Round over, returning to lobby in " .. tostring(lobbyDelay) .. " seconds.")
+
+	timer.Simple(lobbyDelay, function()
 		SlashCo.RemoveHelicopter()
 		SlashCo.CommitPoints()
 
@@ -285,9 +298,51 @@ SlashCo.EndRound = function()
 	end)
 end
 
-local delay1 = 16
-SlashCo.SurvivorWinFinish = function()
-	timer.Simple(delay1, function()
+local winDelay = 16
+function SlashCo.SurvivorWinFinish()
+	timer.Simple(winDelay, function()
 		SlashCo.EndRound()
+	end)
+end
+
+
+if not GameData.IsLobby then
+	timer.Create("SlashCo:WarningTime", 1, 0, function()
+		local curTime = CurTime()
+		local timePassed = curTime - GetGlobal2Float("SCStartTime")
+		if math.IsNearlyEqual(timePassed, SlashCo.WarningTime, 1) and (GameData.LastWarningTime or 0) < curTime then
+			GameData.LastWarningTime = curTime + 5
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/time_alert.mp3",
+				volume = 1,
+				entity = game.GetWorld(),
+				fadeIn = 0,
+			})
+		end
+	end)
+
+	timer.Create("SlashCo:LobbyFailSafe", 1, 0, function()
+		if SlashCo.State ~= SlashCo.States.IN_GAME or g_SlashCoDebug or GameData.TriggeredLobbyFailSafe then
+			return
+		end
+
+		local timePassed = CurTime() - GetGlobal2Float("SCStartTime")
+		if timePassed > 300 and not SlashCo.FailSafeActivate then
+			local slashers = team.GetPlayers(TEAM_SLASHER)
+			if #slashers == 0 then
+				print("[SlashCo] Lobby failsafe was triggered!")
+				GameData.TriggeredLobbyFailSafe = true
+				SlashCo.EndRound()
+				return
+			end
+
+			local survivors = team.GetPlayers(TEAM_SURVIVOR)
+			if #survivors == 0 then
+				print("[SlashCo] Lobby failsafe was triggered!")
+				GameData.TriggeredLobbyFailSafe = true
+				SlashCo.EndRound()
+				return
+			end
+		end
 	end)
 end

@@ -16,7 +16,7 @@ ENT.PingType = "ITEM"
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel(SlashCoItems[self.PrintName].Model)
+		self:SetModel(SlashCoItems[self.OverrideItem or self.PrintName].Model)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)

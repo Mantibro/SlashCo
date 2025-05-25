@@ -19,7 +19,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 		return
 	end
 
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		doPrint(ply, "Cannot assign a player as a survivor while in the lobby.")
 		return
 	end
@@ -51,10 +51,12 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 					targetSelect = v
 				end
 			end
+
 			if tooMany then
 				doPrint(ply, "There's more than one player your arguments apply to.")
 				return
 			end
+
 			if targetSelect then
 				target = targetSelect
 			end
@@ -73,6 +75,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 			break
 		end
 	end
+
 	local found
 	for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
 		if v.id == id then
@@ -105,7 +108,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		return
 	end
 
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		doPrint(ply, "Cannot assign a player as a slasher while in the lobby.")
 		return
 	end
@@ -164,6 +167,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 			break
 		end
 	end
+
 	local found
 	for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
 		if v.s_id == id then
@@ -171,6 +175,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 			break
 		end
 	end
+
 	if not found then
 		table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = args[1] })
 	end
@@ -182,9 +187,11 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		if not IsValid(target) then
 			return
 		end
+
 		if IsValid(ply) then
 			doPrint(ply, "New Slasher successfully assigned.")
 		end
+
 		SlashCo.DropAllItems(target)
 		target:StripWeapons()
 		target:SetTeam(TEAM_SLASHER)
@@ -468,3 +475,91 @@ concommand.Add("slashco_debug_printbats", function(ply)
 
 	doPrint(ply, string.format("total: %s", count))
 end, nil, "Print all battery spawns and their associated generators", FCVAR_CHEAT + FCVAR_PROTECTED)
+
+-- NOTE: This could be abused.
+-- ToDo: Verify that its accurate enouth to not be abused. Maybe add a distance limit
+concommand.Add("slashco_unstuck", function(ply, _, args)
+	if not ply:IsStuck() then
+		ply:ChatPrint("Your not stuck.")
+		return
+	end
+
+	ply:ChatPrint("Look at a free spot and wait 3 seconds")
+	timer.Simple(3, function()
+		local pos = ply:GetEyeTrace().HitPos
+		local tr = util.TraceEntityHull({
+			start = pos,
+			endpos = pos,
+			filter = ply,
+		}, ply)
+
+		if not tr.Hit then
+			ply:SetPos(tr.HitPos)
+		end
+	end)
+end)
+
+timer.Create("SlashCo:CheckStuck", 5, 0, function()
+	for _, ply in ipairs(player.GetAll()) do
+		if not ply:IsStuck() then continue end
+		if ply.IsImpervious and not ply:IsStuck(true) then continue end
+		if SlashCo.State != SlashCo.States.IN_GAME then continue end
+
+		ply._STUCKCOUNT = (ply._STUCKCOUNT or 0) + 1
+		if ply._STUCKCOUNT >= 3 then
+			ply:ChatPrint("If your stuck, run the \"slashco_unstuck\" console command and look at a free spot")
+			ply._STUCKCOUNT = 0
+		end
+	end
+end)
+
+concommand.Add("slashco_debug_lobbybot", function(ply)
+	if GameData.LobbyBot and GameData.LobbyBot:IsValid() then
+		GameData.LobbyBot:Kick("Bye")
+	end
+
+	timer.Simple(0, function()
+		GameData.LobbyBot = player.CreateNextBot("Bot")
+
+		timer.Simple(0, function()
+			if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
+
+			hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_COMMA)
+		end)
+	end)
+end)
+
+concommand.Add("slashco_debug_lobbybot_readysurvivor", function(ply)
+	if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
+
+	hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_F1)
+end)
+
+concommand.Add("slashco_debug_lobbybot_readyslasher", function(ply)
+	if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
+
+	hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_F2)
+end)
+
+hook.Add("StartCommand", "LobbyBot", function(ply, cmd)
+	if ply != GameData.LobbyBot then return end
+
+	cmd:ClearMovement() 
+	cmd:ClearButtons()
+
+	if ply:Team() == TEAM_SURVIVOR then
+		if not ply._REACHED_ELEVATOR then
+			ply._REACHED_ELEVATOR = CurTime()
+			local elevator = ents.FindByClass("func_movelinear")[1]
+			if not IsValid(elevator) then return end
+
+			ply:SetPos(elevator:GetPos() + Vector(0, 0, 10))
+		end
+
+		if (CurTime() - (ply._REACHED_ELEVATOR or 0)) > 30 then
+			if not IsValid(SlashCo.Helicopter) then return end
+
+			SlashCo.Helicopter:Use(ply, ply)
+		end
+	end
+end)

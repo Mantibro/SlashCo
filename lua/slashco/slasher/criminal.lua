@@ -26,7 +26,7 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	local clone = ents.Create("sc_crimclone")
 
 	clone:SetPos(slasher:GetPos())
@@ -39,8 +39,8 @@ SLASHER.OnSpawn = function(slasher)
 	slasher:SetVisible(false)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnTickBehaviour(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	v1 = slasher.SlasherValue1 --Cloning Duration
 
@@ -91,12 +91,12 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	SlashCo.Jumpscare(slasher, target)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnSecondaryFire(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher.ChaseActivationCooldown > 0 then
 		return
@@ -110,8 +110,8 @@ SLASHER.OnSecondaryFire = function(slasher)
 			if cln.IsMain ~= true then
 				cln:Remove()
 			end
-			cln:StopSound("slashco/slasher/criminal_loop.wav")
-			cln:StopSound("slashco/slasher/criminal_rage.wav")
+			cln:StopSound("slashco/slasher/criminal_loop.mp3")
+			cln:StopSound("slashco/slasher/criminal_rage.mp3")
 		end
 
 		slasher:SetNWBool("CriminalCloning", false)
@@ -132,11 +132,11 @@ SLASHER.OnSecondaryFire = function(slasher)
 	end
 end
 
-SLASHER.OnMainAbilityFire = function()
+function SLASHER.OnMainAbilityFire()
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnSpecialAbilityFire(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if not slasher:GetNWBool("CriminalCloning") then
 		return
@@ -163,13 +163,13 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	slasher:SetNWBool("CriminalRage", true)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	ply.CalcSeqOverride = 3
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		if ply.CrimStepTick == nil or ply.CrimStepTick > 2 then
 			ply.CrimStepTick = 0
@@ -191,7 +191,7 @@ local avatarTable = {
 	rage = Material("slashco/ui/icons/slasher/s_12_1")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Criminal")
 
@@ -201,16 +201,16 @@ SLASHER.InitHud = function(_, hud)
 	hud:AddControl("F", "rage", Material("slashco/ui/icons/slasher/s_12_1"))
 	hud:SetControlVisible("F", false)
 
-	hud.prevRage = LocalPlayer():GetNWBool("CriminalRage")
+	hud.prevRage = GameData.LocalPlayer:GetNWBool("CriminalRage")
 	function hud.AlsoThink()
-		local rage = LocalPlayer():GetNWBool("CriminalRage")
+		local rage = GameData.LocalPlayer:GetNWBool("CriminalRage")
 		if rage ~= hud.prevRage then
 			hud:SetAvatar(rage and "rage" or "default")
 			hud:SetControlEnabled("F", not rage)
 			hud.prevRage = rage
 		end
 
-		local progress = LocalPlayer():GetNWInt("GameProgressDisplay")
+		local progress = GameData.LocalPlayer:GetNWInt("GameProgressDisplay")
 		if progress > 6 then
 			if not hud.RageEnabled then
 				hud:SetControlVisible("F", true)
@@ -228,23 +228,23 @@ end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Criminal") == true then
-			if LocalPlayer().crim_f == nil then
-				LocalPlayer().crim_f = 0
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Criminal") == true then
+			if GameData.LocalPlayer.crim_f == nil then
+				GameData.LocalPlayer.crim_f = 0
 			end
-			LocalPlayer().crim_f = LocalPlayer().crim_f + (FrameTime() * 20)
-			if LocalPlayer().crim_f > 59 then
-				LocalPlayer().crim_f = 11
+			GameData.LocalPlayer.crim_f = GameData.LocalPlayer.crim_f + (FrameTime() * 20)
+			if GameData.LocalPlayer.crim_f > 59 then
+				GameData.LocalPlayer.crim_f = 11
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_12")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().crim_f))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.crim_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().crim_f = nil
+			GameData.LocalPlayer.crim_f = nil
 		end
 	end)
 end

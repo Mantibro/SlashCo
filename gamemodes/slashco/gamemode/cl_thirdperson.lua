@@ -1,4 +1,3 @@
-
 hook.Add("CalcView", "SlashCoThirdPerson", function(ply, pos, angles, fov, znear, zfar)
 	local _team = ply:Team()
 	if _team == TEAM_SURVIVOR then

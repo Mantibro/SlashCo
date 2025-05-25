@@ -1,6 +1,10 @@
 local SLASHER = {}
 
 SLASHER.Name = "Borgmire"
+SLASHER.Aliases = {
+	"Borg",
+	"Tim",
+}
 SLASHER.ID = 8
 SLASHER.Class = 1
 SLASHER.DangerLevel = 3
@@ -15,10 +19,10 @@ SLASHER.Eyesight = 2
 SLASHER.KillDistance = 0
 SLASHER.ChaseRange = 1500
 SLASHER.ChaseRadius = 0.88
-SLASHER.ChaseDuration = 12.0
+SLASHER.ChaseDuration = 120.0
 SLASHER.ChaseCooldown = 8
 SLASHER.JumpscareDuration = 0
-SLASHER.ChaseMusic = "slashco/slasher/borgmire_chase.wav"
+SLASHER.ChaseMusic = "slashco/slasher/borgmire_chase.mp3"
 SLASHER.KillSound = ""
 SLASHER.Description = "Borgmire_desc"
 SLASHER.ProTip = "Borgmire_tip"
@@ -26,15 +30,15 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 85))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 85))
-	slasher:PlayGlobalSound("slashco/slasher/borgmire_heartbeat.wav", 50, nil, true)
+	slasher:PlayGlobalSound("slashco/slasher/borgmire_heartbeat.mp3", 50, nil, true)
 	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnTickBehaviour(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --Time Spent chasing
 	local v2 = slasher.SlasherValue2 --Punch Cooldown
@@ -60,11 +64,11 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher.ChaseSound = nil
 
 		if slasher.IdleSound == nil then
-			slasher:PlayGlobalSound("slashco/slasher/borgmire_breath_base.wav", 60, nil, true)
+			slasher:PlayGlobalSound("slashco/slasher/borgmire_breath_base.mp3", 60, nil, true)
 
-			slasher:StopSound("slashco/slasher/borgmire_breath_chase.wav")
+			slasher:StopSound("slashco/slasher/borgmire_breath_chase.mp3")
 			timer.Simple(0.1, function()
-				slasher:StopSound("slashco/slasher/borgmire_breath_chase.wav")
+				slasher:StopSound("slashco/slasher/borgmire_breath_chase.mp3")
 			end)
 
 			slasher.IdleSound = true
@@ -72,19 +76,19 @@ SLASHER.OnTickBehaviour = function(slasher)
 	else
 		slasher.IdleSound = nil
 
-		slasher.SlasherValue1 = v1 + FrameTime()
+		slasher.SlasherValue1 = CurTime() - slasher:GetNWFloat("SlasherChaseBegin")
 
-		slasher:SetRunSpeed((SLASHER.ChaseSpeed - math.sqrt(v1 * (14 - (SO * 7)))) / v3)
-		slasher:SetWalkSpeed((SLASHER.ChaseSpeed - math.sqrt(v1 * (14 - (SO * 7)))) / v3)
+		slasher:SetRunSpeed(math.floor((SLASHER.ChaseSpeed - math.sqrt(v1 * (14 - (SO * 7)))) / v3))
+		slasher:SetWalkSpeed(math.floor((SLASHER.ChaseSpeed - math.sqrt(v1 * (14 - (SO * 7)))) / v3))
 
 		if slasher.ChaseSound == nil then
-			slasher:PlayGlobalSound("slashco/slasher/borgmire_breath_chase.wav", 70, nil, true)
+			slasher:PlayGlobalSound("slashco/slasher/borgmire_breath_chase.mp3", 70, nil, true)
 			slasher:PlayGlobalSound("slashco/slasher/borgmire_anger.mp3", 75)
 			slasher:PlayGlobalSound("slashco/slasher/borgmire_anger_far.mp3", 110)
 
-			slasher:StopSound("slashco/slasher/borgmire_breath_base.wav")
+			slasher:StopSound("slashco/slasher/borgmire_breath_base.mp3")
 			timer.Simple(0.1, function()
-				slasher:StopSound("slashco/slasher/borgmire_breath_base.wav")
+				slasher:StopSound("slashco/slasher/borgmire_breath_base.mp3")
 			end)
 
 			slasher.ChaseSound = true
@@ -95,12 +99,12 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
+function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("BorgmireThrow") then
 		return
 	end
 
-	local SO = SlashCo.CurRound.OfferingData.SO
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher.SlasherValue2 < 0.01 then
 		slasher:SetNWBool("BorgmirePunch", false)
@@ -160,16 +164,16 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher, target)
+function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if slasher.BorgPunching then
 		return
 	end
 
-	local SO = SlashCo.CurRound.OfferingData.SO
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then
 		return
@@ -235,7 +239,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher, target)
 	end)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local borg_punch = ply:GetNWBool("BorgmirePunch")
 	local borg_throw = ply:GetNWBool("BorgmireThrow")
@@ -277,7 +281,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		if ply.BorgStepTick == nil or ply.BorgStepTick > 1 then
 			ply.BorgStepTick = 0
@@ -295,7 +299,7 @@ SLASHER.Footstep = function(ply)
 	return true
 end
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_8"))
 	hud:SetTitle("Borgmire")
 

@@ -50,15 +50,15 @@ local function antiDupePings(ping)
 	end
 end
 
-net.Receive("mantislashcoSurvivorPings", function()
+net.Receive("mantislashco_SurvivorPings", function()
 	local ping = net.ReadTable()
 
 	antiDupePings(ping)
 
 	if ping.Type == "GENERATOR" then
-		LocalPlayer():EmitSound("slashco/ping_generator.mp3")
+		GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
 	elseif ping.Type ~= "LOOK HERE" and ping.Type ~= "LOOK AT THIS" and ping.Type ~= "GHOST" then
-		LocalPlayer():EmitSound("slashco/ping_item.mp3")
+		GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
 	end
 
 	ping.ID = math.random(2 ^ 31 - 1)
@@ -73,7 +73,7 @@ end)
 
 --ping display
 hook.Add("HUDPaint", "PingDisplay", function()
-	if LocalPlayer():Team() == TEAM_SLASHER then
+	if GameData.LocalPlayer:Team() == TEAM_SLASHER then
 		global_pings = {}
 		return
 	end
@@ -123,7 +123,7 @@ hook.Add("HUDPaint", "PingDisplay", function()
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, textColor, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
-		draw.SimpleText(tostring(math.floor(LocalPlayer():GetPos():Distance(v:GetPos()) * 0.0254)) .. " m",
+		draw.SimpleText(tostring(math.floor(GameData.LocalPlayer:GetPos():Distance(v:GetPos()) * 0.0254)) .. " m",
 				"TVCD_small", fl_pos.x, fl_pos.y + 25, Color(255, 255, 255, 180),
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end

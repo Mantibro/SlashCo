@@ -73,12 +73,12 @@ end
 ---ties the value of the meter to a netvar
 function PANEL:TieInt(netvar, doFlash, fallback)
 	fallback = fallback or 0
-	self:SetValue(LocalPlayer():GetNWInt(netvar, fallback))
+	self:SetValue(GameData.LocalPlayer:GetNWInt(netvar, fallback))
 
 	function self.TieCheck()
-		local val = math.Clamp(LocalPlayer():GetNWInt(netvar, fallback), 0, self.Max)
+		local val = math.Clamp(GameData.LocalPlayer:GetNWInt(netvar, fallback), 0, self.Max)
 		if val ~= self.Current then
-			self:SetValue(LocalPlayer():GetNWInt(netvar, fallback))
+			self:SetValue(GameData.LocalPlayer:GetNWInt(netvar, fallback))
 
 			if doFlash then
 				self:Flash()

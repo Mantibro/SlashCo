@@ -17,22 +17,29 @@ function ENT:KeyValue(key, value)
 		return
 	end
 
-	local key1 = string.lower(key)
-	if key1 == "generators_needed" then
+	key = string.lower(key)
+	if key == "generators_needed" then
 		SetGlobal2Int("SlashCoGeneratorsNeeded", valNum)
 		return
 	end
-	if key1 == "generators_spawned" then
+
+	if key == "generators_spawned" then
 		SetGlobal2Int("SlashCoGeneratorsToSpawn", valNum)
 		return
 	end
-	if key1 == "gascans_needed" then
+
+	if key == "gascans_needed" then
 		SetGlobal2Int("SlashCoGasCansPerGenerator", valNum)
 		return
 	end
-	if key1 == "gascans_spawned" then
+
+	if key == "gascans_spawned" then
 		SetGlobal2Int("SlashCoGasCansToSpawn", valNum)
 		return
+	end
+
+	if key == "islobby" and tobool(value) then
+		GameData.IsLobby = true -- NOTE: This value is networked for clients inside GM:InitPostEntity() -> sh_shared.lua
 	end
 end
 

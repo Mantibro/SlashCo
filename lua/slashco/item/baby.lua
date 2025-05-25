@@ -7,81 +7,82 @@ ITEM.Icon = "slashco/ui/icons/items/item_7"
 ITEM.Price = 35
 ITEM.Description = "Baby_desc"
 ITEM.CamPos = Vector(50,0,0)
-ITEM.DisplayColor = function(ply)
-    local setcolor = 360 - math.Clamp(ply:Health(), 0, 100) * 1.2
-    local color = HSVToColor(setcolor, 1, 0.5)
+function ITEM.DisplayColor(ply)
+	local setcolor = 360 - math.Clamp(ply:Health(), 0, 100) * 1.2
+	local color = HSVToColor(setcolor, 1, 0.5)
 
-    return color.r, color.g, color.b, color.a
+	return color.r, color.g, color.b, color.a
 end
 ITEM.IsSpawnable = true
-ITEM.OnUse = function(ply)
-    --When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
-    --Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
-    --(50 - 10%, 25 - 60% ,1 - 100%).
-    --Using it will spawn a spent baby in the position the survivor used it.
+function ITEM.OnUse(ply)
+	--When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
+	--Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
+	--(50 - 10%, 25 - 60% ,1 - 100%).
+	--Using it will spawn a spent baby in the position the survivor used it.
 
-    ply:EmitSound("slashco/survivor/baby_use.mp3")
+	ply:EmitSound("slashco/survivor/baby_use.mp3")
 
-    local deathchance = math.random(0, math.floor(ply:Health() / 5))
-    local hpafter = ply:Health() / 2
+	local deathchance = math.random(0, math.floor(ply:Health() / 5))
+	local hpafter = ply:Health() / 2
 
-    ply:SetHealth(hpafter)
+	ply:SetHealth(hpafter)
 
-    timer.Simple(1, function()
-        if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-            if ply:Health() < 51 and deathchance < 2 then
-                ply:Kill()
-                ply:EmitSound("slashco/survivor/devildie_kill.mp3")
+	timer.Simple(1, function()
+		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+			if ply:Health() < 51 and deathchance < 2 then
+				ply:Kill()
+				ply:EmitSound("slashco/survivor/devildie_kill.mp3")
 
-                local slasher = team.GetPlayers(TEAM_SLASHER)[#team.GetPlayers(TEAM_SLASHER)]
+				local slasher = team.GetPlayers(TEAM_SLASHER)
+				slasher = slasher[math.random(1, #slasher)] -- If there are multiple slasher's we need to be fair and pick a random one, the previous code always chose the second slasher.
 
-                if IsValid(slasher) then
-                    slasher:RandomTeleport()
-                    slasher:EmitSound("slashco/survivor/baby_use.mp3")
-                end
+				if IsValid(slasher) then
+					slasher:RandomTeleport()
+					slasher:EmitSound("slashco/survivor/baby_use.mp3")
+				end
 
-                return
-            end
+				return
+			end
 
-            ply:RandomTeleport()
-        end
-    end)
+			ply:RandomTeleport()
+		end
+	end)
 end
 ITEM.ViewModel = {
-    model = "models/props_c17/doll01.mdl",
-    pos = Vector(64, 0, -6),
-    angle = Angle(45, -70, -120),
-    size = Vector(0.5, 0.5, 0.5),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	model = "models/props_c17/doll01.mdl",
+	pos = Vector(64, 0, -6),
+	angle = Angle(45, -70, -120),
+	size = Vector(0.5, 0.5, 0.5),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-    model = "models/props_c17/doll01.mdl",
-    bone = "ValveBiped.Bip01_Pelvis",
-    pos = Vector(5, 2, 5),
-    angle = Angle(110, -80, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	model = "models/props_c17/doll01.mdl",
+	bone = "ValveBiped.Bip01_Pelvis",
+	pos = Vector(5, 2, 5),
+	angle = Angle(110, -80, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModel = {
-    holdtype = "slam",
-    model = "models/props_c17/doll01.mdl",
-    bone = "ValveBiped.Bip01_R_Hand",
-    pos = Vector(3, 2.5, -1),
-    angle = Angle(180, 0, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	holdtype = "slam",
+	model = "models/props_c17/doll01.mdl",
+	bone = "ValveBiped.Bip01_R_Hand",
+	pos = Vector(3, 2.5, -1),
+	angle = Angle(180, 0, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 
 SlashCo.RegisterItem(ITEM, "Baby")

@@ -26,7 +26,7 @@ SLASHER.SpeedRating = "★☆☆☆☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
-SLASHER.TackleFail = function(slasher)
+function SLASHER.TackleFail(slasher)
 	if IsValid(slasher) then
 		if slasher.TackledPlayer == nil then
 			slasher:SetNWBool("CloakTackleFail", true)
@@ -45,7 +45,7 @@ SLASHER.TackleFail = function(slasher)
 	end
 end
 
-SLASHER.OnTickBehaviour = function(slasher, target)
+function SLASHER.OnTickBehaviour(slasher, target)
 	if IsValid(slasher.TackledPlayer) then
 		if not slasher:IsFrozen() then
 			slasher:Freeze(true)
@@ -91,7 +91,7 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
+function SLASHER.OnPrimaryFire(slasher)
 	if not slasher:GetNWBool("CloakTackle") then
 		slasher:SetNWBool("CloakTackle", true)
 		slasher:SetNWBool("CloakTackling", true)
@@ -110,19 +110,19 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	--SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 
 end
 
-SLASHER.Animator = function(ply, veloc)
+function SLASHER.Animator(ply, veloc)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:IsOnGround() then
@@ -162,7 +162,7 @@ SLASHER.Animator = function(ply, veloc)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function()
+function SLASHER.Footstep()
 	return false
 end
 

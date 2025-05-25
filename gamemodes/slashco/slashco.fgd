@@ -144,6 +144,12 @@
     gascans_needed(integer) : "Gas Cans Needed" : -1 : "The number of gas cans needed to fully fuel each generator. Set to -1 for the gamemode default (normally 4)"
     gascans_spawned(integer) : "Gas Cans Spawned" : -1 : "The default number of gas cans spawned in the map. This value should never be below the generators spawned multiplied by the amount of gas cans needed. Set to -1 to let the gamemode determine based on the round."
 
+    islobby(choices) : "IsLobby" : 0 : "If enabled, this map is marked to be a lobby" =
+    [
+        1 : "Yes"
+        0 : "No"
+    ]
+
     // Inputs
     input set_generators_needed(integer) : "Set the number of generators needed for the round to each the end state. This cannot be changed mid-round."
     input set_generators_spawned(integer) : "Set the number of generators spawned in the map. This cannot be changed mid-round."

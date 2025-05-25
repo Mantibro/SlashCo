@@ -26,15 +26,15 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 	slasher.soundon = 0
 	slasher:SetNWBool("CanKill", true)
 	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnTickBehaviour(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --Roid
 	local v2 = slasher.SlasherValue2 --Tick to change mouse drift
@@ -91,7 +91,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 						if not IsValid(slasher) or not slasher:GetNWBool("LeuonardRoiding", false) then
 							return
 						end
-						slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.wav")
+						slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.mp3")
 					end)
 				end
 			end
@@ -107,7 +107,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 				SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 
-				slasher:StopSound("slashco/slasher/leuonard_grunt_loop.wav")
+				slasher:StopSound("slashco/slasher/leuonard_grunt_loop.mp3")
 				slasher:EmitSound("slashco/slasher/leuonard_grunt_finish.mp3")
 			end
 		end
@@ -135,7 +135,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 				--I FOUND YOU........
 				ent:Remove()
 				slasher:SetNWBool("LeuonardRoiding", true)
-				slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.wav")
+				slasher:EmitSound("slashco/slasher/leuonard_grunt_loop.mp3")
 				slasher:Freeze(true)
 				slasher:SetBodygroup(1, 1)
 
@@ -144,7 +144,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 						return
 					end
 
-					slasher:StopSound("slashco/slasher/leuonard_grunt_loop.wav")
+					slasher:StopSound("slashco/slasher/leuonard_grunt_loop.mp3")
 					slasher:Freeze(false)
 					slasher:SetNWBool("LeuonardRoiding", false)
 					slasher:SetBodygroup(1, 0)
@@ -154,8 +154,8 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 		if slasher.soundon > 0 then
 			slasher:PlayGlobalSound("slashco/slasher/leuonard_yell7.mp3", 100)
-			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_close.wav", 80)
-			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_far.wav", 125)
+			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_close.mp3", 80)
+			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_far.mp3", 125)
 			slasher.soundon = 0
 		end
 
@@ -187,7 +187,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 				if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR and ent.Devastate ~= true then
 					ent:SetVelocity(slasher:GetForward() * 500)
 					ent.Devastate = true
-					ent:EmitSound("slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".wav")
+					ent:EmitSound("slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".mp3")
 					for a = 1, 10 do
 						timer.Simple(a * 0.005, function()
 							local vPoint = ent:GetPos() + Vector(math.random(-25, 25), math.random(-25, 25),
@@ -227,15 +227,15 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	SlashCo.Jumpscare(slasher, target)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if not chase then
@@ -270,7 +270,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/leuonard_step" .. math.random(1, 3) .. ".mp3")
 		return true
@@ -281,7 +281,7 @@ SLASHER.Footstep = function(ply)
 	end
 end
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_14"))
 	hud:SetTitle("Leuonard")
 
@@ -320,29 +320,29 @@ SLASHER.InitHud = function(_, hud)
 	end
 end
 
-SLASHER.PreDrawHalos = function()
+function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_dogg"), nil, 2, false)
 end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Leuonard") == true then
-			if LocalPlayer().leuo_f == nil then
-				LocalPlayer().leuo_f = 0
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Leuonard") == true then
+			if GameData.LocalPlayer.leuo_f == nil then
+				GameData.LocalPlayer.leuo_f = 0
 			end
-			LocalPlayer().leuo_f = LocalPlayer().leuo_f + (FrameTime() * 20)
-			if LocalPlayer().leuo_f > 10 then
-				LocalPlayer().leuo_f = 0
+			GameData.LocalPlayer.leuo_f = GameData.LocalPlayer.leuo_f + (FrameTime() * 20)
+			if GameData.LocalPlayer.leuo_f > 10 then
+				GameData.LocalPlayer.leuo_f = 0
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_14")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().leuo_f))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.leuo_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().leuo_f = nil
+			GameData.LocalPlayer.leuo_f = nil
 		end
 	end)
 

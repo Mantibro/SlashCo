@@ -8,7 +8,7 @@ local function HidePlayermodelSelection()
 end
 
 local function PlayerModelChosen(mod)
-	RunConsoleCommand("slashco_cl_playermodel", mod)
+	GetConVar("slashco_cl_playermodel"):SetString(mod)
 end
 
 function DrawThePlayermodelSelectorBox()
@@ -21,10 +21,12 @@ function DrawThePlayermodelSelectorBox()
 	for c = 0, 2 do
 		for i = 0, 2 do
 			local item = vgui.Create("SpawnIcon", pmSelectFrame)
+			local modelID = val -- Copy the var as else we'll reference val which will always be 10 / a invalid id because its counted up.
 			function item.DoClick()
-				PlayerModelChosen("models/slashco/survivor/male_0" .. val .. ".mdl")
+				PlayerModelChosen("models/slashco/survivor/male_0" .. modelID .. ".mdl")
 				HidePlayermodelSelection()
 			end
+
 			item:SetSize(80, 80)
 			item:SetPos(5 + i * 80, 29 + c * 80)
 			item:SetModel("models/slashco/survivor/male_0" .. val .. ".mdl")
@@ -47,6 +49,7 @@ function DrawThePlayermodelSelectorBox()
 		else
 			surface.SetTextColor(255, 255, 255)
 		end
+
 		surface.SetFont("TVCD")
 		surface.SetTextPos(0, 0)
 		surface.DrawText("[X]")

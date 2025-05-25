@@ -7,10 +7,10 @@ ITEM.Price = 5
 ITEM.Description = "Brick_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ReplacesWorldProps = true
-ITEM.DisplayColor = function()
+function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
-ITEM.OnUse = function(ply)
+function ITEM.OnUse(ply)
 	ply:EmitSound("Weapon_Crowbar.Miss")
 	ply:ViewPunch(Angle(-10, 0, 0))
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))

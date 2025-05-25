@@ -5,6 +5,15 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "LabMeat"
 ENT.ClassName = "sc_labmeat"
 
+hook.Add("SlashCo:Precache", "PrecacheLabMeat", function()
+	SlashCo.PrecacheModel("models/slashco/items/labmeat.mdl")
+	SlashCo.PrecacheSound("slashco/survivor/eat_mayo.mp3")
+	
+	for k=1, 3 do
+		SlashCo.PrecacheSound("npc/headcrab/idle" .. k .. ".wav")
+	end
+end)
+
 function ENT:Initialize()
 	if SERVER then
 		self.ragdoll = ents.Create("prop_ragdoll")

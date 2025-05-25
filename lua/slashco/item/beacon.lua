@@ -7,11 +7,11 @@ ITEM.Icon = "slashco/ui/icons/items/item_9"
 ITEM.Price = 15
 ITEM.Description = "Beacon_desc"
 ITEM.CamPos = Vector(50,0,35)
-ITEM.MaxAllowed = function()
+function ITEM.MaxAllowed()
 	return 1
 end
 ITEM.IsSpawnable = false
-ITEM.OnUse = function(ply)
+function ITEM.OnUse(ply)
 	--If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
 
 	if SlashCo.CurRound.EscapeHelicopterSummoned then
@@ -58,14 +58,14 @@ ITEM.OnUse = function(ply)
 		local ent = SlashCo.CreateItem("sc_activebeacon", ply:WorldSpaceCenter(), Angle(0, 0, 0))
 		ent.DoArming = true
 		ent:DropToFloor()
-		ent:SetNWBool("ArmingBeacon", true)
+		ent:SetArmingBeacon(true)
 		SlashCo.BeaconArming = true
 	else --instant because alone
 		SlashCo.CurRound.DistressBeaconUsed = true
 		SlashCo.SummonEscapeHelicopter(true)
 		local ent = SlashCo.CreateItem("sc_activebeacon", ply:WorldSpaceCenter(), Angle(0, 0, 0))
 		ent:DropToFloor()
-		ent:PlayGlobalSound("slashco/survivor/distress_siren.wav", 100)
+		ent:PlayGlobalSound("slashco/survivor/distress_siren.mp3", 100)
 	end
 end
 ITEM.ViewModel = {

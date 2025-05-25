@@ -1,6 +1,9 @@
 local SLASHER = {}
 
 SLASHER.Name = "Speedrunner"
+SLASHER.Aliases = {
+	"The Hunted",
+}
 SLASHER.ID = 15
 SLASHER.Class = 1
 SLASHER.DangerLevel = 3
@@ -26,16 +29,16 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★★"
 
-SLASHER.OnSpawn = function(slasher)
-	slasher:PlayGlobalSound("slashco/slasher/speedrunner_1.wav", 100, nil, true)
+function SLASHER.OnSpawn(slasher)
+	slasher:PlayGlobalSound("slashco/slasher/speedrunner_1.mp3", 100, nil, true)
 	slasher:SetNWBool("CanKill", true)
 	slasher.SlasherValue1 = 100
 	slasher.SlasherValue2 = 1
 	slasher.SlasherValue3 = 285
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnTickBehaviour(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --Speed
 	local v2 = slasher.SlasherValue2 --Speed Gain multiplier
@@ -44,12 +47,12 @@ SLASHER.OnTickBehaviour = function(slasher)
 	if v1 < v3 then
 		local gasMod = SlashCo.IsPositionLegalForSlashers(slasher:GetPos(), true) and 1 or 0.5
 		local mapSizeMod = (0.5 / SlashCo.MapSize) + 0.5
-		slasher.SlasherValue1 = v1 + FrameTime() * mapSizeMod * v2 * (1 + SO) * 0.66 * gasMod
+		slasher.SlasherValue1 = v1 + engine.TickInterval() * mapSizeMod * v2 * (1 + SO) * 0.66 * gasMod
 	end
 
-	slasher:SetRunSpeed(slasher.SlasherValue1)
-	slasher:SetWalkSpeed(slasher.SlasherValue1)
-	slasher:SetSlowWalkSpeed(slasher.SlasherValue1)
+	slasher:SetRunSpeed(math.floor(slasher.SlasherValue1))
+	slasher:SetWalkSpeed(math.floor(slasher.SlasherValue1))
+	slasher:SetSlowWalkSpeed(math.floor(slasher.SlasherValue1))
 
 	if slasher:GetNWInt("SpeedrunnerSpeed") ~= math.floor(v1) then
 		slasher:SetNWInt("SpeedrunnerSpeed", math.floor(v1))
@@ -59,14 +62,14 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	if SlashCo.Jumpscare(slasher, target) then
 		slasher.SlasherValue1 = math.min(slasher.SlasherValue1 + 30, slasher.SlasherValue3)
 	end
 end
 
 -- the great ability
-SLASHER.RandomTPCans = function()
+function SLASHER.RandomTPCans()
 	for _, ent in ipairs(ents.FindByClass("sc_gascan")) do
 		ent:RandomTeleport(Vector(0, 0, 50))
 		ent:GetPhysicsObject():ApplyForceCenter(Vector((math.random() - 0.5) * 100,
@@ -74,7 +77,7 @@ SLASHER.RandomTPCans = function()
 	end
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 	if slasher.SlasherValue1 < slasher.SlasherValue3 or slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
 		return
 	end
@@ -84,15 +87,15 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end
 	slasher.SpeedRunnering = true
 
-	slasher:StopSound("slashco/slasher/speedrunner_1.wav")
-	slasher:StopSound("slashco/slasher/speedrunner_2.wav")
+	slasher:StopSound("slashco/slasher/speedrunner_1.mp3")
+	slasher:StopSound("slashco/slasher/speedrunner_2.mp3")
 	timer.Simple(0.1, function()
 		if not IsValid(slasher) then
 			return
 		end
 
-		slasher:StopSound("slashco/slasher/speedrunner_1.wav")
-		slasher:StopSound("slashco/slasher/speedrunner_2.wav")
+		slasher:StopSound("slashco/slasher/speedrunner_1.mp3")
+		slasher:StopSound("slashco/slasher/speedrunner_2.mp3")
 	end)
 
 	slasher:Freeze(true)
@@ -114,7 +117,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 		if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
 			slasher:SetNWBool("SpeedrunnerSacrificeOne", true)
-			slasher:PlayGlobalSound("slashco/slasher/speedrunner_2.wav", 100, nil, true)
+			slasher:PlayGlobalSound("slashco/slasher/speedrunner_2.mp3", 100, nil, true)
 			slasher.SlasherValue2 = 2
 			slasher.SlasherValue3 = 325
 			SLASHER.RandomTPCans()
@@ -124,7 +127,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 
 		if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
 			slasher:SetNWBool("SpeedrunnerSacrificeTwo", true)
-			slasher:PlayGlobalSound("slashco/slasher/speedrunner_3.wav", 100, nil, true)
+			slasher:PlayGlobalSound("slashco/slasher/speedrunner_3.mp3", 100, nil, true)
 			slasher.SlasherValue2 = 4
 			slasher.SlasherValue3 = 500
 			slasher:SetBodygroup(1, 1)
@@ -135,7 +138,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end)
 end
 
-SLASHER.Animator = function(ply, veloc)
+function SLASHER.Animator(ply, veloc)
 	local move_vel = ply:WorldToLocal(veloc + ply:GetPos())
 	local anim_vel = veloc:Length()
 
@@ -165,11 +168,11 @@ SLASHER.Animator = function(ply, veloc)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	return ply:GetNWBool("SpeedrunnerSacrificeTwo")
 end
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_15"))
 	hud:SetTitle("Speedrunner")
 
@@ -179,12 +182,12 @@ SLASHER.InitHud = function(_, hud)
 	hud:AddMeter("speed", 235, "", nil, true)
 	hud:TieMeterInt("speed", "SpeedrunnerSpeed")
 
-	hud.prevSac1 = not LocalPlayer():GetNWBool("SpeedrunnerSacrificeOne")
-	hud.prevSac2 = not LocalPlayer():GetNWBool("SpeedrunnerSacrificeTwo")
+	hud.prevSac1 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeOne")
+	hud.prevSac2 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeTwo")
 	hud.SpeedGo = true
 	function hud.AlsoThink()
-		local sac1 = LocalPlayer():GetNWBool("SpeedrunnerSacrificeOne")
-		local sac2 = LocalPlayer():GetNWBool("SpeedrunnerSacrificeTwo")
+		local sac1 = GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeOne")
+		local sac2 = GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeTwo")
 		if sac2 ~= hud.prevSac2 or sac1 ~= hud.prevSac1 then
 			if sac2 then
 				hud:SetMeterMax("speed", 500)
@@ -216,23 +219,23 @@ end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Speedrunner") == true then
-			if LocalPlayer().spd_f == nil then
-				LocalPlayer().spd_f = 0
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Speedrunner") == true then
+			if GameData.LocalPlayer.spd_f == nil then
+				GameData.LocalPlayer.spd_f = 0
 			end
-			LocalPlayer().spd_f = LocalPlayer().spd_f + (FrameTime() * 20)
-			if LocalPlayer().spd_f > 25 then
-				LocalPlayer().spd_f = 25
+			GameData.LocalPlayer.spd_f = GameData.LocalPlayer.spd_f + (FrameTime() * 20)
+			if GameData.LocalPlayer.spd_f > 25 then
+				GameData.LocalPlayer.spd_f = 25
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_15")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().spd_f))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.spd_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().spd_f = nil
+			GameData.LocalPlayer.spd_f = nil
 		end
 	end)
 

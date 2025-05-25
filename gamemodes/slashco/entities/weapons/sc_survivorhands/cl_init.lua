@@ -172,7 +172,7 @@ end
 
 function SWEP:DrawWorldModel()
 	local owner = self:GetOwner()
-	if not IsValid(owner) or not owner:CanBeSeen() or not LocalPlayer():CanSeeFlashlights() then
+	if not IsValid(owner) or not owner:CanBeSeen() or not GameData.LocalPlayer:CanSeeFlashlights() then
 		if IsValid(self.heldEntityWorld) then
 			self.heldEntityWorld:SetNoDraw(true)
 		end

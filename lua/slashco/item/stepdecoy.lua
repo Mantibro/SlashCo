@@ -8,19 +8,19 @@ ITEM.Price = 10
 ITEM.Description = "StepDecoy_desc"
 ITEM.CamPos = Vector(50, 0, 20)
 ITEM.IsSpawnable = true
-ITEM.OnUse = function(ply)
+function ITEM.OnUse(ply)
 	--Active Step Decoy
 
 	local decoy = SlashCo.CreateItem("sc_stepdecoy", ply:LocalToWorld(Vector(0, 0, 30)),
 			ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	decoy:DropToFloor()
-	decoy:SetNWBool("StepDecoyActive", true)
+	decoy:SetStepDecoyActive(true)
 	SlashCo.CurRound.Items[decoy:EntIndex()] = true
 end
-ITEM.OnDrop = function(ply)
+function ITEM.OnDrop(ply)
 	return 30, nil, true
 end
-ITEM.ItemDropped = function(_, itemEnt)
+function ITEM.ItemDropped(_, itemEnt)
 	itemEnt:DropToFloor()
 end
 

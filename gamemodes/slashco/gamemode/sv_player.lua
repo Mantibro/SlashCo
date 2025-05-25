@@ -5,7 +5,7 @@ function GM:PlayerSwitchWeapon()
 end
 
 function GM:PlayerInitialSpawn(ply)
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()
 	end
@@ -70,7 +70,7 @@ function GM:PlayerDeathThink(ply)
 end
 
 function GM:CanPlayerSuicide(player)
-	if player:Team() == TEAM_SPECTATOR or player:Team() == TEAM_SLASHER then
+	if player:Team() == TEAM_SPECTATOR or player:Team() == TEAM_SLASHER or GetGlobal2Bool("IsLobbyStarting") then
 		return false
 	end
 
@@ -79,11 +79,22 @@ end
 
 --Proximity voice chat
 
+local proximity_chat = CreateConVar("slashco_proximity_chat", "1", FCVAR_ARCHIVE, "Enables proximity chat")
+local proximity_voice = CreateConVar("slashco_proximity_voice", "1", FCVAR_ARCHIVE, "Enables proximity voicechat")
+local proximity_range = CreateConVar("slashco_proximity_range", "1000", FCVAR_ARCHIVE, "Sets the proximity range")
+
 hook.Add("PlayerCanHearPlayersVoice", "Maximum Range", function(listener, talker)
-	if talker:Team() == TEAM_SPECTATOR or talker:Team() == TEAM_SLASHER then
+	if not proximity_voice:GetBool() then
+		return true
+	end
+
+	local talkerTeam = talker:Team()
+	if talkerTeam == TEAM_SPECTATOR or talkerTeam == TEAM_SLASHER then
 		return false
 	end
-	if listener:GetPos():DistToSqr(talker:GetPos()) > 1000000 then
+
+	local range = proximity_range:GetInt()
+	if listener:GetPos():DistToSqr(talker:GetPos()) > (range * range) then
 		return false
 	end
 end)
@@ -93,25 +104,35 @@ hook.Add("GetFallDamage", "RealisticDamage", function(_, speed)
 end)
 
 hook.Add("PlayerCanSeePlayersChat", "TeamChat", function(_, _, listener, speaker)
-	if listener:Team() == TEAM_SPECTATOR then
+	if not proximity_chat:GetBool() then
 		return true
 	end
-	if speaker:Team() == TEAM_SLASHER then
-		return false
+
+	local listenerTeam = listener:Team()
+	if listenerTeam == TEAM_SPECTATOR then
+		return true
 	end
-	if listener:Team() == TEAM_SLASHER then
-		return false
-	end
-	if speaker:Team() == TEAM_SPECTATOR and listener:Team() ~= TEAM_SPECTATOR then
+
+	local speakerTeam = speaker:Team()
+	if speakerTeam == TEAM_SLASHER then
 		return false
 	end
 
-	if listener:GetPos():DistToSqr(speaker:GetPos()) > 1000000 then
+	if listenerTeam == TEAM_SLASHER then
 		return false
-	else
-		if speaker:Team() == TEAM_SURVIVOR then
-			return true
-		end
+	end
+
+	if speakerTeam == TEAM_SPECTATOR and listenerTeam ~= TEAM_SPECTATOR then
+		return false
+	end
+
+	local range = proximity_range:GetInt()
+	if listener:GetPos():DistToSqr(speaker:GetPos()) > (range * range) then
+		return false
+	end
+
+	if speakerTeam == TEAM_SURVIVOR then
+		return true
 	end
 end)
 
@@ -122,57 +143,5 @@ end)
 hook.Add("PlayerUse", "STOP", function(ply, _)
 	if ply:Team() == TEAM_SPECTATOR then
 		return false
-	else
-		return
 	end
-end)
-
-local PLAYER = FindMetaTable("Player")
-
-function PLAYER:SetImpervious(state)
-	if state then
-		if self.IsImpervious then
-			return
-		end
-
-		self:SetCustomCollisionCheck(true)
-		self.IsImpervious = true
-
-		local userid = self:UserID()
-		hook.Add("ShouldCollide", "SlashCoImpervious_" .. userid, function(ent1, ent2)
-			if not IsValid(self) then
-				hook.Remove("ShouldCollide", "SlashCoImpervious_" .. userid)
-				return
-			end
-
-			local object
-			if ent1 == self then
-				object = ent2
-			end
-			if ent2 == self then
-				object = ent1
-			end
-
-			if not IsValid(object) then
-				return
-			end
-			if object:IsPlayer() or object:GetClass() == "prop_door_rotating" then
-				--i would put a check for if doors were locked here but the locked state of doors could change
-				--see the warning in https://wiki.facepunch.com/gmod/GM:ShouldCollide to see why this matters
-				return false
-			end
-		end)
-	else
-		if not self.IsImpervious then
-			return
-		end
-
-		self:SetCustomCollisionCheck(false)
-		self.IsImpervious = nil
-		hook.Remove("ShouldCollide", "SlashCoImpervious_" .. self:UserID())
-	end
-end
-
-hook.Add("PlayerDeath", "slashCoRemoveImpervious", function(victim)
-	victim:SetImpervious(false)
 end)

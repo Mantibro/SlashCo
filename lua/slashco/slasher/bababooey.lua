@@ -1,6 +1,11 @@
 local SLASHER = {}
 
 SLASHER.Name = "Bababooey"
+SLASHER.Aliases = {
+	"Phantom",
+	"The Man",
+	"The Mist",
+}
 SLASHER.ID = 1
 SLASHER.Class = 1
 SLASHER.DangerLevel = 1
@@ -18,7 +23,7 @@ SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1.5
-SLASHER.ChaseMusic = "slashco/slasher/baba_chase.wav"
+SLASHER.ChaseMusic = "slashco/slasher/baba_chase.mp3"
 SLASHER.KillSound = "slashco/slasher/baba_kill.mp3"
 SLASHER.Description = "Bababooey_desc"
 SLASHER.ProTip = "Bababooey_tip"
@@ -26,11 +31,11 @@ SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	SLASHER.DoSound(slasher)
 end
 
-SLASHER.DoSound = function(slasher)
+function SLASHER.DoSound(slasher)
 	if slasher:GetNWBool("BababooeyInvisibility") then
 		slasher:EmitSound("slashco/slasher/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))
 	end
@@ -40,8 +45,8 @@ SLASHER.DoSound = function(slasher)
 	end)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnTickBehaviour(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --Cooldown for being able to trigger
 	local v2 = slasher.SlasherValue2 --Cooldown for being able to kill
@@ -76,16 +81,16 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	SlashCo.Jumpscare(slasher, target)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher, target)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnMainAbilityFire(slasher, target)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local cooldown = slasher.SlasherValue1
 
@@ -163,8 +168,8 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 	end
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnSpecialAbilityFire(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if #ents.FindByClass("sc_babaclone") > SO then
 		return
@@ -180,7 +185,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	end
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local spook = ply:GetNWBool("BababooeySpooking")
 
@@ -203,7 +208,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		if ply:GetNWBool("BababooeyInvisibility") then
 			return true
@@ -219,24 +224,24 @@ SLASHER.Footstep = function(ply)
 end
 
 hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-	if LocalPlayer():GetNWBool("SurvivorJumpscare_Bababooey") == true then
-		if LocalPlayer().baba_f == nil then
-			LocalPlayer().baba_f = 0
+	if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Bababooey") == true then
+		if GameData.LocalPlayer.baba_f == nil then
+			GameData.LocalPlayer.baba_f = 0
 		end
-		LocalPlayer().baba_f = LocalPlayer().baba_f + (FrameTime() * 20)
-		if LocalPlayer().baba_f > 45 then
+		GameData.LocalPlayer.baba_f = GameData.LocalPlayer.baba_f + (FrameTime() * 20)
+		if GameData.LocalPlayer.baba_f > 45 then
 			return
 		end
 
 		local Overlay = Material("slashco/ui/overlays/jumpscare_1")
-		Overlay:SetInt("$frame", math.floor(LocalPlayer().baba_f))
+		Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.baba_f))
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(Overlay)
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
 	else
-		LocalPlayer().baba_f = nil
+		GameData.LocalPlayer.baba_f = nil
 	end
 end)
 
@@ -255,7 +260,7 @@ local cloneTable = {
 	["d/set clone"] = Material("slashco/ui/icons/slasher/s_1_a2_1")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Bababooey")
 

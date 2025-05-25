@@ -20,7 +20,7 @@ SLASHER.ChaseRadius = 0.7
 SLASHER.ChaseDuration = 160.0
 SLASHER.ChaseCooldown = 7
 SLASHER.JumpscareDuration = 1.5
-SLASHER.ChaseMusic = "slashco/slasher/covenant_chase.wav"
+SLASHER.ChaseMusic = "slashco/slasher/covenant_chase.mp3"
 SLASHER.KillSound = "slashco/slasher/"
 SLASHER.Description = "Covenant_desc"
 SLASHER.ProTip = "Covenant_tip"
@@ -28,11 +28,11 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.SummonCovenantMembers = function()
+function SLASHER.SummonCovenantMembers()
 	for _, v in ipairs(SLASHER.PlayersToBecomePartOfCovenant) do
 		local clk = player.GetBySteamID64(v.steamid)
 		SlashCo.SelectSlasher("CovenantCloak", v.steamid)
@@ -41,13 +41,13 @@ SLASHER.SummonCovenantMembers = function()
 	end
 end
 
-SLASHER.SummonRocks = function(vic)
+function SLASHER.SummonRocks(vic)
 	SlashCo.SelectSlasher("CovenantRocks", vic:SteamID64())
 	vic:SetTeam(TEAM_SLASHER)
 	vic:Spawn()
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		--Sync the chase for every slasher, meaning every covenant member
 
@@ -68,7 +68,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	if not slasher:GetNWBool("CovenantSummoned") then
 		if not slasher:GetNWBool("CovenantSummoning") then
 			--local dist = slasher:SlasherValue("KillDistance", 135)
@@ -143,17 +143,17 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:IsOnGround() then
@@ -171,7 +171,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function()
+function SLASHER.Footstep()
 	return true
 end
 

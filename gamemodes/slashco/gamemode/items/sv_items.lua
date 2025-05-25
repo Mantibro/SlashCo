@@ -1,12 +1,12 @@
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
 
-SlashCo.UseItem = function(ply)
+function SlashCo.UseItem(ply)
 	if CLIENT then
 		return
 	end
 
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		return
 	end
 
@@ -31,7 +31,7 @@ SlashCo.UseItem = function(ply)
 	end
 end
 
-SlashCo.DropAllItems = function(ply, noEffect)
+function SlashCo.DropAllItems(ply, noEffect)
 	if not noEffect then
 		ply:ClearEffect()
 	end
@@ -40,12 +40,12 @@ SlashCo.DropAllItems = function(ply, noEffect)
 	SlashCo.DropItem(ply)
 end
 
-SlashCo.DropItem = function(ply)
+function SlashCo.DropItem(ply, dropCallback)
 	if CLIENT then
 		return
 	end
 
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		return
 	end
 
@@ -118,12 +118,16 @@ SlashCo.DropItem = function(ply)
 		if not SlashCoItems[item].IsSecondary then
 			SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
 		end
+		
+		if dropCallback then
+			dropCallback(ply, item, droppeditem, phys)
+		end
 	end)
 
 	ply.LastDroppedItemTime = CurTime()
 end
 
-SlashCo.RemoveItem = function(ply, isSec)
+function SlashCo.RemoveItem(ply, isSec)
 	local slot = isSec and "item2" or "item"
 	local item = ply:GetItem(slot)
 	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), isSec and 0.25 or 0.18, 1, function()
@@ -134,7 +138,7 @@ SlashCo.RemoveItem = function(ply, isSec)
 	ply:SetItem(slot, "none")
 end
 
-SlashCo.ChangeSurvivorItem = function(ply, id)
+function SlashCo.ChangeSurvivorItem(ply, id)
 	if SlashCoItems[id] then
 		if SlashCoItems[id].OnPickUp then
 			SlashCoItems[id].OnPickUp(ply)
@@ -160,7 +164,7 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 	end
 end
 
-SlashCo.ItemPickUp = function(ply, itemindex, item)
+function SlashCo.ItemPickUp(ply, itemindex, item)
 	if SlashCoItems[item].IsSecondary and ply:GetItem("item2") ~= "none"
 			or not SlashCoItems[item].IsSecondary and ply:GetItem("item") ~= "none" then
 		return
@@ -177,6 +181,11 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 
 	local dontPickupHook = hook.Run("SlashCoItemPickUp", ply, item, itemindex)
 	if dontPickupHook then
+		return
+	end
+	
+	local itemEnt = Entity(itemindex)
+	if itemEnt.DONTPICKUP then
 		return
 	end
 
@@ -196,8 +205,6 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 			return
 		end
 	end
-
-	local itemEnt = Entity(itemindex)
 
 	if IsValid(itemEnt.SpawnedAt) then
 		itemEnt.SpawnedAt:TriggerOutput("OnPickedUp", ply)

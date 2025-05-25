@@ -3,7 +3,6 @@ local SlashCo = SlashCo or {}
 local ConvoCount = 30
 
 SlashCo.LobbyConvos = {
-
 	{
 		Length1 = 4,
 		Length2 = 4,
@@ -222,7 +221,7 @@ SlashCo.LobbyConvos = {
 
 }
 
-SlashCo.LobbyBanter = function()
+function SlashCo.LobbyBanter()
 	local survivors = team.GetPlayers(TEAM_SURVIVOR)
 
 	if #survivors < 2 then
@@ -271,8 +270,8 @@ SlashCo.LobbyBanter = function()
 	return totalLength
 end
 
-net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
-	if game.GetMap() == "sc_lobby" and SlashCo.LobbyData.LOBBYSTATE == 2 then
+net.Receive("mantislashco_SurvivorVoicePrompt", function(_, ply)
+	if GameData.IsLobby and SlashCo.LobbyData.LOBBYSTATE == 2 then
 		return
 	end
 
@@ -285,7 +284,7 @@ net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
 	ply:EmitSound("slashco/survivor/voice/prompt_" .. prompt .. math.random(1, 5) .. ".mp3")
 end)
 
-SlashCo.EscapeVoicePrompt = function()
+function SlashCo.EscapeVoicePrompt()
 	if team.NumPlayers(TEAM_SURVIVOR) < 1 then
 		return
 	end

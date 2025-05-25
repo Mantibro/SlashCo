@@ -175,7 +175,7 @@ function PANEL:Paint(w, h)
 		pos = self.Entity:WorldSpaceCenter() + self.CamPos
 	end
 
-	local eyeAng = LocalPlayer():LocalEyeAngles() --EyeAngles()
+	local eyeAng = GameData.LocalPlayer:LocalEyeAngles() --EyeAngles()
 	local vec = Vector(self.Distance * self.Entity:GetModelScale(), 0, 0)
 	vec:Rotate(eyeAng)
 	local x, y = self:LocalToScreen(0, 0)
@@ -212,6 +212,6 @@ local frame = vgui.Create("DFrame")
 frame:SetSize(500, 500)
 
 local project = frame:Add("slashco_projector")
-project:SetEntity(LocalPlayer())
+project:SetEntity(GameData.LocalPlayer)
 project:Dock(FILL)
 --]]

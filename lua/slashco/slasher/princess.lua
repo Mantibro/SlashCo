@@ -1,6 +1,10 @@
 local SLASHER = {}
 
 SLASHER.Name = "Princess"
+SLASHER.Aliases = {
+	"Cupcake",
+	"Satan Death Destroyer",
+}
 SLASHER.ID = 17
 SLASHER.Class = 2
 SLASHER.DangerLevel = 1
@@ -18,7 +22,7 @@ SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1.5
-SLASHER.ChaseMusic = "slashco/slasher/princess_chase.wav"
+SLASHER.ChaseMusic = "slashco/slasher/princess_chase.mp3"
 SLASHER.KillSound = ""
 SLASHER.Description = "Princess_desc"
 SLASHER.ProTip = "Princess_tip"
@@ -26,8 +30,11 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.ItemToSpawn = "Baby"
+SLASHER.AngerIncrease = 5
+SLASHER.AngerPassiveGain = 0.04
+SLASHER.AngerChaseGain = 0
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 50))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 50))
 
@@ -36,7 +43,7 @@ SLASHER.OnSpawn = function(slasher)
 	SLASHER.DoSound(slasher)
 end
 
-SLASHER.DoSound = function(slasher)
+function SLASHER.DoSound(slasher)
 	if not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessMaulingSurvivor") and not slasher:GetNWBool("PrincessSniffing") then
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			slasher:EmitSound("slashco/slasher/princess_chase" .. math.random(1, 15) .. ".mp3")
@@ -54,7 +61,7 @@ SLASHER.DoSound = function(slasher)
 	end)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	local v1 = slasher.SlasherValue1 --aggression
 	local v2 = slasher.SlasherValue2 --aggression threshold
 
@@ -199,7 +206,27 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", perception)
 end
 
-SLASHER.Maul = function(slasher, target)
+local function IsPlayerHoldingBaby(target, removeBaby)
+	if target:ItemValue("EntClass", false, true) == "sc_baby" then -- eat the baby >:3
+		if removeBaby then
+			SlashCo.RemoveItem(target, true)
+		end
+
+		return true
+	end
+
+	if target:ItemValue("EntClass", false, false) == "sc_baby" then -- eat the baby >:3
+		if removeBaby then
+			SlashCo.RemoveItem(target, false)
+		end
+
+		return true
+	end
+
+	return false
+end
+
+function SLASHER.Maul(slasher, target)
 	timer.Remove("princessMaul_" .. slasher:UserID())
 	slasher:EmitSound("slashco/slasher/princess_bite.mp3")
 
@@ -208,42 +235,49 @@ SLASHER.Maul = function(slasher, target)
 	bloodfx:SetOrigin(vPoint)
 	util.Effect("BloodImpact", bloodfx)
 
-	if slasher.SlasherValue1 <= 99 then
+	local eatBabyFromPlayer = IsPlayerHoldingBaby(target, true) -- true if were eating a baby that a player was holding.
+	if slasher.SlasherValue1 <= 99 and not eatBabyFromPlayer then
 		return
 	end
 
 	SlashCo.StopChase(slasher)
 	slasher:SetNWBool("PrincessMaulingBase", false)
+	slasher:Freeze(true)
 
-	timer.Simple(FrameTime() * 3, function()
-		if not IsValid(slasher) or not IsValid(target) then
-			return
-		end
-
-		slasher:SetNWBool("PrincessMaulingSurvivor", true)
-		target:TakeDamage(99999, slasher, slasher)
-
-		timer.Simple(FrameTime() * 3, function()
-			if not IsValid(slasher) then
+	if not eatBabyFromPlayer then
+		timer.Simple(0, function() -- ToDo: Why do we even need a timer? Verify.
+			if not IsValid(slasher) or not IsValid(target) then
 				return
 			end
 
-			slasher.victimragdoll = target and (target.DeadBody or NULL)
+			slasher:SetNWBool("PrincessMaulingSurvivor", true)
+			target:TakeDamage(99999, slasher, slasher)
+
+			timer.Simple(FrameTime() * 3, function()
+				if not IsValid(slasher) then
+					return
+				end
+
+				slasher.victimragdoll = target and (target.DeadBody or NULL)
+			end)
 		end)
-	end)
+	end
 
 	slasher:EmitSound("slashco/slasher/princess_maul.mp3")
 
 	local pos = slasher:LocalToWorld(Vector(0, 10, -5))
 	local ang = slasher:LocalToWorldAngles(Angle(90, 0, 0))
 
-	slasher.ref_child = ents.Create("prop_physics")
-	slasher.ref_child:SetMoveType(MOVETYPE_NONE)
-	slasher.ref_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-	slasher.ref_child:SetModel(SlashCoItems.Baby.Model)
-	slasher.ref_child:SetPos(pos)
-	slasher.ref_child:SetAngles(ang)
-	slasher.ref_child:FollowBone(slasher, slasher:LookupBone("head"))
+	if eatBabyFromPlayer or not IsValid(target) then
+		slasher.ref_child = ents.Create("prop_physics")
+		slasher.ref_child:SetMoveType(MOVETYPE_NONE)
+		slasher.ref_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		slasher.ref_child:SetModel(SlashCoItems.Baby.Model)
+		slasher.ref_child:SetPos(pos)
+		slasher.ref_child:SetAngles(ang)
+		slasher.ref_child:FollowBone(slasher, slasher:LookupBone("head"))
+		slasher:SetNWBool("PrincessMaulingChild", true)
+	end
 
 	for i = 1, math.random(9, 10) do
 		timer.Simple((i / 8) * (0.7 + (math.random() * 0.3)), function()
@@ -257,7 +291,7 @@ SLASHER.Maul = function(slasher, target)
 			util.Effect("BloodImpact", bloodfx1)
 
 			slasher.victimragdoll:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(2, 4) .. ".wav")
-			slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".wav")
+			slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".mp3")
 		end)
 	end
 
@@ -266,14 +300,22 @@ SLASHER.Maul = function(slasher, target)
 			return
 		end
 
+		slasher:Freeze(false)
+
 		slasher:SetNWBool("PrincessMaulingSurvivor", false)
 		slasher:SetNWBool("PrincessMaulingBase", false)
+
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
+
+		if IsValid(slasher.ref_child) then
+			slasher:SetNWBool("PrincessMaulingChild", false)
+			slasher.ref_child:Remove()
+		end
 
 		if not IsValid(slasher.victimragdoll) then
 			return
 		end
 
-		slasher.ref_child:Remove()
 		slasher.victimragdoll:Remove()
 
 		local pickedclean = ents.Create("prop_ragdoll")
@@ -298,7 +340,7 @@ SLASHER.Maul = function(slasher, target)
 	end)
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
+function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("PrincessMaulingChild") then
 		return
 	end
@@ -329,9 +371,33 @@ SLASHER.OnPrimaryFire = function(slasher)
 			return
 		end
 
-		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-				Vector(-40, -40, -60), Vector(40, 40, 60),
-				math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4)), DMG_SLASH, 5, false)
+		local tr = util.TraceHull({
+			start = slasher:EyePos(),
+			endpos = slasher:LocalToWorld(Vector(45, 0, 30)),
+			maxs = Vector(40, 40, 60),
+			mins = Vector(-40, -40, -60),
+			filter = slasher,
+			ignoreworld = true,
+		})
+		local target = tr.Entity
+		print(target)
+
+		local damage = math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4))
+		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
+		--		Vector(-40, -40, -60), Vector(40, 40, 60),
+		--		damage, DMG_SLASH, 5, false)
+		
+		if target:IsValid() and (not target:IsPlayer() or (target:Team() == TEAM_SURVIVOR and not IsPlayerHoldingBaby(target, false))) then
+			local dmg = DamageInfo()
+			dmg:SetDamageType(DMG_SLASH)
+			dmg:SetAttacker(slasher)
+			dmg:SetInflictor(slasher)
+			dmg:SetDamage(damage)
+			dmg:SetDamageForce(Vector(1, 1, 1)) -- required or else warnings are spammed
+			dmg:SetDamagePosition(tr.HitPos) -- required or else warnings are spammed
+			target:TakeDamageInfo(dmg)
+		end
+
 
 		if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
 			SLASHER.Maul(slasher, target)
@@ -349,11 +415,11 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("PrincessMaulingChild") then
 		return
 	end
@@ -386,10 +452,10 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local maul_child = ply:GetNWBool("PrincessMaulingChild")
 	local maul_normal = ply:GetNWBool("PrincessMaulingBase")
@@ -443,7 +509,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/princess_step" .. math.random(1, 3) .. ".mp3")
 
@@ -464,7 +530,7 @@ local maulTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_17"))
 	hud:SetTitle("Princess")
 
@@ -486,10 +552,10 @@ SLASHER.InitHud = function(_, hud)
 
 		self.SniffPos = table.Random(sniffables):WorldSpaceCenter()
 
-		local inaccuracy = math.max(self.SniffPos:Distance(LocalPlayer():GetPos()) / 12, 50)
+		local inaccuracy = math.max(self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) / 12, 50)
 		self.SniffRandom = VectorRand(-inaccuracy, inaccuracy)
 		hook.Add("HUDPaint", "SlashCoSniff", function()
-			if LocalPlayer():Team() ~= TEAM_SLASHER or self.SniffPos:Distance(LocalPlayer():GetPos()) < 150 then
+			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not self.SniffPos or self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) < 150 then
 				hook.Remove("HUDPaint", "SlashCoSniff")
 				return
 			end
@@ -505,7 +571,7 @@ SLASHER.InitHud = function(_, hud)
 
 	hud.prevThresh = -1
 	function hud.AlsoThink()
-		local thresh = LocalPlayer():GetNWInt("PrincessAggressionThres")
+		local thresh = GameData.LocalPlayer:GetNWInt("PrincessAggressionThres")
 		if thresh ~= hud.prevThresh then
 			hud:SetMeterMax("aggro", thresh)
 			hud.prevThresh = thresh
@@ -513,7 +579,7 @@ SLASHER.InitHud = function(_, hud)
 	end
 end
 
-SLASHER.PreDrawHalos = function()
+function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_baby"), nil, 2, false)
 
 	local plyWithItem = {}

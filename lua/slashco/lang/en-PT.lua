@@ -1,7 +1,7 @@
 --[[
 
-    Language: en, (Pirate English), (Pirate English)
-    "Translator": Kōfuku
+	Language: en, (Pirate English), (Pirate English)
+	"Translator": Kōfuku
 
 ]]
 
@@ -567,6 +567,7 @@ SlashCo.LangTable["points_left_behind"] = "[%s] LEFT BEHIND"
 SlashCo.LangTable["points_survive"] = "[%s] SURVIVED"
 
 SlashCo.LangTable["points_item"] = "[%s] ITEM BUY-BACK" --misc points
-SlashCo.LangTable["points_fast"] = "[%s] SWIFT SUCCESS"
+SlashCo.LangTable["points_quickescape"] = "[%s] QUICK ESCAPE"
+SlashCo.LangTable["points_slowescape"] = "[%s] SLOW ESCAPE"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] DOIN' YER JOB"

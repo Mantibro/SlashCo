@@ -2,7 +2,7 @@ hook.Add("PlayerButtonDown", "SpectatorFunctions", function(ply, button)
 	if ply:Team() ~= TEAM_SPECTATOR then
 		return
 	end
-	if not GetGlobalBool("SpectatorsCanPing") then
+	if not GetGlobal2Bool("SpectatorsCanPing") then
 		return
 	end
 	if button ~= MOUSE_MIDDLE then

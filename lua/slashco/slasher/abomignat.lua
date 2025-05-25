@@ -1,6 +1,10 @@
 local SLASHER = {}
 
 SLASHER.Name = "Abomignat"
+SLASHER.Aliases = {
+	"The Alien",
+	"The Rat",
+}
 SLASHER.ID = 11
 SLASHER.Class = 1
 SLASHER.DangerLevel = 1
@@ -18,7 +22,7 @@ SLASHER.ChaseRadius = 0.82
 SLASHER.ChaseDuration = 5.0
 SLASHER.ChaseCooldown = 5
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/abomignat_chase.wav"
+SLASHER.ChaseMusic = "slashco/slasher/abomignat_chase.mp3"
 SLASHER.KillSound = ""
 SLASHER.Description = "Abomignat_desc"
 SLASHER.ProTip = "Abomignat_tip"
@@ -26,13 +30,13 @@ SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★★☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
-SLASHER.OnSpawn = function(slasher)
-	slasher:PlayGlobalSound("slashco/slasher/abomignat_breathing.wav", 65, nil, true)
+function SLASHER.OnSpawn(slasher)
+	slasher:PlayGlobalSound("slashco/slasher/abomignat_breathing.mp3", 65, nil, true)
 	slasher.AbomignatKills = 0
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	--local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnTickBehaviour(slasher)
+	--local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	v1 = slasher.SlasherValue1 --Main Slash Cooldown
 	v2 = slasher.SlasherValue2 --Forward charge
@@ -167,8 +171,8 @@ function SLASHER.HandleDOT(slasher, target)
 	target.AbomignatProcs = target.AbomignatProcs + 3
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnPrimaryFire(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher:GetNWBool("AbomignatCrawling") then
 		return
@@ -188,7 +192,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 	slasher:SlasherHudFunc("ShakeControl", "LMB")
 
 	local function SlashFinish()
-		slasher:EmitSound("slashco/slasher/trollge_swing.wav")
+		slasher:EmitSound("slashco/slasher/trollge_swing.mp3")
 		slasher:Freeze(true)
 		slasher.SlasherValue2 = 0
 
@@ -218,18 +222,18 @@ SLASHER.OnPrimaryFire = function(slasher)
 			bloodfx:SetOrigin(vPoint)
 			util.Effect("BloodImpact", bloodfx)
 
-			target:EmitSound("slashco/slasher/trollge_hit.wav")
+			target:EmitSound("slashco/slasher/trollge_hit.mp3")
 		end
 	end
 
 	timer.Create(slasher:EntIndex() .. "_AbomignatSlash", 1, 1, SlashFinish)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("AbomignatCrawling") then
 		slasher:SetNWBool("AbomignatCrawling", false)
 		slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
@@ -265,8 +269,8 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnSpecialAbilityFire(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher:GetNWBool("AbomignatCrawling") then
 		return
@@ -310,7 +314,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	end)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	local abomignat_mainslash = ply:GetNWBool("AbomignatSlashing")
@@ -365,7 +369,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/abomignat_step" .. math.random(1, 3) .. ".mp3")
 		return true
@@ -379,7 +383,7 @@ local controlTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_11"))
 	hud:SetTitle("Abomignat")
 

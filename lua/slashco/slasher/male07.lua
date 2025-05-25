@@ -18,7 +18,7 @@ SLASHER.ChaseRadius = 0.9
 SLASHER.ChaseDuration = 5.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/male07_chase.wav"
+SLASHER.ChaseMusic = "slashco/slasher/male07_chase.mp3"
 SLASHER.KillSound = "slashco/slasher/male07_kill.mp3"
 SLASHER.Description = "Male07_desc"
 SLASHER.ProTip = "Male07_tip"
@@ -26,12 +26,21 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher.SlasherValue1 = 1
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+local monsterModelName = "models/slashco/slashers/male_07/male_07_monster.mdl"
+local maleModelName = "models/Humans/Group01/male_07.mdl"
+local plateModelName = "models/hunter/plates/plate.mdl"
+function SLASHER.Precache()
+	SlashCo.PrecacheModel(monsterModelName)
+	SlashCo.PrecacheModel(maleModelName)
+	SlashCo.PrecacheModel(plateModelName)
+end
+
+function SLASHER.OnTickBehaviour(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --State
 	local v2 = slasher.SlasherValue2 --Time Spent Human Chasing
@@ -96,9 +105,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 					2)) * (1 + SO) then
 				--Become Monster
 
-				local modelname = "models/slashco/slashers/male_07/male_07_monster.mdl"
-				util.PrecacheModel(modelname)
-				slasher:SetModel(modelname)
+				slasher:SetModel(monsterModelName)
 
 				slasher:SetNWBool("Male07Transforming", true)
 				slasher:SetNWBool("Male07Slashing", false)
@@ -138,13 +145,13 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", perception_final)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher.SlasherValue1 == 1 then
 		SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
-	local SO = SlashCo.CurRound.OfferingData.SO
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher.SlasherValue1 == 0 then
 		return
@@ -156,7 +163,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 		slasher.SlasherValue4 = 2
 
 		timer.Simple(0.5, function()
-			slasher:EmitSound("slashco/slasher/trollge_swing.wav")
+			slasher:EmitSound("slashco/slasher/trollge_swing.mp3")
 
 			if SERVER then
 				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
@@ -176,7 +183,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 					bloodfx:SetOrigin(vPoint)
 					util.Effect("BloodImpact", bloodfx)
 
-					target1:EmitSound("slashco/slasher/trollge_hit.wav")
+					target1:EmitSound("slashco/slasher/trollge_hit.mp3")
 				end
 
 				SlashCo.BustDoor(slasher, target, 30000)
@@ -193,11 +200,11 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher, target)
+function SLASHER.OnMainAbilityFire(slasher, target)
 	if slasher.SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then
 		return
 	end
@@ -209,9 +216,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		slasher:SetEyeAngles(target:EyeAngles())
 		target:Remove()
 
-		local modelname = "models/Humans/Group01/male_07.mdl"
-		util.PrecacheModel(modelname)
-		slasher:SetModel(modelname)
+		slasher:SetModel(maleModelName)
 
 		slasher:SetColor(Color(255, 255, 255, 255))
 		slasher:DrawShadow(true)
@@ -230,9 +235,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 	end
 
 	if slasher.SlasherValue1 > 0 then
-		local modelname = "models/hunter/plates/plate.mdl"
-		util.PrecacheModel(modelname)
-		slasher:SetModel(modelname)
+		slasher:SetModel(plateModelName)
 
 		slasher:SetVisible(false)
 
@@ -249,7 +252,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 	end
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local male_slashing = ply:GetNWBool("Male07Slashing")
 	local male_transforming = ply:GetNWBool("Male07Transforming")
 	local chase = ply:GetNWBool("InSlasherChaseMode")
@@ -274,7 +277,7 @@ SLASHER.Animator = function(ply)
 			ply.CalcIdeal = ACT_IDLE
 			ply.CalcSeqOverride = ply:LookupSequence("idle_all")
 		end
-	elseif ply:GetModel() == "models/slashco/slashers/male_07/male_07_monster.mdl" then
+	elseif ply:GetModel() == monsterModelName then
 		if not male_slashing and not male_transforming then
 			ply.anim_antispam = false
 		end
@@ -309,7 +312,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.OnItemSpawn = function()
+function SLASHER.OnItemSpawn()
 	local diff = SlashCo.CurRound.Difficulty
 
 	for _ = 1, (math.random(0, 6) + (10 * SlashCo.MapSize) + (diff * 4)) do
@@ -317,7 +320,7 @@ SLASHER.OnItemSpawn = function()
 	end
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		if ply:GetModel() == "models/hunter/plates/plate.mdl" then
 			return true
@@ -341,20 +344,20 @@ local avatarTable = {
 	monster = Material("slashco/ui/icons/slasher/s_6_s2")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Male07")
 
 	hud:AddControl("R", "possess vessel", possessTable)
 	hud:ChaseAndKill()
 
-	hud.prevState = not LocalPlayer():GetNWInt("Male07State")
+	hud.prevState = not GameData.LocalPlayer:GetNWInt("Male07State")
 	hud.prevPossess = true
 	function hud.AlsoThink()
-		local target = LocalPlayer():GetEyeTrace().Entity
-		local curState = LocalPlayer():GetNWInt("Male07State")
+		local target = GameData.LocalPlayer:GetEyeTrace().Entity
+		local curState = GameData.LocalPlayer:GetNWInt("Male07State")
 
-		if target:GetClass() == "sc_maleclone" and LocalPlayer():GetPos():Distance(target:GetPos()) < 150
+		if target:GetClass() == "sc_maleclone" and GameData.LocalPlayer:GetPos():Distance(target:GetPos()) < 150
 				or curState ~= 0 then
 			if not hud.prevPossess then
 				hud:SetControlEnabled("R", true)
@@ -408,23 +411,23 @@ end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Male07") == true then
-			if LocalPlayer().male_f == nil then
-				LocalPlayer().male_f = 0
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Male07") == true then
+			if GameData.LocalPlayer.male_f == nil then
+				GameData.LocalPlayer.male_f = 0
 			end
-			LocalPlayer().male_f = LocalPlayer().male_f + (FrameTime() * 20)
-			if LocalPlayer().male_f > 49 then
+			GameData.LocalPlayer.male_f = GameData.LocalPlayer.male_f + (FrameTime() * 20)
+			if GameData.LocalPlayer.male_f > 49 then
 				return
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_6")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().male_f))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.male_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().male_f = nil
+			GameData.LocalPlayer.male_f = nil
 		end
 	end)
 end

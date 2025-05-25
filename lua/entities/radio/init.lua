@@ -10,9 +10,9 @@ util.AddNetworkString( "radio" )
 function ENT:Initialize()
  
 	self:SetModel( "models/props/cs_office/radio.mdl" )
-	self:PhysicsInit( SOLID_VPHYSICS )      
+	self:PhysicsInit( SOLID_VPHYSICS )	  
 	self:SetMoveType( MOVETYPE_NONE )  
-	self:SetSolid( SOLID_VPHYSICS )      
+	self:SetSolid( SOLID_VPHYSICS )	  
 	
 
 
@@ -23,8 +23,8 @@ local NextPrintTime = 0
 function ENT:Use( activator, caller )
 
 
-    if (CurTime() >= NextPrintTime) then
-       
+	if (CurTime() >= NextPrintTime) then
+	   
 		net.Start( "radio" )
 		net.WriteEntity( self )
 	net.Send( activator )
@@ -32,7 +32,7 @@ function ENT:Use( activator, caller )
 	NextPrintTime = CurTime() + 1
 	
 
-    end
+	end
 end
  
 //Gonna have to redo the code for this, but its whatever

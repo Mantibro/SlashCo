@@ -1,4 +1,4 @@
-net.Receive("mantiSlashCoPickingSlasher", function()
+net.Receive("mantislashco_PickingSlasher", function()
 	readtable = net.ReadTable()
 
 	SlasherIcon = "slashco/ui/icons/slasher/s_0"
@@ -26,7 +26,7 @@ function HideSelection()
 end
 
 function SlasherChosen(My_Pick)
-	net.Start("mantiSlashCoSelectSlasher")
+	net.Start("mantislashco_SelectSlasher")
 	net.WriteTable({pick = My_Pick})
 	net.SendToServer()
 
@@ -35,7 +35,7 @@ end
 
 
 function DrawTheSlasherSelectorBox()
-	if LocalPlayer():SteamID64() ~= readtable.slashersteamid then return end
+	if GameData.LocalSteamID64 ~= readtable.slashersteamid then return end
 
 	local SlasherPickingID = 0
 	local SlasherPickingCLASS = 0
@@ -71,7 +71,7 @@ function DrawTheSlasherSelectorBox()
 		local Slash = vgui.Create("DButton", SlasherSelectFrame)
 		function Slash.DoClick()
 			SelectThisSlasher(k)
-			LocalPlayer():EmitSound("slashco/slasher_preview.mp3")
+			GameData.LocalPlayer:EmitSound("slashco/slasher_preview.mp3")
 		end
 		Slash:SetPos(30 + x, 30 + y)
 		Slash:SetSize(icon_size, icon_size)
@@ -95,7 +95,7 @@ function DrawTheSlasherSelectorBox()
 			Slash:SetPos((30 + x) - icon_size * 0.06, (30 + y) - icon_size * 0.06)
 		end
 
-		Slash.Paint = function(self, w, h)
+		function Slash.Paint(self, w, h)
 			if is_available then
 				surface.SetMaterial(Material("slashco/ui/icons/slasher/s_" .. SlashCoSlashers[k].ID))
 			else
@@ -116,12 +116,12 @@ function DrawTheSlasherSelectorBox()
 	end
 
 	local confirmselect = vgui.Create("DButton", SlasherSelectFrame)
-	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() LocalPlayer():EmitSound("slashco/slasher_select.mp3") end
+	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() GameData.LocalPlayer:EmitSound("slashco/slasher_select.mp3") end
 	confirmselect:SetPos(ScrW() / 2, ScrH() / 1.1)
 	confirmselect:SetSize(ScrW() / 4, 40)
 	confirmselect:SetText(SlashCo.Language("ItemConfirm"))
 	confirmselect:SetFont("MenuFont2")
-	confirmselect.Paint = function(self, w, h)
+	function confirmselect.Paint(self, w, h)
 		draw.RoundedBox(0, 0, 0, w, h, Color(255, 0, 0, 255))
 	end
 
@@ -142,7 +142,7 @@ function DrawTheSlasherSelectorBox()
 	SlasherSelectFrame:SetKeyboardInputEnabled(false)
 	SlasherSelectFrame:SetDraggable(false)
 	SlasherSelectFrame:ShowCloseButton(false)
-	SlasherSelectFrame.Paint = function(self, w, h)
+	function SlasherSelectFrame.Paint(self, w, h)
 		draw.RoundedBox(0, 0, 0, w, h, color_black)
 	end
 
@@ -227,13 +227,13 @@ local Fun = {
 
 
 hook.Add("PlayerButtonDown", "TheCoder", function(ply, key)
-	if ply ~= LocalPlayer() then return end
+	if ply ~= GameData.LocalPlayer then return end
 	if not IsFirstTimePredicted() then return end
 
 	if IsValid(SlasherSelectFrame) then
 		if key == Fun.Sequence[Fun.CurInput] then
 			Fun.CurInput = Fun.CurInput + 1
-			ply:EmitSound("slashco/blip.wav")
+			ply:EmitSound("slashco/blip.mp3")
 			if Fun.CurInput > 11 then
 				ply:ChatPrint("You unleashed the Beast.")
 				ply:EmitSound("slashco/slasher/leuonard_yell1.mp3")

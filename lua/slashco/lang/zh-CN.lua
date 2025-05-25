@@ -1,7 +1,7 @@
 --[[
 
-    Language: zh-CN, (Simplified Chinese), (简体中文)
-    Translator: 随波逐流
+	Language: zh-CN, (Simplified Chinese), (简体中文)
+	Translator: 随波逐流
 
 ]]
 

@@ -6,10 +6,10 @@ ITEM.EntClass = "sc_benadryl"
 ITEM.Price = 30
 ITEM.Description = "Benadryl_desc"
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.DisplayColor = function()
+function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
-ITEM.OnUse = function(ply)
+function ITEM.OnUse(ply)
 	ply:AddPoints("benadryl")
 	ply:EmitSound("slashco/survivor/benadryl_eat.mp3")
 
@@ -96,17 +96,17 @@ end
 
 local rand = 0
 hook.Add("RenderScreenspaceEffects", "Benadryl", function()
-	if LocalPlayer():GetNWBool("SurvivorBenadryl") then
-		if not LocalPlayer().BenadrylIntensity then
-			LocalPlayer().BenadrylIntensity = RealFrameTime()
+	if GameData.LocalPlayer:GetNWBool("SurvivorBenadryl") then
+		if not GameData.LocalPlayer.BenadrylIntensity then
+			GameData.LocalPlayer.BenadrylIntensity = RealFrameTime()
 		end
 
-		LocalPlayer().BenadrylIntensity = LocalPlayer().BenadrylIntensity + (RealFrameTime() / 277)
-		if LocalPlayer().BenadrylIntensity > 1 then
-			LocalPlayer().BenadrylIntensity = -1
+		GameData.LocalPlayer.BenadrylIntensity = GameData.LocalPlayer.BenadrylIntensity + (RealFrameTime() / 277)
+		if GameData.LocalPlayer.BenadrylIntensity > 1 then
+			GameData.LocalPlayer.BenadrylIntensity = -1
 		end
 
-		local freaker = math.min(math.abs(LocalPlayer().BenadrylIntensity) * 2, 1)
+		local freaker = math.min(math.abs(GameData.LocalPlayer.BenadrylIntensity) * 2, 1)
 		rand = rand + (math.random() / 3)
 		local contrast = 3.5 + math.sin((CurTime() + rand) / 10) * 3
 		local bloom = 3 + math.cos((CurTime() + rand) / 2) * 1
@@ -132,13 +132,13 @@ hook.Add("RenderScreenspaceEffects", "Benadryl", function()
 		DrawMotionBlur(freaker * 0.75 + (contrast * 0.08), freaker * 0.8, freaker * 0.07)
 		DrawSharpen(freaker * bloom, freaker * bloom)
 	else
-		LocalPlayer().BenadrylIntensity = 0
+		GameData.LocalPlayer.BenadrylIntensity = 0
 	end
 end)
 
 local BenadrylSound
 local CreateShadowPerson = function(pos, ang)
-	if not LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
+	if not GameData.LocalPlayer:GetNWBool("SurvivorBenadrylFull") then
 		return
 	end
 
@@ -161,7 +161,7 @@ local CreateShadowPerson = function(pos, ang)
 end
 
 hook.Add("Think", "Benadryl", function()
-	if LocalPlayer():GetNWBool("SurvivorBenadryl") then
+	if GameData.LocalPlayer:GetNWBool("SurvivorBenadryl") then
 		if not BenadrylSound then
 			sound.PlayFile("sound/slashco/benadryl_base.mp3", "noplay", function(music, errCode, errStr)
 				if IsValid(music) then
@@ -175,26 +175,26 @@ hook.Add("Think", "Benadryl", function()
 			end)
 		else
 			local vol = 0
-			if LocalPlayer().BenadrylIntensity then
-				vol = math.abs(LocalPlayer().BenadrylIntensity)
+			if GameData.LocalPlayer.BenadrylIntensity then
+				vol = math.abs(GameData.LocalPlayer.BenadrylIntensity)
 			end
 			BenadrylSound:SetVolume(vol)
 		end
 
-		if not LocalPlayer().ShadowManTick then
-			LocalPlayer().ShadowManTick = CurTime()
+		if not GameData.LocalPlayer.ShadowManTick then
+			GameData.LocalPlayer.ShadowManTick = CurTime()
 		end
 
 		local frequency = 0
 
-		if LocalPlayer().BenadrylIntensity then
-			frequency = math.abs(LocalPlayer().BenadrylIntensity)
+		if GameData.LocalPlayer.BenadrylIntensity then
+			frequency = math.abs(GameData.LocalPlayer.BenadrylIntensity)
 		end
 
-		if CurTime() - LocalPlayer().ShadowManTick > 3 - (frequency * 2) then
-			CreateShadowPerson(LocalPlayer():GetPos() + Vector(math.random(-750, 750), math.random(-750, 750),
+		if CurTime() - GameData.LocalPlayer.ShadowManTick > 3 - (frequency * 2) then
+			CreateShadowPerson(GameData.LocalPlayer:GetPos() + Vector(math.random(-750, 750), math.random(-750, 750),
 					math.random(50, 50)), Angle(0, math.random(1, 360), 0))
-			LocalPlayer().ShadowManTick = CurTime()
+			GameData.LocalPlayer.ShadowManTick = CurTime()
 		end
 	elseif IsValid(BenadrylSound) then
 		BenadrylSound:Stop()
@@ -203,21 +203,21 @@ hook.Add("Think", "Benadryl", function()
 end)
 
 hook.Add("HUDPaint", "Benadryl", function()
-	if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
-		if not LocalPlayer().BenadrylVisionTick then
-			LocalPlayer().BenadrylVisionTick = 10
+	if GameData.LocalPlayer:GetNWBool("SurvivorBenadrylFull") then
+		if not GameData.LocalPlayer.BenadrylVisionTick then
+			GameData.LocalPlayer.BenadrylVisionTick = 10
 		end
 
-		if not LocalPlayer().BenadrylVision then
-			LocalPlayer().BenadrylVision = math.random(0, 30)
+		if not GameData.LocalPlayer.BenadrylVision then
+			GameData.LocalPlayer.BenadrylVision = math.random(0, 30)
 		end
 
-		if LocalPlayer().BenadrylVisionTick < 1 then
+		if GameData.LocalPlayer.BenadrylVisionTick < 1 then
 
 			local Overlay = Material("slashco/ui/overlays/benadryl_visions")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().BenadrylVision))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.BenadrylVision))
 
-			Overlay:SetFloat("$alpha", LocalPlayer().BenadrylVisionTick / 8)
+			Overlay:SetFloat("$alpha", GameData.LocalPlayer.BenadrylVisionTick / 8)
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
@@ -225,11 +225,11 @@ hook.Add("HUDPaint", "Benadryl", function()
 
 		end
 
-		if LocalPlayer().BenadrylVisionTick < 0 then
-			LocalPlayer().BenadrylVision = math.random(0, 30)
-			LocalPlayer().BenadrylVisionTick = 1 + (math.random() * 5)
+		if GameData.LocalPlayer.BenadrylVisionTick < 0 then
+			GameData.LocalPlayer.BenadrylVision = math.random(0, 30)
+			GameData.LocalPlayer.BenadrylVisionTick = 1 + (math.random() * 5)
 		end
 
-		LocalPlayer().BenadrylVisionTick = LocalPlayer().BenadrylVisionTick - (RealFrameTime() * 1)
+		GameData.LocalPlayer.BenadrylVisionTick = GameData.LocalPlayer.BenadrylVisionTick - (RealFrameTime() * 1)
 	end
 end)

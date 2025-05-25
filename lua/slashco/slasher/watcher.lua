@@ -1,6 +1,10 @@
 local SLASHER = {}
 
 SLASHER.Name = "The Watcher"
+SLASHER.Aliases = {
+	"The Agent",
+	"Big Brother",
+}
 SLASHER.ID = 10
 SLASHER.Class = 3
 SLASHER.DangerLevel = 2
@@ -18,23 +22,39 @@ SLASHER.ChaseRadius = 0.96
 SLASHER.ChaseDuration = 2.0
 SLASHER.ChaseCooldown = 2
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/watcher_chase.wav"
-SLASHER.KillSound = "slashco/slasher/watcher_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/watcher/watchertheme_high.ogg"
+SLASHER.KillSound = "slashco/slasher/watcher/watcher_kill.mp3"
 SLASHER.Description = "Watcher_desc"
 SLASHER.ProTip = "Watcher_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★★★☆"
 SLASHER.DiffRating = "★★☆☆☆"
+SLASHER.AngerIncrease = 10 -- Anger increase of objectives being completed
+SLASHER.AngerPassiveGain = 0.05
+SLASHER.AngerChaseGain = 0
+SLASHER.AngerWatchingGain = 0.15 -- Anger thats gained per second when hes watching someone.
+SLASHER.MediumAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
+SLASHER.HighAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 100))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 100))
 	slasher:SetNWBool("CanChase", true)
 	slasher:SetNWBool("CanKill", true)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	--local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.Precache()
+	--SlashCo.PrecacheSound("slashco/slasher/watcher/watcher_rage.mp3")
+end
+
+function SLASHER.OnAngerTick(slasher)
+	if slasher:GetNWBool("WatcherStalking") then
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerWatchingGain)
+	end
+end
+
+function SLASHER.OnTickBehaviour(slasher)
+	--local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --Survey Length
 	local v2 = slasher.SlasherValue2 --Survey Cooldown
@@ -180,16 +200,16 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	SlashCo.Jumpscare(slasher, target)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnMainAbilityFire(slasher)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher.SlasherValue2 > 0 then
 		return
@@ -201,11 +221,11 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	slasher.SlasherValue1 = 10 + (SO * 10)
 	slasher.SlasherValue2 = 100 - (SO * 35)
 
-	slasher:PlayGlobalSound("slashco/slasher/watcher_locate.mp3", 100)
+	slasher:PlayGlobalSound("slashco/slasher/watcher/watcher_locate.mp3", 100)
 
 	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		p:SetNWBool("WatcherSurveyed", true)
-		p:EmitSound("slashco/slasher/watcher_see.mp3")
+		p:EmitSound("slashco/slasher/watcher/watcher_see.mp3")
 	end
 
 	timer.Simple(5 + (SO * 5), function()
@@ -215,8 +235,8 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
-	--local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnSpecialAbilityFire(slasher)
+	--local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if SlashCo.CurRound.GameProgress < (10 - (slasher.SlasherValue4 / 25)) then
 		return
@@ -229,10 +249,10 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	end
 
 	slasher:SetNWBool("WatcherRage", true)
-	slasher:PlayGlobalSound("slashco/slasher/watcher_rage.wav", 100)
+	slasher:PlayGlobalSound("slashco/slasher/watcher/watcher_rage.mp3", 100)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:IsOnGround() then
@@ -250,9 +270,16 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("npc/footsteps/hardboot_generic" .. math.random(1, 6) .. ".wav", 50, 90, 0.75)
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/watcher/watcher_boot" .. idx .. ".mp3",
+			identifier = "WatcherFootstep" .. idx,
+			soundLevel = 100,
+			entity = ply,
+			volume = 1,
+		})
 		return false
 	end
 
@@ -267,13 +294,13 @@ local surveyTable = {
 }
 
 local function canSurveil()
-	return LocalPlayer():GetNWInt("GameProgressDisplay") > (10 - (LocalPlayer():GetNWInt("WatcherStalkTime") / 25))
-			and not LocalPlayer():GetNWBool("WatcherRage") and team.NumPlayers(TEAM_SURVIVOR) > 1
+	return GameData.LocalPlayer:GetNWInt("GameProgressDisplay") > (10 - (GameData.LocalPlayer:GetNWInt("WatcherStalkTime") / 25))
+			and not GameData.LocalPlayer:GetNWBool("WatcherRage") and team.NumPlayers(TEAM_SURVIVOR) > 1
 end
 
 local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 local red = Color(255, 0, 0)
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_10"))
 	hud:SetTitle("Watcher")
 
@@ -293,22 +320,22 @@ SLASHER.InitHud = function(_, hud)
 	end
 
 	function hud.TitleCard.Label:PaintOver()
-		draw.SimpleText("STALK TIME: " .. math.Round(LocalPlayer():GetNWInt("WatcherStalkTime"), 1), "TVCD", 4, 18, red)
+		draw.SimpleText("STALK TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("WatcherStalkTime"), 1), "TVCD", 4, 18, red)
 	end
 
 	hook.Add("HUDPaint", "SlashCoWatcher", function()
-		if LocalPlayer():Team() ~= TEAM_SLASHER then
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			hook.Remove("HUDPaint", "SlashCoWatcher")
 			return
 		end
 
-		if LocalPlayer():GetNWBool("WatcherWatched") then
+		if GameData.LocalPlayer:GetNWBool("WatcherWatched") then
 			draw.SimpleText("YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
 					Color(255, 0, 0, 255),
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		end
 
-		if LocalPlayer():GetNWBool("WatcherStalking") then
+		if GameData.LocalPlayer:GetNWBool("WatcherStalking") then
 			draw.SimpleText("OBSERVING A SURVIVOR. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
 					Color(255, 0, 0, 255),
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
@@ -334,7 +361,7 @@ end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Watcher") == true then
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Watcher") == true then
 			local Overlay = Material("slashco/ui/overlays/watcher_see")
 
 			Overlay:SetFloat("$alpha", 1)
@@ -344,23 +371,23 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		end
 
-		if LocalPlayer():GetNWBool("WatcherSurveyed") == true then
-			if LocalPlayer().al_watch == nil then
-				LocalPlayer().al_watch = 0
+		if GameData.LocalPlayer:GetNWBool("WatcherSurveyed") == true then
+			if GameData.LocalPlayer.al_watch == nil then
+				GameData.LocalPlayer.al_watch = 0
 			end
-			if LocalPlayer().al_watch < 100 then
-				LocalPlayer().al_watch = LocalPlayer().al_watch + (FrameTime() * 100)
+			if GameData.LocalPlayer.al_watch < 100 then
+				GameData.LocalPlayer.al_watch = GameData.LocalPlayer.al_watch + (FrameTime() * 100)
 			end
 
 			local Overlay = Material("slashco/ui/overlays/watcher_see")
 
-			Overlay:SetFloat("$alpha", 1 - (LocalPlayer().al_watch / 100))
+			Overlay:SetFloat("$alpha", 1 - (GameData.LocalPlayer.al_watch / 100))
 
 			surface.SetDrawColor(255, 255, 255, 60)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().al_watch = nil
+			GameData.LocalPlayer.al_watch = nil
 		end
 	end)
 end

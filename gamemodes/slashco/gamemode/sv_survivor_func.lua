@@ -6,18 +6,22 @@ local function survivorButtons(ply, button)
 			ply:SetNWBool("Taunt_Cali", false)
 		end
 	end
+
 	if button == KEY_R then
 		SlashCo.UseItem(ply)
 		return
 	end --Using their Item
+
 	if button == KEY_Q then
 		SlashCo.DropItem(ply)
 		return
 	end --Dropping their Item
+
 	if button == MOUSE_MIDDLE then
 		ply:SurvivorPing()
 		return
 	end
+
 	if button == KEY_1 then
 		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
 			return
@@ -30,6 +34,7 @@ local function survivorButtons(ply, button)
 		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
 		return
 	end
+
 	if button == KEY_2 then
 		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
 			return
@@ -42,6 +47,7 @@ local function survivorButtons(ply, button)
 		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
 		return
 	end
+
 	if button == KEY_3 then
 		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
 			return
@@ -178,6 +184,7 @@ function PLAYER:SurvivorPing()
 			if not input then
 				continue
 			end
+
 			if v.EntClass == class then
 				sayPrompt(self, string.sub(input, 4))
 				ping_info.Name = v.Name
@@ -187,10 +194,10 @@ function PLAYER:SurvivorPing()
 	end
 
 	ping_info.Entity = look
-	net.Start("mantislashcoSurvivorPings")
-	net.WriteTable(ping_info)
-	local players = team.GetPlayers(TEAM_SURVIVOR)
-	table.Add(players, team.GetPlayers(TEAM_SPECTATOR))
+	net.Start("mantislashco_SurvivorPings")
+		net.WriteTable(ping_info)
+		local players = team.GetPlayers(TEAM_SURVIVOR)
+		table.Add(players, team.GetPlayers(TEAM_SPECTATOR))
 	net.Send(players)
 end
 
@@ -226,7 +233,7 @@ function PLAYER:SlamDoor(door_ent)
 end
 
 function sayPrompt(ply, input)
-	if game.GetMap() == "sc_lobby" and SlashCo.LobbyData.LOBBYSTATE == 2 then
+	if GameData.IsLobby and SlashCo.LobbyData.LOBBYSTATE == 2 then
 		return
 	end
 

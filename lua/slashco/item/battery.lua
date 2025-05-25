@@ -8,7 +8,7 @@ ITEM.Description = "Battery_desc"
 ITEM.CamPos = Vector(80,0,0)
 ITEM.IsSpawnable = false
 ITEM.IsBattery = true
-ITEM.OnDrop = function(ply)
+function ITEM.OnDrop(ply)
 	return 55
 end
 ITEM.ViewModel = {

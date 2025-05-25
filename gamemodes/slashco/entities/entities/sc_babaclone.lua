@@ -14,6 +14,10 @@ ENT.PingType = "SLASHER"
 
 ENT.AutomaticFrameAdvance = true
 
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "CloneTripped")
+end
+
 if SERVER then
 	function ENT:UpdateTransmitState()
 		return TRANSMIT_ALWAYS
@@ -27,7 +31,7 @@ if SERVER then
 		self:SetColor(color_transparent)
 		self:SetRenderMode(RENDERMODE_TRANSALPHA)
 
-		self:SetNWBool("CloneTripped", false)
+		self:SetCloneTripped(false)
 
 		timer.Simple(0.1, function()
 			self:ResetSequence("prowl")
@@ -36,20 +40,28 @@ if SERVER then
 		end)
 	end
 
+	local offset = Vector(0, 0, 40)
 	function ENT:Think()
-		if not SlashCo.CurRound.SlasherEntities[self:EntIndex()] then
+		local entIndex = self:EntIndex()
+		if not SlashCo.CurRound.SlasherEntities[entIndex] then
 			self:Remove()
 			return
 		end
-
+		
+		local endPosTr = self:LocalToWorld(offset)
+		endPosTr:Add(self:GetForward())
+		endPosTr:Mult(1150)
 		local tr = util.TraceLine({
-		start = self:LocalToWorld(Vector(0, 0, 40)),
-		endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetForward() * 1150
+			start = self:LocalToWorld(offset),
+			endpos = endPosTr
 		})
-
+		
+		local endPosGround = self:LocalToWorld(offset)
+		endPosGround:Add(self:GetUp())
+		endPosGround:Mult(-10000)
 		local ground = util.TraceLine({
-			start = self:LocalToWorld(Vector(0, 0, 40)),
-			endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetUp() * -10000
+			start = self:LocalToWorld(offset),
+			endpos = endPosGround
 		})
 
 		if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SURVIVOR and not self.activateWalk and SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook == false then
@@ -58,13 +70,16 @@ if SERVER then
 		end
 
 		if self.activateWalk == true then
-			if SlashCo.CurRound.SlasherEntities[self:EntIndex()].PostActivation == false then
-				for s = 1, #team.GetPlayers(TEAM_SLASHER) do local sl = team.GetPlayers(TEAM_SLASHER)[s] sl:ChatPrint("A Bababooey Clone has been tripped!") end
+			if SlashCo.CurRound.SlasherEntities[entIndex].PostActivation == false then
+				for s = 1, #team.GetPlayers(TEAM_SLASHER) do
+					local sl = team.GetPlayers(TEAM_SLASHER)[s]
+					sl:ChatPrint("A Bababooey Clone has been tripped!")
+				end
 			end
 
-			SlashCo.CurRound.SlasherEntities[self:EntIndex()].PostActivation = true
+			SlashCo.CurRound.SlasherEntities[entIndex].PostActivation = true
 
-			self:SetNWBool("CloneTripped", true)
+			self:SetCloneTripped(true)
 
 			self:DrawShadow(true)
 			self:SetColor(color_white)
@@ -75,19 +90,22 @@ if SERVER then
 			self:SetPos(Vector(self:GetPos()[1],self:GetPos()[2],ground.HitPos[3]))
 
 			local etr = util.TraceLine({
-				start = self:LocalToWorld(Vector(0, 0, 40)),
-				endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetForward() * 30
+				start = self:LocalToWorld(offset),
+				endpos = self:LocalToWorld(offset) + self:GetForward() * 30
 			})
 
-			if etr.Hit then table.RemoveByValue(SlashCo.CurRound.SlasherEntities, self:EntIndex()) self:Remove()  end
-		elseif SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook == true then
-			if SlashCo.CurRound.SlasherEntities[self:EntIndex()].PostActivation == false then
-				for s = 1, #team.GetPlayers(TEAM_SLASHER) do local sl = team.GetPlayers(TEAM_SLASHER)[s] sl:ChatPrint("A Bababooey Clone has been tripped!") end
+			if etr.Hit then table.RemoveByValue(SlashCo.CurRound.SlasherEntities, entIndex) self:Remove()  end
+		elseif SlashCo.CurRound.SlasherEntities[entIndex].activateSpook == true then
+			if SlashCo.CurRound.SlasherEntities[entIndex].PostActivation == false then
+				for s = 1, #team.GetPlayers(TEAM_SLASHER) do
+					local sl = team.GetPlayers(TEAM_SLASHER)[s]
+					sl:ChatPrint("A Bababooey Clone has been tripped!")
+				end
 			end
 
-			if SlashCo.CurRound.SlasherEntities[self:EntIndex()].PostActivation == true then return end
+			if SlashCo.CurRound.SlasherEntities[entIndex].PostActivation == true then return end
 
-			self:SetNWBool("CloneTripped", true)
+			self:SetCloneTripped(true)
 
 			self:EmitSound("slashco/slasher/baba_reveal.mp3")
 
@@ -99,10 +117,10 @@ if SERVER then
 			self:ResetSequence("spook")
 			self:SetPlaybackRate(2)
 
-			SlashCo.CurRound.SlasherEntities[self:EntIndex()].PostActivation = true
+			SlashCo.CurRound.SlasherEntities[entIndex].PostActivation = true
 
 			timer.Simple(1.75, function()
-				table.RemoveByValue(SlashCo.CurRound.SlasherEntities, self:EntIndex())
+				table.RemoveByValue(SlashCo.CurRound.SlasherEntities, entIndex)
 				self:Remove()
 			end)
 		end
@@ -111,7 +129,7 @@ if SERVER then
 			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
 
 			if ply:GetPos():Distance(self:GetPos()) < 150 then
-				SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook = true
+				SlashCo.CurRound.SlasherEntities[entIndex].activateSpook = true
 				self:SetAngles(Angle(0, (ply:GetPos() - self:GetPos()):Angle()[2], 0))
 			end
 		end

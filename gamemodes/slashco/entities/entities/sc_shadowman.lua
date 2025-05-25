@@ -42,14 +42,14 @@ function ENT:Initialize()
 	self.Speed = 0.5 + math.random() * 1.5
 	self.Sound = math.random(1, 2)
 
-	if LocalPlayer().BenadrylIntensity then
+	if GameData.LocalPlayer.BenadrylIntensity then
 		self:EmitSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3", 60 + math.random(1, 80), 100,
-				(math.random() * 2) * LocalPlayer().BenadrylIntensity)
+				(math.random() * 2) * GameData.LocalPlayer.BenadrylIntensity)
 	end
 end
 
 function ENT:Think()
-	if not LocalPlayer().BenadrylIntensity then
+	if not GameData.LocalPlayer.BenadrylIntensity then
 		return
 	end
 
@@ -64,7 +64,7 @@ function ENT:Think()
 		return
 	end
 
-	self:SetColor(Color(0, 0, 0, math.abs(LocalPlayer().BenadrylIntensity) * 255))
+	self:SetColor(Color(0, 0, 0, math.abs(GameData.LocalPlayer.BenadrylIntensity) * 255))
 
 	if not IsValid(self.TargetThing) then
 		self.TargetThing = ents.FindByClass("sc_gascan")[math.random(1, #ents.FindByClass("sc_gascan"))]
@@ -101,7 +101,7 @@ function ENT:Think()
 		self.Cycle = CurTime()
 	end
 
-	if not LocalPlayer():GetNWBool("SurvivorBenadryl") then
+	if not GameData.LocalPlayer:GetNWBool("SurvivorBenadryl") then
 		self:StopSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3")
 		self:Remove()
 	end

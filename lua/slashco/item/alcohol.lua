@@ -7,7 +7,7 @@ ITEM.Description = "Unfortunate."
 ITEM.CamPos = Vector(30, 0, 0)
 ITEM.ReplacesWorldProps = true
 ITEM.IsSpawnable = true
-ITEM.OnUse = function(ply)
+function ITEM.OnUse(ply)
 	ply:EmitSound("slashco/survivor/soda_drink" .. math.random(1, 2) .. ".mp3")
 	ply:AddEffect("Buzzed", 45)
 end

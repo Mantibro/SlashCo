@@ -1,7 +1,7 @@
 --[[
 
-    Language: pt-PT, (Portuguese (Portugal)), (Português)
-    Translator: Felipaquee, Emily The Fennec
+	Language: pt-PT, (Portuguese (Portugal)), (Português)
+	Translator: Felipaquee, Emily The Fennec
 
 ]]
 

@@ -13,27 +13,27 @@ ENT.Instructions = ""
 ENT.PingType = "ITEM STASH"
 
 if SERVER then
-    function ENT:UpdateTransmitState()
-        return TRANSMIT_ALWAYS
-    end
+	function ENT:UpdateTransmitState()
+		return TRANSMIT_ALWAYS
+	end
 
-    function ENT:Initialize()
-        self:SetModel("models/hunter/blocks/cube2x3x025.mdl")
-        self:SetSolid(SOLID_VPHYSICS)
-        self:PhysicsInit(SOLID_VPHYSICS)
-        self:SetMoveType(MOVETYPE_NONE)
-        self:SetUseType(SIMPLE_USE)
-        self:SetColor(color_transparent)
-        self:SetRenderMode(RENDERMODE_TRANSCOLOR)
-    end
+	function ENT:Initialize()
+		self:SetModel("models/hunter/blocks/cube2x3x025.mdl")
+		self:SetSolid(SOLID_VPHYSICS)
+		self:PhysicsInit(SOLID_VPHYSICS)
+		self:SetMoveType(MOVETYPE_NONE)
+		self:SetUseType(SIMPLE_USE)
+		self:SetColor(color_transparent)
+		self:SetRenderMode(RENDERMODE_TRANSCOLOR)
+	end
 
-    function ENT:Use(activator)
-        if activator:Team() == TEAM_SURVIVOR and not activator.CantBuy then
-            SlashCo.SendValue(activator, "openItemPicker")
-        end
-    end
+	function ENT:Use(activator)
+		if activator:Team() == TEAM_SURVIVOR and not activator.CantBuy then
+			SlashCo.SendValue(activator, "openItemPicker")
+		end
+	end
 else
-    function ENT:Draw()
-        self:DrawModel()
-    end
+	function ENT:Draw()
+		self:DrawModel()
+	end
 end

@@ -17,6 +17,17 @@ ENT.PingType = "HELICOPTER"
 --local plyCount = 0
 --local self.switch = false
 
+hook.Add("SlashCo:Precache", "PrecacheHelicopter", function()
+	SlashCo.PrecacheSound("slashco/helicopter_engine_distant.mp3")
+	SlashCo.PrecacheSound("slashco/helicopter_rotors_distant.mp3")
+	SlashCo.PrecacheSound("slashco/helicopter_engine_close.mp3")
+	SlashCo.PrecacheSound("slashco/helicopter_rotors_close.mp3")
+end)
+
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "Airborne")
+end
+
 function ENT:Initialize()
 	if SERVER then
 		self:SetModel(SlashCo.HelicopterModel)
@@ -47,10 +58,85 @@ function ENT:Initialize()
 		self.vel = self.vel or 0
 	end
 
-	self:EmitSound("slashco/helicopter_engine_distant.wav", 90, 150, 1, CHAN_STATIC)
-	self:EmitSound("slashco/helicopter_rotors_distant.wav", 150, 100, 1, CHAN_STATIC)
-	self:EmitSound("slashco/helicopter_engine_close.wav", 75, 150, 1, CHAN_STATIC)
-	self:EmitSound("slashco/helicopter_rotors_close.wav", 100, 100, 1, CHAN_STATIC)
+	if CLIENT then
+		self.pixvis = util.GetPixelVisibleHandle()
+	end
+
+	self:PlayHeliSounds()
+
+	for _, ent in ipairs(ents.FindByClass(self:GetClass())) do
+		if ent == self then continue end
+		
+		ent:Remove() -- Only allow a single helicopter to exist at once.
+	end
+
+	SlashCo.Helicopter = self
+end
+
+function ENT:OnRemove()
+	if CLIENT then
+		timer.Simple(0, function()
+			if IsValid(self) then return end
+
+			if SlashCo.Helicopter == self then
+				SlashCo.Helicopter = nil
+			end
+		end)
+	else
+		if SlashCo.Helicopter == self then
+			SlashCo.Helicopter = nil
+			self:QuietHeli()
+		end
+	end
+end
+
+function ENT:PlayHeliSounds()
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/helicopter_engine_distant.mp3",
+		identifier = "HelicopterEngineDistant",
+		soundLevel = 100,
+		looping = true,
+		entity = self,
+		volume = 2,
+		fadeIn = 1,
+	})
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/helicopter_rotors_distant.mp3",
+		identifier = "HelicopterRotorsDistant",
+		soundLevel = 120,
+		looping = true,
+		entity = self,
+		volume = 2,
+		fadeIn = 1,
+	})
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/helicopter_engine_close.mp3",
+		identifier = "HelicopterEngineClose",
+		soundLevel = 80,
+		looping = true,
+		entity = self,
+		volume = 2,
+		fadeIn = 1,
+	})
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/helicopter_rotors_close.mp3",
+		identifier = "HelicopterRotorsClose",
+		soundLevel = 90,
+		looping = true,
+		entity = self,
+		volume = 2,
+		fadeIn = 1,
+	})
+end
+
+function ENT:QuietHeli()
+	SlashCo.AudioSystem.StopSound("HelicopterEngineDistant", 0.5)
+	SlashCo.AudioSystem.StopSound("HelicopterRotorsDistant", 0.5)
+	SlashCo.AudioSystem.StopSound("HelicopterEngineClose", 0.5)
+	SlashCo.AudioSystem.StopSound("HelicopterRotorsClose", 0.5)
 end
 
 function sign(number)
@@ -63,25 +149,25 @@ if SERVER then
 	end
 
 	function ENT:Use(activator)
-		local availabilityHeli = false
+		--local availabilityHeli = false
 		local userEnteredAlready
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
-		if game.GetMap() ~= "sc_lobby" and not SlashCo.CurRound.EscapeHelicopterSummoned then
+		if not GameData.IsLobby and not SlashCo.CurRound.EscapeHelicopterSummoned then
 			return
 		end
 
-		if SatPlayers[SlashCo.MAXPLAYERS - 1] == nil then
+		--[[if SatPlayers[SlashCo.MAXPLAYERS - 1] == nil then
 			availabilityHeli = true
-		end
+		end]]
 
-		if activator:Team() ~= TEAM_SURVIVOR or not availabilityHeli then
+		if activator:Team() ~= TEAM_SURVIVOR --[[or not availabilityHeli]] then
 			return
 		end
 		--The Player is sat down in the helicopter
 
-		if activator:GetNWBool("DynamicFlashlight") then
-			activator:SetNWBool("DynamicFlashlight", false)
+		if activator:GetNW2Bool("DynamicFlashlight") then
+			activator:SetNW2Bool("DynamicFlashlight", false)
 		end
 
 		activator.CantBuy = true
@@ -96,6 +182,11 @@ if SERVER then
 
 		if not userEnteredAlready then
 			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
+
+			-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
+			activator:SetNW2Bool("QuickEscape", (CurTime() - GetGlobal2Float("SCStartTime")) < SlashCo.QuickEscapeTime)
+			activator:SetNW2Bool("SlowEscape", (CurTime() - GetGlobal2Float("SCStartTime")) > SlashCo.SlowEscapeTime)
+			activator:SetNW2Float("EscapeTime", CurTime() - GetGlobal2Float("SCStartTime"))
 		end
 
 		local vehicle = ents.Create("prop_vehicle_prisoner_pod")
@@ -171,17 +262,27 @@ if SERVER then
 		activator:EnterVehicle(vehicle)
 
 		if #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3
-				and SlashCo.LobbyData.LOBBYSTATE < 5 and GAMEMODE.State == GAMEMODE.States.LOBBY then
+				and SlashCo.LobbyData.LOBBYSTATE < 5 and SlashCo.State == SlashCo.States.LOBBY then
 			lobbyFinish()
 		end
 	end
 
 	function ENT:Think()
 		self:NextThink(CurTime())
+		self:DrawShadow(false) -- Loves to bug through the map.
 
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 		local plyCount = #SatPlayers
 		local TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
+
+		local phys = self:GetPhysicsObject()
+		if phys:IsValid() then -- Since we have MOVETYPE_NONE the engine won't update the physics object so we need to do it ourself.
+			phys:SetPos(self:GetPos())
+			phys:SetAngles(self:GetAngles())
+			phys:EnableGravity(false)
+			phys:EnableMotion(false)
+			phys:EnableDrag(false)
+		end
 
 		if self.EnableMovement and TargetPosition ~= nil then
 			local IsAirborne = 1
@@ -194,14 +295,9 @@ if SERVER then
 
 			if ground.Hit then
 				IsAirborne = 0
-
-				local vPoint = self:GetPos()
-				local fx = EffectData()
-				fx:SetOrigin(vPoint)
-				fx:SetScale(math.random(20, 150))
-				fx:SetEntity(self)
-				util.Effect("ThumperDust", fx)
 			end
+
+			self:SetAirborne(IsAirborne == 1)
 
 			self:SetAngles(Angle(self.pitchgo + self.sway_x, self.final_dir + self.sway_y, self.sway_z))
 			self:SetPos(self:GetPos() + ((Vector(self.targsmoothx * self.acceleration - self.sway_x,
@@ -247,7 +343,7 @@ if SERVER then
 		end
 
 		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount == team.NumPlayers(TEAM_SURVIVOR)
-				and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch_full == nil then
+				and SlashCo.State ~= SlashCo.States.LOBBY and self.switch_full == nil then
 
 			SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.COMPLETE)
 			SlashCo.SendObjectives()
@@ -258,9 +354,9 @@ if SERVER then
 		end
 
 		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount >= (team.NumPlayers(TEAM_SURVIVOR) / 2)
-				and GAMEMODE.State == GAMEMODE.States.IN_GAME and self.switch == nil then
+				and SlashCo.State ~= SlashCo.States.LOBBY and self.switch == nil then
 
-			if SlashCo.CurRound.Difficulty ~= 1 then
+			if SlashCo.CurRound.Difficulty ~= SlashCo.DifficultyLevel.NOVICE then
 				return true
 			end
 			self.switch = true
@@ -281,10 +377,10 @@ if SERVER then
 			end)
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount > 0 and GAMEMODE.State == GAMEMODE.States.IN_GAME
+		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount > 0 and SlashCo.State ~= SlashCo.States.LOBBY
 				and self.switch == nil then
 
-			if SlashCo.CurRound.Difficulty ~= 2 then
+			if SlashCo.CurRound.Difficulty ~= SlashCo.DifficultyLevel.INTERMEDIATE then
 				return true
 			end
 			self.switch = true
@@ -310,5 +406,18 @@ if SERVER then
 else
 	function ENT:Draw()
 		self:DrawModel()
+
+		-- This was moved to the client to reduce networking and noticably improve FPS (+50 FPS?!?)
+		local curTime = CurTime()
+		if not self:GetAirborne() and (self.NextEffect or 0) < curTime and util.PixelVisible(self:GetPos(), 150, self.pixvis) > 0.1 then
+			self.NextEffect = curTime + 0.04
+
+			local vPoint = self:GetPos()
+			local fx = EffectData()
+			fx:SetOrigin(vPoint)
+			fx:SetScale(math.random(20, 150))
+			fx:SetEntity(self)
+			util.Effect("ThumperDust", fx)
+		end
 	end
 end

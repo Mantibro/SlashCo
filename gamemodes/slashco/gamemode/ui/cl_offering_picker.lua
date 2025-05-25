@@ -62,8 +62,14 @@ local function DrawOfferSelectorBox()
 	leftSide:DockMargin(0, 0, 5, 0)
 
 	leftSide.Offers = {}
+	
+	local offerings = {}
+	for k, v in ipairs(SCInfo.Offering) do
+		offerings[k] = v
+	end
+	
 	local width = 0
-	for k, p in SortedPairs(SCInfo.Offering) do
+	for k, p in SortedPairs(offerings) do
 		local offer = vgui.Create("DButton", leftSide)
 		function offer.DoClick()
 			SelectThisOffering(k)

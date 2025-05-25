@@ -1,7 +1,7 @@
 --[[
 
-    Language: sv-SE, (Swedish), (Svenska)
-    Translator: DC:marreknarre STEAM: Marrebarre (steamcommunity.com/id/TomteJagare)
+	Language: sv-SE, (Swedish), (Svenska)
+	Translator: DC:marreknarre STEAM: Marrebarre (steamcommunity.com/id/TomteJagare)
 
 ]]
 

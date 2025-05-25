@@ -1,0 +1,2 @@
+Don't convert these to .mp3 files, they may be big but their music and the quality change will be noticable.
+All other sounds are .mp3 to improve file size & they were all turned into mono to allow for proper 3d sounds as sterio stops the engine & bass from playing them properly in 3d.

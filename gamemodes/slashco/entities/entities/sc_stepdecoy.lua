@@ -5,6 +5,10 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "StepDecoy"
 ENT.ClassName = "sc_stepdecoy"
 
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "StepDecoyActive")
+end
+
 function ENT:Initialize()
 	if SERVER then
 		self:SetModel(SlashCoItems.StepDecoy.Model)
@@ -13,7 +17,7 @@ function ENT:Initialize()
 		self:SetUseType(SIMPLE_USE)
 		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
 		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetNWBool("StepDecoyActive", false)
+		self:SetStepDecoyActive(false)
 
 		self.steppa = ents.Create("prop_physics")
 		self.steppa:SetMoveType(MOVETYPE_NONE)
@@ -47,10 +51,13 @@ if CLIENT then
 	return
 end
 
+local offsetVec1 = Vector(0, 0, 20)
+local offsetVec2 = Vector(0, 0, -20)
 function ENT:Think()
 	if self.cyc == nil then
 		self.cyc = 0
 	end
+
 	if self.cyc > 1 then
 		self.cyc = 0
 	end
@@ -58,33 +65,44 @@ function ENT:Think()
 
 	self.steppa:SetCycle(self.cyc)
 
-	if self:GetNWBool("StepDecoyActive") then
+	if self:GetStepDecoyActive() then
 		if not self:GetPhysicsObject():IsAsleep() then
 			self:GetPhysicsObject():Sleep()
 			self:SetAngles(Angle(0, self:GetAngles()[2], 0))
 		end
 
 		local ground = util.TraceLine({
-			start = self:LocalToWorld(Vector(0, 0, 20)),
-			endpos = self:LocalToWorld(Vector(0, 0, -20)),
+			start = self:LocalToWorld(offsetVec1),
+			endpos = self:LocalToWorld(offsetVec2),
 			filter = self
 		})
 
-		self:SetPos(self:GetPos() + self:GetForward() * 3)
-		self:SetPos(Vector(self:GetPos()[1], self:GetPos()[2], ground.HitPos[3] + 5))
+		local forward = self:GetForward()
+		--self:SetPos(self:GetPos() + forward * 3)
+		local pos = self:GetPos()
+		self:SetPos(Vector(pos[1], pos[2], ground.HitPos[3] + 5))
 
+		local etrEndPos = self:LocalToWorld(offsetVec1)
+		etrEndPos:Add(forward)
+		etrEndPos:Mult(6)
+		
 		local etr = util.TraceLine({
-			start = self:LocalToWorld(Vector(0, 0, 20)),
-			endpos = self:LocalToWorld(Vector(0, 0, 20)) + self:GetForward() * 6,
+			start = self:LocalToWorld(offsetVec1),
+			endpos = etrEndPos,
 			filter = self
 		})
 
 		if etr.Hit then
-			if self:GetPhysicsObject():IsValid() then
-				self:GetPhysicsObject():Wake()
+			local physObj = self:GetPhysicsObject()
+			if physObj:IsValid() then
+				physObj:Wake()
+				
+				forward:Mult(-15)
+				forward:Add(offsetVec1)
+				physObj:ApplyForceCenter(forward)
 			end
-			self:GetPhysicsObject():ApplyForceCenter((self:GetForward() * -15) + (Vector(0, 0, 20)))
-			self:SetNWBool("StepDecoyActive", false)
+
+			self:SetStepDecoyActive(false)
 		end
 	end
 

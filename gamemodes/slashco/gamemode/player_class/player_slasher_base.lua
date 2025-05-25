@@ -18,8 +18,7 @@ end
 
 function PLAYER:SetModel()
 	local modelname = self.Player:SlasherValue("Model", "models/Humans/Group01/male_07.mdl")
-	print(modelname)
-	util.PrecacheModel(modelname)
+	SlashCo.PrecacheModel(modelname) -- The model should have already been precached by SlashCo.PrecacheSlasher
 	self.Player:SetModel(modelname)
 	self.Player:SetCanWalk(false)
 end
@@ -28,7 +27,7 @@ if CLIENT then
 	function PLAYER:Init()
 		self.Player:RemoveEffects(EF_NOFLASHLIGHT)
 
-		if LocalPlayer() ~= self.Player then
+		if GameData.LocalPlayer ~= self.Player then
 			return
 		end
 
@@ -38,12 +37,12 @@ if CLIENT then
 	end
 
 	function PLAYER:ClassChanged()
-		if LocalPlayer() ~= self.Player then
+		if GameData.LocalPlayer ~= self.Player then
 			return
 		end
 
-		if IsValid(LocalPlayer().SlasherHud) then
-			LocalPlayer().SlasherHud:Remove()
+		if IsValid(GameData.LocalPlayer.SlasherHud) then
+			GameData.LocalPlayer.SlasherHud:Remove()
 		end
 	end
 else

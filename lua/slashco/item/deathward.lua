@@ -7,11 +7,11 @@ ITEM.Icon = "slashco/ui/icons/items/item_2"
 ITEM.Price = 50
 ITEM.Description = "Deathward_desc"
 ITEM.CamPos = Vector(40, 0, 15)
-ITEM.MaxAllowed = function()
+function ITEM.MaxAllowed()
 	return 2
 end
 ITEM.IsSpawnable = true
-ITEM.OnDie = function(ply)
+function ITEM.OnDie(ply)
 	ply:EmitSound("slashco/survivor/deathward.mp3")
 	ply:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")
 
@@ -19,11 +19,11 @@ ITEM.OnDie = function(ply)
 
 	return true
 end
-ITEM.OnSwitchFrom = function(ply)
+function ITEM.OnSwitchFrom(ply)
 	timer.Remove("deathWardDamage_" .. ply:UserID())
 end
-ITEM.OnPickUp = function(ply)
-	if game.GetMap() == "sc_lobby" then
+function ITEM.OnPickUp(ply)
+	if GameData.IsLobby then
 		return
 	end
 

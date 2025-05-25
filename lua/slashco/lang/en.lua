@@ -1,7 +1,7 @@
 --[[
 
-    Language: en, (English), (English)
-    Translator: Manti
+	Language: en, (English), (English)
+	Translator: Manti
 
 ]]
 
@@ -188,6 +188,9 @@ SlashCo.LangTable["Soda_desc"] = "Become invisible on use."
 
 SlashCo.LangTable["StepDecoy"] = "Step Decoy"
 SlashCo.LangTable["StepDecoy_desc"] = "If placed on a solid surface, this will imitate footsteps sounds which can distract slashers."
+
+SlashCo.LangTable["TeslaCoil"] = "Tesla Coil"
+SlashCo.LangTable["TeslaCoil_desc"] = "Stuns all slashers on the entire map for 15 seconds"
 
 --GameInfo
 
@@ -587,6 +590,7 @@ SlashCo.LangTable["points_left_behind"] = "[%s] LEFT BEHIND"
 SlashCo.LangTable["points_survive"] = "[%s] SURVIVED"
 
 SlashCo.LangTable["points_item"] = "[%s] ITEM BUY-BACK" --misc points
-SlashCo.LangTable["points_fast"] = "[%s] SWIFT SUCCESS"
+SlashCo.LangTable["points_quickescape"] = "[%s] QUICK ESCAPE"
+SlashCo.LangTable["points_slowescape"] = "[%s] SLOW ESCAPE"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] DOING YOUR JOB"

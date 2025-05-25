@@ -3,16 +3,16 @@ local EFFECT = {}
 --become undetectable
 
 EFFECT.Name = "Invisibility"
-EFFECT.OnFootstep = function()
+function EFFECT.OnFootstep()
 	return true
 end
-EFFECT.CanBeSeen = function()
+function EFFECT.CanBeSeen()
 	return false
 end
-EFFECT.OnApplied = function(ply)
+function EFFECT.OnApplied(ply)
 	ply:AddSpeedEffect("invis", 250, 2)
 end
-EFFECT.OnExpired = function(ply)
+function EFFECT.OnExpired(ply)
 	ply:RemoveSpeedEffect("invis")
 end
 
@@ -28,7 +28,7 @@ local colors = {
 	["$pp_colour_mulb"] = -0.8
 }
 
-EFFECT.Screenspace = function()
+function EFFECT.Screenspace()
 	DrawMotionBlur(0.1, 0.4, 0.01)
 	DrawColorModify(colors)
 end

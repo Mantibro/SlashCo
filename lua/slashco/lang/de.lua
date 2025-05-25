@@ -1,7 +1,7 @@
 --[[
 
-    Language: de, (German), (Deutsch)
-    Translator: Fuchs, eno
+	Language: de, (German), (Deutsch)
+	Translator: Fuchs, eno
 
 ]]
 
@@ -186,33 +186,36 @@ SlashCo.LangTable["Soda_desc"] = "Werde bei der Verwendung unsichtbar."
 SlashCo.LangTable["StepDecoy"] = "Schritt Köder"
 SlashCo.LangTable["StepDecoy_desc"] = "Wenn es auf einer festen Oberfläche platziert wird, imitiert es Schrittgeräusche, die Slasher ablenken können."
 
+SlashCo.LangTable["TeslaCoil"] = "Tesla Spule"
+SlashCo.LangTable["TeslaCoil_desc"] = "Macht alle Slasher auf der Map für 15 Sekunden bewegungsunfähig"
+
 --GameInfo
 
 SlashCo.LangTable["SurvivorInfo"] = [[Willkommen beim SlashCo Strom Wiederherstellung Programm.
 
 Dein Auftrag ist es, zwei Generatoren in einem Gebiet namens Slasher Zone aufzutanken und zu aktivieren.
 
-Du musst vier Benzinkanister schütten und in jeden eine Autobatterie einsetzen, was sich jedoch als nicht ganz einfach erweisen könnte.
+Du musst vier Benzinkanister in sie schütten und in jeden eine Autobatterie einsetzen, was sich jedoch als nicht ganz einfach erweisen könnte.
 
 Ein bösartiges Wesen, das als Slasher benannt ist, wird sich mit dir in der Zone aufhalten. Du kannst deine Aufgabe nur erfolgreich abschließen 
 wenn du weißt, wie du überleben kannst.\n\nDu wirst von einem Hubschrauber abgesetzt, der dich auch wieder abholt, nachdem die beiden Generatoren aktiviert sind.
 
 Solltest du jemals ohne Team festsitzen, kann der Hubschrauber dich vorzeitig retten, wenn du ihm ein Notsignal gibst. 
-Ein solches Signal findest du immer in die Slasher Zone.
+Ein solches Signal findest du immer in der Slasher Zone.
 Die Rettung kommt nur, wenn mindestens ein Generator aktiviert wird.
 
 Bevor du dich in die Slasher Zone aufmachst, kannst du dir in der Lobby einen Gegenstand aussuchen, den du im Austausch gegen Punkte erhältst, die du in den Runden als Überlebender verdienst.]]
 
 SlashCo.LangTable["SlasherInfo"] = [[Als Slasher ist es dein Ziel, alle Überlebenden zu töten, bevor sie entkommen können.
 
-Du kannst den Fortschritt der Aufgaben der Überlebenden mit einem Stab verfolgen, der den Spielfortschritt zeigt.
+Du kannst den Fortschritt der Überlebenden mit einer Fortschrittsleiste verfolgen, der den Spielfortschritt zeigt.
 
 Jeder Slasher hat einzigartige Fähigkeiten, die dir helfen können, dein Ziel auf unterschiedliche Weise zu erreichen. 
 Außerdem sind die Slasher in drei verschiedene Klassen unterteilt, von denen jede eine andere Art von Fähigkeit besitzt.
 
 Kryptid:
 Die Fähigkeiten der Kryptiden sind einfach und leicht zu verstehen. 
-Sie bestehen aus relativ unkomplizierten Methoden, die helfen dir, Überlebende zu töten.
+Sie bestehen aus relativ unkomplizierten Techniken, die helfen dir, Überlebende zu töten.
 
 Dämon:
 Die Fähigkeiten eines Dämons hängen von den verbrauchten Gegenständen ab, die überall auf der Map zu finden sind, und manchmal auch vom Spielfortschritt der Runde. 
@@ -243,7 +246,7 @@ SlashCo.LangTable["slasher_assess"] = "-Slasher Bewertung-"
 SlashCo.LangTable["offering_idle"] = "Ein Opfer abgeben"
 
 --Survivor
-SlashCo.LangTable["item_use"] = "[%s] NUTZ"
+SlashCo.LangTable["item_use"] = "[%s] NUTZEN"
 SlashCo.LangTable["item_drop"] = "[%s] FALLEN LASSEN"
 SlashCo.LangTable["door_slam"] = "[%s] AUFSCHLAGEN"
 SlashCo.LangTable["surv_ping"] = "[%s] PING"
@@ -258,14 +261,14 @@ SlashCo.LangTable["SLASHER"] = "SLASHER"
 SlashCo.LangTable["DEAD BODY"] = "LEICHNAM"
 SlashCo.LangTable["HELICOPTER"] = "HUBSCHRAUBER"
 SlashCo.LangTable["PLUSH DOG"] = "PLÜSCHHUND"
-SlashCo.LangTable["ITEM STASH"] = "GEGENDSTAND LAGER"
+SlashCo.LangTable["ITEM STASH"] = "GEGENDSTANDS VORRAT"
 SlashCo.LangTable["OFFERING TABLE"] = "OPFERTISCH"
 
 --Spectator
 SlashCo.LangTable["spectating"] = "DU BIST EIN ZUSCHAUER"
 SlashCo.LangTable["hide_info"] = "[%s] DRÜCKEN, UM INFORMATIONEN ZU VERSTECKEN"
-SlashCo.LangTable["toggle_halo"] = "[%s] HALOS UMSCHALTEN"
-SlashCo.LangTable["toggle_halo_gas"] = "[%s] BENZINKANISTER HALOS UMSCHALTEN"
+SlashCo.LangTable["toggle_halo"] = "[%s] SPIELER-SCHIMMER UMSCHALTEN"
+SlashCo.LangTable["toggle_halo_gas"] = "[%s] BENZINKANISTER-SCHIMMER UMSCHALTEN"
 SlashCo.LangTable["player_follow"] = "[%s] SPIELER VERFOLGEN"
 SlashCo.LangTable["player_cycle"] = "[%s] ÜBERLEBENDE ZYKLEN"
 SlashCo.LangTable["switch_view"] = "[%s] ANSICHT WECHSELN"
@@ -295,21 +298,21 @@ SlashCo.LangTable["Abomignat_desc"] = [[Der monströse Slasher, der einfache Fä
 -Der Crawling-Modus ermöglicht ein schnelles Durchqueren der Map.]]
 SlashCo.LangTable["Abomignat_tip"] = "-Dieser Slasher gibt beim Angreifen Geschwindigkeitsstöße von sich."
 
-SlashCo.LangTable["Abomignat_enablecrawling"] = "Crawling aktivieren"
-SlashCo.LangTable["Abomignat_disablecrawling"] = "Crawling deaktivieren"
-SlashCo.LangTable["Abomignat_slashcharge"] = "Schrägstrichladung"
-SlashCo.LangTable["Abomignat_lunge"] = "Ausfallschritt"
+SlashCo.LangTable["Abomignat_enablecrawling"] = "Krabbeln aktivieren"
+SlashCo.LangTable["Abomignat_disablecrawling"] = "Krabbeln deaktivieren"
+SlashCo.LangTable["Abomignat_slashcharge"] = "Aufschlitzladung"
+SlashCo.LangTable["Abomignat_lunge"] = "Anspringen"
 
 --Amogus
 SlashCo.LangTable["Amogus"] = "Amogus"
-SlashCo.LangTable["Amogus_desc"] = [[Der Betrüger Slasher ist ein Meister der Täuschung und des Versteckens.
+SlashCo.LangTable["Amogus_desc"] = [[Der Schwindler Slasher ist ein Meister der Täuschung und des Versteckens.
 
--Amogus kann die Form einer Überlebenden annehmen.
+-Amogus kann das Aussehen eines Überlebenden annehmen.
 -Er kann die Form eines Benzinkanisters annehmen.
 -Amogus ist beim Laufen sehr laut.]]
 SlashCo.LangTable["Amogus_tip"] = "-Dieser Slasher kann sich als Mensch tarnen."
 
-SlashCo.LangTable["Amogus_survivor_disguised_title"] = "unauffälliger Überlebende"
+SlashCo.LangTable["Amogus_survivor_disguised_title"] = "unauffälliger Überlebender"
 SlashCo.LangTable["Amogus_gas_disguised_title"] = "Regulärer Benzinkanister"
 SlashCo.LangTable["Amogus_survivor_disguise"] = "als Überlebender tarnen"
 SlashCo.LangTable["Amogus_gas_disguise"] = "als Benzinkanister tarnen"
@@ -317,7 +320,7 @@ SlashCo.LangTable["Amogus_un_disguise"] = "enthülle dich"
 
 --Bababooey
 SlashCo.LangTable["Bababooey"] = "Bababooey"
-SlashCo.LangTable["Bababooey_desc"] = [[Der Phantom Slasher, der sich auf Illusionsfähigkeiten spezialisiert, um die Überlebende zu überrumpeln.
+SlashCo.LangTable["Bababooey_desc"] = [[Der Phantom Slasher, der sich auf Illusionsfähigkeiten spezialisiert, um die Überlebende zu überraschen.
 
 -Bababooey kann sich unsichtbar machen.
 -Er kann einen Phantomklon von sich selbst erschaffen, um Überlebende zu erschrecken und zu lokalisieren.]]
@@ -330,7 +333,7 @@ SlashCo.LangTable["Bababooey_clonetrip"] = "Ein Bababooey Klon wurde ausgelöst!
 
 --Borgmire
 SlashCo.LangTable["Borgmire"] = "Borgmire"
-SlashCo.LangTable["Borgmire_desc"] = [[Der Brute Slasher, der Überlebende mit überwältigender Kraft überwältigen kann.
+SlashCo.LangTable["Borgmire_desc"] = [[Der brutale Slasher, der Überlebende mit überwältigender Kraft überwältigen kann.
 
 -Borgmire ist am effektivsten bei kurzen Verfolgungen.
 -Er kann Überlebende in der Nähe aufheben und werfen, um ihnen schweren Schaden hinzuzufügen.]]
@@ -365,7 +368,7 @@ SlashCo.LangTable["Criminal_unsummonclones"] = "Klone abberufen"
 SlashCo.LangTable["Criminal_rage"] = "wut"
 
 --Dolphinman
-SlashCo.LangTable["Dolphinman"] = "Delphinmann"
+SlashCo.LangTable["Dolphinman"] = "Dolphinman"
 SlashCo.LangTable["Dolphinman_desc"] = [[Der geduldige Slasher, der auf Überlebende wartet, die zu ihm kommen.
 
 -Dolphinman muss sich vor Überlebenden verstecken, um Jagd aufzubauen.
@@ -381,10 +384,10 @@ SlashCo.LangTable["Dolphinman_hunt"] = "Jagd"
 SlashCo.LangTable["FreeSmiley"] = "Free Smiley Dealer"
 SlashCo.LangTable["FreeSmiley_desc"] = [[Der Beschwörer Slasher, der seine Schergen einsetzt, um die Kontrolle über die Map zu übernehmen.
 
--Free Smiley Dealer kann zwei Arten von Schergen beschwören, Nachdenklich und Verrückt.
+-Free Smiley Dealer kann zwei Arten von Schergen beschwören, Nachdenkliche und Verrückte.
 -Beide werden ihn alarmieren, wenn ein Überlebender entdeckt wird.
--Nachdenklich kann einen Überlebenden für eine kurze Zeit betäuben.
--Verrückt ladet die Überlebenden an und fügt ihnen Schaden zu.]]
+-Nachdenkliche können einen Überlebenden für eine kurze Zeit betäuben.
+-Verrückte stürmen den Überlebenden an und fügen ihm Schaden zu.]]
 SlashCo.LangTable["FreeSmiley_tip"] = "-Dieser Slasher arbeitet nicht allein."
 
 SlashCo.LangTable["FreeSmiley_switchdeal"] = "Deal Wechseln"
@@ -398,44 +401,44 @@ SlashCo.LangTable["Leuonard_desc"] = [[Der instabile Slasher, der im Laufe der Z
 
 -Leuonard's R██e wird mit der Zeit zunehmen.
 -Das Ringen mit einem Plüschhund führt zu einer Verringerung der R██e.
--Bei Erreichen von 100 Prozent R██e wird Leuonard extrem lebensgefährlich, aber fast unkontrollierbar.]]
+-Bei Erreichen von 100 Prozent R██e wird Leuonard extrem Tödlich, aber fast unkontrollierbar.]]
 SlashCo.LangTable["Leuonard_tip"] = "-Dieser Slasher scheint eine Vorliebe für Plüschhunde zu haben."
 
 SlashCo.LangTable["Leuonard_roid"] = "r**e"
 
 --Male_07
 SlashCo.LangTable["Male07"] = "Male_07"
-SlashCo.LangTable["Male07_desc"] = [[Der allwissende Slasher, der einen seiner vielen Klone besitzen kann.
+SlashCo.LangTable["Male07_desc"] = [[Der allwissende Slasher, der über einen seiner vielen Klone besitz ergreifen kann.
 
 -Male_07 wird sich nach einer langen Zeit der Verfolgung in ein monströses Wesen verwandeln.
 -Im Laufe des Spiels kann er seine tödlichere menschliche Form länger behalten.]]
 SlashCo.LangTable["Male07_tip"] = "-Dieser Slasher ist körperlos und kann von Gefäßen Besitz ergreifen."
 
-SlashCo.LangTable["Male07_possess"] = "Gefäß besitzen"
+SlashCo.LangTable["Male07_possess"] = "Gefäß übernehmen"
 SlashCo.LangTable["Male07_unpossess"] = "Gefäß loslassen"
-SlashCo.LangTable["Male07_slash"] = "Schrägstrich"
+SlashCo.LangTable["Male07_slash"] = "Hieb"
 
 --Manspider
 SlashCo.LangTable["Manspider"] = "Manspider"
-SlashCo.LangTable["Manspider_desc"] = [[Der Jägersmann Slasher, der bei seinen Opfern wählerisch ist.
+SlashCo.LangTable["Manspider_desc"] = [[Der Jäger Slasher, der bei seinen Opfern wählerisch ist.
 
 -Manspider kann immer nur einen Überlebenden anvisieren.
 -Er wird in der Nähe von Überlebenden langsam Aggression aufbauen.
 -Er kann sich irgendwo einnisten, um eine Chance zu haben, sofort Beute zu finden.]]
 SlashCo.LangTable["Manspider_tip"] = "-Dieser Slasher ist ein sehr wählerischer Jäger."
 
-SlashCo.LangTable["Manspider_nest"] = "Nest"
-SlashCo.LangTable["Manspider_yourprey"] = "deine Beute: "
-SlashCo.LangTable["Manspider_awaitprey"] = "in Erwartung von Beute"
-SlashCo.LangTable["Manspider_abandonnest"] = "das Nest verlassen"
+SlashCo.LangTable["Manspider_nest"] = "Nesten"
+SlashCo.LangTable["Manspider_yourprey"] = "Deine Beute: "
+SlashCo.LangTable["Manspider_awaitprey"] = "Warten auf Beute"
+SlashCo.LangTable["Manspider_abandonnest"] = "Das Nest verlassen"
 
 --Princess
 SlashCo.LangTable["Princess"] = "Princess"
 SlashCo.LangTable["Princess_desc"] = [[Der wilde Slasher, der Kinder zerfleischt.
 
--Princess kann seine Aggression während einer Verfolgung steigern, aber nur bis zu einer bestimmten Grenze.
--Die Aggressionsgrenze kann durch das Zerfleischen von Babies erhöht werden, wodurch deine Aggression zurückgesetzt wird.
--Je höher die Aggression, desto schneller und brutaler ist deine Verfolgung.]]
+-Princess kann seine Wut während einer Verfolgung steigern, aber nur bis zu einer bestimmten Grenze.
+-Die Wutgrenze kann durch das Zerfleischen von Babies erhöht werden, wodurch die Wut zurückgesetzt wird.
+-Je höher die Wut, desto schneller und brutaler ist die Jagd.]]
 SlashCo.LangTable["Princess_tip"] = "-Dieser Slasher kann mit Babies abgelenkt werden."
 
 SlashCo.LangTable["Princess_sniff"] = "schnüffeln"
@@ -452,32 +455,32 @@ SlashCo.LangTable["Sid_desc"] = [[Der psychotische Slasher, der seine Wut mit Ke
 SlashCo.LangTable["Sid_tip"] = "-Laute Gewehrschüsse wurden in Zonen gehört, in denen dieser Slasher anwesend war."
 
 SlashCo.LangTable["Sid_gun_title"] = "Sid (mit einer Waffe)"
-SlashCo.LangTable["Sid_gunuses"] = "Waffe Verwendungen"
-SlashCo.LangTable["Sid_shoot"] = "schieß"
+SlashCo.LangTable["Sid_gunuses"] = "Waffe verwendungen"
+SlashCo.LangTable["Sid_shoot"] = "schießen"
 SlashCo.LangTable["Sid_eatcookie"] = "Keks essen"
 SlashCo.LangTable["Sid_equipgun"] = "Waffe ausrüsten"
 SlashCo.LangTable["Sid_unequipgun"] = "Waffe abrüsten"
 
 --Speedrunner
 SlashCo.LangTable["Speedrunner"] = "Speedrunner"
-SlashCo.LangTable["Speedrunner_desc"] = [[Der Speed Slasher, bei dem die Geschwindigkeit mit der Zeit immer weiter ansteigt.
+SlashCo.LangTable["Speedrunner_desc"] = [[Der schnelle Slasher, bei dem die Geschwindigkeit mit der Zeit immer weiter ansteigt.
 
 -Speedrunner fängt extrem langsam an.
--Wenn er genug Geschwindigkeit erreicht hat, erhält er die Fähigkeit, RNG-Opfer zu bringen, 
-wodurch die Geschwindigkeit zurückgesetzt wird, aber es erlaubt ihm, sie schneller wiederzuerlangen, und mehr davon.
+-Wenn er genug Geschwindigkeit erreicht hat, erhält er die Fähigkeit, RNG Opferung, 
+wodurch die Geschwindigkeit zurückgesetzt wird, aber es erlaubt ihm, sie schneller und mehr auf einmal wiederzuerlangen.
 -RNG Opferung hat zusätzliche Auswirkungen auf die Runde, wenn es eingesetzt wird.]]
-SlashCo.LangTable["Speedrunner_tip"] = "-Dieser Slasher wächst mit der Zeit außerordentlich schnell."
+SlashCo.LangTable["Speedrunner_tip"] = "-Dieser Slasher wird mit der Zeit außerordentlich schnell."
 
 SlashCo.LangTable["Speedrunner_speed"] = "Geschwindigkeit"
-SlashCo.LangTable["Speedrunner_sacrifice"] = "RNG-Opfer"
+SlashCo.LangTable["Speedrunner_sacrifice"] = "RNG Opferung"
 
 --Thirsty
 SlashCo.LangTable["Thirsty"] = "Thirsty"
-SlashCo.LangTable["Thirsty_desc"] = [[Der Milch Slasher, der seine Fähigkeiten von seinem Durstlevel abhängig hat.
+SlashCo.LangTable["Thirsty_desc"] = [[Der Milch Slasher, dem seine Fähigkeiten von seinem Durstlevel abhängig sind.
 
 -Thirsty muss Krüge mit Milch trinken, um seinen Durst zu stillen.
 -Je durstiger er ist, desto langsamer wird er, aber er kann die Position der Spieler spüren.
--Thirsty ist sehr ruhig.]]
+-Thirsty ist sehr leise.]]
 SlashCo.LangTable["Thirsty_tip"] = "-Dieser Slasher ist schwer mit Milch Krügen verbunden."
 
 SlashCo.LangTable["Thirsty_drinkmilk"] = "Milch trinken"
@@ -491,16 +494,16 @@ Blut das er gesammelt hat vergrößert.
 
 -Trollge kann keine Überlebenden sehen, die stillstehen.
 -Er muss genug Blut sammeln, um seine wahre Form zu erreichen.
--Er kann kein Blut mehr abnehmen, wenn die Runde weit genug fortgeschritten ist]]
+-Er kann kein Blut mehr sammeln, wenn die Runde weit genug fortgeschritten ist]]
 SlashCo.LangTable["Trollge_tip"] = "-Seine Sehkraft scheint auf bewegliche Objekte beschränkt zu sein."
 
-SlashCo.LangTable["Trollge_dash"] = "Dash"
+SlashCo.LangTable["Trollge_dash"] = "Sprint"
 SlashCo.LangTable["Trollge_claw"] = "Kralle"
 SlashCo.LangTable["Trollge_blood"] = "Blut"
 
 --Tyler
 SlashCo.LangTable["Tyler"] = "Tyler"
-SlashCo.LangTable["Tyler_desc"] = [[Der Balance Slasher, der den Verlauf der Runde kontrolliert.
+SlashCo.LangTable["Tyler_desc"] = [[Der ausgeglichene Slasher, der den Verlauf der Runde kontrolliert.
 
 -Tyler hat zwei Formen. Erschaffer und Zerstörer.
 -Tyler, der Erschaffer wird Benzinkanister für Überlebende herstellen, wenn er gefunden wird.
@@ -511,16 +514,16 @@ SlashCo.LangTable["Tyler_destroyer"] = "Tyler, der Zerstörer"
 
 SlashCo.LangTable["Tyler_manifest"] = "manifestieren"
 SlashCo.LangTable["Tyler_hiding"] = "(Verstecken)"
-SlashCo.LangTable["Tyler_destroy"] = "zerstöre"
+SlashCo.LangTable["Tyler_destroy"] = "Zerstören"
 
 --Watcher
 SlashCo.LangTable["Watcher"] = "Watcher"
-SlashCo.LangTable["Watcher_desc"] = [[Der beobachtende Slasher, dessen Kraft auf dem Augenlicht liegt.
+SlashCo.LangTable["Watcher_desc"] = [[Der beobachtende Slasher, dessen Kraft auf Sicht basiert.
 
 -Der Watcher kann von Zeit zu Zeit die Karte durchsuchen, um alle Überlebenden zu lokalisieren.
--Er wird verlangsamt, wenn er angeschaut wird, aber jeder, der dies tut, wird geortet.
+-Er wird verlangsamt, wenn er angeschaut wird, aber jeder, der dies tut, wird aufgedeckt.
 -Der Wächter kann Überlebende verfolgen, um seine Spezialfähigkeit „Vollständige Überwachung“ zu entwickeln.]]
-SlashCo.LangTable["Watcher_tip"] = "-TDieser Slasher leidet unter einem Geschwindigkeitsverlust, wenn er beobachtet wird."
+SlashCo.LangTable["Watcher_tip"] = "-Dieser Slasher leidet unter einem Geschwindigkeitsverlust, wenn er beobachtet wird."
 
 SlashCo.LangTable["Watcher_survey"] = "BEOBACHTEN"
 SlashCo.LangTable["Watcher_fullsurveillance"] = "VOLLE ÜBERWACHUNG"
@@ -529,12 +532,12 @@ SlashCo.LangTable["Watcher_observe"] = "ÜBERLEBENDE AM BEOBACHTEN. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "STALK ZEIT: "
 
 --misc from maptools
-SlashCo.LangTable["spectators_can_ping"] = "Spektatoren können jetzt für Überlebende pingen."
+SlashCo.LangTable["spectators_can_ping"] = "Zuschauer können jetzt für Überlebende pingen."
 SlashCo.LangTable["unhide"] = "einblenden"
-SlashCo.LangTable["max pensives"] = "Zerstöre alle pensives"
-SlashCo.LangTable["max zanies"] = "Zerstöre alle zanies"
+SlashCo.LangTable["max pensives"] = "Zerstöre alle Nachdenkliche"
+SlashCo.LangTable["max zanies"] = "Zerstöre alle Verrückte"
 SlashCo.LangTable["cant_fuel"] = "[SCHON VOLL]"
-SlashCo.LangTable["cant_power"] = "[BESITZT SCHON EINEN AKKU]"
+SlashCo.LangTable["cant_power"] = "[BESITZT SCHON EINE BATTERIE]"
 
 --main objectives
 SlashCo.LangTable["objective_generators"] = "VERSORGE %s GENERATOREN MIT STROM"
@@ -543,17 +546,17 @@ SlashCo.LangTable["objective_heliwait"] = "WARTE AUF DEN HUBSCHRAUBER"
 SlashCo.LangTable["objective_helicopter"] = "STEIG IN DEN HUBSCHRAUBER"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) AUFRÄUME %s MÜLLTEILE" --item spawns
-SlashCo.LangTable["objective_trash"] = "(OPTIONAL) AUFRÄUME 1 MÜLLTEIL"
-SlashCo.LangTable["objective_mops"] = "(OPTIONAL) MOP %s VERSCHÜTTUNGEN" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(OPTIONAL) MOP 1 VERSCHÜTTUNG"
-SlashCo.LangTable["objective_traps"] = "(OPTIONAL) ZURÜCKSETZE %s MAUSEFALLEN" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(OPTIONAL) ZURÜCKSETZE 1 MAUSEFALLE"
-SlashCo.LangTable["objective_pages"] = "(OPTIONAL) SAMMEL %s DOKUMENTE" --gascan spawns
+SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) RÄUME %s MÜLLTEILE AUF" --item spawns
+SlashCo.LangTable["objective_trash"] = "(OPTIONAL) RÄUME 1 MÜLLTEIL AUF"
+SlashCo.LangTable["objective_mops"] = "(OPTIONAL) WISCHE %s VERSCHÜTTUNGEN AUF" --gen spawns
+SlashCo.LangTable["objective_mop"] = "(OPTIONAL) WISCH 1 VERSCHÜTTUNG AUF"
+SlashCo.LangTable["objective_traps"] = "(OPTIONAL) SETZE %s MAUSEFALLEN ZURÜCK" --battery spawns
+SlashCo.LangTable["objective_trap"] = "(OPTIONAL) SETZE 1 MAUSEFALLE ZURÜCK"
+SlashCo.LangTable["objective_pages"] = "(OPTIONAL) SAMMELE %s DOKUMENTE" --gascan spawns
 SlashCo.LangTable["objective_page"] = "(OPTIONAL) SAMMEL 1 DOKUMENT"
 
 --points summary
-SlashCo.LangTable["point_summary"] = "- VERDIENENDE PUNKTE -"
+SlashCo.LangTable["point_summary"] = "- VERDIENTE PUNKTE -"
 SlashCo.LangTable["point_total"] = "PUNKTE INSGESAMT: %s"
 SlashCo.LangTable["point_nil"] = "KEINE!"
 
@@ -574,6 +577,7 @@ SlashCo.LangTable["points_left_behind"] = "[%s] ZURÜCKGELASSEN"
 SlashCo.LangTable["points_survive"] = "[%s] ÜBERLEBT"
 
 SlashCo.LangTable["points_item"] = "[%s] ITEM-RÜCKKAUF" --misc points
-SlashCo.LangTable["points_fast"] = "[%s] SCHNELL ERFOLGT"
+SlashCo.LangTable["points_quickescape"] = "[%s] SCHNELLE FLUCHT"
+SlashCo.LangTable["points_slowescape"] = "[%s] LANGSAME FLUCHT"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
-SlashCo.LangTable["points_working"] = "[%s] DEINE JOB TUN"
+SlashCo.LangTable["points_working"] = "[%s] DEINEN JOB GETAN"

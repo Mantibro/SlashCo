@@ -7,6 +7,16 @@ ENT.Type			= "nextbot"
 ENT.ClassName 		= "sc_crimclone"
 ENT.Spawnable		= true
 
+hook.Add("SlashCo:Precache", "PrecacheClone", function()
+	SlashCo.PrecacheModel("models/slashco/slashers/criminal/criminal.mdl")
+	SlashCo.PrecacheSound("slashco/slasher/criminal_rage.mp3")
+	SlashCo.PrecacheSound("slashco/slasher/criminal_loop.mp3")
+end)
+
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "MainRageClone")
+end
+
 function ENT:Initialize()
 	self:SetModel("models/slashco/slashers/criminal/criminal.mdl")
 
@@ -27,12 +37,12 @@ function ENT:RunBehaviour()
 
 		self:StartActivity(ACT_IDLE)
 		if self.IsMain ~= true then
-			if rage_switch then self:EmitSound("slashco/slasher/criminal_rage.wav")
-			else self:EmitSound("slashco/slasher/criminal_loop.wav") end
+			if rage_switch then self:EmitSound("slashco/slasher/criminal_rage.mp3")
+			else self:EmitSound("slashco/slasher/criminal_loop.mp3") end
 		end
 		coroutine.wait(10)
-		self:StopSound("slashco/slasher/criminal_loop.wav")
-		self:StopSound("slashco/slasher/criminal_rage.wav")
+		self:StopSound("slashco/slasher/criminal_loop.mp3")
+		self:StopSound("slashco/slasher/criminal_rage.mp3")
 
 		coroutine.yield()
 	end
@@ -80,11 +90,11 @@ if SERVER then
 			if rage_switch then
 				self:SetBodygroup(0, 1)
 				self:SetSkin(1)
-				if not self:GetNWBool("MainRageClone") then self:SetNWBool("MainRageClone", true) end
+				if not self:GetMainRageClone() then self:SetMainRageClone(true) end
 			else
 				self:SetBodygroup(0, 0)
 				self:SetSkin(0)
-				if self:GetNWBool("MainRageClone") then self:SetNWBool("MainRageClone", false) end
+				if self:GetMainRageClone() then self:SetMainRageClone(false) end
 			end
 		end
 	end

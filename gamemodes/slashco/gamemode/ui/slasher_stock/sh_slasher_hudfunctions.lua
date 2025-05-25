@@ -3,36 +3,36 @@ SlashCo = SlashCo or {}
 if CLIENT then
 	---gets the slasher hud panel
 	function SlashCo.SlasherHud()
-		return LocalPlayer().SlasherHud
+		return GameData.LocalPlayer.SlasherHud
 	end
 
 	---reinitializes the slasher hud panel and returns it
 	function SlashCo.InitSlasherHud()
-		if IsValid(LocalPlayer().SlasherHud) then
-			LocalPlayer().SlasherHud:Remove()
+		if IsValid(GameData.LocalPlayer.SlasherHud) then
+			GameData.LocalPlayer.SlasherHud:Remove()
 		end
 
-		LocalPlayer().SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
-		LocalPlayer():SlasherFunction("InitHud", LocalPlayer().SlasherHud)
-		return LocalPlayer().SlasherHud
+		GameData.LocalPlayer.SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
+		GameData.LocalPlayer:SlasherFunction("InitHud", GameData.LocalPlayer.SlasherHud)
+		return GameData.LocalPlayer.SlasherHud
 	end
 
 	---internal: reinitializes the slasher hud panel if there's a lua reload
 	-- [[
-	if IsValid(LocalPlayer().SlasherHud) then
-		LocalPlayer().SlasherHud:Remove()
+	if GameData.LocalPlayer and IsValid(GameData.LocalPlayer.SlasherHud) then
+		GameData.LocalPlayer.SlasherHud:Remove()
 		--end
-		LocalPlayer().SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
-		LocalPlayer():SlasherFunction("InitHud", LocalPlayer().SlasherHud)
+		GameData.LocalPlayer.SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
+		GameData.LocalPlayer:SlasherFunction("InitHud", GameData.LocalPlayer.SlasherHud)
 	end
 	--]]
 
 	hook.Add("scValue_SlasherHudFunc", "SlashCoReceiveHudFunc", function(funcName, ...)
-		if not IsValid(LocalPlayer().SlasherHud) or not LocalPlayer().SlasherHud[funcName] then
+		if not IsValid(GameData.LocalPlayer.SlasherHud) or not GameData.LocalPlayer.SlasherHud[funcName] then
 			return
 		end
 
-		LocalPlayer().SlasherHud[funcName](LocalPlayer().SlasherHud, ...)
+		GameData.LocalPlayer.SlasherHud[funcName](GameData.LocalPlayer.SlasherHud, ...)
 	end)
 
 	return

@@ -1,4 +1,4 @@
-net.Receive("mantislashcoOfferingVoteOut", function()
+net.Receive("mantislashco_OfferingVoteOut", function()
 	local t = net.ReadTable()
 
 	offeror_name = player.GetBySteamID64(t.ply):GetName()
@@ -10,7 +10,7 @@ net.Receive("mantislashcoOfferingVoteOut", function()
 		return
 	end
 
-	if t.ply == LocalPlayer():SteamID64() then
+	if t.ply == GameData.LocalSteamID64 then
 		show_vote_screen = false
 		return
 	end
@@ -18,17 +18,17 @@ net.Receive("mantislashcoOfferingVoteOut", function()
 	show_vote_screen = true
 end)
 
-net.Receive("mantislashcoOfferingEndVote", function()
+net.Receive("mantislashco_OfferingEndVote", function()
 	local t = net.ReadTable()
 
-	if t.ply ~= LocalPlayer():SteamID64() then
+	if t.ply ~= GameData.LocalSteamID64 then
 		return
 	end
 
 	show_vote_screen = false
 end)
 
-net.Receive("mantislashcoOfferingVoteFinished", function()
+net.Receive("mantislashco_OfferingVoteFinished", function()
 	local t = net.ReadTable()
 
 	offering_vote_result = t.r
@@ -37,7 +37,7 @@ net.Receive("mantislashcoOfferingVoteFinished", function()
 end)
 
 hook.Add("HUDPaint", "OfferingVoteHUD", function()
-	local ply = LocalPlayer()
+	local ply = GameData.LocalPlayer
 
 	if show_offering_result_screen == true then
 		if offerjingle_antispam == nil then
@@ -45,7 +45,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 			offerjingle_antispam = true
 		end
 
-		stop_lobbymusic = true
+		SlashCo.AudioSystem.DisableBackgroundMusic()
 
 		if o_tick == nil then
 			o_tick = 1
@@ -60,7 +60,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 
 		if o_tick == 0 then
 			show_offering_result_screen = false
-			stop_lobbymusic = false
+			SlashCo.AudioSystem.EnableBackgroundMusic()
 			lobbymusic_antispam = false
 		end
 

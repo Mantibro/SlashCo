@@ -2,18 +2,6 @@ AddCSLuaFile()
 
 local PLAYER = FindMetaTable("Player")
 
-if SERVER then
-	---print a translated message to a player's chat
-	---follows the rules of chat.AddText()
-	---for a translated string that need formatting, use a table:
-	---{<translation key>, <insert>...}
-	function PLAYER:ChatText(...)
-		SlashCo.SendValue(self, "ChatText", ...)
-	end
-
-	return
-end
-
 ---print a translated message to a player's chat
 ---follows the rules of chat.AddText()
 ---for a translated string that need formatting, use a table:
@@ -29,6 +17,19 @@ function SlashCo.ChatText(...)
 			table.insert(toPrint, v)
 		end
 	end
+
 	chat.AddText(unpack(toPrint))
 end
+
 hook.Add("scValue_ChatText", "SlashCoChatText", SlashCo.ChatText)
+
+if CLIENT then return end
+-- Server only function
+
+---print a translated message to a player's chat
+---follows the rules of chat.AddText()
+---for a translated string that need formatting, use a table:
+---{<translation key>, <insert>...}
+function PLAYER:ChatText(...)
+	SlashCo.SendValue(self, "ChatText", ...)
+end
