@@ -31,15 +31,15 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 SLASHER.ItemToSpawn = "MilkJug"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
 	slasher:SetNWBool("FullMilks", false)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
-	--local SatO = SlashCo.CurRound.OfferingData.SatO
+	--local Satiation = SlashCo.CurRound.OfferingData.Satiation
 
 	local v1 = slasher.SlasherValue1 --Milk drank
 	local v2 = slasher.SlasherValue2 --Pacification
@@ -92,11 +92,11 @@ SLASHER.OnTickBehaviour = function(slasher)
 	end
 	
 	if slasher.SlasherValue1 > 3 then
-	    slasher:SetNWBool("FullMilks", true)
+		slasher:SetNWBool("FullMilks", true)
 	end
 	
 	if slasher:GetNWBool("FullMilks") and not slasher:GetNWBool("DemonPacified") then
-	    slasher.SlasherValue3 = 0
+		slasher.SlasherValue3 = 0
 		eyesight_final = 4
 		perception_final = 2.0
 	end
@@ -111,19 +111,19 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", perception_final)
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("ThirstyDrinking")
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	SlashCo.Jumpscare(slasher, target)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher, target)
+function SLASHER.OnMainAbilityFire(slasher, target)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 	local SatO = SlashCo.CurRound.OfferingData.Satiation
 
@@ -220,7 +220,7 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 	end)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local pac = ply:GetNWBool("DemonPacified")
 
@@ -262,7 +262,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function()
+function SLASHER.Footstep()
 	return true
 end
 
@@ -272,7 +272,7 @@ local milkTable = {
 }
 
 local gray = Color(128, 128, 128)
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_5"))
 	hud:SetTitle("Thirsty")
 
@@ -299,7 +299,7 @@ SLASHER.InitHud = function(_, hud)
 	})
 end
 
-SLASHER.PreDrawHalos = function()
+function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_milkjug"), "gray", 2, false)
 
 	local plyWithItem = {}
@@ -312,7 +312,7 @@ SLASHER.PreDrawHalos = function()
 	SlashCo.DrawHalo(plyWithItem, "gray", 2, false)
 end
 
-SLASHER.ThirstyRage = function(ply)
+function SLASHER.ThirstyRage(ply)
 	local pos = ply:GetPos()
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
@@ -341,26 +341,26 @@ end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Thirsty") == true then
-			if LocalPlayer().thrs_f == nil then
-				LocalPlayer().thrs_f = 0
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Thirsty") == true then
+			if GameData.LocalPlayer.thrs_f == nil then
+				GameData.LocalPlayer.thrs_f = 0
 			end
-			LocalPlayer().thrs_f = LocalPlayer().thrs_f + (FrameTime() * 20)
-			if LocalPlayer().thrs_f > 29 then
-				LocalPlayer().thrs_f = 25
+			GameData.LocalPlayer.thrs_f = GameData.LocalPlayer.thrs_f + (FrameTime() * 20)
+			if GameData.LocalPlayer.thrs_f > 29 then
+				GameData.LocalPlayer.thrs_f = 25
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_5")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().thrs_f))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.thrs_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().thrs_f = nil
+			GameData.LocalPlayer.thrs_f = nil
 		end
 
-		if LocalPlayer():GetNWBool("ThirstyFuck") == true then
+		if GameData.LocalPlayer:GetNWBool("ThirstyFuck") == true then
 			local Overlay = Material("slashco/ui/overlays/thirsty_fuck")
 
 			surface.SetDrawColor(255, 255, 255, 60)

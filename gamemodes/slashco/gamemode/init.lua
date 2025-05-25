@@ -478,7 +478,7 @@ local function Think()
 			end
 		end
 
-        -- having two slashers its not that big of a deal, specially if there's like 14 survivors
+		-- having two slashers its not that big of a deal, specially if there's like 14 survivors
 		-- one generator can be speedrunned instanly in most maps
 
 		--//duality condition//--

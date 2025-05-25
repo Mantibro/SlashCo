@@ -52,7 +52,7 @@ end
 
 function SLASHER.HideTime(slasher)
 	slasher.TylerTime = math.max((25 + SlashCo.MapSize * 25) - ((SlashCo.GetSlasherAnger(slasher) / 2) / SlashCo.MapSize) - team.NumPlayers(TEAM_SURVIVOR), SLASHER.MinTylerTime)
-	print("Tyler transformation time: " .. slasher.TylerTime)
+	-- print("Tyler transformation time: " .. slasher.TylerTime)
 end
 
 local function EndlessChase()
@@ -70,7 +70,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 	
 	if SlashCo.IsSlowEscape() then
-	    endlessChase = true
+		endlessChase = true
 	end
 
 	if (v1 == 0 or v1 == 1) and endlessChase then
@@ -136,8 +136,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.TylerSongPickedID = nil
 			slasher.SlasherValue1 = 2
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
-		    SlashCo.AddSlasherAnger(slasher, 100) -- Max it out
-		    anger = SlashCo.GetSlasherAnger(slasher)
+			SlashCo.AddSlasherAnger(slasher, 100) -- Max it out
+			anger = SlashCo.GetSlasherAnger(slasher)
 			endlessChase = true
 		end
 
@@ -150,12 +150,12 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetNWBool("TylerCreating", true)
 				slasher.SlasherValue2 = 0
 				slasher.TylerSongPickedID = nil
-			    timer.Simple(0.5, function()
-				    if not IsValid(slasher) then
-					    return
-				    end
-                    SlashCo.AudioSystem.StopSound("TylerSong", 0)
-			    end)
+				timer.Simple(0.5, function()
+					if not IsValid(slasher) then
+						return
+					end
+					SlashCo.AudioSystem.StopSound("TylerSong", 0)
+				end)
 			end
 		end
 		--SlashCo.AudioSystem.StopSound("TylerSong", 0)

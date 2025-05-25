@@ -26,11 +26,11 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
-SLASHER.OnSpawn = function(slasher)
-    slasher:SetNWBool("CanChase", true)
+function SLASHER.OnSpawn(slasher)
+	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	local v1 = math.Clamp(slasher.SlasherValue1, 0, 2) --Shock cooldown
 	slasher.SlasherValue1 = v1
 	
@@ -42,12 +42,12 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	--if not slasher:GetNWBool("InSlasherChaseMode") then
 	--	return
 	--end
 
-    if not IsValid(target) or not target:IsPlayer() then
+	if not IsValid(target) or not target:IsPlayer() then
 		return
 	end
 	
@@ -78,13 +78,13 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 					end
 					
 					target1:EmitSound("ambient/energy/spark"..tostring(math.random(1,6))..".wav", 100, 100, 0.25)
-			        local vec, ang = slasher:GetBonePosition(slasher:LookupBone("Hand.R"))
-			        local vPoint = vec
-			        local lightning = EffectData()
-			        lightning:SetOrigin(vPoint + target1:GetPos() + Vector(0, 0, 2))
-			        lightning:SetStart(Vector(255, 0, 0))
-			        lightning:SetAttachment(0)
-			        util.Effect("rocks_lightning", lightning)
+					local vec, ang = slasher:GetBonePosition(slasher:LookupBone("Hand.R"))
+					local vPoint = vec
+					local lightning = EffectData()
+					lightning:SetOrigin(vPoint + target1:GetPos() + Vector(0, 0, 2))
+					lightning:SetStart(Vector(255, 0, 0))
+					lightning:SetAttachment(0)
+					util.Effect("rocks_lightning", lightning)
 				end
 			end
 		end)
@@ -109,17 +109,17 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	--SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:IsOnGround() then
@@ -137,7 +137,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
 		return true
@@ -148,17 +148,17 @@ SLASHER.Footstep = function(ply)
 	end
 end
 
-SLASHER.InitHud = function(_, hud)
-    hud:SetAvatar(Material("slashco/ui/icons/slasher/s_rocks"))
+function SLASHER.InitHud(_, hud)
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_rocks"))
 	hud:SetTitle("CovenantRocks")
 	
-    hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/s_0"))
+	hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/s_0"))
 	--hud:UntieControl("LMB")
-    --hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
+	--hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
 	
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("HUDPaint", "SlashCoZanySurvey", function()
-		if LocalPlayer():Team() ~= TEAM_SLASHER then
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			hook.Remove("HUDPaint", "SlashCoZanySurvey")
 		end
 

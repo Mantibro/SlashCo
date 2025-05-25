@@ -31,11 +31,11 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
-SLASHER.PickUpAttempt = function(ply)
+function SLASHER.PickUpAttempt(ply)
 	return ply:GetNWBool("AmogusSurvivorDisguise")
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	if IsValid(ents.GetByIndex(slasher.SlasherValue3)) then
 		ents.GetByIndex(slasher.SlasherValue3):SetAngles(Angle(0, slasher:EyeAngles()[2], 0))
 	end
@@ -75,7 +75,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetNWBool("AmogusFuelDisguise") then
 		return
 	end
@@ -128,11 +128,11 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	end)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if not slasher:GetNWBool("AmogusDisguising") and slasher.SlasherValue2 < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
@@ -175,7 +175,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 		slasher:SlasherHudFunc("SetAvatar", "default")
 		slasher:SlasherHudFunc("SetTitle", "Amogus")
 
-        slasher:SetModel(SLASHER.Model)
+		slasher:SetModel(SLASHER.Model)
 
 		slasher:SetVisible(true)
 
@@ -195,7 +195,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 	if not slasher:GetNWBool("AmogusDisguising") and slasher.SlasherValue2 < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 		slasher:SetNWBool("AmogusDisguising", true)
 		slasher:Freeze(true)
@@ -235,12 +235,12 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	end
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("AmogusFuelDisguise")
 end
 
-SLASHER.Animator = function(ply)
-    local chase = ply:GetNWBool("InSlasherChaseMode")
+function SLASHER.Animator(ply)
+	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:GetNWBool("AmogusSurvivorDisguise") then
 		return
@@ -261,7 +261,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		if ply:GetNWBool("AmogusFuelDisguise") then
 			return true
@@ -283,23 +283,23 @@ SLASHER.Footstep = function(ply)
 end
 
 hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-	if LocalPlayer():GetNWBool("SurvivorJumpscare_Amogus") == true then
-		if LocalPlayer().amog_f == nil then
-			LocalPlayer().amog_f = 0
+	if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Amogus") == true then
+		if GameData.LocalPlayer.amog_f == nil then
+			GameData.LocalPlayer.amog_f = 0
 		end
-		LocalPlayer().amog_f = LocalPlayer().amog_f + (FrameTime() * 20)
-		if LocalPlayer().amog_f > 59 then
-			LocalPlayer().amog_f = 50
+		GameData.LocalPlayer.amog_f = GameData.LocalPlayer.amog_f + (FrameTime() * 20)
+		if GameData.LocalPlayer.amog_f > 59 then
+			GameData.LocalPlayer.amog_f = 50
 		end
 
 		local Overlay = Material("slashco/ui/overlays/jumpscare_4")
-		Overlay:SetInt("$frame", math.floor(LocalPlayer().amog_f))
+		Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.amog_f))
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(Overlay)
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 	else
-		LocalPlayer().amog_f = nil
+		GameData.LocalPlayer.amog_f = nil
 	end
 end)
 
@@ -321,7 +321,7 @@ local killTable = {
 	["d/sneak kill"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetTitle("Amogus")
 	hud:SetAvatarTable(avatarTable)
 
@@ -337,7 +337,7 @@ SLASHER.InitHud = function(_, hud)
 	local control = hud:GetControl("LMB")
 	control.prevSurvivor = -1
 	function control.AlsoThink()
-		local survivor = LocalPlayer():GetNWBool("AmogusSurvivorDisguise")
+		local survivor = GameData.LocalPlayer:GetNWBool("AmogusSurvivorDisguise")
 		if survivor ~= control.prevSurvivor then
 			if survivor then
 				control:SetText("sneak kill")
@@ -348,7 +348,7 @@ SLASHER.InitHud = function(_, hud)
 			control.prevSurvivor = survivor
 		end
 
-		if survivor and LocalPlayer():GetVelocity():Length() < 1 then
+		if survivor and GameData.LocalPlayer:GetVelocity():Length() < 1 then
 			if not control.prevKill then
 				control:SetEnabled(true)
 				control:Shake()

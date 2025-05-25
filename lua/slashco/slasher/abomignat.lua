@@ -30,12 +30,12 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★★★☆"
 SLASHER.DiffRating = "★★☆☆☆"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher:PlayGlobalSound("slashco/slasher/abomignat_breathing.mp3", 65, nil, true)
 	slasher.AbomignatKills = 0
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	--local SO = SlashCo.CurRound.OfferingData.SO
 
 	v1 = slasher.SlasherValue1 --Main Slash Cooldown
@@ -171,7 +171,7 @@ function SLASHER.HandleDOT(slasher, target)
 	target.AbomignatProcs = target.AbomignatProcs + 3
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
+function SLASHER.OnPrimaryFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher:GetNWBool("AbomignatCrawling") then
@@ -229,11 +229,11 @@ SLASHER.OnPrimaryFire = function(slasher)
 	timer.Create(slasher:EntIndex() .. "_AbomignatSlash", 1, 1, SlashFinish)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("AbomignatCrawling") then
 		slasher:SetNWBool("AbomignatCrawling", false)
 		slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
@@ -269,7 +269,7 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher:GetNWBool("AbomignatCrawling") then
@@ -314,11 +314,11 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	end)
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("AbomignatLunging") or ply:GetNWBool("AbomignatLungeFinish")
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	local abomignat_mainslash = ply:GetNWBool("AbomignatSlashing")
@@ -373,7 +373,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/abomignat_step" .. math.random(1, 3) .. ".mp3")
 		return true
@@ -387,7 +387,7 @@ local controlTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_11"))
 	hud:SetTitle("Abomignat")
 

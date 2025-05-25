@@ -7,14 +7,14 @@ ITEM.Icon = "slashco/ui/icons/items/item_20"
 ITEM.Price = 100
 ITEM.Description = "BalkanBoost_desc"
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.MaxAllowed = function()
+function ITEM.MaxAllowed()
 	return 4
 end
 ITEM.IsSpawnable = false
-ITEM.DisplayColor = function()
+function ITEM.DisplayColor()
 	return 232, 23, 55, 255
 end
-ITEM.OnUse = function(ply)
+function ITEM.OnUse(ply)
 	ply:EmitSound("slashco/survivor/balkan_eat.wav")
 
 	timer.Simple(0.01, function()
@@ -43,46 +43,46 @@ ITEM.OnUse = function(ply)
 				ply:SetNWBool("MarkedBySmiley", false)
 				ply:AddEffect("Slowness", 9999)
 				local hpafter = ply:Health() / 6
-                ply:SetHealth(hpafter)
+				ply:SetHealth(hpafter)
 			end
 		end)
 	end)
 end
 ITEM.ViewModel = {
 	model = ITEM.Model,
-    pos = Vector(64, 0, -6),
-    angle = Angle(-40, -90, -120),
-    size = Vector(0.5, 0.5, 0.5),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	pos = Vector(64, 0, -6),
+	angle = Angle(-40, -90, -120),
+	size = Vector(0.5, 0.5, 0.5),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
 	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Pelvis",
-    pos = Vector(5, 2, 5),
-    angle = Angle(110, -80, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	pos = Vector(5, 2, 5),
+	angle = Angle(110, -80, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModel = {
 	holdtype = "slam",
 	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
-    pos = Vector(3, 2.5, -1),
-    angle = Angle(180, -50, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	pos = Vector(3, 2.5, -1),
+	angle = Angle(180, -50, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 
 SlashCo.RegisterItem(ITEM, "BalkanBoost")
@@ -107,14 +107,14 @@ end
 
 local rand = 0
 hook.Add("RenderScreenspaceEffects", "BalkanBoost", function()
-	if LocalPlayer():GetNWBool("SurvivorBalkanFull") then
+	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
 
 		local tab = {
 			["$pp_colour_addr"] = 0.07,
 			["$pp_colour_addg"] = 0,
 			["$pp_colour_addb"] = 0,
 			["$pp_colour_brightness"] = 0,
-		    ["$pp_colour_contrast"] = 2,
+			["$pp_colour_contrast"] = 2,
 			["$pp_colour_colour"] = 4,
 			["$pp_colour_mulr"] = 0.07,
 			["$pp_colour_mulg"] = 0,
@@ -128,7 +128,7 @@ end)
 local BalkanSound
 
 hook.Add("Think", "BalkanBoost", function()
-	if LocalPlayer():GetNWBool("SurvivorBalkan") then
+	if GameData.LocalPlayer:GetNWBool("SurvivorBalkan") then
 		if not BalkanSound then
 			sound.PlayFile("sound/slashco/balkan_icantstopnow.mp3", "noplay", function(music, errCode, errStr)
 				if IsValid(music) then
@@ -154,24 +154,24 @@ hook.Add("Think", "BalkanBoost", function()
 end)
 
 hook.Add("HUDPaint", "BalkanBoost", function()
-	if LocalPlayer():GetNWBool("SurvivorBalkanFull") then
-		if not LocalPlayer().BalkanVisionTick then
-			LocalPlayer().BalkanVisionTick = 10
+	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
+		if not GameData.LocalPlayer.BalkanVisionTick then
+			GameData.LocalPlayer.BalkanVisionTick = 10
 		end
 
-		if not LocalPlayer().BalkanVision then
-			LocalPlayer().BalkanVision = math.random(0, 30)
+		if not GameData.LocalPlayer.BalkanVision then
+			GameData.LocalPlayer.BalkanVision = math.random(0, 30)
 		end
 
-		if LocalPlayer().BalkanVisionTick < 1 then
+		if GameData.LocalPlayer.BalkanVisionTick < 1 then
 			surface.SetDrawColor(232, 23, 55, 100)
 		end
 
-		if LocalPlayer().BalkanVisionTick < 0 then
-			LocalPlayer().BalkanVision = math.random(0, 30)
-			LocalPlayer().BalkanVisionTick = 1 + (math.random() * 5)
+		if GameData.LocalPlayer.BalkanVisionTick < 0 then
+			GameData.LocalPlayer.BalkanVision = math.random(0, 30)
+			GameData.LocalPlayer.BalkanVisionTick = 1 + (math.random() * 5)
 		end
 
-		LocalPlayer().BalkanVisionTick = LocalPlayer().BalkanVisionTick - (RealFrameTime() * 1)
+		GameData.LocalPlayer.BalkanVisionTick = GameData.LocalPlayer.BalkanVisionTick - (RealFrameTime() * 1)
 	end
 end)

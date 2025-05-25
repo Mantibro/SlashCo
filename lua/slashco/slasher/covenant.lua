@@ -31,13 +31,13 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
-SLASHER.OnSpawn = function(slasher)
-    slasher:PlayGlobalSound("slashco/slasher/ltg_ritual" .. math.random(1, 6) .. ".mp3", 100)
+function SLASHER.OnSpawn(slasher)
+	slasher:PlayGlobalSound("slashco/slasher/ltg_ritual" .. math.random(1, 6) .. ".mp3", 100)
 	slasher:SetNWBool("CanChase", true)
 	slasher.RockSummoned = false
 end
 
-SLASHER.SummonCovenantMembers = function(target)
+function SLASHER.SummonCovenantMembers(target)
 	-- Ahora acepta un argumento para el jugador a convertir
 	local clk = target
 	if IsValid(clk) then
@@ -53,7 +53,7 @@ SLASHER.SummonCovenantMembers = function(target)
 	end
 end
 
-SLASHER.SummonRocks = function(vic)
+function SLASHER.SummonRocks(vic)
 	SlashCo.SelectSlasher("CovenantRocks", vic:SteamID64())
 	SlashCo.ApplySlasherToPlayer(vic)
 	vic:SetTeam(TEAM_SLASHER)
@@ -62,7 +62,7 @@ SLASHER.SummonRocks = function(vic)
 	SlashCo.BroadcastCurrentRoundData(false)
 end
 
-SLASHER.OnTickBehaviour = function(slasher, cloak)
+function SLASHER.OnTickBehaviour(slasher, cloak)
 	for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		--Sync the chase for every slasher, meaning every covenant member
 
@@ -83,7 +83,7 @@ SLASHER.OnTickBehaviour = function(slasher, cloak)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	if not IsValid(target) or not target:IsPlayer() then
 		return
 	end
@@ -174,20 +174,20 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
-    if slasher:GetNWBool("InSlasherChaseMode") then
-	    return
+function SLASHER.OnSecondaryFire(slasher)
+	if slasher:GetNWBool("InSlasherChaseMode") then
+		return
 	end
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:IsOnGround() then
@@ -205,7 +205,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
 		return true
@@ -216,8 +216,8 @@ SLASHER.Footstep = function(ply)
 	end
 end
 
-SLASHER.InitHud = function(_, hud)
-    hud:SetAvatar(Material("slashco/ui/icons/slasher/s_18"))
+function SLASHER.InitHud(_, hud)
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_18"))
 	hud:SetTitle("Covenant")
 	
 	hud:AddControl("LMB", "covenant_member", Material("slashco/ui/icons/slasher/s_covenantcloak"))
@@ -225,7 +225,7 @@ SLASHER.InitHud = function(_, hud)
 	
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("HUDPaint", "SlashCoZanySurvey", function()
-		if LocalPlayer():Team() ~= TEAM_SLASHER then
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			hook.Remove("HUDPaint", "SlashCoZanySurvey")
 		end
 

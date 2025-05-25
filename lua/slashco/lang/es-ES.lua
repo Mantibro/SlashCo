@@ -1,7 +1,7 @@
 --[[
 
-    Language: es-ES, (Spanish), (Español)
-    Translator: Sherrifdoggo
+	Language: es-ES, (Spanish), (Español)
+	Translator: Sherrifdoggo
 
 ]]
 

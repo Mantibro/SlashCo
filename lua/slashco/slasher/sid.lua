@@ -444,7 +444,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("SidEating")
 end
 

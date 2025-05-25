@@ -5,10 +5,10 @@ local EFFECT = {}
 EFFECT.Name = "Balkan"
 EFFECT.ChangesSpeed = true
 EFFECT.FuelSpeed = 3.5
-EFFECT.OnApplied = function(ply)
+function EFFECT.OnApplied(ply)
 	ply:AddSpeedEffect("buzzEffect", 600, 20)
 end
-EFFECT.OnExpired = function(ply)
+function EFFECT.OnExpired(ply)
 	ply:RemoveSpeedEffect("buzzEffect")
 end
 
@@ -24,8 +24,8 @@ local colors = {
 	["$pp_colour_mulb"] = 0
 }
 
-EFFECT.Screenspace = function()
-    DrawSobel(0.13	)
+function EFFECT.Screenspace()
+	DrawSobel(0.13	)
 	DrawSharpen(0.8, 0.8)
 	DrawMotionBlur(0.5, 0.6, 0.05)
 	DrawToyTown(4, ScrH() / 2)

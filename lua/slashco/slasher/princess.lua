@@ -243,7 +243,7 @@ function SLASHER.Maul(slasher, target)
 	SlashCo.StopChase(slasher)
 	slasher:SetNWBool("PrincessMaulingBase", false)
 
-    slasher:Freeze(true)
+	slasher:Freeze(true)
 
 	if not eatBabyFromPlayer then
 		timer.Simple(0, function() -- ToDo: Why do we even need a timer? Verify.
@@ -309,7 +309,7 @@ function SLASHER.Maul(slasher, target)
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 
 		if IsValid(slasher.ref_child) then
-		    slasher:SetNWBool("PrincessMaulingChild", false)
+			slasher:SetNWBool("PrincessMaulingChild", false)
 			slasher.ref_child:Remove()
 		end
 
@@ -455,7 +455,7 @@ end
 function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("PrincessMaulingChild") or ply:GetNWBool("PrincessMaulingSurvivor") or ply:GetNWBool("PrincessSniffing")
 end
 

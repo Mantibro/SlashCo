@@ -30,14 +30,14 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 85))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 85))
 	slasher:PlayGlobalSound("slashco/slasher/borgmire_heartbeat.mp3", 50, nil, true)
 	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --Time Spent chasing
@@ -99,7 +99,7 @@ SLASHER.OnTickBehaviour = function(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
+function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("BorgmireThrow") then
 		return
 	end
@@ -164,11 +164,11 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher, target)
+function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if slasher.BorgPunching then
 		return
 	end
@@ -239,7 +239,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher, target)
 	end)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local borg_punch = ply:GetNWBool("BorgmirePunch")
 	local borg_throw = ply:GetNWBool("BorgmireThrow")
@@ -281,7 +281,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		if ply.BorgStepTick == nil or ply.BorgStepTick > 1 then
 			ply.BorgStepTick = 0
@@ -299,7 +299,7 @@ SLASHER.Footstep = function(ply)
 	return true
 end
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_8"))
 	hud:SetTitle("Borgmire")
 

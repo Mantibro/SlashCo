@@ -409,7 +409,7 @@ hook.Add("GameContentChanged", "SlashCo:RefreshMapConfigs", SlashCo.LoadMapConfi
 function SlashCo.IsPositionLegalForSlashers(pos, noSurvivorCheck, distFactor)
 	local dist = (600 + GetGlobal2Int("SlashCoMapSize", 1) * 150) * (distFactor or 1)
 
-    -- removing this may not be the best solution, need to check if theres a better way
+	-- removing this may not be the best solution, need to check if theres a better way
 	-- to prevent unplayable rounds for slashers that use this function
 	
 	--[[for _, v in ipairs(ents.FindInSphere(pos, dist)) do

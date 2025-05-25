@@ -26,11 +26,11 @@ SLASHER.SpeedRating = "★☆☆☆☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
-SLASHER.OnSpawn = function(slasher)
-    slasher:SetNWBool("CanChase", true)
+function SLASHER.OnSpawn(slasher)
+	slasher:SetNWBool("CanChase", true)
 end
 
-SLASHER.TackleFail = function(slasher)
+function SLASHER.TackleFail(slasher)
 	if IsValid(slasher) then
 		if slasher.TackledPlayer == nil then
 			slasher:SetNWBool("CloakTackleFail", true)
@@ -52,7 +52,7 @@ end
 local SURVIVOR_STUN_TIME = 1.2
 local SLASHER_STUN_TIME = 4.5
 
-SLASHER.OnTickBehaviour = function(slasher, target)
+function SLASHER.OnTickBehaviour(slasher, target)
 	if IsValid(slasher.TackledPlayer) then
 		if not slasher:IsFrozen() then
 			slasher:Freeze(true)
@@ -71,8 +71,8 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 			slasher:SetPos(slasher.TackledPlayer:GetPos() + Vector(0, 0, 80))
 			slasher.TackledPlayer = nil
 			timer.Simple(2.0, function()
-			    slasher:Freeze(false)
-		    end)
+				slasher:Freeze(false)
+			end)
 		end
 	end
 
@@ -139,7 +139,7 @@ SLASHER.OnTickBehaviour = function(slasher, target)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
+function SLASHER.OnPrimaryFire(slasher)
 	if IsValid(slasher.TackledPlayer) then
 		return
 	end
@@ -166,20 +166,20 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("CloakTackle") or ply:GetNWBool("CloakTackling")
 end
 
-SLASHER.Animator = function(ply, veloc)
+function SLASHER.Animator(ply, veloc)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:IsOnGround() then
@@ -219,7 +219,7 @@ SLASHER.Animator = function(ply, veloc)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
 		return true
@@ -230,15 +230,15 @@ SLASHER.Footstep = function(ply)
 	end
 end
 
-SLASHER.InitHud = function(_, hud)
-    hud:SetAvatar(Material("slashco/ui/icons/slasher/s_covenantcloak"))
+function SLASHER.InitHud(_, hud)
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_covenantcloak"))
 	hud:SetTitle("CovenantCloak")
 	
-    hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/s_0"))
+	hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/s_0"))
 	
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("HUDPaint", "SlashCoZanySurvey", function()
-		if LocalPlayer():Team() ~= TEAM_SLASHER then
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			hook.Remove("HUDPaint", "SlashCoZanySurvey")
 		end
 

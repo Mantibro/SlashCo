@@ -112,14 +112,14 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
 			SlashCo.AudioSystem.PlaySound({
-		        soundPath = "slashco/slasher/trollge/trollge_stage1.mp3",
-		        identifier = "TrollgeStage1",
-		        soundLevel = 120,
-		        looping = true,
-		        entity = slasher,
-		        volume = 1,
-		        fadeIn = 1,
-	        })
+				soundPath = "slashco/slasher/trollge/trollge_stage1.mp3",
+				identifier = "TrollgeStage1",
+				soundLevel = 120,
+				looping = true,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 1,
+			})
 
 			slasher:SetRunSpeed(280)
 			slasher:SetWalkSpeed(150)
@@ -159,14 +159,14 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:Freeze(false)
 			--slasher:PlayGlobalSound("slashco/slasher/trollge_stage7.wav", 60, nil, true)
 			SlashCo.AudioSystem.PlaySound({
-		        soundPath = "slashco/slasher/trollge/trollge_stage7.mp3",
-		        identifier = "TrollgeStage2",
-		        soundLevel = 140,
-		        looping = true,
-		        entity = slasher,
-		        volume = 1,
-		        fadeIn = 1,
-	        })
+				soundPath = "slashco/slasher/trollge/trollge_stage7.mp3",
+				identifier = "TrollgeStage2",
+				soundLevel = 140,
+				looping = true,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 1,
+			})
 
 			slasher:SetRunSpeed(450)
 			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
@@ -231,7 +231,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 	
-	    local find = ents.FindInSphere(slasher:GetPos(), 60)
+		local find = ents.FindInSphere(slasher:GetPos(), 60)
 
 		for f = 1, #find do
 			local ent = find[f]
@@ -240,48 +240,48 @@ function SLASHER.OnTickBehaviour(slasher)
 				--WHAT HAVE YOU DONE...
 				ent:Remove()
 				slasher.SlasherValue3 = 8
-		        slasher:SetNWBool("TrollgeTransition", true)
-		        slasher:Freeze(true)
-		        slasher:StopSound("slashco/slasher/trollge_breathing.wav")
-	 	        slasher:PlayGlobalSound("slashco/slasher/trollge/trollge_transition.mp3", 125)
+				slasher:SetNWBool("TrollgeTransition", true)
+				slasher:Freeze(true)
+				slasher:StopSound("slashco/slasher/trollge_breathing.wav")
+	 			slasher:PlayGlobalSound("slashco/slasher/trollge/trollge_transition.mp3", 125)
 
-		        for i = 1, #player.GetAll() do
-			        local ply = player.GetAll()[i]
-			        ply:SetNWBool("DisplayTrollgeTransition", true)
-		        end
+				for i = 1, #player.GetAll() do
+					local ply = player.GetAll()[i]
+					ply:SetNWBool("DisplayTrollgeTransition", true)
+				end
 
-		        timer.Simple(7, function()
-			        if not IsValid(slasher) then
-				        return
-			        end
+				timer.Simple(7, function()
+					if not IsValid(slasher) then
+						return
+					end
 
-			        --transit
-			        slasher:StopSound("slashco/slasher/trollge_breathing.wav")
-			        slasher.SlasherValue1 = 2
-			        slasher:SetNWBool("TrollgeTransition", false)
-			        slasher:Freeze(false)
-			        SlashCo.AudioSystem.PlaySound({
-		                soundPath = "slashco/slasher/trollge/trollge_stage7.mp3",
-		                identifier = "TrollgeStage2",
-		                soundLevel = 140,
-		                looping = true,
-		                entity = slasher,
-		                volume = 1,
-		                fadeIn = 1,
-	                })
+					--transit
+					slasher:StopSound("slashco/slasher/trollge_breathing.wav")
+					slasher.SlasherValue1 = 2
+					slasher:SetNWBool("TrollgeTransition", false)
+					slasher:Freeze(false)
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/trollge/trollge_stage7.mp3",
+						identifier = "TrollgeStage2",
+						soundLevel = 140,
+						looping = true,
+						entity = slasher,
+						volume = 1,
+						fadeIn = 1,
+					})
 
-			        slasher:SetRunSpeed(450)
-			        slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
-			        final_eyesight = 10
+					slasher:SetRunSpeed(450)
+					slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+					final_eyesight = 10
 					slasher:SetNWBool("CanKill", true)
 
-			        for i = 1, #player.GetAll() do
-				        local ply = player.GetAll()[i]
-				        ply:SetNWBool("DisplayTrollgeTransition", false)
-			        end
-		        end)
-		    end
-        end
+					for i = 1, #player.GetAll() do
+						local ply = player.GetAll()[i]
+						ply:SetNWBool("DisplayTrollgeTransition", false)
+					end
+				end)
+			end
+		end
 
 	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
@@ -453,7 +453,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	end
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("TrollgeDashing") or ply:GetNWBool("TrollgeDashFinish")
 end
 

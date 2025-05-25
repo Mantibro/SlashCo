@@ -100,8 +100,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 			return
 		end
 
-	    SlashCo.AudioSystem.StopSound("Speedrun1", 0.5)
-	    SlashCo.AudioSystem.StopSound("Speedrun2", 0.5)
+		SlashCo.AudioSystem.StopSound("Speedrun1", 0.5)
+		SlashCo.AudioSystem.StopSound("Speedrun2", 0.5)
 	end)
 
 	slasher:Freeze(true)
@@ -124,14 +124,14 @@ function SLASHER.OnMainAbilityFire(slasher)
 		if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
 			slasher:SetNWBool("SpeedrunnerSacrificeOne", true)
 			SlashCo.AudioSystem.PlaySound({
-		        soundPath = "slashco/slasher/speedrunner/speedrunner_2.mp3",
-		        identifier = "Speedrun2",
-		        soundLevel = 10000,
-		        looping = true,
-		        entity = slasher,
-		        volume = 1,
-		        fadeIn = 1,
-	        })
+				soundPath = "slashco/slasher/speedrunner/speedrunner_2.mp3",
+				identifier = "Speedrun2",
+				soundLevel = 10000,
+				looping = true,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 1,
+			})
 			slasher.SlasherValue2 = 2
 			slasher.SlasherValue3 = 325
 			SLASHER.RandomTPCans()
@@ -142,14 +142,14 @@ function SLASHER.OnMainAbilityFire(slasher)
 		if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
 			slasher:SetNWBool("SpeedrunnerSacrificeTwo", true)
 			SlashCo.AudioSystem.PlaySound({
-		        soundPath = "slashco/slasher/speedrunner/speedrunner_3.mp3",
-		        identifier = "Speedrun3",
-		        soundLevel = 10000,
-		        looping = true,
-		        entity = slasher,
-		        volume = 1,
-		        fadeIn = 1,
-	        })
+				soundPath = "slashco/slasher/speedrunner/speedrunner_3.mp3",
+				identifier = "Speedrun3",
+				soundLevel = 10000,
+				looping = true,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 1,
+			})
 			slasher.SlasherValue2 = 4
 			slasher.SlasherValue3 = 500
 			slasher:SetBodygroup(1, 1)

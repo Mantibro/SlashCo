@@ -30,7 +30,7 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.CannotBeSpectated = true
 
-SLASHER.OnSpawn = function(slasher)
+function SLASHER.OnSpawn(slasher)
 	slasher.Jump = slasher:GetJumpPower()
 end
 
@@ -56,7 +56,7 @@ local function PlayCallSound(slasher)
 	})
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
+function SLASHER.OnTickBehaviour(slasher)
 	local v1 = slasher.SlasherValue1 --Hunt power
 
 	local hunt_boost = 0
@@ -196,11 +196,11 @@ function SLASHER.OnHitByTeslaCoil(slasher)
 	slasher:SetNWBool("DolphinInHiding", false) -- Evitar que si es encontrado durante el stun se softlockee.
 end
 
-SLASHER.Thirdperson = function(ply)
+function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("DolphinInHiding")
 end
 
-SLASHER.CanBeSeen = function(ply)
+function SLASHER.CanBeSeen(ply)
 	if SERVER then
 		return
 	end
@@ -210,34 +210,34 @@ SLASHER.CanBeSeen = function(ply)
 	end
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher.KillDelayTick > 0 then
 		return
 	end
 	
 	if SlashCo.Jumpscare(slasher, target) then
-	    if slasher:GetNWBool("DolphinHunting") then
-		    slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 15)
-		    slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
+		if slasher:GetNWBool("DolphinHunting") then
+			slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 15)
+			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 		else
-		    slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 20)
-		    slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
+			slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 20)
+			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 		end
 	end
 	
-    if slasher:GetNWBool("DolphinHunting") then
-	    slasher.KillDelayTick = SLASHER.KillDelay
+	if slasher:GetNWBool("DolphinHunting") then
+		slasher.KillDelayTick = SLASHER.KillDelay
 	else
-	    slasher.KillDelayTick = SLASHER.KillDelay + 4.5
+		slasher.KillDelayTick = SLASHER.KillDelay + 4.5
 	end
 	
 	slasher.KillDelayTick = SLASHER.KillDelay
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
+function SLASHER.OnMainAbilityFire(slasher)
 	if not slasher:GetNWBool("DolphinHunting") and not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
 		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
 			return
@@ -264,10 +264,10 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local hunt = ply:GetNWBool("DolphinHunting")
 	local hide = ply:GetNWBool("DolphinInHiding")
 	local found = ply:GetNWBool("DolphinFound")
@@ -295,7 +295,7 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/amogus_step" .. math.random(1, 3) .. ".mp3", 75, 130)
 	end
@@ -309,7 +309,7 @@ local hideIcons = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_16"))
 	hud:SetTitle("Dolphinman")
 
@@ -325,10 +325,10 @@ SLASHER.InitHud = function(_, hud)
 	hud.prevHide = -1
 	function hud.AlsoThink()
 		local hide
-		if LocalPlayer():GetNWBool("DolphinInHiding") then
-			hide = not LocalPlayer():GetNWBool("DolphinFound") and LocalPlayer():GetNWInt("DolphinHunt") >= 5
+		if GameData.LocalPlayer:GetNWBool("DolphinInHiding") then
+			hide = not GameData.LocalPlayer:GetNWBool("DolphinFound") and GameData.LocalPlayer:GetNWInt("DolphinHunt") >= 5
 		else
-			hide = SlashCo.IsPositionLegalForSlashers(LocalPlayer():GetPos())
+			hide = SlashCo.IsPositionLegalForSlashers(GameData.LocalPlayer:GetPos())
 		end
 
 		if hud.prevHide ~= hide then
@@ -340,29 +340,29 @@ end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Dolphinman") == true then
-			if LocalPlayer().dolf_f == nil then
-				LocalPlayer().dolf_f = 0
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Dolphinman") == true then
+			if GameData.LocalPlayer.dolf_f == nil then
+				GameData.LocalPlayer.dolf_f = 0
 			end
-			LocalPlayer().dolf_f = LocalPlayer().dolf_f + (FrameTime() * 20)
-			if LocalPlayer().dolf_f > 29 then
-				LocalPlayer().dolf_f = 28
+			GameData.LocalPlayer.dolf_f = GameData.LocalPlayer.dolf_f + (FrameTime() * 20)
+			if GameData.LocalPlayer.dolf_f > 29 then
+				GameData.LocalPlayer.dolf_f = 28
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_16")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().dolf_f))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.dolf_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().dolf_f = nil
+			GameData.LocalPlayer.dolf_f = nil
 		end
 	end)
 	hook.Add("Tick", "DolphinmanLight", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 
-			if v == LocalPlayer() then
+			if v == GameData.LocalPlayer then
 				return
 			end
 

@@ -7,7 +7,7 @@ SlashCo.AudioSystem.Sounds = SlashCo.AudioSystem.Sounds or {}
 
 -- Needed since WriteSoundField else wouldn't work.
 -- ToDo: Why do we even use the EntIndex and not the Entity handle?
---       Probably because the Entity handle might not get valid when we call Entity(index) before it was created?
+--	   Probably because the Entity handle might not get valid when we call Entity(index) before it was created?
 local function WriteEntIndex(entity)
 	net.WriteUInt(entity:EntIndex(), MAX_EDICT_BITS)
 end
