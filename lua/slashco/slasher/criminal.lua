@@ -1,6 +1,10 @@
 local SLASHER = {}
 
 SLASHER.Name = "Criminal"
+SLASHER.Aliases = {
+	"The Man Behind the Slaughter",
+	"The Purple Guy",
+}
 SLASHER.ID = 12
 SLASHER.Class = 3
 SLASHER.DangerLevel = 3
@@ -37,6 +41,7 @@ function SLASHER.OnSpawn(slasher)
 	clone:Activate()
 
 	slasher:SetVisible(false)
+	slasher:DrawShadow(false)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -110,8 +115,8 @@ function SLASHER.OnSecondaryFire(slasher)
 			if cln.IsMain ~= true then
 				cln:Remove()
 			end
-			cln:StopSound("slashco/slasher/criminal_loop.mp3")
-			cln:StopSound("slashco/slasher/criminal_rage.mp3")
+			cln:StopSound("slashco/slasher/criminal_loop.wav")
+			cln:StopSound("slashco/slasher/criminal_rage.wav")
 		end
 
 		slasher:SetNWBool("CriminalCloning", false)

@@ -1,6 +1,10 @@
 local SLASHER = {}
 
 SLASHER.Name = "Manspider"
+SLASHER.Aliases = {
+	"The Worst",
+	"Itsy Bitsy",
+}
 SLASHER.ID = 9
 SLASHER.Class = 1
 SLASHER.DangerLevel = 2
@@ -8,8 +12,8 @@ SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/manspider/manspider.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 5
-SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 290
+SLASHER.ProwlSpeed = 250
+SLASHER.ChaseSpeed = 315
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
 SLASHER.KillDistance = 150
@@ -27,13 +31,13 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 SLASHER.CannotBeSpectated = true
 
-function SLASHER.OnSpawn(slasher)
+SLASHER.OnSpawn = function(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
 	slasher.Jump = slasher:GetJumpPower()
 end
 
-function SLASHER.OnTickBehaviour(slasher)
+SLASHER.OnTickBehaviour = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	local v1 = slasher.SlasherValue1 --Target SteamID
@@ -182,7 +186,7 @@ function SLASHER.OnKillPlayer(slasher, target)
 	slasher.SlasherValue1 = "" -- We killed our prey, so reset it or else he might persist in case he had multiple lives
 end
 
-function SLASHER.OnPrimaryFire(slasher, target)
+SLASHER.OnPrimaryFire = function(slasher, target)
 	if not IsValid(target) or not target:IsPlayer() then
 		return
 	end
@@ -195,11 +199,11 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	end
 end
 
-function SLASHER.Thirdperson(ply)
+SLASHER.Thirdperson = function(ply)
 	return ply:GetNWBool("ManspiderNested")
 end
 
-function SLASHER.CanBeSeen(ply)
+SLASHER.CanBeSeen = function(ply)
 	if SERVER then
 		return
 	end
@@ -209,7 +213,7 @@ function SLASHER.CanBeSeen(ply)
 	end
 end
 
-function SLASHER.OnSecondaryFire(slasher)
+SLASHER.OnSecondaryFire = function(slasher)
 	local target = slasher:GetEyeTrace().Entity
 
 	if not target:IsPlayer() then
@@ -223,8 +227,12 @@ function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-function SLASHER.OnMainAbilityFire(slasher)
+SLASHER.OnMainAbilityFire = function(slasher)
 	if slasher.SlasherValue1 ~= "" then
+		return
+	end
+	
+	if not slasher:IsOnGround() then
 		return
 	end
 
@@ -239,7 +247,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetWalkSpeed(1)
 		slasher:SetSlowWalkSpeed(1)
 	else
-		if slasher.SlasherValue3 > 50 then
+		if slasher.SlasherValue3 > 50 or not slasher:IsOnGround() then
 			slasher:SetNWBool("ManspiderNested", false)
 
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
@@ -249,7 +257,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	end
 end
 
-function SLASHER.OnSpecialAbilityFire(slasher)
+SLASHER.OnSpecialAbilityFire = function(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if slasher.SlasherValue2 > 0 then
@@ -260,7 +268,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetNWBool("ManspiderNested") then
 		return
 	end
 
@@ -273,6 +281,10 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		if not IsValid(slasher) then
 			return
 		end
+		
+		if slasher:GetNWBool("ManspiderNested") then
+		    return
+	    end
 
 		local strength_forward = 800 + (SO * 500)
 		local strength_up = 200 + (SO * 100)
@@ -282,7 +294,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end)
 end
 
-function SLASHER.Animator(ply)
+SLASHER.Animator = function(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local manspider_nest = ply:GetNWBool("ManspiderNested")
 
@@ -305,7 +317,7 @@ function SLASHER.Animator(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-function SLASHER.Footstep(ply)
+SLASHER.Footstep = function(ply)
 	if SERVER then
 		ply:EmitSound("slashco/slasher/manspider_step.mp3")
 		return true
@@ -338,7 +350,7 @@ local nestTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-function SLASHER.InitHud(_, hud)
+SLASHER.InitHud = function(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_9"))
 	hud:SetTitle("Manspider")
 
@@ -349,7 +361,7 @@ function SLASHER.InitHud(_, hud)
 	hud:TieControlVisible("LMB", "CanKill")
 	hud:TieControlVisible("RMB", "CanChase")
 	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/s_punch"))
-	hud:TieControlVisible("F", "InSlasherChaseMode", true, false, true)
+	hud:TieControlVisible("F", "ManspiderNested", true, false, false)
 	hud:TieControl("F", "CanLeap", false, true)
 
 	hud.prevTarget = -1
@@ -357,7 +369,7 @@ function SLASHER.InitHud(_, hud)
 	hud.prevLeave = -1
 	hud.prevHide = -1
 	function hud.AlsoThink()
-		local target = GameData.LocalPlayer:GetNWString("ManspiderTarget")
+		local target = LocalPlayer():GetNWString("ManspiderTarget")
 		if target ~= hud.prevTarget then
 			if target == "" then
 				hook.Remove("HUDPaint", "SlashCoPreyReal")
@@ -371,13 +383,13 @@ function SLASHER.InitHud(_, hud)
 				end
 
 				hook.Add("HUDPaint", "SlashCoPreyReal", function()
-					if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not IsValid(targetEnt) then
+					if LocalPlayer():Team() ~= TEAM_SLASHER or not IsValid(targetEnt) then
 						hook.Remove("HUDPaint", "SlashCoPreyReal")
 					end
 
 					targetPaint(targetEnt)
 
-					local distColor = math.Clamp(GameData.LocalPlayer:GetPos():Distance(targetEnt:GetPos()), 0, 2048) / 16
+					local distColor = math.Clamp(LocalPlayer():GetPos():Distance(targetEnt:GetPos()), 0, 2048) / 16
 					draw.SimpleText("Your prey: " .. targetEnt:Name(), "ItemFontTip",
 							ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
 							TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -386,7 +398,7 @@ function SLASHER.InitHud(_, hud)
 			hud.prevTarget = target
 		end
 
-		local nested = GameData.LocalPlayer:GetNWBool("ManspiderNested")
+		local nested = LocalPlayer():GetNWBool("ManspiderNested")
 		if nested ~= hud.prevNested then
 			hud:ShakeControl("R")
 			if nested then
@@ -399,7 +411,7 @@ function SLASHER.InitHud(_, hud)
 			hud.prevNested = nested
 		end
 
-		local hide = SlashCo.IsPositionLegalForSlashers(GameData.LocalPlayer:GetPos())
+		local hide = SlashCo.IsPositionLegalForSlashers(LocalPlayer():GetPos())
 		if hud.prevHide ~= hide then
 			if not nested then
 				hud:SetControlEnabled("R", hide)
@@ -408,7 +420,7 @@ function SLASHER.InitHud(_, hud)
 			hud.prevHide = hide
 		end
 
-		local canLeave = GameData.LocalPlayer:GetNWBool("ManspiderCanLeaveNest")
+		local canLeave = LocalPlayer():GetNWBool("ManspiderCanLeaveNest")
 		if canLeave ~= hud.prevLeave then
 			if nested and canLeave then
 				hud:SetControlText("R", "abandon nest")
@@ -423,23 +435,23 @@ end
 
 if CLIENT then
 	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Manspider") == true then
-			if GameData.LocalPlayer.mans_f == nil then
-				GameData.LocalPlayer.mans_f = 0
+		if LocalPlayer():GetNWBool("SurvivorJumpscare_Manspider") == true then
+			if LocalPlayer().mans_f == nil then
+				LocalPlayer().mans_f = 0
 			end
-			GameData.LocalPlayer.mans_f = GameData.LocalPlayer.mans_f + (FrameTime() * 20)
-			if GameData.LocalPlayer.mans_f > 59 then
-				GameData.LocalPlayer.mans_f = 58
+			LocalPlayer().mans_f = LocalPlayer().mans_f + (FrameTime() * 20)
+			if LocalPlayer().mans_f > 59 then
+				LocalPlayer().mans_f = 58
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_9")
-			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.mans_f))
+			Overlay:SetInt("$frame", math.floor(LocalPlayer().mans_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			GameData.LocalPlayer.mans_f = nil
+			LocalPlayer().mans_f = nil
 		end
 	end)
 end

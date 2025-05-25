@@ -1,53 +1,68 @@
- local SLASHER = {}
+local SLASHER = {}
 
 SLASHER.PlayersToBecomePartOfCovenant = {}
 
 SLASHER.Name = "The Covenant"
+SLASHER.Aliases = {
+	"Low Tier God",
+}
 SLASHER.ID = 18
 SLASHER.Class = 1
-SLASHER.DangerLevel = 1
-SLASHER.IsSelectable = false
+SLASHER.DangerLevel = 3
+SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/covenant/covenant.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 297
+SLASHER.ChaseSpeed = 275
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 3
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 160.0
+SLASHER.ChaseDuration = 30.0
 SLASHER.ChaseCooldown = 7
-SLASHER.JumpscareDuration = 1.5
+SLASHER.JumpscareDuration = 2.0
 SLASHER.ChaseMusic = "slashco/slasher/covenant_chase.mp3"
-SLASHER.KillSound = "slashco/slasher/"
+SLASHER.KillSound = ""
 SLASHER.Description = "Covenant_desc"
 SLASHER.ProTip = "Covenant_tip"
-SLASHER.SpeedRating = "★★★★★"
+SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
-function SLASHER.OnSpawn(slasher)
+SLASHER.OnSpawn = function(slasher)
+    slasher:PlayGlobalSound("slashco/slasher/ltg_ritual" .. math.random(1, 6) .. ".mp3", 100)
 	slasher:SetNWBool("CanChase", true)
+	slasher.RockSummoned = false
 end
 
-function SLASHER.SummonCovenantMembers()
-	for _, v in ipairs(SLASHER.PlayersToBecomePartOfCovenant) do
-		local clk = player.GetBySteamID64(v.steamid)
-		SlashCo.SelectSlasher("CovenantCloak", v.steamid)
+SLASHER.SummonCovenantMembers = function(target)
+	-- Ahora acepta un argumento para el jugador a convertir
+	local clk = target
+	if IsValid(clk) then
+		SlashCo.SelectSlasher("CovenantCloak", clk:SteamID64())
+		SlashCo.ApplySlasherToPlayer(clk)
 		clk:SetTeam(TEAM_SLASHER)
 		clk:Spawn()
+		SlashCo.OnSlasherSpawned(clk)
+		SlashCo.BroadcastCurrentRoundData(false)
+		
+		-- Añadimos al jugador a la tabla por si necesitamos hacer un seguimiento
+		table.insert(SLASHER.PlayersToBecomePartOfCovenant, {steamid = clk:SteamID64()})
 	end
 end
 
-function SLASHER.SummonRocks(vic)
+SLASHER.SummonRocks = function(vic)
 	SlashCo.SelectSlasher("CovenantRocks", vic:SteamID64())
+	SlashCo.ApplySlasherToPlayer(vic)
 	vic:SetTeam(TEAM_SLASHER)
 	vic:Spawn()
+	SlashCo.OnSlasherSpawned(vic)
+	SlashCo.BroadcastCurrentRoundData(false)
 end
 
-function SLASHER.OnTickBehaviour(slasher)
+SLASHER.OnTickBehaviour = function(slasher, cloak)
 	for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		--Sync the chase for every slasher, meaning every covenant member
 
@@ -68,92 +83,111 @@ function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
 
-function SLASHER.OnPrimaryFire(slasher, target)
-	if not slasher:GetNWBool("CovenantSummoned") then
-		if not slasher:GetNWBool("CovenantSummoning") then
-			--local dist = slasher:SlasherValue("KillDistance", 135)
+SLASHER.OnPrimaryFire = function(slasher, target)
+	if not IsValid(target) or not target:IsPlayer() then
+		return
+	end
 
-			if IsValid(target) and target:IsPlayer() then
-				target:Kill()
+	if target:Team() ~= TEAM_SURVIVOR then
+		return
+	end
+	
+	if slasher:GetPos():Distance(target:GetPos()) >= 135 then
+		return
+	end
 
-				timer.Simple(FrameTime(), function()
-					local ragdoll = target.DeadBody
-					--[[ragdoll:SetModel("models/player/corpse1.mdl")
-					ragdoll:SetPos(slasher:LocalToWorld( Vector(20,0,5) ))
-					ragdoll:SetNoDraw(false)
-					ragdoll:Spawn()]]
+	if not slasher:GetNWBool("CovenantSummoning") then
+		target:Kill()
+		timer.Simple(FrameTime(), function()
+			local ragdoll = target.DeadBody
 
-					local physCount = ragdoll:GetPhysicsObjectCount()
+			local physCount = ragdoll:GetPhysicsObjectCount()
 
-					timer.Simple(2, function()
-						for i = 0, (physCount - 1) do
-							local PhysBone = ragdoll:GetPhysicsObjectNum(i)
+			timer.Simple(2, function()
+				for i = 0, (physCount - 1) do
+					local PhysBone = ragdoll:GetPhysicsObjectNum(i)
 
-							if PhysBone:IsValid() then
-								PhysBone:EnableGravity(false)
-							end
-						end
+					if PhysBone:IsValid() then
+						PhysBone:EnableGravity(false)
+					end
+				end
+			end)
+
+			if not slasher.RockSummoned then
+				-- Primera víctima se convierte en Rocks
+				timer.Simple(4, function()
+					SLASHER.SummonRocks(target)
+					target:Freeze(true)
+
+					timer.Simple(3, function()
+						target:Freeze(false)
+						target:SetNWBool("RocksBeingSummoned", false)
 					end)
-
-					timer.Simple(4, function()
-						SLASHER.SummonRocks(slasher.PlayerToBecomeRocks)
-						slasher.PlayerToBecomeRocks:Freeze(true)
-
-						timer.Simple(3, function()
-							slasher.PlayerToBecomeRocks:Freeze(false)
-							slasher.PlayerToBecomeRocks:SetNWBool("RocksBeingSummoned", false)
-						end)
-					end)
-
-					timer.Simple(6, function()
-						local Dissolver = ents.Create("env_entity_dissolver")
-						timer.Simple(1, function()
-							if IsValid(Dissolver) then
-								Dissolver:Remove() -- backup edict save on error
-							end
-						end)
-
-						Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
-						Dissolver:SetKeyValue("dissolvetype", 0)
-						Dissolver:SetKeyValue("magnitude", 0)
-						Dissolver:SetPos(ragdoll:GetPos())
-						Dissolver:SetPhysicsAttacker(slasher)
-						Dissolver:Spawn()
-
-						ragdoll:SetName(Dissolver.Target)
-
-						Dissolver:Fire("Dissolve", Dissolver.Target, 0)
-						Dissolver:Fire("Kill", "", 0.1)
-
-						slasher:SetNWBool("CovenantSummoning", false)
-
-						slasher:Freeze(false)
-					end)
-
-					slasher:EmitSound("slashco/slasher/ltg_summoning.mp3")
-
-					slasher.PlayerToBecomeRocks = target
-					target:SetNWBool("RocksBeingSummoned", true)
-
-					slasher:SetNWBool("CovenantSummoning", true)
-					slasher:Freeze(true)
 				end)
+				
+				slasher.PlayerToBecomeRocks = target
+				target:SetNWBool("RocksBeingSummoned", true)
+				slasher.RockSummoned = true
+			else
+				-- Las víctimas siguientes se convierten en Cloaks
+				timer.Simple(4, function()
+					SLASHER.SummonCovenantMembers(target)
+					target:Freeze(true)
+
+					timer.Simple(3, function()
+						target:Freeze(false)
+						target:SetNWBool("CloaksBeingSummoned", false)
+					end)
+				end)
+				
+				target:SetNWBool("CloaksBeingSummoned", true)
 			end
-		end
+
+			timer.Simple(6, function()
+				local Dissolver = ents.Create("env_entity_dissolver")
+				timer.Simple(1, function()
+					if IsValid(Dissolver) then
+						Dissolver:Remove() -- backup edict save on error
+					end
+				end)
+
+				Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
+				Dissolver:SetKeyValue("dissolvetype", 0)
+				Dissolver:SetKeyValue("magnitude", 0)
+				Dissolver:SetPos(ragdoll:GetPos())
+				Dissolver:SetPhysicsAttacker(slasher)
+				Dissolver:Spawn()
+
+				ragdoll:SetName(Dissolver.Target)
+
+				Dissolver:Fire("Dissolve", Dissolver.Target, 0)
+				Dissolver:Fire("Kill", "", 0.1)
+
+				slasher:SetNWBool("CovenantSummoning", false)
+				slasher:Freeze(false)
+			end)
+
+			slasher:EmitSound("slashco/slasher/ltg_summoning.mp3")
+			slasher:SetNWBool("CovenantSummoning", true)
+			slasher:Freeze(true)
+		end)
 	end
 end
 
-function SLASHER.OnSecondaryFire(slasher)
+SLASHER.OnSecondaryFire = function(slasher)
+    if slasher:GetNWBool("InSlasherChaseMode") then
+	    return
+	end
 	SlashCo.StartChaseMode(slasher)
 end
 
-function SLASHER.OnMainAbilityFire(slasher)
+SLASHER.OnMainAbilityFire = function(slasher)
 end
 
-function SLASHER.OnSpecialAbilityFire(slasher)
+SLASHER.OnSpecialAbilityFire = function(slasher)
 end
 
-function SLASHER.Animator(ply)
+SLASHER.Animator = function(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
 	if ply:IsOnGround() then
@@ -171,8 +205,45 @@ function SLASHER.Animator(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-function SLASHER.Footstep()
-	return true
+SLASHER.Footstep = function(ply)
+	if SERVER then
+		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
+		return true
+	end
+
+	if CLIENT then
+		return true
+	end
+end
+
+SLASHER.InitHud = function(_, hud)
+    hud:SetAvatar(Material("slashco/ui/icons/slasher/s_18"))
+	hud:SetTitle("Covenant")
+	
+	hud:AddControl("LMB", "covenant_member", Material("slashco/ui/icons/slasher/s_covenantcloak"))
+	hud:AddControl("RMB", "chase", Material("slashco/ui/icons/slasher/s_chase"))
+	
+	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+	hook.Add("HUDPaint", "SlashCoZanySurvey", function()
+		if LocalPlayer():Team() ~= TEAM_SLASHER then
+			hook.Remove("HUDPaint", "SlashCoZanySurvey")
+		end
+
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not survivor:CanBeSeen() then
+				continue
+			end
+
+			if survivor:GetNWBool("MarkedByCloaks") then
+				local pos = survivor:WorldSpaceCenter():ToScreen()
+
+				if pos.visible then
+					surface.SetMaterial(surveyNoticeIcon)
+					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
+				end
+			end
+		end
+	end)
 end
 
 SlashCo.RegisterSlasher(SLASHER, "Covenant")

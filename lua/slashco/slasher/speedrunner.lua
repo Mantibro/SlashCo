@@ -22,7 +22,7 @@ SLASHER.ChaseDuration = 0.0
 SLASHER.ChaseCooldown = 1
 SLASHER.JumpscareDuration = 1.5
 SLASHER.ChaseMusic = ""
-SLASHER.KillSound = "slashco/slasher/speedrunner_kill.mp3"
+SLASHER.KillSound = "slashco/slasher/speedrunner/speedrunner_kill.mp3"
 SLASHER.Description = "Speedrunner_desc"
 SLASHER.ProTip = "Speedrunner_tip"
 SLASHER.SpeedRating = "★★★★★"
@@ -30,7 +30,15 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★★"
 
 function SLASHER.OnSpawn(slasher)
-	slasher:PlayGlobalSound("slashco/slasher/speedrunner_1.mp3", 100, nil, true)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/speedrunner/speedrunner_1.mp3",
+		identifier = "Speedrun1",
+		soundLevel = 10000,
+		looping = true,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 1,
+	})
 	slasher:SetNWBool("CanKill", true)
 	slasher.SlasherValue1 = 100
 	slasher.SlasherValue2 = 1
@@ -87,23 +95,21 @@ function SLASHER.OnMainAbilityFire(slasher)
 	end
 	slasher.SpeedRunnering = true
 
-	slasher:StopSound("slashco/slasher/speedrunner_1.mp3")
-	slasher:StopSound("slashco/slasher/speedrunner_2.mp3")
 	timer.Simple(0.1, function()
 		if not IsValid(slasher) then
 			return
 		end
 
-		slasher:StopSound("slashco/slasher/speedrunner_1.mp3")
-		slasher:StopSound("slashco/slasher/speedrunner_2.mp3")
+	    SlashCo.AudioSystem.StopSound("Speedrun1", 0.5)
+	    SlashCo.AudioSystem.StopSound("Speedrun2", 0.5)
 	end)
 
 	slasher:Freeze(true)
 
 	if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
-		slasher:EmitSound("slashco/slasher/speedrunner_rng1.mp3", 85, 100)
+		slasher:EmitSound("slashco/slasher/speedrunner/speedrunner_rng1.mp3", 85, 100)
 	else
-		slasher:EmitSound("slashco/slasher/speedrunner_rng2.mp3", 85, 100)
+		slasher:EmitSound("slashco/slasher/speedrunner/speedrunner_rng2.mp3", 85, 100)
 	end
 
 	timer.Simple(2, function()
@@ -117,7 +123,15 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 		if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
 			slasher:SetNWBool("SpeedrunnerSacrificeOne", true)
-			slasher:PlayGlobalSound("slashco/slasher/speedrunner_2.mp3", 100, nil, true)
+			SlashCo.AudioSystem.PlaySound({
+		        soundPath = "slashco/slasher/speedrunner/speedrunner_2.mp3",
+		        identifier = "Speedrun2",
+		        soundLevel = 10000,
+		        looping = true,
+		        entity = slasher,
+		        volume = 1,
+		        fadeIn = 1,
+	        })
 			slasher.SlasherValue2 = 2
 			slasher.SlasherValue3 = 325
 			SLASHER.RandomTPCans()
@@ -127,7 +141,15 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 		if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
 			slasher:SetNWBool("SpeedrunnerSacrificeTwo", true)
-			slasher:PlayGlobalSound("slashco/slasher/speedrunner_3.mp3", 100, nil, true)
+			SlashCo.AudioSystem.PlaySound({
+		        soundPath = "slashco/slasher/speedrunner/speedrunner_3.mp3",
+		        identifier = "Speedrun3",
+		        soundLevel = 10000,
+		        looping = true,
+		        entity = slasher,
+		        volume = 1,
+		        fadeIn = 1,
+	        })
 			slasher.SlasherValue2 = 4
 			slasher.SlasherValue3 = 500
 			slasher:SetBodygroup(1, 1)

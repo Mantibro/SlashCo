@@ -32,7 +32,7 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.CannotBeSpectated = true
-SLASHER.AngerIncrease = 5 -- Anger increase of objectives being completed & every time he gives out a fuel can.
+SLASHER.AngerIncrease = 15 -- Anger increase of objectives being completed & every time he gives out a fuel can.
 SLASHER.AngerPassiveGain = 0
 SLASHER.AngerChaseGain = 0
 SLASHER.MinChase = 15 -- Number of seconds that are the minimum for a chase
@@ -43,22 +43,16 @@ SLASHER.CustomBackgroundMusic = true -- Tyler has his own background music.
 function SLASHER.OnSpawn(slasher)
 	slasher.SlasherValue1 = 0
 	slasher:SetVisible(false)
+	SlashCo.AudioSystem.EnableBackgroundMusic()
+	SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/igor/igors_theme.ogg", 1)
 end
 
 function SLASHER.Precache()
-	-- ToDo: Implement sound precaching for the new audiosystem.
-	--[[for k=1, 6 do
-		SlashCo.PrecacheSound("slashco/slasher/igor/tyler_song_" .. k .. ".mp3")
-	end
-	
-	SlashCo.PrecacheSound("slashco/slasher/igor/tyler_destroyer_theme.mp3")
-	SlashCo.PrecacheSound("slashco/slasher/igor/tyler_destroyer_whisper.mp3")
-	SlashCo.PrecacheSound("slashco/slasher/igor/tyler_alarm.mp3")]]
-	--SlashCo.PrecacheGeneric("slashco/ui/overlays/tyler_destroyer_face.vtf")
 end
 
 function SLASHER.HideTime(slasher)
 	slasher.TylerTime = math.max((25 + SlashCo.MapSize * 25) - ((SlashCo.GetSlasherAnger(slasher) / 2) / SlashCo.MapSize) - team.NumPlayers(TEAM_SURVIVOR), SLASHER.MinTylerTime)
+	print("Tyler transformation time: " .. slasher.TylerTime)
 end
 
 local function EndlessChase()
@@ -74,6 +68,10 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
+	
+	if SlashCo.IsSlowEscape() then
+	    endlessChase = true
+	end
 
 	if (v1 == 0 or v1 == 1) and endlessChase then
 		slasher.SlasherValue1 = 2
@@ -101,17 +99,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.tyler_destroyer_entrance_antispam = nil
 	elseif v1 == 1 then
 		--Creator
-
-		if SlashCo.BeaconArming then
-			slasher.SlasherValue1 = 0
-			slasher.SlasherValue2 = 0
-			slasher.SlasherValue5 = 0
-			slasher:SetVisible(false)
-			if slasher.TylerSongPickedID then
-				SlashCo.AudioSystem.StopSound("TylerSong", 0)
-				slasher.TylerSongPickedID = nil
-			end
-		end
 
 		slasher:SetImpervious(false)
 		slasher:SetNWBool("TylerFlash", false)
@@ -145,10 +132,13 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		--Time ran out
-		if (SlashCo.CurRound.EscapeHelicopterSummoned and v2 > slasher.TylerTime / 2.5) or v2 > slasher.TylerTime then
+		if SlashCo.CurRound.EscapeHelicopterSummoned then
 			slasher.TylerSongPickedID = nil
 			slasher.SlasherValue1 = 2
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
+		    SlashCo.AddSlasherAnger(slasher, 100) -- Max it out
+		    anger = SlashCo.GetSlasherAnger(slasher)
+			endlessChase = true
 		end
 
 		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
@@ -159,10 +149,16 @@ function SLASHER.OnTickBehaviour(slasher)
 			if not slasher:GetNWBool("TylerCreating") and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
 				slasher:SetNWBool("TylerCreating", true)
 				slasher.SlasherValue2 = 0
-				SlashCo.AudioSystem.StopSound("TylerSong", 0)
 				slasher.TylerSongPickedID = nil
+			    timer.Simple(0.5, function()
+				    if not IsValid(slasher) then
+					    return
+				    end
+                    SlashCo.AudioSystem.StopSound("TylerSong", 0)
+			    end)
 			end
 		end
+		--SlashCo.AudioSystem.StopSound("TylerSong", 0)
 
 		if slasher:GetNWBool("TylerCreating") and slasher.SlasherValue5 ~= 1.8 then
 			slasher.SlasherValue5 = 1.8
@@ -175,7 +171,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					return
 				end
 
-				SlashCo.CreateGasCan(slasher:GetPos() + (slasher:GetForward() * 60) + Vector(0, 0, 18), Angle(0, 0, 0))
+				SlashCo.CreateGasCan(slasher:GetPos() + Vector(0, 0, 5), Angle(0, 0, 0)) -- Gasolina en el Pie :eyes:
 				SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 			end)
 
@@ -203,7 +199,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if slasher.tyler_destroyer_entrance_antispam == nil then
 			SlashCo.AudioSystem.DisableBackgroundMusic()
-			SlashCo.AudioSystem.StopSound("TylerSong", 1)
+			SlashCo.AudioSystem.StopSound("TylerSong", 0)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = endlessChase and "slashco/slasher/igor/igor_whatsgood_intro.ogg" or "slashco/slasher/igor/tyler_alarm.ogg",
 				identifier = "TylerAlarm",
@@ -300,8 +296,11 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			SlashCo.AudioSystem.StopSound("TylerTheme", 1)
 			SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
-			SlashCo.AudioSystem.EnableBackgroundMusic() -- We only play the background music now after the first time he chased.
-			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/igor/igors_theme.ogg", 1)
+
+			timer.Simple(0.1, function()
+				SlashCo.AudioSystem.StopSound("TylerTheme", 1)
+				SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
+			end)
 
 			slasher:SetVisible(false)
 			slasher:SetNWBool("TylerFlash", false)
@@ -372,6 +371,12 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		target:Freeze(true)
 	end
 	slasher:Freeze(true)
+	
+	if EndlessChase() then
+		slasher.KillDelayTick = 2.2
+	else
+		slasher.KillDelayTick = SLASHER.KillDelay
+	end
 
 	slasher.KillDelayTick = SLASHER.KillDelay
 	slasher.SlasherValue2 = 0
@@ -421,7 +426,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		if IsValid(slasher) then
 			slasher:Freeze(false)
 			if EndlessChase() then goto skip end
-
+			
 			slasher.SlasherValue1 = 0
 			slasher:SetVisible(false)
 
@@ -429,6 +434,15 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			SlashCo.AudioSystem.StopSound("TylerWhisper", 0.5)
 			SlashCo.AudioSystem.EnableBackgroundMusic()
 			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/igor/igors_theme.ogg", 1)
+
+			timer.Simple(0.1, function()
+				if not IsValid(slasher) then
+					return
+				end
+
+				SlashCo.AudioSystem.StopSound("TylerTheme", 0.5)
+				SlashCo.AudioSystem.StopSound("TylerWhisper", 0.5)
+			end)
 
 			slasher:SetNWBool("TylerFlash", false)
 			::skip::

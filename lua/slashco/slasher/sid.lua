@@ -444,6 +444,10 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end
 end
 
+SLASHER.Thirdperson = function(ply)
+	return ply:GetNWBool("SidEating")
+end
+
 function SLASHER.Animator(ply)
 	local eating = ply:GetNWBool("SidEating")
 	local equipping_gun = ply:GetNWBool("SidGunEquipping")

@@ -242,7 +242,8 @@ function SLASHER.Maul(slasher, target)
 
 	SlashCo.StopChase(slasher)
 	slasher:SetNWBool("PrincessMaulingBase", false)
-	slasher:Freeze(true)
+
+    slasher:Freeze(true)
 
 	if not eatBabyFromPlayer then
 		timer.Simple(0, function() -- ToDo: Why do we even need a timer? Verify.
@@ -299,16 +300,16 @@ function SLASHER.Maul(slasher, target)
 		if not IsValid(slasher) then
 			return
 		end
-
+		
 		slasher:Freeze(false)
 
 		slasher:SetNWBool("PrincessMaulingSurvivor", false)
 		slasher:SetNWBool("PrincessMaulingBase", false)
-
+		
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 
 		if IsValid(slasher.ref_child) then
-			slasher:SetNWBool("PrincessMaulingChild", false)
+		    slasher:SetNWBool("PrincessMaulingChild", false)
 			slasher.ref_child:Remove()
 		end
 
@@ -386,7 +387,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
 		--		Vector(-40, -40, -60), Vector(40, 40, 60),
 		--		damage, DMG_SLASH, 5, false)
-		
+
 		if target:IsValid() and (not target:IsPlayer() or (target:Team() == TEAM_SURVIVOR and not IsPlayerHoldingBaby(target, false))) then
 			local dmg = DamageInfo()
 			dmg:SetDamageType(DMG_SLASH)
@@ -397,7 +398,6 @@ function SLASHER.OnPrimaryFire(slasher)
 			dmg:SetDamagePosition(tr.HitPos) -- required or else warnings are spammed
 			target:TakeDamageInfo(dmg)
 		end
-
 
 		if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
 			SLASHER.Maul(slasher, target)
@@ -453,6 +453,10 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
+end
+
+SLASHER.Thirdperson = function(ply)
+	return ply:GetNWBool("PrincessMaulingChild") or ply:GetNWBool("PrincessMaulingSurvivor") or ply:GetNWBool("PrincessSniffing")
 end
 
 function SLASHER.Animator(ply)

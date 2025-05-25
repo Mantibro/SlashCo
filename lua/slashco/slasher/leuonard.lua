@@ -1,6 +1,9 @@
 local SLASHER = {}
 
 SLASHER.Name = "Leuonard"
+SLASHER.Aliases = {
+	"MONDAY NIGHT RAW",
+}
 SLASHER.ID = 14
 SLASHER.Class = 2
 SLASHER.DangerLevel = 3
@@ -18,7 +21,7 @@ SLASHER.ChaseRadius = 0.86
 SLASHER.ChaseDuration = 5.0
 SLASHER.ChaseCooldown = 4
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/leuonard_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/leuonard_chase.wav"
 SLASHER.KillSound = "slashco/slasher/leuonard_yell1.mp3"
 SLASHER.Description = "Leuonard_desc"
 SLASHER.ProTip = "Leuonard_tip"
@@ -152,7 +155,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 		end
 
-		if slasher.soundon > 0 then
+		if not slasher.soundon == 0 then
 			slasher:PlayGlobalSound("slashco/slasher/leuonard_yell7.mp3", 100)
 			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_close.mp3", 80)
 			slasher:PlayGlobalSound("slashco/slasher/leuonard_full_far.mp3", 125)
@@ -233,6 +236,10 @@ end
 
 function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
+end
+
+SLASHER.Thirdperson = function(ply)
+	return ply:GetNWBool("LeuonardRoiding")
 end
 
 function SLASHER.Animator(ply)

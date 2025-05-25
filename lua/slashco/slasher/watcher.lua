@@ -33,6 +33,7 @@ SLASHER.AngerIncrease = 10 -- Anger increase of objectives being completed
 SLASHER.AngerPassiveGain = 0.05
 SLASHER.AngerChaseGain = 0
 SLASHER.AngerWatchingGain = 0.15 -- Anger thats gained per second when hes watching someone.
+SLASHER.LowAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
 SLASHER.MediumAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
 SLASHER.HighAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
 
@@ -41,10 +42,6 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetCurrentViewOffset(Vector(0, 0, 100))
 	slasher:SetNWBool("CanChase", true)
 	slasher:SetNWBool("CanKill", true)
-end
-
-function SLASHER.Precache()
-	--SlashCo.PrecacheSound("slashco/slasher/watcher/watcher_rage.mp3")
 end
 
 function SLASHER.OnAngerTick(slasher)
@@ -205,6 +202,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
+	if slasher:GetNWBool("WatcherRage") then
+		return
+	end
 	SlashCo.StartChaseMode(slasher)
 end
 
@@ -236,7 +236,6 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	--local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	if SlashCo.CurRound.GameProgress < (10 - (slasher.SlasherValue4 / 25)) then
 		return
@@ -249,7 +248,16 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end
 
 	slasher:SetNWBool("WatcherRage", true)
-	slasher:PlayGlobalSound("slashco/slasher/watcher/watcher_rage.mp3", 100)
+	SlashCo.AudioSystem.DisableBackgroundMusic()
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/watcher/watcher_rage.mp3",
+		identifier = "WatcherRage",
+		soundLevel = 100,
+		looping = true,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 1,
+	})
 end
 
 function SLASHER.Animator(ply)
@@ -273,13 +281,7 @@ end
 function SLASHER.Footstep(ply)
 	if SERVER then
 		local idx = math.random(1, 4)
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/watcher/watcher_boot" .. idx .. ".mp3",
-			identifier = "WatcherFootstep" .. idx,
-			soundLevel = 100,
-			entity = ply,
-			volume = 1,
-		})
+		ply:EmitSound("slashco/slasher/watcher/watcher_boot" .. idx .. ".mp3")
 		return false
 	end
 

@@ -1,0 +1,219 @@
+local SLASHER = {}
+
+SLASHER.Name = "The Mindblower" -- unfinished slasher, code may be messy or not even working
+SLASHER.Aliases = {
+	"Pancake Hater",
+	"Waffle Enthusiast",
+}
+SLASHER.ID = "22"
+SLASHER.Class = 2
+SLASHER.DangerLevel = 2
+SLASHER.IsSelectable = false
+SLASHER.Model = "models/Humans/Group01/male_05.mdl" -- placeholder
+SLASHER.GasCanMod = 0
+SLASHER.KillDelay = 3
+SLASHER.ProwlSpeed = 200
+SLASHER.ChaseSpeed = 255
+SLASHER.Perception = 1.0
+SLASHER.Eyesight = 3
+SLASHER.KillDistance = 100
+SLASHER.ChaseRange = 1500
+SLASHER.ChaseRadius = 0.9
+SLASHER.ChaseDuration = 25.0
+SLASHER.ChaseCooldown = 5
+SLASHER.JumpscareDuration = 3.0
+SLASHER.ChaseMusic = "slashco/slasher/mindblower_chase.wav"
+SLASHER.KillSound = "slashco/slasher/mindblower_pancakeblow.mp3"
+SLASHER.Description = "Mindblower_desc"
+SLASHER.ProTip = "Mindblower_tip"
+SLASHER.SpeedRating = "★★☆☆☆"
+SLASHER.EyeRating = "★★★☆☆"
+SLASHER.DiffRating = "★★☆☆☆"
+
+SLASHER.OnSpawn = function(slasher)
+    SlashCo.CreateItem("sc_pancake", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
+	slasher:SetNWBool("CanKill", true)
+	slasher:SetNWBool("CanChase", true)
+end
+
+SLASHER.OnTickBehaviour = function(slasher)
+    local SO = SlashCo.CurRound.OfferingData.Singularity
+    local v1 = slasher.SlasherValue1 --Survivor speed decrease when being chased
+	local v2 = slasher.SlasherValue2 --Pacification
+	local _ents = ents.FindInSphere(self:GetPos())
+	
+	for _, v in ipairs(_ents) do
+		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(slasher:GetPos()) < 1700 and v1 < 160 and slasher:GetNWBool("InSlasherChaseMode") then
+			slasher.SlasherValue1 = v1 + (FrameTime() + (SO * 0.02)) + (FrameTime() * 0.5)
+		    target:SetSlowWalkSpeed(SlowWalkSpeed - (v1 / 0.5))
+		    target:SetWalkSpeed(WalkSpeed - (v1 / 0.5))
+		    target:SetRunSpeed(RunSpeed - (v1 / 0.5))
+		else
+			slasher.SlasherValue1 = 0
+		end
+	end
+	
+	if v2 > 0 then
+		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
+		slasher:SetNWBool("CanKill", false)
+		slasher:SetNWBool("CanChase", false)
+	else
+		slasher:SetNWBool("CanKill", true)
+		slasher:SetNWBool("CanChase", true)
+		slasher:SetNWBool("DemonPacified", false)
+	end
+
+	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
+	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+end
+
+SLASHER.OnPrimaryFire = function(slasher, target)
+    SlashCo.Jumpscare(slasher, target)
+	
+	if target:GetNWBool("SurvivorBeingJumpscared") then
+	    target:Kill()
+		timer.Simple(FrameTime(), function()
+			local ragdoll = target.DeadBody
+
+			local physCount = ragdoll:GetPhysicsObjectCount()
+
+			timer.Simple(0.1, function()
+			    slasher:Freeze(true)
+				for i = 0, (physCount - 1) do
+					local PhysBone = ragdoll:GetPhysicsObjectNum(i)
+
+					if PhysBone:IsValid() then
+						PhysBone:EnableGravity(false)
+					end
+				end
+			end)
+			
+			timer.Simple(2, function()
+			    ParticleEffect("ExplosionCore_wall", ragdoll:GetPos()+ragdoll:OBBMaxs()*Vector(0,0,0), Angle(0,0,0),ragdoll)
+				local Dissolver = ents.Create("env_entity_dissolver")
+				timer.Simple(1, function()
+					if IsValid(Dissolver) then
+						Dissolver:Remove() -- backup edict save on error
+					end
+				end)
+
+				Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
+				Dissolver:SetKeyValue("dissolvetype", 0)
+				Dissolver:SetKeyValue("magnitude", 0)
+				Dissolver:SetPos(ragdoll:GetPos())
+				Dissolver:SetPhysicsAttacker(slasher)
+				Dissolver:Spawn()
+
+				ragdoll:SetName(Dissolver.Target)
+
+				Dissolver:Fire("Dissolve", Dissolver.Target, 0)
+				Dissolver:Fire("Kill", "", 0.1)
+
+				slasher:Freeze(false)
+			end)
+		end)
+	end
+end
+
+SLASHER.OnSecondaryFire = function(slasher)
+    SlashCo.StartChaseMode(slasher)
+end
+
+function SLASHER.OnMainAbilityFire(slasher, target)
+	if not IsValid(target) or target:GetClass() ~= "sc_pancake" then
+		return
+	end
+
+	if slasher:GetPos():Distance(target:GetPos()) >= 150 then
+		return
+	end
+	
+	slasher:Freeze(true)
+    slasher:EmitSound("slashco/slasher/mindblower_pancakeblow.mp3")
+
+	timer.Simple(2.5, function()
+		if not IsValid(slasher) then
+			return
+		end
+		
+		slasher:SetNWBool("DemonPacified", true)
+		slasher:Freeze(false)
+		if IsValid(target) then
+		    ParticleEffect( "ExplosionCore_wall", target:GetEyeTrace().HitPos, Angle( 0, 0, 0 ) )
+			target:Remove()
+		end
+	end)
+
+end
+
+SLASHER.OnSpecialAbilityFire = function(slasher)
+end
+
+SLASHER.Animator = function(ply)
+	local chase = ply:GetNWBool("InSlasherChaseMode")
+
+	if ply:IsOnGround() then
+		if not chase then
+			ply.CalcIdeal = ACT_HL2MP_WALK
+			ply.CalcSeqOverride = ply:LookupSequence("walk_all")
+		else
+			ply.CalcIdeal = ACT_HL2MP_RUN
+			ply.CalcSeqOverride = ply:LookupSequence("run_magic")
+		end
+	else
+		if not chase then
+			ply.CalcSeqOverride = ply:LookupSequence("jump_slam")
+		else
+			ply.CalcSeqOverride = ply:LookupSequence("jump_magic")
+		end
+	end
+
+	return ply.CalcIdeal, ply.CalcSeqOverride
+end
+
+SLASHER.Animator = function(ply)
+	local chase = ply:GetNWBool("InSlasherChaseMode")
+
+	if ply:IsOnGround() then
+		if not chase then
+			ply.CalcIdeal = ACT_WALK
+			ply.CalcSeqOverride = ply:LookupSequence("walk_all")
+		else
+			ply.CalcIdeal = ACT_RUN
+			ply.CalcSeqOverride = ply:LookupSequence("run_magic")
+		end
+	else
+		ply.CalcIdeal = ACT_JUMP
+		ply.CalcSeqOverride = ply:LookupSequence("jump_magic")
+	end
+	
+	ply:SetPoseParameter("move_x", ply:GetVelocity():Length() / 100)
+	if ply:GetVelocity():Length() < 30 then
+		ply.CalcIdeal = ACT_IDLE
+		ply.CalcSeqOverride = ply:LookupSequence("idle_all_01")
+	end
+
+	return ply.CalcIdeal, ply.CalcSeqOverride
+end
+
+SLASHER.Footstep = function(ply)
+	if SERVER then
+		if ply:GetNWBool("InSlasherChaseMode") then
+			return true
+		else
+			return false
+		end
+	end
+
+	return true
+end
+
+SLASHER.InitHud = function(_, hud)
+    hud:SetAvatar(Material("slashco/ui/icons/slasher/s_0"))
+	hud:SetTitle("Mindblower")
+    hud:AddControl("LMB", "blow survivor", Material("slashco/ui/icons/slasher/s_0"))
+	hud:AddControl("RMB", "chase", Material("slashco/ui/icons/slasher/s_0"))
+	hud:AddControl("R", "blow pancake", Material("slashco/ui/icons/slasher/s_0"))
+end
+
+SlashCo.RegisterSlasher(SLASHER, "Mindblower")

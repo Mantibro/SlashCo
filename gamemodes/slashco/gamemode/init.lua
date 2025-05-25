@@ -478,8 +478,11 @@ local function Think()
 			end
 		end
 
+        -- having two slashers its not that big of a deal, specially if there's like 14 survivors
+		-- one generator can be speedrunned instanly in most maps
+
 		--//duality condition//--
-		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Duality and runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
+		--[[if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Duality and runningCount > 0 and not SlashCo.CurRound.EscapeHelicopterSummoned then
 			--(SPAWN HELICOPTER)
 
 			local failed = SlashCo.SummonEscapeHelicopter()
@@ -492,7 +495,7 @@ local function Think()
 
 				SlashCo.CurRound.DistressBeaconUsed = false
 			end
-		end
+		end]]
 
 		--Go back to lobby if everyone dies.
 		if team.NumPlayers(TEAM_SURVIVOR) <= 0 and SlashCo.CurRound.roundOverToggle then
