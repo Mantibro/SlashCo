@@ -87,8 +87,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 				slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
 			end)
-			
-			slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 * FrameTime() * 0.5 / 3.5)
 
 			PlayCallSound(slasher)
 
@@ -184,6 +182,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
+	if SlashCo.CurRound.EscapeHelicopterSummoned then
+	    if v1 < 100 then
+		slasher.SlasherValue1 = v1 + (FrameTime() / (2 - ((SO - 1) / 2)))
+	    end
+        end
+
 	if slasher:GetNWInt("DolphinHunt") ~= math.floor(v1) then
 		slasher:SetNWInt("DolphinHunt", math.floor(v1))
 	end
@@ -193,7 +197,10 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
-	slasher:SetNWBool("DolphinInHiding", false) -- Evitar que si es encontrado durante el stun se softlockee.
+	-- shit fixed i hope
+	slasher:SetNWBool("DolphinInHiding", false)
+	slasher:SetNWBool("DolphinFound", false)
+	slasher:SetNWBool("DolphinHunting", false)
 end
 
 function SLASHER.Thirdperson(ply)
