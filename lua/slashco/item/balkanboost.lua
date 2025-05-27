@@ -33,12 +33,7 @@ function ITEM.OnUse(ply)
 		
 		timer.Simple(164, function()
 			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-				ply:SetNWBool("SurvivorBalkanFull", false)
-			end
-		end)
-		
-		timer.Simple(164, function()
-			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+			    ply:SetNWBool("SurvivorBalkanFull", false)
 				ply:SetNWBool("SurvivorBalkan", false)
 				ply:SetNWBool("MarkedBySmiley", false)
 				ply:AddEffect("Slowness", 9999)
@@ -105,7 +100,6 @@ if SERVER then
 	return
 end
 
-local rand = 0
 hook.Add("RenderScreenspaceEffects", "BalkanBoost", function()
 	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
 
@@ -150,28 +144,5 @@ hook.Add("Think", "BalkanBoost", function()
 	elseif IsValid(BalkanSound) then
 		BalkanSound:Stop()
 		BalkanSound = nil
-	end
-end)
-
-hook.Add("HUDPaint", "BalkanBoost", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
-		if not GameData.LocalPlayer.BalkanVisionTick then
-			GameData.LocalPlayer.BalkanVisionTick = 10
-		end
-
-		if not GameData.LocalPlayer.BalkanVision then
-			GameData.LocalPlayer.BalkanVision = math.random(0, 30)
-		end
-
-		if GameData.LocalPlayer.BalkanVisionTick < 1 then
-			surface.SetDrawColor(232, 23, 55, 100)
-		end
-
-		if GameData.LocalPlayer.BalkanVisionTick < 0 then
-			GameData.LocalPlayer.BalkanVision = math.random(0, 30)
-			GameData.LocalPlayer.BalkanVisionTick = 1 + (math.random() * 5)
-		end
-
-		GameData.LocalPlayer.BalkanVisionTick = GameData.LocalPlayer.BalkanVisionTick - (RealFrameTime() * 1)
 	end
 end)
