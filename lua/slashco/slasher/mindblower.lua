@@ -208,7 +208,7 @@ function SLASHER.Footstep(ply)
 	return true
 end
 
-function´SLASHER.InitHud(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_0"))
 	hud:SetTitle("Mindblower")
 	hud:AddControl("LMB", "blow survivor", Material("slashco/ui/icons/slasher/s_0"))
