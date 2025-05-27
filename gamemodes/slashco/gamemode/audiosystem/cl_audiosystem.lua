@@ -401,14 +401,20 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 function SlashCo.AudioSystem.PlaySound(soundData)
 	soundData.identifier = soundData.identifier or soundData.soundPath
 	soundData.startTick = soundData.startTick or engine.TickCount()
-	soundData.entity = soundData.entity or game.GetWorld()
+	--soundData.entity = soundData.entity or game.GetWorld()
 	soundData.volume = soundData.volume or 1
 	soundData.looping = soundData.looping or false
 	soundData.modes = soundData.modes or ""
 
 	SlashCo.AudioSystem.StopSound(soundData.identifier, 0.5)
 
-	local entIndex = isnumber(soundData.entity) and soundData.entity or (IsValid(soundData.entity) and soundData.entity:EntIndex() or 0)
+	local entIndex = 0
+	if isnumber(soundData.entity) then
+		entIndex = soundData.entity
+	elseif IsValid(soundData.entity) then
+		entIndex = soundData.entity:EntIndex()
+	end
+
 	local useMono = entIndex == 0 and not soundData.position
 	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(useMono and "mono" or "3d", soundData.modes), function(channel)
 		if soundData.fadeIn and soundData.fadeIn != 0 then
@@ -519,7 +525,7 @@ end
 net.Receive("slashCo_AudioSystem_PlaySound", function()
 	local soundData = {
 		soundPath = ReadSoundField(net.ReadString),
-		entIndex = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS),
+		entity = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS),
 		soundLevel = ReadSoundField(net.ReadUInt, 14),
 		volume = ReadSoundField(net.ReadFloat),
 		looping = ReadSoundField(net.ReadBool),
