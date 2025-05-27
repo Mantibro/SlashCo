@@ -138,8 +138,8 @@ end
 
 local function lobbyButtons(ply, button)
 	local plyTeam = ply:Team()
-	if SlashCo.LobbyData.LOBBYSTATE == 0 then
-		if plyTeam == TEAM_LOBBY and button == KEY_F1 then
+	if SlashCo.LobbyData.LOBBYSTATE == 0 and plyTeam == TEAM_LOBBY  then
+		if button == KEY_F1 then
 			if getReadyState(ply) ~= 1 then
 				lobbyPlayerReadying(ply, 1)
 				broadcastLobbyInfo()
@@ -153,7 +153,7 @@ local function lobbyButtons(ply, button)
 			Sndd:ChangePitch(100, 0)
 		end
 
-		if plyTeam == TEAM_LOBBY and button == KEY_F2 then
+		if button == KEY_F2 then
 			if getReadyState(ply) ~= 2 then
 				--Check if the player has made an offering or agreed to one
 				if isPlyOfferer(ply) then
@@ -181,7 +181,7 @@ local function lobbyButtons(ply, button)
 			end
 		end
 
-		if plyTeam == TEAM_LOBBY and button == 95 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferer(ply) then
+		if button == KEY_F4 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferer(ply) then
 			SlashCo.OfferingVote(ply, true)
 			SlashCo.EndOfferingVote(ply)
 		end

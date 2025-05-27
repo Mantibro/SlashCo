@@ -571,8 +571,8 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
 		local text = SlashCo.Language("offering_idle")
 
-		if offering_name ~= nil then
-			text = SlashCo.Language("Offering_name", offering_name)
+		if GameData.OfferingName ~= nil then
+			text = SlashCo.Language("Offering_name", GameData.OfferingName)
 		end
 
 		surface.SetFont("LobbyFont1")

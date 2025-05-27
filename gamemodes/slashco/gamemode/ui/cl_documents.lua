@@ -94,9 +94,7 @@ local function SwitchSelection(newSelection, isRightMouse)
 		wasLeftMousePressed = true
 	end
 
-	SlashCo.AudioSystem.GetPrecachedChannel(isRightMouse and "DocumentRightClick" or "DocumentLeftClick", function(channel)
-		channel:Play()
-	end)
+	SlashCo.AudioSystem.PlayPrecachedChannel(isRightMouse and "DocumentRightClick" or "DocumentLeftClick")
 end
 
 local function IsPressing(mouse)

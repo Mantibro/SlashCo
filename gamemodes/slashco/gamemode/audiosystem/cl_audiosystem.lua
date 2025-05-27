@@ -142,6 +142,12 @@ function SlashCo.AudioSystem.GetPrecachedChannel(identifier, callback, precacheD
 	end
 end
 
+function SlashCo.AudioSystem.PlayPrecachedChannel(identifier)
+	SlashCo.AudioSystem.GetPrecachedChannel(identifier, function(channel)
+		channel:Play()
+	end)
+end
+
 -- This causes the channel to follow the entities position, BUT the channel WONT be removed if the entity is removed.
 function SlashCo.AudioSystem.ParentChannelToEntity(channel, entity)
 	local entityIndex = 0
@@ -355,7 +361,7 @@ local function UpdateChannelPositions()
 		if not IsValid(ent) then continue end
 
 		entTbl.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
-		channel:SetPos(ent:GetPos())
+		channel:SetPos(ent:EyePos())
 	end
 end
 
@@ -364,7 +370,12 @@ function SlashCo.AudioSystem.Think()
 	UpdateChannelPositions()
 end
 
-hook.Add("Think", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
+--[[
+	NOTE: We use PreRender as using Think would be after the audiosystem already played the next audio chunks.
+	This would cause the audio of parented channels to lag behind and if a sound is playing on the local player, it sounds awful.
+	Related Issue: https://github.com/Facepunch/garrysmod-issues/issues/6361
+]]
+hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 
 --[[
 	The soundData table contains all values to create and configure a channel.

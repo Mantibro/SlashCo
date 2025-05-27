@@ -21,13 +21,18 @@ SLASHER.ChaseRadius = 0.0
 SLASHER.ChaseDuration = 0.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = ""
+SLASHER.ChaseMusic = "slashco/slasher/trollge/trollge_chase.ogg"
 SLASHER.KillSound = "slashco/slasher/trollge/trollge_kill.mp3"
 SLASHER.Description = "Trollge_desc"
 SLASHER.ProTip = "Trollge_tip"
 SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
+SLASHER.AngerIncrease = 10
+SLASHER.AngerPassiveGain = 0.07
+SLASHER.AngerChaseGain = 0
+-- Only when he's really angry his abiance should play. This is why we only set it for HighAnger.
+SLASHER.HighAngerBackgroundMusic = "slashco/slasher/trollge/trollge_ambiance.ogg"
 
 function SLASHER.OnSpawn(slasher)
 	slasher:PlayGlobalSound("slashco/slasher/trollge_breathing.wav", 50, nil, true)
@@ -72,6 +77,18 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
+
+	if math.random(1, 1000) == 1 then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/trollge/troll_limb" .. math.random(1, 9) .. ".mp3",
+			identifier = "TrollgeLimb",
+			minDistance = 250,
+			maxDistance = 750,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+	end
 
 	if v2 > 0 then
 		slasher.SlasherValue2 = v2 - FrameTime()
@@ -590,6 +607,26 @@ function SLASHER.ClientSideEffect()
 		ply:SetMaterial("lights/white")
 		ply:SetColor(Color(255, 255, 255, SLASHER.Visibility(nil, ply)))
 		ply:SetRenderMode(RENDERMODE_TRANSCOLOR)
+	end
+end
+
+function SLASHER.Footstep(ply)
+	if SERVER then
+		local idx = math.random(1, 5)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/trollge/troll_step" .. idx .. ".mp3",
+			identifier = "TrollgeFootstep" .. idx,
+			minDistance = 150,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
+		return false
+	end
+
+	if CLIENT then
+		return false
 	end
 end
 

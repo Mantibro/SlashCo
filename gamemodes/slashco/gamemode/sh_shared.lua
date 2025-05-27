@@ -297,6 +297,9 @@ SCInfo = {}
 
 SCInfo.Offering = {} // use ipairs to iterate, if you use pairs you will get errors as the enums -> Exposure and such will be included.
 function SlashCo.AddOffering(offeringTbl)
+	-- Rarity can only range from 1 to 3. Their used only for the sound that is played when their enabled.
+	offeringTbl.Rarity = math.Clamp(offeringTbl.Rarity, 1, 3)
+
 	SCInfo.Offering[offeringTbl.Name] = table.insert(SCInfo.Offering, offeringTbl)
 end
 
