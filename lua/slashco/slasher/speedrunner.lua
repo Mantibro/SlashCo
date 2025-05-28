@@ -33,11 +33,12 @@ function SLASHER.OnSpawn(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/speedrunner/speedrunner_1.mp3",
 		identifier = "Speedrun1",
-		soundLevel = 10000,
+		minDistance = 750,
+		maxDistance = 1400,
 		looping = true,
 		entity = slasher,
 		volume = 1,
-		fadeIn = 1,
+		fadeIn = 0,
 	})
 	slasher:SetNWBool("CanKill", true)
 	slasher.SlasherValue1 = 100
@@ -126,11 +127,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/speedrunner/speedrunner_2.mp3",
 				identifier = "Speedrun2",
-				soundLevel = 10000,
+		        minDistance = 750,
+                maxDistance = 1400,
 				looping = true,
 				entity = slasher,
 				volume = 1,
-				fadeIn = 1,
+				fadeIn = 0,
 			})
 			slasher.SlasherValue2 = 2
 			slasher.SlasherValue3 = 325
@@ -144,11 +146,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/speedrunner/speedrunner_3.mp3",
 				identifier = "Speedrun3",
-				soundLevel = 10000,
+				minDistance = 750,
+		        maxDistance = 1400,
 				looping = true,
 				entity = slasher,
 				volume = 1,
-				fadeIn = 1,
+				fadeIn = 0,
 			})
 			slasher.SlasherValue2 = 4
 			slasher.SlasherValue3 = 500
