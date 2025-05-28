@@ -8,7 +8,7 @@ SLASHER.IsSelectable = false
 SLASHER.Model = "models/slashco/slashers/covenant/cloak.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
-SLASHER.ProwlSpeed = 125
+SLASHER.ProwlSpeed = 150
 SLASHER.ChaseSpeed = 275
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
@@ -103,12 +103,12 @@ function SLASHER.OnTickBehaviour(slasher, target)
 								ply:SetVelocity(ply.SlashCo_PushDir * pushStrength + Vector(0,0,120))
 								ply.SlashCo_PushDir = nil
 							end
-
-							timer.Simple(10.0, function()
-								if IsValid(ply) then
-									ply:SetNWBool("MarkedByCloaks", false)
-								end
-							end)
+						end
+					end)
+					
+					timer.Simple(10.0, function()
+						if IsValid(ply) then
+							ply:SetNWBool("MarkedByCloaks", false)
 						end
 					end)
 

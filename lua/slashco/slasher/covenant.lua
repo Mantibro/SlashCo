@@ -20,7 +20,7 @@ SLASHER.Eyesight = 3
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 30.0
+SLASHER.ChaseDuration = 60.0
 SLASHER.ChaseCooldown = 7
 SLASHER.JumpscareDuration = 2.0
 SLASHER.ChaseMusic = "slashco/slasher/covenant_chase.mp3"
@@ -38,7 +38,7 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.SummonCovenantMembers(target)
-	-- Ahora acepta un argumento para el jugador a convertir
+	-- Now accepts an argument for the converted player
 	local clk = target
 	if IsValid(clk) then
 		SlashCo.SelectSlasher("CovenantCloak", clk:SteamID64())
@@ -48,7 +48,7 @@ function SLASHER.SummonCovenantMembers(target)
 		SlashCo.OnSlasherSpawned(clk)
 		SlashCo.BroadcastCurrentRoundData(false)
 		
-		-- Añadimos al jugador a la tabla por si necesitamos hacer un seguimiento
+		-- Add player to table in case we need it
 		table.insert(SLASHER.PlayersToBecomePartOfCovenant, {steamid = clk:SteamID64()})
 	end
 end
@@ -114,7 +114,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end)
 
 			if not slasher.RockSummoned then
-				-- Primera víctima se convierte en Rocks
+				-- First victim becomes Rocks
 				timer.Simple(4, function()
 					SLASHER.SummonRocks(target)
 					target:Freeze(true)
@@ -129,7 +129,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				target:SetNWBool("RocksBeingSummoned", true)
 				slasher.RockSummoned = true
 			else
-				-- Las víctimas siguientes se convierten en Cloaks
+				-- Next victims becomes Cloaks
 				timer.Simple(4, function()
 					SLASHER.SummonCovenantMembers(target)
 					target:Freeze(true)
