@@ -4,7 +4,6 @@ SLASHER.Name = "Free Smiley Dealer"
 SLASHER.Aliases = {
 	"Yellow Guy",
 	"Smiley",
-	"Free Smiley Dealer",
 }
 SLASHER.ID = 13
 SLASHER.Class = 1
