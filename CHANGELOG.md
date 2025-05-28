@@ -35,8 +35,7 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [#] Made his HUD effect local and based off his distance to the player<br>
 [#] Move all sounds into `slashco/slasher/igor`<br>
 [#] Switched all code over to use the new audiosystem and the new anger system<br>
-[#] Beacon Arming activates destroyer mode.<br>
-[#] On spawn of the escape helicopter, goes perma destroyer.<br>
+[#] When the escape helicopter is called, activates endless chase.<br>
 [#] Improved tyler hide time duration.<br>
 
 ### The Watcher
@@ -96,6 +95,10 @@ All newly added sounds will be from the SlashCo VR version.<br>
 ### Trollge
 [#] Can see the halos of Balkan Boost holders.<br>
 [#] On contact with a Balkan Boost, instantly change to stage 3.<br>
+[#] Switched all sounds to use the new audiosystem.<br>
+[#] Move all sounds into `slashco/slasher/trollge`<br>
+[+] Added footstep sounds from SlashCo VR<br>
+[+] Added background music from SlashCo VR<br>
 
 ### Covenant
 [+] Added footstep sounds to covenant and his members.<br>
