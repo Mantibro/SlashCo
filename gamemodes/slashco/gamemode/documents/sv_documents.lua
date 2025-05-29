@@ -141,7 +141,7 @@ hook.Add("SlashCo:EndRound", "SlashCo:HandoutDocuments", function(winners)
 			rating = rating - 1
 		end
 
-		if not ply:GetNW2Bool("QuickEscape") then
+		if not ply.QuickEscape then
 			rating = rating - 1
 		end
 

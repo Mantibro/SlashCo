@@ -66,15 +66,19 @@ function ENT:Think()
 	self.steppa:SetCycle(self.cyc)
 
 	if self:GetStepDecoyActive() then
-		if not self:GetPhysicsObject():IsAsleep() then
-			self:GetPhysicsObject():Sleep()
+		local physObj = self:GetPhysicsObject()
+		if not physObj:IsAsleep() then
+			physObj:Sleep()
 			self:SetAngles(Angle(0, self:GetAngles()[2], 0))
 		end
 
+		local etrStartPos = self:LocalToWorld(offsetVec1)
 		local ground = util.TraceLine({
-			start = self:LocalToWorld(offsetVec1),
+			start = etrStartPos,
 			endpos = self:LocalToWorld(offsetVec2),
-			filter = self
+			filter = self,
+			collisiongroup = COLLISION_GROUP_WORLD,
+			mask = MASK_SOLID_BRUSHONLY,
 		})
 
 		local forward = self:GetForward()
@@ -82,22 +86,22 @@ function ENT:Think()
 		local pos = self:GetPos()
 		self:SetPos(Vector(pos[1], pos[2], ground.HitPos[3] + 5))
 
-		local etrEndPos = self:LocalToWorld(offsetVec1)
-		etrEndPos:Add(forward)
-		etrEndPos:Mult(6)
+		local etrEndPos = etrStartPos + forward
+		etrEndPos:Mul(6)
 		
 		local etr = util.TraceLine({
-			start = self:LocalToWorld(offsetVec1),
+			start = etrStartPos,
 			endpos = etrEndPos,
-			filter = self
+			filter = self,
+			collisiongroup = COLLISION_GROUP_WORLD,
+			mask = MASK_SOLID_BRUSHONLY,
 		})
 
 		if etr.Hit then
-			local physObj = self:GetPhysicsObject()
 			if physObj:IsValid() then
 				physObj:Wake()
 				
-				forward:Mult(-15)
+				forward:Mul(-15)
 				forward:Add(offsetVec1)
 				physObj:ApplyForceCenter(forward)
 			end

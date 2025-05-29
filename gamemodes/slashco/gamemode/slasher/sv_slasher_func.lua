@@ -95,7 +95,8 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 
 			--local inv = (1 - SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseRadius) / 2
 
-			local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2,
+			local eyeTrace = slasher:GetEyeTrace()
+			local find = ents.FindInCone(slasher:GetPos(), eyeTrace.Normal, dist * 2,
 					slasher:SlasherValue("ChaseRadius", 0.91) + inv)
 			local find_p = NULL
 
@@ -106,9 +107,9 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 				end
 			end
 
-			if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist * 2 then
+			if eyeTrace.Entity:IsPlayer() and eyeTrace.Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(eyeTrace.Entity:GetPos()) < dist * 2 then
 				slasher.CurrentChaseTick = 0
-				find_p = slasher:GetEyeTrace().Entity
+				find_p = eyeTrace.Entity
 			end
 
 			if IsValid(find_p) and not find_p:GetNWBool("SurvivorChased") then

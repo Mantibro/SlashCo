@@ -194,11 +194,11 @@ function SlashCo.EndRound()
 
 	local survivors = team.GetPlayers(TEAM_SURVIVOR)
 	for _, ply in ipairs(survivors) do
-		if ply:GetNW2Bool("QuickEscape") then
+		if ply.QuickEscape then
 			ply:AddPoints("quickescape")
 		end
 
-		if ply:GetNW2Bool("SlowEscape") then
+		if ply.SlowEscape then
 			ply:AddPoints("slowescape")
 		end
 	end

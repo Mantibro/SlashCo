@@ -36,7 +36,7 @@ end
 
 local function PlayCallSound(slasher)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/dolfin/dolfin_call.mp3",
+		soundPath = "slashco/slasher/dolfin/dolfin_call.ogg",
 		identifier = "DolfinCall",
 		soundLevel = 50,
 		looping = true,
@@ -46,7 +46,7 @@ local function PlayCallSound(slasher)
 	})
 
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/dolfin/dolfin_call_far.mp3",
+		soundPath = "slashco/slasher/dolfin/dolfin_call_far.ogg",
 		identifier = "DolfinCallFar",
 		soundLevel = 80,
 		looping = true,
@@ -95,6 +95,18 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetNWBool("DolphinInHiding", false)
 				slasher:SetNWBool("DolphinHunting", true)
 			end)
+		end
+
+		if math.random(1, 1000) == 1 then
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/dolfin/dolfin_click" .. math.random(1, 2) .. ".ogg",
+				identifier = "DolfinClick",
+				minDistance = 350,
+				maxDistance = 800,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end
 
 		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -304,7 +316,16 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/amogus_step" .. math.random(1, 3) .. ".mp3", 75, 130)
+		local idx = math.random(1, 5)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/dolfin/dolphin_step" .. idx .. ".mp3",
+			identifier = "DolphinFootstep" .. idx,
+			minDistance = 150,
+			maxDistance = 200,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
 	return true

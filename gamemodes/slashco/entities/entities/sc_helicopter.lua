@@ -184,8 +184,8 @@ if SERVER then
 			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
 
 			-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
-			activator:SetNW2Bool("QuickEscape", (CurTime() - GetGlobal2Float("SCStartTime")) < SlashCo.QuickEscapeTime)
-			activator:SetNW2Bool("SlowEscape", (CurTime() - GetGlobal2Float("SCStartTime")) > SlashCo.SlowEscapeTime)
+			activator.QuickEscape = (CurTime() - GetGlobal2Float("SCStartTime")) < SlashCo.QuickEscapeTime
+			activator.SlowEscape = (CurTime() - GetGlobal2Float("SCStartTime")) > SlashCo.SlowEscapeTime
 			activator:SetNW2Float("EscapeTime", CurTime() - GetGlobal2Float("SCStartTime"))
 		end
 
@@ -268,7 +268,8 @@ if SERVER then
 	end
 
 	function ENT:Think()
-		self:NextThink(CurTime())
+		local curTime = CurTime()
+		self:NextThink(curTime)
 		self:DrawShadow(false) -- Loves to bug through the map.
 
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
@@ -276,8 +277,9 @@ if SERVER then
 		local TargetPosition = SlashCo.CurRound.HelicopterTargetPosition
 
 		local phys = self:GetPhysicsObject()
+		local pos = self:GetPos()
 		if phys:IsValid() then -- Since we have MOVETYPE_NONE the engine won't update the physics object so we need to do it ourself.
-			phys:SetPos(self:GetPos())
+			phys:SetPos(pos)
 			phys:SetAngles(self:GetAngles())
 			phys:EnableGravity(false)
 			phys:EnableMotion(false)
@@ -285,36 +287,45 @@ if SERVER then
 		end
 
 		if self.EnableMovement and TargetPosition ~= nil then
-			local IsAirborne = 1
+			local targetPos = Vector(self.targsmoothx * self.acceleration - self.sway_x,
+					self.targsmoothy * self.acceleration - self.sway_y,
+					self.targsmoothz * self.acceleration - self.sway_z)
+			targetPos:Div(8)
+	
+			if targetPos:Length() ~= 0 then
+				local IsAirborne = 1
 
-			local ground = util.TraceLine({
-				start = self:LocalToWorld(Vector(0, 0, 40)),
-				endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetUp() * -43,
-				filter = self
-			})
+				local ground = util.TraceLine({
+					start = self:LocalToWorld(Vector(0, 0, 40)),
+					endpos = self:LocalToWorld(Vector(0, 0, 40)) + self:GetUp() * -43,
+					filter = self,
+					collisiongroup = COLLISION_GROUP_WORLD,
+					mask = MASK_SOLID_BRUSHONLY,
+				})
 
-			if ground.Hit then
-				IsAirborne = 0
+				if ground.Hit then
+					IsAirborne = 0
+				end
+
+				self:SetAirborne(IsAirborne == 1)
 			end
 
-			self:SetAirborne(IsAirborne == 1)
-
+			local IsAirborne = self:GetAirborne() and 1 or 0
 			self:SetAngles(Angle(self.pitchgo + self.sway_x, self.final_dir + self.sway_y, self.sway_z))
-			self:SetPos(self:GetPos() + ((Vector(self.targsmoothx * self.acceleration - self.sway_x,
-					self.targsmoothy * self.acceleration - self.sway_y,
-					self.targsmoothz * self.acceleration - self.sway_z)) / 8))
+			pos:Add(targetPos)
+			self:SetPos(pos)
 
 			--Calculate it all afterwards
 
-			self.targsmoothx = math.sqrt(math.abs(TargetPosition[1] - self:GetPos()[1])) * sign(TargetPosition[1] - self:GetPos()[1])
-			self.targsmoothy = math.sqrt(math.abs(TargetPosition[2] - self:GetPos()[2])) * sign(TargetPosition[2] - self:GetPos()[2])
-			self.targsmoothz = math.sqrt(math.abs(TargetPosition[3] - self:GetPos()[3])) * sign(TargetPosition[3] - self:GetPos()[3])
+			self.targsmoothx = math.sqrt(math.abs(TargetPosition[1] - pos[1])) * sign(TargetPosition[1] - pos[1])
+			self.targsmoothy = math.sqrt(math.abs(TargetPosition[2] - pos[2])) * sign(TargetPosition[2] - pos[2])
+			self.targsmoothz = math.sqrt(math.abs(TargetPosition[3] - pos[3])) * sign(TargetPosition[3] - pos[3])
 
 			self.vel = Vector(self.targsmoothx, self.targsmoothy, self.targsmoothz):Length()
 
-			self.sway_x = IsAirborne * math.sin(CurTime() * 0.6) * (2 + (self.pitchgo * 2))
-			self.sway_y = IsAirborne * math.sin(CurTime() * 1) * (1.5 + (self.pitchgo * 2))
-			self.sway_z = IsAirborne * math.sin(CurTime() * 0.8) * (2 + (self.pitchgo * 2))
+			self.sway_x = IsAirborne * math.sin(curTime * 0.6) * (2 + (self.pitchgo * 2))
+			self.sway_y = IsAirborne * math.sin(curTime * 1) * (1.5 + (self.pitchgo * 2))
+			self.sway_z = IsAirborne * math.sin(curTime * 0.8) * (2 + (self.pitchgo * 2))
 
 			local dir_length = Vector(self.targsmoothx - self.sway_x, self.targsmoothy - self.sway_y,
 					self.targsmoothz - self.sway_z):Length()
@@ -342,8 +353,8 @@ if SERVER then
 			self.pitchgo = self.acceleration * self.vel / 16
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount == team.NumPlayers(TEAM_SURVIVOR)
-				and SlashCo.State ~= SlashCo.States.LOBBY and self.switch_full == nil then
+		local survivors = team.NumPlayers(TEAM_SURVIVOR)
+		if survivors > 0 and plyCount == survivors and SlashCo.State ~= SlashCo.States.LOBBY and self.switch_full == nil then
 
 			SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.COMPLETE)
 			SlashCo.SendObjectives()
@@ -353,9 +364,7 @@ if SERVER then
 			self.switch_full = true
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount >= (team.NumPlayers(TEAM_SURVIVOR) / 2)
-				and SlashCo.State ~= SlashCo.States.LOBBY and self.switch == nil then
-
+		if survivors > 0 and plyCount >= (survivors / 2) and SlashCo.State ~= SlashCo.States.LOBBY and self.switch == nil then
 			if SlashCo.CurRound.Difficulty ~= SlashCo.DifficultyLevel.NOVICE then
 				return true
 			end
@@ -377,7 +386,7 @@ if SERVER then
 			end)
 		end
 
-		if team.NumPlayers(TEAM_SURVIVOR) > 0 and plyCount > 0 and SlashCo.State ~= SlashCo.States.LOBBY
+		if survivors > 0 and plyCount > 0 and SlashCo.State ~= SlashCo.States.LOBBY
 				and self.switch == nil then
 
 			if SlashCo.CurRound.Difficulty ~= SlashCo.DifficultyLevel.INTERMEDIATE then

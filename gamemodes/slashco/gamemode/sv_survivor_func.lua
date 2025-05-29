@@ -74,8 +74,7 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, button)
 	if ply:GetNWBool("SurvivorTackled") then
 		if button == KEY_D or button == KEY_A and ply.LastTackleStruggleKey ~= button then
 			ply.LastTackleStruggleKey = button
-			ply.TackleStruggle = ply.TackleStruggle or 0
-			ply.TackleStruggle = ply.TackleStruggle + 1
+			ply.TackleStruggle = (ply.TackleStruggle or 0) + 1
 		end
 
 		return

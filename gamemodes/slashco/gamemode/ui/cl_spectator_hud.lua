@@ -161,12 +161,13 @@ if CLIENT then
 		if not IsFirstTimePredicted() then
 			return
 		end
-		if button ~= 107 or not SlashCoTestConfig then
+		if button ~= KEY_COUNT or not SlashCoTestConfig then
 			return
 		end
-
-		if IsValid(ply:GetEyeTrace().Entity) then
-			ply:ChatPrint("ENTITY SPAWNPOINT ID: " .. ply:GetEyeTrace().Entity:GetNWInt("SpawnPoint_ID"))
+		
+		local eyeTrace = ply:GetEyeTrace()
+		if IsValid(eyeTrace.Entity) then
+			ply:ChatPrint("ENTITY SPAWNPOINT ID: " .. eyeTrace.Entity:GetNWInt("SpawnPoint_ID"))
 		end
 	end)
 end

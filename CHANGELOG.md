@@ -68,6 +68,7 @@ All newly added sounds will be from the SlashCo VR version.<br>
 
 ### Dolphinman
 [+] Added a breathing sound when hiding.<br>
+[+] Added proper footstep sounds<br>
 [#] Increased KillDelay (0.25s - 0.50s).<br>
 [#] Decreased hunt power gain on kill when hunting (25% - 15%).<br>
 [#] Decreased hunt power loss on standing (50% - 25%).<br>
@@ -125,6 +126,10 @@ All newly added sounds will be from the SlashCo VR version.<br>
 
 ### Nightvision goggles
 [+] Added the Nightvision goggles<br>
+
+### Deathward
+[#] Raised price from `50` to `80` credits.<br>
+[#] Allow one to drop the used deathward.<br>
 
 ## Offering changes
 

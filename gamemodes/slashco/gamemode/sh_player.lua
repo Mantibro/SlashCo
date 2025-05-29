@@ -78,7 +78,7 @@ end
 -- This function is VERY expensive, BUT it shouldn't be called too frequent anyways.
 function PLAYER:FindPlayersInView(dist, radius, notrace)
 	local pos = self:EyePos()
-	local foundEnts = ents.FindInCone(pos, self:GetEyeTrace().Normal, dist, radius)
+	local foundEnts = ents.FindInCone(pos, self:GetAimVector(), dist, radius)
 	local results = {}
 	for _, ent in ipairs(foundEnts) do
 		if ent:IsPlayer() and ent:Team() == TEAM_SURVIVOR and ent:CanBeSeen() then
