@@ -134,6 +134,9 @@ SlashCo.LangTable["Alcohol_desc"] = "Unfortunate."
 SlashCo.LangTable["Baby"] = "The Baby"
 SlashCo.LangTable["Baby_desc"] = "Halve your health to teleport to a random location. At low health, using this item has a chance of killing you instantly. If you die to this item, the slasher will teleport instead."
 
+SlashCo.LangTable["BalkanBoost"] = "Balkan Boost"
+SlashCo.LangTable["BalkanBoost_desc"] = "I think the FDA is much too terrified to regulate this.\nUse at your own discretion.\nWhen you're going through hell, keep going."
+
 SlashCo.LangTable["Battery"] = "Battery"
 SlashCo.LangTable["Battery_desc"] = "A lead-acid battery that serves as a reusable source of electric current."
 
@@ -176,6 +179,9 @@ SlashCo.LangTable["Mayonnaise_desc"] = "Get a large boost to health."
 
 SlashCo.LangTable["MilkJug"] = "Milk Jug"
 SlashCo.LangTable["MilkJug_desc"] = "Gain a temporary boost in speed on use.\nA certain Slasher seems to really like this item."
+
+SlashCo.LangTable["NightVisionGoggles"] = "NightVision Goggles"
+SlashCo.LangTable["NightVisionGoggles_desc"] = "Grants night vision when equipped."
 
 SlashCo.LangTable["PocketSand"] = "Pocket Sand"
 SlashCo.LangTable["PocketSand_desc"] = "Blinds a nearby slasher."
