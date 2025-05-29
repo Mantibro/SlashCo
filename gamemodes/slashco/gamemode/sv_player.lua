@@ -108,6 +108,10 @@ hook.Add("PlayerCanSeePlayersChat", "TeamChat", function(_, _, listener, speaker
 		return true
 	end
 
+	if not IsValid(speaker) then
+		return true -- The console spoke. Let everyone know :3
+	end
+
 	local listenerTeam = listener:Team()
 	if listenerTeam == TEAM_SPECTATOR then
 		return true
