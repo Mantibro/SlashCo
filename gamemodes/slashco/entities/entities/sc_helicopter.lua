@@ -90,12 +90,6 @@ function ENT:OnRemove()
 	end
 end
 
-if IsValid(SlashCo.Helicopter) then
-	SlashCo.AudioSystem.DisableBackgroundMusic()
-	SlashCo.Helicopter:QuietHeli()
-	SlashCo.Helicopter:PlayHeliSounds()
-end
-
 function ENT:PlayHeliSounds()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_engine_distant.mp3",
