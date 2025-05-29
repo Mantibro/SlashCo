@@ -90,44 +90,54 @@ function ENT:OnRemove()
 	end
 end
 
+if IsValid(SlashCo.Helicopter) then
+	SlashCo.AudioSystem.DisableBackgroundMusic()
+	SlashCo.Helicopter:QuietHeli()
+	SlashCo.Helicopter:PlayHeliSounds()
+end
+
 function ENT:PlayHeliSounds()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_engine_distant.mp3",
 		identifier = "HelicopterEngineDistant",
-		soundLevel = 100,
+		minDistance = 750,
+		maxDistance = 1000,
 		looping = true,
 		entity = self,
-		volume = 2,
+		volume = 1,
 		fadeIn = 1,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_rotors_distant.mp3",
 		identifier = "HelicopterRotorsDistant",
-		soundLevel = 120,
+		minDistance = 4000,
+		maxDistance = 8000,
 		looping = true,
 		entity = self,
-		volume = 2,
+		volume = 1,
 		fadeIn = 1,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_engine_close.mp3",
 		identifier = "HelicopterEngineClose",
-		soundLevel = 80,
+		minDistance = 250,
+		maxDistance = 500,
 		looping = true,
 		entity = self,
-		volume = 2,
+		volume = 1,
 		fadeIn = 1,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_rotors_close.mp3",
 		identifier = "HelicopterRotorsClose",
-		soundLevel = 90,
+		minDistance = 750,
+		maxDistance = 1500,
 		looping = true,
 		entity = self,
-		volume = 2,
+		volume = 1,
 		fadeIn = 1,
 	})
 end

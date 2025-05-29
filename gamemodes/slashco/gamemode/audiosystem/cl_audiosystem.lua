@@ -1,5 +1,5 @@
 SlashCo.AudioSystem.Channels = SlashCo.AudioSystem.Channels or {} -- All IGModAudioChannel instances, use pairs to iterate as it will have holes.
-SlashCo.AudioSystem.ParentedChannels = SlashCo.AudioSystem.ParentedChannels or {}
+SlashCo.AudioSystem.CreatingChannels = SlashCo.AudioSystem.CreatingChannels or {} -- Sounds that are currently being created.
 SlashCo.AudioSystem.PrecacheSounds = SlashCo.AudioSystem.PrecacheSounds or {}
 SlashCo.AudioSystem.BackgroundChannel = SlashCo.AudioSystem.BackgroundChannel or nil
 SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs or 0 -- Incremental number to assign channel id's
@@ -11,6 +11,11 @@ function SlashCo.AudioSystem.ShouldPlayBackgroundMusic()
 
 	return GetGlobal2Bool("SlashCo:ShouldPlayBackgroundMusic", false)
 end]]
+
+local ChannelStates = {
+	OK = 1,
+	DESTROYING = 2,
+}
 
 -- Strips away any spaces & adds the additional stuff.
 local function AppendMode(mode, addition)
@@ -26,6 +31,7 @@ function SlashCo.AudioSystem.NukeChannels()
 		precacheData.channel:__gc()
 	end
 
+	SlashCo.AudioSystem.CreatingChannels = {}
 	SlashCo.AudioSystem.BackgroundChannel = nil
 end
 
@@ -43,7 +49,7 @@ function SlashCo.AudioSystem.GetChannelID(channel)
 end
 
 -- NOTE: The callback is not called if the channel wasn't created.
-function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback)
+function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallback)
 	if not soundFile or soundFile == "" then return end
 
 	soundFile = SlashCo.AudioSystem.ToSound(soundFile)
@@ -52,19 +58,25 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback)
 		return
 	end
 
+
 	sound.PlayFile(soundFile, mode, function(channel, errCode, errStr)
 		if not IsValid(channel) then
+			if not errorCallback then
+				errorCallback(errCode, errStr)
+			end
 			error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. "," .. soundFile .. ")\n")
 			return
 		end
 
 		SlashCo.AudioSystem.CheckChannels()
 		SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs + 1
-		SlashCo.AudioSystem.Channels[channel] = { -- ToDo: Actually implement this logic
+		local channelData = { -- ToDo: Actually implement this logic
 			deleteWhenFinished = false,
 			ID = SlashCo.AudioSystem.ChannelIDs,
+			State = ChannelStates.OK,
 		}
-		callback(channel)
+		SlashCo.AudioSystem.Channels[channel] = channelData
+		callback(channel, channelData)
 	end)
 end
 
@@ -74,7 +86,7 @@ end
 
 function SlashCo.AudioSystem.GetChannelByIdentifier(identifier)
 	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
-		if channelData.identifier == identifier then
+		if channelData.identifier == identifier and channelData.State == ChannelStates.OK then
 			return channel
 		end
 	end
@@ -101,6 +113,7 @@ function SlashCo.AudioSystem.PrecacheSound(soundFile, mode, identifier, callback
 		precacheData.channel = channel
 		precacheData.creating = false
 
+		SlashCo.AudioSystem.SetChannelIdentifier(channel, identifier)
 		if callback then
 			callback(channel)
 		end
@@ -161,34 +174,70 @@ function SlashCo.AudioSystem.ParentChannelToEntity(channel, entity)
 		end
 	end
 
-	SlashCo.AudioSystem.ParentedChannels[channel] = {
-		ent = entity,
-		entIndex = entityIndex,
-	}
+	local channelData = SlashCo.AudioSystem.Channels[channel]
+	channelData.ent = entity
+	channelData.entIndex = entityIndex
+end
+
+-- BUG: Bass doesn't seem to care about 3DFadeDistance and it seems like it never actually fades out for some weird reason. So we calculate and set the volume ourself.
+local function CalculateFadeVolume(playerPos, channelPos, initialVolume, minDistance, maxDistance)
+	local distance = channelPos:Distance(playerPos)
+
+	if distance <= minDistance then
+		return initialVolume
+	elseif distance >= maxDistance then
+		return 0
+	else
+		return initialVolume * (1 - ((distance - minDistance) / (maxDistance - minDistance)))
+	end
+end
+
+-- Helper function to wrap around CalculateFadeVolume
+local function CalculateChannelVolume(channel, targetVol)
+	if channel:Is3D() then
+		local channelData = SlashCo.AudioSystem.Channels[channel]
+		if channelData then
+			local soundData = channelData.soundData
+			if soundData and soundData.minDistance and soundData.maxDistance then
+				return CalculateFadeVolume(GameData.LocalPlayer:GetPos(), channel:GetPos(), targetVol, soundData.minDistance, soundData.maxDistance)
+			end
+		end
+	end
+
+	return targetVol
 end
 
 -- Fades out and destroys the channel.
 function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime)
-	if IsValid(channel) and channel:GetState() == GMOD_CHANNEL_PLAYING then
+	if IsValid(channel) and channel:GetState() == GMOD_CHANNEL_PLAYING and fadeOutTime and fadeOutTime ~= 0 then
 		local vol = channel:GetVolume()
 		if vol > 0 then
 			local id = SlashCo.AudioSystem.GetChannelID(channel)
-			timer.Remove("SlashCo:FadeInAudioChannel" .. id) -- Remove any fadeIn timer that might exist
+			timer.Remove("SlashCo:FadeToAudioChannel" .. id) -- Remove any fadeIn timer that might exist
 			local timerName = "SlashCo:ShutdownAudioChannel" .. id
 			local updateFreq = 0.05
 			local volumeDecrement = vol / math.ceil(fadeOutTime / updateFreq)
+			local channelData = SlashCo.AudioSystem.Channels[channel]
+			channelData.State = ChannelStates.DESTROYING
 			timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
 				if !IsValid(channel) or vol <= 0 then
 					timer.Remove(timerName)
+					channelData.volume = nil
 					channel:Stop()
+					channel:__gc()
 					SlashCo.AudioSystem.CheckChannels()
 					SlashCo.AudioSystem.Channels[channel] = nil
-					SlashCo.AudioSystem.ParentedChannels[channel] = nil
 					return
 				end
 
-				vol = channel:GetVolume() - volumeDecrement
-				channel:SetVolume(vol)
+				vol = vol - volumeDecrement
+				local channelVolume = CalculateChannelVolume(channel, vol)
+				if channelVolume == 0 then
+					vol = 0 -- makes deletions faster if the channel is already out of range.
+				end
+
+				channelData.volume = vol
+				channel:SetVolume(channelVolume)
 			end)
 
 			return
@@ -197,7 +246,9 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime)
 
 	SlashCo.AudioSystem.CheckChannels()
 	SlashCo.AudioSystem.Channels[channel] = nil
-	SlashCo.AudioSystem.ParentedChannels[channel] = nil
+	if IsValid(channel) then
+		channel:__gc()
+	end
 end
 
 function SlashCo.AudioSystem.EnsureValidVolume(volume)
@@ -216,9 +267,10 @@ function SlashCo.AudioSystem.FadeTo(channel, fadeInTime, targetVol)
 	local vol = SlashCo.AudioSystem.EnsureValidVolume(channel:GetVolume())
 	local lowerVol = targetVol < vol
 	local id = SlashCo.AudioSystem.GetChannelID(channel)
-	local timerName = "SlashCo:FadeInAudioChannel" .. id
+	local timerName = "SlashCo:FadeToAudioChannel" .. id
 	local updateFreq = 0.05
 	local volumeIncrement = math.abs(targetVol - vol) / math.ceil(fadeInTime / updateFreq)
+	local channelData = SlashCo.AudioSystem.Channels[channel]
 	timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
 		local reachedTarget = false
 		if lowerVol then
@@ -228,17 +280,20 @@ function SlashCo.AudioSystem.FadeTo(channel, fadeInTime, targetVol)
 		end
 
 		if !IsValid(channel) or reachedTarget then
+			channelData.volume = nil
 			timer.Remove(timerName)
 			return
 		end
 
 		if lowerVol then
-			vol = channel:GetVolume() - volumeIncrement
+			vol = vol - volumeIncrement
 		else
-			vol = channel:GetVolume() + volumeIncrement
+			vol = vol + volumeIncrement
 		end
 
-		channel:SetVolume(SlashCo.AudioSystem.EnsureValidVolume(vol))
+		local channelVolume = CalculateChannelVolume(channel, vol)
+		channelData.volume = channelVolume
+		channel:SetVolume(SlashCo.AudioSystem.EnsureValidVolume(channelVolume))
 	end)
 end
 
@@ -352,16 +407,27 @@ local function UpdateBackgroundMusic()
 end
 
 local function UpdateChannelPositions()
-	for channel, entTbl in pairs(SlashCo.AudioSystem.ParentedChannels) do
+	local localPlyPos = GameData.LocalPlayer:GetPos()
+	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
 		--[[
 			Why don't we remove the channel if the parent is gone?
 			Because on full updates, the parent might disappear and then reappear.
 		]]
-		local ent = entTbl.ent or Entity(entTbl.entIndex)
+		if not channelData.entIndex then continue end
+
+		local ent = channelData.ent or Entity(channelData.entIndex)
 		if not IsValid(ent) then continue end
 
-		entTbl.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
-		channel:SetPos(ent:EyePos())
+		channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
+		local newPos = ent:EyePos()
+		channel:SetPos(newPos)
+
+		local soundData = channelData.soundData
+		if soundData and soundData.minDistance and soundData.maxDistance then
+			local volume = CalculateFadeVolume(localPlyPos, newPos, channelData.volume or soundData.volume, soundData.minDistance, soundData.maxDistance)
+			channel:SetVolume(volume)
+			--print("3D", channel, channelData.ID, volume)
+		end
 	end
 end
 
@@ -415,10 +481,27 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		entIndex = soundData.entity:EntIndex()
 	end
 
+	local isAlreadyInCreation = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] ~= nil
+	SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = soundData
+	
+	-- Required to prevent a race conditions where multiple channels could have been created with the same identifier.
+	-- BUG: Look at this later again for a special case: What if soundData.soundPath is different in the second call done and it uses the same identifier?
+	if isAlreadyInCreation then return end
+
 	local useMono = entIndex == 0 and not soundData.position
-	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(useMono and "mono" or "3d", soundData.modes), function(channel)
+	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(useMono and "mono" or "3d", soundData.modes), function(channel, channelData)
+		local soundData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] or soundData -- Update in case it was updated in the few frames we had originally made our call.
+		if soundData.DESTROYCHANNEL then
+			channel:SetVolume(0)
+			SlashCo.AudioSystem.DestroyChannel(channel)
+			SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil
+			channel:__gc()
+			return
+		end
+
 		if soundData.fadeIn and soundData.fadeIn != 0 then
 			channel:SetVolume(0)
+			channelData.volume = 0
 		else
 			channel:SetVolume(soundData.volume)
 		end
@@ -445,15 +528,22 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 
 		if soundData.soundLevel and soundData.soundLevel != 0 then
 			channel:Set3DFadeDistance(soundData.soundLevel ^ 1.25, soundData.soundLevel ^ 1.5)
+			soundData.minDistance = soundData.soundLevel ^ 1.25
+			soundData.maxDistance = soundData.soundLevel ^ 1.5
 		end
 
 		if soundData.minDistance and soundData.maxDistance then
 			channel:Set3DFadeDistance(soundData.minDistance, soundData.maxDistance)
 		end
 
+		channelData.soundData = soundData -- Save the data that was used to create this channel.
+
+		SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil
 		if soundData.callback then
 			soundData.callback(channel)
 		end
+	end, function(errCode, errStr)
+		SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil -- Error happened, just clear it out from creation.
 	end)
 end
 
@@ -472,7 +562,7 @@ function SlashCo.AudioSystem.GetEntityChannels(entity)
 	end
 
 	local results = {}
-	for channel, entTbl in pairs(SlashCo.AudioSystem.ParentedChannels) do
+	for channel, entTbl in pairs(SlashCo.AudioSystem.Channels) do
 		if entTbl.entIndex ~= entIndex then continue end
 		
 		table.insert(results, channel)
@@ -500,6 +590,12 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 				SlashCo.AudioSystem.DestroyChannel(channel, fadeOut)
 			end
 		end
+		return
+	end
+
+	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier]
+	if creationSounData then -- The channel wasn't created yet, so we cannot stop it. Instead we'll set a flag.
+		creationSounData.DESTROYCHANNEL = true
 		return
 	end
 

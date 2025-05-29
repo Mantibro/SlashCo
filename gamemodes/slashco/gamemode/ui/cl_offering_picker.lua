@@ -10,8 +10,11 @@ local function SetOfferLabel()
 	offerBox.OfferDesc:SetText(SlashCo.Language(SCInfo.Offering[selectedOffer].Name .. "_desc"))
 end
 
-SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_1.mp3", "mono", "OfferSelect")
-SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_2.mp3", "mono", "OfferConfirm")
+if GameData.IsLobby then
+	SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_1.mp3", "mono", "OfferSelect")
+	SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_2.mp3", "mono", "OfferConfirm")
+end
+
 local function SelectThisOffering(offerID)
 	offerBox.Left.Offers[selectedOffer]:SetEnabled(true)
 	selectedOffer = offerID

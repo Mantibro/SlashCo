@@ -222,7 +222,7 @@ function PLAYER:SlamDoor(door_ent)
 	local pos = self:GetPos()
 	local name = door_ent:GetName()
 	slamDoor(door_ent, pos)
-	for _, v in ipairs(ents.FindInSphere(door_ent:WorldSpaceCenter(), 150)) do
+	for _, v in ipairs(ents.FindInSphere(door_ent:WorldSpaceCenter(), 100)) do
 		if v:GetName() == name then
 			slamDoor(v, pos)
 		end

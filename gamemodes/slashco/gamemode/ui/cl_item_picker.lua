@@ -4,9 +4,11 @@ local SlashCoItems = SlashCoItems
 local MGSelection = false
 local mapPrice = 50
 
-SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_1.mp3", "mono", "ItemPickerMenuClick") -- Used for all other ui sounds
-SlashCo.AudioSystem.PrecacheSound("slashco/ui/item_display.mp3", "mono", "ItemPickerDisplayClick") -- Used for item selection
-SlashCo.AudioSystem.PrecacheSound("slashco/ui/item_select.mp3", "mono", "ItemPickerSelect") -- Used when a item is confirmed
+if GameData.IsLobby then
+	SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_1.mp3", "mono", "ItemPickerMenuClick") -- Used for all other ui sounds
+	SlashCo.AudioSystem.PrecacheSound("slashco/ui/item_display.mp3", "mono", "ItemPickerDisplayClick") -- Used for item selection
+	SlashCo.AudioSystem.PrecacheSound("slashco/ui/item_select.mp3", "mono", "ItemPickerSelect") -- Used when a item is confirmed
+end
 
 local function BlockConfirm()
 	itemSelectFrame.Confirm:SetText("XXXXXXX")
