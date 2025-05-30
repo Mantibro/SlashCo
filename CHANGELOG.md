@@ -1,5 +1,8 @@
-## Note
+## Notes
 All newly added sounds will be from the SlashCo VR version.<br>
+
+> [!WARNING]
+> When we release these changes, revert `gamemodes/slashco/slashco.txt` -> `workshopid` back to the main addon -> `2844428843`
 
 ## gameplay changes
 [+] A dark fog that dynamically adjusts to the environment lighting.<br>
