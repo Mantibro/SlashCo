@@ -40,6 +40,10 @@ function PLAYER:CanSeeFlashlights()
 	return self:GetNWBool("SlashCoSeeFlashlights", true)
 end
 
+function PLAYER:IsVisible()
+	return self:GetNWBool("SlashCoVisible", true)
+end
+
 if CLIENT then
 	hook.Add("Think", "hidePlayersIfCannotSee", function()
 		for _, ply in player.Iterator() do
@@ -64,10 +68,6 @@ end
 
 function PLAYER:SetVisible(state)
 	self:SetNWBool("SlashCoVisible", state)
-end
-
-function PLAYER:IsVisible()
-	return self:GetNWBool("SlashCoVisible", true)
 end
 
 function PLAYER:SetCanSeeFlashlights(state)
