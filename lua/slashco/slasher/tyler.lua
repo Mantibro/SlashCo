@@ -35,10 +35,13 @@ SLASHER.CannotBeSpectated = true
 SLASHER.AngerIncrease = 10 -- Anger increase of objectives being completed & every time he gives out a fuel can.
 SLASHER.AngerPassiveGain = 0
 SLASHER.AngerChaseGain = 0
-SLASHER.MinChase = 15 -- Number of seconds that are the minimum for a chase
+SLASHER.MinChase = 20 -- Number of seconds that are the minimum for a chase
 SLASHER.MinTylerTime = 5 -- Number of seconds he has to be at minimum as tyler the creator.
 SLASHER.AllowEndlessChase = false -- If true, tyler will enter a endless chase once a round has reached the slow escape mark.
 SLASHER.CustomBackgroundMusic = true -- Tyler has his own background music.
+SLASHER.DisableHelicopterMusic = true
+SLASHER.HelicopterArriveTime = 30 -- We don't want Tyler to be able to kill everyone while they have to wait 2 minutes just for the Helicopter to arrive.
+SLASHER.SpawnDelay = 10 -- We don't need to let Tyler wait much, why? because players depend on Tyler.
 
 function SLASHER.OnSpawn(slasher)
 	slasher.TylerState = 0
@@ -93,6 +96,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeAsTylerSpecter = (slasher.TimeAsTylerSpecter or 0) + FrameTime()
 		final_perception = 6.0
 
+		if slasher:IsVisible() then
+			slasher:SetVisible(false) -- Just in case he somehow ends up still being visible
+		end
+
 		if slasher.TimeAsTylerSpecter > 30 then
 			slasher.TylerState = 1
 			slasher.TimeAsTylerSpecter = 0
@@ -102,6 +109,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.tyler_destroyer_entrance_antispam = nil
 	elseif TylerState == 1 then
 		--Creator
+
+		if not slasher:IsVisible() then
+			slasher:SetVisible(true) -- Just in case he somehow ends up invisible
+		end
 
 		slasher:SetImpervious(false)
 		slasher:SetNWBool("TylerFlash", false)
@@ -518,7 +529,7 @@ function SLASHER.CanBeSeen(ply)
 		return
 	end
 
-	if ply:GetNWBool("SlashCoVisible", true) and ply:GetNWInt("TylerState") ~= 1 then
+	if ply:IsVisible() and ply:GetNWInt("TylerState") ~= 1 then
 		return true
 	end
 end

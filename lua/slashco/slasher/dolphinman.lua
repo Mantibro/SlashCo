@@ -224,7 +224,7 @@ function SLASHER.CanBeSeen(ply)
 		return
 	end
 
-	if ply:GetNWBool("SlashCoVisible", true) and not ply:GetNWBool("DolphinInHiding") then
+	if ply:IsVisible() and not ply:GetNWBool("DolphinInHiding") then
 		return true
 	end
 end

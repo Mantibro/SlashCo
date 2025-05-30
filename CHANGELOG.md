@@ -41,6 +41,8 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [#] Switched all code over to use the new audiosystem and the new anger system<br>
 [#] When the escape helicopter is called, activates endless chase.<br>
 [#] Improved tyler hide time duration.<br>
+[#] He will **always** spawn after `10` seconds into the round<br>
+[#] The Helicopter will **always** arrive after `30` seconds when escaping<br>
 
 ### The Watcher
 [+] Added footstep sounds from SlashCo VR<br>

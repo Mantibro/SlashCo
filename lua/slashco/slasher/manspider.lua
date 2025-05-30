@@ -208,7 +208,7 @@ function SLASHER.CanBeSeen(ply)
 		return
 	end
 
-	if ply:GetNWBool("SlashCoVisible", true) and not ply:GetNWBool("ManspiderNested") then
+	if ply:IsVisible() and not ply:GetNWBool("ManspiderNested") then
 		return true
 	end
 end
