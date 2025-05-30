@@ -5,7 +5,7 @@ CreateClientConVar("slashco_cl_show_healthvalue", 0, true, false,
 
 local SlashCoItems = SlashCoItems
 local prevHp, SetTime, ShowDamage, prevHp1, aHp, TimeToFuel, TimeUntilFueled
-local FuelingCan
+local FuelingCan, FuelingCanIndex = NULL, -1
 local IsFueling
 local maxHp = 100
 local healthIndicatorShift = 0
@@ -37,9 +37,11 @@ end
 
 net.Receive("mantislashco_GasPourProgress", function()
 	TimeToFuel = net.ReadUInt(8)
-	FuelingCan = net.ReadEntity()
+	FuelingCanIndex = net.ReadUInt(MAX_EDICT_BITS)
 	IsFueling = net.ReadBool()
 	TimeUntilFueled = net.ReadFloat()
+
+	FuelingCan = Entity(FuelingCanIndex)
 end)
 
 hook.Add("DrawOverlay", "SlashCoVHS", function()
@@ -215,7 +217,13 @@ local function gasFuelMeter(hitPos)
 		end
 	end
 
-	if IsFueling and IsValid(FuelingCan) then
+	if IsFueling then
+		if not IsValid(FuelingCan) and FuelingCanIndex ~= -1 then
+			FuelingCan = Entity(FuelingCanIndex)
+		end
+
+		if FuelingCan == NULL then return end -- We don't need IsValid since it here can either be NULL or Valid.
+
 		local genPos = FuelingCan:GetPos()
 		local realDistance = hitPos:Distance(genPos)
 		if realDistance < 100 then
@@ -239,6 +247,8 @@ local function gasFuelMeter(hitPos)
 					yClamp, Color(255, 255, 255, fade), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 		else
 			IsFueling = false
+			FuelingCanIndex = -1
+			FuelingCan = NULL
 		end
 	end
 end

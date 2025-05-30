@@ -213,6 +213,7 @@ function SlashCo.SpawnGasCans()
 
 	local forceGasCanCount = -1
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if p == NULL then continue end
 		gasCanCount = gasCanCount + p:SlasherValue("GasCanMod", 0)
 		
 		forceGasCanCount = forceGasCanCount + p:SlasherValue("ForceGasCanCount", 0)
@@ -289,6 +290,7 @@ function SlashCo.SpawnItems()
 	--item count for demons
 	SlashCo.CurRound.ItemCount = SlashCo.CurRound.ItemCount + SlashCo.CurRound.OfferingData.ItemMod + SlashCo.CurRound.Difficulty
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if p == NULL then continue end
 		local item = p:SlasherValue("ItemToSpawn")
 
 		if item then
@@ -341,21 +343,21 @@ function SlashCo.SetHelicopterPositions()
 	SlashCo.CurRound.HelicopterSpawnPosition = spawn:GetPos() - Vector(0, 0, 70)
 end
 
-local slasherSpawned
-
 function SlashCo.SpawnSlasher()
-	if slasherSpawned then
+	if GameData.SlasherSpawned then
 		return
 	end
 
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if p == NULL then continue end
+
 		p:SetTeam(TEAM_SLASHER)
 		p:Spawn()
 
 		SlashCo.OnSlasherSpawned(p)
 	end
 
-	slasherSpawned = true
+	GameData.SlasherSpawned = true
 end
 
 local function singlePlayerTable()
@@ -738,6 +740,7 @@ local function startRound(noSetup)
 	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}
 	local dangerLevel = SlashCo.DangerLevel.Unknown
 	for _, slasher in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if slasher == NULL then continue end
 		local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
 		if slasherTbl and ((slasherTbl.DangerLevel or 0) > dangerLevel) then
 			dangerLevel = slasherTbl.DangerLevel

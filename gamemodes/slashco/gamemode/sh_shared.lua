@@ -19,7 +19,7 @@ SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Mod
 SlashCo.GhostPingDelay = 480
 SlashCo.QuickEscapeTime = 600 -- Time in seconds to count as a quick escape
 SlashCo.SlowEscapeTime = 1200 -- Time in seconds to count as a slow escape
-SlashCo.WarningTime = SlashCo.SlowEscapeTime - 300 -- Time in seconds when the survivors should be warned that they got only 5 minutes left before its a slow run.
+SlashCo.WarningTime = SlashCo.SlowEscapeTime - 300 -- Time in seconds when the survivors should be warned that they got only 5 minutes left before its a slow run. NOTE: At this point, some hints will be given to survivors like fuel cans will make sounds
 
 SlashCo.HelicopterVoices = {
 	INTRO = 1,

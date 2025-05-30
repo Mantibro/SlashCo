@@ -141,7 +141,7 @@ end
 function ENT:SendData(ply)
 	net.Start("mantislashco_GasPourProgress")
 		net.WriteUInt(TimeToFuel, 8)
-		net.WriteEntity(self.FuelingCan)
+		net.WriteUInt(self.FuelingCan:EntIndex(), MAX_EDICT_BITS) -- NOTE: We require this since we might send this net message before the Entity was networked, so we need to accout for that.
 		net.WriteBool(self.IsFueling)
 		net.WriteFloat(self.TimeUntilFueled)
 	net.Send(ply)
@@ -265,6 +265,9 @@ function ENT:Use(activator)
 			self.ItemModel = activator:ItemValue("Model", false, true)
 			timer.Simple(0.25, function()
 				self:MakeGasCan(self.ItemModel)
+				if IsValid(activator) then
+					self:Use(activator, activator) -- Hopefully allow them to instantly pour into the generator instead of having to release and press USE again.
+				end
 			end)
 
 			activator:SecondaryItemFunction("OnFuel", self)

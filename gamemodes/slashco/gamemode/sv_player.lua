@@ -104,7 +104,7 @@ hook.Add("GetFallDamage", "RealisticDamage", function(_, speed)
 end)
 
 hook.Add("PlayerCanSeePlayersChat", "TeamChat", function(_, _, listener, speaker)
-	if not proximity_chat:GetBool() then
+	if not proximity_chat:GetBool() or GameData.IsLobby then
 		return true
 	end
 

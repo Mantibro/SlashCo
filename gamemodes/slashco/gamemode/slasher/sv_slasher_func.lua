@@ -15,6 +15,14 @@ function SlashCo.ApplySlasherToPlayer(ply)
 	end
 end
 
+-- Used for debugging.
+function SlashCo.SpawnPlayerAsSlasher(ply, slasherName)
+	ply:SetNWString("Slasher", slasherName)
+	ply:SetTeam(TEAM_SLASHER)
+	ply:Spawn()
+	SlashCo.OnSlasherSpawned(ply)
+end
+
 function SlashCo.PrepareSlasherForSpawning()
 	--[[
 
@@ -45,6 +53,8 @@ function SlashCo.OnSlasherSpawned(ply)
 	ply.ChaseActivationCooldown = 0
 	ply.KillDelayTick = 0
 	ply.CurrentChaseTick = 0
+	
+	-- ToDo: Move away from these values, they make the code painful to read and it serves no use to have them like this.
 	ply.SlasherValue1 = 0
 	ply.SlasherValue2 = 0
 	ply.SlasherValue3 = 0

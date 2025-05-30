@@ -16,11 +16,15 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [+] Implemented quick escape and slow escape.<br>
 (If you escape before the round went on for 10 minutes it counts as a quick escape, if you escape after 20 minutes its a slow escape)<br>
 [+] Added ambient sounds which volume and sound track are based off the Slasher's anger.<br>
+[+] After `15` minutes(the warning time) of playing, the player receives a warning sound indicating that they got 5 minutes left before they would have a slow escape<br>
+[+] When the warning time is reached, fuel cans will start making noises making it more easy to find them<br>
+[#] You can now hold the USE key when fuling a generator instead of having to let go of it and press it again<br>
 [#] Disable broken door collisions after it stopped moving<br>
 (if you accidentally walked on it previously, your movement would become jittery as the prediction would fail).<br>
 [#] Allow one to drop the used deathward<br>
 [#] Removed player limit.<br>
 [#] New lobby map file (more players spawns)<br>
+[#] Make the chat global in the lobby<br>
 
 ## Slasher Changes
 
@@ -174,6 +178,7 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [#] Show the spectator ui to the slasher when their waiting to be spawned.<br>
 [#] Fixed `gmod_hands` sometimes spawning and causing errors<br>
 [#] Fixed a bug with particle emitters used for footsteps and decoy causing issues when they don't clean up quick enouth & optimized the code of it to only use a single emitter now.<br>
+[#] Fixed a error caused by the console using the `say` command.<br>
 [-] Removed hardcoded 7-player limit.<br>
 (If the helicopter is full, additional players will be somewhat bugged, but it should work fine.)<br>
 
