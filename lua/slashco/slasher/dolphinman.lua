@@ -57,7 +57,7 @@ local function PlayCallSound(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local v1 = slasher.SlasherValue1 --Hunt power
+	local HuntPower = slasher.HuntPower or 0 --Hunt power
 
 	local hunt_boost = 0
 
@@ -71,8 +71,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:EmitSound("slashco/slasher/dolfin/dolfin_breath.wav", 40)
 
 		--get hunt yes.....
-		if v1 < 100 then
-			slasher.SlasherValue1 = v1 + (FrameTime() / (2 - ((SO - 1) / 2)))
+		if HuntPower < 100 then
+			slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
 		end
 
 		--Survivore finderore
@@ -175,10 +175,10 @@ function SLASHER.OnTickBehaviour(slasher)
 			hunt_boost = 1
 
 			--oh fuck i'm losing my hunt!!
-			slasher.SlasherValue1 = v1 - (FrameTime() / 1 + SO)
+			slasher.HuntPower = HuntPower - (FrameTime() / 1 + SO)
 
 			--damn shit
-			if v1 <= 0 then
+			if HuntPower <= 0 then
 				slasher:SetNWBool("DolphinHunting", false)
 				SlashCo.AudioSystem.StopSound("DolfinCall", 0.5)
 				SlashCo.AudioSystem.StopSound("DolfinCallFar", 0.5)
@@ -195,13 +195,13 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if SlashCo.CurRound.EscapeHelicopterSummoned then
-	    if v1 < 100 then
-		slasher.SlasherValue1 = v1 + (FrameTime() / (2 - ((SO - 1) / 2)))
+	    if HuntPower < 100 then
+		slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
 	    end
         end
 
-	if slasher:GetNWInt("DolphinHunt") ~= math.floor(v1) then
-		slasher:SetNWInt("DolphinHunt", math.floor(v1))
+	if slasher:GetNWInt("DolphinHunt") ~= math.floor(HuntPower) then
+		slasher:SetNWInt("DolphinHunt", math.floor(HuntPower))
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight + (hunt_boost * 5))
@@ -236,10 +236,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	
 	if SlashCo.Jumpscare(slasher, target) then
 		if slasher:GetNWBool("DolphinHunting") then
-			slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 15)
+			slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
 			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 		else
-			slasher.SlasherValue1 = math.min(100, slasher.SlasherValue1 + 20)
+			slasher.HuntPower = math.min(100, slasher.HuntPower + 20)
 			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 		end
 	end
@@ -267,7 +267,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		return
 	end
 
-	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") and slasher.SlasherValue1 >= 5 then
+	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") and slasher.HuntPower >= 5 then
 		slasher:SetNWBool("DolphinInHiding", false)
 		
 		slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
@@ -279,7 +279,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 			slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
 		end)
 
-		slasher.SlasherValue1 = slasher.SlasherValue1 - math.floor(slasher.SlasherValue1 / 1.5)
+		slasher.HuntPower = slasher.HuntPower - math.floor(slasher.HuntPower / 1.5)
 	end
 end
 
@@ -320,8 +320,8 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/dolfin/dolphin_step" .. idx .. ".mp3",
 			identifier = "DolphinFootstep" .. idx,
-			minDistance = 150,
-			maxDistance = 200,
+			minDistance = 250,
+			maxDistance = 400,
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,

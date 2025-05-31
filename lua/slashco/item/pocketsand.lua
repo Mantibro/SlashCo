@@ -8,40 +8,47 @@ ITEM.Price = 30
 ITEM.Description = "PocketSand_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
+
 function ITEM.OnUse(ply)
 	local found = {}
 
-	for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if s:GetPos():Distance(ply:GetPos()) > 200 then
+	local plyPos = ply:EyePos()
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		if slasher:EyePos():Distance(plyPos) > 200 then
 			continue
 		end
 
 		local tr = util.TraceLine({
-			start = ply:EyePos(),
-			endpos = s:WorldSpaceCenter(),
+			start = plyPos,
+			endpos = slasher:WorldSpaceCenter(),
 			filter = ply
 		})
 
-		if tr.Entity == s then
-			table.insert(found, s)
+		if tr.Entity == slasher then
+			table.insert(found, slasher)
 		end
-	end
-
-	if table.IsEmpty(found) then
-		return true
-	end
-
-	for _, v in ipairs(found) do
-		v:SetNWBool("SlasherBlinded", true)
 	end
 
 	ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3")
 	ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
 
+	timer.Simple(0, function() -- Something causes particles to be nuked >:(
+		ParticleEffect("pocketsand", plyPos, angle_zero)
+	end)
+
+	if table.IsEmpty(found) then
+		return true
+	end
+
+	for _, slasher in ipairs(found) do
+		slasher:SetNWBool("SlasherBlinded", true)
+		slasher:SlasherFunction("OnHitByPocketSand", ply)
+	end
+
 	timer.Simple(8, function()
-		for _, v in ipairs(found) do
-			if not IsValid(v) then continue end
-			v:SetNWBool("SlasherBlinded", false)
+		for _, slasher in ipairs(found) do
+			if not IsValid(slasher) then continue end
+			slasher:SetNWBool("SlasherBlinded", false)
 		end
 	end)
 end

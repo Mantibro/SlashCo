@@ -17,6 +17,7 @@ end
 
 -- Used for debugging.
 function SlashCo.SpawnPlayerAsSlasher(ply, slasherName)
+	SlashCo.AudioSystem.StopSound(nil, 1, ply) -- Stop any sounds that were playing from the player in case we switched from one slasher to another.
 	ply:SetNWString("Slasher", slasherName)
 	ply:SetTeam(TEAM_SLASHER)
 	ply:Spawn()
@@ -345,7 +346,8 @@ function SlashCo.StartChaseMode(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = slasher:SlasherValue("ChaseMusic"),
 		identifier = "ChaseMusic",
-		soundLevel = 60,
+		minDistance = 1000 * SlashCo.MapSize,
+		maxDistance = 2000 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 1,

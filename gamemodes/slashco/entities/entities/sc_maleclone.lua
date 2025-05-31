@@ -23,6 +23,9 @@ function ENT:Initialize()
 
 	self:SetModel("models/Humans/Group01/male_07.mdl")
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	if SERVER then
+		self:StartActivity(ACT_IDLE) -- Don't T-Pose for a frame
+	end
 end
 
 function ENT:OnTakeDamage()

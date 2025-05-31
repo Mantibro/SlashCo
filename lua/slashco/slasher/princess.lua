@@ -22,7 +22,7 @@ SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1.5
-SLASHER.ChaseMusic = "slashco/slasher/princess_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/princess/princess_chase.mp3"
 SLASHER.KillSound = ""
 SLASHER.Description = "Princess_desc"
 SLASHER.ProTip = "Princess_tip"
@@ -46,14 +46,15 @@ end
 function SLASHER.DoSound(slasher)
 	if not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessMaulingSurvivor") and not slasher:GetNWBool("PrincessSniffing") then
 		if slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:EmitSound("slashco/slasher/princess_chase" .. math.random(1, 15) .. ".mp3")
+			slasher:EmitSound("slashco/slasher/princess/princess_chase" .. math.random(1, 15) .. ".mp3")
 		else
-			slasher:EmitSound("slashco/slasher/princess_idle" .. math.random(1, 9) .. ".mp3")
+			slasher:EmitSound("slashco/slasher/princess/princess_idle" .. math.random(1, 9) .. ".mp3")
 		end
 	end
 
-	timer.Simple(2, function()
-		if not IsValid(slasher) then
+	timer.Create("PrincessSound", 2, 1, function()
+		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= "Princess" then
+			timer.Remove("PrincessSound")
 			return
 		end
 
@@ -109,7 +110,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetNWBool("PrincessMaulingChild", true)
 				slasher:Freeze(true)
 
-				slasher:EmitSound("slashco/slasher/princess_maul.mp3")
+				slasher:EmitSound("slashco/slasher/princess/princess_maul.mp3")
 
 				--baby in jaw
 
@@ -228,7 +229,7 @@ end
 
 function SLASHER.Maul(slasher, target)
 	timer.Remove("princessMaul_" .. slasher:UserID())
-	slasher:EmitSound("slashco/slasher/princess_bite.mp3")
+	slasher:EmitSound("slashco/slasher/princess/princess_bite.mp3")
 
 	local vPoint = target:GetPos()
 	local bloodfx = EffectData()
@@ -264,7 +265,7 @@ function SLASHER.Maul(slasher, target)
 		end)
 	end
 
-	slasher:EmitSound("slashco/slasher/princess_maul.mp3")
+	slasher:EmitSound("slashco/slasher/princess/princess_maul.mp3")
 
 	local pos = slasher:LocalToWorld(Vector(0, 10, -5))
 	local ang = slasher:LocalToWorldAngles(Angle(90, 0, 0))
@@ -361,7 +362,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	slasher.MaulTime = CurTime()
 
 	slasher:SetNWBool("PrincessMaulingBase", true)
-	slasher:EmitSound("slashco/slasher/princess_attack.mp3")
+	slasher:EmitSound("slashco/slasher/princess/princess_attack.mp3")
 
 	if slasher:IsOnGround() then
 		slasher:SetVelocity(slasher:GetForward() * 800)
@@ -381,8 +382,6 @@ function SLASHER.OnPrimaryFire(slasher)
 			ignoreworld = true,
 		})
 		local target = tr.Entity
-		print(target)
-
 		local damage = math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4))
 		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
 		--		Vector(-40, -40, -60), Vector(40, 40, 60),
@@ -438,7 +437,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 	slasher:SetNWBool("PrincessSniffing", true)
 	slasher:Freeze(true)
-	slasher:EmitSound("slashco/slasher/princess_sniff.mp3")
+	slasher:EmitSound("slashco/slasher/princess/princess_sniff.mp3")
 
 	timer.Simple(4, function()
 		if not IsValid(slasher) then
@@ -515,18 +514,30 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/princess_step" .. math.random(1, 3) .. ".mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
+			identifier = "PrincessFootstep1",
+			minDistance = 300,
+			maxDistance = 700,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(0.15, function()
-			ply:EmitSound("slashco/slasher/princess_step" .. math.random(1, 3) .. ".mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
+				identifier = "PrincessFootstep2",
+				minDistance = 300,
+				maxDistance = 700,
+				entity = ply,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end)
-
-		return true
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 local maulTable = {

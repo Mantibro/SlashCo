@@ -260,16 +260,16 @@ function SlashCo.AudioSystem.EnsureValidVolume(volume)
 end
 
 -- Fades the channel's volume to the target volume.
-function SlashCo.AudioSystem.FadeTo(channel, fadeInTime, targetVol)
+function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol)
 	targetVol = targetVol or 1
-	fadeInTime = fadeInTime or 1
+	fadeTime = fadeTime or 1
 
 	local vol = SlashCo.AudioSystem.EnsureValidVolume(channel:GetVolume())
 	local lowerVol = targetVol < vol
 	local id = SlashCo.AudioSystem.GetChannelID(channel)
 	local timerName = "SlashCo:FadeToAudioChannel" .. id
 	local updateFreq = 0.05
-	local volumeIncrement = math.abs(targetVol - vol) / math.ceil(fadeInTime / updateFreq)
+	local volumeIncrement = math.abs(targetVol - vol) / math.ceil(fadeTime / updateFreq)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
 	timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
 		local reachedTarget = false
@@ -481,8 +481,14 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		entIndex = soundData.entity:EntIndex()
 	end
 
-	local isAlreadyInCreation = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] ~= nil
+	local existingCreationData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier]
+	local isAlreadyInCreation = existingCreationData ~= nil
+	if existingCreationData and (existingCreationData.creationTimeout or 0) < CurTime() then
+		isAlreadyInCreation = false
+	end
+
 	SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = soundData
+	soundData.creationTimeout = CurTime() + 5 -- if the sound for some reason wasn't created after 5 seconds, we will think it timed out.
 	
 	-- Required to prevent a race conditions where multiple channels could have been created with the same identifier.
 	-- BUG: Look at this later again for a special case: What if soundData.soundPath is different in the second call done and it uses the same identifier?
@@ -550,10 +556,10 @@ end
 -- Returns all channels that were parented to the given entity.
 function SlashCo.AudioSystem.GetEntityChannels(entity)
 	local entIndex = -1
-	if IsValid(entity) then
-		entIndex = entity:EntIndex()
-	elseif isnumber(entity) then
+	if isnumber(entity) then
 		entIndex = entity
+	elseif isentity(entity) and IsValid(entity) then
+		entIndex = entity:EntIndex()
 	end
 
 	if entIndex == -1 then
@@ -649,4 +655,15 @@ net.Receive("slashCo_AudioSystem_StopSound", function()
 	end
 
 	SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
+end)
+
+net.Receive("slashCo_AudioSystem_FadeSound", function() -- ToDo: Fix this function
+	local identifier = net.ReadString()
+	local fadeTime = net.ReadFloat()
+	local targetVolume = net.ReadFloat()
+
+	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier)
+	if not channel then return end
+
+	SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVolume)
 end)

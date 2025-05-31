@@ -32,11 +32,9 @@ end
 
 local monsterModelName = "models/slashco/slashers/male_07/male_07_monster.mdl"
 local maleModelName = "models/Humans/Group01/male_07.mdl"
-local plateModelName = "models/hunter/plates/plate.mdl"
 function SLASHER.Precache()
 	SlashCo.PrecacheModel(monsterModelName)
 	SlashCo.PrecacheModel(maleModelName)
-	SlashCo.PrecacheModel(plateModelName)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -235,7 +233,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end
 
 	if slasher.SlasherValue1 > 0 then
-		slasher:SetModel(plateModelName)
+		slasher:SetModel(maleModelName)
 
 		slasher:SetVisible(false)
 
@@ -322,7 +320,7 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		if ply:GetModel() == "models/hunter/plates/plate.mdl" then
+		if ply:IsVisible() then
 			return true
 		else
 			return false

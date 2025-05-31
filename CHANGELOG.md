@@ -55,6 +55,7 @@ All newly added sounds will be from the SlashCo VR version.<br>
 
 ### Princess
 [+] If a player is holding a baby, Princess will eat the baby now.<br>
+[+] Added new footstep sounds<br>
 [#] When Princess eats/kills a player or baby, they will be stunned for 4.5 seconds.<br>
 
 ### Abomignat
@@ -103,12 +104,14 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [#] After 4 milkies, Thirst meter will not increase anymore and will give you a permanent visibility buff.<br>
 
 ### Trollge
+[+] Added footstep sounds from SlashCo VR<br>
+[+] Added background music from SlashCo VR<br>
+[+] Added two sounds for when he's blinded by pocket sand<br>
 [#] Can see the halos of Balkan Boost holders.<br>
 [#] On contact with a Balkan Boost, instantly change to stage 3.<br>
 [#] Switched all sounds to use the new audiosystem.<br>
 [#] Move all sounds into `slashco/slasher/trollge`<br>
-[+] Added footstep sounds from SlashCo VR<br>
-[+] Added background music from SlashCo VR<br>
+[#] Optimized his code slightly<br>
 
 ### Covenant
 [+] Added footstep sounds to covenant and his members.<br>
@@ -125,6 +128,10 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [#] "Cloaks" can mark survivors when tackled.<br>
 [#] Changed Danger level to Devastating.<br>
 
+### Male07
+[#] Fixed him leaving a NPC causing the NPC to T-Pose for one frame.<br>
+[#] Fixed some engine squence warnings related to the slasher's model being set to a plate.<br>
+
 ## Item changes
 
 ### Baby
@@ -137,8 +144,14 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [+] Added the Nightvision goggles<br>
 
 ### Deathward
+[+] Added a proper death/revive animation.<br>
+(Additionally everyone can now hear you respawn. You better run.)<br>
 [#] Raised price from `50` to `80` credits.<br>
 [#] Allow one to drop the used deathward.<br>
+
+### PocketSand
+[+] Created a effect for when its used.<br>
+(The effect's range matches the range of where slashers would be blinded)<br>
 
 ## Offering changes
 

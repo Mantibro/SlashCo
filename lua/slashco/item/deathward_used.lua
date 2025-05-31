@@ -69,4 +69,4 @@ ITEM.WorldModel = {
 	bodygroup = {[0] = 1}
 }
 
-SlashCo.RegisterItem(ITEM, "DeathWardUsed")
+SlashCo.RegisterItem(ITEM, "DeathWard (Used)")

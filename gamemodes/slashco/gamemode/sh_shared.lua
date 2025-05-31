@@ -9,6 +9,9 @@ include("player_class/player_survivor.lua")
 include("player_class/player_slasher_base.lua")
 include("player_class/player_lobby.lua")
 
+game.AddParticles("particles/slashco.pcf")
+PrecacheParticleSystem("pocketsand")
+
 SlashCo = SlashCo or {}
 
 SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator

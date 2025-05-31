@@ -76,3 +76,12 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entity)
 		end
 	net.Broadcast()
 end
+
+util.AddNetworkString("slashCo_AudioSystem_FadeSound")
+function SlashCo.AudioSystem.FadeSound(identifier, fadeTime, targetVolume) -- ToDo: Fix this function.
+	net.Start("slashCo_AudioSystem_FadeSound")
+		net.WriteString(identifier)
+		net.WriteFloat(fadeTime)
+		net.WriteFloat(targetVolume)
+	net.Broadcast()
+end

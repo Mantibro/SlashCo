@@ -325,6 +325,92 @@ local function hpMeter()
 	parsed:Draw(ScrW() * 0.025 + 4, ScrH() * 0.95, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 end
 
+local lastDeathSecond = 0
+local lastDeathTime = 0
+local skull = Material("slashco/ui/slashco_skull", "noclamp")
+local deathward = Material("slashco/ui/deathward", "noclamp")
+local deathwardBorken = Material("slashco/ui/deathward_broken", "noclamp")
+hook.Add("PreRender", "SlashCo:DeathUI", function()
+	if not GameData.LocalPlayer:GetNW2Bool("ShowDeathUI", false) then return end
+
+	local curTime = GameData.LocalPlayer:GetNW2Float("DeathUITime", 0)
+	if curTime == 0 then return end
+
+	if lastDeathTime ~= curTime then
+		lastDeathSecond = 0
+		lastDeathTime = curTime
+	end
+
+	--GameData.LocalPlayer:EmitSound("slashco/survivor/deathward.mp3")
+	--GameData.LocalPlayer:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")
+
+	local animTime = (CurTime() - curTime) * 2
+	local isDeathWard = GameData.LocalPlayer:GetNW2Bool("DeathWardUI", false)
+	if lastDeathSecond ~= math.floor(animTime) then
+		lastDeathSecond = math.floor(animTime)
+
+		if lastDeathSecond % 2 == 1 and animTime < 8 and animTime > 2 then
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/deathbeep.mp3",
+				identifier = "DeathBeep",
+				volume = 1,
+				fadeIn = 0,
+			})
+		end
+
+		if lastDeathSecond == 16 and isDeathWard then
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3",
+				identifier = "DeathWardBreak",
+				volume = 1,
+				fadeIn = 0,
+			})
+		end
+	end
+
+	local endTime = isDeathWard and 18 or 7
+	if endTime + 2 < animTime then return end -- We were supposed to be done already!
+
+	cam.Start2D()
+		local scrW, scrH = ScrW(), ScrH()
+		surface.SetDrawColor(0, 0, 0, 255)
+		surface.DrawRect(0, 0, scrW, scrH)
+
+		if animTime > 2 then
+			surface.SetDrawColor(color_white)
+			if lastDeathSecond % 2 == 1 and animTime < 8 then
+				surface.SetMaterial(skull)
+				surface.DrawTexturedRect(scrW / 2 - 128, scrH / 2 - 128, 256, 256)
+			end
+
+			if isDeathWard and animTime > 10 then
+				local shakeStrength = 25
+				if animTime < 16 then
+					surface.SetMaterial(deathward)
+
+					if animTime > 13 then
+						local scale = 1 + ((animTime - 16) / 3)
+						local strength = scale * shakeStrength
+						surface.DrawTexturedRect(scrW / 2 - 128 + math.random(-strength, strength), scrH / 2 - 128 + math.random(-strength, strength), 256, 256)
+					else
+						surface.DrawTexturedRect(scrW / 2 - 128, scrH / 2 - 128, 256, 256)
+					end
+				else
+					surface.SetMaterial(deathwardBorken)
+
+					if animTime > 18 then
+						surface.DrawTexturedRect(scrW / 2 - 128 + math.random(-shakeStrength, shakeStrength), scrH / 2 - 128 + math.random(-shakeStrength, shakeStrength), 256, 256)
+					else
+						surface.DrawTexturedRect(scrW / 2 - 128, scrH / 2 - 128, 256, 256)
+					end
+				end
+			end
+		end
+	cam.End2D()
+
+	return true
+end)
+
 hook.Add("HUDPaint", "SurvivorHUD", function()
 	local ply = GameData.LocalPlayer
 

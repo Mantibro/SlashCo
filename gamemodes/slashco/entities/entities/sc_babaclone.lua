@@ -50,7 +50,7 @@ if SERVER then
 		
 		local endPosTr = self:LocalToWorld(offset)
 		endPosTr:Add(self:GetForward())
-		endPosTr:Mult(1150)
+		endPosTr:Mul(1150)
 		local tr = util.TraceLine({
 			start = self:LocalToWorld(offset),
 			endpos = endPosTr
@@ -58,7 +58,7 @@ if SERVER then
 		
 		local endPosGround = self:LocalToWorld(offset)
 		endPosGround:Add(self:GetUp())
-		endPosGround:Mult(-10000)
+		endPosGround:Mul(-10000)
 		local ground = util.TraceLine({
 			start = self:LocalToWorld(offset),
 			endpos = endPosGround

@@ -12,10 +12,47 @@ function ITEM.MaxAllowed()
 end
 ITEM.IsSpawnable = true
 function ITEM.OnDie(ply)
-	ply:EmitSound("slashco/survivor/deathward.mp3")
-	ply:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")
-
 	SlashCo.ChangeSurvivorItem(ply, "DeathWardUsed")
+	local pos = ply:WorldSpaceCenter()
+	SlashCo.DropItem(ply, function(ply, item, droppedItem, phys)
+		phys:SetPos(pos, true)
+		phys:SetVelocityInstantaneous(vector_origin)
+	end)
+
+	ply:SetVisible(false)
+	ply:SetImpervious(true)
+	ply:GodEnable()
+	ply:Freeze(true)
+
+	ply:SetNW2Bool("ShowDeathUI", true)
+	ply:SetNW2Bool("DeathWardUI", true)
+	ply:SetNW2Float("DeathUITime", CurTime())
+
+	timer.Simple(9, function()
+		if not IsValid(ply) then return end
+
+		SlashCo.AudioSystem.PlaySound({ -- Leak the location of the player that respawned to everyone >:3
+			soundPath = "slashco/survivor/deathward.mp3",
+			identifier = "DeathWard",
+			position = ply:GetPos(),
+			minDistance = 2500,
+			maxDistance = 15000,
+			volume = 1,
+			fadeIn = 0,
+		})
+
+		timer.Simple(1, function()
+			if not IsValid(ply) then return end
+
+			ply:SetNW2Bool("ShowDeathUI", false)
+			ply:SetNW2Bool("DeathWardUI", false)
+
+			ply:SetVisible(true)
+			ply:SetImpervious(false)
+			ply:GodDisable()
+			ply:Freeze(false)
+		end)
+	end)
 
 	return true
 end
