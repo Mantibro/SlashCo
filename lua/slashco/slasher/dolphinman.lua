@@ -36,7 +36,7 @@ end
 
 local function PlayCallSound(slasher)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/dolfin/dolfin_call.ogg",
+		soundPath = "slashco/slasher/dolfin/dolfin_call.mp3",
 		identifier = "DolfinCall",
 		soundLevel = 50,
 		looping = true,
@@ -46,7 +46,7 @@ local function PlayCallSound(slasher)
 	})
 
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/dolfin/dolfin_call_far.ogg",
+		soundPath = "slashco/slasher/dolfin/dolfin_call_far.mp3",
 		identifier = "DolfinCallFar",
 		soundLevel = 80,
 		looping = true,
