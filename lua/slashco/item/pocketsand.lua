@@ -29,16 +29,16 @@ function ITEM.OnUse(ply)
 		end
 	end
 
+	if table.IsEmpty(found) then
+		return true
+	end
+
 	ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3")
 	ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
 
 	timer.Simple(0, function() -- Something causes particles to be nuked >:(
 		ParticleEffect("pocketsand", plyPos, angle_zero)
 	end)
-
-	if table.IsEmpty(found) then
-		return true
-	end
 
 	for _, slasher in ipairs(found) do
 		slasher:SetNWBool("SlasherBlinded", true)
