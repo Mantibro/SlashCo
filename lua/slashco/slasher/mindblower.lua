@@ -38,23 +38,23 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
-	local v1 = slasher.SlasherValue1 --Survivor speed decrease when being chased
-	local v2 = slasher.SlasherValue2 --Pacification
+	local SurvSpeed = slasher.SurvivorSpeed or 0 --Survivor speed decrease when being chased
+	local Pacification = slasher.Pacification or 0 --Pacification
 	local _ents = ents.FindInSphere(self:GetPos())
 	
 	for _, v in ipairs(_ents) do
-		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(slasher:GetPos()) < 1700 and v1 < 160 and slasher:GetNWBool("InSlasherChaseMode") then
-			slasher.SlasherValue1 = v1 + (FrameTime() + (SO * 0.02)) + (FrameTime() * 0.5)
-			target:SetSlowWalkSpeed(SlowWalkSpeed - (v1 / 0.5))
-			target:SetWalkSpeed(WalkSpeed - (v1 / 0.5))
-			target:SetRunSpeed(RunSpeed - (v1 / 0.5))
+		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(slasher:GetPos()) < 1700 and SurvSpeed < 160 and slasher:GetNWBool("InSlasherChaseMode") then
+			slasher.SurvivorSpeed = SurvSpeed + (FrameTime() + (SO * 0.02)) + (FrameTime() * 0.5)
+			v:SetSlowWalkSpeed(SlowWalkSpeed - (SurvSpeed / 0.5))
+			v:SetWalkSpeed(WalkSpeed - (SurvSpeed / 0.5))
+			v:SetRunSpeed(RunSpeed - (SurvSpeed / 0.5))
 		else
-			slasher.SlasherValue1 = 0
+			slasher.SurvivorSpeed = 0
 		end
 	end
 	
-	if v2 > 0 then
-		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
+	if Pacification > 0 then
+		slasher.Pacification = Pacification - (FrameTime() + (SO * 0.04))
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
 	else
@@ -89,7 +89,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end)
 			
 			timer.Simple(2, function()
-				ParticleEffect("ExplosionCore_wall", ragdoll:GetPos()+ragdoll:OBBMaxs()*Vector(0,0,0), Angle(0,0,0),ragdoll)
+				local explosion = EffectData()
+			    explosion:SetOrigin(ragdoll:GetPos() + Vector(0, 0, 0))
+			    util.Effect("ExplosionCore_wall", explosion)
 				local Dissolver = ents.Create("env_entity_dissolver")
 				timer.Simple(1, function()
 					if IsValid(Dissolver) then
@@ -139,7 +141,9 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:SetNWBool("DemonPacified", true)
 		slasher:Freeze(false)
 		if IsValid(target) then
-			ParticleEffect( "ExplosionCore_wall", target:GetEyeTrace().HitPos, Angle( 0, 0, 0 ) )
+		    local explosion = EffectData()
+			explosion:SetOrigin(target:GetPos() + Vector(0, 0, 0))
+			util.Effect("ExplosionCore_wall", explosion)
 			target:Remove()
 		end
 	end)

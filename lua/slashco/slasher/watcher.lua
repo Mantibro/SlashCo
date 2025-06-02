@@ -70,7 +70,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCoSlashers[slasher:GetNWString("Slasher")].CanChase = false
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") or slasher:GetNWBool("WatcherRage") then
+	if slasher:GetNWBool("InSlasherChaseMode") then
 		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed - (v3 * 80))
 		slasher:SetWalkSpeed(SLASHER.ChaseSpeed - (v3 * 80))
 		slasher:SetRunSpeed(SLASHER.ChaseSpeed - (v3 * 80))
@@ -78,6 +78,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed - (v3 * 120))
 		slasher:SetWalkSpeed(SLASHER.ProwlSpeed - (v3 * 120))
 		slasher:SetRunSpeed(SLASHER.ProwlSpeed - (v3 * 120))
+	end
+	
+	if slasher:GetNWBool("WatcherRage") then
+		slasher:SetSlowWalkSpeed(380)
+		slasher:SetWalkSpeed(380)
+		slasher:SetRunSpeed(380)
 	end
 
 	if v2 > 0 then
@@ -252,19 +258,21 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/watcher/watcher_rage.mp3",
 		identifier = "WatcherRage",
-		soundLevel = 100,
+		minDistance = 1000 * SlashCo.MapSize,
+	    maxDistance = 2000 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 1,
-		fadeIn = 1,
+		fadeIn = 0,
 	})
 end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local rage = ply:GetNWBool("WatcherRage")
 
 	if ply:IsOnGround() then
-		if not chase then
+		if not chase or rage then
 			ply.CalcIdeal = ACT_WALK
 			ply.CalcSeqOverride = ply:LookupSequence("prowl")
 		else
@@ -281,7 +289,15 @@ end
 function SLASHER.Footstep(ply)
 	if SERVER then
 		local idx = math.random(1, 4)
-		ply:EmitSound("slashco/slasher/watcher/watcher_boot" .. idx .. ".mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/watcher/watcher_boot" .. idx .. ".mp3",
+			identifier = "WatcherFootstep" .. idx,
+		    minDistance = 250,
+			maxDistance = 550,
+			entity = ply,
+		    volume = 1,
+			fadeIn = 0,
+		})
 		return false
 	end
 

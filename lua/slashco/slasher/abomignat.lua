@@ -55,7 +55,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNWBool("AbomignatLunging") then
-		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
+		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 30)),
 				Vector(-15, -15, -60), Vector(15, 15, 60), 100, DMG_SLASH, 5, false)
 
 		SlashCo.BustDoor(slasher, target, 25000)
@@ -199,7 +199,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		local damage = 50 + slasher.AbomignatKills * 10
 
 		slasher:LagCompensation(true)
-		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
+		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 0)),
 				Vector(-40, -40, -60), Vector(40, 40, 60), damage, DMG_SLASH, 5, false)
 		slasher:LagCompensation(false)
 

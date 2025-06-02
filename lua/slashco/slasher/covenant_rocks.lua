@@ -43,9 +43,9 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	--if not slasher:GetNWBool("InSlasherChaseMode") then
-	--	return
-	--end
+	if not slasher:GetNWBool("InSlasherChaseMode") then
+		return
+	end
 
 	if not IsValid(target) or not target:IsPlayer() then
 		return
@@ -81,8 +81,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					local vec, ang = slasher:GetBonePosition(slasher:LookupBone("Hand.R"))
 					local vPoint = vec
 					local lightning = EffectData()
-					lightning:SetOrigin(vPoint + target1:GetPos() + Vector(0, 0, 2))
-					lightning:SetStart(Vector(255, 0, 0))
+					lightning:SetOrigin(vPoint + target1:GetPos() + Vector(0, 0, 0))
+					lightning:SetStart(Vector(0, 0, 0))
 					lightning:SetAttachment(0)
 					util.Effect("rocks_lightning", lightning)
 				end
@@ -107,16 +107,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			slasher.SlasherValue1 = slasher.SlasherValue1 + 0.5
 		end)
 	end
-end
-
-function SLASHER.OnSecondaryFire(slasher)
-	--SlashCo.StartChaseMode(slasher)
-end
-
-function SLASHER.OnMainAbilityFire(slasher)
-end
-
-function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Animator(ply)
@@ -153,8 +143,8 @@ function SLASHER.InitHud(_, hud)
 	hud:SetTitle("CovenantRocks")
 	
 	hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/s_0"))
-	--hud:UntieControl("LMB")
-	--hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
+	hud:UntieControl("LMB")
+	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
 	
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("HUDPaint", "SlashCoZanySurvey", function()

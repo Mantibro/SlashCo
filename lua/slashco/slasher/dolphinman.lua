@@ -38,21 +38,23 @@ local function PlayCallSound(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/dolfin/dolfin_call.mp3",
 		identifier = "DolfinCall",
-		soundLevel = 50,
+		minDistance = 700 * SlashCo.MapSize,
+		maxDistance = 1240 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 2,
-		fadeIn = 1,
+		fadeIn = 0,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/dolfin/dolfin_call_far.mp3",
 		identifier = "DolfinCallFar",
-		soundLevel = 80,
+		minDistance = 1250 * SlashCo.MapSize,
+		maxDistance = 2250 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 2,
-		fadeIn = 1,
+		fadeIn = 0,
 	})
 end
 
@@ -62,6 +64,18 @@ function SLASHER.OnTickBehaviour(slasher)
 	local hunt_boost = 0
 
 	local SO = SlashCo.CurRound.OfferingData.Singularity
+	
+	if math.random(1, 1000) == 1 then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/dolfin/dolfin_click" .. math.random(1, 2) .. ".ogg",
+			identifier = "DolfinClick",
+			minDistance = 350,
+			maxDistance = 800,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+	end
 
 	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
 		slasher:SetJumpPower(0)
@@ -95,18 +109,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetNWBool("DolphinInHiding", false)
 				slasher:SetNWBool("DolphinHunting", true)
 			end)
-		end
-
-		if math.random(1, 1000) == 1 then
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/dolfin/dolfin_click" .. math.random(1, 2) .. ".ogg",
-				identifier = "DolfinClick",
-				minDistance = 350,
-				maxDistance = 800,
-				entity = slasher,
-				volume = 1,
-				fadeIn = 0,
-			})
 		end
 
 		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -195,10 +197,10 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if SlashCo.CurRound.EscapeHelicopterSummoned then
-	    if HuntPower < 100 then
-		slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
-	    end
+        if HuntPower < 100 then
+            slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
         end
+    end
 
 	if slasher:GetNWInt("DolphinHunt") ~= math.floor(HuntPower) then
 		slasher:SetNWInt("DolphinHunt", math.floor(HuntPower))
@@ -209,10 +211,11 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
-	-- shit fixed i hope
+    -- i'm crying
 	slasher:SetNWBool("DolphinInHiding", false)
 	slasher:SetNWBool("DolphinFound", false)
 	slasher:SetNWBool("DolphinHunting", false)
+	slasher:SetNWBool("CanKill", true)
 end
 
 function SLASHER.Thirdperson(ply)
@@ -234,23 +237,23 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 	
+	slasher.KillDelayTick = SLASHER.KillDelay
+	-- this works a bit weird(?
+	if slasher:GetNWBool("DolphinHunting") then
+        slasher.KillDelayTick = SLASHER.KillDelay
+	else
+        slasher.KillDelayTick = SLASHER.KillDelay + 2.5
+	end
+	
 	if SlashCo.Jumpscare(slasher, target) then
 		if slasher:GetNWBool("DolphinHunting") then
-			slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
+		    slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
 			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 		else
 			slasher.HuntPower = math.min(100, slasher.HuntPower + 20)
 			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 		end
 	end
-	
-	if slasher:GetNWBool("DolphinHunting") then
-		slasher.KillDelayTick = SLASHER.KillDelay
-	else
-		slasher.KillDelayTick = SLASHER.KillDelay + 4.5
-	end
-	
-	slasher.KillDelayTick = SLASHER.KillDelay
 end
 
 function SLASHER.OnSecondaryFire(slasher)

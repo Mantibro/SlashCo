@@ -136,7 +136,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				maxDistance = 1500 + (1000 * SlashCo.MapSize),
 				looping = true,
 				entity = slasher,
-				volume = math.max(0.8 - (slasher.SlasherValue3 * 0.12), 0.1),
+				volume = math.max(0.6 - (slasher.SlasherValue3 * 0.12), 0.1),
 				fadeIn = 1,
 			})
 			SLASHER.HideTime(slasher)
@@ -170,7 +170,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				end)
 			end
 		end
-		--SlashCo.AudioSystem.StopSound("TylerSong", 0)
 
 		if slasher:GetNWBool("TylerCreating") and slasher.TylerBlink ~= 1.8 then
 			slasher.TylerBlink = 1.8
@@ -219,7 +218,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				maxDistance = 20000,
 				looping = true,
 				entity = slasher,
-				volume = 1,
+				volume = 0.8,
 				fadeIn = 1,
 			})
 			SlashCo.AddSlasherAnger(slasher, 5) -- Add some anger just because he got mad.
@@ -240,7 +239,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					maxDistance = 20000,
 					looping = true,
 					entity = slasher,
-					volume = 1,
+					volume = 0.9,
 					fadeIn = 1,
 				})
 			else
@@ -252,7 +251,7 @@ function SLASHER.OnTickBehaviour(slasher)
 						maxDistance = 20000,
 						looping = true,
 						entity = slasher,
-						volume = 1,
+						volume = 0.8,
 						fadeIn = 1,
 					})
 				else
@@ -263,18 +262,18 @@ function SLASHER.OnTickBehaviour(slasher)
 						maxDistance = 20000,
 						looping = true,
 						entity = slasher,
-						volume = 1,
+						volume = 0.8,
 						fadeIn = 1,
 					})
 
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "slashco/slasher/igor/tyler_destroyer_whisper.mp3",
 						identifier = "TylerWhisper",
-						minDistance = 250,
-						maxDistance = 500,
+						minDistance = 850,
+						maxDistance = 1500,
 						looping = true,
 						entity = slasher,
-						volume = 1,
+						volume = 0.8,
 						fadeIn = 1,
 					})
 				end
@@ -425,7 +424,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	end
 
 	timer.Simple(SlashCoSlashers[slasher:GetNWString("Slasher")].JumpscareDuration, function()
-		SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
+        SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
 
 		if IsValid(slasher) then
 			slasher:Freeze(false)
