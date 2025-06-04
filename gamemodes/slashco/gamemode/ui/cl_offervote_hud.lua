@@ -79,7 +79,7 @@ hook.Add("HUDPaint", "OfferingVoteHUD", function()
 		return
 	end
 
-	draw.SimpleText(SlashCo.Language("offervote_1", offeror_name, SlashCo.Language("Offering_name", GameData.OfferingName or "")),
+	draw.SimpleText(SlashCo.Language("offervote_1", GameData.OfferorName, SlashCo.Language("Offering_name", GameData.OfferingName or "")),
 			"LobbyFont1", ScrW() * 0.5, ScrH() * 0.27, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
 	draw.SimpleText("[F4]", "TVCD", ScrW() * 0.5, ScrH() * 0.33, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)

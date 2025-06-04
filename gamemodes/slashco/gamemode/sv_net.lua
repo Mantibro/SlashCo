@@ -129,7 +129,7 @@ end
 
 hook.Add("scValue_sendOffer", "slashCo_StartOfferingVote", function(ply, offer)
 	table.insert(SlashCo.LobbyData.Offerors, ply:SteamID64())
-	SlashCo.BroadcastOfferingVote(ply:SteamID64(), offer)
+	SlashCo.BroadcastOfferingVote(ply, offer)
 	SlashCo.LobbyData.VotedOffering = offer
 
 	timer.Create("OfferingVoteTimer", 20, 1, function()
