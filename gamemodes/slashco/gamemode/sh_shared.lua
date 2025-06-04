@@ -196,6 +196,7 @@ if CLIENT then
 	--GameData.LocalPlayer = nil
 	--GameData.LocalSteamID = nil
 	--GameData.LocalSteamID64 = nil
+	--GameData.LocalEntIndex = -1
 	GameData.StateOfLobby = GameData.StateOfLobby or 0
 	GameData.LobbyInfoTable = GameData.LobbyInfoTable or {}
 	GameData.TimeLeft = GameData.TimeLeft or nil
@@ -214,6 +215,7 @@ if CLIENT then
 		end
 
 		GameData.LocalPlayer = LocalPlayer()
+		GameData.LocalEntIndex = GameData.LocalPlayer:EntIndex()
 		GameData.LocalSteamID = GameData.LocalPlayer:SteamID()
 		GameData.LocalSteamID64 = GameData.LocalPlayer:SteamID64()
 	end

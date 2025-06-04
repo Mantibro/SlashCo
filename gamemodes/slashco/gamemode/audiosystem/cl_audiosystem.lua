@@ -385,7 +385,7 @@ function SlashCo.AudioSystem.Init()
 end
 
 hook.Add("InitPostEntity", "SlashCo:AudioSystem", SlashCo.AudioSystem.Init)
-if game.GetWorld() != NULL then
+if game.GetWorld() ~= NULL then
 	SlashCo.AudioSystem.Init()
 end
 
@@ -395,7 +395,7 @@ local function UpdateBackgroundMusic()
 	if not IsValid(SlashCo.AudioSystem.BackgroundChannel) then
 		SlashCo.AudioSystem.PlayBackgroundMusic()
 	else
-		if SlashCo.AudioSystem.BackgroundChannel:GetState() != GMOD_CHANNEL_PLAYING then -- Fk stopsound
+		if SlashCo.AudioSystem.BackgroundChannel:GetState() ~= GMOD_CHANNEL_PLAYING then -- Fk stopsound
 			SlashCo.AudioSystem.BackgroundChannel:Play()
 		end
 
@@ -494,7 +494,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	-- BUG: Look at this later again for a special case: What if soundData.soundPath is different in the second call done and it uses the same identifier?
 	if isAlreadyInCreation then return end
 
-	local useMono = entIndex == 0 and not soundData.position
+	local useMono = entIndex == 0 and not soundData.position and not soundData.forceMono
 	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(useMono and "mono" or "3d", soundData.modes), function(channel, channelData)
 		local soundData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] or soundData -- Update in case it was updated in the few frames we had originally made our call.
 		if soundData.DESTROYCHANNEL then
@@ -505,7 +505,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			return
 		end
 
-		if soundData.fadeIn and soundData.fadeIn != 0 then
+		if soundData.fadeIn and soundData.fadeIn ~= 0 then
 			channel:SetVolume(0)
 			channelData.volume = 0
 		else
@@ -520,11 +520,11 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			SlashCo.AudioSystem.SetChannelIdentifier(channel, soundData.identifier)
 		end
 
-		if soundData.fadeIn and soundData.fadeIn != 0 then
+		if soundData.fadeIn and soundData.fadeIn ~= 0 then
 			SlashCo.AudioSystem.FadeTo(channel, soundData.fadeIn, soundData.volume)
 		end
 
-		if entIndex != 0 then
+		if entIndex ~= 0 then
 			SlashCo.AudioSystem.ParentChannelToEntity(channel, entIndex)
 		end
 
@@ -532,7 +532,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channel:SetPos(soundData.position)
 		end
 
-		if soundData.soundLevel and soundData.soundLevel != 0 then
+		if soundData.soundLevel and soundData.soundLevel ~= 0 then
 			channel:Set3DFadeDistance(soundData.soundLevel ^ 1.25, soundData.soundLevel ^ 1.5)
 			soundData.minDistance = soundData.soundLevel ^ 1.25
 			soundData.maxDistance = soundData.soundLevel ^ 1.5
@@ -638,6 +638,12 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		maxDistance = ReadSoundField(net.ReadUInt, 16),
 		modes = ReadSoundField(net.ReadString),
 	}
+
+	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
+	-- While clientside, the channel could be moved after PlaySound was called so if we forced it into mono we could break things.
+	if soundData.entity ~= nil and soundData.entity == GameData.LocalEntIndex then
+		soundData.forceMono = true -- We are playing the sound on the local player, so we switch it to mono for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
+	end
 
 	SlashCo.AudioSystem.PlaySound(soundData)
 end)
