@@ -197,9 +197,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if SlashCo.CurRound.EscapeHelicopterSummoned then
-        if HuntPower < 100 then
-            slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
-        end
+		if HuntPower < 100 then
+		    slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
+		end
     end
 
 	if slasher:GetNWInt("DolphinHunt") ~= math.floor(HuntPower) then
@@ -240,9 +240,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	slasher.KillDelayTick = SLASHER.KillDelay
 	-- this works a bit weird(?
 	if slasher:GetNWBool("DolphinHunting") then
-        slasher.KillDelayTick = SLASHER.KillDelay
+		slasher.KillDelayTick = SLASHER.KillDelay
 	else
-        slasher.KillDelayTick = SLASHER.KillDelay + 2.5
+		slasher.KillDelayTick = SLASHER.KillDelay + 2.5
 	end
 	
 	if SlashCo.Jumpscare(slasher, target) then

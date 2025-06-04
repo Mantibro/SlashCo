@@ -424,7 +424,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	end
 
 	timer.Simple(SlashCoSlashers[slasher:GetNWString("Slasher")].JumpscareDuration, function()
-        SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
+		SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
 
 		if IsValid(slasher) then
 			slasher:Freeze(false)
