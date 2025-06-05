@@ -184,8 +184,7 @@ hook.Add("Think", "Benadryl", function()
 			if GameData.LocalPlayer.BenadrylIntensity then
 				vol = math.abs(GameData.LocalPlayer.BenadrylIntensity)
 			end
-			GameData.BenadrylSound:SetVolume(vol * 2)
-			print(vol * 2)
+			GameData.BenadrylSound:SetVolume(vol)
 		end
 
 		if not GameData.LocalPlayer.ShadowManTick then
