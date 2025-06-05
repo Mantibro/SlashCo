@@ -115,6 +115,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		slasher:SetImpervious(false)
+		slasher.TimeAsTylerSpecter = 0
 		slasher:SetNWBool("TylerFlash", false)
 		slasher:SetSlowWalkSpeed(1)
 		slasher:SetRunSpeed(1)
@@ -161,6 +162,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if not slasher:GetNWBool("TylerCreating") and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
 				slasher:SetNWBool("TylerCreating", true)
 				slasher.TimeAsTylerForm = 0
+				slasher.TimeAsTylerSpecter = 0
 				slasher.TylerSongPickedID = nil
 				timer.Simple(0.5, function()
 					if not IsValid(slasher) then
@@ -174,6 +176,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if slasher:GetNWBool("TylerCreating") and slasher.TylerBlink ~= 1.8 then
 			slasher.TylerBlink = 1.8
 			slasher.TimeAsTylerForm = 0
+			slasher.TimeAsTylerSpecter = 0
 
 			slasher:EmitSound("slashco/slasher/igor/tyler_create.mp3")
 
@@ -194,6 +197,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetNWBool("TylerCreating", false)
 				slasher.TylerState = 0
 				slasher.TimeAsTylerForm = 0
+				slasher.TimeAsTylerSpecter = 0
 				slasher.SlasherValue3 = slasher.SlasherValue3 + 1
 				slasher.TylerBlink = 0
 				slasher:Freeze(false)
@@ -307,6 +311,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if TimeAsTylerForm > math.max((((3 + SlashCo.MapSize) / 4) * anger), SLASHER.MinChase) and not endlessChase then
 			slasher.TylerState = 0
+			slasher.TimeAsTylerSpecter = 0
 
 			SlashCo.AudioSystem.StopSound("TylerTheme", 1)
 			SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
@@ -431,6 +436,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			if EndlessChase() then goto skip end
 			
 			slasher.TylerState = 0
+			slasher.TimeAsTylerSpecter = 0
 			slasher:SetVisible(false)
 
 			SlashCo.AudioSystem.StopSound("TylerTheme", 0.5)
