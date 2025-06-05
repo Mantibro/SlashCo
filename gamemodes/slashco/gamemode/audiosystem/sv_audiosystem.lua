@@ -9,7 +9,7 @@ SlashCo.AudioSystem.Sounds = SlashCo.AudioSystem.Sounds or {}
 -- ToDo: Why do we even use the EntIndex and not the Entity handle?
 --	   Probably because the Entity handle might not get valid when we call Entity(index) before it was created?
 local function WriteEntIndex(entity)
-	net.WriteUInt(entity:EntIndex(), MAX_EDICT_BITS)
+	net.WriteUInt(isnumber(entity) and entity or entity:EntIndex(), MAX_EDICT_BITS)
 end
 
 --[[
@@ -47,7 +47,12 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		WriteSoundField(soundData.maxDistance, net.WriteUInt, 16)
 		WriteSoundField(soundData.position, net.WriteVector)
 		WriteSoundField(soundData.modes, net.WriteString)
-	net.Broadcast()
+
+	if not soundData.sendToEntity then -- serverside only, its networked only to the player its being played od
+		net.Broadcast()
+	else
+		net.Send(soundData.sendToEntity)
+	end
 
 	--[[table.insert(SlashCo.AudioSystem.Sounds, {
 		filePath = soundPath,
@@ -60,7 +65,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 end
 
 util.AddNetworkString("slashCo_AudioSystem_StopSound")
-function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entity)
+function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entity, sendToEntity)
 	fadeOut = fadeOut or 0
 
 	local isValid = IsValid(entity)
@@ -74,7 +79,11 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entity)
 		if isValid then
 			net.WriteUInt(entity:EntIndex(), MAX_EDICT_BITS)
 		end
-	net.Broadcast()
+	if not sendToEntity then
+		net.Broadcast()
+	else
+		net.Send(sendToEntity)
+	end
 end
 
 util.AddNetworkString("slashCo_AudioSystem_FadeSound")

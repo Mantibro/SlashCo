@@ -1,0 +1,26 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/shadowman/eyeglow"
+
+	"$selfillum" "1"
+	"$selfillummask" "models/slashco/shadowman/eyeglow"
+	"$selfillumtint" "[10 10 10]"
+
+	"$envmap" "env_cubemap"
+	"$envmaptint" "[0 0 0]"
+
+	"$emissiveBlendEnabled" "1"
+	"$emissiveBlendStrength" "1"
+	"$emissiveBlendTexture" "vgui/white"
+	"$emissiveBlendBaseTexture" "models/slashco/shadowman/eyeglow"
+	"$emissiveBlendFlowTexture" "vgui/white"
+	"$emissiveBlendTint" "[1 1 1]"
+	"$emissiveBlendScrollVector" "[0 0]"
+	"$nodecal" "1"
+	"$model" 1
+
+	"$detail" "models/slashco/shadowman/eyeglow"
+    "$detailblendmode" "5"
+    "$detailscale" "1"
+    "$detailblendfactor" "1"
+}

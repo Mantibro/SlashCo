@@ -95,6 +95,7 @@ function SlashCo.AudioSystem.GetChannelByIdentifier(identifier)
 end
 
 -- Precaches a sound that can then be played using the given identifier
+-- ToDo: Switch this function over to use PlaySound instead of implementing the logic itself again.
 function SlashCo.AudioSystem.PrecacheSound(soundFile, mode, identifier, callback)
 	local existingPrecacheData = SlashCo.AudioSystem.PrecacheSounds[identifier]
 	if existingPrecacheData and IsValid(existingPrecacheData.channel) then
@@ -460,6 +461,7 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		number maxDistance - The maximum distance after which the sound cannot be heard anymore.
 		Vector position - A position to play the sound from, be aware that if a entity is set it will override this position!
 		string modes - Any additional modes to pass to SlashCo.AudioSystem.CreateChannel
+		boolean noplay - Won't automatically play the sound
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -492,9 +494,13 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	
 	-- Required to prevent a race conditions where multiple channels could have been created with the same identifier.
 	-- BUG: Look at this later again for a special case: What if soundData.soundPath is different in the second call done and it uses the same identifier?
-	if isAlreadyInCreation then return end
+	if isAlreadyInCreation then
+		soundData.identifier = existingCreationData.identifier
+		soundData.soundPath = existingCreationData.soundPath
+		return
+	end
 
-	local useMono = entIndex == 0 and not soundData.position and not soundData.forceMono
+	local useMono = entIndex <= 0 and not soundData.position and not soundData.forceMono
 	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(useMono and "mono" or "3d", soundData.modes), function(channel, channelData)
 		local soundData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] or soundData -- Update in case it was updated in the few frames we had originally made our call.
 		if soundData.DESTROYCHANNEL then
@@ -512,7 +518,6 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channel:SetVolume(soundData.volume)
 		end
 
-		channel:Play()
 		channel:EnableLooping(soundData.looping)
 		channel:SetTime(SlashCo.AudioSystem.CalculateTime(channel, soundData.startTick))
 
@@ -540,6 +545,10 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 
 		if soundData.minDistance and soundData.maxDistance then
 			channel:Set3DFadeDistance(soundData.minDistance, soundData.maxDistance)
+		end
+
+		if not soundData.noplay then -- We call Play only here since some settings might change how it can be heard.
+			channel:Play()
 		end
 
 		channelData.soundData = soundData -- Save the data that was used to create this channel.

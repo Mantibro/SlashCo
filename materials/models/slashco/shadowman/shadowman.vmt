@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/shadowman/shadowman"
+	"$nodecal" "1"
+	"$model" 1
+	"$selfillum" 1
+}

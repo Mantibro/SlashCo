@@ -40,12 +40,28 @@ function ENT:Initialize()
 	end)
 
 	self.Speed = 0.5 + math.random() * 1.5
-	self.Sound = math.random(1, 2)
+
+	GameData.ShadowManIndex = (GameData.ShadowManIndex or 0) + 1
+	self.ShadowIndex = GameData.ShadowManIndex
 
 	if GameData.LocalPlayer.BenadrylIntensity then
-		self:EmitSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3", 60 + math.random(1, 80), 100,
-				(math.random() * 2) * GameData.LocalPlayer.BenadrylIntensity)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/benadryl/shadowman/Shadow_Voice_" .. math.random(1, 113) .. ".ogg",
+			identifier = "ShadowMan" .. GameData.ShadowManIndex,
+			minDistance = 100,
+			maxDistance = 500,
+			entity = self,
+			volume = 0.25,
+			fadeIn = 0,
+		})
 	end
+end
+
+function ENT:OnRemove()
+	local entIndex = self.ShadowIndex
+	timer.Simple(10, function()
+		SlashCo.AudioSystem.StopSound("ShadowMan" .. entIndex, 1, entIndex)
+	end)
 end
 
 function ENT:Think()
@@ -53,7 +69,7 @@ function ENT:Think()
 		return
 	end
 
-	if not self.Speed or not self.Sound then
+	if not self.Speed then
 		self:Remove()
 		return
 	end
@@ -87,7 +103,6 @@ function ENT:Think()
 		end
 
 		if self:GetPos():Distance(self.TargetThing:GetPos()) < 25 then
-			self:StopSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3")
 			self:Remove()
 		end
 	end
@@ -101,8 +116,7 @@ function ENT:Think()
 		self.Cycle = CurTime()
 	end
 
-	if not GameData.LocalPlayer:GetNWBool("SurvivorBenadryl") then
-		self:StopSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3")
+	if GameData.LocalPlayer:GetNW2Float("InitialBenadrylTime", 0) == 0 then
 		self:Remove()
 	end
 end

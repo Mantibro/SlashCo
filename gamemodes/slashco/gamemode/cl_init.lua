@@ -165,7 +165,6 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 	local mult = GameData.LocalPlayer:GetNW2Float("FogMult", 1)
 	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * mult)
 	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * mult)
-	--print(targetFogEnd, brighness, GameData.LastFogEnd)
 
 	render.FogStart(GameData.LastFogStart)
 	render.FogEnd(GameData.LastFogEnd)
