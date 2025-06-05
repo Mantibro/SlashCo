@@ -41,30 +41,30 @@ function SLASHER.OnSpawn(slasher)
 		fadeIn = 0,
 	})
 	slasher:SetNWBool("CanKill", true)
-	slasher.SlasherValue1 = 100
-	slasher.SlasherValue2 = 1
-	slasher.SlasherValue3 = 285
+	slasher.Speedrun = 100
+	slasher.Speedrunning = 1
+	slasher.Speedrunned = 285
 end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local v1 = slasher.SlasherValue1 --Speed
-	local v2 = slasher.SlasherValue2 --Speed Gain multiplier
-	local v3 = slasher.SlasherValue3 --max speed allowed
+	local Speed = slasher.Speedrun or 0 --Speed
+	local SpeedGain = slasher.Speedrunning or 0 --Speed Gain multiplier
+	local SpeedMax = slasher.Speedrunned or 0 --max speed allowed
 
-	if v1 < v3 then
+	if Speed < SpeedMax then
 		local gasMod = SlashCo.IsPositionLegalForSlashers(slasher:GetPos(), true) and 1 or 0.5
 		local mapSizeMod = (0.5 / SlashCo.MapSize) + 0.5
-		slasher.SlasherValue1 = v1 + engine.TickInterval() * mapSizeMod * v2 * (1 + SO) * 0.66 * gasMod
+		slasher.Speedrun = Speed + engine.TickInterval() * mapSizeMod * SpeedGain * (1 + SO) * 0.66 * gasMod
 	end
 
-	slasher:SetRunSpeed(math.floor(slasher.SlasherValue1))
-	slasher:SetWalkSpeed(math.floor(slasher.SlasherValue1))
-	slasher:SetSlowWalkSpeed(math.floor(slasher.SlasherValue1))
+	slasher:SetRunSpeed(math.floor(slasher.Speedrun))
+	slasher:SetWalkSpeed(math.floor(slasher.Speedrun))
+	slasher:SetSlowWalkSpeed(math.floor(slasher.Speedrun))
 
-	if slasher:GetNWInt("SpeedrunnerSpeed") ~= math.floor(v1) then
-		slasher:SetNWInt("SpeedrunnerSpeed", math.floor(v1))
+	if slasher:GetNWInt("SpeedrunnerSpeed") ~= math.floor(Speed) then
+		slasher:SetNWInt("SpeedrunnerSpeed", math.floor(Speed))
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
@@ -73,7 +73,7 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if SlashCo.Jumpscare(slasher, target) then
-		slasher.SlasherValue1 = math.min(slasher.SlasherValue1 + 30, slasher.SlasherValue3)
+		slasher.Speedrun = math.min(slasher.Speedrun + 30, slasher.Speedrunned)
 	end
 end
 
@@ -87,7 +87,7 @@ function SLASHER.RandomTPCans()
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.SlasherValue1 < slasher.SlasherValue3 or slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
+	if slasher.Speedrun < slasher.Speedrunned or slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
 		return
 	end
 
@@ -118,7 +118,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 			return
 		end
 
-		slasher.SlasherValue1 = 100
+		slasher.Speedrun = 100
 		slasher.SpeedRunnering = nil
 		slasher:Freeze(false)
 
@@ -134,8 +134,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 				volume = 1,
 				fadeIn = 0,
 			})
-			slasher.SlasherValue2 = 2
-			slasher.SlasherValue3 = 325
+			slasher.Speedrunning = 2
+			slasher.Speedrunned = 325
 			SLASHER.RandomTPCans()
 
 			return
@@ -153,8 +153,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 				volume = 1,
 				fadeIn = 0,
 			})
-			slasher.SlasherValue2 = 4
-			slasher.SlasherValue3 = 500
+			slasher.Speedrunning = 4
+			slasher.Speedrunned = 500
 			slasher:SetBodygroup(1, 1)
 			SLASHER.RandomTPCans()
 

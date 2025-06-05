@@ -36,22 +36,21 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	--local SO = SlashCo.CurRound.OfferingData.SO
 
-	v1 = slasher.SlasherValue1 --Main Slash Cooldown
-	v2 = slasher.SlasherValue2 --Forward charge
-	v3 = slasher.SlasherValue3 --Lunge Finish Antispam
-	v4 = slasher.SlasherValue4 --Lunge Duration
+	local SlashCD = slasher.SlashCD or 0 --Main Slash Cooldown
+	local FCharge = slasher.FowardCharge or 0 --Forward charge
+	local AntiSpam = slasher.LungeAntiSpam or 0 --Lunge Finish Antispam
+	local LungeDuration = slasher.LungeDuration or 0 --Lunge Duration
 
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
 
-	if v1 > 0 then
-		slasher.SlasherValue1 = v1 - FrameTime()
+	if SlashCD > 0 then
+		slasher.SlashCD = SlashCD - FrameTime()
 	end
 
 	if slasher:IsOnGround() then
-		slasher:SetVelocity(slasher:GetForward() * v2 * 8)
+		slasher:SetVelocity(slasher:GetForward() * FCharge * 8)
 	end
 
 	if slasher:GetNWBool("AbomignatLunging") then
@@ -60,9 +59,9 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		SlashCo.BustDoor(slasher, target, 25000)
 
-		slasher.SlasherValue4 = v4 + 1
+		slasher.LungeDuration = LungeDuration + 1
 
-		if (slasher:GetVelocity():Length() < 450 or target:IsValid()) and v4 > 30 and slasher.SlasherValue3 == 0 then
+		if (slasher:GetVelocity():Length() < 450 or target:IsValid()) and LungeDuration > 30 and slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
 				slasher:EmitSound("slashco/slasher/abomignat_scream" .. math.random(1, 3) .. ".mp3")
@@ -71,13 +70,13 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("AbomignatLunging", false)
 			slasher:SetCycle(0)
 
-			slasher.SlasherValue2 = 0
-			slasher.SlasherValue3 = 1
+			slasher.FowardCharge = 0
+			slasher.LungeAntiSpam = 1
 
 			timer.Simple(4, function()
-				if v3 == 1 then
-					slasher.SlasherValue3 = 2
-					slasher.SlasherValue4 = 0
+				if AntiSpam == 1 then
+					slasher.LungeAntiSpam = 2
+					slasher.LungeDuration = 0
 					slasher:SetNWBool("AbomignatLungeFinish", false)
 					slasher:Freeze(false)
 				end
@@ -123,11 +122,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if v1 > 0 and slasher:GetNWBool("AbomignatCanMainSlash") then
+	if SlashCD > 0 and slasher:GetNWBool("AbomignatCanMainSlash") then
 		slasher:SetNWBool("AbomignatCanMainSlash", false)
 	end
 
-	if v1 <= 0 and not slasher:GetNWBool("AbomignatCanMainSlash") then
+	if SlashCD <= 0 and not slasher:GetNWBool("AbomignatCanMainSlash") then
 		slasher:SetNWBool("AbomignatCanMainSlash", true)
 	end
 
@@ -180,13 +179,13 @@ function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("AbomignatSlashing") then
 		return
 	end
-	if slasher.SlasherValue1 > 0 then
+	if slasher.SlashCD > 0 then
 		return
 	end
 
 	slasher:SetNWBool("AbomignatSlashing", true)
-	slasher.SlasherValue1 = 3 - (SO * 3)
-	slasher.SlasherValue2 = 6
+	slasher.SlashCD = 3 - (SO * 3)
+	slasher.FowardCharge = 6
 
 	slasher:EmitSound("slashco/slasher/abomignat_scream" .. math.random(1, 3) .. ".mp3")
 	slasher:SlasherHudFunc("ShakeControl", "LMB")
@@ -194,7 +193,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	local function SlashFinish()
 		slasher:EmitSound("slashco/slasher/trollge/trollge_swing.mp3")
 		slasher:Freeze(true)
-		slasher.SlasherValue2 = 0
+		slasher.FowardCharge = 0
 
 		local damage = 50 + slasher.AbomignatKills * 10
 
@@ -276,12 +275,12 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	if slasher.SlasherValue1 > 0 then
+	if slasher.SlashCD > 0 then
 		return
 	end
-	slasher.SlasherValue1 = 10 - (SO * 4)
-	slasher.SlasherValue2 = 8 + (SO * 4)
-	slasher.SlasherValue3 = 0
+	slasher.SlashCD = 10 - (SO * 4)
+	slasher.FowardCharge = 8 + (SO * 4)
+	slasher.LungeAntiSpam = 0
 
 	slasher:Freeze(true)
 
@@ -290,7 +289,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	slasher:SlasherHudFunc("ShakeControl", "F")
 
 	timer.Simple(1.75, function()
-		if slasher.SlasherValue3 == 0 then
+		if slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
 				slasher:EmitSound("slashco/slasher/abomignat_scream" .. math.random(1, 3) .. ".mp3")
@@ -299,14 +298,14 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher:SetNWBool("AbomignatLunging", false)
 			slasher:SetCycle(0)
 
-			slasher.SlasherValue2 = 0
-			slasher.SlasherValue3 = 1
+			slasher.FowardCharge = 0
+			slasher.LungeAntiSpam = 1
 		end
 
 		timer.Simple(4, function()
-			if slasher.SlasherValue3 == 1 then
-				slasher.SlasherValue3 = 2
-				slasher.SlasherValue4 = 0
+			if slasher.LungeAntiSpam == 1 then
+				slasher.LungeAntiSpam = 2
+				slasher.LungeDuration = 0
 				slasher:SetNWBool("AbomignatLungeFinish", false)
 				slasher:Freeze(false)
 			end

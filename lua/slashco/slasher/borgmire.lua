@@ -40,23 +40,23 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local v1 = slasher.SlasherValue1 --Time Spent chasing
-	local v2 = slasher.SlasherValue2 --Punch Cooldown
-	local v3 = slasher.SlasherValue3 --Punch Slowdown
+	local ChaseTime = slasher.TimeChasing or 0 --Time Spent chasing
+	local PunchCD = slasher.PunchCooldown or 0 --Punch Cooldown
+	local PunchSD = slasher.PunchSlowdown or 0 --Punch Slowdown
 
-	if v2 > 0 then
-		slasher.SlasherValue2 = v2 - FrameTime()
+	if PunchCD > 0 then
+		slasher.PunchCooldown = PunchCD - FrameTime()
 	end
 
-	if v3 > 1 then
-		slasher.SlasherValue3 = v3 - (FrameTime() / (2 - SO))
+	if PunchSD > 1 then
+		slasher.PunchSlowdown = PunchSD - (FrameTime() / (2 - SO))
 	end
-	if v3 < 1 then
-		slasher.SlasherValue3 = 1
+	if PunchSD < 1 then
+		slasher.PunchSlowdown = 1
 	end
 
 	if not slasher:GetNWBool("InSlasherChaseMode") then
-		slasher.SlasherValue1 = 0
+		slasher.TimeChasing = 0
 
 		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
@@ -76,10 +76,10 @@ function SLASHER.OnTickBehaviour(slasher)
 	else
 		slasher.IdleSound = nil
 
-		slasher.SlasherValue1 = v1 + FrameTime()
+		slasher.TimeChasing = ChaseTime + FrameTime()
 
-		slasher:SetRunSpeed((SLASHER.ChaseSpeed - math.sqrt(v1 * (14 - (SO * 7)))) / v3)
-		slasher:SetWalkSpeed((SLASHER.ChaseSpeed - math.sqrt(v1 * (14 - (SO * 7)))) / v3)
+		slasher:SetRunSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - (SO * 7)))) / PunchSD)
+		slasher:SetWalkSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - (SO * 7)))) / PunchSD)
 
 		if slasher.ChaseSound == nil then
 			slasher:PlayGlobalSound("slashco/slasher/borgmire_breath_chase.mp3", 70, nil, true)
@@ -106,11 +106,11 @@ function SLASHER.OnPrimaryFire(slasher)
 
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	if slasher.SlasherValue2 < 0.01 then
+	if slasher.PunchCooldown < 0.01 then
 		slasher:SetNWBool("BorgmirePunch", false)
 		slasher.BorgPunching = true
 		timer.Remove("BorgmirePunchDecay")
-		slasher.SlasherValue2 = 2
+		slasher.PunchCooldown = 2
 
 		timer.Simple(0.3, function()
 			if not IsValid(slasher) then
@@ -118,7 +118,7 @@ function SLASHER.OnPrimaryFire(slasher)
 			end
 
 			slasher:EmitSound("slashco/slasher/borgmire_swing" .. math.random(1, 2) .. ".mp3")
-			slasher.SlasherValue3 = 2
+			slasher.PunchSlowdown = 2
 
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
 					Vector(-35, -45, -60), Vector(35, 45, 60), 35 + (SO * 20), DMG_SLASH, 5, false)

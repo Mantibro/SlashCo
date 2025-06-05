@@ -27,7 +27,7 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
 function SLASHER.OnSpawn(slasher)
-	slasher.SlasherValue1 = 1
+	slasher.MaleState = 1
 end
 
 local monsterModelName = "models/slashco/slashers/male_07/male_07_monster.mdl"
@@ -40,22 +40,22 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local v1 = slasher.SlasherValue1 --State
-	local v2 = slasher.SlasherValue2 --Time Spent Human Chasing
-	local v3 = slasher.SlasherValue3 --Cooldown
-	local v4 = slasher.SlasherValue4 --Slash Cooldown
+	local State = slasher.MaleState or 0 --State
+	local ChaseAsHuman = slasher.TimeChasingAsHuman or 0 --Time Spent Human Chasing
+	local MaleCD = slasher.MaleCooldown or 0 --Cooldown
+	local SlashCD = slasher.SlashCooldown or 0 --Slash Cooldown
 
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
 
-	if v3 > 0 then
-		slasher.SlasherValue3 = v3 - FrameTime()
+	if MaleCD > 0 then
+		slasher.MaleCooldown = MaleCD - FrameTime()
 	end
-	if v4 > 0 then
-		slasher.SlasherValue4 = v4 - FrameTime()
+	if SlashCD > 0 then
+		slasher.SlashCooldown = SlashCD - FrameTime()
 	end
 
-	if v1 == 0 then
+	if State == 0 then
 		--Specter mode
 
 		prowl_final = 300
@@ -66,7 +66,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
 		slasher:SetImpervious(true)
-	elseif v1 == 1 then
+	elseif State == 1 then
 		--Human mode
 
 		prowl_final = 100
@@ -81,7 +81,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if slasher.CurrentChaseTick == 99 then
 			slasher.CurrentChaseTick = 0
 		end
-	elseif v1 == 2 then
+	elseif State == 2 then
 		--Monster mode
 
 		prowl_final = 150
@@ -94,12 +94,12 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNWBool("InSlasherChaseMode") then
-		if v1 == 1 then
-			slasher.SlasherValue2 = v2 + FrameTime()
+		if State == 1 then
+			slasher.TimeChasingAsHuman = ChaseAsHuman + FrameTime()
 
 			--Timer - 10 seconds + Game Progress (1-10) ^ 3 (SO - x2)
 
-			if v2 > 1 + (SlashCo.CurRound.GameProgress * 1.5) + (0.75 * math.pow(SlashCo.CurRound.GameProgress,
+			if ChaseAsHuman > 1 + (SlashCo.CurRound.GameProgress * 1.5) + (0.75 * math.pow(SlashCo.CurRound.GameProgress,
 					2)) * (1 + SO) then
 				--Become Monster
 
@@ -128,15 +128,15 @@ function SLASHER.OnTickBehaviour(slasher)
 					end
 				end)
 
-				slasher.SlasherValue1 = 2
+				slasher.MaleState = 2
 			end
 		end
 	else
-		slasher.SlasherValue2 = 0
+		slasher.TimeChasingAsHuman = 0
 	end
 
-	if slasher:GetNWInt("Male07State") ~= v1 then
-		slasher:SetNWInt("Male07State", v1)
+	if slasher:GetNWInt("Male07State") ~= State then
+		slasher:SetNWInt("Male07State", State)
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", eyesight_final)
@@ -144,21 +144,21 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher.SlasherValue1 == 1 then
+	if slasher.MaleState == 1 then
 		SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	if slasher.SlasherValue1 == 0 then
+	if slasher.MaleState == 0 then
 		return
 	end
 
-	if slasher.SlasherValue4 < 0.01 then
+	if slasher.SlashCooldown < 0.01 then
 		slasher:SetNWBool("Male07Slashing", false)
 		timer.Remove("Male07SlashDecay")
-		slasher.SlasherValue4 = 2
+		slasher.SlashCooldown = 2
 
 		timer.Simple(0.5, function()
 			slasher:EmitSound("slashco/slasher/trollge_swing.mp3")
@@ -203,7 +203,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	if slasher.SlasherValue3 > 0 or slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher.MaleCooldown > 0 or slasher:GetNWBool("InSlasherChaseMode") then
 		return
 	end
 
@@ -222,9 +222,9 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:SetVisible(true)
 		slasher:SetMoveType(MOVETYPE_WALK)
 
-		slasher.SlasherValue1 = 1
+		slasher.MaleState = 1
 		slasher.CurrentChaseTick = 0
-		slasher.SlasherValue3 = 3
+		slasher.MaleCooldown = 3
 
 		slasher:SetWalkSpeed(100)
 		slasher:SetRunSpeed(100)
@@ -232,16 +232,16 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		return
 	end
 
-	if slasher.SlasherValue1 > 0 then
+	if slasher.MaleState > 0 then
 		slasher:SetModel(maleModelName)
 
 		slasher:SetVisible(false)
 
 		SlashCo.CreateItem("sc_maleclone", slasher:GetPos(), slasher:GetAngles())
 
-		slasher.SlasherValue1 = 0
+		slasher.MaleState = 0
 		slasher:EmitSound("slashco/slasher/male07_unpossess" .. math.random(1, 2) .. ".mp3")
-		slasher.SlasherValue3 = 3
+		slasher.MaleCooldown = 3
 
 		slasher:SetWalkSpeed(300)
 		slasher:SetRunSpeed(300)

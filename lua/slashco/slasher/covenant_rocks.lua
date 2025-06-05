@@ -31,11 +31,10 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local v1 = math.Clamp(slasher.SlasherValue1, 0, 2) --Shock cooldown
-	slasher.SlasherValue1 = v1
+	local ShockCD = slasher.ShockCooldown or 0 --Shock cooldown
 	
-	if v1 > 0 then
-		slasher.SlasherValue1 = v1 - FrameTime()
+	if ShockCD > 0 then
+		slasher.ShockCooldown = ShockCD - FrameTime()
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
@@ -59,9 +58,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	if slasher.SlasherValue1 < 0.01 then
+	if slasher.ShockCooldown < 0.01 then
 		slasher:SetNWBool("RockPunching", false)
 		timer.Remove("RockPunchDecay")
+		slasher.ShockCooldown = 2
 
 		timer.Simple(0.3, function()
 			if not IsValid(slasher) then
@@ -104,7 +104,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				slasher:SetNWBool("RockPunching", false)
 			end)
 
-			slasher.SlasherValue1 = slasher.SlasherValue1 + 0.5
 		end)
 	end
 end

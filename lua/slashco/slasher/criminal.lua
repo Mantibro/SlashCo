@@ -47,7 +47,7 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	v1 = slasher.SlasherValue1 --Cloning Duration
+	local ClonTimer = slasher.ClonDuration or 0 --Cloning Duration
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
@@ -64,16 +64,16 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNWBool("CriminalCloning") then
-		slasher.SlasherValue1 = v1 + FrameTime()
+		slasher.ClonDuration = ClonTimer + FrameTime()
 
 		if not slasher:GetNWBool("CriminalRage") then
-			local speed = SLASHER.ChaseSpeed - (v1 / (4 + SO))
+			local speed = SLASHER.ChaseSpeed - (ClonTimer / (4 + SO))
 
 			slasher:SetSlowWalkSpeed(speed)
 			slasher:SetWalkSpeed(speed)
 			slasher:SetRunSpeed(speed)
 		else
-			local speed = 25 + SLASHER.ChaseSpeed - (v1 / (5 + SO))
+			local speed = 25 + SLASHER.ChaseSpeed - (ClonTimer / (5 + SO))
 
 			slasher:SetSlowWalkSpeed(speed)
 			slasher:SetWalkSpeed(speed)
@@ -86,7 +86,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-		slasher.SlasherValue1 = 0
+		slasher.ClonDuration = 0
 
 		final_perception = 1
 		final_eyesight = 6
@@ -164,7 +164,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		clone:Activate()
 	end
 
-	slasher.SlasherValue1 = 0
+	slasher.ClonDuration = 0
 	slasher:SetNWBool("CriminalRage", true)
 end
 

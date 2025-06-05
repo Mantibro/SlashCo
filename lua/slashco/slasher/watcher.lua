@@ -53,31 +53,31 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	--local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local v1 = slasher.SlasherValue1 --Survey Length
-	local v2 = slasher.SlasherValue2 --Survey Cooldown
-	local v3 = slasher.SlasherValue3 --Watched
-	local v4 = slasher.SlasherValue4 --Stalk time
+	local SurveyLG = slasher.SurveyLength or 0 --Survey Length
+	local SurveyCD = slasher.SurveyCooldown or 0 --Survey Cooldown
+	local Watched = slasher.WatcherWatched or 0 --Watched
+	local Stalking = slasher.StalkTime or 0 --Stalk time
 
-	slasher.SlasherValue3 = slasher:GetNWBool("WatcherWatched") and 1 or 0
+	slasher.WatcherWatched = slasher:GetNWBool("WatcherWatched") and 1 or 0
 
 	if not slasher:GetNWBool("WatcherRage") then
-		if v1 > 0 then
-			slasher.SlasherValue1 = v1 - FrameTime()
+		if SurveyLG > 0 then
+			slasher.SurveyLength = SurveyLG - FrameTime()
 		end
 	else
-		slasher.SlasherValue1 = 1
-		slasher.SlasherValue3 = 0.65
+		slasher.SurveyLength = 1
+		slasher.WatcherWatched = 0.65
 		SlashCoSlashers[slasher:GetNWString("Slasher")].CanChase = false
 	end
 
 	if slasher:GetNWBool("InSlasherChaseMode") then
-		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed - (v3 * 80))
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed - (v3 * 80))
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed - (v3 * 80))
+		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed - (Watched * 80))
+		slasher:SetWalkSpeed(SLASHER.ChaseSpeed - (Watched * 80))
+		slasher:SetRunSpeed(SLASHER.ChaseSpeed - (Watched * 80))
 	else
-		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed - (v3 * 120))
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed - (v3 * 120))
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed - (v3 * 120))
+		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed - (Watched * 120))
+		slasher:SetWalkSpeed(SLASHER.ProwlSpeed - (Watched * 120))
+		slasher:SetRunSpeed(SLASHER.ProwlSpeed - (Watched * 120))
 	end
 	
 	if slasher:GetNWBool("WatcherRage") then
@@ -86,14 +86,14 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetRunSpeed(380)
 	end
 
-	if v2 > 0 then
-		slasher.SlasherValue2 = v2 - FrameTime()
+	if SurveyCD > 0 then
+		slasher.SurveyCooldown = SurveyCD - FrameTime()
 	end
 
 	local isSeen = false
 
 	for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		if v1 > 0 then
+		if SurveyLG > 0 then
 			if not surv:GetNWBool("SurvivorWatcherSurveyed") then
 				surv:SetNWBool("SurvivorWatcherSurveyed", true)
 			end
@@ -180,7 +180,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	:: FOUND ::
 
 	if IsValid(target) and isSeen == false and not slasher:GetNWBool("InSlasherChaseMode") then
-		slasher.SlasherValue4 = v4 + FrameTime()
+		slasher.StalkTime = Stalking + FrameTime()
 		if not slasher:GetNWBool("WatcherStalking") then
 			slasher:SetNWBool("WatcherStalking", true)
 		end
@@ -190,15 +190,15 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if v2 < 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= true then
+	if SurveyCD < 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= true then
 		slasher:SetNWBool("WatcherCanSurvey", true)
 	end
 
-	if v2 >= 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= false then
+	if SurveyCD >= 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= false then
 		slasher:SetNWBool("WatcherCanSurvey", false)
 	end
 
-	slasher:SetNWInt("WatcherStalkTime", v4)
+	slasher:SetNWInt("WatcherStalkTime", Stalking)
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
 end
@@ -217,15 +217,15 @@ end
 function SLASHER.OnMainAbilityFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	if slasher.SlasherValue2 > 0 then
+	if slasher.SurveyCooldown > 0 then
 		return
 	end
 	if slasher:GetNWBool("WatcherRage") then
 		return
 	end
 
-	slasher.SlasherValue1 = 10 + (SO * 10)
-	slasher.SlasherValue2 = 100 - (SO * 35)
+	slasher.SurveyLength = 10 + (SO * 10)
+	slasher.SurveyCooldown = 100 - (SO * 35)
 
 	slasher:PlayGlobalSound("slashco/slasher/watcher/watcher_locate.mp3", 100)
 
@@ -243,7 +243,7 @@ end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 
-	if SlashCo.CurRound.GameProgress < (10 - (slasher.SlasherValue4 / 25)) then
+	if SlashCo.CurRound.GameProgress < (10 - (slasher.StalkTime / 25)) then
 		return
 	end
 	if slasher:GetNWBool("WatcherRage") then

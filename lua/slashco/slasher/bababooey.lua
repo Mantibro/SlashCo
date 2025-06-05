@@ -48,15 +48,15 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local v1 = slasher.SlasherValue1 --Cooldown for being able to trigger
-	local v2 = slasher.SlasherValue2 --Cooldown for being able to kill
-	local v3 = slasher.SlasherValue3 --Cooldown for spook animation
+	local TriggerCD = slasher.TriggerCooldown or 0 --Cooldown for being able to trigger
+	local KillCD = slasher.KillCooldown or 0 --Cooldown for being able to kill
+	local SpookCD = slasher.SpookCooldown or 0 --Cooldown for spook animation
 
-	if v1 > 0 then
-		slasher.SlasherValue1 = v1 - (FrameTime() + (SO * 0.04))
+	if TriggerCD > 0 then
+		slasher.TriggerCooldown = TriggerCD - (FrameTime() + (SO * 0.04))
 	end
 
-	if v2 > 0 then
+	if KillCD > 0 then
 		slasher:SetNWBool("CanKill", false)
 	elseif not slasher:GetNWBool("BababooeyInvisibility") then
 		slasher:SetNWBool("CanKill", true)
@@ -66,15 +66,15 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	slasher:SetNWBool("CanChase", not slasher:GetNWBool("BababooeyInvisibility"))
 
-	if v3 < 0.01 then
+	if SpookCD < 0.01 then
 		slasher:SetNWBool("BababooeySpooking", false)
 	end
 
-	if v2 > 0 then
-		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
+	if KillCD > 0 then
+		slasher.KillCooldown = KillCD - (FrameTime() + (SO * 0.04))
 	end
-	if v3 > 0 then
-		slasher.SlasherValue3 = v3 - (FrameTime() + (SO * 0.04))
+	if SpookCD > 0 then
+		slasher.SpookCooldown = SpookCD - (FrameTime() + (SO * 0.04))
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
@@ -92,7 +92,7 @@ end
 function SLASHER.OnMainAbilityFire(slasher, target)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local cooldown = slasher.SlasherValue1
+	local cooldown = slasher.TriggerCooldown
 
 	if cooldown > 0 then
 		return
@@ -110,7 +110,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", false)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
 
-		slasher.SlasherValue1 = 4
+		slasher.TriggerCooldown = 4
 		slasher:EmitSound("slashco/slasher/baba_hide.mp3")
 
 		timer.Simple(1, function()
@@ -138,8 +138,8 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 			if slasher:GetPos():Distance(target:GetPos()) < 150 then
 				slasher:SetNWBool("BababooeySpooking", true)
-				slasher.SlasherValue2 = 2
-				slasher.SlasherValue3 = 2
+				slasher.KillCooldown = 2
+				slasher.SpookCooldown = 2
 				slasher:EmitSound("slashco/slasher/baba_scare.mp3", 100)
 				slasher:Freeze(true)
 				timer.Simple(2.5, function()
@@ -156,8 +156,8 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		:: SKIP ::
 
 		--Quiet appear
-		slasher.SlasherValue2 = math.random(3, 13 - (SO * 6))
-		slasher.SlasherValue1 = 8
+		slasher.KillCooldown = math.random(3, 13 - (SO * 6))
+		slasher.TriggerCooldown = 8
 
 		:: SPOOKAPPEAR ::
 

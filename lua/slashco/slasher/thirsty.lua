@@ -39,42 +39,41 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
-	--local Satiation = SlashCo.CurRound.OfferingData.Satiation
 
-	local v1 = slasher.SlasherValue1 --Milk drank
-	local v2 = slasher.SlasherValue2 --Pacification
-	local v3 = slasher.SlasherValue3 --Thirst
-	--local v4 = slasher.SlasherValue4 --prowl speed
-	--local v5 = slasher.SlasherValue5 --chase speed
+	local Milks = slasher.MilkCount or 0 --Milk drank
+	local Pacification = slasher.Pacification or 0 --Pacification
+	local Thirst = slasher.Thirsty or 0 --Thirst
+	local ThirstyPS = slasher.ThirstyProwlSpeed or 0 -- Prowl Speed
+	local ThirstyCS = slasher.ThirstyChaseSpeed or 0 -- Chase Speed
 
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
 
-	if v2 > 0 then
+	if Pacification > 0 then
 		--Thirsty is pacified
-		slasher.SlasherValue3 = 0
+		slasher.Thirsty = 0
 
-		slasher.SlasherValue4 = 100
-		slasher.SlasherValue5 = 100
+		ThirstyPS = 100
+		ThirstyCS = 100
 		eyesight_final = 0
 		perception_final = 0
 
-		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
+		slasher.Pacification = Pacification - (FrameTime() + (SO * 0.04))
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
-		slasher.SlasherValue3 = 0
+		slasher.Thirsty = 0
 		slasher:SetNWBool("DemonPacified", true)
 	else
 		--Thirsty is not pacified
-		if v3 < 100 then
-			slasher.SlasherValue3 = v3 + (FrameTime() / (2 - (SO / 2)))
+		if Thirst < 100 then
+			slasher.Thirsty = Thirst + (FrameTime() / (2 - (SO / 2)))
 		end
 		--Deplete thirst
 
-		slasher.SlasherValue5 = 285 - (v1 * 10)
-		slasher.SlasherValue4 = 100 + ((v3 / (7 - v1)) + (v1 * 30)) * (0.8 + (SO * 0.5))
-		eyesight_final = 2 + (v3 / (28.5 - (v1 * 4)))
-		perception_final = 1.0 + (v3 / (44.5 - (v1 * 8)))
+		ThirstyCS = 285 - (Milks * 10)
+		ThirstyPS = 100 + ((Thirst / (7 - Milks)) + (Milks * 30)) * (0.8 + (SO * 0.5))
+		eyesight_final = 2 + (Thirst / (28.5 - (Milks * 4)))
+		perception_final = 1.0 + (Thirst / (44.5 - (Milks * 8)))
 		--Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
 		--His chase speed is greatest at low milk drank, and the more he drinks, it is converted to prowl speed.
 
@@ -83,28 +82,28 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("DemonPacified", false)
 
 		if slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:SetRunSpeed(slasher.SlasherValue5)
-			slasher:SetWalkSpeed(slasher.SlasherValue5)
+			slasher:SetRunSpeed(ThirstyCS)
+			slasher:SetWalkSpeed(ThirstyCS)
 		else
-			slasher:SetRunSpeed(slasher.SlasherValue4)
-			slasher:SetWalkSpeed(slasher.SlasherValue4)
+			slasher:SetRunSpeed(ThirstyPS)
+			slasher:SetWalkSpeed(ThirstyPS)
 		end
 	end
 	
-	if slasher.SlasherValue1 > 3 then
+	if slasher.MilkCount > 3 then
 		slasher:SetNWBool("FullMilks", true)
 	end
 	
 	if slasher:GetNWBool("FullMilks") and not slasher:GetNWBool("DemonPacified") then
-		slasher.SlasherValue3 = 0
+		slasher.Thirsty = 0
 		eyesight_final = 4
 		perception_final = 2.0
 	end
 
-	slasher:SetNWInt("ThirstyThirst", math.floor(v3))
+	slasher:SetNWInt("ThirstyThirst", math.floor(Thirst))
 
-	if slasher:GetNWInt("ThirstyMilkDrank") ~= v1 then
-		slasher:SetNWInt("ThirstyMilkDrank", v1)
+	if slasher:GetNWInt("ThirstyMilkDrank") ~= Milks then
+		slasher:SetNWInt("ThirstyMilkDrank", Milks)
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", eyesight_final)
@@ -138,9 +137,9 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	slasher:SetNWBool("ThirstyDrinking", true)
 	slasher:SetNWBool("InSlasherChaseMode", false)
 	slasher:StopSound(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseMusic)
-	slasher:SetRunSpeed(slasher.SlasherValue4)
-	slasher:SetWalkSpeed(slasher.SlasherValue4)
-	slasher.SlasherValue2 = 99
+	slasher:SetRunSpeed(slasher.ThirstyProwlSpeed)
+	slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
+	slasher.Pacification = 99
 	slasher:Freeze(true)
 
 	target:Remove()
@@ -208,13 +207,13 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:SetNWBool("ThirstyDrinking", false)
 		slasher:SetNWBool("DemonPacified", true)
 
-		if slasher.SlasherValue1 < (6 + SatO) then
-			slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
+		if slasher.MilkCount < (6 + SatO) then
+			slasher.MilkCount = slasher.MilkCount + 1 + SatO
 		end
 
-		slasher.SlasherValue2 = math.random(20, 35)
+		slasher.Pacification = math.random(20, 35)
 
-		if slasher.SlasherValue1 > 2 then
+		if slasher.MilkCount > 2 then
 			slasher:SetNWBool("ThirstyBigMlik", true)
 		end
 	end)
@@ -324,7 +323,7 @@ function SLASHER.ThirstyRage(ply)
 			return
 		end
 
-		slasher.SlasherValue1 = 6
+		slasher.MilkCount = 6
 		slasher:SetNWBool("ThirstyBigMlik", true)
 
 		for _, ply1 in ipairs(player.GetAll()) do

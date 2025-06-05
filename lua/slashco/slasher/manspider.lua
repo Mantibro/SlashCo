@@ -40,29 +40,29 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local v1 = slasher.SlasherValue1 --Target SteamID
-	local v2 = slasher.SlasherValue2 --Leap Cooldown
-	local v3 = slasher.SlasherValue3 --Time spend nested
-	local v4 = slasher.SlasherValue4 --Aggression
+	local Target = slasher.TargetPlayer or 0 --Target SteamID
+	local LeapCD = slasher.LeapCooldown or 0 --Leap Cooldown
+	local TimeNested = slasher.TimeNested or 0 --Time spend nested
+	local Aggression = slasher.Aggression or 0 --Aggression
 
-	if v2 > 0 then
-		slasher.SlasherValue2 = v2 - FrameTime()
+	if LeapCD > 0 then
+		slasher.LeapCooldown = LeapCD - FrameTime()
 		slasher:SetNWBool("CanLeap", false)
 	else
 		slasher:SetNWBool("CanLeap", true)
 	end
 
-	if not isstring(v1) or v1 == 0 then
-		slasher.SlasherValue1 = ""
+	if not isstring(Target) or Target == 0 then
+		slasher.TargetPlayer = ""
 	end
 
-	if v1 == "" then
+	if Target == "" then
 		slasher:SetNWBool("CanChase", false)
 		slasher:SetNWBool("CanKill", false)
 
 		local numP = team.NumPlayers(TEAM_SURVIVOR)
 		if numP < 2 and numP > 0 then
-			v1 = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
+			Target = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
 
 			slasher:SetNWBool("CanChase", true)
 			slasher:SetNWBool("CanKill", true)
@@ -71,15 +71,15 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("CanChase", true)
 		slasher:SetNWBool("CanKill", true)
 
-		local s = player.GetBySteamID64(v1)
+		local s = player.GetBySteamID64(Target)
 		if not IsValid(s) or s:Team() ~= TEAM_SURVIVOR then
-			slasher.SlasherValue1 = ""
+			slasher.TargetPlayer = ""
 		end
 	end
 
 	if slasher:GetNWBool("ManspiderNested") then
 		--Find a survivor
-		slasher.SlasherValue3 = v3 + FrameTime()
+		slasher.TimeNested = TimeNested + FrameTime()
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
 			slasher:StopSound("slashco/slasher/manspider_idle.mp3")
@@ -92,7 +92,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				continue
 			end
 
-			if s:GetPos():Distance(slasher:GetPos()) >= (1000 + (v3 * 3) + (SO * 750)) then
+			if s:GetPos():Distance(slasher:GetPos()) >= (1000 + (TimeNested * 3) + (SO * 750)) then
 				continue
 			end
 
@@ -107,7 +107,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
-			slasher.SlasherValue1 = s:SteamID64()
+			slasher.TargetPlayer = s:SteamID64()
 			slasher:SetNWBool("ManspiderNested", false)
 
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
@@ -115,10 +115,10 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 		end
 
-		slasher.SlasherValue4 = 0
+		slasher.Aggression = 0
 	else
 		--Not nested
-		slasher.SlasherValue3 = 0
+		slasher.TimeNested = 0
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
 			slasher:PlayGlobalSound("slashco/slasher/manspider_idle.mp3", 50, nil, true)
@@ -126,7 +126,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
 
-		if v1 == "" then
+		if Target == "" then
 			for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 				if not s:CanBeSeen() then
 					continue
@@ -148,23 +148,23 @@ function SLASHER.OnTickBehaviour(slasher)
 					continue
 				end
 
-				slasher.SlasherValue4 = v4 + (FrameTime() * ((250 - d) / 2000)) + (SO * FrameTime())
+				slasher.Aggression = Aggression + (FrameTime() * ((250 - d) / 2000)) + (SO * FrameTime())
 
-				if v4 > 100 then
-					slasher.SlasherValue1 = s:SteamID64()
+				if Aggression > 100 then
+					slasher.TargetPlayer = s:SteamID64()
 					slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
 				end
 			end
 		else
-			slasher.SlasherValue4 = 0
+			slasher.Aggression = 0
 		end
 	end
 
-	if slasher:GetNWString("ManspiderTarget") ~= v1 then
-		slasher:SetNWString("ManspiderTarget", v1)
+	if slasher:GetNWString("ManspiderTarget") ~= Target then
+		slasher:SetNWString("ManspiderTarget", Target)
 	end
 
-	if v3 > 50 then
+	if TimeNested > 50 then
 		if slasher:GetNWBool("ManspiderCanLeaveNest") ~= true then
 			slasher:SetNWBool("ManspiderCanLeaveNest", true)
 		end
@@ -179,11 +179,11 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
-	slasher.SlasherValue1 = "" -- Reset prey when we got hit by a tesla coil.
+	slasher.TargetPlayer = "" -- Reset prey when we got hit by a tesla coil.
 end
 
 function SLASHER.OnKillPlayer(slasher, target)
-	slasher.SlasherValue1 = "" -- We killed our prey, so reset it or else he might persist in case he had multiple lives
+	slasher.TargetPlayer = "" -- We killed our prey, so reset it or else he might persist in case he had multiple lives
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
@@ -191,7 +191,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	if target:SteamID64() ~= slasher.SlasherValue1 then
+	if target:SteamID64() ~= slasher.TargetPlayer then
 		slasher:ChatPrint("You can only kill your Prey.")
 		return
 	else
@@ -220,7 +220,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		return
 	end
 
-	if target:SteamID64() ~= slasher.SlasherValue1 then
+	if target:SteamID64() ~= slasher.TargetPlayer then
 		return
 	end
 
@@ -228,7 +228,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.SlasherValue1 ~= "" then
+	if slasher.TargetPlayer ~= "" then
 		return
 	end
 	
@@ -247,7 +247,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetWalkSpeed(1)
 		slasher:SetSlowWalkSpeed(1)
 	else
-		if slasher.SlasherValue3 > 50 or not slasher:IsOnGround() then
+		if slasher.TimeNested > 50 or not slasher:IsOnGround() then
 			slasher:SetNWBool("ManspiderNested", false)
 
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
@@ -260,7 +260,7 @@ end
 function SLASHER.OnSpecialAbilityFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	if slasher.SlasherValue2 > 0 then
+	if slasher.LeapCooldown > 0 then
 		return
 	end
 
@@ -272,7 +272,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	slasher.SlasherValue2 = 15
+	slasher.LeapCooldown = 15
 
 	slasher:Freeze(true)
 	slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")

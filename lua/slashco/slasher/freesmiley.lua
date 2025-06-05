@@ -37,15 +37,15 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local v1 = slasher.SlasherValue1 --Summon Cooldown
-	local v2 = slasher.SlasherValue2 --Selected Summon
+	local SummonCD = slasher.SummonCooldown or 0 --Summon Cooldown
+	local SummonChoose = slasher.SummonChoose or 0 --Selected Summon
 
-	if v1 > 0 then
-		slasher.SlasherValue1 = v1 - FrameTime()
+	if SummonCD > 0 then
+		slasher.SummonCooldown = SummonCD - FrameTime()
 	end
 
-	slasher:SetNWInt("SmileySummonCooldown", math.floor(v1))
-	slasher:SetNWInt("SmileySummonSelect", v2)
+	slasher:SetNWInt("SmileySummonCooldown", math.floor(SummonCD))
+	slasher:SetNWInt("SmileySummonSelect", SummonChoose)
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
@@ -63,16 +63,16 @@ function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("FreeSmileySummoning") then
 		return
 	end
-	if slasher.SlasherValue1 > 0 then
+	if slasher.SummonCooldown > 0 then
 		return
 	end
 
-	if slasher.SlasherValue2 == 0 then
-		slasher.SlasherValue2 = 1
+	if SummonChoose == 0 then
+		SummonChoose = 1
 		return
 	end
-	if slasher.SlasherValue2 == 1 then
-		slasher.SlasherValue2 = 0
+	if SummonChoose == 1 then
+		SummonChoose = 0
 		return
 	end
 end
@@ -84,12 +84,12 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	if slasher.SlasherValue1 > 0 then
+	if slasher.SummonCooldown > 0 then
 		return
 	end
 
 	local zanies = ents.FindByClass("sc_zanysmiley")
-	if slasher.SlasherValue2 == 0 and #zanies >= 2 then
+	if SummonChoose == 0 and #zanies >= 2 then
 		for _, v in ipairs(zanies) do
 			v:Use(slasher)
 		end
@@ -97,20 +97,20 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	slasher.SlasherValue1 = 50 - (SO * 25)
+	slasher.SummonCooldown = 50 - (SO * 25)
 
 	slasher:SetNWBool("FreeSmileySummoning", true)
 
 	slasher:Freeze(true)
 	timer.Simple(4, function()
-		if slasher.SlasherValue2 == 0 then
+		if SummonChoose == 0 then
 			local smiley = ents.Create("sc_zanysmiley")
 			smiley:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
 			smiley:SetAngles(slasher:GetAngles())
 			smiley:Spawn()
 			smiley:Activate()
 		end
-		if slasher.SlasherValue2 == 1 then
+		if SummonChoose == 1 then
 			local smiley = ents.Create("sc_pensivesmiley")
 			smiley:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
 			smiley:SetAngles(slasher:GetAngles())

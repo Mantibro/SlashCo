@@ -38,7 +38,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 50))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 50))
 
-	slasher.SlasherValue2 = 50
+	slasher.AggressionThreshold = 50
 
 	SLASHER.DoSound(slasher)
 end
@@ -63,8 +63,8 @@ function SLASHER.DoSound(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local v1 = slasher.SlasherValue1 --aggression
-	local v2 = slasher.SlasherValue2 --aggression threshold
+	local Aggression = slasher.Aggression or 0 --aggression
+	local AggressionTH = slasher.AggressionThreshold or 0 --aggression threshold
 
 	local eyesight = SLASHER.Eyesight
 	local perception = SLASHER.Perception
@@ -80,11 +80,11 @@ function SLASHER.OnTickBehaviour(slasher)
 	--find children to maul
 	if slasher:GetNWBool("InSlasherChaseMode") then
 		--Get Aggro
-		if v1 < v2 then
-			slasher.SlasherValue1 = v1 + FrameTime()
+		if Aggression < AggressionTH then
+			slasher.Aggression = Aggression + FrameTime()
 		end
 
-		local speed = SLASHER.ChaseSpeed + (v1 / 8)
+		local speed = SLASHER.ChaseSpeed + (Aggression / 8)
 
 		slasher:SetRunSpeed(speed)
 		slasher:SetWalkSpeed(speed)
@@ -92,9 +92,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		local lookent = slasher:GetEyeTrace().Entity
 
 		if lookent:GetPos():Distance(slasher:GetPos()) < 100 then
-			if v1 >= 95 then
+			if Aggression >= 95 then
 				SlashCo.BustDoor(slasher, lookent, 50000)
-			elseif v1 >= 50 then
+			elseif Aggression >= 50 then
 				slasher:SlamDoor(lookent)
 			end
 
@@ -155,8 +155,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 					mauled_child:Remove()
 
-					slasher.SlasherValue2 = slasher.SlasherValue2 + math.random(15, 20)
-					slasher.SlasherValue1 = v1 - math.random(25, v1 + 26)
+					slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
+					slasher.Aggression = Aggression - math.random(25, Aggression + 26)
 				end)
 
 				---yeah
@@ -178,20 +178,20 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if v2 > 100 then
-		slasher.SlasherValue2 = 100
+	if AggressionTH > 100 then
+		slasher.AggressionThreshold = 100
 	end
 
-	if v1 < 0 then
-		slasher.SlasherValue1 = 0
+	if Aggression < 0 then
+		slasher.Aggression = 0
 	end
 
-	if slasher:GetNWInt("PrincessAggression") ~= math.floor(slasher.SlasherValue1) then
-		slasher:SetNWInt("PrincessAggression", math.floor(slasher.SlasherValue1))
+	if slasher:GetNWInt("PrincessAggression") ~= math.floor(slasher.Aggression) then
+		slasher:SetNWInt("PrincessAggression", math.floor(slasher.Aggression))
 	end
 
-	if slasher:GetNWInt("PrincessAggressionThres") ~= math.floor(slasher.SlasherValue2) then
-		slasher:SetNWInt("PrincessAggressionThres", math.floor(slasher.SlasherValue2))
+	if slasher:GetNWInt("PrincessAggressionThres") ~= math.floor(slasher.AggressionThreshold) then
+		slasher:SetNWInt("PrincessAggressionThres", math.floor(slasher.AggressionThreshold))
 	end
 
 	if IsValid(slasher.victimragdoll) and IsValid(slasher.ref_child) then
@@ -237,7 +237,7 @@ function SLASHER.Maul(slasher, target)
 	util.Effect("BloodImpact", bloodfx)
 
 	local eatBabyFromPlayer = IsPlayerHoldingBaby(target, true) -- true if were eating a baby that a player was holding.
-	if slasher.SlasherValue1 <= 99 and not eatBabyFromPlayer then
+	if slasher.Aggression <= 99 and not eatBabyFromPlayer then
 		return
 	end
 
@@ -382,7 +382,7 @@ function SLASHER.OnPrimaryFire(slasher)
 			ignoreworld = true,
 		})
 		local target = tr.Entity
-		local damage = math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4))
+		local damage = math.random(15, 30) + math.random(0, math.floor(slasher.Aggression / 4))
 		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
 		--		Vector(-40, -40, -60), Vector(40, 40, 60),
 		--		damage, DMG_SLASH, 5, false)
