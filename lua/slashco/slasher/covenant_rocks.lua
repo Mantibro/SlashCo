@@ -15,7 +15,7 @@ SLASHER.Eyesight = 3
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1500
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 60.0
+SLASHER.ChaseDuration = 30.0
 SLASHER.ChaseCooldown = 1
 SLASHER.JumpscareDuration = 1.5
 SLASHER.ChaseMusic = ""
@@ -70,7 +70,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			if SERVER then
 				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(137, 0, 0)),
-						Vector(-30, -30, -60), Vector(30, 30, 60), 35, DMG_SLASH, 5, false)
+						Vector(-30, -30, -60), Vector(30, 30, 60), 25, DMG_SLASH, 5, false)
 
 				if target1:IsPlayer() then
 					if target1:Team() ~= TEAM_SURVIVOR then

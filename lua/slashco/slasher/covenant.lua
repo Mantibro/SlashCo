@@ -20,7 +20,7 @@ SLASHER.Eyesight = 3
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 60.0
+SLASHER.ChaseDuration = 30.0
 SLASHER.ChaseCooldown = 7
 SLASHER.JumpscareDuration = 2.0
 SLASHER.ChaseMusic = "slashco/slasher/covenant_chase.mp3"
@@ -175,16 +175,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
 	SlashCo.StartChaseMode(slasher)
-end
-
-function SLASHER.OnMainAbilityFire(slasher)
-end
-
-function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Animator(ply)

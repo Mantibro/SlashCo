@@ -382,7 +382,7 @@ function SLASHER.OnPrimaryFire(slasher)
 			ignoreworld = true,
 		})
 		local target = tr.Entity
-		local damage = math.random(15, 30) + math.random(0, math.floor(slasher.Aggression / 4))
+		local damage = math.random(20, 35) + math.random(0, math.floor(slasher.Aggression / 4))
 		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
 		--		Vector(-40, -40, -60), Vector(40, 40, 60),
 		--		damage, DMG_SLASH, 5, false)

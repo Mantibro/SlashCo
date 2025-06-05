@@ -15,7 +15,7 @@ SLASHER.Eyesight = 5
 SLASHER.KillDistance = 135
 SLASHER.ChaseRange = 1500
 SLASHER.ChaseRadius = 0.91
-SLASHER.ChaseDuration = 60.0
+SLASHER.ChaseDuration = 30.0
 SLASHER.ChaseCooldown = 1
 SLASHER.JumpscareDuration = 1.5
 SLASHER.ChaseMusic = ""
@@ -164,15 +164,6 @@ function SLASHER.OnPrimaryFire(slasher)
 			--SLASHER.TackleFail(slasher)
 		end)
 	end
-end
-
-function SLASHER.OnSecondaryFire(slasher)
-end
-
-function SLASHER.OnMainAbilityFire(slasher)
-end
-
-function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Thirdperson(ply)
