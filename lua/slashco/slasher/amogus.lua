@@ -37,7 +37,7 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 
-    local DisguiseT = slasher.DisguiseTimer or 0 -- Time spent disguised and near survivors
+	local DisguiseT = slasher.DisguiseTimer or 0 -- Time spent disguised and near survivors
 	local DisguiseCD = slasher.DisguiseCooldown or 0 -- Disguising Cooldown
 	local Entity = slasher.DisguiseEntity or 0 -- Entity Index
 	local Speech = slasher.AmogusSpeech or 0 -- Time to speak
