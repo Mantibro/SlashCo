@@ -42,6 +42,11 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetCurrentViewOffset(Vector(0, 0, 100))
 	slasher:SetNWBool("CanChase", true)
 	slasher:SetNWBool("CanKill", true)
+
+	slasher.SurveyLength = 0
+	slasher.SurveyCooldown = 0
+	slasher.WatcherWatched = 0
+	slasher.StalkTime = 0
 end
 
 function SLASHER.OnAngerTick(slasher)

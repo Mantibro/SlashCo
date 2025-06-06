@@ -34,6 +34,9 @@ function SLASHER.OnSpawn(slasher)
 	slasher.soundon = 0
 	slasher:SetNWBool("CanKill", true)
 	slasher:SetNWBool("CanChase", true)
+
+	slasher.LeuonardRoid = 0
+	slasher.MouseDriftTick = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)

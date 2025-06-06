@@ -31,19 +31,25 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
+function SLASHER.OnSpawn(slasher)
+	slasher.DisguiseTimer = 0
+	slasher.DisguiseCooldown = 0
+	slasher.DisguiseEntity = nil
+	slasher.AmogusSpeech = 0
+end
+
 function SLASHER.PickUpAttempt(ply)
 	return ply:GetNWBool("AmogusSurvivorDisguise")
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-
 	local DisguiseT = slasher.DisguiseTimer or 0 -- Time spent disguised and near survivors
 	local DisguiseCD = slasher.DisguiseCooldown or 0 -- Disguising Cooldown
-	local Entity = slasher.DisguiseEntity or 0 -- Entity Index
+	local Entity = slasher.DisguiseEntity or nil -- Entity Index
 	local Speech = slasher.AmogusSpeech or 0 -- Time to speak
 
-	if IsValid(ents.GetByIndex(Entity)) then
-		ents.GetByIndex(Entity):SetAngles(Angle(0, slasher:EyeAngles()[2], 0))
+	if IsValid(Entity) then
+		Entity:SetAngles(Angle(0, slasher:EyeAngles()[2], 0))
 	end
 
 	if DisguiseCD > 0 then
@@ -54,7 +60,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
 			slasher:SetNWBool("CanKill", true)
 			slasher:SetNWBool("CanChase", true)
-			Entity = 0
+			if IsValid(Entity) then
+				Entity:Remove() -- Don't possibly leak entities.
+				slasher.DisguiseEntity = nil
+			end
 		else
 			slasher:SetNWBool("CanKill", false)
 			slasher:SetNWBool("CanChase", false)
@@ -190,8 +199,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 		slasher.KillDelayTick = 2 - (SO * 1.95)
 
-		if IsValid(ents.GetByIndex(slasher.DisguiseEntity)) then
-			ents.GetByIndex(slasher.DisguiseEntity):Remove()
+		if IsValid(slasher.DisguiseEntity) then
+			slasher.DisguiseEntity:Remove()
 		end
 
 		timer.Simple(2 - (SO * 1.95), function()
@@ -222,18 +231,18 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 			slasher:SetVisible(false)
 
-			local g = ents.Create("prop_physics")
+			local prop = ents.Create("prop_physics")
 
-			g:SetPos(slasher:GetPos() + Vector(-27, 0, 15))
-			g:SetAngles(slasher:GetAngles() + Angle(0, 90, 0))
-			g:SetModel(SlashCoItems.GasCan.Model)
-			g:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-			g:Spawn()
+			prop:SetPos(slasher:GetPos() + Vector(-27, 0, 15))
+			prop:SetAngles(slasher:GetAngles() + Angle(0, 90, 0))
+			prop:SetModel(SlashCoItems.GasCan.Model)
+			prop:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+			prop:Spawn()
 
-			g:FollowBone(slasher, slasher:LookupBone("Hips"))
+			prop:FollowBone(slasher, slasher:LookupBone("Hips"))
 
-			local id = g:EntIndex()
-			slasher.DisguiseEntity = id
+			local id = prop:EntIndex()
+			slasher.DisguiseEntity = prop
 
 			slasher:SetRunSpeed(200)
 			slasher:SetWalkSpeed(200)

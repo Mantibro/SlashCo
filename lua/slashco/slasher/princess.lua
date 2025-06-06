@@ -39,6 +39,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetCurrentViewOffset(Vector(0, 0, 50))
 
 	slasher.AggressionThreshold = 50
+	slasher.Aggression = 0
 
 	SLASHER.DoSound(slasher)
 end

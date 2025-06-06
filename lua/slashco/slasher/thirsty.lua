@@ -35,6 +35,12 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
 	slasher:SetNWBool("FullMilks", false)
+
+	slasher.MilkCount = 0
+	slasher.Pacification = 0
+	slasher.Thirsty = 0
+	slasher.ThirstyProwlSpeed = 0
+	slasher.ThirstyChaseSpeed = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -90,7 +96,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 	
-	if slasher.MilkCount > 3 then
+	if Milks > 3 then
 		slasher:SetNWBool("FullMilks", true)
 	end
 	

@@ -53,6 +53,11 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	PlayBreathing(slasher)
+	
+	slasher.TrollgeStage = 0
+	slasher.ClawCooldown = 0
+	slasher.TrollgeBlood = 0
+	slasher.TrollgeDashing = 0
 end
 
 local function stopDash(slasher)

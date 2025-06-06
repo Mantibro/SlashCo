@@ -34,6 +34,9 @@ function SLASHER.OnSpawn(slasher)
 	SLASHER.SmileyIdle(slasher)
 	slasher:SetNWBool("CanKill", true)
 	slasher:SetNWBool("CanChase", true)
+
+	slasher.SummonCooldown = 0
+	slasher.SummonChoose = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)

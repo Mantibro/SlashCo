@@ -35,6 +35,11 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
 	slasher.Jump = slasher:GetJumpPower()
+
+	slasher.TargetPlayer = 0
+	slasher.LeapCooldown = 0
+	slasher.TimeNested = 0
+	slasher.Aggression = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)

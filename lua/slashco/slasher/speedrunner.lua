@@ -41,6 +41,7 @@ function SLASHER.OnSpawn(slasher)
 		fadeIn = 0,
 	})
 	slasher:SetNWBool("CanKill", true)
+
 	slasher.Speedrun = 100
 	slasher.Speedrunning = 1
 	slasher.Speedrunned = 285

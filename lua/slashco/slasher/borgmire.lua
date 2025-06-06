@@ -35,6 +35,10 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetCurrentViewOffset(Vector(0, 0, 85))
 	slasher:PlayGlobalSound("slashco/slasher/borgmire_heartbeat.mp3", 50, nil, true)
 	slasher:SetNWBool("CanChase", true)
+
+	slasher.TimeChasing = 0
+	slasher.PunchCooldown = 0
+	slasher.PunchSlowdown = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)

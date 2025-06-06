@@ -28,6 +28,8 @@ SLASHER.DiffRating = "★★★☆☆"
 
 function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("CanChase", true)
+
+	slasher.ShockCooldown = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)

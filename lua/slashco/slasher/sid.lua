@@ -31,6 +31,14 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.ItemToSpawn = "Cookie"
 
+function SLASHER.OnSpawn(slasher)
+	slasher.EatedCookies = 0
+	slasher.Pacification = 0
+	slasher.GunCooldown = 0
+	slasher.GunSpread = 0
+	slasher.ChaseSpeed = 0
+end
+
 function SLASHER.OnTickBehaviour(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 

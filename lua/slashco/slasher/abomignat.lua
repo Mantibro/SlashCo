@@ -33,10 +33,14 @@ SLASHER.DiffRating = "★★☆☆☆"
 function SLASHER.OnSpawn(slasher)
 	slasher:PlayGlobalSound("slashco/slasher/abomignat_breathing.mp3", 65, nil, true)
 	slasher.AbomignatKills = 0
+
+	slasher.SlashCD = 0
+	slasher.FowardCharge = 0
+	slasher.LungeAntiSpam = 0
+	slasher.LungeDuration = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-
 	local SlashCD = slasher.SlashCD or 0 --Main Slash Cooldown
 	local FCharge = slasher.FowardCharge or 0 --Forward charge
 	local AntiSpam = slasher.LungeAntiSpam or 0 --Lunge Finish Antispam

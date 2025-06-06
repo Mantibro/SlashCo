@@ -33,6 +33,10 @@ SLASHER.DiffRating = "★☆☆☆☆"
 
 function SLASHER.OnSpawn(slasher)
 	SLASHER.DoSound(slasher)
+
+	slasher.TriggerCooldown = 0
+	slasher.KillCooldown = 0
+	slasher.SpookCooldown = 0
 end
 
 function SLASHER.DoSound(slasher)

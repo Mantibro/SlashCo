@@ -42,6 +42,8 @@ function SLASHER.OnSpawn(slasher)
 
 	slasher:SetVisible(false)
 	slasher:DrawShadow(false)
+
+	slasher.ClonDuration = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)

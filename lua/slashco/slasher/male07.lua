@@ -28,6 +28,9 @@ SLASHER.DiffRating = "★★★☆☆"
 
 function SLASHER.OnSpawn(slasher)
 	slasher.MaleState = 1
+	slasher.TimeChasingAsHuman = 0
+	slasher.MaleCooldown = 0
+	slasher.SlashCooldown = 0
 end
 
 local monsterModelName = "models/slashco/slashers/male_07/male_07_monster.mdl"
