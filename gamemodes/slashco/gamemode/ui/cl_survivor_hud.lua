@@ -413,8 +413,14 @@ end)
 
 hook.Add("HUDPaint", "SurvivorHUD", function()
 	local ply = GameData.LocalPlayer
+	
+	local team = ply:Team()
+	if team == TEAM_LOBBY then
+		slamIndicator()
+		return
+	end
 
-	if ply:Team() ~= TEAM_SURVIVOR then
+	if team ~= TEAM_SURVIVOR then
 		return
 	end
 

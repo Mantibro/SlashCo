@@ -64,7 +64,8 @@ end
 
 --Door Ramming
 hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, button)
-	if ply:Team() ~= TEAM_SURVIVOR then
+	local team = ply:Team()
+	if team ~= TEAM_SURVIVOR and team ~= TEAM_LOBBY then
 		return
 	end
 

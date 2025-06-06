@@ -87,7 +87,7 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local stage = slasher.TrollgeStage --Stage
-	local ClawCD = math.Clamp(slasher.ClawCooldown, 0, 2) --Claw cooldown
+	local ClawCD = math.Clamp(slasher.ClawCooldown or 0, 0, 2) --Claw cooldown
 	slasher.ClawCooldown = ClawCD
 	local Blood = slasher.TrollgeBlood or 0 --blood
 	local Dashing = slasher.TrollgeDashing or 0 --dashing
