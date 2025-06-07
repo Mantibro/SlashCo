@@ -52,28 +52,32 @@ end
 function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallback)
 	if not soundFile or soundFile == "" then return end
 
-	soundFile = SlashCo.AudioSystem.ToSound(soundFile)
+	local isURL = string.find(soundFile, "://", 1, true)
+	soundFile = isURL and soundFile or SlashCo.AudioSystem.ToSound(soundFile)
+
 	if not soundFile:find(".", 1, true) then -- It has no fileName?!? We shall deny this request.
 		error("[SlashCo] Tried to use a invalid sound file! (" .. soundFile .. ")")
 		return
 	end
 
-
-	sound.PlayFile(soundFile, mode, function(channel, errCode, errStr)
+	local soundFunc = isURL and sound.PlayURL or sound.PlayFile
+	soundFunc(soundFile, mode, function(channel, errCode, errStr)
 		if not IsValid(channel) then
 			if not errorCallback then
 				errorCallback(errCode, errStr)
 			end
+
 			error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. "," .. soundFile .. ")\n")
 			return
 		end
 
 		SlashCo.AudioSystem.CheckChannels()
 		SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs + 1
-		local channelData = { -- ToDo: Actually implement this logic
-			deleteWhenFinished = false,
+		local channelData = {
+			deleteWhenFinished = false,  -- ToDo: Actually implement this logic
 			ID = SlashCo.AudioSystem.ChannelIDs,
 			State = ChannelStates.OK,
+			isURL = isURL,
 		}
 		SlashCo.AudioSystem.Channels[channel] = channelData
 		callback(channel, channelData)
@@ -146,6 +150,7 @@ function SlashCo.AudioSystem.GetPrecachedChannel(identifier, callback, precacheD
 				callback(channel)
 			end
 		end)
+
 		return
 	end
 
@@ -252,6 +257,7 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime)
 	end
 end
 
+-- ToDo: Check if we even need this function anymore or if we fixed it unknowingly that it could become nan somehow.
 function SlashCo.AudioSystem.EnsureValidVolume(volume)
 	if volume == volume then -- if its not nan, we can say its safe
 		return volume
@@ -307,6 +313,7 @@ end
 function SlashCo.AudioSystem.CalculateTime(channel, tickCount)
 	local calculateTime = (engine.TickCount() - tickCount) * engine.TickInterval()
 	local fileLength = channel:GetLength()
+
 	return calculateTime - (fileLength * math.floor(calculateTime / fileLength))
 end
 
@@ -362,6 +369,7 @@ local function OnBackgroundMusicStateChange(ent, name, old, new)
 	end
 end
 
+-- Did you know? This was one too >:3
 local function OnBackgroundMusicVolumeChange(ent, name, old, new)
 	if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
 		SlashCo.AudioSystem.FadeTo(SlashCo.AudioSystem.BackgroundChannel, 5, new)
@@ -386,7 +394,7 @@ function SlashCo.AudioSystem.Init()
 end
 
 hook.Add("InitPostEntity", "SlashCo:AudioSystem", SlashCo.AudioSystem.Init)
-if game.GetWorld() ~= NULL then
+if game.GetWorld() ~= NULL then -- Autorefresh time
 	SlashCo.AudioSystem.Init()
 end
 
@@ -610,6 +618,7 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 				SlashCo.AudioSystem.DestroyChannel(channel, fadeOut)
 			end
 		end
+
 		return
 	end
 
@@ -651,6 +660,8 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		minDistance = ReadSoundField(net.ReadUInt, 16),
 		maxDistance = ReadSoundField(net.ReadUInt, 16),
 		modes = ReadSoundField(net.ReadString),
+		pan = ReadSoundField(net.ReadFloat),
+		playbackRate = ReadSoundField(net.ReadFloat),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
@@ -668,6 +679,7 @@ net.Receive("slashCo_AudioSystem_StopSound", function()
 	if not stopAllSounds then
 		identifier = net.ReadString()
 	end
+
 	local fadeOut = net.ReadFloat()
 	local entIndex = nil
 	if net.ReadBool() then
