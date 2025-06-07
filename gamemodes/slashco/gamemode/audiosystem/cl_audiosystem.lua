@@ -4,6 +4,11 @@ SlashCo.AudioSystem.PrecacheSounds = SlashCo.AudioSystem.PrecacheSounds or {}
 SlashCo.AudioSystem.BackgroundChannel = SlashCo.AudioSystem.BackgroundChannel or nil
 SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs or 0 -- Incremental number to assign channel id's
 
+-- So that we don't depend on the GameData table as this system is meant to also work as a standalone library.
+SlashCo.AudioSystem.IsSinglePlayer = SlashCo.AudioSystem.IsSinglePlayer or game.SinglePlayer()
+SlashCo.AudioSystem.LocalPlayer = SlashCo.AudioSystem.LocalPlayer or nil
+SlashCo.AudioSystem.LocalEntIndex = SlashCo.AudioSystem.LocalEntIndex or -1
+
 --[[local slashco_enable_backgroundmusic = CreateClientConVar("slashco_enable_backgroundmusic", "1", true, false)
 
 function SlashCo.AudioSystem.ShouldPlayBackgroundMusic()
@@ -205,7 +210,7 @@ local function CalculateChannelVolume(channel, targetVol)
 		if channelData then
 			local soundData = channelData.soundData
 			if soundData and soundData.minDistance and soundData.maxDistance then
-				return CalculateFadeVolume(GameData.LocalPlayer:GetPos(), channel:GetPos(), targetVol, soundData.minDistance, soundData.maxDistance)
+				return CalculateFadeVolume(SlashCo.AudioSystem.LocalPlayer:GetPos(), channel:GetPos(), targetVol, soundData.minDistance, soundData.maxDistance)
 			end
 		end
 	end
@@ -379,6 +384,9 @@ end
 function SlashCo.AudioSystem.Init()
 	local world = game.GetWorld()
 
+	SlashCo.AudioSystem.LocalPlayer = LocalPlayer()
+	SlashCo.AudioSystem.LocalEntIndex = AudioSystem.LocalPlayer:EntIndex()
+
 	--[[
 		Setting up the proxies in case the background music changes.
 		then we manually call the var proxy because the NW2Vars at this point were already networked so our proxy won't catch the initial value.
@@ -409,7 +417,7 @@ local function UpdateBackgroundMusic()
 		end
 
 		local backgroundMusicTime = SlashCo.AudioSystem.GetBackgroundMusicTime()
-		if not math.IsNearlyEqual(SlashCo.AudioSystem.BackgroundChannel:GetTime(), backgroundMusicTime, 1) and not GameData.IsSinglePlayer then -- Allow a tolerance of 1 second difference, if were in single player we don't care.
+		if not math.IsNearlyEqual(SlashCo.AudioSystem.BackgroundChannel:GetTime(), backgroundMusicTime, 1) and not SlashCo.AudioSystem.IsSinglePlayer then -- Allow a tolerance of 1 second difference, if were in single player we don't care.
 			SlashCo.AudioSystem.BackgroundChannel:SetTime(backgroundMusicTime)
 		end
 	end
@@ -427,14 +435,14 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 
 	local soundData = channelData.soundData
 	if soundData and soundData.minDistance and soundData.maxDistance then
-		local volume = CalculateFadeVolume(localPlyPos or GameData.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData.minDistance, soundData.maxDistance)
+		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData.minDistance, soundData.maxDistance)
 		channel:SetVolume(volume)
 		--print("3D", channel, channelData.ID, volume)
 	end
 end
 
 local function UpdateChannelPositions()
-	local localPlyPos = GameData.LocalPlayer:GetPos()
+	local localPlyPos = SlashCo.AudioSystem.LocalPlayer:GetPos()
 	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
 		--[[
 			Why don't we remove the channel if the parent is gone?
@@ -666,7 +674,7 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
 	-- While clientside, the channel could be moved after PlaySound was called so if we forced it into mono we could break things.
-	if soundData.entity ~= nil and soundData.entity == GameData.LocalEntIndex then
+	if soundData.entity ~= nil and soundData.entity == SlashCo.AudioSystem.LocalEntIndex then
 		soundData.forceMono = true -- We are playing the sound on the local player, so we switch it to mono for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
 	end
 
