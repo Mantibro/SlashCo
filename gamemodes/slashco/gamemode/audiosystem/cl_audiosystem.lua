@@ -431,6 +431,10 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 
 	channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
 	local newPos = ent:EyePos()
+	if newPos == ent:GetPos() then -- I don't like that we call GetPos for this again :/
+		newPos = ent:WorldSpaceCenter() -- If possible, use the EyePos, but if the EyePos matches the Entity's position, we use the WorldSpaceCenter as a better position.
+	end
+
 	channel:SetPos(newPos)
 
 	local soundData = channelData.soundData
