@@ -188,7 +188,8 @@ local function lobbyButtons(ply, button)
 	end
 
 	--Switching Teams
-	if button == KEY_COMMA and SlashCo.LobbyData.LOBBYSTATE == 0 then
+	-- NOTE: We check both KEY_COMMA and KEY_Q since previously the key was set to be COMMA but was changed to be Q.
+	if (button == KEY_COMMA or button == KEY_Q) and SlashCo.LobbyData.LOBBYSTATE == 0 then
 		if plyTeam == TEAM_SPECTATOR then
 			if (#team.GetPlayers(TEAM_LOBBY) < GameData.MaxPlayers) then
 				ply:SetTeam(TEAM_LOBBY)

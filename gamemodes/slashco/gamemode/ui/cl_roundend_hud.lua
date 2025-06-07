@@ -215,6 +215,10 @@ local stringTable = {
 			table.insert(lines, SlashCo.Language("Offering_name", info[6]))
 		end
 
+		if GameData.IsNewPlayer then
+			cookie.Set("slashco_hasplaycount", tostring(cookie.GetNumber("slashco_hasplaycount", 0) + 1)) -- They played their first round, we don't need to flag them to be new at this point.
+		end
+
 		return lines
 	end
 }

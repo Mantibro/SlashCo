@@ -23,6 +23,7 @@ SlashCo.LangTable["SomeRescued"] = "Apenas alguns dos Trabalhadores SlashCo deix
 SlashCo.LangTable["NoneRescued"] = "Os Trabalhadores SlashCo deixados não puderam ser resgatados."
 SlashCo.LangTable["Cursed"] = "Sua alma agora está perdida."
 SlashCo.LangTable["Judgement"] = "JULGAMENTO"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Prima [%s] para gerar"
 
 SlashCo.LangTable["InLobby"] = "No Lobby"
 SlashCo.LangTable["InGame"] = "No jogo (%s)"

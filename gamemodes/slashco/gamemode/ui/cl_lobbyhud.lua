@@ -61,16 +61,15 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 	local scrW, scrH = ScrW(), ScrH()
 	local point_count = localPly:GetNW2Int("Points", 0)
 	local localTeam = localPly:Team()
+	if localTeam == TEAM_SPECTATOR then return end
 
-	if localTeam != TEAM_SPECTATOR then
-		draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
-				"TVCD", ScrW() * 0.025, ScrH() * 0.05, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
-	end
+	draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
+			"TVCD", ScrW() * 0.025, ScrH() * 0.05, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 	--LobbyFont1
 	if localTeam == TEAM_LOBBY then
 		if GameData.StateOfLobby == nil or GameData.StateOfLobby < 1 then
-			draw.SimpleText("[,] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
+			draw.SimpleText("[Q] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
 					color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 
@@ -105,7 +104,7 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 			end
 
 			local mul_y = 1
-			draw.SimpleText("[" .. plynum .. "/" .. GameData.MaxPlayers .. "] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
+			local width, height = draw.SimpleText("[" .. plynum .. "/" .. GameData.MaxPlayers .. "] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
 					TEXT_ALIGN_TOP)
 
 			for i = 1, #Lobby_Players do
@@ -143,15 +142,15 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 
 			if clientReadiness then
 				if clientReadiness < 1 then
-					draw.SimpleText("	   [" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.045,
+					draw.SimpleText("[" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025 + width,
 							scrH * 0.22, grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == 1 then
-					draw.SimpleText("	   [" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.045, scrH * 0.22,
+					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
+							string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
 							green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == 2 then
-					draw.SimpleText("	   [" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.045, scrH * 0.22, red,
+					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
+							string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22, red,
 							TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				end
 			end

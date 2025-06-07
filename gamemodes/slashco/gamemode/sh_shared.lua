@@ -204,6 +204,7 @@ if CLIENT then
 	GameData.IsLobby = GetGlobal2Bool("SlashCo:IsLobby", GameData.IsLobby) -- For autorefresh
 	GameData.Lobby = GetGlobal2String("SlashCo:Lobby", GameData.Lobby) -- For autorefresh
 	GameData.IsLan = GetGlobal2Bool("SlashCo:IsLan", GameData.IsLan)
+	GameData.IsNewPlayer = cookie.GetNumber("slashco_hasplaycount", 0) < 3 -- We keep track how many rounds they played. If they played more than 3 rounds, their not considered a new player anymore. this variable is used to enable hints for them.
 
 	function GM:InitPostEntity()
 		GameData.IsLobby = GetGlobal2Bool("SlashCo:IsLobby", GameData.IsLobby)

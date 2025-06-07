@@ -23,6 +23,7 @@ SlashCo.LangTable["SomeRescued"] = "Bara ett fåtal av de utskickade SlashCo Arb
 SlashCo.LangTable["NoneRescued"] = "Dom utskickande SlashCo Arbetarna kunde ej bli räddade."
 SlashCo.LangTable["Cursed"] = "Din själ är nu försvunnen."
 SlashCo.LangTable["Judgement"] = "UTSLAG"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Tryck på [%s] för att skapa"
 
 SlashCo.LangTable["InLobby"] = "I Väntrummet"
 SlashCo.LangTable["InGame"] = "I Spel (%s)"
