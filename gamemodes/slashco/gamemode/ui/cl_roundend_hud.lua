@@ -216,7 +216,7 @@ local stringTable = {
 		end
 
 		if GameData.IsNewPlayer then
-			cookie.Set("slashco_hasplaycount", tostring(cookie.GetNumber("slashco_hasplaycount", 0) + 1)) -- They played their first round, we don't need to flag them to be new at this point.
+			cookie.Set("slashco_totalplaycount", tostring(cookie.GetNumber("slashco_totalplaycount", 0) + 1)) -- They played their first round, we don't need to flag them to be new at this point.
 		end
 
 		return lines
