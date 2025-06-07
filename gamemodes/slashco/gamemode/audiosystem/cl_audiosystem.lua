@@ -385,7 +385,7 @@ function SlashCo.AudioSystem.Init()
 	local world = game.GetWorld()
 
 	SlashCo.AudioSystem.LocalPlayer = LocalPlayer()
-	SlashCo.AudioSystem.LocalEntIndex = AudioSystem.LocalPlayer:EntIndex()
+	SlashCo.AudioSystem.LocalEntIndex = SlashCo.AudioSystem.LocalPlayer:EntIndex()
 
 	--[[
 		Setting up the proxies in case the background music changes.
