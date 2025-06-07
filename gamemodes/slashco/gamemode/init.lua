@@ -453,7 +453,7 @@ local function Think()
 				totalCansRemaining = totalCansRemaining + (v.CansRemaining or gasPerGen)
 			end
 
-			if #ents.FindByClass("sc_gascan") <= totalCansRemaining then
+			if #gens <= totalCansRemaining then
 				return
 			end --Prevent draining if there is too few gas cans
 

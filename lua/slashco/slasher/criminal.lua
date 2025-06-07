@@ -111,14 +111,12 @@ function SLASHER.OnSecondaryFire(slasher)
 	slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
 
 	if slasher:GetNWBool("CriminalCloning") then
-		for i = 1, #ents.FindByClass("sc_crimclone") do
-			local cln = ents.FindByClass("sc_crimclone")[i]
-
-			if cln.IsMain ~= true then
-				cln:Remove()
+		for _, clone in ipairs(ents.FindByClass("sc_crimclone")) do
+			if clone.IsMain ~= true then
+				clone:Remove()
 			end
-			cln:StopSound("slashco/slasher/criminal_loop.wav")
-			cln:StopSound("slashco/slasher/criminal_rage.wav")
+			clone:StopSound("slashco/slasher/criminal_loop.wav")
+			clone:StopSound("slashco/slasher/criminal_rage.wav")
 		end
 
 		slasher:SetNWBool("CriminalCloning", false)

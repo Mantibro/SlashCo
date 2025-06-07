@@ -64,6 +64,10 @@ function ENT:OnRemove()
 	end)
 end
 
+local minBox = Vector(-6000, -6000, -6000)
+local maxBox = Vector(6000, 6000, 6000)
+local ang = Angle(0, 0, 0)
+local traceStartOffset = Vector(0, 0, 80)
 function ENT:Think()
 	if not GameData.LocalPlayer.BenadrylIntensity then
 		return
@@ -75,7 +79,8 @@ function ENT:Think()
 	end
 
 	--remove shadowboys that are way too far away
-	if not self:GetPos():WithinAABox(Vector(-6000, -6000, -6000), Vector(6000, 6000, 6000)) then
+	local pos = self:GetPos()
+	if not pos:WithinAABox(minBox, maxBox) then
 		self:Remove()
 		return
 	end
@@ -83,26 +88,32 @@ function ENT:Think()
 	self:SetColor(Color(0, 0, 0, math.abs(GameData.LocalPlayer.BenadrylIntensity) * 255))
 
 	if not IsValid(self.TargetThing) then
-		self.TargetThing = ents.FindByClass("sc_gascan")[math.random(1, #ents.FindByClass("sc_gascan"))]
+		local gasCans = ents.FindByClass("sc_gascan")
+		self.TargetThing = gasCans[math.random(1, #gasCans)]
 	else
 		if not self.Speed then
 			self.Speed = 1
 		end
 
-		local dir = (self.TargetThing:GetPos() - self:GetPos()):GetNormalized() * self.Speed
-		self:SetPos(self:GetPos() + dir)
-		self:SetAngles(Angle(0, (self:GetPos() + dir):Angle()[2] + 90, 0))
-
+		local dir = (self.TargetThing:GetPos() - pos):GetNormalized() * self.Speed
+		pos:Add(dir)
+		self:SetPos(pos)
+		ang[2] = pos:Angle()[2] + 90
+		self:SetAngles(ang)
+	
+		local up = self:GetUp()
+		up:Mul(-200)
 		local ground = util.TraceLine({
-			start = self:LocalToWorld(Vector(0, 0, 80)),
-			endpos = self:LocalToWorld(Vector(0, 0, 0)) + self:GetUp() * -200
+			start = self:LocalToWorld(traceStartOffset),
+			endpos = self:LocalToWorld(vector_origin):Add(up)
 		})
 
 		if ground.Fraction > 0 then
 			self:SetPos(ground.HitPos)
+			pos = ground.HitPos
 		end
 
-		if self:GetPos():Distance(self.TargetThing:GetPos()) < 25 then
+		if pos:Distance(self.TargetThing:GetPos()) < 25 then
 			self:Remove()
 		end
 	end

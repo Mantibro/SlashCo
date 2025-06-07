@@ -188,9 +188,9 @@ if SERVER then
 			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
 
 			-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
-			activator.QuickEscape = (CurTime() - GetGlobal2Float("SCStartTime")) < SlashCo.QuickEscapeTime
-			activator.SlowEscape = (CurTime() - GetGlobal2Float("SCStartTime")) > SlashCo.SlowEscapeTime
-			activator:SetNW2Float("EscapeTime", CurTime() - GetGlobal2Float("SCStartTime"))
+			activator.QuickEscape = SlashCo.GetRoundTime() < SlashCo.QuickEscapeTime
+			activator.SlowEscape = SlashCo.GetRoundTime() > SlashCo.SlowEscapeTime
+			activator:SetNW2Float("EscapeTime", SlashCo.GetRoundTime())
 		end
 
 		local vehicle = ents.Create("prop_vehicle_prisoner_pod")

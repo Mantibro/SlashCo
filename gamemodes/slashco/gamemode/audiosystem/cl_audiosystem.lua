@@ -407,6 +407,24 @@ local function UpdateBackgroundMusic()
 	end
 end
 
+local function UpdateChannelPosition(channel, channelData, localPlyPos)
+	if not channelData.entIndex then return end
+
+	local ent = channelData.ent or Entity(channelData.entIndex)
+	if not IsValid(ent) then return end
+
+	channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
+	local newPos = ent:EyePos()
+	channel:SetPos(newPos)
+
+	local soundData = channelData.soundData
+	if soundData and soundData.minDistance and soundData.maxDistance then
+		local volume = CalculateFadeVolume(localPlyPos or GameData.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData.minDistance, soundData.maxDistance)
+		channel:SetVolume(volume)
+		--print("3D", channel, channelData.ID, volume)
+	end
+end
+
 local function UpdateChannelPositions()
 	local localPlyPos = GameData.LocalPlayer:GetPos()
 	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
@@ -414,21 +432,7 @@ local function UpdateChannelPositions()
 			Why don't we remove the channel if the parent is gone?
 			Because on full updates, the parent might disappear and then reappear.
 		]]
-		if not channelData.entIndex then continue end
-
-		local ent = channelData.ent or Entity(channelData.entIndex)
-		if not IsValid(ent) then continue end
-
-		channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
-		local newPos = ent:EyePos()
-		channel:SetPos(newPos)
-
-		local soundData = channelData.soundData
-		if soundData and soundData.minDistance and soundData.maxDistance then
-			local volume = CalculateFadeVolume(localPlyPos, newPos, channelData.volume or soundData.volume, soundData.minDistance, soundData.maxDistance)
-			channel:SetVolume(volume)
-			--print("3D", channel, channelData.ID, volume)
-		end
+		UpdateChannelPosition(channel, channelData, localPlyPos)
 	end
 end
 
@@ -501,7 +505,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	end
 
 	local useMono = entIndex <= 0 and not soundData.position and not soundData.forceMono
-	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(useMono and "mono" or "3d", soundData.modes), function(channel, channelData)
+	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(AppendMode(useMono and "mono" or "3d", soundData.modes), "noplay"), function(channel, channelData)
 		local soundData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] or soundData -- Update in case it was updated in the few frames we had originally made our call.
 		if soundData.DESTROYCHANNEL then
 			channel:SetVolume(0)
@@ -547,11 +551,12 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channel:Set3DFadeDistance(soundData.minDistance, soundData.maxDistance)
 		end
 
+		channelData.soundData = soundData -- Save the data that was used to create this channel.
+		UpdateChannelPosition(channel, channelData) -- Update the channel position so that when we play it, there won't be a audio bug for 1 frame where it would play from the world origin.
+
 		if not soundData.noplay then -- We call Play only here since some settings might change how it can be heard.
 			channel:Play()
 		end
-
-		channelData.soundData = soundData -- Save the data that was used to create this channel.
 
 		SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil
 		if soundData.callback then

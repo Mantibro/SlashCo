@@ -8,7 +8,7 @@ function SlashCo.SinglePlayerSetup()
 
 	hook.Add("PlayerInitialSpawn", "SinglePlayerSetup", function(ply)
 		table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = ply:SteamID64() })
-		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = ply:SteamID64(), GameContribution = 0 })
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = ply:SteamID64() })
 	end)
 end
 
@@ -65,7 +65,7 @@ function SlashCo.LoadCurRoundData()
 
 				--table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sr_id })
 				--For the slasher's clientside view also
-				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sr_id, GameContribution = 0 })
+				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sr_id })
 			end
 
 			return
@@ -85,7 +85,7 @@ function SlashCo.LoadCurRoundData()
 				local steamid = query[i].Survivors
 				table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = steamid })
 				--For the slasher's clientside view also
-				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = steamid, GameContribution = 0 })
+				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = steamid })
 			end
 		end
 
@@ -247,6 +247,10 @@ function SlashCo.EndRound()
 		end
 	end
 
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		SlashCo.AudioSystem.StopSound(nil, 1, slasher) -- Stop all sounds playing by the slasher.
+	end
+
 	local winners = {}
 	if heliCount > 0 then
 		--Add to stats of the remaining survivors' wins
@@ -309,7 +313,7 @@ end
 if not GameData.IsLobby then
 	timer.Create("SlashCo:WarningTime", 1, 0, function()
 		local curTime = CurTime()
-		local timePassed = curTime - GetGlobal2Float("SCStartTime")
+		local timePassed = SlashCo.GetRoundTime()
 		if math.IsNearlyEqual(timePassed, SlashCo.WarningTime, 1) and (GameData.LastWarningTime or 0) < curTime then
 			GameData.LastWarningTime = curTime + 5
 			SlashCo.AudioSystem.PlaySound({
@@ -326,7 +330,7 @@ if not GameData.IsLobby then
 			return
 		end
 
-		local timePassed = CurTime() - GetGlobal2Float("SCStartTime")
+		local timePassed = SlashCo.GetRoundTime()
 		if timePassed > 300 and not SlashCo.FailSafeActivate then
 			local slashers = team.GetPlayers(TEAM_SLASHER)
 			if #slashers == 0 then

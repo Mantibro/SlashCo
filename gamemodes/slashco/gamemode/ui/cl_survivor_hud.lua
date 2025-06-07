@@ -449,8 +449,7 @@ end)
 local chaseLightOffset = Vector(0, 0, 20)
 hook.Add("Think", "Slasher_Chasing_Light", function()
 	local curTime = CurTime()
-	for s=1, #ents.FindByClass("sc_crimclone") do
-		local clone = ents.FindByClass("sc_crimclone")[s]
+	for _, clone in ipairs(ents.FindByClass("sc_crimclone")) do
 		if clone:GetMainRageClone() then
 			local tlight = DynamicLight(clone:EntIndex() + 1)
 			if tlight then
@@ -459,15 +458,15 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 				tlight.g = 0
 				tlight.b = 255
 				tlight.brightness = 5
-				tlight.Decay = 1000
-				tlight.Size = 250
+				local size = 250
+				tlight.Decay = size * 4
+				tlight.Size = size
 				tlight.DieTime = curTime + 1
 			end
 		end
 	end
 
-	for s=1, #team.GetPlayers(TEAM_SLASHER) do
-		local slasher = team.GetPlayers(TEAM_SLASHER)[s]
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if slasher:GetNWBool("TrollgeStage2") then
 			local tlight = DynamicLight(slasher:EntIndex() + 1)
 			if tlight then
@@ -489,9 +488,10 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 				dlight.r = 255
 				dlight.g = 0
 				dlight.b = 0
-				dlight.brightness = 8
-				dlight.Decay = 1000
-				dlight.Size = 300
+				dlight.brightness = 10
+				local size = 400
+				dlight.Decay = size * 3
+				dlight.Size = size
 				dlight.DieTime = curTime + 1
 			end
 		end
@@ -507,8 +507,9 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 			dlight.g = 0
 			dlight.b = 0
 			dlight.brightness = 6
-			dlight.Decay = 1000
-			dlight.Size = 250
+			local size = 250
+			dlight.Decay = size * 4
+			dlight.Size = size
 			dlight.DieTime = curTime + 1
 		end
 	end

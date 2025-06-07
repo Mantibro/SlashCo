@@ -24,7 +24,7 @@ function ENT:Think()
 	local curTime = CurTime()
 	self:NextThink(curTime + 0.5)
 
-	if SlashCo.WarningTime > (curTime - GetGlobal2Float("SCStartTime")) then
+	if SlashCo.WarningTime > SlashCo.GetRoundTime() then
 		return true
 	end
 
@@ -36,7 +36,7 @@ function ENT:Think()
 		end
 	end
 
-	if math.random(1, math.max(50 - (nearbyFuelCans * 3), 1)) == 1 then
+	if math.random(1, math.max(50 - math.min((nearbyFuelCans * 3), 35), 1)) == 1 then
 		nearbyFuelCans = math.max(nearbyFuelCans, 1) -- Just for the math below to play nice.
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/canisterheavyimpact" .. math.random(1, 3) .. ".mp3",

@@ -281,8 +281,9 @@ function SlashCo.SpawnItems()
 			v:Remove()
 		end
 	end
-
-	if table.IsEmpty(ents.FindByClass("info_sc_item")) then
+	
+	local itemSpawns = ents.FindByClass("info_sc_item")
+	if table.IsEmpty(itemSpawns) then
 		SlashCo.Abort("Missing item spawn entities")
 		return
 	end
@@ -294,7 +295,7 @@ function SlashCo.SpawnItems()
 		local item = p:SlasherValue("ItemToSpawn")
 
 		if item then
-			local items = SlashCo.SelectSpawns(ents.FindByClass("info_sc_item"), SlashCo.CurRound.ItemCount,
+			local items = SlashCo.SelectSpawns(itemSpawns, SlashCo.CurRound.ItemCount,
 					itemCondForced, itemCondNonForced, true)
 
 			SlashCo.Spawn(items, function(ent)
@@ -305,7 +306,7 @@ function SlashCo.SpawnItems()
 		p:SlasherFunction("OnItemSpawn", SlashCo.CurRound.ItemCount)
 	end
 
-	local beacon = SlashCo.SelectSpawns(ents.FindByClass("info_sc_item"), 1, itemCondForced, itemCondNonForced)
+	local beacon = SlashCo.SelectSpawns(itemSpawns, 1, itemCondForced, itemCondNonForced)
 	if IsValid(beacon) then
 		beacon.Item = "Beacon"
 		beacon:SpawnEnt()
@@ -313,7 +314,7 @@ function SlashCo.SpawnItems()
 
 	--item count for everything else
 	local randomItemCount = GameData.MaxPlayers - math.floor((SlashCo.CurRound.Difficulty + 1) / 2) - #SlashCo.CurRound.SlasherData.AllSurvivors
-	local items = SlashCo.SelectSpawns(ents.FindByClass("info_sc_item"), randomItemCount,
+	local items = SlashCo.SelectSpawns(itemSpawns, randomItemCount,
 			nil, nil, true)
 
 	SlashCo.Spawn(items)
@@ -364,10 +365,21 @@ local function singlePlayerTable()
 	local tbl = {}
 
 	for _, v in player.Iterator() do
-		table.insert(tbl, { Survivors = v:SteamID64(), Item = "none" })
+		local steamID64 = v:SteamID64()
+		tbl[steamID64] = { Survivors = steamID64, Item = "none" }
 	end
 
 	return tbl
+end
+
+-- Flips a table to have the given key as the actual key instead of the normal DB 1, 2, 3 stuff.
+function SQLTableToLuaTable(data, keyName)
+	local resultTable = {}
+	for _, tbl in ipairs(data) do
+		resultTable[tbl[keyName]] = tbl
+	end
+
+	return resultTable
 end
 
 ---Set up players for the round
@@ -388,135 +400,87 @@ function SlashCo.SetupPlayers()
 
 	local becameCovenant = 0
 	local spawn_queue = 0
-	local survivors = sql.Query("SELECT * FROM slashco_table_survivordata; ") or singlePlayerTable()
-	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}
-	timer.Simple(0.5, function()
-		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			for _, v1 in ipairs(survivors) do
-				if v1.Survivors == v:SteamID64() then
-					SlashCo.DropAllItems(v) -- if somehow a player grabs an item beforehand
-					SlashCo.ChangeSurvivorItem(v, v1.Item)
-					SlashCo.SendValue(v, "preItem", v1.Item)
-					break
-				end
-			end
-		end
-	end)
-
-	for _, ply in ipairs(player.GetAll()) do
+	local survivors = SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_survivordata; "), "Survivors") or singlePlayerTable()
+	local slashers = SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata; "), "Slashers") or {}
+	local plys = player.GetAll()
+	for _, ply in ipairs(plys) do
 		--Assign the teams for the current round
 		local id = ply:SteamID64()
-		print("name: " .. ply:Name())
+		-- print("name: " .. ply:Name())
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
-			for i = 1, #slashers do
-				--Slasher becomes the sole survivor
-				if id == slashers[i].Slashers then
-					print(ply:Name() .. " now Survivor for Nightmare.")
-					ply:SetTeam(TEAM_SURVIVOR)
-					ply:Spawn()
-				end
+			if slashers[id] then
+				print(ply:Name() .. " now Survivor for Nightmare.")
+				ply:SetTeam(TEAM_SURVIVOR)
+				ply:Spawn()
+				continue
 			end
 
-			for i = 1, #survivors do
-				if id == survivors[i].Survivors then
-					ply:SetTeam(TEAM_SPECTATOR)
-					ply:Spawn()
+			if survivors[id] then
+				ply:SetTeam(TEAM_SPECTATOR)
+				ply:Spawn()
 
-					print(ply:Name() .. " now Slasher for Nightmare")
-					table.insert(SlashCo.CurRound.SlashersToBeSpawned, ply)
-
-					break
-				else
-					if slashers[1] ~= nil and id == slashers[1].Slashers then
-						goto CONT_NGHT
-					end
-
-					for k = 1, #survivors do
-						if id == survivors[k].Survivors then
-							goto CONT_NGHT
-						end
-					end
-
-					ply:SetTeam(TEAM_SPECTATOR)
-					ply:Spawn()
-					print(ply:Name() .. " now Spectator (Nightmare)")
-				end
-
-				:: CONT_NGHT ::
+				print(ply:Name() .. " now Slasher for Nightmare")
+				table.insert(SlashCo.CurRound.SlashersToBeSpawned, ply)
+				continue
 			end
 
-			if play >= #player.GetAll() then
-				goto NIGHTMARE_SKIPALL
-			else
-				goto NIGHTMARE_SKIPPART
-			end
+			ply:SetTeam(TEAM_SPECTATOR)
+			ply:Spawn()
+			print(ply:Name() .. " now Spectator (Nightmare)")
+
+			continue
 		end
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
-		for i = 1, #survivors do
-			if id == survivors[i].Survivors then
-				ply:SetTeam(TEAM_SURVIVOR)
-				ply:Spawn()
-				print(ply:Name() .. " now Survivor")
-
-				break
-			else
-				if slashers[1] ~= nil and id == slashers[1].Slashers then
-					continue
-				end
-
-				if slashers[2] ~= nil and id == slashers[2].Slashers then
-					continue
-				end
-
-				for k = 1, #survivors do
-					if id == survivors[k].Survivors then
-						continue
-					end
-				end
-
-				ply:SetTeam(TEAM_SPECTATOR)
-				ply:Spawn()
-				print(ply:Name() .. " now Spectator")
-				spawn_queue = spawn_queue + 1
-
-				if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
-					table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
-					becameCovenant = becameCovenant + 1
+		if slashers[id] then
+			for _, v in ipairs(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant) do
+				if v.steamid == id then
+					print(ply:Name() .. " will become part of the Covenant.")
+					ply:SetTeam(TEAM_SPECTATOR)
+					ply:Spawn()
+					spawn_queue = spawn_queue + 1
 				end
 			end
+
+			print(ply:Name() .. " now Slasher (Memorized)")
+			ply:SetTeam(TEAM_SPECTATOR)
+			ply:Spawn()
+			spawn_queue = spawn_queue + 1
+
+			table.insert(SlashCo.CurRound.SlashersToBeSpawned, ply)
+			continue
 		end
 
-		for i = 1, #slashers do
-			if id == slashers[i].Slashers then
-				for _, v in ipairs(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant) do
-					if v.steamid == id then
-						print(ply:Name() .. " will become part of the Covenant.")
-						ply:SetTeam(TEAM_SPECTATOR)
-						ply:Spawn()
-						spawn_queue = spawn_queue + 1
-
-						goto covenant_member
-					end
-				end
-
-				print(ply:Name() .. " now Slasher (Memorized)")
-				ply:SetTeam(TEAM_SPECTATOR)
-				ply:Spawn()
-				spawn_queue = spawn_queue + 1
-
-				table.insert(SlashCo.CurRound.SlashersToBeSpawned, ply)
-
-				:: covenant_member ::
-			end
+		if survivors[id] or SlashCo.AllowLateJoin then
+			ply:SetTeam(TEAM_SURVIVOR)
+			ply:Spawn()
+			print(ply:Name() .. " now Survivor")
+			continue
 		end
 
-		:: NIGHTMARE_SKIPPART ::
+		-- They weren't processed yet, so their a spectator.
+		ply:SetTeam(TEAM_SPECTATOR)
+		ply:Spawn()
+		print(ply:Name() .. " now Spectator")
+		spawn_queue = spawn_queue + 1
+
+		if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
+			table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
+			becameCovenant = becameCovenant + 1
+		end
 	end
 
-	:: NIGHTMARE_SKIPALL ::
+	-- Hand out all items, as all survivors should be spawned by now.
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		local survivorEntry = survivors[survivor:SteamID64()]
+		if survivorEntry then
+			SlashCo.DropAllItems(survivor) -- if somehow a player grabs an item beforehand
+			SlashCo.ChangeSurvivorItem(survivor, survivorEntry.Item)
+			SlashCo.SendValue(survivor, "preItem", survivorEntry.Item)
+		end
+	end
 end
 
 local function makeEnt(class, config)

@@ -42,12 +42,19 @@ SLASHER.CustomBackgroundMusic = true -- Tyler has his own background music.
 SLASHER.DisableHelicopterMusic = true
 SLASHER.HelicopterArriveTime = 30 -- We don't want Tyler to be able to kill everyone while they have to wait 2 minutes just for the Helicopter to arrive.
 SLASHER.SpawnDelay = 10 -- We don't need to let Tyler wait much, why? because players depend on Tyler.
+SLASHER.AudioRangeDecreasePerGasCan = 0.1 -- For every gas can he created, the range of his audio is decreased by this much. (This value is used for multiplication!)
+SLASHER.MinimumAudioRange = 250 -- The minimum range that he is required to have.
 
 function SLASHER.OnSpawn(slasher)
-	slasher.TylerState = 0
 	slasher:SetVisible(false)
 	SlashCo.AudioSystem.EnableBackgroundMusic()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/igor/igors_theme.ogg", 1)
+
+	slasher.GasCanCreated = 0
+	slasher.TylerState = 0
+	slasher.TimeAsTylerForm = 0
+	slasher.TimeAsTylerSpecter = 0
+	slasher.TylerBlink = 0
 end
 
 function SLASHER.Precache()
@@ -62,6 +69,23 @@ local function EndlessChase()
 	return (SLASHER.AllowEndlessChase and SlashCo.IsSlowEscape()) or SlashCo.CurRound.EscapeHelicopterSummoned -- When the time for a slow escape is reached or the helicopter was summoned, we enter a endless chase
 end
 
+-- Enums to use making the code more readable.
+local TYLER_SPECTER = 0
+local TYLER_CREATOR = 1
+local TYLER_PRE_DESTROYER = 2
+local TYLER_DESTROYER = 3
+local function SwitchForm(slasher, newForm)
+	local anger = SlashCo.GetSlasherAnger(slasher)
+	if newForm == TYLER_CREATOR and anger > 50 and math.random(1, 200 - anger) == 1 then
+		newForm = TYLER_PRE_DESTROYER -- When becoming Creator, he has a random chance to become a destroyer instead if his anger is already above 20.
+	end
+
+	slasher.TylerState = newForm
+
+	slasher.TimeAsTylerSpecter = 0
+	slasher.TimeAsTylerForm = 0
+end
+
 function SLASHER.OnTickBehaviour(slasher)
 	local TylerState = slasher.TylerState or 0 --State
 	local TimeAsTylerForm = slasher.TimeAsTylerForm or 0 --Time Spent as Creator or destroyer
@@ -73,14 +97,14 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if (TylerState == 0 or TylerState == 1) and endlessChase then
-		slasher.TylerState = 2
+		SwitchForm(slasher, 2)
 		SlashCo.AudioSystem.StopSound("TylerSong", 0)
 		slasher.TylerSongPickedID = nil
 		SlashCo.AddSlasherAnger(slasher, 100) -- Max it out
 		anger = SlashCo.GetSlasherAnger(slasher)
 	end
 
-	if TylerState == 0 then
+	if TylerState == TYLER_SPECTER then
 		--Specter
 
 		slasher.TylerSongPickedID = nil
@@ -101,13 +125,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		if slasher.TimeAsTylerSpecter > 30 then
-			slasher.TylerState = 1
-			slasher.TimeAsTylerSpecter = 0
+			SwitchForm(slasher, TYLER_CREATOR)
 			slasher:SetVisible(true)
 		end
 
 		slasher.tyler_destroyer_entrance_antispam = nil
-	elseif TylerState == 1 then
+	elseif TylerState == TYLER_CREATOR then
 		--Creator
 
 		if not slasher:IsVisible() then
@@ -115,7 +138,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		slasher:SetImpervious(false)
-		slasher.TimeAsTylerSpecter = 0
 		slasher:SetNWBool("TylerFlash", false)
 		slasher:SetSlowWalkSpeed(1)
 		slasher:SetRunSpeed(1)
@@ -133,11 +155,11 @@ function SLASHER.OnTickBehaviour(slasher)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = slasher.TylerSongPickedID,
 				identifier = "TylerSong",
-				minDistance = 500 + (500 * SlashCo.MapSize),
-				maxDistance = 1500 + (1000 * SlashCo.MapSize),
+				minDistance = math.max((500 + (500 * SlashCo.MapSize)) * (1 - (SLASHER.AudioRangeDecreasePerGasCan * slasher.GasCanCreated)), SLASHER.MinimumAudioRange),
+				maxDistance = math.max((1500 + (1000 * SlashCo.MapSize)) * (1 - (SLASHER.AudioRangeDecreasePerGasCan * slasher.GasCanCreated)), SLASHER.MinimumAudioRange * 2),
 				looping = true,
 				entity = slasher,
-				volume = math.max(0.6 - (slasher.SlasherValue3 * 0.12), 0.1),
+				volume = math.max(0.6 - (slasher.GasCanCreated * 0.12), 0.1),
 				fadeIn = 1,
 			})
 			SLASHER.HideTime(slasher)
@@ -150,7 +172,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		--Time ran out
 		if (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > slasher.TylerTime / 2.5) or TimeAsTylerForm > slasher.TylerTime then
 			slasher.TylerSongPickedID = nil
-			slasher.TylerState = 2
+			SwitchForm(slasher, TYLER_PRE_DESTROYER)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
 		end
 
@@ -185,7 +207,8 @@ function SLASHER.OnTickBehaviour(slasher)
 					return
 				end
 
-				SlashCo.CreateGasCan(slasher:GetPos() + Vector(0, 0, 5), Angle(0, 0, 0)) -- Gasolina en el Pie :eyes:
+				-- NOTE: We use WorldSpaceCenter so that the gas cans spawn a bit in the air, this stops them from somehow bugging and falling through the floor.
+				SlashCo.CreateGasCan(slasher:WorldSpaceCenter(), Angle(0, 0, 0)) -- Gasolina en el Pie :eyes:
 				SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 			end)
 
@@ -195,10 +218,8 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 
 				slasher:SetNWBool("TylerCreating", false)
-				slasher.TylerState = 0
-				slasher.TimeAsTylerForm = 0
-				slasher.TimeAsTylerSpecter = 0
-				slasher.SlasherValue3 = slasher.SlasherValue3 + 1
+				SwitchForm(slasher, TYLER_SPECTER)
+				slasher.GasCanCreated = slasher.GasCanCreated + 1
 				slasher.TylerBlink = 0
 				slasher:Freeze(false)
 				slasher:SetVisible(false)
@@ -206,7 +227,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		slasher.tyler_destroyer_entrance_antispam = nil
-	elseif TylerState == 2 then
+	elseif TylerState == TYLER_PRE_DESTROYER then
 		--Pre-Destroyer
 
 		slasher.TylerSongPickedID = nil
@@ -284,7 +305,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			slasher:Freeze(false)
-			slasher.TylerState = 3
+			SwitchForm(slasher, TYLER_DESTROYER)
 
 			SetGlobal2Bool("DisplayTylerTheDestroyerEffects", true)
 		end
@@ -297,7 +318,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeAsTylerForm = 0
 		slasher:SetNWBool("CanKill", false)
 		final_perception = 0.0
-	elseif TylerState == 3 then
+	elseif TylerState == TYLER_DESTROYER then
 		--Destroyer
 
 		slasher:SetSlowWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
@@ -310,8 +331,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_perception = 2.0
 
 		if TimeAsTylerForm > math.max((((3 + SlashCo.MapSize) / 4) * anger), SLASHER.MinChase) and not endlessChase then
-			slasher.TylerState = 0
-			slasher.TimeAsTylerSpecter = 0
+			SwitchForm(slasher, TYLER_SPECTER)
 
 			SlashCo.AudioSystem.StopSound("TylerTheme", 1)
 			SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
@@ -323,7 +343,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if TylerState > 1 then
+	if TylerState == TYLER_PRE_DESTROYER or TylerState == TYLER_DESTROYER then
 		slasher.TylerBlink = TylerBlink + FrameTime()
 
 		if TylerBlink > 0.85 then
@@ -348,7 +368,7 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher.TylerState ~= 3 then
+	if slasher.TylerState ~= TYLER_DESTROYER then
 		return
 	end
 
@@ -435,7 +455,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			slasher:Freeze(false)
 			if EndlessChase() then goto skip end
 			
-			slasher.TylerState = 0
+			SwitchForm(slasher, TYLER_SPECTER)
 			slasher.TimeAsTylerSpecter = 0
 			slasher:SetVisible(false)
 
@@ -490,7 +510,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		return
 	end
 
-	slasher.TylerState = 1
+	SwitchForm(slasher, TYLER_CREATOR)
 	slasher:SetVisible(true)
 end
 

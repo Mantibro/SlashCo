@@ -17,6 +17,11 @@ end
 
 -- Used for debugging.
 function SlashCo.SpawnPlayerAsSlasher(ply, slasherName)
+	if SlashCo.CurRound.GameProgress == -1 then -- We didn't spawn them yet, so just mark them as having the slasher selected.
+		SlashCo.SelectSlasher(slasherName, ply:SteamID64())
+		return
+	end
+
 	SlashCo.AudioSystem.StopSound(nil, 1, ply) -- Stop any sounds that were playing from the player in case we switched from one slasher to another.
 	ply:SetNWString("Slasher", slasherName)
 	ply:SetTeam(TEAM_SLASHER)

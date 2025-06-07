@@ -87,7 +87,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 	SlashCo.CurRound.Slashers[target:SteamID64()] = nil
 
 	if not found then
-		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = id, GameContribution = 0 })
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = id })
 	end
 
 	doPrint(ply, "New Survivor successfully assigned.")
@@ -266,7 +266,7 @@ concommand.Add("slashco_debug_run_survivor", function(ply)
 			k:SetTeam(TEAM_SURVIVOR)
 			k:Spawn()
 
-			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = k:SteamID64(), GameContribution = 0 })
+			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = k:SteamID64() })
 			doPrint(ply, k:Name() .. " is now a survivor")
 		end
 	end)

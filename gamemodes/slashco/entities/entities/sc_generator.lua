@@ -66,7 +66,7 @@ if CLIENT then
 		GameData.GeneratorLight:DrawModel()
 
 		local curTime = CurTime()
-		local dlight = DynamicLight(cacheData.entindex + 99996)
+		local dlight = DynamicLight(cacheData.entindex)
 		if dlight then
 			dlight.pos = cacheData.pos
 			dlight.r = not running and 255 or 0
@@ -75,8 +75,8 @@ if CLIENT then
 			dlight.brightness = 5
 			dlight.Decay = 1000
 			--dlight.nomodel = true -- We don't need that.
-			dlight.Size = math.abs(math.sin(curTime)) * 200
-			dlight.DieTime = curTime + 0.1
+			dlight.Size = math.abs(running and 1 or math.sin(curTime)) * 200
+			dlight.DieTime = curTime + (running and 60 or 0.1)
 		end
 
 		self:DrawModel()
