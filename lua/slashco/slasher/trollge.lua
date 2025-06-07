@@ -204,8 +204,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
 			final_eyesight = 10
 
-			for i = 1, #player.GetAll() do
-				local ply = player.GetAll()[i]
+			for _, ply in ipairs(player.GetAll()) do
 				ply:SetNWBool("DisplayTrollgeTransition", false)
 			end
 		end)

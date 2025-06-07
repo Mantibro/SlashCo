@@ -282,7 +282,7 @@ local function spectatorButtons(ply, button)
 		return
 	end
 
-	if button == KEY_SPACE then
+	if button == KEY_SPACE and IsValid(ply:GetObserverTarget()) then
 		--Spectator presses Space, cycles camera modes.
 		if ply:GetObserverMode() == OBS_MODE_CHASE then
 			ply:SetObserverMode(OBS_MODE_IN_EYE)
@@ -299,14 +299,17 @@ local function slasherButtons(ply, button)
 		ply:SlasherFunction("OnPrimaryFire", lagTrace(ply))
 		return
 	end --Killing / Damaging
+
 	if button == MOUSE_RIGHT then
 		ply:SlasherFunction("OnSecondaryFire", lagTrace(ply))
 		return
 	end --Activate Chase Mode
+
 	if button == KEY_R then
 		ply:SlasherFunction("OnMainAbilityFire", lagTrace(ply))
 		return
 	end --Main Ability
+
 	if button == KEY_F then
 		ply:SlasherFunction("OnSpecialAbilityFire", lagTrace(ply))
 		return

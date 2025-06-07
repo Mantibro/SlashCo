@@ -107,6 +107,14 @@ function PANEL:RenderTop(ent)
 	end
 	--]]
 
+	local r, g, b = 255, 255, 255
+	if self.ForceRenderColor then
+		r = self.ForceRenderColor.r / 255
+		g = self.ForceRenderColor.g / 255
+		b = self.ForceRenderColor.b / 255
+	end
+
+	render.SetColorModulation(r, g, b)
 	if not ent:GetNoDraw() then
 		if IsValid(ent.ProjectedModel) and not ent.RenderOverride then
 			ent.ProjectedModel:DrawModel()
@@ -193,7 +201,7 @@ function PANEL:Paint(w, h)
 			render.SetModelLighting(i, col.r / 255, col.g / 255, col.b / 255)
 		end
 	end
-
+	
 	self:RenderTop(self.Entity)
 	if self.ExtraEntities then
 		for _, v in pairs(self.ExtraEntities) do

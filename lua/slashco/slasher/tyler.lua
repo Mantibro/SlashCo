@@ -84,6 +84,20 @@ local function SwitchForm(slasher, newForm)
 
 	slasher.TimeAsTylerSpecter = 0
 	slasher.TimeAsTylerForm = 0
+	slasher.tyler_destroyer_entrance_antispam = nil
+end
+
+--[[
+	Force him to enter pre-destroyer.
+	Even if he was already destroyer.
+	This causes the right song to play & the survivors get a few more seconds since he goes through the whole pre-destroyer state again.
+]]
+function SLASHER.OnHelicopterSummon(slasher)
+	SlashCo.AudioSystem.StopSound("TylerAlarm", 0.5)
+	SlashCo.AudioSystem.StopSound("TylerTheme", 1)
+	SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
+	SlashCo.AudioSystem.StopSound("TylerSong", 0)
+	SwitchForm(slasher, TYLER_PRE_DESTROYER)
 end
 
 function SLASHER.OnTickBehaviour(slasher)

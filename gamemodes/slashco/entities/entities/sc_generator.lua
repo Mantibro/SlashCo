@@ -219,7 +219,15 @@ function ENT:CheckProgress(dontFailStart)
 		self.IsRunning = true
 		self.Progress = 5
 		self:SetRunning(true)
-		self:EmitSound("slashco/generator_start.mp3", 85, 100, 1)
+		SlashCo.AudioSystem.PlaySound({ -- Let everyone hear that a generator was started
+			soundPath = "slashco/generator_start.mp3",
+			identifier = "GeneratorStart",
+			minDistance = 500,
+			maxDistance = 10000,
+			entity = self,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(6.4, function()
 			self:PlayGlobalSound("slashco/generator_loop.mp3", 85, nil, true)

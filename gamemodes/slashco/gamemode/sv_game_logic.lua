@@ -145,10 +145,8 @@ function SlashCo.AwaitExpectedPlayers()
 
 		for i = 1, #SlashCo.CurRound.ExpectedPlayers do
 			local ex_p = player.GetBySteamID64(SlashCo.CurRound.ExpectedPlayers[i].steamid)
-
-			for p = 1, #player.GetAll() do
-				local s_p = player.GetAll()[p]
-
+			
+			for _, s_p in ipairs(player.GetAll()) do
 				if ex_p == s_p then
 					expected_count = expected_count + 1
 					print("[SlashCo] Expected player " .. expected_count .. " in!" .. "(" .. ex_p:Name() .. ")")

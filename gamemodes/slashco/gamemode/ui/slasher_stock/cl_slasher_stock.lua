@@ -885,12 +885,12 @@ function PANEL:MakeGeneratorsCard()
 		return
 	end
 
-	for _, v in ipairs(gens) do
+	for _, genEntity in ipairs(gens) do
 		local gen = self:Add("slashco_projector")
 		table.insert(self.Gens, gen)
 		gen:SetSize(160, 160)
 		--gen:SetPos(ScrW() / 2 + 160 * k - 80 * genCount - 160)
-		gen:SetEntity(v)
+		gen:SetEntity(genEntity)
 		gen:SetFOV(22)
 		gen:SetDistance(400)
 		self:ModelFog(gen)
@@ -939,6 +939,11 @@ function PANEL:MakeGeneratorsCard()
 						end
 					end)
 				end
+			end
+
+			if IsValid(genEntity) then
+				local running = genEntity:GetRunning()
+				gen.ForceRenderColor = Color(running and 50 or 255, running and 255 or 50, 50)
 			end
 		end
 	end
