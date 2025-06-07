@@ -138,7 +138,7 @@ function SlashCo.RemoveItem(ply, isSec)
 	ply:SetItem(slot, "none")
 end
 
-function SlashCo.ChangeSurvivorItem(ply, id)
+function SlashCo.ChangeSurvivorItem(ply, id, noSound)
 	if SlashCoItems[id] then
 		if SlashCoItems[id].OnPickUp then
 			SlashCoItems[id].OnPickUp(ply)
@@ -153,11 +153,13 @@ function SlashCo.ChangeSurvivorItem(ply, id)
 			ply:ItemFunction2("OnSwitchFrom", item)
 			ply:SetItem("item", id)
 		end
-
-		if SlashCoItems[id].EquipSound then
-			ply:EmitSound(SlashCoItems[id].EquipSound())
-		else
-			ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+		
+		if not noSound then
+			if SlashCoItems[id].EquipSound then
+				ply:EmitSound(SlashCoItems[id].EquipSound())
+			else
+				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+			end
 		end
 	elseif id == "none" then
 		ply:SetItem("item", "none")
