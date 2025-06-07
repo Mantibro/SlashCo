@@ -98,7 +98,7 @@ function ENT:PlayHeliSounds()
 		maxDistance = 1000,
 		looping = true,
 		entity = self,
-		volume = 1,
+		volume = 0.7,
 		fadeIn = 1,
 	})
 
@@ -109,7 +109,7 @@ function ENT:PlayHeliSounds()
 		maxDistance = 8000,
 		looping = true,
 		entity = self,
-		volume = 1,
+		volume = 0.7,
 		fadeIn = 1,
 	})
 
@@ -120,7 +120,7 @@ function ENT:PlayHeliSounds()
 		maxDistance = 500,
 		looping = true,
 		entity = self,
-		volume = 1,
+		volume = 0.7,
 		fadeIn = 1,
 	})
 
@@ -131,7 +131,7 @@ function ENT:PlayHeliSounds()
 		maxDistance = 1500,
 		looping = true,
 		entity = self,
-		volume = 1,
+		volume = 0.7,
 		fadeIn = 1,
 	})
 end

@@ -355,7 +355,7 @@ function SlashCo.StartChaseMode(slasher)
 		maxDistance = 2000 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
-		volume = 1,
+		volume = 0.7,
 		fadeIn = 1,
 	})
 end
