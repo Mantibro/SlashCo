@@ -276,7 +276,7 @@ function SlashCo.StopChase(slasher)
 end
 
 function SlashCo.StartChaseMode(slasher)
-	if slasher.ChaseActivationCooldown > 0 then
+	if (slasher.ChaseActivationCooldown or 0) > 0 then
 		return
 	end
 
