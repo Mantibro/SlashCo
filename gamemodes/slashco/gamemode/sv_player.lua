@@ -89,6 +89,10 @@ hook.Add("PlayerCanHearPlayersVoice", "Maximum Range", function(listener, talker
 	end
 
 	local talkerTeam = talker:Team()
+	local listenerTeam = listener:Team()
+	if listenerTeam == talkerTeam and (talkerTeam == TEAM_SLASHER or talkerTeam == TEAM_SPECTATOR) then
+		return true
+	end
 	if talkerTeam == TEAM_SPECTATOR or talkerTeam == TEAM_SLASHER then
 		return false
 	end
