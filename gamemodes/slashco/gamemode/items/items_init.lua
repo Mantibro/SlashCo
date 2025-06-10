@@ -69,10 +69,16 @@ function PLAYER:AddEffect(value, duration)
 	end
 	self:SetItem("itemEffect", value)
 	self:EffectFunction("OnApplied")
-	timer.Create("itemEffectExpire_" .. self:UserID(), duration, 1, function()
+	GameData.EffectCounter = (GameData.EffectCounter or 0) + 1
+	local effectID = GameData.EffectCounter
+	self.ActiveEffects = self.ActiveEffects or {}
+	self.ActiveEffects[effectID] = true
+	timer.Create("itemEffectExpire_" .. GameData.EffectCounter, duration, 1, function()
 		if not IsValid(self) then
 			return
 		end
+
+		self.ActiveEffects[effectID] = nil
 		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 		self:EffectFunction("OnExpired")
 		self:SetItem("itemEffect", "none")
@@ -97,7 +103,9 @@ function PLAYER:ClearEffect()
 	end
 
 	self:SetItem("itemEffect", "none")
-	timer.Remove("itemEffectExpire_" .. self:UserID())
+	for effectID, _ in pairs(self.ActiveEffects or {}) do
+		timer.Remove("itemEffectExpire_" .. effectID)
+	end
 end
 
 ---check the <valueName> value of a player's item in a specific slot

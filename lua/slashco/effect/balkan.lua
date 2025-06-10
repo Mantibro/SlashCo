@@ -6,10 +6,10 @@ EFFECT.Name = "Balkan"
 EFFECT.ChangesSpeed = true
 EFFECT.FuelSpeed = 3.5
 function EFFECT.OnApplied(ply)
-	ply:AddSpeedEffect("buzzEffect", 600, 20)
+	ply:AddSpeedEffect("balkanEffect", 600, 20)
 end
 function EFFECT.OnExpired(ply)
-	ply:RemoveSpeedEffect("buzzEffect")
+	ply:RemoveSpeedEffect("balkanEffect")
 end
 
 local colors = {

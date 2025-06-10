@@ -65,11 +65,12 @@ local function SwitchForm(slasher, newForm)
 
 	if newForm == TYLER_CREATOR or newForm == TYLER_SPECTER then
 		SLASHER.HideTime(slasher)
-		if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() then -- If its already playing, we don't need to start it again.
+		if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and slasher.WasDestroyerOnce then -- If its already playing, we don't need to start it again.
 			SlashCo.AudioSystem.EnableBackgroundMusic()
 			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/igor/igors_theme.ogg", math.Clamp(100 - anger, 0, 100) / 100) -- Make the background music getting more silent the more anger he has.
 		end
 	else
+		slasher.WasDestroyerOnce = true
 		SlashCo.AudioSystem.DisableBackgroundMusic()
 	end
 end
