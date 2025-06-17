@@ -38,7 +38,9 @@ function GM:PlayerSpawn(ply, transition)
 
 	-- Stop observer mode
 	ply:UnSpectate()
-	ply:SetupHands()
+	if ply:Team() == TEAM_SURVIVOR then -- So that we have less entities & also less possible errors.
+		ply:SetupHands()
+	end
 
 	player_manager.OnPlayerSpawn(ply, transition)
 	player_manager.RunClass(ply, "Spawn")
