@@ -197,7 +197,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	--slasher:SetEyeAngles( Angle(0,pick_ang,0) )
 
 	slasher.ChaseActivationCooldown = 99
-	slasher:EmitSound("slashco/slasher/throw.mp3")
+	slasher:EmitSound("slashco/slasher/borgmire_throw.mp3")
 
 	target:Freeze(true)
 	slasher:Freeze(false)
