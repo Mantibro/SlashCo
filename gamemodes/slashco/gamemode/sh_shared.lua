@@ -197,9 +197,13 @@ GameData = GameData or {} -- A table containing data that is frequently used, al
 GameData.Map = game.GetMap()
 GameData.Lobby = GameData.Lobby or "sc_lobby" -- Map name of the default lobby, might change after GM:InitPostEntity was called(if you use it before it was called you might experience issues so don't use it too early)
 GameData.IsLobby = GameData.Map == GameData.Lobby -- true if the current map is a lobby, same as above don't use it too early.
-GameData.MaxPlayers = game.MaxPlayers()
+GameData.BaseMaxSurvivors = 6 -- Used later on to calculate balancement
+GameData.BaseMaxPlayers = GameData.BaseMaxSurvivors + 1 -- 6 survivors, 1 slasher
+GameData.MaxPlayers = GameData.BaseMaxPlayers -- This value is set in InitPostEntity & will be networked to all clients
+GameData.TotalSlots = game.MaxPlayers()
 GameData.IsSinglePlayer = game.SinglePlayer()
 GameData.IsLan = GetConVar("sv_lan"):GetBool()
+GameData.World = GameData.World or game.GetWorld()
 
 if CLIENT then
 	--GameData.LocalPlayer = nil
@@ -214,11 +218,18 @@ if CLIENT then
 	GameData.Lobby = GetGlobal2String("SlashCo:Lobby", GameData.Lobby) -- For autorefresh
 	GameData.IsLan = GetGlobal2Bool("SlashCo:IsLan", GameData.IsLan)
 	GameData.IsNewPlayer = cookie.GetNumber("slashco_totalplaycount", 0) < 3 -- We keep track how many rounds they played. If they played more than 3 rounds, their not considered a new player anymore. this variable is used to enable hints for them.
+	GameData.MaxPlayers = GetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers) -- For autorefresh
 
 	function GM:InitPostEntity()
+		GameData.World = game.GetWorld()
+		GameData.World:SetNW2VarProxy("SlashCo:MaxPlayers", function(_, _, _, newVal)
+			GameData.MaxPlayers = newVal
+		end)
+
 		GameData.IsLobby = GetGlobal2Bool("SlashCo:IsLobby", GameData.IsLobby)
 		GameData.Lobby = GetGlobal2String("SlashCo:Lobby", GameData.Lobby)
 		GameData.IsLan = GetGlobal2Bool("SlashCo:IsLan", GameData.IsLan)
+		GameData.MaxPlayers = GetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers)
 
 		if GameData.IsLan then -- We require this for multirun clients.
 			SlashCo.SetupLanOverrides()
@@ -230,7 +241,15 @@ if CLIENT then
 		GameData.LocalSteamID64 = GameData.LocalPlayer:SteamID64()
 	end
 else
+	local maxplayers = CreateConVar("slashco_maxplayers", tostring(GameData.BaseMaxPlayers), FCVAR_ARCHIVE, "The number of maximum players, by default 7. 6 survivors - 1 slasher", 1, 255)
+	cvars.AddChangeCallback("slashco_maxplayers", function(convar, _, newValue)
+		GameData.MaxPlayers = math.min(tonumber(newValue) or GameData.MaxPlayers, GameData.TotalSlots) -- We clamp it so that we cannot have more max players than slots to avoid confusion.
+		SetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers)
+	end, "slashco_maxplayers_refresh")
+
 	function GM:InitPostEntity()
+		GameData.World = game.GetWorld()
+
 		if GameData.IsLobby then
 			GameData.Lobby = GameData.Map
 			cookie.Set("SlashCo:LastLobby", GameData.Lobby)
@@ -249,6 +268,8 @@ else
 		SetGlobal2Bool("SlashCo:IsLobby", GameData.IsLobby) -- Network our state.
 		SetGlobal2String("SlashCo:Lobby", GameData.Lobby)
 		SetGlobal2Bool("SlashCo:IsLan", GameData.IsLan)
+		GameData.MaxPlayers = math.min(maxplayers and maxplayers:GetInt() or GameData.MaxPlayers, GameData.TotalSlots)
+		SetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers)
 
 		if GameData.IsLan then
 			SlashCo.SetupLanOverrides()

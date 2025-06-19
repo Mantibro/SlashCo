@@ -169,7 +169,7 @@ end
 
 ---Auto-fills some gas cans at the start of the round if there are too few players
 local function roundHeadstart()
-	if #SlashCo.CurRound.SlasherData.AllSurvivors > (math.max(GameData.MaxPlayers, 7) - 2) then
+	if #SlashCo.CurRound.SlasherData.AllSurvivors > (math.max(GameData.MaxPlayers, GameData.BaseMaxPlayers) - 2) then
 		return
 	end
 
