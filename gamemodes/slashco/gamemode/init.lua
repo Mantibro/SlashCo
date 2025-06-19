@@ -156,14 +156,14 @@ local function lobbyButtons(ply, button)
 		if button == KEY_F2 then
 			if getReadyState(ply) ~= 2 then
 				--Check if the player has made an offering or agreed to one
-				if isPlyOfferer(ply) then
+				--[[if isPlyOfferer(ply) then
 					ply:ChatPrint("Cannot ready as Slasher as you have either made or agreed to an Offering.")
 					local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 					Sndd:Play()
 					Sndd:ChangeVolume(0.5, 0)
 					Sndd:ChangePitch(65, 0)
 					return
-				end
+				end]]
 
 				lobbyPlayerReadying(ply, 2)
 				broadcastLobbyInfo()

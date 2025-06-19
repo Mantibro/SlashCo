@@ -370,13 +370,13 @@ local function lobbyRoundSetup()
 			end
 		end
 
-		if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
+		--[[if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
 			SlashCo.LobbyData.Offering = 0
 
 			for _, play in ipairs(player.GetAll()) do
 				play:ChatPrint("[SlashCo] No Spectators, Duality Offering was cleared.")
 			end
-		end
+		end]]
 
 		if SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
 			--Duality Slasher
@@ -385,15 +385,14 @@ local function lobbyRoundSetup()
 
 			:: reroll ::
 
-			dual_random = math.random(1, #team.GetPlayers(TEAM_SPECTATOR))
+			dual_random = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
+			local lobbyPlys = team.GetPlayers(TEAM_LOBBY)
 
-			if team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
+			if lobbyPlys[dual_random]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
 				goto reroll
 			end
 
-			table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64() })
-
-			--SlashCo.LobbyData.AssignedSlashers[2].steamid = team.GetPlayers(TEAM_SPECTATOR)[dual_random]:SteamID64()
+			table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = lobbyPlys[dual_random]:SteamID64() })
 
 			local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
 			p:ChatText("second_slasher")
@@ -515,7 +514,7 @@ function LobbyVendorVoice(item)
 	end
 end
 
-local MapForceCost = 50
+local MapForceCost = 100
 local function pickMap(ply, map)
 	local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
@@ -726,13 +725,13 @@ end
 function SlashCo.OfferingVoteSuccess(id)
 	local fail = false
 
-	if id == 4 and #team.GetPlayers(TEAM_SPECTATOR) < 1 then
+	--[[if id == 4 and #team.GetPlayers(TEAM_SPECTATOR) < 1 then
 		for _, ply in player.Iterator() do
 			ply:ChatText("offervote_duality_fail")
 			SlashCo.EndOfferingVote(ply)
 			fail = true
 		end
-	end
+	end]]
 
 	if id == 2 then
 		--Satiation

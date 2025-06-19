@@ -2,7 +2,7 @@ local selectedItem, selectedMap
 local itemSelectFrame, mapForce
 local SlashCoItems = SlashCoItems
 local MGSelection = false
-local mapPrice = 50
+local mapPrice = 100
 
 if GameData.IsLobby then
 	SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_1.mp3", "mono", "ItemPickerMenuClick") -- Used for all other ui sounds
@@ -42,6 +42,7 @@ local function SetConfirm()
 	function itemSelectFrame.Confirm.DoClick()
 		if MGSelection then
 			SlashCo.SendValue("pickMap", selectedMap)
+			SlashCo.AudioSystem.PlayPrecachedChannel("ItemPickerSelect")
 		else
 			SlashCo.SendValue("pickItem", selectedItem)
 			SlashCo.AudioSystem.PlayPrecachedChannel("ItemPickerSelect")
