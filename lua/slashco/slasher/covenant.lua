@@ -114,8 +114,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end)
 
 			if not slasher.RockSummoned then
-				-- First victim becomes Rocks
-				timer.Simple(4, function()
+				timer.Simple(4, function() -- First victim becomes Rocks
 					SLASHER.SummonRocks(target)
 					target:Freeze(true)
 
@@ -129,18 +128,22 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				target:SetNWBool("RocksBeingSummoned", true)
 				slasher.RockSummoned = true
 			else
-				-- Next victims becomes Cloaks
-				timer.Simple(4, function()
-					SLASHER.SummonCovenantMembers(target)
-					target:Freeze(true)
+				local slashPlys = team.GetPlayers(TEAM_SLASHER)
+				if slashPlys == 6 then
+				    return
+				else
+					timer.Simple(4, function() -- Next victims becomes Cloaks
+						SLASHER.SummonCovenantMembers(target)
+						target:Freeze(true)
 
-					timer.Simple(3, function()
-						target:Freeze(false)
-						target:SetNWBool("CloaksBeingSummoned", false)
+						timer.Simple(3, function()
+							target:Freeze(false)
+							target:SetNWBool("CloaksBeingSummoned", false)
+						end)
 					end)
-				end)
-				
-				target:SetNWBool("CloaksBeingSummoned", true)
+
+					target:SetNWBool("CloaksBeingSummoned", true)
+				end
 			end
 
 			timer.Simple(6, function()
