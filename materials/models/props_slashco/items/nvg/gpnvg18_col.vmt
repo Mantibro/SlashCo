@@ -1,14 +1,14 @@
 "VertexlitGeneric"
 {
-	"$basetexture" "mats/motoess/props/gpnvg18_col"
-	"$bumpmap" "mats/motoess/props/gpnvg18_nml"
+	"$basetexture" "models/props_slashco/items/nvg/gpnvg18_col"
+	"$bumpmap" "models/props_slashco/items/nvg/gpnvg18_nml"
 	"$color2" "[0.8 0.8 0.8]"
              //"$selfillum" "1"
              //"$selfillummaskscale" "15"
              //"$selfillummask" "/chr_ying_main_emi"
 	
 	"$normalmapalphaenvmapmask" "1"				
-	"$envmap" "mats/motoess/props/envmap"						
+	"$envmap" "models/props_slashco/items/nvg/envmap"						
 	"$envmaptint" "[.03 .03 .03]"					
  	"$envmapFresnel" "0.5"					
 
@@ -19,10 +19,10 @@
 	"$phong" "1"	
 	"$phongboost" "2"
 	"$phongexponent" "9"	
-	"$phongexponenttexture" "mats/motoess/props/upperbody_a_mask"
+	"$phongexponenttexture" "models/props_slashco/items/nvg/upperbody_a_mask"
 
-             //"$phongwarptexture" "mats/motoess/props/phongwarp2"		
-	"$lightwarptexture" "mats/motoess/props/lightwarp_soft"
+             //"$phongwarptexture" "models/props_slashco/items/nvg/phongwarp2"		
+	"$lightwarptexture" "models/props_slashco/items/nvg/lightwarp_soft"
 	"$phongtint" "[.85 .85 1]"
 	"$phongfresnelranges" "[.2 .5 5]"
 

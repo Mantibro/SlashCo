@@ -28,7 +28,7 @@ function GenDynLight(color)
 end
 
 function ITEM.OnPickUp(ply)
-	if game.GetMap() == "sc_lobby_fix" then
+	if game.GetMap() == "sc_lobby" then
 		return
 	end
 	ply:SetNWBool("NightVision", true)
@@ -115,7 +115,7 @@ hook.Add("RenderScreenspaceEffects", "NightVision", function()
 		}
 
 		DrawColorModify(nvg)
-		DrawMaterialOverlay("motoess_nvgs/motoess_nvg_filter.png", 0)
+		DrawMaterialOverlay("models/props_slashco/items/nvg/filter.png", 0)
 	else
 		return
 	end
