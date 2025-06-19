@@ -74,7 +74,7 @@ ITEM.WorldModel = {
 SlashCo.RegisterItem(ITEM, "Benadryl")
 
 if SERVER then
-	hook.Add("PostPlayerDeath", "SlashCo:RemoveHatMans", function(ply)
+	hook.Add("PostPlayerDeath", "SlashCo:RemoveBenadrylEffect", function(ply)
 		if ply:Team() ~= TEAM_SPECTATOR then return end -- They survived, let their suffering continue.
 
 		ply:SetNW2Float("InitialBenadrylTime", 0) -- Reset the benadryl time for its effects to stop.
