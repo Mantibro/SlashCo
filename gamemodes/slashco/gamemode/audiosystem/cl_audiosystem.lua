@@ -486,6 +486,7 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		Vector position - A position to play the sound from, be aware that if a entity is set it will override this position!
 		string modes - Any additional modes to pass to SlashCo.AudioSystem.CreateChannel
 		boolean noplay - Won't automatically play the sound
+		string group - If set, a hook is called allowing you to add a hook that is executed when a sound is played like this: hook.Add("SlashCO:AudioSystem:PlaySound:ExampleGroup", "Example", function(soundData, channel))
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -562,7 +563,6 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		if soundData.soundLevel and soundData.soundLevel ~= 0 then
-			channel:Set3DFadeDistance(soundData.soundLevel ^ 1.25, soundData.soundLevel ^ 1.5)
 			soundData.minDistance = soundData.soundLevel ^ 1.25
 			soundData.maxDistance = soundData.soundLevel ^ 1.5
 		end
@@ -581,6 +581,10 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil
 		if soundData.callback then
 			soundData.callback(channel)
+		end
+
+		if soundData.group then
+			hook.Run("SlashCo:AudioSystem:PlaySound:" .. soundData.group, soundData, channel)
 		end
 	end, function(errCode, errStr)
 		SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil -- Error happened, just clear it out from creation.
@@ -674,6 +678,7 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		modes = ReadSoundField(net.ReadString),
 		pan = ReadSoundField(net.ReadFloat),
 		playbackRate = ReadSoundField(net.ReadFloat),
+		group = ReadSoundField(net.ReadString),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
