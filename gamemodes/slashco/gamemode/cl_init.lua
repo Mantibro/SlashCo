@@ -762,19 +762,14 @@ end
 
 local function WasSeenBySlasher(_, _, old, new)
 	if new then
-		SlashCo.AudioSystem.CreateChannel("slashco/survivor/seen_by_slasher.mp3", "mono noplay", function(channel)
-			channel:SetVolume(0)
-			channel:Play()
-			SlashCo.AudioSystem.FadeTo(channel, 1)
-			SlashCo.AudioSystem.ParentChannelToEntity(channel, GameData.LocalPlayer)
-
-			timer.Create("SlashCo:SeenBySlasherSound", 1, 0, function() -- Properly unregister the channel when it finished playing.
-				if not IsValid(channel) or channel:GetState() != GMOD_CHANNEL_PLAYING then
-					SlashCo.AudioSystem.DestroyChannel(channel)
-					timer.Remove("SlashCo:SeenBySlasherSound")
-				end
-			end)
-		end)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/survivor/seen_by_slasher.mp3",
+			identifier = "SeenBySlasher",
+			entity = 0,
+			volume = 1,
+			fadeIn = 0.5,
+			fadeOut = 0.5,
+		})
 	end
 end
 

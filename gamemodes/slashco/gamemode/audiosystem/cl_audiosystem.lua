@@ -487,6 +487,8 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		string modes - Any additional modes to pass to SlashCo.AudioSystem.CreateChannel
 		boolean noplay - Won't automatically play the sound
 		string group - If set, a hook is called allowing you to add a hook that is executed when a sound is played like this: hook.Add("SlashCO:AudioSystem:PlaySound:ExampleGroup", "Example", function(soundData, channel))
+		boolean deleteWhenDone - If true, the channel is deleted once the sound finished playing (will ignore looping flag and still stop it).
+		number fadeOut - How many seconds before the ending it should start to fade out, and when it faded out the channel is destroyed.
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -505,7 +507,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	if isnumber(soundData.entity) then
 		entIndex = soundData.entity
 	elseif IsValid(soundData.entity) then
-		entIndex = soundData.entity:EntIndex()
+		entIndex = soundData.entity:EntIndex() -- ToDo: Should we also support clientside entities? Probably.
 	end
 
 	local existingCreationData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier]
@@ -585,6 +587,20 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 
 		if soundData.group then
 			hook.Run("SlashCo:AudioSystem:PlaySound:" .. soundData.group, soundData, channel)
+		end
+
+		if soundData.deleteWhenDone then
+			timer.Simple(channel:GetLength() + 0.2, function()
+				if not IsValid(channel) then return end
+				SlashCo.AudioSystem.DestroyChannel(channel, 0)
+			end)
+		end
+
+		if soundData.fadeOut then
+			timer.Simple(channel:GetLength() - (soundData.fadeOut + 0.2), function() -- We add 0.2 just as a buffer to ensure that it'll go fine.
+				if not IsValid(channel) then return end
+				SlashCo.AudioSystem.DestroyChannel(channel, soundData.fadeOut)
+			end)
 		end
 	end, function(errCode, errStr)
 		SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil -- Error happened, just clear it out from creation.
@@ -679,6 +695,8 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		pan = ReadSoundField(net.ReadFloat),
 		playbackRate = ReadSoundField(net.ReadFloat),
 		group = ReadSoundField(net.ReadString),
+		deleteWhenDone = ReadSoundField(net.ReadBool),
+		fadeOut = ReadSoundField(net.ReadFloat),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.

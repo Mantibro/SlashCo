@@ -50,6 +50,8 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		WriteSoundField(soundData.pan, net.WriteFloat)
 		WriteSoundField(soundData.playbackRate, net.WriteFloat)
 		WriteSoundField(soundData.group, net.WriteString)
+		WriteSoundField(soundData.deleteWhenDone, net.WriteBool)
+		WriteSoundField(soundData.fadeOut, net.WriteFloat)
 
 	if not soundData.sendToEntity then -- serverside only, its networked only to the player its being played od
 		net.Broadcast()
