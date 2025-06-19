@@ -153,6 +153,10 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [+] Created a effect for when its used.<br>
 (The effect's range matches the range of where slashers would be blinded)<br>
 
+### Benadryl
+[+] Added Hat man that spawns when you eat it.<br>
+[+] Added all the Shadow voices from SlashCo VR<br>
+
 ## Offering changes
 
 ### Duality

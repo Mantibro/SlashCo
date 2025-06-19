@@ -28,6 +28,12 @@ function ENT:Initialize()
 		self.Path = Path("Follow")
 		self:FindRandomSpot()
 
+		local target = self:GetTarget()
+		if IsValid(target) then
+			target:GiveDocument("Hat Man", 0) -- By default, as soon as the hat man spawns the player receives the initial document.
+			target.GotHatMan = true
+		end
+
 		local loco = self.loco
 		loco:SetAcceleration(500)
 		loco:SetDeceleration(1000)
@@ -170,6 +176,8 @@ function ENT:FindRandomSpot()
 end
 
 function ENT:BehaveUpdate(interval)
+	if SlashCo.State ~= SlashCo.States.IN_GAME then return end -- If the round is over, don't move.
+
 	self.loco:SetGravity(0)
 	local path = self.Path
 	if not IsValid(path) then
@@ -180,7 +188,7 @@ function ENT:BehaveUpdate(interval)
 	local target = self:GetTarget()
 	if not IsValid(target) then return end
 
-	if path:GetAge() > 5 then
+	if path:GetAge() > 1 then
 		local targetPos = target:GetPos()
 		path:Compute(self, targetPos)
 		--path:Draw()
@@ -213,6 +221,8 @@ function ENT:BehaveUpdate(interval)
 				freshlyBeingLookedAt = true
 				target:SetNW2Float("LookingAtHatMan", CurTime())
 			end
+
+			break
 		end
 	end
 

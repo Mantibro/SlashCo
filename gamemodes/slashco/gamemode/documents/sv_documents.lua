@@ -95,7 +95,7 @@ function PLAYER:GiveDocument(name, rating)
 			rating = rating
 		}
 	else
-		if documents[name].rating < rating then -- We only allow a increase in the rating
+		if documents[name].rating < rating then -- We only allow a increase in the rating in this function
 			sql.Query("UPDATE slashco_documents SET Rating = " .. rating .. " WHERE PlayerID = '" .. self:SteamID64() .. "';")
 			documents[name].rating = rating
 		end
@@ -153,6 +153,10 @@ hook.Add("SlashCo:EndRound", "SlashCo:HandoutDocuments", function(winners)
 			if not SlashCo.GetDocumentTable(name) then continue end -- No document with the Slasher's name exists...
 
 			ply:GiveDocument(name, rating)
+		end
+
+		if ply.GotHatMan then
+			ply:GiveDocument("Hat Man", rating)
 		end
 	end
 end)

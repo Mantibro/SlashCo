@@ -179,18 +179,18 @@ local selection = {
 		local slasher = SlashCo.HasDocument(selectedDocument.Name) and SlashCoSlashers[selectedDocument.Slasher] or nil
 
 		surface.SetDrawColor(255, 255, 255, 255)
-		surface.SetMaterial(slasher and Material("slashco/ui/icons/slasher/s_" .. slasher.ID) or unknownIcon)
+		surface.SetMaterial(slasher and Material("slashco/ui/icons/slasher/s_" .. slasher.ID) or (selectedDocument.ID and Material("slashco/ui/icons/slasher/s_" .. selectedDocument.ID) or unknownIcon))
 		surface.DrawTexturedRect(w / 20, h - (h / 2.7), w / 3, h / 3)
 
-		draw.SimpleText("[" .. string.upper(slasher and slasher.Name or "UNKNOWN") .. "]", "TVCDMediumBig", h / 1.45, w / 1.3, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-		if slasher then
-			draw.SimpleText(string.upper(SlashCo.DangerLevel[slasher.DangerLevel] .. " " .. SlashCo.SlasherClass[slasher.Class]), "TVCDMedium", h / 1.45, w / 1.17, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("[" .. string.upper(slasher and slasher.Name or (selectedDocument.Name or "UNKNOWN")) .. "]", "TVCDMediumBig", h / 1.45, w / 1.3, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		if slasher or (selectedDocument.DangerLevel and selectedDocument.Class) then
+			draw.SimpleText(string.upper(SlashCo.DangerLevel[slasher and slasher.DangerLevel or selectedDocument.DangerLevel] .. " " .. SlashCo.SlasherClass[slasher and slasher.Class or selectedDocument.Class]), "TVCDMedium", h / 1.45, w / 1.17, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		else
 			draw.SimpleText("ENCOUNTER SLASHER TO UNLOCK ENTRY", "TVCDSmall", h / 1.45, w / 1.17, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 
-		if IsPressing(MOUSE_LEFT) and slasher then
-			SwitchSelection("Slasher-" .. selectedDocument.Name)
+		if IsPressing(MOUSE_LEFT) and (slasher or selectedDocument.ID) then
+			SwitchSelection("Slasher-" .. (selectedDocument.Slasher or selectedDocument.Name))
 		end
 
 		if IsPressing(MOUSE_RIGHT) then
@@ -236,21 +236,27 @@ end
 
 for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 	local slasher = SlashCoSlashers[document.Slasher]
-	if not slasher then continue end -- No slasher? Then something is invalid
+	local Aliases = document.Aliases or (slasher and slasher.Aliases or {})
+	local Class = string.upper(SlashCo.SlasherClass[document.Class or (slasher and slasher.Class or SlashCo.SlasherClass.Unknown)])
+	local DangerLevel = string.upper(SlashCo.DangerLevel[document.DangerLevel or (slasher and slasher.DangerLevel or SlashCo.DangerLevel.Unknown)])
+	local Name = slasher and slasher.Name or document.Name
+	local ID = slasher and slasher.ID or document.ID
+
+	if not Aliases or not Class or not DangerLevel or not ID then continue end -- No slasher and no data? Then something is invalid
 
 	local descriptionRows = SplitTextIntoRows(document.Description, "TVCD", screenSize / 1.01)
 	local additionalDescriptionRows = SplitTextIntoRows(document.AdditionalDescription, "TVCD", screenSize / 1.01)
 
-	local icon = Material("slashco/ui/icons/slasher/s_" .. slasher.ID)
+	local icon = Material("slashco/ui/icons/slasher/s_" .. ID)
 	selection["Slasher-" .. (document.Slasher or document.Name)] = function(w, h)
 		local row = 1
 		local rowSize = w / 32
-		draw.SimpleText("ENTRY: \"" .. slasher.Name .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText("ENTRY: \"" .. Name .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
 		draw.SimpleText("ALIASES:", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
-		for _, name in ipairs(slasher.Aliases or {}) do
+		for _, name in ipairs(Aliases) do
 			row = row + 1
 			draw.SimpleText("\"" .. name .. "\"", "TVCD", h / 3.1, rowSize * row, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
@@ -259,13 +265,13 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 		draw.SimpleText("CLASS:", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
-		draw.SimpleText("[" .. string.upper(SlashCo.SlasherClass[slasher.Class]) .. "]", "TVCD", h / 3.1, rowSize * row, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("[" .. Class .. "]", "TVCD", h / 3.1, rowSize * row, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		row = row + 1
 		draw.SimpleText("DANGER LVL:", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
-		draw.SimpleText("[" .. string.upper(SlashCo.DangerLevel[slasher.DangerLevel]) .. "]", "TVCD", h / 3.1, rowSize * row, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("[" .. DangerLevel .. "]", "TVCD", h / 3.1, rowSize * row, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		if row < 13 then -- Offset to align everything
 			row = 13
