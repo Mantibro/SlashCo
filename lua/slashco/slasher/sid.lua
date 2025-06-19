@@ -235,7 +235,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 				local idx = math.random(1,4)
 				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3"
+					soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3",
 					identifier = "SidAngry" .. idx,
 					minDistance = 750,
 					maxDistance = 1250,
@@ -725,7 +725,7 @@ function SLASHER.SidRage(ply)
 
 		local idx = math.random(1,4)
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3"
+			soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3",
 			identifier = "SidAngry" .. idx,
 			minDistance = 750,
 			maxDistance = 1250,
