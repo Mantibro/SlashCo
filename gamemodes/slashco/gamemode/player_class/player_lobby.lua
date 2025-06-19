@@ -13,6 +13,7 @@ PLAYER.WalkSpeed = 200
 PLAYER.RunSpeed = 350
 PLAYER.StartHealth = 100
 PLAYER.MaxHealth = 100
+PLAYER.AvoidPlayers = false -- Stops players from being pushed out of each other.
 
 function PLAYER:Loadout()
 	self.Player:RemoveAllAmmo()

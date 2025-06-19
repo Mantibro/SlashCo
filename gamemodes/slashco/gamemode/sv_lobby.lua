@@ -410,6 +410,7 @@ local function lobbyRoundSetup()
 
 				ply:SetTeam(TEAM_SURVIVOR)
 				ply:Spawn()
+				ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
 
 				print("Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
 			end
