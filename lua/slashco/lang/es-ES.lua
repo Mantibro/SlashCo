@@ -151,7 +151,7 @@ SlashCo.LangTable["Beacon_already_on_way"] = "El Helicóptero ya viene de camino
 SlashCo.LangTable["Beacon_already_active"] = "Ya se usó una Baliza."
 SlashCo.LangTable["Beacon_confirm"] = "Usar la Baliza con más de un sobreviviente vivo causara que tome tiempo usarla. Úsala otra vez para confirmar."
 SlashCo.LangTable["Beacon_unavailable"] = "No puedes activar la Baliza si no se ha prendido ningún generador."
-SlashCo.LangTable["Beacon_unavailable_players"] = "No puedes activar la Baliza si hay mas de 5 jugadores con vida."
+SlashCo.LangTable["Beacon_survivors"] = "No puedes activar la Baliza si hay mas de 5 supervivientes con vida."
 
 SlashCo.LangTable["BalkanBoost"] = "Impulso Balcanico"
 SlashCo.LangTable["BalkanBoost_desc"] = "Creo que la FDA esta demasiado asustada para regular esto.\nUsa bajo tu propia discrecion.\nCuando estes pasando un infierno, sigue adelante."

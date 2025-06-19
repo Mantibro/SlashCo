@@ -147,6 +147,7 @@ SlashCo.LangTable["Beacon_already_on_way"] = "The Helicopter is already on its w
 SlashCo.LangTable["Beacon_already_active"] = "There is already a beacon deployed."
 SlashCo.LangTable["Beacon_confirm"] = "Using the beacon with more than 1 living survivor will cause it to take time to arm. Use again to confirm."
 SlashCo.LangTable["Beacon_unavailable"] = "You can activate the beacon once one generator has been turned on."
+SlashCo.LangTable["Beacon_survivors"] = "You can't activate the beacon if there more than 5 survivors alive."
 
 SlashCo.LangTable["Benadryl"] = "25 gram Benadryl"
 SlashCo.LangTable["Benadryl_desc"] = "All new 25 gram Benadryl, made from 1200 pills.\n Feel free to take this if you feel the Assignments aren't challenging enough as is."

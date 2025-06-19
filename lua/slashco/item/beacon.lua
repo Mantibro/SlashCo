@@ -53,6 +53,11 @@ function ITEM.OnUse(ply)
 
 		return true
 	end
+	
+	if team.NumPlayers(TEAM_SURVIVOR) > 5 then --don't speedrun this
+		ply:ChatText("Beacon_survivors")
+		return true
+	end
 
 	if team.NumPlayers(TEAM_SURVIVOR) > 1 then --slow beacon arming
 		local ent = SlashCo.CreateItem("sc_activebeacon", ply:WorldSpaceCenter(), Angle(0, 0, 0))
