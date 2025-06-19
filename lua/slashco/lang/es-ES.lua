@@ -23,7 +23,7 @@ SlashCo.LangTable["SomeRescued"] = "Solo algunos de los empleados de SlashCo fue
 SlashCo.LangTable["NoneRescued"] = "Ningún empleado de SlashCo fue rescatado."
 SlashCo.LangTable["Cursed"] = "Te han hecho brujería."
 SlashCo.LangTable["Judgement"] = "JUICIO"
-SlashCo.LangTable["newplayer_spawnnotice"] = "Presiona [%s] para generar"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Presiona [%s] para entrar"
 
 SlashCo.LangTable["HP"] = "VIDA"
 SlashCo.LangTable["FUEL"] = "COMBUSTIBLE"
