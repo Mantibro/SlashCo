@@ -22,7 +22,7 @@ SLASHER.ChaseRadius = 0.82
 SLASHER.ChaseDuration = 7.0
 SLASHER.ChaseCooldown = 5
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/abomignat_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/abomignat/abomignat_chase.mp3"
 SLASHER.KillSound = ""
 SLASHER.Description = "Abomignat_desc"
 SLASHER.ProTip = "Abomignat_tip"
@@ -31,7 +31,7 @@ SLASHER.EyeRating = "★★★★☆"
 SLASHER.DiffRating = "★★☆☆☆"
 
 function SLASHER.OnSpawn(slasher)
-	slasher:PlayGlobalSound("slashco/slasher/abomignat_breathing.mp3", 65, nil, true)
+	slasher:PlayGlobalSound("slashco/slasher/abomignat/abomignat_breathing.mp3", 65, nil, true)
 	slasher.AbomignatKills = 0
 
 	slasher.SlashCD = 0
@@ -68,7 +68,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if (slasher:GetVelocity():Length() < 450 or target:IsValid()) and LungeDuration > 30 and slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
-				slasher:EmitSound("slashco/slasher/abomignat_scream" .. math.random(1, 3) .. ".mp3")
+				slasher:EmitSound("slashco/slasher/abomignat/abomignat_scream" .. math.random(1, 3) .. ".mp3")
 			end)
 
 			slasher:SetNWBool("AbomignatLunging", false)
@@ -191,7 +191,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	slasher.SlashCD = 3 - (SO * 3)
 	slasher.FowardCharge = 6
 
-	slasher:EmitSound("slashco/slasher/abomignat_scream" .. math.random(1, 3) .. ".mp3")
+	slasher:EmitSound("slashco/slasher/abomignat/abomignat_scream" .. math.random(1, 3) .. ".mp3")
 	slasher:SlasherHudFunc("ShakeControl", "LMB")
 
 	local function SlashFinish()
@@ -289,14 +289,14 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	slasher:Freeze(true)
 
 	slasher:SetNWBool("AbomignatLunging", true)
-	slasher:EmitSound("slashco/slasher/abomignat_lunge.mp3")
+	slasher:EmitSound("slashco/slasher/abomignat/abomignat_lunge.mp3")
 	slasher:SlasherHudFunc("ShakeControl", "F")
 
 	timer.Simple(1.75, function()
 		if slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
-				slasher:EmitSound("slashco/slasher/abomignat_scream" .. math.random(1, 3) .. ".mp3")
+				slasher:EmitSound("slashco/slasher/abomignat/abomignat_scream" .. math.random(1, 3) .. ".mp3")
 			end)
 
 			slasher:SetNWBool("AbomignatLunging", false)
@@ -378,7 +378,7 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/abomignat_step" .. math.random(1, 3) .. ".mp3")
+		ply:EmitSound("slashco/slasher/abomignat/abomignat_step" .. math.random(1, 3) .. ".mp3")
 		return true
 	end
 

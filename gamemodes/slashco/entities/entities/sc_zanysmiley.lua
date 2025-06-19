@@ -106,7 +106,16 @@ function ENT:RunBehaviour()
 
 			-- Now that we have a enemy, the code in this block will run
 			self:SetSequence(self:LookupSequence("attack"))
-			self:EmitSound("slashco/slasher/zany_attack.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/freesmiley/zany_attack.mp3",
+				identifier = "ZanyAttack",
+				minDistance = 700,
+				maxDistance = 1240,
+				looping = true,
+				entity = self,
+				volume = 1,
+				fadeIn = 0,
+			})
 			self.loco:FaceTowards(self:GetEnemy():GetPos())	-- Face our enemy
 			--self:StartActivity( ACT_WALK )			-- Set the animation
 			self.loco:SetDesiredSpeed(350)		-- Set the speed that we will be moving at. Don't worry, the animation will speed up/slow down to match
@@ -120,7 +129,17 @@ function ENT:RunBehaviour()
 			-- Since we can't find an enemy, lets wander
 			-- Its the same code used in Garry's test bot
 			self:SetSequence(self:LookupSequence("idle"))
-			self:EmitSound("slashco/slasher/zany_breath" .. math.random(1, 3) .. ".mp3")
+			local idx = math.random(1, 3)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/freesmiley/zany_breath" .. idx .. ".mp3",
+				identifier = "ZanyBreath" .. idx,
+				minDistance = 700,
+				maxDistance = 1240,
+				looping = false,
+				entity = self,
+				volume = 1,
+				fadeIn = 0,
+			})
 			--self:StartActivity( ACT_WALK )			-- Walk anmimation
 			self.loco:SetDesiredSpeed(50)		-- Walk speed
 
@@ -292,7 +311,7 @@ function ENT:Think()
 			v:SetNWBool("MarkedBySmiley", false)
 			v.BeenMarked = nil
 			timer.Remove("zanyMark_" .. v:UserID())
-			self:StopSound("slashco/slasher/zany_attack.mp3")
+			SlashCo.AudioSystem.StopSound("ZanyAttack", 0)
 			self:Remove()
 		end
 	end

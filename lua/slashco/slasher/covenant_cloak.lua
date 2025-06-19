@@ -212,7 +212,7 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
+		ply:EmitSound("slashco/slasher/bababooey/babastep_0" .. math.random(1, 3) .. ".mp3")
 		return true
 	end
 

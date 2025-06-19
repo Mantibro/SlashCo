@@ -22,8 +22,8 @@ SLASHER.ChaseRadius = 0.92
 SLASHER.ChaseDuration = 8.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/thirsty_chase.mp3"
-SLASHER.KillSound = "slashco/slasher/thirsty_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/thirsty/thirsty_chase.mp3"
+SLASHER.KillSound = "slashco/slasher/thirsty/thirsty_kill.mp3"
 SLASHER.Description = "Thirsty_desc"
 SLASHER.ProTip = "Thirsty_tip"
 SLASHER.SpeedRating = "★☆☆☆☆"
@@ -169,7 +169,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 			return
 		end
 
-		slasher:EmitSound("slashco/slasher/thirsty_drink.mp3")
+		slasher:EmitSound("slashco/slasher/thirsty/thirsty_drink.mp3")
 	end)
 
 	timer.Simple(4.5, function()
@@ -373,8 +373,8 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
 			if g_thirstySound == nil then
-				surface.PlaySound("slashco/slasher/thirsty_rage1.mp3")
-				surface.PlaySound("slashco/slasher/thirsty_rage2.mp3")
+				surface.PlaySound("slashco/slasher/thirsty/thirsty_rage1.mp3")
+				surface.PlaySound("slashco/slasher/thirsty/thirsty_rage2.mp3")
 				g_thirstySound = true
 			end
 		end

@@ -23,7 +23,7 @@ SLASHER.ChaseDuration = 0.0
 SLASHER.ChaseCooldown = 10
 SLASHER.JumpscareDuration = 4
 SLASHER.ChaseMusic = ""
-SLASHER.KillSound = "slashco/slasher/criminal_kill.mp3"
+SLASHER.KillSound = "slashco/slasher/criminal/criminal_kill.mp3"
 SLASHER.Description = "Criminal_desc"
 SLASHER.ProTip = "Criminal_tip"
 SLASHER.SpeedRating = "★★★★☆"
@@ -115,8 +115,8 @@ function SLASHER.OnSecondaryFire(slasher)
 			if clone.IsMain ~= true then
 				clone:Remove()
 			end
-			clone:StopSound("slashco/slasher/criminal_loop.wav")
-			clone:StopSound("slashco/slasher/criminal_rage.wav")
+			SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5)
+			SlashCo.AudioSystem.StopSound("CriminalRage", 0.5)
 		end
 
 		slasher:SetNWBool("CriminalCloning", false)
@@ -181,7 +181,7 @@ function SLASHER.Footstep(ply)
 		end
 
 		if ply.CrimStepTick == 0 then
-			ply:EmitSound("slashco/slasher/criminal_step" .. math.random(1, 6) .. ".mp3")
+			ply:EmitSound("slashco/slasher/criminal/criminal_step" .. math.random(1, 6) .. ".mp3")
 		end
 
 		ply.CrimStepTick = ply.CrimStepTick + 1

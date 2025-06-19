@@ -18,8 +18,8 @@ SLASHER.ChaseRadius = 0.9
 SLASHER.ChaseDuration = 5.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/male07_chase.mp3"
-SLASHER.KillSound = "slashco/slasher/male07_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/male07/male07_chase.mp3"
+SLASHER.KillSound = "slashco/slasher/male07/male07_kill.mp3"
 SLASHER.Description = "Male07_desc"
 SLASHER.ProTip = "Male07_tip"
 SLASHER.SpeedRating = "★★★★★"
@@ -164,7 +164,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		slasher.SlashCooldown = 2
 
 		timer.Simple(0.5, function()
-			slasher:EmitSound("slashco/slasher/trollge_swing.mp3")
+			slasher:EmitSound("slashco/slasher/trollge/trollge_swing.mp3")
 
 			if SERVER then
 				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
@@ -184,7 +184,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					bloodfx:SetOrigin(vPoint)
 					util.Effect("BloodImpact", bloodfx)
 
-					target1:EmitSound("slashco/slasher/trollge_hit.mp3")
+					target1:EmitSound("slashco/slasher/trollge/trollge_hit.mp3")
 				end
 
 				SlashCo.BustDoor(slasher, target, 30000)
@@ -211,7 +211,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end
 
 	if IsValid(target) and target:GetClass() == "sc_maleclone" and slasher:GetPos():Distance(target:GetPos()) < 150 then
-		slasher:EmitSound("slashco/slasher/male07_possess.mp3")
+		slasher:EmitSound("slashco/slasher/male07/male07_possess.mp3")
 
 		slasher:SetPos(target:GetPos())
 		slasher:SetEyeAngles(target:EyeAngles())
@@ -243,7 +243,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		SlashCo.CreateItem("sc_maleclone", slasher:GetPos(), slasher:GetAngles())
 
 		slasher.MaleState = 0
-		slasher:EmitSound("slashco/slasher/male07_unpossess" .. math.random(1, 2) .. ".mp3")
+		slasher:EmitSound("slashco/slasher/male07/male07_unpossess" .. math.random(1, 2) .. ".mp3")
 		slasher.MaleCooldown = 3
 
 		slasher:SetWalkSpeed(300)

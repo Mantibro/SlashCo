@@ -296,7 +296,17 @@ function ENT:Think()
 		attacked:SetNWBool("MarkedBySmiley", true)
 
 		if self.AttackEngage == false then
-			self:EmitSound("slashco/slasher/pensive_attack" .. math.random(1, 2) .. ".mp3")
+			local idx = math.random(1, 2)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/freesmiley/pensive_attack" .. idk .. ".mp3",
+				identifier = "PensiveAttack" .. idx,
+				minDistance = 700,
+				maxDistance = 1240,
+				looping = false,
+				entity = self,
+				volume = 1,
+				fadeIn = 0,
+			})
 
 			timer.Simple(20, function()
 				if not IsValid(attacked) then

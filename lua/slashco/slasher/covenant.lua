@@ -23,7 +23,7 @@ SLASHER.ChaseRadius = 0.7
 SLASHER.ChaseDuration = 30.0
 SLASHER.ChaseCooldown = 7
 SLASHER.JumpscareDuration = 2.0
-SLASHER.ChaseMusic = "slashco/slasher/covenant_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/covenant/covenant_chase.mp3"
 SLASHER.KillSound = ""
 SLASHER.Description = "Covenant_desc"
 SLASHER.ProTip = "Covenant_tip"
@@ -32,7 +32,7 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
 function SLASHER.OnSpawn(slasher)
-	slasher:PlayGlobalSound("slashco/slasher/ltg_ritual" .. math.random(1, 6) .. ".mp3", 100)
+	slasher:PlayGlobalSound("slashco/slasher/covenant/covenant_ritual" .. math.random(1, 6) .. ".mp3", 100)
 	slasher:SetNWBool("CanChase", true)
 	slasher.RockSummoned = false
 end
@@ -167,7 +167,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				slasher:Freeze(false)
 			end)
 
-			slasher:EmitSound("slashco/slasher/ltg_summoning.mp3")
+			slasher:EmitSound("slashco/slasher/covenant/covenant_summoning.mp3")
 			slasher:SetNWBool("CovenantSummoning", true)
 			slasher:Freeze(true)
 		end)
@@ -198,7 +198,7 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
+		ply:EmitSound("slashco/slasher/bababooey/babastep_0" .. math.random(1, 3) .. ".mp3")
 		return true
 	end
 

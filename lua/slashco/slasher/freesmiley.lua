@@ -22,8 +22,8 @@ SLASHER.ChaseRadius = 0.85
 SLASHER.ChaseDuration = 9.0
 SLASHER.ChaseCooldown = 4
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/freesmiley_chase.mp3"
-SLASHER.KillSound = "slashco/slasher/freesmiley_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/freesmiley/freesmiley_chase.mp3"
+SLASHER.KillSound = "slashco/slasher/freesmiley/freesmiley_kill.mp3"
 SLASHER.Description = "FreeSmiley_desc"
 SLASHER.ProTip = "FreeSmiley_tip"
 SLASHER.SpeedRating = "★☆☆☆☆"
@@ -278,7 +278,7 @@ end
 
 function SLASHER.SmileyIdle(slasher)
 	if not slasher:GetNWBool("InSlasherChaseMode") then
-		slasher:EmitSound("slashco/slasher/freesmiley_idle" .. math.random(1, 7) .. ".mp3")
+		slasher:EmitSound("slashco/slasher/freesmiley/freesmiley_idle" .. math.random(1, 7) .. ".mp3")
 	end
 
 	timer.Simple(math.random(3, 5), function()

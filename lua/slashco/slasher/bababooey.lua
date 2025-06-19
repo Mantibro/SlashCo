@@ -23,8 +23,8 @@ SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1.5
-SLASHER.ChaseMusic = "slashco/slasher/baba_chase.mp3"
-SLASHER.KillSound = "slashco/slasher/baba_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/bababooey/baba_chase.mp3"
+SLASHER.KillSound = "slashco/slasher/bababooey/baba_kill.mp3"
 SLASHER.Description = "Bababooey_desc"
 SLASHER.ProTip = "Bababooey_tip"
 SLASHER.SpeedRating = "★★★☆☆"
@@ -41,7 +41,7 @@ end
 
 function SLASHER.DoSound(slasher)
 	if slasher:GetNWBool("BababooeyInvisibility") then
-		slasher:EmitSound("slashco/slasher/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))
+		slasher:EmitSound("slashco/slasher/bababooey/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))
 	end
 
 	timer.Simple(math.random(6, 10), function()
@@ -115,20 +115,20 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
 
 		slasher.TriggerCooldown = 4
-		slasher:EmitSound("slashco/slasher/baba_hide.mp3")
+		slasher:EmitSound("slashco/slasher/bababooey/baba_hide.mp3")
 
 		timer.Simple(1, function()
 			--Delay for entering invisibility
 
 			slasher:SetVisible(false)
 
-			slasher:PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130)
+			slasher:PlayGlobalSound("slashco/slasher/bababooey/bababooey_loud.mp3", 130)
 
 			slasher:SetRunSpeed(200)
 			slasher:SetWalkSpeed(200)
 		end)
 	else
-		slasher:EmitSound("slashco/slasher/baba_reveal.mp3")
+		slasher:EmitSound("slashco/slasher/bababooey/baba_reveal.mp3")
 
 		slasher:SlasherHudFunc("SetAvatar", "default")
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
@@ -144,7 +144,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 				slasher:SetNWBool("BababooeySpooking", true)
 				slasher.KillCooldown = 2
 				slasher.SpookCooldown = 2
-				slasher:EmitSound("slashco/slasher/baba_scare.mp3", 100)
+				slasher:EmitSound("slashco/slasher/bababooey/baba_scare.mp3", 100)
 				slasher:Freeze(true)
 				timer.Simple(2.5, function()
 					slasher:Freeze(false)
@@ -218,7 +218,7 @@ function SLASHER.Footstep(ply)
 			return true
 		end
 
-		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
+		ply:EmitSound("slashco/slasher/bababooey/babastep_0" .. math.random(1, 3) .. ".mp3")
 		return true
 	end
 

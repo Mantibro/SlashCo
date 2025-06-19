@@ -22,8 +22,8 @@ SLASHER.ChaseRadius = 0.9
 SLASHER.ChaseDuration = 9.0
 SLASHER.ChaseCooldown = 2
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/manspider_chase.mp3"
-SLASHER.KillSound = "slashco/slasher/manspider_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/manspider/manspider_chase.mp3"
+SLASHER.KillSound = "slashco/slasher/manspider/manspider_kill.mp3"
 SLASHER.Description = "Manspider_desc"
 SLASHER.ProTip = "Manspider_tip"
 SLASHER.SpeedRating = "★★★☆☆"
@@ -87,7 +87,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeNested = TimeNested + FrameTime()
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
-			slasher:StopSound("slashco/slasher/manspider_idle.mp3")
+			slasher:StopSound("slashco/slasher/manspider/manspider_idle.mp3")
 			slasher:SetJumpPower(0)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
@@ -111,7 +111,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				continue
 			end
 
-			slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
+			slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
 			slasher.TargetPlayer = s:SteamID64()
 			slasher:SetNWBool("ManspiderNested", false)
 
@@ -126,7 +126,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeNested = 0
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
-			slasher:PlayGlobalSound("slashco/slasher/manspider_idle.mp3", 50, nil, true)
+			slasher:PlayGlobalSound("slashco/slasher/manspider/manspider_idle.mp3", 50, nil, true)
 			slasher:SetJumpPower(slasher.Jump)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
@@ -157,7 +157,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				if Aggression > 100 then
 					slasher.TargetPlayer = s:SteamID64()
-					slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
+					slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
 				end
 			end
 		else
@@ -280,7 +280,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	slasher.LeapCooldown = 15
 
 	slasher:Freeze(true)
-	slasher:EmitSound("slashco/slasher/manspider_scream" .. math.random(1, 4) .. ".mp3")
+	slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
 
 	timer.Simple(1, function()
 		if not IsValid(slasher) then
@@ -324,7 +324,7 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/manspider_step.mp3")
+		ply:EmitSound("slashco/slasher/manspider/manspider_step.mp3")
 		return true
 	end
 

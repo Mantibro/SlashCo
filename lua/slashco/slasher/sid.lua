@@ -22,8 +22,8 @@ SLASHER.ChaseRadius = 0.96
 SLASHER.ChaseDuration = 6.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1
-SLASHER.ChaseMusic = "slashco/slasher/sid_chase.mp3"
-SLASHER.KillSound = "slashco/slasher/sid_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/sid/sid_chase.mp3"
+SLASHER.KillSound = "slashco/slasher/sid/sid_kill.mp3"
 SLASHER.Description = "Sid_desc"
 SLASHER.ProTip = "Sid_tip"
 SLASHER.SpeedRating = "★★☆☆☆"
@@ -111,7 +111,16 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("SidGunLetterC") and slasher:GetNWBool("SidGunEquipped") then
 		slasher:SetNWBool("SidGunLetterC", true)
-		slasher:PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.mp3", 95, 0.5)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_THE_LETTER_C.mp3",
+			identifier = "SidLetterC",
+			minDistance = 750,
+			maxDistance = 1400,
+			looping = true,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
 	if slasher:GetNWInt("SidGunUses") ~= Cookies then
@@ -155,9 +164,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			slasher:SetNWBool("SidGunShoot", true)
 
-			slasher:PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150)
-			slasher:PlayGlobalSound("slashco/slasher/sid_shot.mp3", 85)
-			slasher:PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 70)
+			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot_farthest.mp3", 150)
+			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot.mp3", 85)
+			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot_legacy.mp3", 70)
 
 			slasher:FireBullets(
 					{
@@ -224,7 +233,17 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				target:SetNWBool("SurvivorBeingJumpscared", true)
 				slasher:SetNWBool("CanChase", false)
 
-				slasher:PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 85)
+				local idx = math.random(1,4)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3"
+					identifier = "SidAngry" .. idx,
+					minDistance = 750,
+					maxDistance = 1250,
+					looping = false,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
 
 				slasher:SetNWBool("SidExecuting", true)
 
@@ -267,10 +286,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 					target:SetNWBool("SurvivorBeingJumpscared", false)
 
-					slasher:PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150)
+					slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot_farthest.mp3", 150)
 
-					slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
-					slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
+					slasher:EmitSound("slashco/slasher/sid/sid_shot.mp3", 95)
+					slasher:EmitSound("slashco/slasher/sid/sid_shot_2.mp3", 85)
 
 					local vec, ang = slasher:GetBonePosition(slasher:LookupBone("HandL"))
 					local vPoint = vec
@@ -332,7 +351,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		slasher:SetSlowWalkSpeed(1)
 		slasher:SetWalkSpeed(1)
 		slasher:SetRunSpeed(1)
-		slasher:EmitSound("slashco/slasher/sid_draw.mp3", 75, 110)
+		slasher:EmitSound("slashco/slasher/sid/sid_draw.mp3", 75, 110)
 
 		timer.Simple(1, function()
 			if not IsValid(slasher) then
@@ -341,7 +360,7 @@ function SLASHER.OnSecondaryFire(slasher)
 
 			slasher:SetNWBool("SidGunAiming", false)
 			slasher:SetNWBool("SidGunAimed", true)
-			slasher:EmitSound("slashco/slasher/sid_clipout.mp3")
+			slasher:EmitSound("slashco/slasher/sid/sid_clipout.mp3")
 			slasher.GunSpread = 2
 		end)
 	elseif slasher:GetNWBool("SidGunAimed") and slasher.GunCooldown < 0.01 then
@@ -373,12 +392,12 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 	slasher:SetNWBool("SidEating", true)
 	slasher.Pacification = 99
-	slasher:EmitSound("slashco/slasher/sid_cookie" .. math.random(1, 2) .. ".mp3")
+	slasher:EmitSound("slashco/slasher/sid/sid_cookie" .. math.random(1, 2) .. ".mp3")
 
 	target:SetNWBool("BeingEaten", true)
 
 	timer.Simple(1.3, function()
-		slasher:EmitSound("slashco/slasher/sid_eating.mp3")
+		slasher:EmitSound("slashco/slasher/sid/sid_eating.mp3")
 	end)
 
 	slasher:Freeze(true)
@@ -421,11 +440,11 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			--Show the gun model
 
 			slasher:SetBodygroup(1, 1)
-			slasher:EmitSound("slashco/slasher/sid_draw.mp3")
+			slasher:EmitSound("slashco/slasher/sid/sid_draw.mp3")
 		end)
 		timer.Simple(2.25, function()
 			--sound
-			slasher:EmitSound("slashco/slasher/sid_slideback.mp3", 75, 75)
+			slasher:EmitSound("slashco/slasher/sid/sid_slideback.mp3", 75, 75)
 			slasher:SlasherHudFunc("SetCrosshairProngs", 4)
 		end)
 
@@ -447,7 +466,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher:SetNWBool("SidGun", false)
 		slasher:SetBodygroup(1, 0)
 		slasher:SetNWBool("SidGunLetterC", false)
-		slasher:StopSound("slashco/slasher/sid_THE_LETTER_C.mp3")
+		SlashCo.AudioSystem.StopSound("SidLetterC", 0.5)
 		slasher.Pacification = math.random(5, 15)
 	end
 end
@@ -540,7 +559,7 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/sid_step" .. math.random(1, 2) .. ".mp3")
+		ply:EmitSound("slashco/slasher/sid/sid_step" .. math.random(1, 2) .. ".mp3")
 		return true
 	end
 
@@ -704,7 +723,17 @@ function SLASHER.SidRage(ply)
 
 		slasher.EatedCookies = slasher.EatedCookies + 2
 
-		slasher:PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 95)
+		local idx = math.random(1,4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3"
+			identifier = "SidAngry" .. idx,
+			minDistance = 750,
+			maxDistance = 1250,
+			looping = false,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		for _, v in player.Iterator() do
 			v:SetNWBool("SidFuck", true)
@@ -715,7 +744,7 @@ function SLASHER.SidRage(ply)
 				v:SetNWBool("SidFuck", false)
 			end
 
-			slasher:PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85)
+			slasher:PlayGlobalSound("slashco/slasher/sid/sid_sad_1.mp3", 85)
 		end)
 	end
 end
@@ -748,7 +777,7 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
 			if c == nil then
-				surface.PlaySound("slashco/slasher/sid_rage_drone.mp3")
+				surface.PlaySound("slashco/slasher/sid/sid_rage_drone.mp3")
 				c = true
 			end
 		end

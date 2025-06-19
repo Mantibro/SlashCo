@@ -9,8 +9,8 @@ ENT.Spawnable		= true
 
 hook.Add("SlashCo:Precache", "PrecacheClone", function()
 	SlashCo.PrecacheModel("models/slashco/slashers/criminal/criminal.mdl")
-	SlashCo.PrecacheSound("slashco/slasher/criminal_rage.mp3")
-	SlashCo.PrecacheSound("slashco/slasher/criminal_loop.mp3")
+	SlashCo.PrecacheSound("slashco/slasher/criminal/criminal_rage.mp3")
+	SlashCo.PrecacheSound("slashco/slasher/criminal/criminal_loop.mp3")
 end)
 
 function ENT:SetupDataTables()
@@ -37,12 +37,33 @@ function ENT:RunBehaviour()
 
 		self:StartActivity(ACT_IDLE)
 		if self.IsMain ~= true then
-			if rage_switch then self:EmitSound("slashco/slasher/criminal_rage.mp3")
-			else self:EmitSound("slashco/slasher/criminal_loop.mp3") end
+			if rage_switch then
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/criminal/criminal_rage.mp3",
+					identifier = "CriminalRage",
+					minDistance = 850 * SlashCo.MapSize,
+					maxDistance = 1550 * SlashCo.MapSize,
+					looping = true,
+					entity = self,
+					volume = 1,
+					fadeIn = 0,
+				})
+			else
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/criminal/criminal_loop.mp3",
+					identifier = "CriminalLoop",
+					minDistance = 700 * SlashCo.MapSize,
+					maxDistance = 1240 * SlashCo.MapSize,
+					looping = true,
+					entity = self,
+					volume = 1,
+					fadeIn = 0,
+				}) 
+			end
 		end
 		coroutine.wait(10)
-		self:StopSound("slashco/slasher/criminal_loop.mp3")
-		self:StopSound("slashco/slasher/criminal_rage.mp3")
+		SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5)
+		SlashCo.AudioSystem.StopSound("CriminalRage", 0.5)
 
 		coroutine.yield()
 	end
