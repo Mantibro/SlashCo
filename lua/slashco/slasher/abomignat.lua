@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"The Rat",
 }
 SLASHER.ID = 11
-SLASHER.Class = 1
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/abomignat/abomignat.mdl"
 SLASHER.GasCanMod = 0

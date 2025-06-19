@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Itsy Bitsy",
 }
 SLASHER.ID = 9
-SLASHER.Class = 1
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/manspider/manspider.mdl"
 SLASHER.GasCanMod = 0

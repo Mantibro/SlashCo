@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Big Brother",
 }
 SLASHER.ID = 10
-SLASHER.Class = 3
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Umbra
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/watcher/watcher.mdl"
 SLASHER.GasCanMod = 0

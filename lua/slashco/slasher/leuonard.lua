@@ -5,8 +5,8 @@ SLASHER.Aliases = {
 	"MONDAY NIGHT RAW",
 }
 SLASHER.ID = 14
-SLASHER.Class = 2
-SLASHER.DangerLevel = 3
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = false
 SLASHER.Model = "models/slashco/slashers/leuonard/leuonard.mdl"
 SLASHER.GasCanMod = 0

@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Tyler The Destroyer",
 }
 SLASHER.ID = 7
-SLASHER.Class = 2
-SLASHER.DangerLevel = 3
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/tyler/tyler.mdl"
 SLASHER.GasCanMod = -6

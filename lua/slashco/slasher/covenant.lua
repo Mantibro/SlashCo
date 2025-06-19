@@ -7,8 +7,8 @@ SLASHER.Aliases = {
 	"Low Tier God",
 }
 SLASHER.ID = 18
-SLASHER.Class = 1
-SLASHER.DangerLevel = 3
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/covenant/covenant.mdl"
 SLASHER.GasCanMod = 0

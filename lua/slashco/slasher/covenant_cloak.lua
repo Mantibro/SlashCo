@@ -2,8 +2,8 @@ local SLASHER = {}
 
 SLASHER.Name = "Covenant Cloak"
 SLASHER.ID = "covenantcloak"
-SLASHER.Class = 1
-SLASHER.DangerLevel = 1
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = false
 SLASHER.Model = "models/slashco/slashers/covenant/cloak.mdl"
 SLASHER.GasCanMod = 0

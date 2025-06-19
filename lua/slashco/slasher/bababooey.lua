@@ -7,8 +7,8 @@ SLASHER.Aliases = {
 	"The Mist",
 }
 SLASHER.ID = 1
-SLASHER.Class = 1
-SLASHER.DangerLevel = 1
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/baba/baba.mdl"
 SLASHER.GasCanMod = 0

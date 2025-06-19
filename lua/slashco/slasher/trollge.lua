@@ -5,8 +5,8 @@ SLASHER.Aliases = {
 	"Comedy",
 }
 SLASHER.ID = 3
-SLASHER.Class = 3
-SLASHER.DangerLevel = 3
+SLASHER.Class = SlashCo.SlasherClass.Umbra
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/trollge/trollge.mdl"
 SLASHER.GasCanMod = 0

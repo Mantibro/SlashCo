@@ -5,8 +5,8 @@ SLASHER.Aliases = {
 	"The Hunted",
 }
 SLASHER.ID = 15
-SLASHER.Class = 1
-SLASHER.DangerLevel = 3
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/dream/dream.mdl"
 SLASHER.GasCanMod = 0

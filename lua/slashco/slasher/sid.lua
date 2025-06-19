@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Cookie Monster",
 }
 SLASHER.ID = 2
-SLASHER.Class = 2
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/sid/sid.mdl"
 SLASHER.GasCanMod = 0

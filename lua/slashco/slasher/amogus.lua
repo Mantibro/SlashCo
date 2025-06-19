@@ -7,8 +7,8 @@ SLASHER.Aliases = {
 	"Jerma985",
 }
 SLASHER.ID = 4
-SLASHER.Class = 1
-SLASHER.DangerLevel = 1
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/amogus/amogus.mdl"
 SLASHER.GasCanMod = 0

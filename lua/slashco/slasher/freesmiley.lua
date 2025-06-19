@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Smiley",
 }
 SLASHER.ID = 13
-SLASHER.Class = 1
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/freesmiley/freesmiley.mdl"
 SLASHER.GasCanMod = 0

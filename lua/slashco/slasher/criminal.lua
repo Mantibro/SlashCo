@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"The Purple Guy",
 }
 SLASHER.ID = 12
-SLASHER.Class = 3
-SLASHER.DangerLevel = 3
+SLASHER.Class = SlashCo.SlasherClass.Umbra
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/criminal/criminal.mdl"
 SLASHER.GasCanMod = 0

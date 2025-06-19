@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Satan Death Destroyer",
 }
 SLASHER.ID = 17
-SLASHER.Class = 2
-SLASHER.DangerLevel = 1
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/princess/princess.mdl"
 SLASHER.GasCanMod = 0

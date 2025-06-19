@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Waffle Enthusiast",
 }
 SLASHER.ID = "22"
-SLASHER.Class = 2
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = false
 SLASHER.Model = "models/Humans/Group01/male_05.mdl" -- placeholder
 SLASHER.GasCanMod = 0

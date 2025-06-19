@@ -5,8 +5,8 @@ SLASHER.Aliases = {
 	"Dolfin",
 }
 SLASHER.ID = 16
-SLASHER.Class = 1
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/dolphinman/dolphinman.mdl"
 SLASHER.GasCanMod = 0

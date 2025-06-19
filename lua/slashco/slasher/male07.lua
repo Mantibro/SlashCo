@@ -2,8 +2,8 @@ local SLASHER = {}
 
 SLASHER.Name = "Male_07"
 SLASHER.ID = 6
-SLASHER.Class = 3
-SLASHER.DangerLevel = 3
+SLASHER.Class = SlashCo.SlasherClass.Umbra
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/Humans/Group01/male_07.mdl"
 SLASHER.GasCanMod = 0

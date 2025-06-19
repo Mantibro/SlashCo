@@ -6,8 +6,8 @@ SLASHER.Aliases = {
 	"Milk Demon",
 }
 SLASHER.ID = 5
-SLASHER.Class = 2
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/thirsty/thirsty.mdl"
 SLASHER.GasCanMod = 0
