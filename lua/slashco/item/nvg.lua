@@ -28,7 +28,7 @@ function GenDynLight(color)
 end
 
 function ITEM.OnPickUp(ply)
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		return
 	end
 	ply:SetNWBool("NightVision", true)
