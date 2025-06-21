@@ -39,6 +39,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher.TimeChasing = 0
 	slasher.PunchCooldown = 0
 	slasher.PunchSlowdown = 0
+	slasher.ThrowCooldown = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -47,9 +48,14 @@ function SLASHER.OnTickBehaviour(slasher)
 	local ChaseTime = slasher.TimeChasing or 0 --Time Spent chasing
 	local PunchCD = slasher.PunchCooldown or 0 --Punch Cooldown
 	local PunchSD = slasher.PunchSlowdown or 0 --Punch Slowdown
+	local ThrowCD = slasher.ThrowCooldown or 0 -- Throw Cooldown
 
 	if PunchCD > 0 then
 		slasher.PunchCooldown = PunchCD - FrameTime()
+	end
+	
+	if ThrowCD > 0 then
+		slasher.ThrowCooldown = ThrowCD - FrameTime()
 	end
 
 	if PunchSD > 1 then
@@ -191,56 +197,54 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		return
 	end
 
-	slasher:SetNWBool("BorgmireThrow", true)
+	if slasher.ThrowCooldown < 0.01 then
+		slasher:SetNWBool("BorgmireThrow", true)
+		slasher.ChaseActivationCooldown = 99
+		slasher:EmitSound("slashco/slasher/borgmire/borgmire_throw.mp3")
+		
+		target:Freeze(true)
+		slasher:Freeze(false)
+		target:SetPos(slasher:GetPos() + Vector(0, 0, 70))
 
-	--local pick_ang = SlashCo.RadialTester(slasher, 200, target)
-	--slasher:SetEyeAngles( Angle(0,pick_ang,0) )
+		for i = 1, 13 do
+			timer.Simple(0.1 + (i / 10), function()
+				if not IsValid(target) then
+					return
+				end
 
-	slasher.ChaseActivationCooldown = 99
-	slasher:EmitSound("slashco/slasher/borgmire/borgmire_throw.mp3")
+				target:SetPos(slasher:GetPos() + Vector(0, 0, 70))
+			end)
+		end
 
-	target:Freeze(true)
-	slasher:Freeze(false)
-
-	target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
-
-	for i = 1, 13 do
-		timer.Simple(0.1 + (i / 10), function()
+		timer.Simple(1.5, function()
 			if not IsValid(target) then
 				return
 			end
 
-			target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
+			target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
+
+			local strength_forward = 1600 + (SO * 450)
+			local strength_up = 800 + (SO * 150)
+
+			target:SetVelocity((slasher:GetForward() * strength_forward) + Vector(0, 0, strength_up))
+
+			target:Freeze(false)
+			if target:Health() > 1 then
+				target:SetHealth(target:Health() * 0.75)
+			end
+			
+			slasher.ThrowCooldown = 3
+		end)
+
+		timer.Simple(2, function()
+			if not IsValid(target) then
+				return
+			end
+
+			slasher:SetNWBool("BorgmireThrow", false)
+			slasher.ChaseActivationCooldown = 2
 		end)
 	end
-
-	timer.Simple(1.5, function()
-		if not IsValid(target) then
-			return
-		end
-
-		target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
-
-		local strength_forward = 1600 + (SO * 450)
-		local strength_up = 800 + (SO * 150)
-
-		target:SetVelocity((slasher:GetForward() * strength_forward) + Vector(0, 0, strength_up))
-
-		target:Freeze(false)
-		if target:Health() > 1 then
-			target:SetHealth(target:Health() * 0.75)
-		end
-	end)
-
-	timer.Simple(2, function()
-		if not IsValid(target) then
-			return
-		end
-
-		--slasher:Freeze(false)
-		slasher:SetNWBool("BorgmireThrow", false)
-		slasher.ChaseActivationCooldown = 2
-	end)
 end
 
 function SLASHER.Animator(ply)
