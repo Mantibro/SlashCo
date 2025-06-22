@@ -3,6 +3,7 @@ SlashCo.AudioSystem.CreatingChannels = SlashCo.AudioSystem.CreatingChannels or {
 SlashCo.AudioSystem.PrecacheSounds = SlashCo.AudioSystem.PrecacheSounds or {}
 SlashCo.AudioSystem.BackgroundChannel = SlashCo.AudioSystem.BackgroundChannel or nil
 SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs or 0 -- Incremental number to assign channel id's
+SlashCo.AudioSystem.UpdateFrequency = 0.05 -- How often timers execute to update the volume when fading it to a new value.
 
 -- So that we don't depend on the GameData table as this system is meant to also work as a standalone library.
 SlashCo.AudioSystem.IsSinglePlayer = SlashCo.AudioSystem.IsSinglePlayer or game.SinglePlayer()
@@ -255,15 +256,27 @@ local function CalculateChannelVolume(channel, targetVol)
 	return targetVol
 end
 
--- Fades out and destroys the channel.
-function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime)
+-- ToDo: Check if we even need this function anymore or if we fixed it unknowingly that it could become nan somehow.
+function SlashCo.AudioSystem.EnsureValidVolume(volume)
+	if volume == volume then -- if its not nan, we can say its safe
+		return volume
+	end
+
+	return 0 -- math.Clamp(volume, -10, 10) -- We return 0 as else if it would clamp to 10 it could errape the client.
+end
+
+--[[
+	Fades out and destroys the channel.
+	callback = function(channelData) end
+]]
+function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime, callback)
 	if IsValid(channel) and channel:GetState() == GMOD_CHANNEL_PLAYING and fadeOutTime and fadeOutTime ~= 0 then
 		local vol = channel:GetVolume()
 		if vol > 0 then
 			local id = SlashCo.AudioSystem.GetChannelID(channel)
 			timer.Remove("SlashCo:FadeToAudioChannel" .. id) -- Remove any fadeIn timer that might exist
 			local timerName = "SlashCo:ShutdownAudioChannel" .. id
-			local updateFreq = 0.05
+			local updateFreq = SlashCo.AudioSystem.UpdateFrequency
 			local volumeDecrement = vol / math.ceil(fadeOutTime / updateFreq)
 			local channelData = SlashCo.AudioSystem.Channels[channel]
 			channelData.State = ChannelStates.DESTROYING
@@ -275,6 +288,10 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime)
 					channel:__gc()
 					SlashCo.AudioSystem.CheckChannels()
 					SlashCo.AudioSystem.Channels[channel] = nil
+
+					if callback then
+						callback(channelData)
+					end
 					return
 				end
 
@@ -285,7 +302,7 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime)
 				end
 
 				channelData.volume = vol
-				channel:SetVolume(channelVolume)
+				channel:SetVolume(SlashCo.AudioSystem.EnsureValidVolume(channelVolume))
 			end)
 
 			return
@@ -296,20 +313,20 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime)
 	SlashCo.AudioSystem.Channels[channel] = nil
 	if IsValid(channel) then
 		channel:__gc()
+
+		if callback then
+			callback(channelData)
+		end
 	end
 end
 
--- ToDo: Check if we even need this function anymore or if we fixed it unknowingly that it could become nan somehow.
-function SlashCo.AudioSystem.EnsureValidVolume(volume)
-	if volume == volume then -- if its not nan, we can say its safe
-		return volume
-	end
+--[[
+	Fades the channel's volume to the target volume.
+	callback = function(channel, channelData) end
 
-	return 0 -- math.Clamp(volume, -10, 10) -- We return 0 as else if it would clamp to 10 it could errape the client.
-end
-
--- Fades the channel's volume to the target volume.
-function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol)
+	NOTE: When called multiple times, the callback will only be called when the fade actually finishes, when its overwritten it won't be called.
+]]
+function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol, callback)
 	targetVol = targetVol or 1
 	fadeTime = fadeTime or 1
 
@@ -317,7 +334,7 @@ function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol)
 	local lowerVol = targetVol < vol
 	local id = SlashCo.AudioSystem.GetChannelID(channel)
 	local timerName = "SlashCo:FadeToAudioChannel" .. id
-	local updateFreq = 0.05
+	local updateFreq = SlashCo.AudioSystem.UpdateFrequency
 	local volumeIncrement = math.abs(targetVol - vol) / math.ceil(fadeTime / updateFreq)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
 	timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
@@ -331,6 +348,9 @@ function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol)
 		if !IsValid(channel) or reachedTarget then
 			channelData.volume = nil
 			timer.Remove(timerName)
+			if callback then
+				callback(channel, channelData)
+			end
 			return
 		end
 
