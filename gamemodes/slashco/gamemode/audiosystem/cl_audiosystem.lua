@@ -352,9 +352,12 @@ function SlashCo.AudioSystem.StopBackgroundMusic()
 end
 
 -- Returns the calculated time a channel is supposed to be at, it accounts for looping sounds
-function SlashCo.AudioSystem.CalculateTime(channel, tickCount)
+function SlashCo.AudioSystem.CalculateTime(channel, tickCount, looping)
 	local calculateTime = (engine.TickCount() - tickCount) * engine.TickInterval()
 	local fileLength = channel:GetLength()
+	if not looping then -- If we don't want looping, then we simply return the normal time without any more calculations.
+		return math.min(calculateTime, fileLength)
+	end
 
 	return calculateTime - (fileLength * math.floor(calculateTime / fileLength))
 end
@@ -482,7 +485,16 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 	local soundData = channelData.soundData
 	if newPos and soundData and soundData.minDistance and soundData.maxDistance then
 		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData)
+		--print(volume, channel:GetState())
 		channel:SetVolume(volume)
+		-- ToDo: Right now we don't do this as else stopsound won't have any effect. I'll add a convar later to allow anyone to adjust the volume for the entire audiosystem, until then we won't force the sounds upon users.
+		--[[if not soundData.noplay and channel:GetState() == GMOD_CHANNEL_STOPPED then -- BUG: Why can the sound randomy stop? I know that it isn't this system since in all cases where we stop it, we also delete it.
+			local time = channel:GetTime()
+			local length = channel:GetLength()
+			if not math.IsNearlyEqual(length, time, 1) and time < length then
+				channel:Play()
+			end
+		end]]
 		--print("3D", channel, channelData.ID, volume)
 	end
 end
@@ -614,7 +626,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		channel:EnableLooping(soundData.looping)
-		channel:SetTime(SlashCo.AudioSystem.CalculateTime(channel, soundData.startTick))
+		channel:SetTime(SlashCo.AudioSystem.CalculateTime(channel, soundData.startTick, soundData.looping))
 
 		if soundData.identifier then
 			SlashCo.AudioSystem.SetChannelIdentifier(channel, soundData.identifier)
