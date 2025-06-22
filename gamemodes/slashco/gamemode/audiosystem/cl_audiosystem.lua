@@ -466,7 +466,7 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 		local ent = channelData.ent or Entity(channelData.entIndex)
 		if IsValid(ent) then
 			channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
-			local newPos = ent:EyePos()
+			newPos = ent:EyePos()
 			if newPos == ent:GetPos() then -- I don't like that we call GetPos for this again :/
 				newPos = ent:WorldSpaceCenter() -- If possible, use the EyePos, but if the EyePos matches the Entity's position, we use the WorldSpaceCenter as a better position.
 			end
@@ -480,7 +480,7 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 	end
 
 	local soundData = channelData.soundData
-	if soundData and soundData.minDistance and soundData.maxDistance then
+	if newPos and soundData and soundData.minDistance and soundData.maxDistance then
 		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData)
 		channel:SetVolume(volume)
 		--print("3D", channel, channelData.ID, volume)
