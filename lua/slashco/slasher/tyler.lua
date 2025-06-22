@@ -45,6 +45,10 @@ SLASHER.SpawnDelay = 10 -- We don't need to let Tyler wait much, why? because pl
 SLASHER.AudioRangeDecreasePerGasCan = 0.1 -- For every gas can he created, the range of his audio is decreased by this much. (This value is used for multiplication!)
 SLASHER.MinimumAudioRange = 250 -- The minimum range that he is required to have.
 
+local function EndlessChase()
+	return (SLASHER.AllowEndlessChase and SlashCo.IsSlowEscape()) or SlashCo.CurRound.EscapeHelicopterSummoned -- When the time for a slow escape is reached or the helicopter was summoned, we enter a endless chase
+end
+
 -- Enums to use making the code more readable.
 local TYLER_SPECTER = 0
 local TYLER_CREATOR = 1
@@ -69,9 +73,14 @@ local function SwitchForm(slasher, newForm)
 			SlashCo.AudioSystem.EnableBackgroundMusic()
 			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/igor/igors_theme.ogg", math.Clamp(100 - anger, 0, 100) / 100) -- Make the background music getting more silent the more anger he has.
 		end
+
+		slasher:SetNW2Bool("Slasher:NoFootsteps", false)
 	else
 		slasher.WasDestroyerOnce = true
 		SlashCo.AudioSystem.DisableBackgroundMusic()
+		if EndlessChase() then
+			slasher:SetNW2Bool("Slasher:NoFootsteps", true)
+		end
 	end
 end
 
@@ -90,12 +99,8 @@ function SLASHER.Precache()
 end
 
 function SLASHER.HideTime(slasher)
-	slasher.TylerTime = math.max((25 + SlashCo.MapSize * 25) - ((SlashCo.GetSlasherAnger(slasher) / 2) / SlashCo.MapSize) - team.NumPlayers(TEAM_SURVIVOR), SLASHER.MinTylerTime)
+	slasher.TylerTime = math.max((25 + SlashCo.MapSize * 25) - ((SlashCo.GetSlasherAnger(slasher) / 3) / SlashCo.MapSize) - team.NumPlayers(TEAM_SURVIVOR), SLASHER.MinTylerTime)
 	-- print("Tyler transformation time: " .. slasher.TylerTime)
-end
-
-local function EndlessChase()
-	return (SLASHER.AllowEndlessChase and SlashCo.IsSlowEscape()) or SlashCo.CurRound.EscapeHelicopterSummoned -- When the time for a slow escape is reached or the helicopter was summoned, we enter a endless chase
 end
 
 --[[

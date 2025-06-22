@@ -31,10 +31,11 @@ function ITEM.OnDie(ply)
 	timer.Simple(9, function()
 		if not IsValid(ply) then return end
 
+		local spawnEnt = SlashCo.FindSpawn(ply)
 		SlashCo.AudioSystem.PlaySound({ -- Leak the location of the player that respawned to everyone >:3
 			soundPath = "slashco/survivor/deathward.mp3",
 			identifier = "DeathWard",
-			position = ply:GetPos(),
+			position = IsValid(spawnEnt) and spawnEnt:GetPos() or ply:GetPos(),
 			minDistance = 2500,
 			maxDistance = 15000,
 			volume = 1,

@@ -349,6 +349,8 @@ function SlashCo.SummonEscapeHelicopter(distress)
 		if arriveTime ~= -1 and (helicopterArriveTime ~= -1 and (arriveTime < helicopterArriveTime) or helicopterArriveTime == -1) then
 			helicopterArriveTime = arriveTime
 		end
+
+		slasher:SlasherFunction("OnHelicopterSummon")
 	end
 	
 	local delay = helicopterArriveTime ~= -1 and helicopterArriveTime or (30 + math.random(0, 30 + (SlashCo.CurRound.Difficulty * 20)))

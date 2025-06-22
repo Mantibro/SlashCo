@@ -132,6 +132,10 @@ if CLIENT then
 			emitter = ParticleEmitter(Vector(0, 0, 0))
 		end
 
+		if GameData.LocalPlayer:GetNW2Bool("Slasher:NoFootsteps") then
+			return
+		end
+
 		--Survivor Step Notice
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if survivor:ItemFunction("OnFootstep") then

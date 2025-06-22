@@ -715,6 +715,7 @@ local function startRound(noSetup)
 		soundPath = SlashCo.GetDangerSound(dangerLevel),
 		volume = 3,
 		fadeIn = 0,
+		deleteWhenDone = true,
 	})
 
 	timer.Simple(8, function()
@@ -776,11 +777,7 @@ function SlashCo.StartRound(noSetup)
 	end)
 end
 
-hook.Add("PlayerSelectSpawn", "RandomSpawn", function(ply, transition)
-	if transition then
-		return
-	end
-
+function SlashCo.FindSpawn(ply)
 	local elements
 	if ply:Team() == TEAM_SURVIVOR then
 		elements = ents.FindByClass("info_sc_player_employee")
@@ -798,4 +795,12 @@ hook.Add("PlayerSelectSpawn", "RandomSpawn", function(ply, transition)
 		ent:SpawnEnt()
 		return ent
 	end
+end
+
+hook.Add("PlayerSelectSpawn", "RandomSpawn", function(ply, transition)
+	if transition then
+		return
+	end
+
+	return SlashCo.FindSpawn(ply)
 end)
