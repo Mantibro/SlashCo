@@ -96,10 +96,13 @@ function ENT:PlayHeliSounds()
 		identifier = "HelicopterEngineDistant",
 		minDistance = 750,
 		maxDistance = 1000,
+		startDistance = 200,
+		startEndDistance = 500,
 		looping = true,
 		entity = self,
 		volume = 0.7,
 		fadeIn = 1,
+		noWorldSpace = true,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
@@ -107,10 +110,13 @@ function ENT:PlayHeliSounds()
 		identifier = "HelicopterRotorsDistant",
 		minDistance = 4000,
 		maxDistance = 8000,
+		startDistance = 750,
+		startEndDistance = 1000,
 		looping = true,
 		entity = self,
 		volume = 0.7,
 		fadeIn = 1,
+		noWorldSpace = true,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
@@ -122,6 +128,7 @@ function ENT:PlayHeliSounds()
 		entity = self,
 		volume = 0.7,
 		fadeIn = 1,
+		noWorldSpace = true,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
@@ -133,6 +140,7 @@ function ENT:PlayHeliSounds()
 		entity = self,
 		volume = 0.7,
 		fadeIn = 1,
+		noWorldSpace = true,
 	})
 end
 

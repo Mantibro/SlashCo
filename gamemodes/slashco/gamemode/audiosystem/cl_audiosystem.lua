@@ -464,13 +464,16 @@ local function UpdateBackgroundMusic()
 end
 
 local function UpdateChannelPosition(channel, channelData, localPlyPos)
+	local soundData = channelData.soundData
+	if not soundData then return end
+
 	local newPos = channelData.pos
 	if channelData.entIndex then
 		local ent = channelData.ent or Entity(channelData.entIndex)
 		if IsValid(ent) then
 			channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
 			newPos = ent:EyePos()
-			if newPos == ent:GetPos() then -- I don't like that we call GetPos for this again :/
+			if not soundData.noWorldSpace and newPos == ent:GetPos() then -- I don't like that we call GetPos for this again :/
 				newPos = ent:WorldSpaceCenter() -- If possible, use the EyePos, but if the EyePos matches the Entity's position, we use the WorldSpaceCenter as a better position.
 			end
 
@@ -482,8 +485,7 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 		end
 	end
 
-	local soundData = channelData.soundData
-	if newPos and soundData and soundData.minDistance and soundData.maxDistance then
+	if newPos and soundData.minDistance and soundData.maxDistance then
 		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData)
 		--print(volume, channel:GetState())
 		channel:SetVolume(volume)
@@ -550,6 +552,7 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		number fadeOut - How many seconds before the ending it should start to fade out, and when it faded out the channel is destroyed.
 		boolean forceMono - Forces the sound to play as mono. Perferably use forceSterio since it won't butcher the sound quality.
 		boolean forceSterio - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
+		boolean noWorldSpace - If set it will use the entities EyePos instead of falling back to using it's WorldSpaceCenter position.
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -799,6 +802,7 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		fadeOut = ReadSoundField(net.ReadFloat),
 		forceMono = ReadSoundField(net.ReadBool),
 		forceSterio = ReadSoundField(net.ReadBool),
+		noWorldSpace = ReadSoundField(net.ReadBool),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
