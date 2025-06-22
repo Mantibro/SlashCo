@@ -483,6 +483,15 @@ local function UpdateBackgroundMusic()
 	end
 end
 
+function CalculatePan(ply, channelPos)
+	local forward = ply:GetAimVector()
+	local right = forward:Angle():Right()
+	local toSound = (channelPos - ply:GetPos()):GetNormalized()
+
+	local pan = right:Dot(toSound)
+	return math.Clamp(pan, -1, 1)
+end
+
 local function UpdateChannelPosition(channel, channelData, localPlyPos)
 	local soundData = channelData.soundData
 	if not soundData then return end
@@ -507,7 +516,11 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 
 	if newPos and soundData.minDistance and soundData.maxDistance then
 		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData)
-		--print(volume, channel:GetState())
+		
+		if soundData.dynamicPan then
+			channel:SetPan(CalculatePan(SlashCo.AudioSystem.LocalPlayer, newPos))
+		end
+
 		channel:SetVolume(volume)
 		-- ToDo: Right now we don't do this as else stopsound won't have any effect. I'll add a convar later to allow anyone to adjust the volume for the entire audiosystem, until then we won't force the sounds upon users.
 		--[[if not soundData.noplay and channel:GetState() == GMOD_CHANNEL_STOPPED then -- BUG: Why can the sound randomy stop? I know that it isn't this system since in all cases where we stop it, we also delete it.
@@ -573,6 +586,7 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		boolean forceMono - Forces the sound to play as mono. Perferably use forceSterio since it won't butcher the sound quality.
 		boolean forceSterio - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
 		boolean noWorldSpace - If set it will use the entities EyePos instead of falling back to using it's WorldSpaceCenter position.
+		boolean dynamicPan - If set it will calculate the pan for the channel giving the sound a 3D effect.
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -582,6 +596,8 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		See the comment above the CalculateFadeVolume for reference.
 
 		all distance fields work regardless of the channel being in 3D or not, so you can use forceSterio and still use minDistance/maxDistance without issues.
+
+		You can combine forceSterio and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in sterio/using multiple channels instead of the normal 3D that forces them into mono.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
 	soundData.identifier = soundData.identifier or soundData.soundPath
@@ -823,6 +839,7 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		forceMono = ReadSoundField(net.ReadBool),
 		forceSterio = ReadSoundField(net.ReadBool),
 		noWorldSpace = ReadSoundField(net.ReadBool),
+		dynamicPan = ReadSoundField(net.ReadBool),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.

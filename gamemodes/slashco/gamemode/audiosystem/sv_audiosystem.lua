@@ -63,6 +63,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		WriteSoundField(soundData.forceMono, net.WriteBool)
 		WriteSoundField(soundData.forceSterio, net.WriteBool)
 		WriteSoundField(soundData.noWorldSpace, net.WriteBool)
+		WriteSoundField(soundData.dynamicPan, net.WriteBool)
 		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 
 	if not soundData.sendToEntity then -- serverside only, its networked only to the player its being played od
