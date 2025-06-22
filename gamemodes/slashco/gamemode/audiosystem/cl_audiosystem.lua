@@ -626,7 +626,9 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		channel:EnableLooping(soundData.looping)
-		channel:SetTime(SlashCo.AudioSystem.CalculateTime(channel, soundData.startTick, soundData.looping))
+		local calcTime = SlashCo.AudioSystem.CalculateTime(channel, soundData.startTick, soundData.looping)
+		channel:SetTime(calcTime)
+		local timeLeft = channel:GetLength() - calcTime
 
 		if soundData.identifier then
 			SlashCo.AudioSystem.SetChannelIdentifier(channel, soundData.identifier)
@@ -653,6 +655,10 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channel:SetPan(soundData.pan)
 		end
 
+		if soundData.playbackRate then
+			channel:SetPlaybackRate(soundData.playbackRate)
+		end
+
 		if soundData.soundLevel and soundData.soundLevel ~= 0 then
 			soundData.minDistance = soundData.soundLevel ^ 1.25
 			soundData.maxDistance = soundData.soundLevel ^ 1.5
@@ -668,7 +674,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 		UpdateChannelPosition(channel, channelData) -- Update the channel position so that when we play it, there won't be a audio bug for 1 frame where it would play from the world origin.
 
-		if not soundData.noplay then -- We call Play only here since some settings might change how it can be heard.
+		if not soundData.noplay and (timeLeft > 0 or soundData.looping) then -- We call Play only here since some settings might change how it can be heard.
 			channel:Play()
 		end
 
@@ -682,14 +688,14 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		if soundData.deleteWhenDone then
-			timer.Simple(channel:GetLength() + 0.2, function()
+			timer.Simple(timeLeft + 0.2, function()
 				if not IsValid(channel) then return end
 				SlashCo.AudioSystem.DestroyChannel(channel, 0)
 			end)
 		end
 
 		if soundData.fadeOut then
-			timer.Simple(channel:GetLength() - (soundData.fadeOut + 0.2), function() -- We add 0.2 just as a buffer to ensure that it'll go fine.
+			timer.Simple(timeLeft - (soundData.fadeOut + 0.2), function() -- We add 0.2 just as a buffer to ensure that it'll go fine.
 				if not IsValid(channel) then return end
 				SlashCo.AudioSystem.DestroyChannel(channel, soundData.fadeOut)
 			end)
