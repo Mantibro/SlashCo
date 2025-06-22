@@ -190,27 +190,64 @@ function SlashCo.AudioSystem.ParentChannelToEntity(channel, entity)
 	channelData.entIndex = entityIndex
 end
 
--- BUG: Bass doesn't seem to care about 3DFadeDistance and it seems like it never actually fades out for some weird reason. So we calculate and set the volume ourself.
-local function CalculateFadeVolume(playerPos, channelPos, initialVolume, minDistance, maxDistance)
+--[[
+	BUG: Bass doesn't seem to care about 3DFadeDistance and it seems like it never actually fades out for some weird reason. So we calculate and set the volume ourself.
+	Anyways, doing it like this we have more control :3
+
+	How we currently do it:
+
+	Distance →
+	0      startDistance   startEndDistance    minDistance        maxDistance       ∞
+	|────────────┬─────────────────┬──────────────┬────────────────┬──────────────→
+	|  Silent    │    Fade In →    │   Full Vol   │   Fade Out ↓   │     Silent
+	|            │ (0 → 100% vol)  │    (100%)    │ (100% → 0)     │
+
+	if no startDistance or no startEndDistance is set, the initial Silent zone won't exist.
+	if no minDistance or no maxDistance is set, the final Silent zone won't exist.
+]]
+local function CalculateFadeVolume(playerPos, channelPos, initialVolume, soundData)
 	local distance = channelPos:Distance(playerPos)
 
-	if distance <= minDistance then
-		return initialVolume
-	elseif distance >= maxDistance then
-		return 0
-	else
-		return initialVolume * (1 - ((distance - minDistance) / (maxDistance - minDistance)))
+	local startDistance = soundData.startDistance
+	local startEndDistance = soundData.startEndDistance
+	if startDistance and startEndDistance then
+		if distance < startDistance then
+			return 0
+		end
+
+		if distance < startEndDistance then
+			return initialVolume * (1 - ((distance - startEndDistance) / (startDistance - startEndDistance)))
+		end
 	end
+
+	local minDistance = soundData.minDistance
+	local maxDistance = soundData.maxDistance
+	if minDistance and maxDistance then
+		if distance <= minDistance then
+			return initialVolume
+		end
+
+		if distance < maxDistance then
+			return initialVolume * (1 - ((distance - minDistance) / (maxDistance - minDistance)))
+		end
+
+		if distance >= maxDistance then
+			return 0
+		end
+	end
+
+	return initialVolume
 end
 
 -- Helper function to wrap around CalculateFadeVolume
 local function CalculateChannelVolume(channel, targetVol)
-	if channel:Is3D() then
+	local channelData = SlashCo.AudioSystem.Channels[channel]
+	if channelData.is3D or channelData.pos then
 		local channelData = SlashCo.AudioSystem.Channels[channel]
 		if channelData then
 			local soundData = channelData.soundData
-			if soundData and soundData.minDistance and soundData.maxDistance then
-				return CalculateFadeVolume(SlashCo.AudioSystem.LocalPlayer:GetPos(), channel:GetPos(), targetVol, soundData.minDistance, soundData.maxDistance)
+			if soundData then
+				return CalculateFadeVolume(SlashCo.AudioSystem.LocalPlayer:GetPos(), channelData.pos or channel:GetPos(), targetVol, soundData)
 			end
 		end
 	end
@@ -347,7 +384,7 @@ function SlashCo.AudioSystem.PlayBackgroundMusic(fileName)
 	if (lastCreation + 5) > CurTime() then return end
 	lastCreation = CurTime()
 
-	SlashCo.AudioSystem.CreateChannel(backgroundMusic, "mono noplay", function(channel)
+	SlashCo.AudioSystem.CreateChannel(backgroundMusic, "noplay", function(channel)
 		SlashCo.AudioSystem.BackgroundChannel = channel
 
 		channel:SetVolume(0)
@@ -424,22 +461,27 @@ local function UpdateBackgroundMusic()
 end
 
 local function UpdateChannelPosition(channel, channelData, localPlyPos)
-	if not channelData.entIndex then return end
+	local newPos = channelData.pos
+	if channelData.entIndex then
+		local ent = channelData.ent or Entity(channelData.entIndex)
+		if IsValid(ent) then
+			channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
+			local newPos = ent:EyePos()
+			if newPos == ent:GetPos() then -- I don't like that we call GetPos for this again :/
+				newPos = ent:WorldSpaceCenter() -- If possible, use the EyePos, but if the EyePos matches the Entity's position, we use the WorldSpaceCenter as a better position.
+			end
 
-	local ent = channelData.ent or Entity(channelData.entIndex)
-	if not IsValid(ent) then return end
-
-	channelData.ent = ent -- In case for some reason the entity didn't exist yet, could happen on full updates?
-	local newPos = ent:EyePos()
-	if newPos == ent:GetPos() then -- I don't like that we call GetPos for this again :/
-		newPos = ent:WorldSpaceCenter() -- If possible, use the EyePos, but if the EyePos matches the Entity's position, we use the WorldSpaceCenter as a better position.
+			if channelData.is3D then -- We don't need to call it when the position isn't saved anyways as for non-3d channels the position is always Vector(0, 0, 0)
+				channel:SetPos(newPos)
+			else
+				channelData.pos = newPos -- Since non-3d channels :GetPos will always be the world origin, we store our position in here instead.
+			end
+		end
 	end
-
-	channel:SetPos(newPos)
 
 	local soundData = channelData.soundData
 	if soundData and soundData.minDistance and soundData.maxDistance then
-		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData.minDistance, soundData.maxDistance)
+		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData)
 		channel:SetVolume(volume)
 		--print("3D", channel, channelData.ID, volume)
 	end
@@ -483,15 +525,28 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		function callback - the callback function that is called when the channel was created. The channel is given to the callback as the first argument
 		number minDistance - The minimum distance for the sound to start fading
 		number maxDistance - The maximum distance after which the sound cannot be heard anymore.
-		Vector position - A position to play the sound from, be aware that if a entity is set it will override this position!
+		number startDistance - The distance at which the sound should begin to be hearable, default 0 - close up the sound is fully audiable. This allows you to make sounds only audible at a certain distance, meaning if you're closer than this distance, it cannot be heard.
+		number startEndDistance - The distance at which the sound should be fully audiable, default 0.
+		Vector position - A position to play the sound from, be aware that if a entity is set it will override this position! BUT if the entity wasn't networked yet this will ensure the sound starts at the right position.
 		string modes - Any additional modes to pass to SlashCo.AudioSystem.CreateChannel
+		number pan - The sound pan - See https://wiki.facepunch.com/gmod/IGModAudioChannel:SetPan
+		number playbackRate - The sound playback rate.
 		boolean noplay - Won't automatically play the sound
 		string group - If set, a hook is called allowing you to add a hook that is executed when a sound is played like this: hook.Add("SlashCO:AudioSystem:PlaySound:ExampleGroup", "Example", function(soundData, channel))
 		boolean deleteWhenDone - If true, the channel is deleted once the sound finished playing (will ignore looping flag and still stop it).
+		number fadeIn - How many seconds it takes for the song to fade in at the start of it.
 		number fadeOut - How many seconds before the ending it should start to fade out, and when it faded out the channel is destroyed.
+		boolean forceMono - Forces the sound to play as mono. Perferably use forceSterio since it won't butcher the sound quality.
+		boolean forceSterio - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
+
+		minDistance and maxDistance act as a distance to fadeOut the volume when you get too far away.
+		startDistance and startEndDistance act as a distance to fadeOut the volume when you get too close, where startEndDistance is the point when the sound is on full volume while at startDistance it will be completely faded out.
+		See the comment above the CalculateFadeVolume for reference.
+
+		all distance fields work regardless of the channel being in 3D or not, so you can use forceSterio and still use minDistance/maxDistance without issues.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
 	soundData.identifier = soundData.identifier or soundData.soundPath
@@ -527,8 +582,21 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		return
 	end
 
-	local useMono = entIndex <= 0 and not soundData.position and not soundData.forceMono
-	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(AppendMode(useMono and "mono" or "3d", soundData.modes), "noplay"), function(channel, channelData)
+	local useMode = "" -- By default we use sterio since it sounds far better than mono.
+	if entIndex > 0 or soundData.position then
+		useMode = "3d"
+	end
+
+	if soundData.forceMono then
+		useMode = "mono"
+	end
+
+	-- Useful when it has a position/entity but you still want to play it as sterio.
+	if soundData.forceSterio then
+		useMode = ""
+	end
+
+	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(AppendMode(useMode, soundData.modes), "noplay"), function(channel, channelData)
 		local soundData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] or soundData -- Update in case it was updated in the few frames we had originally made our call.
 		if soundData.DESTROYCHANNEL then
 			channel:SetVolume(0)
@@ -560,8 +628,17 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			SlashCo.AudioSystem.ParentChannelToEntity(channel, entIndex)
 		end
 
+		channelData.is3D = channel:Is3D()
 		if soundData.position then
-			channel:SetPos(soundData.position)
+			if channelData.is3D then
+				channel:SetPos(soundData.position)
+			else
+				channelData.pos = soundData.position
+			end
+		end
+
+		if soundData.pan then
+			channel:SetPan(soundData.pan)
 		end
 
 		if soundData.soundLevel and soundData.soundLevel ~= 0 then
@@ -574,6 +651,9 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		channelData.soundData = soundData -- Save the data that was used to create this channel.
+		if IsEntity(soundData.entity) then -- If they gave us an entity, copy it over and use it to support clientside entities since we cannot use the EntIndex for thoes.
+			channelData.ent = soundData.entity
+		end
 		UpdateChannelPosition(channel, channelData) -- Update the channel position so that when we play it, there won't be a audio bug for 1 frame where it would play from the world origin.
 
 		if not soundData.noplay then -- We call Play only here since some settings might change how it can be heard.
@@ -686,17 +766,22 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		soundLevel = ReadSoundField(net.ReadUInt, 14),
 		volume = ReadSoundField(net.ReadFloat),
 		looping = ReadSoundField(net.ReadBool),
-		fadeIn = ReadSoundField(net.ReadFloat),
-		tickCount = ReadSoundField(net.ReadUInt, 32),
+		startTick = ReadSoundField(net.ReadUInt, 32),
 		identifier = ReadSoundField(net.ReadString),
 		minDistance = ReadSoundField(net.ReadUInt, 16),
 		maxDistance = ReadSoundField(net.ReadUInt, 16),
+		startDistance = ReadSoundField(net.ReadUInt, 16),
+		startEndDistance = ReadSoundField(net.ReadUInt, 16),
+		position = ReadSoundField(net.ReadVector),
 		modes = ReadSoundField(net.ReadString),
 		pan = ReadSoundField(net.ReadFloat),
 		playbackRate = ReadSoundField(net.ReadFloat),
 		group = ReadSoundField(net.ReadString),
 		deleteWhenDone = ReadSoundField(net.ReadBool),
+		fadeIn = ReadSoundField(net.ReadFloat),
 		fadeOut = ReadSoundField(net.ReadFloat),
+		forceMono = ReadSoundField(net.ReadBool),
+		forceSterio = ReadSoundField(net.ReadBool),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
@@ -709,17 +794,9 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 end)
 
 net.Receive("slashCo_AudioSystem_StopSound", function()
-	local stopAllSounds = net.ReadBool()
-	local identifier = nil
-	if not stopAllSounds then
-		identifier = net.ReadString()
-	end
-
+	local identifier = ReadSoundField(net.ReadString)
 	local fadeOut = net.ReadFloat()
-	local entIndex = nil
-	if net.ReadBool() then
-		entIndex = net.ReadUInt(MAX_EDICT_BITS)
-	end
+	local entIndex = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS)
 
 	SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 end)

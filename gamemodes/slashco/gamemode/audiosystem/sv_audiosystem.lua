@@ -34,24 +34,35 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		error("PlaySound: Missing soundPath field!")
 	end
 
+	-- Fallback code to ensure that if an entity wasn't networked to a client yet,
+	-- the sound would still have the right volume calculated when used with any of the fields that require a position to calculate the volume with.
+	if not soundData.position and (soundData.minDistance or soundData.maxDistance or soundData.startDistance or soundData.startEndDistance) and soundData.entity and (isnumber(soundData.entity) or IsValid(soundData.entity)) then
+		soundData.position = (isnumber(soundData.entity) and Entity(soundData.entity) or soundData.entity):GetPos()
+	end
+
 	net.Start("slashCo_AudioSystem_PlaySound")
 		WriteSoundField(soundData.soundPath, net.WriteString)
 		WriteSoundField(soundData.entity, WriteEntIndex)
 		WriteSoundField(soundData.soundLevel, net.WriteUInt, 14)
 		WriteSoundField(soundData.volume, net.WriteFloat)
 		WriteSoundField(soundData.looping, net.WriteBool)
-		WriteSoundField(soundData.fadeIn, net.WriteFloat)
 		WriteSoundField(soundData.startTick, net.WriteUInt, 32)
 		WriteSoundField(soundData.identifier, net.WriteString)
 		WriteSoundField(soundData.minDistance, net.WriteUInt, 16)
 		WriteSoundField(soundData.maxDistance, net.WriteUInt, 16)
+		WriteSoundField(soundData.startDistance, net.WriteUInt, 16)
+		WriteSoundField(soundData.startEndDistance, net.WriteUInt, 16)
 		WriteSoundField(soundData.position, net.WriteVector)
 		WriteSoundField(soundData.modes, net.WriteString)
 		WriteSoundField(soundData.pan, net.WriteFloat)
 		WriteSoundField(soundData.playbackRate, net.WriteFloat)
 		WriteSoundField(soundData.group, net.WriteString)
 		WriteSoundField(soundData.deleteWhenDone, net.WriteBool)
+		WriteSoundField(soundData.fadeIn, net.WriteFloat)
 		WriteSoundField(soundData.fadeOut, net.WriteFloat)
+		WriteSoundField(soundData.forceMono, net.WriteBool)
+		WriteSoundField(soundData.forceSterio, net.WriteBool)
+		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 
 	if not soundData.sendToEntity then -- serverside only, its networked only to the player its being played od
 		net.Broadcast()
@@ -75,15 +86,9 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entity, sendToEntity
 
 	local isValid = IsValid(entity)
 	net.Start("slashCo_AudioSystem_StopSound")
-		net.WriteBool(identifier == nil) -- if given nil as a identifier we will stop all sounds.
-		if identifier then
-			net.WriteString(identifier)
-		end
+		WriteSoundField(identifier, net.WriteString) -- if given nil as a identifier we will stop all sounds.
 		net.WriteFloat(fadeOut)
-		net.WriteBool(isValid)
-		if isValid then
-			net.WriteUInt(entity:EntIndex(), MAX_EDICT_BITS)
-		end
+		WriteSoundField(entity, WriteEntIndex)
 	if not sendToEntity then
 		net.Broadcast()
 	else

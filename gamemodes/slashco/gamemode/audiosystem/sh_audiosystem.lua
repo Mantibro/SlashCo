@@ -69,6 +69,22 @@ function SlashCo.AudioSystem.PrecacheSound(soundFile)
 	-- ToDo
 end
 
+--[[
+	Helper function calculating the tickcount for when you're using the startTick field on PlaySound.
+	If given no baseTick it will result in it using the current tickcount.
+	give it a baseTick of 0 to just get the calculation of the time as ticks.
+	The input time should be a timepoint in the song like 10 for 10 seconds into the song.
+]]
+function SlashCo.AudioSystem.TimeToTick(time, baseTick)
+	local tickTime = time > 0 and (time / engine.TickInterval()) or 0
+	baseTick = baseTick or engine.TickCount()
+	if baseTick == 0 then
+		return tickTime
+	end
+
+	return baseTick - tickTime
+end
+
 -- Server & client files are loaded at last
 if SERVER then
 	include("sv_audiosystem.lua")
