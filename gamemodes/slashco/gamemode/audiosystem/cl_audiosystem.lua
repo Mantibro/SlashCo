@@ -79,10 +79,10 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 		SlashCo.AudioSystem.CheckChannels()
 		SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs + 1
 		local channelData = {
-			deleteWhenFinished = false,  -- ToDo: Actually implement this logic
 			ID = SlashCo.AudioSystem.ChannelIDs,
 			State = ChannelStates.OK,
 			isURL = isURL,
+			is3D = channel:Is3D(),
 		}
 		SlashCo.AudioSystem.Channels[channel] = channelData
 		callback(channel, channelData)
@@ -642,7 +642,6 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			SlashCo.AudioSystem.ParentChannelToEntity(channel, entIndex)
 		end
 
-		channelData.is3D = channel:Is3D()
 		if soundData.position then
 			if channelData.is3D then
 				channel:SetPos(soundData.position)
