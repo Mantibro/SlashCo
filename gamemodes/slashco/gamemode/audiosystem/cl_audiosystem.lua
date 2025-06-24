@@ -384,7 +384,7 @@ end
 
 -- Returns the current background music time syncronized with all players.
 function SlashCo.AudioSystem.GetBackgroundMusicTime()
-	return SlashCo.AudioSystem.CalculateTime(SlashCo.AudioSystem.BackgroundChannel, GetGlobal2Int("SlashCo:StartTimeBackgroundMusic"))
+	return SlashCo.AudioSystem.CalculateTime(SlashCo.AudioSystem.BackgroundChannel, GetGlobal2Int("SlashCo:StartTimeBackgroundMusic"), true)
 end
 
 local lastCreation = 0 -- Doesn't need autorefresh so were fine.
@@ -413,7 +413,7 @@ function SlashCo.AudioSystem.PlayBackgroundMusic(fileName)
 		channel:SetVolume(0)
 		channel:Play()
 		channel:EnableLooping(true)
-		SlashCo.AudioSystem.BackgroundChannel:SetTime(SlashCo.AudioSystem.GetBackgroundMusicTime())
+		channel:SetTime(SlashCo.AudioSystem.GetBackgroundMusicTime())
 		SlashCo.AudioSystem.FadeTo(channel, 5, SlashCo.AudioSystem.GetBackgroundMusicVolume())
 	end)
 end
