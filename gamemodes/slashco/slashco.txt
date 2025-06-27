@@ -29,5 +29,15 @@
 			"singleplayer"	"1"
 			"replicate"		"1"
 		}
+
+		3
+		{
+			"name"			"slashco_maxplayers"
+			"text"			"Max Players"
+			"help"			"Maximum number of Players that can play, any additional players are forced into spectator."
+			"type"			"Numeric"
+			"default"		"7"
+			"singleplayer"	"1"
+		}
 	}
 }
