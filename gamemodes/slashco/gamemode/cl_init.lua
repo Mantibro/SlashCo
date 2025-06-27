@@ -123,8 +123,9 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 	if GameData.IsLobby then return end
 	if GameData.LocalPlayer:Team() == TEAM_SPECTATOR then return end
 
+	local r, g, b = SlashCo.GetGlobalFogColor(2)
 	render.FogMode(MATERIAL_FOG_LINEAR)
-	render.FogColor(0, 0, 0)
+	render.FogColor(r, g, b)
 	render.FogMaxDensity(1)
 
 	local targetFogStart = 200
@@ -164,7 +165,7 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 		targetFogEnd = targetFogStart * 1.5
 	end
 
-	local mult = GameData.LocalPlayer:GetNW2Float("FogMult", 1)
+	local mult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult()) / 2
 	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * mult)
 	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * mult)
 

@@ -79,6 +79,14 @@ function PLAYER:WasSeenBySlasher()
 	return self:GetNW2Bool("WasSeenBySlasher", false)
 end
 
+function PLAYER:SetFogMult(mult)
+	self:SetNW2Float("FogMult", mult)
+end
+
+function PLAYER:GetFogMult()
+	return self:GetNW2Float("FogMult", 1)
+end
+
 -- This function is VERY expensive, BUT it shouldn't be called too frequent anyways.
 function PLAYER:FindPlayersInView(dist, radius, notrace)
 	local pos = self:EyePos()

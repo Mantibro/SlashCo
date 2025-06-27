@@ -71,6 +71,57 @@ function SlashCo.GetClassColor(class)
 	return class == SlashCo.SlasherClass.Unknown and SlashCo.UnknownCol or SlashCo.KnownCol
 end
 
+function SlashCo.SetGlobalFogMult(mult)
+	SetGlobal2Float("FogMult", mult)
+end
+
+function SlashCo.GetGlobalFogMult()
+	return GetGlobal2Float("FogMult", 1)
+end
+
+-- Accepts a vector or color as input.
+function SlashCo.SetGlobalFogColor(color)
+	local r, g, b = 0, 0, 0
+	if isvector(color) then -- If given a vector we assume it use a range from 0-1 for colors so we multiply it by 255
+		r, g, b = color:Unpack()
+		r, g, b = r * 255, g * 255, b * 255
+	else
+		r = color.r
+		g = color.g
+		b = color.b
+	end
+
+	SetGlobal2Float("FogColorR", r)
+	SetGlobal2Float("FogColorG", g)
+	SetGlobal2Float("FogColorB", b)
+end
+
+-- type = if not given, it will return a color object, if set to 1, it will return a vector with a colors as a range from 0-1, if set to 2, it will return 3 arguments r g b.
+-- object = if not nil then it will use the given color or vector object and set the values directly into it instead of creating a new one
+function SlashCo.GetGlobalFogColor(type, object)
+	local r = GetGlobal2Float("FogColorR", 0)
+	local g = GetGlobal2Float("FogColorG", 0)
+	local b = GetGlobal2Float("FogColorB", 0)
+
+	if not object then
+		if not type then
+			return Color(r, g, b)
+		elseif type == 1 then
+			return Vector(r / 255, g / 255, b / 255)
+		elseif type == 2 then
+			return r, g, b
+		end
+	else
+		if not asVector then
+			object.r = r
+			object.g = g
+			object.b = b
+		else
+			object:SetUnpacked(r / 255, g / 255, b / 255)
+		end
+	end
+end
+
 --[[
 	DangerLevel's
 	Use the SlashCo.AddDangerLevel and NEVER manually add stuff to SlashCo.DangerLevel

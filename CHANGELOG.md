@@ -207,8 +207,11 @@ All newly added sounds will be from the SlashCo VR version.<br>
 ## Lua API Changes
 This documentation wasn't finished yet<br>
 
+[+] Added `SlashCo.SetGlobalFogMult`, `SlashCo.GetGlobalFogMult`, `SlashCo.SetGlobalFogColor`, `SlashCo.GetGlobalFogColor` functions<br>
+[+] Added `Player:SetFogMult`, `Player:GetFogMult`, `Player:MarkAsSeenBySlasher`, `Player:WasSeenBySlasher`, `Player:FindPlayersInView`, `Player:IsStuck` functions<br>
 [+] Added `SlashCo.States`, `SlashCo.DifficultyLevel`, `SlashCo.SlasherClass`, `SlashCo.DangerLevel` enums<br>
-[+] Added `SlashCo.GetDangerColor`, `SlashCo.GetDangerSound`, `SlashCo.GetNameColor`, `SlashCo.GetClassColor` functions<br>
+[+] Added `SlashCo.GetRoundTime`, `SlashCo.IsQuickEscape`, `SlashCo.IsSlowEscape`, `SlashCo.GetRoundStartTime` functions<br>
+[+] Added `SlashCo.GetDangerColor`, `SlashCo.GetDangerSound`, `SlashCo.GetNameColor`, `SlashCo.GetClassColor`, `SlashCo.CopyColor` functions<br>
 [#] Changed `SlashCo.OfferingData` keys.<br>
 \-> Renamed `SO` to `Singularity`<br>
 \-> Renamed `DO` to `Duality`<br>
