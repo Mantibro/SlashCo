@@ -117,7 +117,9 @@ hook.Add("HUDShouldDraw", "DisableDefaultHUD", function(name)
 end)
 
 local skyBoxVec = Vector(0, 0, 100000)
+local dynamicfog = CreateConVar("slashco_dynamicfog", "1", FCVAR_ARCHIVE, "Experimental - Dynamic fog that changes based on your location", 0, 1)
 function GM:SetupWorldFog() -- A basic world fog that dynamicly changes depending on the environment
+	if not dynamicfog:GetBool() then return end
 	if GameData.IsLobby then return end
 	if GameData.LocalPlayer:Team() == TEAM_SPECTATOR then return end
 
