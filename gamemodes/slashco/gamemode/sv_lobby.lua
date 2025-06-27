@@ -262,13 +262,19 @@ end
 
 local function BeginSlasherSelection()
 	print("Slasher Selecting!")
+	
+	-- We did this previously clientside, but there's no reason to go server -> client -> server when the client gets no choice.
+	if SlashCo.LobbyData.SelectedSlasherInfo.ID ~= 0 then
+		SlashCo.ChooseTheSlasherLobby(SlashCo.LobbyData.SelectedSlasherInfo.ID)
+		return
+	end
 
 	net.Start("mantislashco_PickingSlasher")
 		net.WriteTable({
 			slashersteamid = SlashCo.LobbyData.AssignedSlashers[1].steamid,
-			slashID = SlashCo.LobbyData.SelectedSlasherInfo.ID,
 			slashClass = SlashCo.LobbyData.SelectedSlasherInfo.CLASS,
-			slashDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER
+			slashDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER,
+			bannedSlashers = SlashCo.GetBannedSlashers(true),
 		})
 	net.Broadcast()
 end
@@ -436,11 +442,16 @@ local function lobbyRoundSetup()
 	end
 end
 
-net.Receive("mantislashco_SelectSlasher", function()
+net.Receive("mantislashco_SelectSlasher", function(_, ply)
 	if SERVER then
-		rec_id = net.ReadTable()
-		print("[SlashCo] Received. (" .. rec_id.pick .. ")")
-		SlashCo.ChooseTheSlasherLobby(rec_id.pick)
+		rec_id = net.ReadString()
+		if SlashCo.IsSlasherBanned(rec_id) then
+			print("[SlashCo] \"" .. ply:Name() .. "\" tried to pick a banned slasher! (" .. rec_id .. ")")
+			return
+		end
+
+		print("[SlashCo] Received. (" .. rec_id .. ")")
+		SlashCo.ChooseTheSlasherLobby(rec_id)
 	end
 end)
 

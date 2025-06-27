@@ -21,6 +21,8 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [+] Added ambient sounds which volume and sound track are based off the Slasher's anger.<br>
 [+] After `15` minutes(the warning time) of playing, the player receives a warning sound indicating that they got 5 minutes left before they would have a slow escape<br>
 [+] When the warning time is reached, fuel cans will start making noises making it more easy to find them<br>
+[+] Added `slashco_unstuck` console command that can be used to unstuck yourself if you somehow get stuck due to any kind of bug<br>
+[+] Added `slashco_banslasher`, `slashco_unbanslasher` allowing hosts to ban one or multiple slashers. The ban **remains indefinetly** until removed manually!<br>
 [#] You can now hold the USE key when fuling a generator instead of having to let go of it and press it again<br>
 [#] Disable broken door collisions after it stopped moving<br>
 (if you accidentally walked on it previously, your movement would become jittery as the prediction would fail).<br>
@@ -207,6 +209,7 @@ All newly added sounds will be from the SlashCo VR version.<br>
 ## Lua API Changes
 This documentation wasn't finished yet<br>
 
+[+] Added `SlashCo.GetBannedSlashers`, `SlashCo.IsSlasherBanned`, `SlashCo.BanSlasher`, `SlashCo.UnbanSlasher` functions<br>
 [+] Added `SlashCo.SetGlobalFogMult`, `SlashCo.GetGlobalFogMult`, `SlashCo.SetGlobalFogColor`, `SlashCo.GetGlobalFogColor` functions<br>
 [+] Added `Player:SetFogMult`, `Player:GetFogMult`, `Player:MarkAsSeenBySlasher`, `Player:WasSeenBySlasher`, `Player:FindPlayersInView`, `Player:IsStuck` functions<br>
 [+] Added `SlashCo.States`, `SlashCo.DifficultyLevel`, `SlashCo.SlasherClass`, `SlashCo.DangerLevel` enums<br>

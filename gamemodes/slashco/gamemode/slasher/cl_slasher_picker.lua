@@ -1,5 +1,5 @@
 net.Receive("mantislashco_PickingSlasher", function()
-	readtable = net.ReadTable()
+	GameData.PickSlasherTbl = net.ReadTable()
 
 	SlasherIcon = "slashco/ui/icons/slasher/s_0"
 	SelectedSlasher = "None"
@@ -27,7 +27,7 @@ end
 
 function SlasherChosen(My_Pick)
 	net.Start("mantislashco_SelectSlasher")
-	net.WriteTable({pick = My_Pick})
+		net.WriteString(My_Pick)
 	net.SendToServer()
 
 	print("Slasher chosen with the Name of " .. My_Pick)
@@ -35,36 +35,35 @@ end
 
 
 function DrawTheSlasherSelectorBox()
-	if GameData.LocalSteamID64 ~= readtable.slashersteamid then return end
+	if GameData.LocalSteamID64 ~= GameData.PickSlasherTbl.slashersteamid then return end
 
-	local SlasherPickingID = 0
 	local SlasherPickingCLASS = 0
 	local SlasherPickingDANGER = 0
-
-	if readtable ~= nil then
-		SlasherPickingID = readtable.slashID
-		SlasherPickingCLASS = readtable.slashClass
-		SlasherPickingDANGER = readtable.slashDanger
+	local bannedSlashers = {}
+	if GameData.PickSlasherTbl ~= nil then
+		SlasherPickingCLASS = GameData.PickSlasherTbl.slashClass
+		SlasherPickingDANGER = GameData.PickSlasherTbl.slashDanger
+		bannedSlashers = GameData.PickSlasherTbl.bannedSlashers
 	end
 
 	if not SelectedSlasher then
 		SelectedSlasher = "None"
 	end
 
-	if IsValid(SlasherSelectFrame) then print("not valid!") return end
-
-	if  SlasherPickingID ~= 0 then SlasherChosen(SlasherPickingID) return end
+	if IsValid(SlasherSelectFrame) then
+		SlasherSelectFrame:Remove()
+	end
 
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create("DFrame")
 	SlasherSelectFrame:SetTitle("")
+	SlasherSelectFrame:ParentToHUD()
 
 	local x = ScrW() / 50
 	local y = ScrH() / 25
 	local icon_size = ScrW() / 15
 	local row = 0
 	local count = 1
-
 	for k, v in SortedPairs(SlashCoSlashers) do
 		if not v.IsSelectable then continue end
 
@@ -89,6 +88,11 @@ function DrawTheSlasherSelectorBox()
 			is_available = false
 		end
 
+		if bannedSlashers[v.Name] then
+			Slash:SetDisabled(true)
+			is_available = false
+		end
+
 		if SelectedSlasher == k  then
 			Slash:SetDisabled(true)
 			Slash:SetSize(icon_size * 1.12, icon_size * 1.12)
@@ -101,6 +105,7 @@ function DrawTheSlasherSelectorBox()
 			else
 				surface.SetMaterial(Material("slashco/ui/icons/slasher/kill_disabled"))
 			end
+
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.DrawTexturedRect(0, 0, w, h)
 		end
@@ -116,7 +121,11 @@ function DrawTheSlasherSelectorBox()
 	end
 
 	local confirmselect = vgui.Create("DButton", SlasherSelectFrame)
-	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() GameData.LocalPlayer:EmitSound("slashco/slasher_select.mp3") end
+	function confirmselect.DoClick()
+		SlasherChosen(SelectedSlasher)
+		HideSelection()
+		GameData.LocalPlayer:EmitSound("slashco/slasher_select.mp3")
+	end
 	confirmselect:SetPos(ScrW() / 2, ScrH() / 1.1)
 	confirmselect:SetSize(ScrW() / 4, 40)
 	confirmselect:SetText(SlashCo.Language("ItemConfirm"))
