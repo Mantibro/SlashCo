@@ -25,7 +25,7 @@ SLASHER.ChaseDuration = 0.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2
 SLASHER.ChaseMusic = ""
-SLASHER.KillSound = "slashco/slasher/igor/tyler_kill.mp3"
+SLASHER.KillSound = "slashco/slasher/tyler/tyler_kill.mp3"
 SLASHER.Description = "Tyler_desc"
 SLASHER.ProTip = "Tyler_tip"
 SLASHER.SpeedRating = "★★★★★"
@@ -71,7 +71,7 @@ local function SwitchForm(slasher, newForm)
 		SLASHER.HideTime(slasher)
 		if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and slasher.WasDestroyerOnce then -- If its already playing, we don't need to start it again.
 			SlashCo.AudioSystem.EnableBackgroundMusic()
-			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/igor/igors_theme.ogg", math.Clamp(100 - anger, 0, 100) / 100) -- Make the background music getting more silent the more anger he has.
+			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.Clamp(100 - anger, 0, 100) / 100) -- Make the background music getting more silent the more anger he has.
 		end
 
 		slasher:SetNW2Bool("Slasher:NoFootsteps", false)
@@ -181,7 +181,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
 			local rnd = math.random(1, 9)
-			slasher.TylerSongPickedID = "slashco/slasher/igor/tyler_song_" .. rnd .. (rnd <= 6 and ".mp3" or ".ogg")
+			slasher.TylerSongPickedID = "slashco/slasher/tyler/tyler_song_" .. rnd .. (rnd <= 6 and ".mp3" or ".ogg")
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = slasher.TylerSongPickedID,
 				identifier = "TylerSong",
@@ -230,7 +230,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.TimeAsTylerForm = 0
 			slasher.TimeAsTylerSpecter = 0
 
-			slasher:EmitSound("slashco/slasher/igor/tyler_create.mp3")
+			slasher:EmitSound("slashco/slasher/tyler/tyler_create.mp3")
 
 			timer.Simple(3, function()
 				if not IsValid(slasher) then
@@ -266,7 +266,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if slasher.tyler_destroyer_entrance_antispam == nil then
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = endlessChase and "slashco/slasher/igor/igor_whatsgood_intro.ogg" or "slashco/slasher/igor/tyler_alarm.ogg",
+				soundPath = endlessChase and "slashco/slasher/tyler/tyler_whatsgood_intro.ogg" or "slashco/slasher/tyler/tyler_alarm.ogg",
 				identifier = "TylerAlarm",
 				minDistance = 15000,
 				maxDistance = 20000,
@@ -287,7 +287,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			if anger < 50 then -- switch up songs if his anger is below 50.
 				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/igor/igor_nmw.ogg",
+					soundPath = "slashco/slasher/tyler/tyler_destroyer_low.ogg",
 					identifier = "TylerTheme",
 					minDistance = 15000,
 					maxDistance = 20000,
@@ -299,7 +299,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			else
 				if endlessChase then
 					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/igor/igor_whatsgood.ogg",
+						soundPath = "slashco/slasher/tyler/tyler_whatsgood.ogg",
 						identifier = "TylerTheme",
 						minDistance = 15000,
 						maxDistance = 20000,
@@ -310,7 +310,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					})
 				else
 					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/igor/tyler_destroyer_theme.mp3",
+						soundPath = "slashco/slasher/tyler/tyler_destroyer_theme.mp3",
 						identifier = "TylerTheme",
 						minDistance = 15000,
 						maxDistance = 20000,
@@ -321,7 +321,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					})
 
 					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/igor/tyler_destroyer_whisper.mp3",
+						soundPath = "slashco/slasher/tyler/tyler_destroyer_whisper.mp3",
 						identifier = "TylerWhisper",
 						minDistance = 850,
 						maxDistance = 1500,
