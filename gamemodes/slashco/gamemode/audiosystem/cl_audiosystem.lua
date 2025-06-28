@@ -583,6 +583,7 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		boolean deleteWhenDone - If true, the channel is deleted once the sound finished playing (will ignore looping flag and still stop it).
 		number fadeIn - How many seconds it takes for the song to fade in at the start of it.
 		number fadeOut - How many seconds before the ending it should start to fade out, and when it faded out the channel is destroyed.
+		number fadeOutStart - How many seconds after the sound start it should begin to fade out. Use negative number to use a time based off the end of the sound instead of the start.
 		boolean forceMono - Forces the sound to play as mono. Perferably use forceSterio since it won't butcher the sound quality.
 		boolean forceSterio - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
 		boolean noWorldSpace - If set it will use the entities EyePos instead of falling back to using it's WorldSpaceCenter position.
@@ -667,7 +668,8 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		channel:EnableLooping(soundData.looping)
 		local calcTime = SlashCo.AudioSystem.CalculateTime(channel, soundData.startTick, soundData.looping)
 		channel:SetTime(calcTime)
-		local timeLeft = channel:GetLength() - calcTime
+		local totalLength = channel:GetLength()
+		local timeLeft = totalLength - calcTime
 
 		if soundData.identifier then
 			SlashCo.AudioSystem.SetChannelIdentifier(channel, soundData.identifier)
@@ -726,14 +728,25 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		if soundData.deleteWhenDone then
-			timer.Simple(timeLeft + 0.2, function()
+			timer.Simple(timeLeft + 0.1, function()
 				if not IsValid(channel) then return end
 				SlashCo.AudioSystem.DestroyChannel(channel, 0)
 			end)
 		end
 
 		if soundData.fadeOut then
-			timer.Simple(timeLeft - (soundData.fadeOut + 0.2), function() -- We add 0.2 just as a buffer to ensure that it'll go fine.
+			local baseTime = soundData.fadeOut + 0.1 -- We add 0.1 just as a buffer to ensure that it'll go fine.
+			local time = timeLeft - baseTime
+			local timeOffset = soundData.fadeOutStart or 0
+			if timeOffset ~= 0 then
+				if timeOffset > 0 then
+					time = timeOffset - calcTime
+				else
+					time = totalLength + timeOffset
+				end
+			end
+
+			timer.Simple(time, function()
 				if not IsValid(channel) then return end
 				SlashCo.AudioSystem.DestroyChannel(channel, soundData.fadeOut)
 			end)
@@ -836,6 +849,7 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		deleteWhenDone = ReadSoundField(net.ReadBool),
 		fadeIn = ReadSoundField(net.ReadFloat),
 		fadeOut = ReadSoundField(net.ReadFloat),
+		fadeOutStart = ReadSoundField(net.ReadFloat),
 		forceMono = ReadSoundField(net.ReadBool),
 		forceSterio = ReadSoundField(net.ReadBool),
 		noWorldSpace = ReadSoundField(net.ReadBool),

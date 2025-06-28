@@ -60,6 +60,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		WriteSoundField(soundData.deleteWhenDone, net.WriteBool)
 		WriteSoundField(soundData.fadeIn, net.WriteFloat)
 		WriteSoundField(soundData.fadeOut, net.WriteFloat)
+		WriteSoundField(soundData.fadeOutStart, net.WriteFloat)
 		WriteSoundField(soundData.forceMono, net.WriteBool)
 		WriteSoundField(soundData.forceSterio, net.WriteBool)
 		WriteSoundField(soundData.noWorldSpace, net.WriteBool)

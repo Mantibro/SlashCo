@@ -769,9 +769,10 @@ local function WasSeenBySlasher(_, _, old, new)
 			soundPath = "slashco/survivor/seen_by_slasher.mp3",
 			identifier = "SeenBySlasher",
 			entity = 0,
-			volume = 1,
+			volume = 0.5,
 			fadeIn = 0.5,
-			fadeOut = 0.5,
+			fadeOut = 4,
+			fadeOutStart = 2,
 		})
 	end
 end

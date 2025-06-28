@@ -52,8 +52,23 @@ function SlashCo.PrepareSlasherForSpawning()
 end
 
 function SlashCo.OnSlasherSpawned(ply)
-	ply:SetRunSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
-	ply:SetWalkSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
+	local slasherTbl = SlashCoSlashers[ply:GetNWString("Slasher")]
+	if slasherTbl.OnBalanceForPlayers then
+		slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+		--[[
+			Example:
+
+			totalSurvivors = How many survivors existed when they got spawned in using the helicopter
+			additionalSurvivors = How many survivors above or below the base max survivor count exist. If 2 total survivors exist them this would be -4 since 2 - 6(the base max survivors) = -4
+				
+			function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+				SLASHER.ProwlSpeed = 140 + (5 * totalSurvivors)
+			end
+		]]
+	end
+
+	ply:SetRunSpeed(slasherTbl.ProwlSpeed)
+	ply:SetWalkSpeed(slasherTbl.ProwlSpeed)
 	ply:SetNW2Float("SlasherAnger", 0)
 
 	ply.ChaseActivationCooldown = 0
@@ -352,7 +367,7 @@ function SlashCo.StartChaseMode(slasher)
 		soundPath = slasher:SlasherValue("ChaseMusic"),
 		identifier = "ChaseMusic",
 		minDistance = 1000 * SlashCo.MapSize,
-		maxDistance = 2000 * SlashCo.MapSize,
+		maxDistance = 3000 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 0.7,

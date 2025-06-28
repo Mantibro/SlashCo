@@ -696,10 +696,12 @@ local function startRound(noSetup)
 	SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterTargetPosition, SlashCo.CurRound.HelicopterIntroAngle)
 	SlashCo.BroadcastCurrentRoundData(true)
 
-	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+	local survivors = team.GetPlayers(TEAM_SURVIVOR)
+	for _, ply in ipairs(survivors) do
 		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
 		ply:SetHealth(ply:GetMaxHealth())
 	end
+	GameData.RoundStartSurvivorCount = #survivors
 
 	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}
 	local dangerLevel = SlashCo.DangerLevel.Unknown
