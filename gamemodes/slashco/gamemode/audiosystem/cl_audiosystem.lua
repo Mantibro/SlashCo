@@ -588,6 +588,8 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		boolean forceSterio - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
 		boolean noWorldSpace - If set it will use the entities EyePos instead of falling back to using it's WorldSpaceCenter position.
 		boolean dynamicPan - If set it will calculate the pan for the channel giving the sound a 3D effect.
+		string fallbackSoundPath - The fallback sound when the bound ConVar is disabled.
+		string boundConVar - A ConVar the sound is bound to, when the ConVar is false then it will instead play the set fallbackSoundPath
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -601,7 +603,15 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		You can combine forceSterio and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in sterio/using multiple channels instead of the normal 3D that forces them into mono.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
-	soundData.identifier = soundData.identifier or soundData.soundPath
+	local soundPath = soundData.soundPath
+	if soundData.boundConVar and soundData.fallbackSoundPath then
+		local convar = GetConVar(soundData.boundConVar)
+		if not convar:GetBool() then
+			soundPath = soundData.fallbackSoundPath
+		end
+	end
+
+	soundData.identifier = soundData.identifier or soundPath
 	soundData.startTick = soundData.startTick or engine.TickCount()
 	--soundData.entity = soundData.entity or game.GetWorld()
 	soundData.volume = soundData.volume or 1
@@ -648,7 +658,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		useMode = ""
 	end
 
-	SlashCo.AudioSystem.CreateChannel(soundData.soundPath, AppendMode(AppendMode(useMode, soundData.modes), "noplay"), function(channel, channelData)
+	SlashCo.AudioSystem.CreateChannel(soundPath, AppendMode(AppendMode(useMode, soundData.modes), "noplay"), function(channel, channelData)
 		local soundData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier] or soundData -- Update in case it was updated in the few frames we had originally made our call.
 		if soundData.DESTROYCHANNEL then
 			channel:SetVolume(0)
@@ -831,6 +841,7 @@ end
 net.Receive("slashCo_AudioSystem_PlaySound", function()
 	local soundData = {
 		soundPath = ReadSoundField(net.ReadString),
+		fallbackSoundPath = ReadSoundField(net.ReadString),
 		entity = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS),
 		soundLevel = ReadSoundField(net.ReadUInt, 14),
 		volume = ReadSoundField(net.ReadFloat),
@@ -854,12 +865,13 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		forceSterio = ReadSoundField(net.ReadBool),
 		noWorldSpace = ReadSoundField(net.ReadBool),
 		dynamicPan = ReadSoundField(net.ReadBool),
+		boundConVar = ReadSoundField(net.ReadString),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
 	-- While clientside, the channel could be moved after PlaySound was called so if we forced it into mono we could break things.
 	if soundData.entity ~= nil and soundData.entity == SlashCo.AudioSystem.LocalEntIndex then
-		soundData.forceMono = true -- We are playing the sound on the local player, so we switch it to mono for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
+		soundData.forceSterio = true -- We are playing the sound on the local player, so we switch it to sterio for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
 	end
 
 	SlashCo.AudioSystem.PlaySound(soundData)

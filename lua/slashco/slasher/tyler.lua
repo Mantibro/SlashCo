@@ -116,6 +116,10 @@ function SLASHER.OnHelicopterSummon(slasher)
 	SwitchForm(slasher, TYLER_PRE_DESTROYER)
 end
 
+if CLIENT then
+	CreateClientConVar("slashco_tyler_endless_chase_music", "1", true, false, "When 0 the endless chase music is changed to be the normal one", 0, 1)
+end
+
 function SLASHER.OnTickBehaviour(slasher)
 	local TylerState = slasher.TylerState or 0 --State
 	local TimeAsTylerForm = slasher.TimeAsTylerForm or 0 --Time Spent as Creator or destroyer
@@ -267,6 +271,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = endlessChase and "slashco/slasher/tyler/tyler_whatsgood_intro.ogg" or "slashco/slasher/tyler/tyler_alarm.ogg",
+				fallbackSoundPath = endlessChase and "slashco/slasher/tyler/tyler_alarm.ogg" or nil,
+				boundConVar = endlessChase and "slashco_tyler_endless_chase_music" or nil,
 				identifier = "TylerAlarm",
 				minDistance = 15000,
 				maxDistance = 20000,
@@ -300,6 +306,8 @@ function SLASHER.OnTickBehaviour(slasher)
 				if endlessChase then
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "slashco/slasher/tyler/tyler_whatsgood.ogg",
+						fallbackSoundPath = "slashco/slasher/tyler/tyler_destroyer_theme.mp3",
+						boundConVar = "slashco_tyler_endless_chase_music",
 						identifier = "TylerTheme",
 						minDistance = 15000,
 						maxDistance = 20000,
