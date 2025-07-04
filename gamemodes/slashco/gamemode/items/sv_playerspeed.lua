@@ -19,6 +19,9 @@ function PLAYER:RemoveSpeedEffect(key)
 	self:UpdateSpeed()
 end
 
+local BASE_RUN_SPEED = 300
+local BASE_WALK_SPEED = 200
+local BASE_SLOW_WALK_SPEED = 100
 function PLAYER:UpdateSpeed()
 	local highestPriority = -9999
 	local highestPrioritySpeed
@@ -30,13 +33,13 @@ function PLAYER:UpdateSpeed()
 	end
 
 	if highestPriority == -9999 then
-		self:SetRunSpeed(300)
-		self:SetWalkSpeed(200)
-		self:SetSlowWalkSpeed(100)
+		self:SetRunSpeed(BASE_RUN_SPEED)
+		self:SetWalkSpeed(BASE_WALK_SPEED)
+		self:SetSlowWalkSpeed(BASE_SLOW_WALK_SPEED)
 	else
 		self:SetRunSpeed(highestPrioritySpeed)
-		self:SetWalkSpeed(math.min(highestPrioritySpeed, 200))
-		self:SetSlowWalkSpeed(math.min(highestPrioritySpeed, 100))
+		self:SetWalkSpeed(math.min(highestPrioritySpeed, BASE_WALK_SPEED))
+		self:SetSlowWalkSpeed(math.min(highestPrioritySpeed, BASE_SLOW_WALK_SPEED))
 	end
 end
 
