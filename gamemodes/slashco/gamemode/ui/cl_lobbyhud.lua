@@ -14,19 +14,18 @@ local longest_name, plynum, clientReadiness, Lobby_Players
 local isClientinLobby = false
 local function UpdateLobbyState()
 	Lobby_Players = {}
-	for _, v in ipairs(GameData.LobbyInfoTable) do
-		local ply = player.GetBySteamID64(v.steamid)
-
+	for ply, readyState in pairs(GameData.LobbyInfoTable) do
 		if not IsValid(ply) then
 			continue
 		end
 
-		if not table.HasValue(Lobby_Players, { ID = v.steamid }) then
-			table.insert(Lobby_Players, { ID = v.steamid, Name = ply:GetName(), Ready = v.readyState })
+		if not Lobby_Players[ply] then
+			table.insert(Lobby_Players, { ID = ply:SteamID64(), Name = ply:GetName(), Ready = readyState })
+			Lobby_Players[ply] = true
 		end
 
-		if v.steamid == GameData.LocalSteamID64 then
-			clientReadiness = v.readyState
+		if ply == GameData.LocalPlayer then
+			clientReadiness = readyState
 			isClientinLobby = true
 		end
 	end
@@ -38,8 +37,13 @@ local function UpdateLobbyState()
 	end
 end
 
-net.Receive("mantislashco_GiveLobbyInfo", function()
-	GameData.LobbyInfoTable = net.ReadTable()
+net.Receive("mantislashco_GiveLobbyInfo", function(len)
+	GameData.LobbyInfoTable = {} -- We only use GameData.LobbyInfoTable in this file.
+
+	local entities = len / (MAX_EDICT_BITS + 2) -- +2 because of the uint we write
+	for k=1, entities do
+		GameData.LobbyInfoTable[net.ReadEntity()] = net.ReadUInt(2)
+	end
 
 	UpdateLobbyState()
 end)

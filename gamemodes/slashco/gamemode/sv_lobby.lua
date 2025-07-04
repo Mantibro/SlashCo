@@ -135,42 +135,21 @@ end
 
 --Only run this and the removePlayerFromLobby function using the GM:PlayerChangedTeam hook: https://wiki.facepunch.com/gmod/GM:PlayerChangedTeam
 local function addPlayerToLobby(ply)
-	if not table.HasValue(SlashCo.LobbyData.Players, ply:SteamID64()) then
-		table.insert(SlashCo.LobbyData.Players, { steamid = ply:SteamID64(), readyState = 0 })
-	end
-
+	SlashCo.LobbyData.Players[ply] = 0 -- Ready state
 	broadcastLobbyInfo()
 end
 
 local function removePlayerFromLobby(ply)
-	local id = ply:SteamID64()
-	for _, v in ipairs(SlashCo.LobbyData.Players) do
-		if v.steamid == id then
-			--If the steamid in this entry matches the one we're looking for, remove it.
-			table.remove(SlashCo.LobbyData.Players, _)
-		end
-	end
+	SlashCo.LobbyData.Players[ply] = nil
 	broadcastLobbyInfo()
 end
 
 function lobbyPlayerReadying(ply, state)
-	local id = ply:SteamID64()
-	for _, v in ipairs(SlashCo.LobbyData.Players) do
-		if v.steamid == id then
-			SlashCo.LobbyData.Players[_].readyState = state
-		end
-	end
+	SlashCo.LobbyData.Players[ply] = state
 end
 
 function getReadyState(ply)
-	local id = ply:SteamID64()
-
-	--Return the player's ReadyState
-	for _, v in ipairs(SlashCo.LobbyData.Players) do
-		if v.steamid == id then
-			return SlashCo.LobbyData.Players[_].readyState
-		end
-	end
+	return SlashCo.LobbyData.Players[ply]
 end
 
 function isPlyOfferer(ply)
@@ -187,23 +166,27 @@ end
 
 function lobbyReady()
 	--Is everyone ready?
-	for _, v in ipairs(SlashCo.LobbyData.Players) do
-		if v.readyState == 0 then
+	for _, readyState in pairs(SlashCo.LobbyData.Players) do
+		if readyState == 0 then
 			return false
 		end
 	end
+
 	--If we make it here then everyone has a readystate that isn't 0 and so everyone must be ready
 	return true
 end
 
 function broadcastLobbyInfo()
 	net.Start("mantislashco_GiveLobbyInfo")
-	net.WriteTable(SlashCo.LobbyData.Players)
+		for ply, readyState in pairs(SlashCo.LobbyData.Players) do
+			net.WriteEntity(ply)
+			net.WriteUInt(readyState, 2)
+		end
 	net.Broadcast()
 
 	if timer.TimeLeft("AllReadyLobby") ~= nil then
 		net.Start("mantislashco_LobbyTimerTime")
-		net.WriteUInt(math.floor(timer.TimeLeft("AllReadyLobby")), 6)
+			net.WriteUInt(math.floor(timer.TimeLeft("AllReadyLobby")), 6)
 		net.Broadcast()
 	end
 end
@@ -316,15 +299,15 @@ local function lobbyRoundSetup()
 
 		--SlashCo.LobbyData.DeathwardsLeft = 2 - SlashCo.LobbyData.SelectedDifficulty
 
-		for i = 1, #SlashCo.LobbyData.Players do
+		for ply, readyState in pairs(SlashCo.LobbyData.Players) do
 			--Setup for assigning that players' in-game teams
 
-			if SlashCo.LobbyData.Players[i].readyState == 1 then
-				table.insert(SlashCo.LobbyData.PotentialSurvivors, { steamid = SlashCo.LobbyData.Players[i].steamid })
-				print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.Players[i].steamid):GetName() .. " now is a potential Survivor.")
-			elseif SlashCo.LobbyData.Players[i].readyState == 2 then
-				table.insert(SlashCo.LobbyData.PotentialSlashers, { steamid = SlashCo.LobbyData.Players[i].steamid })
-				print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.Players[i].steamid):GetName() .. " now is a potential Slasher.")
+			if readyState == 1 then
+				table.insert(SlashCo.LobbyData.PotentialSurvivors, { steamid = ply:SteamID64() })
+				print("(Debug) " .. ply:GetName() .. " now is a potential Survivor.")
+			elseif readyState == 2 then
+				table.insert(SlashCo.LobbyData.PotentialSlashers, { steamid = ply:SteamID64() })
+				print("(Debug) " .. ply:GetName() .. " now is a potential Slasher.")
 			end
 		end
 
@@ -576,7 +559,7 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		broadcastLobbyInfo()
 	end
 
-	local num = #SlashCo.LobbyData.Players
+	local num = table.Count(SlashCo.LobbyData.Players)
 	local num_o = #SlashCo.LobbyData.Offerors
 
 	if num_o > 0 and SlashCo.LobbyData.Offering < 1 and num_o > (num / 2) then
@@ -594,11 +577,13 @@ hook.Add("Tick", "LobbyTickEvent", function()
 			seek = 0
 		end
 
-		for p = 1, num do
-			local ply = player.GetBySteamID64(SlashCo.LobbyData.Players[p].steamid)
-			if not ply then continue end -- It can return false.
+		for ply, readyState in pairs(SlashCo.LobbyData.Players) do
+			if not IsValid(ply) then
+				removePlayerFromLobby(ply)
+				continue
+			end
 
-			local rdy = getReadyState(ply)
+			local rdy = readyState
 			if rdy > 0 then
 				seek = seek + 1
 			end
@@ -779,13 +764,11 @@ concommand.Add("lobby_debug_proceed", function(ply)
 		doors[1]:Fire("Open")
 		doors[2]:Fire("Open")
 
-		for i = 1, #SlashCo.LobbyData.Players do
+		for ply, readyState in pairs(SlashCo.LobbyData.Players) do
 			--If someone is not ready, force them as ready survivor.
 
-			local ply1 = player.GetBySteamID64(SlashCo.LobbyData.Players[i].steamid)
-
-			if getReadyState(ply1) < 1 then
-				lobbyPlayerReadying(ply1, 1)
+			if getReadyState(ply) < 1 then
+				lobbyPlayerReadying(ply, 1)
 			end
 		end
 
