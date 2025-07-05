@@ -60,6 +60,17 @@ local function SwitchForm(slasher, newForm)
 		newForm = TYLER_PRE_DESTROYER -- When becoming Creator, he has a random chance to become a destroyer instead if his anger is already above 20.
 	end
 
+	if slasher.TylerState == TYLER_DESTROYER then
+		SlashCo.AudioSystem.StopSound("TylerTheme", 1)
+		SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
+
+		slasher:SetVisible(false)
+		slasher:SetNWBool("TylerFlash", false)
+		slasher.TimeAsTylerSpecter = 0
+
+		SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
+	end
+
 	slasher.TylerState = newForm
 
 	slasher.TimeAsTylerSpecter = 0
@@ -131,7 +142,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if (TylerState == 0 or TylerState == 1) and endlessChase then
-		SwitchForm(slasher, 2)
+		SwitchForm(slasher, TYLER_PRE_DESTROYER)
 		SlashCo.AudioSystem.StopSound("TylerSong", 0)
 		slasher.TylerSongPickedID = nil
 		SlashCo.AddSlasherAnger(slasher, 100) -- Max it out
@@ -370,14 +381,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if TimeAsTylerForm > math.max((((3 + SlashCo.MapSize) / 4) * anger), SLASHER.MinChase) and not endlessChase then
 			SwitchForm(slasher, TYLER_SPECTER)
-
-			SlashCo.AudioSystem.StopSound("TylerTheme", 1)
-			SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
-
-			slasher:SetVisible(false)
-			slasher:SetNWBool("TylerFlash", false)
-
-			SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
 		end
 	end
 
@@ -494,22 +497,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			if EndlessChase() then goto skip end
 			
 			SwitchForm(slasher, TYLER_SPECTER)
-			slasher.TimeAsTylerSpecter = 0
-			slasher:SetVisible(false)
 
-			SlashCo.AudioSystem.StopSound("TylerTheme", 0.5)
-			SlashCo.AudioSystem.StopSound("TylerWhisper", 0.5)
-
-			timer.Simple(0.1, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				SlashCo.AudioSystem.StopSound("TylerTheme", 0.5)
-				SlashCo.AudioSystem.StopSound("TylerWhisper", 0.5)
-			end)
-
-			slasher:SetNWBool("TylerFlash", false)
 			::skip::
 		end
 
