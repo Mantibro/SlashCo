@@ -208,6 +208,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.TylerSongPickedID = nil
 			SwitchForm(slasher, TYLER_PRE_DESTROYER)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
+			return
 		end
 
 		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do

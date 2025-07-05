@@ -284,8 +284,10 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime, callback)
 				if !IsValid(channel) or vol <= 0 then
 					timer.Remove(timerName)
 					channelData.volume = nil
-					channel:Stop()
-					channel:__gc()
+					if IsValid(channel) then
+						channel:Stop()
+						channel:__gc()
+					end
 					SlashCo.AudioSystem.CheckChannels()
 					SlashCo.AudioSystem.Channels[channel] = nil
 
@@ -557,6 +559,85 @@ end
 ]]
 hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 
+local function RenderPulseEffect(entity, pulse, bumpDelay)
+	local originalScale = entity:GetModelScale()
+	if not pulse then
+		entity._LastPulseScale = Lerp(FrameTime(), (entity._LastPulseScale or originalScale), 1)
+		--print(entity._LastPulseScale)
+		entity:SetModelScale(entity._LastPulseScale, 0)
+	else
+		entity:SetModelScale(originalScale * 1.1, 0)
+		entity._LastPulseScale = entity:GetModelScale()
+	end
+
+	local r, g, b = 255, 0, 0
+	render.SetColorModulation(r / 255, g / 255, b / 255)
+	render.SetBlend(((entity._LastPulseScale - 1) * 10) - (math.Clamp(bumpDelay - CurTime(), 1, 0)) * 255)
+	entity:DrawModel()
+	render.SetBlend(1)
+	entity:SetModelScale(originalScale, 0)
+end
+
+function SlashCo.AudioSystem.EffectThink() -- A WIP effect that can be used at a later point.
+	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
+		local soundData = channelData.soundData
+		if not soundData then continue end
+
+		local pulseEffect = soundData.pulseEffect
+		if pulseEffect then
+			local shouldPulse = false
+			local sampleSize = 10
+			local threshold = 0.1
+			local minDelay = 0.2
+			local offset = 25
+			local fft = {}
+			//debug.setmetatable(fft, meta)
+			channel:FFT(fft, FFT_4096)
+			if #fft == 0 then continue end
+			local sum = 0
+			local sumCount = 0
+			for i=offset, offset + sampleSize do
+				sum = sum + fft[i]
+				sumCount = sumCount + 1
+			end
+			sum = sum / sumCount
+			channelData.PreviousPulseSum = Lerp(0.003, channelData.PreviousPulseSum or 0, sum)
+
+			if #fft == 0 then continue end
+			cam.Start2D()
+			surface.SetDrawColor(0, 0, 0, 255)
+			for i=offset, offset + sampleSize do
+				surface.DrawRect(0, 2 * i, fft[i] * 8192, 10)
+			end
+			cam.End2D()
+
+			channelData.bumpDelay = channelData.bumpDelay or CurTime()
+			if channelData.bumpDelay < CurTime() and sum > channelData.PreviousPulseSum then
+				channelData.PreviousPulseSum = sum
+				channelData.bumpDelay = CurTime() + minDelay
+				shouldPulse = true
+			end
+
+			local pulseEnt = pulseEffect.entity and Entity(pulseEffect.entity) or nil
+			if IsValid(pulseEnt) then
+				RenderPulseEffect(pulseEnt, shouldPulse, channelData.bumpDelay)
+			end
+
+			if pulseEffect.entityClass then
+				for _, ent in ipairs(ents.FindByClass(pulseEffect.entityClass)) do
+					RenderPulseEffect(ent, shouldPulse, channelData.bumpDelay)
+				end
+			end
+		end
+	end
+end
+
+hook.Add("PostDrawOpaqueRenderables", "SlashCo:AudioSystem", function(_, drawingSkybox, drawing3D)
+	if drawing3D or drawingSkybox then return end
+
+	--SlashCo.AudioSystem.EffectThink()
+end)
+
 --[[
 	The soundData table contains all values to create and configure a channel.
 	Required fields:
@@ -590,6 +671,11 @@ hook.Add("PreRender", "SlashCo:AudioSystem", SlashCo.AudioSystem.Think)
 		boolean dynamicPan - If set it will calculate the pan for the channel giving the sound a 3D effect.
 		string fallbackSoundPath - The fallback sound when the bound ConVar is disabled.
 		string boundConVar - A ConVar the sound is bound to, when the ConVar is false then it will instead play the set fallbackSoundPath
+
+		table pulseEffect - A table for the pulse effect. NOTE: This is still WIP and should not be used.
+		-> Entity entity - A entity that should pulse
+		-> string entityClass - The class of which all entities should pulse like sc_gascan
+		-> number frequency - The sound frequency that should be checked for - currently unused.
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -838,6 +924,14 @@ local function ReadSoundField(readFunc, ...)
 	return nil
 end
 
+local function ReadPulseEffect()
+	return {
+		entity = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS),
+		entityClass = ReadSoundField(net.ReadString),
+		frequency = ReadSoundField(net.ReadUInt, 16),
+	}
+end
+
 net.Receive("slashCo_AudioSystem_PlaySound", function()
 	local soundData = {
 		soundPath = ReadSoundField(net.ReadString),
@@ -866,6 +960,7 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		noWorldSpace = ReadSoundField(net.ReadBool),
 		dynamicPan = ReadSoundField(net.ReadBool),
 		boundConVar = ReadSoundField(net.ReadString),
+		pulseEffect = ReadSoundField(ReadPulseEffect),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
