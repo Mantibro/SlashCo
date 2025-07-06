@@ -193,7 +193,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		return
 	end
 
-	if slasher:GetPos():Distance(target:GetPos()) >= 200 or target:GetNWBool("SurvivorBeingJumpscared") then
+	if slasher:GetPos():Distance(target:GetPos()) >= 100 or target:GetNWBool("SurvivorBeingJumpscared") then
 		return
 	end
 
@@ -203,8 +203,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		slasher:EmitSound("slashco/slasher/borgmire/borgmire_throw.mp3")
 		
 		target:Freeze(true)
-		slasher:Freeze(false)
-		target:SetPos(slasher:GetPos() + Vector(0, 0, 70))
+		target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
 
 		for i = 1, 13 do
 			timer.Simple(0.1 + (i / 10), function()
@@ -212,7 +211,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 					return
 				end
 
-				target:SetPos(slasher:GetPos() + Vector(0, 0, 70))
+				target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
 			end)
 		end
 
