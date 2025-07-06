@@ -86,9 +86,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	
 	if slasher:GetNWBool("WatcherRage") then
-		slasher:SetSlowWalkSpeed(380)
-		slasher:SetWalkSpeed(380)
-		slasher:SetRunSpeed(380)
+		slasher:SetSlowWalkSpeed(340)
+		slasher:SetWalkSpeed(340)
+		slasher:SetRunSpeed(340)
 	end
 
 	if SurveyCD > 0 then

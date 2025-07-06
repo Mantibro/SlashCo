@@ -215,7 +215,11 @@ function SLASHER.OnHitByTeslaCoil(slasher)
 	slasher:SetNWBool("DolphinInHiding", false)
 	slasher:SetNWBool("DolphinFound", false)
 	slasher:SetNWBool("DolphinHunting", false)
-	slasher:SetNWBool("CanKill", true)
+	timer.Simple(16, function()
+		if not slasher:GetNWBool("CanKill") then
+			slasher:SetNWBool("CanKill", true)
+		end
+	end)
 end
 
 function SLASHER.Thirdperson(ply)

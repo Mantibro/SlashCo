@@ -22,7 +22,7 @@ SLASHER.ChaseRadius = 0.96
 SLASHER.ChaseDuration = 6.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1
-SLASHER.ChaseMusic = "slashco/slasher/sid/sid_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/sid/sid_chase.ogg"
 SLASHER.KillSound = "slashco/slasher/sid/sid_kill.mp3"
 SLASHER.Description = "Sid_desc"
 SLASHER.ProTip = "Sid_tip"
@@ -36,7 +36,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher.Pacification = 0
 	slasher.GunCooldown = 0
 	slasher.GunSpread = 0
-	slasher.ChaseSpeed = 0
+	slasher.ChaseIncrease = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -47,7 +47,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local Pacification = slasher.Pacification or 0
 	local GunCD = slasher.GunCooldown or 0 --Gun use cooldown
 	local GunSP = slasher.GunSpread or 0 --bullet spread
-	local ChaseSpeed = slasher.ChaseSpeed or 0 --chase speed increase
+	local ChaseIN = slasher.ChaseIncrease or 0 --chase speed increase
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
@@ -73,12 +73,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.GunSpread = GunSP - (0.02 + (SO * 0.08))
 	end
 
-	if ChaseSpeed < 160 and slasher:GetNWBool("InSlasherChaseMode") then
-		slasher.ChaseSpeed = ChaseSpeed + (FrameTime() + (SO * 0.02)) + (Cookies * FrameTime() * 0.5)
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed + (ChaseSpeed / 3.5))
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed + (ChaseSpeed / 3.5))
+	if ChaseIN < 160 and slasher:GetNWBool("InSlasherChaseMode") then
+		slasher.ChaseIncrease = ChaseIN + (FrameTime() + (SO * 0.02)) + (Cookies * FrameTime() * 0.5)
+		slasher:SetRunSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
+		slasher:SetWalkSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
 	else
-		slasher.ChaseSpeed = 0
+		slasher.ChaseIncrease = 0
 	end
 
 	if not slasher:GetNWBool("DemonPacified") then
@@ -112,7 +112,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	if slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("SidGunLetterC") and slasher:GetNWBool("SidGunEquipped") then
 		slasher:SetNWBool("SidGunLetterC", true)
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/sid/sid_THE_LETTER_C.mp3",
+			soundPath = "slashco/slasher/sid/sid_THE_LETTER_C.ogg",
 			identifier = "SidLetterC",
 			minDistance = 750,
 			maxDistance = 1400,
@@ -367,13 +367,17 @@ function SLASHER.OnSecondaryFire(slasher)
 		slasher.GunCooldown = 2
 		slasher:SetNWBool("SidGunAiming", false)
 		slasher:SetNWBool("SidGunAimed", false)
-		slasher:SetSlowWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
+		--slasher:SetSlowWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
+		--slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
+		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 
 		if not gunrage then
-			slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
+			--slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
+			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 		else
-			slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+			--slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 		end
 	end
 end
@@ -458,7 +462,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher.GunCooldown = 2
 
 			if slasher:GetNWBool("SidGunRage") then
-				slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+				--slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+				slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 			end
 		end)
 	elseif slasher:GetNWBool("SidGun") and slasher.GunCooldown < 0.01 and not slasher:GetNWBool("SidGunAiming") and not slasher:GetNWBool("SidGunAimed") then

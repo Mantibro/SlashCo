@@ -22,7 +22,7 @@ SLASHER.ChaseRadius = 0.85
 SLASHER.ChaseDuration = 9.0
 SLASHER.ChaseCooldown = 4
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/freesmiley/freesmiley_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/freesmiley/freesmiley_chase.ogg"
 SLASHER.KillSound = "slashco/slasher/freesmiley/freesmiley_kill.mp3"
 SLASHER.Description = "FreeSmiley_desc"
 SLASHER.ProTip = "FreeSmiley_tip"
@@ -70,12 +70,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 		return
 	end
 
-	if SummonChoose == 0 then
-		SummonChoose = 1
+	if slasher.SummonChoose == 0 then
+		slasher.SummonChoose = 1
 		return
 	end
-	if SummonChoose == 1 then
-		SummonChoose = 0
+	if slasher.SummonChoose == 1 then
+		slasher.SummonChoose = 0
 		return
 	end
 end
@@ -92,7 +92,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end
 
 	local zanies = ents.FindByClass("sc_zanysmiley")
-	if SummonChoose == 0 and #zanies >= 2 then
+	if slasher.SummonChoose == 0 and #zanies >= 2 then
 		for _, v in ipairs(zanies) do
 			v:Use(slasher)
 		end
@@ -106,14 +106,14 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 	slasher:Freeze(true)
 	timer.Simple(4, function()
-		if SummonChoose == 0 then
+		if slasher.SummonChoose == 0 then
 			local smiley = ents.Create("sc_zanysmiley")
 			smiley:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
 			smiley:SetAngles(slasher:GetAngles())
 			smiley:Spawn()
 			smiley:Activate()
 		end
-		if SummonChoose == 1 then
+		if slasher.SummonChoose == 1 then
 			local smiley = ents.Create("sc_pensivesmiley")
 			smiley:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
 			smiley:SetAngles(slasher:GetAngles())

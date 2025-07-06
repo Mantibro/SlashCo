@@ -149,13 +149,13 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/trollge/trollge_stage1.mp3",
+				soundPath = "slashco/slasher/trollge/trollge_stage1.ogg",
 				identifier = "TrollgeStage1",
 				minDistance = 550,
 				maxDistance = 1100,
 				looping = true,
 				entity = slasher,
-				volume = 1,
+				volume = 0.9,
 				fadeIn = 0,
 			})
 
@@ -196,7 +196,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				maxDistance = 2200,
 				looping = true,
 				entity = slasher,
-				volume = 1,
+				volume = 0.7,
 				fadeIn = 0,
 			})
 

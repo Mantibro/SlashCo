@@ -325,7 +325,7 @@ function SLASHER.OnTickBehaviour(slasher)
 						maxDistance = 20000,
 						looping = true,
 						entity = slasher,
-						volume = 0.8,
+						volume = 0.6,
 						fadeIn = 1,
 					})
 				else

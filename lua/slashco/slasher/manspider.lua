@@ -252,7 +252,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetWalkSpeed(1)
 		slasher:SetSlowWalkSpeed(1)
 	else
-		if slasher.TimeNested > 50 or not slasher:IsOnGround() then
+		if slasher.TimeNested > 30 or not slasher:IsOnGround() then
 			slasher:SetNWBool("ManspiderNested", false)
 
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)

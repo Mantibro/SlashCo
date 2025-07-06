@@ -22,7 +22,7 @@ SLASHER.ChaseRadius = 0.92
 SLASHER.ChaseDuration = 8.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/thirsty/thirsty_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/thirsty/thirsty_chase.ogg"
 SLASHER.KillSound = "slashco/slasher/thirsty/thirsty_kill.mp3"
 SLASHER.Description = "Thirsty_desc"
 SLASHER.ProTip = "Thirsty_tip"
@@ -39,8 +39,8 @@ function SLASHER.OnSpawn(slasher)
 	slasher.MilkCount = 0
 	slasher.Pacification = 0
 	slasher.Thirsty = 0
-	slasher.ThirstyProwlSpeed = 0
-	slasher.ThirstyChaseSpeed = 0
+	--slasher.ThirstyProwlSpeed = 0
+	--slasher.ThirstyChaseSpeed = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -49,8 +49,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	local Milks = slasher.MilkCount or 0 --Milk drank
 	local Pacification = slasher.Pacification or 0 --Pacification
 	local Thirst = slasher.Thirsty or 0 --Thirst
-	local ThirstyPS = slasher.ThirstyProwlSpeed or 0 -- Prowl Speed
-	local ThirstyCS = slasher.ThirstyChaseSpeed or 0 -- Chase Speed
+	--local ThirstyPS = slasher.ThirstyProwlSpeed or 0 -- Prowl Speed
+	--local ThirstyCS = slasher.ThirstyChaseSpeed or 0 -- Chase Speed
 
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
@@ -59,8 +59,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		--Thirsty is pacified
 		slasher.Thirsty = 0
 
-		ThirstyPS = 100
-		ThirstyCS = 100
+		slasher.ThirstyProwlSpeed = 100
+		slasher.ThirstyChaseSpeed = 100
 		eyesight_final = 0
 		perception_final = 0
 
@@ -76,8 +76,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 		--Deplete thirst
 
-		ThirstyCS = 285 - (Milks * 10)
-		ThirstyPS = 100 + ((Thirst / (7 - Milks)) + (Milks * 30)) * (0.8 + (SO * 0.5))
+		slasher.ThirstyChaseSpeed = 285 - (Milks * 10)
+		slasher.ThirstyProwlSpeed = 100 - ((Thirst / (7 - Milks)) + (Milks * 30)) * (0.8 + (SO * 0.5))
 		eyesight_final = 2 + (Thirst / (28.5 - (Milks * 4)))
 		perception_final = 1.0 + (Thirst / (44.5 - (Milks * 8)))
 		--Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
@@ -88,11 +88,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("DemonPacified", false)
 
 		if slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:SetRunSpeed(ThirstyCS)
-			slasher:SetWalkSpeed(ThirstyCS)
+			slasher:SetRunSpeed(slasher.ThirstyChaseSpeed)
+			slasher:SetWalkSpeed(slasher.ThirstyChaseSpeed)
 		else
-			slasher:SetRunSpeed(ThirstyPS)
-			slasher:SetWalkSpeed(ThirstyPS)
+			slasher:SetRunSpeed(slasher.ThirstyProwlSpeed)
+			slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
 		end
 	end
 	
