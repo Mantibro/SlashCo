@@ -13,7 +13,7 @@ SLASHER.Model = "models/slashco/slashers/thirsty/thirsty.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 2
 SLASHER.ProwlSpeed = 120
-SLASHER.ChaseSpeed = 280
+SLASHER.ChaseSpeed = 290
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 2
 SLASHER.KillDistance = 150
@@ -57,8 +57,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if Pacification > 0 then
 		--Thirsty is pacified
-		slasher.Thirsty = 0
-
 		slasher.ThirstyProwlSpeed = 100
 		slasher.ThirstyChaseSpeed = 100
 		eyesight_final = 0
@@ -76,8 +74,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 		--Deplete thirst
 
-		slasher.ThirstyChaseSpeed = 285 - (Milks * 10)
-		slasher.ThirstyProwlSpeed = 100 - ((Thirst / (7 - Milks)) + (Milks * 30)) * (0.8 + (SO * 0.5))
+		slasher.ThirstyChaseSpeed = 290 - (Milks * 10)
+		slasher.ThirstyProwlSpeed = 100 - ((Thirst / (7 - Milks)) - (Milks * 40)) * (0.8 + (SO * 0.5))
 		eyesight_final = 2 + (Thirst / (28.5 - (Milks * 4)))
 		perception_final = 1.0 + (Thirst / (44.5 - (Milks * 8)))
 		--Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
