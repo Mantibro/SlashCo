@@ -763,34 +763,6 @@ function SlashCo.ReadSound(fileName)
 	return _sound
 end
 
-local function WasSeenBySlasher(_, _, old, new)
-	if new then
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/survivor/seen_by_slasher.mp3",
-			identifier = "SeenBySlasher",
-			entity = 0,
-			volume = 0.5,
-			fadeIn = 0.5,
-			fadeOut = 4,
-			fadeOutStart = 2,
-		})
-	end
-end
-
-local function SetupWasSeenHook()
-	local ply = GameData and GameData.LocalPlayer or LocalPlayer()
-
-	ply:SetNW2VarProxy("WasSeenBySlasher", WasSeenBySlasher)
-
-	-- Plays the sound if the player was already seen
-	-- WasSeenBySlasher(nil, nil, nil, ply:WasSeenBySlasher())
-end
-
-hook.Add("InitPostEntity", "SlashCo:WasLocalPlayerSeenBySlasher", SetupWasSeenHook)
-if game.GetWorld() != NULL then
-	SetupWasSeenHook()
-end
-
 SC_CLIENT_LOADED = true
 
 ---load patch files; these are specifically intended to modify existing addon code
