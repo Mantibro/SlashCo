@@ -31,7 +31,7 @@ SLASHER.DiffRating = "★★★★★"
 
 function SLASHER.OnSpawn(slasher)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/speedrunner/speedrunner_1.mp3",
+		soundPath = "slashco/slasher/speedrunner/speedrunner_1.ogg",
 		identifier = "Speedrun1",
 		minDistance = 750,
 		maxDistance = 1400,
@@ -126,7 +126,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
 			slasher:SetNWBool("SpeedrunnerSacrificeOne", true)
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/speedrunner/speedrunner_2.mp3",
+				soundPath = "slashco/slasher/speedrunner/speedrunner_2.ogg",
 				identifier = "Speedrun2",
 				minDistance = 750,
 				maxDistance = 1400,
@@ -145,7 +145,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
 			slasher:SetNWBool("SpeedrunnerSacrificeTwo", true)
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/speedrunner/speedrunner_3.mp3",
+				soundPath = "slashco/slasher/speedrunner/speedrunner_3.ogg",
 				identifier = "Speedrun3",
 				minDistance = 750,
 				maxDistance = 1400,

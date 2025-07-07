@@ -22,7 +22,7 @@ SLASHER.ChaseRadius = 0.96
 SLASHER.ChaseDuration = 2.0
 SLASHER.ChaseCooldown = 2
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/watcher/watchertheme_high.ogg"
+SLASHER.ChaseMusic = "slashco/slasher/watcher/watcher_chase.ogg"
 SLASHER.KillSound = "slashco/slasher/watcher/watcher_kill.mp3"
 SLASHER.Description = "Watcher_desc"
 SLASHER.ProTip = "Watcher_tip"
@@ -35,7 +35,7 @@ SLASHER.AngerChaseGain = 0
 SLASHER.AngerWatchingGain = 0.15 -- Anger thats gained per second when hes watching someone.
 SLASHER.LowAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
 SLASHER.MediumAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
-SLASHER.HighAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
+SLASHER.HighAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_high.ogg"
 
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 100))
@@ -86,9 +86,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	
 	if slasher:GetNWBool("WatcherRage") then
-		slasher:SetSlowWalkSpeed(340)
-		slasher:SetWalkSpeed(340)
-		slasher:SetRunSpeed(340)
+		slasher:SetSlowWalkSpeed(300)
+		slasher:SetWalkSpeed(300)
+		slasher:SetRunSpeed(300)
 	end
 
 	if SurveyCD > 0 then
@@ -261,7 +261,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	slasher:SetNWBool("WatcherRage", true)
 	SlashCo.AudioSystem.DisableBackgroundMusic()
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/watcher/watcher_rage.mp3",
+		soundPath = "slashco/slasher/watcher/watcher_rage.ogg",
 		identifier = "WatcherRage",
 		minDistance = 1000 * SlashCo.MapSize,
 	    maxDistance = 2000 * SlashCo.MapSize,

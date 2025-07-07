@@ -22,7 +22,7 @@ SLASHER.ChaseRadius = 0.9
 SLASHER.ChaseDuration = 9.0
 SLASHER.ChaseCooldown = 2
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/manspider/manspider_chase.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/manspider/manspider_chase.ogg"
 SLASHER.KillSound = "slashco/slasher/manspider/manspider_kill.mp3"
 SLASHER.Description = "Manspider_desc"
 SLASHER.ProTip = "Manspider_tip"
@@ -67,7 +67,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		local numP = team.NumPlayers(TEAM_SURVIVOR)
 		if numP < 2 and numP > 0 then
-			Target = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
+			slasher.TargetPlayer = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
 
 			slasher:SetNWBool("CanChase", true)
 			slasher:SetNWBool("CanKill", true)
