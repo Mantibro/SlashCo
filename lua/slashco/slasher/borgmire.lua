@@ -193,7 +193,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		return
 	end
 
-	if slasher:GetPos():Distance(target:GetPos()) >= 100 or target:GetNWBool("SurvivorBeingJumpscared") then
+	if slasher:GetPos():Distance(target:GetPos()) >= 140 or target:GetNWBool("SurvivorBeingJumpscared") then
 		return
 	end
 
