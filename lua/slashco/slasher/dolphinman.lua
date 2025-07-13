@@ -42,7 +42,7 @@ local function PlayCallSound(slasher)
 		maxDistance = 1240 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
-		volume = 2,
+		volume = 1,
 		fadeIn = 0,
 	})
 
@@ -53,7 +53,7 @@ local function PlayCallSound(slasher)
 		maxDistance = 2250 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
-		volume = 2,
+		volume = 0.8,
 		fadeIn = 0,
 	})
 end
@@ -108,6 +108,8 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetNWBool("DolphinFound", false)
 				slasher:SetNWBool("DolphinInHiding", false)
 				slasher:SetNWBool("DolphinHunting", true)
+				
+				slasher:SetNWBool("CanKill", true)
 			end)
 		end
 
@@ -212,9 +214,12 @@ end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
     -- i'm crying
-	slasher:SetNWBool("DolphinFound", false)
-	slasher:SetNWBool("DolphinHunting", false)
 	slasher:SetNWBool("DolphinInHiding", true)
+
+	timer.Simple(16, function()
+		slasher:SetNWBool("DolphinInHiding", false)
+		slasher:SetNWBool("CanKill", true)
+	end)
 end
 
 function SLASHER.Thirdperson(ply)

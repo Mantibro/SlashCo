@@ -298,7 +298,7 @@ function ENT:Think()
 		if self.AttackEngage == false then
 			local idx = math.random(1, 2)
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/freesmiley/pensive_attack" .. idk .. ".mp3",
+				soundPath = "slashco/slasher/freesmiley/pensive_attack" .. idx .. ".mp3",
 				identifier = "PensiveAttack" .. idx,
 				minDistance = 700,
 				maxDistance = 1240,
