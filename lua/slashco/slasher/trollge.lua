@@ -292,7 +292,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:Freeze(false)
 				SlashCo.AddSlasherAnger(slasher, 100)
 				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/trollge/trollge_chase.ogg",
+					soundPath = "slashco/slasher/trollge/trollge_stage6.ogg",
 					identifier = "TrollgeStage2",
 					minDistance = 1100,
 					maxDistance = 2200,
