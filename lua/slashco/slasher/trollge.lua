@@ -32,7 +32,7 @@ SLASHER.AngerIncrease = 10
 SLASHER.AngerPassiveGain = 0.05
 SLASHER.AngerChaseGain = 0
 -- Only when he's really angry his ambiance should play. This is why we only set it for HighAnger.
-SLASHER.HighAngerBackgroundMusic = "slashco/slasher/trollge/trollge_ambiance.ogg"
+SLASHER.HighAngerBackgroundMusic = "slashco/slasher/trollge/trollge_stage6.ogg"
 
 local function PlayBreathing(slasher)
 	SlashCo.AudioSystem.PlaySound({
