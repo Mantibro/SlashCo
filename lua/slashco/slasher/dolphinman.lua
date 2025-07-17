@@ -198,12 +198,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if SlashCo.CurRound.EscapeHelicopterSummoned then
-		if HuntPower < 100 then
-		    slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
-		end
-    end
-
 	if slasher:GetNWInt("DolphinHunt") ~= math.floor(HuntPower) then
 		slasher:SetNWInt("DolphinHunt", math.floor(HuntPower))
 	end
@@ -214,11 +208,14 @@ end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
     -- i'm crying
-	slasher:SetNWBool("DolphinInHiding", true)
+	slasher:SetNWBool("DolphinFound", false)
+	slasher:SetNWBool("DolphinInHiding", false)
+	slasher:SetNWBool("DolphinHunting", false)
 
 	timer.Simple(16, function()
-		slasher:SetNWBool("DolphinInHiding", false)
-		slasher:SetNWBool("CanKill", true)
+		if not slasher:GetNWBool("CanKill") then
+			slasher:SetNWBool("CanKill", true)
+		end
 	end)
 end
 
@@ -237,18 +234,6 @@ function SLASHER.CanBeSeen(ply)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher.KillDelayTick > 0 then
-		return
-	end
-	
-	slasher.KillDelayTick = SLASHER.KillDelay
-	-- this works a bit weird(?
-	if slasher:GetNWBool("DolphinHunting") then
-		slasher.KillDelayTick = SLASHER.KillDelay
-	else
-		slasher.KillDelayTick = SLASHER.KillDelay + 2.5
-	end
-	
 	if SlashCo.Jumpscare(slasher, target) then
 		if slasher:GetNWBool("DolphinHunting") then
 		    slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
