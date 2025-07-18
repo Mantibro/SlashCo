@@ -311,6 +311,9 @@ function SLASHER.Maul(slasher, target)
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 
 		if IsValid(slasher.ref_child) then
+			slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
+			slasher.Aggression = Aggression - math.random(25, Aggression + 26)
+
 			slasher:SetNWBool("PrincessMaulingChild", false)
 			slasher.ref_child:Remove()
 		end
