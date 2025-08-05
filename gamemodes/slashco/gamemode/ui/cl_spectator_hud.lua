@@ -236,9 +236,9 @@ hook.Add("Think", "Spectator_Vision_Light", function()
 		dlight.r = 255
 		dlight.g = 255
 		dlight.b = 255
-		dlight.brightness = 1
+		dlight.brightness = 2
 		dlight.Decay = 1000
-		dlight.Size = 2500
+		dlight.Size = 1000
 		dlight.DieTime = CurTime() + 0.1
 	end
 end)
