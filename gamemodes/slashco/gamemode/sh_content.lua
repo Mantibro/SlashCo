@@ -41,6 +41,8 @@ if SERVER and not SlashCo.Content.AddedMapToWorkshop then
 		resource.AddWorkshop(wsid) -- Adds the current map to the server download.
 		SlashCo.Content.AddedMapToWorkshop = true
 	end
+
+	resource.AddWorkshop("3453013573") -- Add the gamemode itself, just to be sure that it was added since somehow people still miss content.
 end
 
 if CLIENT then

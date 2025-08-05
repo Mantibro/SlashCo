@@ -258,6 +258,8 @@ SlashCo.LangTable["slasher_assess"] = "-Slasher Assessment-"
 
 SlashCo.LangTable["offering_idle"] = "Make an Offering"
 
+SlashCo.LangTable["server_announcement"] = "Server Announcement"
+
 --Survivor
 SlashCo.LangTable["item_use"] = "[%s] USE"
 SlashCo.LangTable["item_drop"] = "[%s] DROP"

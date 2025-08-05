@@ -581,3 +581,36 @@ net.Receive("SlashCo:AskToBecomeSlasher", function()
 		cam.End2D()
 	end)
 end)
+
+net.Receive("SlashCo:Announcement", function()
+	system.FlashWindow() -- Flash it to notify them if their tabbed out.
+
+	local timeToDisplay = net.ReadUInt(8)
+	local text = net.ReadString()
+	local startTime = CurTime()
+	local fadeTime = 0.5 -- in seconds
+	local textColor = Color(255, 255, 255)
+	hook.Add("PostDrawHUD", "SlashCo:AskToBecomeSlasher", function()
+		local curTime = CurTime()
+		local difference = curTime - startTime
+		local fadeOut = difference > timeToDisplay
+		if fadeOut then
+			difference = difference - timeToDisplay
+		end
+
+		local alpha = fadeOut and (255 - (math.Clamp(difference / fadeTime, 0, 1) * 255)) or (math.Clamp(difference / fadeTime, 0, 1) * 255)
+		cam.Start2D() -- If we don't do this, we get shifted by like 1 pixel for some reason.
+			surface.SetDrawColor(0, 0, 0, alpha)
+			surface.DrawRect(0, 0, ScrW(), ScrH()) -- Yes, its shifted for some reason.
+
+			textColor.a = alpha
+			draw.SimpleText(SlashCo.Language("server_announcement"), "TVCD", ScrW() * 0.5, ScrH() * 0.27, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+
+			if fadeOut or difference > 1 then
+				local textAlpha = math.Clamp(fadeOut and 1 or ((difference - 1) / fadeTime), 0, 1) * 255
+				textColor.a = (fadeOut and textAlpha > 0) and alpha or textAlpha
+				draw.SimpleText(text, "TVCD", ScrW() * 0.5, ScrH() * 0.34, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
+		cam.End2D()
+	end)
+end)

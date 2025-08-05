@@ -670,3 +670,12 @@ concommand.Add("slashco_unbanslasher", function(ply, _, _, argStr)
 		doPrint(ply, "Failed to unban slasher \"" .. argStr .. "\", you probably wrote the name wrong")
 	end
 end)
+
+concommand.Add("slashco_announcement", function(ply, _, _, argStr)
+	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+		doPrint(ply, "Only admins can use this command!")
+		return
+	end
+
+	SlashCo.BroadcastAnnouncement(argStr)
+end)

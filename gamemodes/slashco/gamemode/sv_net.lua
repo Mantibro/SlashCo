@@ -27,6 +27,7 @@ util.AddNetworkString("mantislashco_SurvivorPings")
 util.AddNetworkString("mantislashco_HelicopterVoice")
 util.AddNetworkString("mantislashco_MapAmbientPlay")
 util.AddNetworkString("SlashCo:AskToBecomeSlasher")
+util.AddNetworkString("SlashCo:Announcement")
 
 local ENTITY = FindMetaTable("Entity")
 
@@ -279,4 +280,15 @@ function SlashCo.HelicopterRadioVoice(type)
 		net.WriteUInt(type, 4)
 		net.WriteUInt(math.random(1, type == SlashCo.HelicopterVoices.INTRO and 8 or 5), 4) -- Sound index
 	net.Broadcast()
+end
+
+function SlashCo.BroadcastAnnouncement(text, time, ply)
+	net.Start("SlashCo:Announcement")
+		net.WriteUInt(time or (5 + (string.len(text) / 20)), 8)
+		net.WriteString(text)
+	if ply then
+		net.Send(ply)
+	else
+		net.Broadcast()
+	end
 end
