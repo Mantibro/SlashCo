@@ -77,6 +77,8 @@ SlashCo.LangTable["map_already_selected"] = "This map has already been selected.
 SlashCo.LangTable["map_notenough"] = "You don't have enough points for a Map Guarantee."
 SlashCo.LangTable["map_guaranteed_to"] = "%s spent %s points to set the mission to be on %s."
 
+SlashCo.LangTable["ask_to_become_slasher"] = "Do you want to become the Slasher?"
+
 SlashCo.LangTable["playermodel_choose"] = "[CHOOSE...]"
 
 SlashCo.LangTable["GameInfo"] = "[%s] GAME INFO"

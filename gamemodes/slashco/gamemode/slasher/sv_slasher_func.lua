@@ -480,7 +480,7 @@ local midAmbientTracks = {
 	"slashco/ambienttrack/ambient_mid5.ogg",
 }
 timer.Create("SlashCo:SlasherAnger", 1, 0, function()
-	if GameData.IsLobby then return end
+	if GameData.IsLobby or not SlashCo.RoundStarted then return end
 
 	local hasCustomBackgroundMusic = false
 	local backgroundMusic = nil -- change the file later.

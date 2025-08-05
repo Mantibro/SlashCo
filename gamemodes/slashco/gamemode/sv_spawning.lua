@@ -17,6 +17,8 @@ function SlashCo.Abort(reason)
 		v:ChatPrint("Aborting round: " .. reason)
 	end
 
+	if GameData.IsLobby then return end -- We aborted in lobby? GG
+
 	if not SlashCo.Aborts then
 		SlashCo.RoundOverScreen(SlashCo.RoundState.CURSED)
 		timer.Create("SlashCoAbort", 5, 1, function()

@@ -26,6 +26,7 @@ util.AddNetworkString("mantislashco_SurvivorVoicePrompt")
 util.AddNetworkString("mantislashco_SurvivorPings")
 util.AddNetworkString("mantislashco_HelicopterVoice")
 util.AddNetworkString("mantislashco_MapAmbientPlay")
+util.AddNetworkString("SlashCo:AskToBecomeSlasher")
 
 local ENTITY = FindMetaTable("Entity")
 

@@ -375,7 +375,7 @@ end)
 net.Receive("mantislashco_GiveSlasherData", function()
 	local SlasherTable = net.ReadTable()
 	local ply = GameData.LocalPlayer
-	if not ply:IsValid() then
+	if not IsValid(ply) then
 		return
 	end
 

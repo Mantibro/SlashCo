@@ -57,7 +57,7 @@ local function lobbySaveCurData()
 		if not sql.TableExists("slashco_table_basedata") then
 			--Create the database table
 
-			sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary TEXT , SlasherIDSecondary TEXT , SurviorGasMod NUMBER);")
+			sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER, SlasherDanger NUMBER, SlasherClass NUMBER, SlasherID TEXT, Offering NUMBER, SlasherIDPrimary TEXT, SlasherIDSecondary TEXT, SurviorGasMod NUMBER);")
 			sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
 			sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
 		end
@@ -96,7 +96,7 @@ local function lobbySaveCurData()
 		end
 
 		--Major data dump
-		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
+		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. SlashCo.LobbyData.SelectedSlasherInfo.DANGER .. ", " .. SlashCo.LobbyData.SelectedSlasherInfo.CLASS .. ", '" .. SlashCo.LobbyData.SelectedSlasherInfo.ID .. "', " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
 
 		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			--Save the Current Survivors to the database
@@ -427,18 +427,27 @@ end
 
 net.Receive("mantislashco_SelectSlasher", function(_, ply)
 	if SERVER then
-		rec_id = net.ReadString()
+		local rec_id = net.ReadString()
 		if SlashCo.IsSlasherBanned(rec_id) then
 			print("[SlashCo] \"" .. ply:Name() .. "\" tried to pick a banned slasher! (" .. rec_id .. ")")
+			if SlashCo.AwaitPlayerToSelectSlasher then
+				SlashCo.AwaitPlayerToSelectSlasher(ply, nil)
+			end
 			return
 		end
 
 		print("[SlashCo] Received. (" .. rec_id .. ")")
 		SlashCo.ChooseTheSlasherLobby(rec_id)
+
+		if SlashCo.AwaitPlayerToSelectSlasher then
+			SlashCo.AwaitPlayerToSelectSlasher(ply, rec_id)
+		end
 	end
 end)
 
 function SlashCo.ChooseTheSlasherLobby(id)
+	if not GameData.IsLobby then return end
+
 	if SERVER then
 		SlashCo.LobbyData.PickedSlasher = id
 		print("[SlashCo] Slasher Picked. (" .. id .. ")")

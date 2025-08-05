@@ -514,3 +514,69 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 		end
 	end
 end)
+
+net.Receive("SlashCo:AskToBecomeSlasher", function()
+	SlashCo.AudioSystem.PrecacheSound("slashco/deathbeep.mp3", "mono", "AskToBecomeSlasher")
+
+	local timeToAsk = net.ReadUInt(8)
+	local startTime = CurTime()
+	local fadeTime = 0.5 -- in seconds
+	local textColor = Color(255, 255, 255)
+	local chooseYes = false
+	local chooseTime = 0
+	hook.Add("PostDrawHUD", "SlashCo:AskToBecomeSlasher", function()
+		local curTime = CurTime()
+		local difference = curTime - startTime
+		local fadeOut = difference > timeToAsk
+		if fadeOut then
+			difference = difference - timeToAsk
+		end
+
+		local alpha = fadeOut and (255 - (math.Clamp(difference / fadeTime, 0, 1) * 255)) or (math.Clamp(difference / fadeTime, 0, 1) * 255)
+		cam.Start2D() -- If we don't do this, we get shifted by like 1 pixel for some reason.
+			surface.SetDrawColor(0, 0, 0, alpha)
+			surface.DrawRect(0, 0, ScrW(), ScrH()) -- Yes, its shifted for some reason.
+
+			textColor.a = alpha
+			draw.SimpleText(SlashCo.Language("ask_to_become_slasher"), "TVCD", ScrW() * 0.5, ScrH() * 0.27, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+
+			if fadeOut or difference > 1 then
+				local textAlpha = math.Clamp(fadeOut and 1 or ((difference - 1) / fadeTime), 0, 1) * 255
+				if (chooseTime > 0 and not chooseYes) then
+					textAlpha = (math.Clamp(chooseTime - curTime, 0, 1) * 255)
+				end
+
+				textColor.a = (fadeOut and textAlpha > 0) and alpha or textAlpha
+				draw.SimpleText(SlashCo.Language("vocal_yes") .. " - [F1]", "TVCD", ScrW() * 0.5, ScrH() * 0.34, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
+
+			if fadeOut or difference > 2 then
+				local textAlpha = math.Clamp(fadeOut and 1 or ((difference - 2) / fadeTime), 0, 1) * 255
+				if (chooseTime > 0 and chooseYes) then
+					textAlpha = (math.Clamp(chooseTime - curTime, 0, 1) * 255)
+				end
+
+				textColor.a =  (fadeOut and textAlpha > 0) and alpha or textAlpha
+				draw.SimpleText(SlashCo.Language("vocal_no") .. " - [F2]", "TVCD", ScrW() * 0.5, ScrH() * 0.38, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
+
+			if not fadeOut and chooseTime <= 0 then
+				if input.IsButtonDown(KEY_F1) then
+					chooseTime = CurTime() + fadeTime
+					chooseYes = true
+					SlashCo.AudioSystem.PlayPrecachedChannel("AskToBecomeSlasher")
+					net.Start("SlashCo:AskToBecomeSlasher")
+						net.WriteBool(true)
+					net.SendToServer()
+				elseif input.IsButtonDown(KEY_F2) then
+					chooseTime = CurTime() + fadeTime
+					chooseYes = false
+					SlashCo.AudioSystem.PlayPrecachedChannel("AskToBecomeSlasher")
+					net.Start("SlashCo:AskToBecomeSlasher")
+						net.WriteBool(false)
+					net.SendToServer()
+				end
+			end
+		cam.End2D()
+	end)
+end)
