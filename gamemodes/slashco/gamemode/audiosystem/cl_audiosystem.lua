@@ -69,7 +69,7 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 	local soundFunc = isURL and sound.PlayURL or sound.PlayFile
 	soundFunc(soundFile, mode, function(channel, errCode, errStr)
 		if not IsValid(channel) then
-			if not errorCallback then
+			if errorCallback then
 				errorCallback(errCode, errStr)
 			end
 

@@ -470,7 +470,7 @@ if not GameData.IsLobby then
 		if timePassed > 300 and not SlashCo.FailSafeActivate then
 			local slashers = team.GetPlayers(TEAM_SLASHER)
 			if #slashers == 0 then
-				print("[SlashCo] Lobby failsafe was triggered!")
+				print("[SlashCo] Lobby failsafe was triggered! (No Slashers)")
 				GameData.TriggeredLobbyFailSafe = true
 				SlashCo.EndRound()
 				return
@@ -478,7 +478,7 @@ if not GameData.IsLobby then
 
 			local survivors = team.GetPlayers(TEAM_SURVIVOR)
 			if #survivors == 0 then
-				print("[SlashCo] Lobby failsafe was triggered!")
+				print("[SlashCo] Lobby failsafe was triggered! (No Survivors)")
 				GameData.TriggeredLobbyFailSafe = true
 				SlashCo.EndRound()
 				return
