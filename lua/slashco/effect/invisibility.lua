@@ -11,9 +11,11 @@ function EFFECT.CanBeSeen()
 end
 function EFFECT.OnApplied(ply)
 	ply:AddSpeedEffect("invis", 250, 2)
+	ply:DrawShadow(false)
 end
 function EFFECT.OnExpired(ply)
 	ply:RemoveSpeedEffect("invis")
+	ply:DrawShadow(true)
 end
 
 local colors = {
