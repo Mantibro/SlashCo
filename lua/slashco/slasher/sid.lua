@@ -31,6 +31,11 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.ItemToSpawn = "Cookie"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 275 + (7.5 * additionalSurvivors)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher.EatedCookies = 0
 	slasher.Pacification = 0

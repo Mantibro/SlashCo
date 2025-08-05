@@ -31,6 +31,14 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 SLASHER.CannotBeSpectated = true
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 250 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 315 + (7.5 * additionalSurvivors)
+	if additionalSurvivors > 0 then -- Only increase the chase duration if we have more than the default survivors.
+		SLASHER.ChaseDuration = 9.0 + (1 * additionalSurvivors)
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))

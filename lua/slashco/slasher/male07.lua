@@ -26,6 +26,14 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 100 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 302 + (7.5 * additionalSurvivors)
+	if additionalSurvivors > 0 then -- Only increase the chase duration if we have more than the default survivors.
+		SLASHER.ChaseDuration = 5.0 + (1 * additionalSurvivors)
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher.MaleState = 1
 	slasher.TimeChasingAsHuman = 0

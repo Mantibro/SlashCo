@@ -71,7 +71,7 @@ function SlashCo.ResetCurRoundData()
 			CurrentOffering = 0,
 			OfferingName = "",
 			GasCanMod = 0,
-			Singularity = 0, -- ToDo: rename this and the two below, what do they do, what are they? no idea :(
+			Singularity = 0,
 			Duality = false,
 			Satiation = 0,
 			--DrainageTick = 0, --not used

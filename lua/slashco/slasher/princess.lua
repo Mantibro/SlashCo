@@ -34,6 +34,14 @@ SLASHER.AngerIncrease = 5
 SLASHER.AngerPassiveGain = 0.04
 SLASHER.AngerChaseGain = 0
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ChaseSpeed = 280 + (7.5 * additionalSurvivors)
+	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
+	if additionalSurvivors > 0 then -- Only increase these if we have more than the default survivors.
+		SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 50))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 50))

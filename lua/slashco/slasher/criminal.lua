@@ -30,6 +30,11 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 200 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 310 + (5 * additionalSurvivors)
+end
+
 function SLASHER.OnSpawn(slasher)
 	local clone = ents.Create("sc_crimclone")
 

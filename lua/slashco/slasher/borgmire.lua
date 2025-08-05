@@ -30,6 +30,12 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 325 + (7.5 * additionalSurvivors)
+	SLASHER.ChaseDuration = 12.0 + (1 * additionalSurvivors)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 85))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 85))

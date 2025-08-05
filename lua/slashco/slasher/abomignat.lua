@@ -30,6 +30,13 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★★★☆"
 SLASHER.DiffRating = "★★☆☆☆"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 200 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 325 + (7.5 * additionalSurvivors)
+	SLASHER.KillDistance = 150 + (5 * additionalSurvivors)
+	SLASHER.ChaseDuration = 7.0 + (1 * additionalSurvivors)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:PlayGlobalSound("slashco/slasher/abomignat/abomignat_breathing.mp3", 65, nil, true)
 	slasher.AbomignatKills = 0

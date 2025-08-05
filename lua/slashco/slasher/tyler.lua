@@ -44,6 +44,15 @@ SLASHER.HelicopterArriveTime = 30 -- We don't want Tyler to be able to kill ever
 SLASHER.SpawnDelay = 10 -- We don't need to let Tyler wait much, why? because players depend on Tyler.
 SLASHER.AudioRangeDecreasePerGasCan = 0.1 -- For every gas can he created, the range of his audio is decreased by this much. (This value is used for multiplication!)
 SLASHER.MinimumAudioRange = 250 -- The minimum range that he is required to have.
+SLASHER.TimeMultiplier = 1
+
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 300 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 580 + (7.5 * additionalSurvivors)
+	SLASHER.TimeMultiplier = 1 + math.Clamp(additionalSurvivors / 10, 0.5, 3)
+
+	SLASHER.MinTylerTime = math.Clamp(5 + (-0.5 * additionalSurvivors), 2, 30)
+end
 
 local function EndlessChase()
 	return (SLASHER.AllowEndlessChase and SlashCo.IsSlowEscape()) or SlashCo.CurRound.EscapeHelicopterSummoned -- When the time for a slow escape is reached or the helicopter was summoned, we enter a endless chase
@@ -169,7 +178,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetVisible(false) -- Just in case he somehow ends up still being visible
 		end
 
-		if slasher.TimeAsTylerSpecter > 30 then
+		if slasher.TimeAsTylerSpecter > (30 * SLASHER.TimeMultiplier) then
 			SwitchForm(slasher, TYLER_CREATOR)
 			slasher:SetVisible(true)
 		end

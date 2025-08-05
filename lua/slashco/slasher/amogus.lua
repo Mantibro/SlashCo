@@ -31,6 +31,11 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 296 + (5 * additionalSurvivors)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher.DisguiseTimer = 0
 	slasher.DisguiseCooldown = 0

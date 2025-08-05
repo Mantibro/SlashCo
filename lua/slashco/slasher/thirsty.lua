@@ -31,6 +31,11 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 SLASHER.ItemToSpawn = "MilkJug"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 120 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 290 + (7.5 * additionalSurvivors)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))

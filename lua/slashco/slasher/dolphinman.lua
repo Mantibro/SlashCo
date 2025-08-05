@@ -30,6 +30,12 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.CannotBeSpectated = true
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 315 + (5 * additionalSurvivors)
+	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher.Jump = slasher:GetJumpPower()
 end
