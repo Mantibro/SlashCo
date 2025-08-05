@@ -748,7 +748,6 @@ local function startRound(noSetup)
 	if settingsEnt then
 		settingsEnt:TriggerOutput("OnRoundStarted", settingsEnt, settingsEnt, #SlashCo.CurRound.ExpectedPlayers)
 	end
-	table.Empty(SlashCo.CurRound.ExpectedPlayers)
 
 	SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.INCOMPLETE, GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded))
 	SlashCo.SendObjectives()

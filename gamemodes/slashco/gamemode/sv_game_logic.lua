@@ -146,13 +146,14 @@ local function StartRound(instant)
 	if SlashCo.CurRound.AntiLoopSpawn then return end
 
 	SlashCo.AudioSystem.DisableBackgroundMusic()
-	SlashCo.CurRound.AntiLoopSpawn = true
 	print("[SlashCo] All players connected. " .. (instant and "Starting now" or "Starting in 10 seconds") .. ". . .")
 	SlashCo.CurRound.SlasherData.GameReadyToBegin = true
 	SlashCo.RoundBeginTimer(instant)
 end
 
 function AskPlayersToBecomeSlasher()
+	if SlashCo.CurRound.AntiLoopSpawn then return end
+
 	SlashCo.AudioSystem.EnableBackgroundMusic()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/ambienttrack/mf_high.ogg", 1)
 
@@ -169,6 +170,7 @@ function AskPlayersToBecomeSlasher()
 	end)
 
 	timer.Create("SlashCo:AskToBecomeSlasherTimeLimit", timeToAsk, 1, function()
+		if SlashCo.CurRound.AntiLoopSpawn then return end
 		for idx, ply in ipairs(becomeSlasher) do
 			if not IsValid(ply) then
 				table.remove(becomeSlasher, idx)
@@ -181,12 +183,14 @@ function AskPlayersToBecomeSlasher()
 			local selectedPlyIndex = math.random(#becomeSlasher)
 			local selectedPly = becomeSlasher[math.random(#becomeSlasher)]
 			if not IsValid(selectedPly) then
+				if SlashCo.CurRound.AntiLoopSpawn then return end
 				SlashCo.Abort("No one wanted to become the slasher... Well GG")
 				return
 			end
 
 			SlashCo.AwaitPlayerToSelectSlasher = function(ply, id) -- if id is nil, then they tried to select a banned slasher or they took too long!
 				SlashCo.AwaitPlayerToSelectSlasher = nil
+				if SlashCo.CurRound.AntiLoopSpawn then return end
 				sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( " .. ply:SteamID64() .. " );")
 				SlashCo.SelectSlasher(id or SlashCo.CurRound.FirstSelectedSlasherID, ply:SteamID64())
 				StartRound(true)
@@ -207,6 +211,7 @@ function AskPlayersToBecomeSlasher()
 			net.Send(selectedPly)
 
 			timer.Create("SlashCo:WaitingForPlayerToPickSlasher", 15, 1, function()
+				if SlashCo.CurRound.AntiLoopSpawn then return end
 				if not IsValid(selectedPly) then
 					table.remove(becomeSlasher, selectedPlyIndex)
 					slasherSelection() -- Run the selection again since our selected player disconnected when he was supposed to become the slasher.
@@ -229,6 +234,8 @@ function SlashCo.SetupExpectedPlayersFailsafe()
 
 	SlashCo.CurRound.DisconnectedPlayers = {}
 	timer.Create("SlashCo:ExpectedPlayersFailsafe", 90, 1, function()
+		if SlashCo.CurRound.AntiLoopSpawn then return end
+
 		if player.GetCount() < 2 then
 			SlashCo.Abort("Not enouth players to start a round")
 			return
@@ -266,6 +273,8 @@ function SlashCo.SetupExpectedPlayersFailsafe()
 
 	gameevent.Listen("player_disconnect")
 	hook.Add("player_disconnect", "SlashCo:OnPlayerDisconnect", function(data)
+		if SlashCo.CurRound.AntiLoopSpawn then return end
+
 		local steamID64 = util.SteamIDTo64(data.networkid)
 		for idx, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
 			if data.steamid == steamID64 then
@@ -280,6 +289,7 @@ end
 
 function SlashCo.AwaitExpectedPlayers()
 	if GameData.IsLobby then return end
+	if SlashCo.CurRound.AntiLoopSpawn then return end
 	if not game.SinglePlayer() and #SlashCo.CurRound.ExpectedPlayers < 2 then
 		return
 	end -- don't start with no data
@@ -307,6 +317,7 @@ end
 --				***Begin the round start timer***
 function SlashCo.RoundBeginTimer(instant)
 	local time = game.SinglePlayer() and 3 or 10
+	SlashCo.CurRound.AntiLoopSpawn = true
 	if instant then
 		SlashCo.StartRound()
 	else

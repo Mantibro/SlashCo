@@ -573,7 +573,26 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
 	timer.Simple(2, function()
 		if IsValid(ply) then
 			SlashCo.BroadcastMasterDatabaseForClient(ply)
+
+			if not GameData.IsLobby then
+				local steamID = ply:SteamID64()
+				for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
+					if data.steamid == steamID then
+						ply:SetTeam(TEAM_SURVIVOR)
+						ply:Spawn()
+
+						local itemEntry = GameData.SurvivorData[steamID]
+						if itemEntry then
+							SlashCo.DropAllItems(survivor)
+							SlashCo.ChangeSurvivorItem(survivor, itemEntry.Item, true)
+							SlashCo.SendValue(survivor, "preItem", itemEntry.Item)
+						end
+						break
+					end
+				end
+			end
 		end
+
 		SlashCo.BroadcastCurrentRoundData(false)
 		SlashCo.BroadcastGlobalData()
 	end)
@@ -696,8 +715,6 @@ function GM:PlayerDeath(victim)
 		if team.NumPlayers(TEAM_SURVIVOR) == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
 			team.GetPlayers(TEAM_SURVIVOR)[1]:SetPoints("last_survive")
 		end
-
-		--...............
 
 		victim:SetTeam(TEAM_SPECTATOR)
 		timer.Simple(0, function()
