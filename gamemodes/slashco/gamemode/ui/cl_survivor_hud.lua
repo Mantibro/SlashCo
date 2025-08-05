@@ -516,6 +516,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 end)
 
 net.Receive("SlashCo:AskToBecomeSlasher", function()
+	system.FlashWindow() -- Flash it to notify them if their tabbed out.
 	SlashCo.AudioSystem.PrecacheSound("slashco/deathbeep.mp3", "mono", "AskToBecomeSlasher")
 
 	local timeToAsk = net.ReadUInt(8)
