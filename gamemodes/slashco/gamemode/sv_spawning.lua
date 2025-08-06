@@ -788,6 +788,9 @@ function SlashCo.FindSpawn(ply)
 		table.Add(elements, ents.FindByClass("info_sc_player_survivor"))
 	elseif ply:Team() == TEAM_SLASHER then
 		elements = ents.FindByClass("info_sc_player_slasher")
+	elseif GameData.IsLobby then
+		GameData.PlayerSpawns = GameData.PlayerSpawns or ents.FindByClass("info_player_start")
+		elements = GameData.PlayerSpawns
 	end
 
 	if elements and not table.IsEmpty(elements) then
@@ -795,16 +798,20 @@ function SlashCo.FindSpawn(ply)
 		if not IsValid(ent) then
 			return
 		end
+
 		ent.SpawnedEntity = ply
-		ent:SpawnEnt()
+		if ent.SpawnEnt then -- info_player_start doesn't have this.
+			ent:SpawnEnt()
+		end
+
 		return ent
 	end
 end
 
-hook.Add("PlayerSelectSpawn", "RandomSpawn", function(ply, transition)
+function GM:PlayerSelectSpawn(ply, transiton)
 	if transition then
 		return
 	end
 
 	return SlashCo.FindSpawn(ply)
-end)
+end
