@@ -5,6 +5,8 @@ SlashCo.AudioSystem.BackgroundChannel = SlashCo.AudioSystem.BackgroundChannel or
 SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs or 0 -- Incremental number to assign channel id's
 SlashCo.AudioSystem.UpdateFrequency = 0.05 -- How often timers execute to update the volume when fading it to a new value.
 
+local ErrorList = {} -- A table containing all the files we failed to open, if the file is in this list and we fail loading again, then we won't throw another error.
+
 -- So that we don't depend on the GameData table as this system is meant to also work as a standalone library.
 SlashCo.AudioSystem.IsSinglePlayer = SlashCo.AudioSystem.IsSinglePlayer or game.SinglePlayer()
 SlashCo.AudioSystem.LocalPlayer = SlashCo.AudioSystem.LocalPlayer or nil
@@ -73,7 +75,10 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 				errorCallback(errCode, errStr)
 			end
 
-			error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. "," .. soundFile .. ")\n")
+			if not ErrorList[soundFile] then
+				ErrorList[soundFile] = true
+				error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. "," .. soundFile .. ")\n")
+			end
 			return
 		end
 
