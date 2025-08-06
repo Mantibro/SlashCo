@@ -35,7 +35,7 @@ SLASHER.AngerChaseGain = 0
 SLASHER.HighAngerBackgroundMusic = "slashco/slasher/trollge/trollge_stage6.ogg"
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (2.5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 295 + (5 * additionalSurvivors)
 end
 
