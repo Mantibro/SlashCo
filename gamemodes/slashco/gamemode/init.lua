@@ -574,18 +574,20 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
 		if IsValid(ply) then
 			SlashCo.BroadcastMasterDatabaseForClient(ply)
 
-			if not GameData.IsLobby and SlashCo.GetRoundTime() < SlashCo.MaximumLateJoinTime and GameData.SurvivorData then
+			if not GameData.IsLobby and SlashCo.GetRoundTime() < SlashCo.MaximumLateJoinTime then
 				local steamID = ply:SteamID64()
 				for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
 					if data.steamid == steamID then
 						ply:SetTeam(TEAM_SURVIVOR)
 						ply:Spawn()
 
-						local itemEntry = GameData.SurvivorData[steamID]
-						if itemEntry then
-							SlashCo.DropAllItems(survivor)
-							SlashCo.ChangeSurvivorItem(survivor, itemEntry.Item, true)
-							SlashCo.SendValue(survivor, "preItem", itemEntry.Item)
+						if GameData.SurvivorData then
+							local itemEntry = GameData.SurvivorData[steamID]
+							if itemEntry then
+								SlashCo.DropAllItems(survivor)
+								SlashCo.ChangeSurvivorItem(survivor, itemEntry.Item, true)
+								SlashCo.SendValue(survivor, "preItem", itemEntry.Item)
+							end
 						end
 						break
 					end

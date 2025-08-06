@@ -483,6 +483,7 @@ function SlashCo.SetupPlayers()
 			SlashCo.SendValue(survivor, "preItem", survivorEntry.Item)
 		end
 	end
+	GameData.SurvivorData = survivors -- Save the data so that when players join late we can still give them their items.
 end
 
 local function makeEnt(class, config)
