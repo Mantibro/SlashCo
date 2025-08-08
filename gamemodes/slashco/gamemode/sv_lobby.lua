@@ -638,7 +638,9 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		end
 
 		for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
-			local pos = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid):GetPos()
+			local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid)
+			if not ply then continue end
+			local pos = ply:GetPos()
 			local x = pos[1]
 			local y = pos[2]
 
