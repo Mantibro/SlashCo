@@ -19,10 +19,14 @@ end
 
 function ENT:Initialize()
 	self:SetModel("models/slashco/slashers/criminal/criminal.mdl")
-
+	self:SetNotSolid(true)
 	self.RandPos = 0.12
 
-	self:SetNotSolid(true)
+	if not self.AssignedSlasher then
+		error("Expected self.AssignedSlasher to be valid!")
+	end
+
+	self.SlasherPlayer = player.GetBySteamID64(self.AssignedSlasher)
 end
 
 function ENT:OnTakeDamage()
@@ -30,11 +34,10 @@ function ENT:OnTakeDamage()
 end
 
 function ENT:RunBehaviour()
-	while true do							-- Here is the loop, it will run forever
-		if self.AssignedSlasher == nil or not IsValid(player.GetBySteamID64(self.AssignedSlasher)) then return end
+	while true do
+		if not IsValid(self.SlasherPlayer) then return end
 
-		local rage_switch = player.GetBySteamID64(self.AssignedSlasher):GetNWBool("CriminalRage")
-
+		local rage_switch = slasher:GetNWBool("CriminalRage")
 		self:StartActivity(ACT_IDLE)
 		if self.IsMain ~= true then
 			if rage_switch then
@@ -75,12 +78,12 @@ if SERVER then
 	end
 
 	function ENT:Think()
-		if self.AssignedSlasher == nil or not IsValid(player.GetBySteamID64(self.AssignedSlasher)) then
+		if not IsValid(self.SlasherPlayer) then return end
 			self:Remove()
 			return
 		end
 
-		local rage_switch = player.GetBySteamID64(self.AssignedSlasher):GetNWBool("CriminalRage")
+		local rage_switch = self.SlasherPlayer:GetNWBool("CriminalRage")
 
 		if not self.IsMain then
 			if rage_switch then
@@ -91,8 +94,8 @@ if SERVER then
 
 			self.RandPos = self.RandPos - FrameTime()
 
-			if self.RandPos < 0.01 or player.GetBySteamID64(self.AssignedSlasher):GetPos():Distance(self:GetPos()) > 1200 then
-				local n_pos = SlashCo.LocalizedTraceHullLocator(player.GetBySteamID64(self.AssignedSlasher), 1000)
+			if self.RandPos < 0.01 or self.SlasherPlayer:GetPos():Distance(self:GetPos()) > 1200 then
+				local n_pos = SlashCo.LocalizedTraceHullLocator(self.SlasherPlayer, 1000)
 
 				self:SetPos(n_pos)
 				self:SetAngles(Angle(0, math.random(0, 359), 0))
@@ -100,10 +103,10 @@ if SERVER then
 				self.RandPos = math.random(1, 15)
 			end
 		else
-			local c_pos = player.GetBySteamID64(self.AssignedSlasher):GetPos()
-			local c_ang = player.GetBySteamID64(self.AssignedSlasher):GetAngles()
+			local c_pos = self.SlasherPlayer:GetPos()
+			local c_ang = self.SlasherPlayer:GetAngles()
 
-			if player.GetBySteamID64(self.AssignedSlasher):GetVelocity():Length() < 5 then
+			if self.SlasherPlayer:GetVelocity():Length() < 5 then
 				self:SetPos(c_pos)
 				self:SetAngles(c_ang)
 			end
