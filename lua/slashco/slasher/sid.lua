@@ -387,9 +387,35 @@ function SLASHER.OnSecondaryFire(slasher)
 	end
 end
 
+local function IsPlayerHoldingCookie(target, removeCookie)
+	if target:ItemValue("EntClass", false, true) == "sc_cookie" then -- eat the Cookie >:3
+		if removeBaby then
+			SlashCo.RemoveItem(target, true)
+		end
+
+		return true
+	end
+
+	if target:ItemValue("EntClass", false, false) == "sc_cookie" then -- eat the Cookie >:3
+		if removeBaby then
+			SlashCo.RemoveItem(target, false)
+		end
+
+		return true
+	end
+
+	return false
+end
+
 function SLASHER.OnMainAbilityFire(slasher, target)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 	local Satiation = SlashCo.CurRound.OfferingData.Satiation
+
+	if (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
+		target = SlashCo.CreateItem("sc_cookie")
+		target:SetPos(ply:WorldSpaceCenter())
+		target:DropToFloor()
+	end
 
 	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then
 		return
