@@ -574,7 +574,7 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
 		if IsValid(ply) then
 			SlashCo.BroadcastMasterDatabaseForClient(ply)
 
-			if not GameData.IsLobby and SlashCo.GetRoundTime() < SlashCo.MaximumLateJoinTime then
+			if not GameData.IsLobby and SlashCo.RoundStarted and SlashCo.GetRoundTime() < SlashCo.MaximumLateJoinTime then
 				local steamID = ply:SteamID64()
 				for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
 					if data.steamid == steamID then
