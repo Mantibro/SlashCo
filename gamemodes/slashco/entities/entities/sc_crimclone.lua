@@ -97,7 +97,9 @@ if SERVER then
 			if self.RandPos < 0.01 or self.SlasherPlayer:GetPos():Distance(self:GetPos()) > 1200 then
 				local n_pos = SlashCo.LocalizedTraceHullLocator(self.SlasherPlayer, 1000)
 
-				self:SetPos(n_pos)
+				if n_pos then
+					self:SetPos(n_pos)
+				end
 				self:SetAngles(Angle(0, math.random(0, 359), 0))
 
 				self.RandPos = math.random(1, 15)
