@@ -458,11 +458,11 @@ end
 
 
 if not GameData.IsLobby then
-	timer.Create("SlashCo:WarningTime", 1, 0, function()
+	timer.Create("SlashCo:OverTime", 1, 0, function()
 		local curTime = CurTime()
 		local timePassed = SlashCo.GetRoundTime()
-		if math.IsNearlyEqual(timePassed, SlashCo.WarningTime, 1) and (GameData.LastWarningTime or 0) < curTime then
-			GameData.LastWarningTime = curTime + 5
+		if math.IsNearlyEqual(timePassed, SlashCo.OverTime, 1) and (GameData.LastOverTime or 0) < curTime then
+			GameData.LastOverTime = curTime + 5
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/time_alert.mp3",
 				volume = 1,
