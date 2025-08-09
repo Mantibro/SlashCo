@@ -244,6 +244,11 @@ function SlashCo.SetupExpectedPlayersFailsafe()
 		local expected_count = 0
 		local plys = player.GetAll()
 		for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
+			if data.disconnected then
+				expected_count = expected_count + 1
+				continue
+			end
+
 			for _, ply in ipairs(plys) do
 				if data.steamid == ply:SteamID64() then
 					expected_count = expected_count + 1
@@ -278,8 +283,8 @@ function SlashCo.SetupExpectedPlayersFailsafe()
 		local steamID64 = util.SteamIDTo64(data.networkid)
 		for idx, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
 			if data.steamid == steamID64 then
-				print("[SlashCo] One of our expected players disconnected! Removing from list.")
-				table.remove(SlashCo.CurRound.ExpectedPlayers, idx)
+				print("[SlashCo] One of our expected players disconnected! Marking as disconnected...")
+				data.disconnected = true
 				SlashCo.AwaitExpectedPlayers()
 				break
 			end
@@ -299,6 +304,11 @@ function SlashCo.AwaitExpectedPlayers()
 	local expected_count = 0
 	local plys = player.GetAll()
 	for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
+		if data.disconnected then
+			expected_count = expected_count + 1
+			continue
+		end
+
 		for _, ply in ipairs(plys) do
 			if data.steamid == ply:SteamID64() then
 				expected_count = expected_count + 1
