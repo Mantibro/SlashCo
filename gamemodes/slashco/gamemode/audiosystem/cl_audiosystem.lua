@@ -11,6 +11,7 @@ local ErrorList = {} -- A table containing all the files we failed to open, if t
 SlashCo.AudioSystem.IsSinglePlayer = SlashCo.AudioSystem.IsSinglePlayer or game.SinglePlayer()
 SlashCo.AudioSystem.LocalPlayer = SlashCo.AudioSystem.LocalPlayer or nil
 SlashCo.AudioSystem.LocalEntIndex = SlashCo.AudioSystem.LocalEntIndex or -1
+SlashCo.AudioSystem.ValidLocalPlayer = IsValid(SlashCo.AudioSystem.LocalPlayer)
 
 --[[local slashco_enable_backgroundmusic = CreateClientConVar("slashco_enable_backgroundmusic", "1", true, false)
 
@@ -245,6 +246,11 @@ local function CalculateFadeVolume(playerPos, channelPos, initialVolume, soundDa
 	return initialVolume
 end
 
+local fallbackPosition = Vector(0, 0, 0)
+local function GetLocalPlayerPosition() -- We can get net messages received before the local player is valid, so we fallback to the world origin until them.
+	return SlashCo.AudioSystem.ValidLocalPlayer and SlashCo.AudioSystem.LocalPlayer:GetPos() or fallbackPosition
+end
+
 -- Helper function to wrap around CalculateFadeVolume
 local function CalculateChannelVolume(channel, targetVol)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
@@ -253,7 +259,7 @@ local function CalculateChannelVolume(channel, targetVol)
 		if channelData then
 			local soundData = channelData.soundData
 			if soundData then
-				return CalculateFadeVolume(SlashCo.AudioSystem.LocalPlayer:GetPos(), channelData.pos or channel:GetPos(), targetVol, soundData)
+				return CalculateFadeVolume(GetLocalPlayerPosition(), channelData.pos or channel:GetPos(), targetVol, soundData)
 			end
 		end
 	end
@@ -461,6 +467,7 @@ function SlashCo.AudioSystem.Init()
 
 	SlashCo.AudioSystem.LocalPlayer = LocalPlayer()
 	SlashCo.AudioSystem.LocalEntIndex = SlashCo.AudioSystem.LocalPlayer:EntIndex()
+	SlashCo.AudioSystem.ValidLocalPlayer = IsValid(SlashCo.AudioSystem.LocalPlayer)
 
 	--[[
 		Setting up the proxies in case the background music changes.
@@ -499,6 +506,10 @@ local function UpdateBackgroundMusic()
 end
 
 function CalculatePan(ply, channelPos)
+	if not SlashCo.AudioSystem.ValidLocalPlayer then
+		return 0
+	end
+
 	local forward = ply:GetAimVector()
 	local right = forward:Angle():Right()
 	local toSound = (channelPos - ply:GetPos()):GetNormalized()
@@ -530,7 +541,7 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 	end
 
 	if newPos and soundData.minDistance and soundData.maxDistance then
-		local volume = CalculateFadeVolume(localPlyPos or SlashCo.AudioSystem.LocalPlayer:GetPos(), newPos, channelData.volume or soundData.volume, soundData)
+		local volume = CalculateFadeVolume(localPlyPos or GetLocalPlayerPosition(), newPos, channelData.volume or soundData.volume, soundData)
 		
 		if soundData.dynamicPan then
 			channel:SetPan(CalculatePan(SlashCo.AudioSystem.LocalPlayer, newPos))
@@ -550,7 +561,7 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 end
 
 local function UpdateChannelPositions()
-	local localPlyPos = SlashCo.AudioSystem.LocalPlayer:GetPos()
+	local localPlyPos = GetLocalPlayerPosition()
 	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
 		--[[
 			Why don't we remove the channel if the parent is gone?
