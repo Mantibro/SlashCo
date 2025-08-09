@@ -223,7 +223,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			SLASHER.HideTime(slasher)
 		end
 
-		SlashCo.AudioSystem.SetBackgroundMusicVolume((math.Clamp(100 - anger, 0, 100) / 100) * math.Clamp(1 - (TimeAsTylerForm > slasher.TylerTime), 0, 1))
+		-- We let the background music fade out, this way players know, Tyler is somewhere as the creator, and the players know if he's close to entering destroyer.
+		SlashCo.AudioSystem.SetBackgroundMusicVolume(math.Round((math.Clamp(100 - anger, 0, 100) / 100) * math.Clamp(1 - (TimeAsTylerForm / slasher.TylerTime), 0, 1), 2))
 
 		--Time ran out
 		if (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
