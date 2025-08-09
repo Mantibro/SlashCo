@@ -223,8 +223,10 @@ function SLASHER.OnTickBehaviour(slasher)
 			SLASHER.HideTime(slasher)
 		end
 
+		SlashCo.AudioSystem.SetBackgroundMusicVolume((math.Clamp(100 - anger, 0, 100) / 100) * math.Clamp(1 - (TimeAsTylerForm > slasher.TylerTime), 0, 1))
+
 		--Time ran out
-		if (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > slasher.TylerTime / 2.5) or TimeAsTylerForm > slasher.TylerTime then
+		if (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
 			slasher.TylerSongPickedID = nil
 			SwitchForm(slasher, TYLER_PRE_DESTROYER)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
