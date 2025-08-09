@@ -652,7 +652,7 @@ hook.Add("Tick", "LobbyTickEvent", function()
 			break
 		end
 
-		if all_players_in and SERVER then
+		if (all_players_in or (CurTime() > (SlashCo.LobbyData.ElevatorEnterTime or CurTime()))) and SERVER then
 			RunConsoleCommand("lobby_debug_transition")
 		end
 	end
@@ -770,6 +770,7 @@ concommand.Add("lobby_debug_proceed", function(ply)
 
 	if SERVER then
 		SlashCo.LobbyData.LOBBYSTATE = 1
+		SlashCo.LobbyData.ElevatorEnterTime = CurTime() + 30 -- It will proceed on its own
 
 		local doors = ents.FindByName("Slashco_Elev_Shutter")
 		doors[1]:Fire("Open")
