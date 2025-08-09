@@ -41,8 +41,8 @@ function ENT:Think()
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/canisterheavyimpact" .. math.random(1, 3) .. ".mp3",
 			identifier = "FuelCanSound",
-			minDistance = 100 + (150 * SlashCo.MapSize * nearbyFuelCans),
-			maxDistance = 500 + (400 * SlashCo.MapSize * nearbyFuelCans),
+			minDistance = 100 + (150 * SlashCo.MapSize * math.min(nearbyFuelCans, 5)), -- It should at best only multiply by 5 fuel cans or else the range can become too big.
+			maxDistance = 500 + (400 * SlashCo.MapSize * math.min(nearbyFuelCans, 5)),
 			entity = self,
 			volume = 0.5,
 			fadeIn = 0,
