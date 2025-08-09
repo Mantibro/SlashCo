@@ -96,7 +96,7 @@ local function lobbySaveCurData()
 		end
 
 		--Major data dump
-		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. SlashCo.LobbyData.SelectedSlasherInfo.DANGER .. ", " .. SlashCo.LobbyData.SelectedSlasherInfo.CLASS .. ", '" .. SlashCo.LobbyData.SelectedSlasherInfo.ID .. "', " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
+		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.DANGER or SlashCo.DangerLevel.Unknown) .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.CLASS or SlashCo.DangerLevel.Unknown) .. ", '" .. (SlashCo.LobbyData.SelectedSlasherInfo.ID or 0) .. "', " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
 
 		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			--Save the Current Survivors to the database
