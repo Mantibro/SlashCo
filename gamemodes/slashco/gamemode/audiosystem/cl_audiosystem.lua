@@ -444,7 +444,7 @@ local function OnBackgroundMusicChange(ent, name, old, new)
 	SlashCo.AudioSystem.PlayBackgroundMusic(new)
 end
 
--- This is a NW2 Proxy function.
+-- This is another NW2 Proxy function.
 local function OnBackgroundMusicStateChange(ent, name, old, new)
 	if not new then
 		if IsValid(SlashCo.AudioSystem.BackgroundChannel) then

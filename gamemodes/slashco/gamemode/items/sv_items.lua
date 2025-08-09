@@ -40,25 +40,34 @@ function SlashCo.DropAllItems(ply, noEffect)
 	SlashCo.DropItem(ply)
 end
 
-function SlashCo.DropItem(ply, dropCallback)
+function SlashCo.DropItem(ply, dropCallback, ignoreField)
 	if CLIENT then
 		return
 	end
 
 	if GameData.IsLobby then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
 	if ply:Team() ~= TEAM_SURVIVOR then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
 	if ply:IsFrozen() then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
 	local item = ply:GetItem("item2")
-	if item == "none" then
+	if item == "none" or (SlashCoItems[item] and SlashCoItems[item][ignoreField]) then
 		item = ply:GetItem("item")
 	end
 
@@ -69,6 +78,9 @@ function SlashCo.DropItem(ply, dropCallback)
 
 	local dontDrop = ply:ItemFunction2("PreDrop", item)
 	if dontDrop then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
@@ -77,6 +89,9 @@ function SlashCo.DropItem(ply, dropCallback)
 	if SlashCoItems[item].IsSecondary then
 		local dontDrop1 = ply:ItemFunction("PreDropSecondary", item)
 		if dontDrop1 then
+			if dropCallback then
+				dropCallback(nil)
+			end
 			return
 		end
 
@@ -96,6 +111,9 @@ function SlashCo.DropItem(ply, dropCallback)
 
 		local height, dontDrop1, dontPush = ply:ItemFunction2("OnDrop", item)
 		if dontDrop1 then
+			if dropCallback then
+				dropCallback(nil)
+			end
 			return
 		end
 

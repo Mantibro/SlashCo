@@ -27,6 +27,16 @@ function SlashCo.RegisterEffect(table, name)
 	SlashCoEffects[name] = table
 end
 
+function SlashCo.GetItemByEntity(class)
+	for name, tbl in pairs(SlashCoItems) do
+		if tbl.EntClass and tbl.EntClass == class then
+			return name
+		end
+	end
+
+	return nil
+end
+
 function SlashCo.GetItemTable(name)
 	return SlashCoItems[name]
 end
