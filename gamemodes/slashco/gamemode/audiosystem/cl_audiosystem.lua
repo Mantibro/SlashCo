@@ -333,6 +333,35 @@ end
 
 	NOTE: When called multiple times, the callback will only be called when the fade actually finishes, when its overwritten it won't be called.
 ]]
+local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel)
+	local reachedTarget = false
+	if lowerVol then
+		reachedTarget = targetVol >= vol
+	else
+		reachedTarget = vol >= targetVol
+	end
+
+	if !IsValid(channel) or reachedTarget then
+		channelData.volume = nil
+		timer.Remove(timerName)
+		if callback then
+			callback(channel, channelData)
+		end
+		return targetVol
+	end
+
+	if lowerVol then
+		vol = vol - volumeIncrement
+	else
+		vol = vol + volumeIncrement
+	end
+
+	local channelVolume = CalculateChannelVolume(channel, vol)
+	channelData.volume = channelVolume
+	channel:SetVolume(SlashCo.AudioSystem.EnsureValidVolume(channelVolume))
+	return vol
+end
+
 function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol, callback)
 	targetVol = targetVol or 1
 	fadeTime = fadeTime or 1
@@ -345,32 +374,11 @@ function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol, callback)
 	local volumeIncrement = math.abs(targetVol - vol) / math.ceil(fadeTime / updateFreq)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
 	timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
-		local reachedTarget = false
-		if lowerVol then
-			reachedTarget = targetVol >= vol
-		else
-			reachedTarget = vol >= targetVol
-		end
-
-		if !IsValid(channel) or reachedTarget then
-			channelData.volume = nil
-			timer.Remove(timerName)
-			if callback then
-				callback(channel, channelData)
-			end
-			return
-		end
-
-		if lowerVol then
-			vol = vol - volumeIncrement
-		else
-			vol = vol + volumeIncrement
-		end
-
-		local channelVolume = CalculateChannelVolume(channel, vol)
-		channelData.volume = channelVolume
-		channel:SetVolume(SlashCo.AudioSystem.EnsureValidVolume(channelVolume))
+		vol = UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel)
 	end)
+
+	-- Do one update outside the timer, since if you call this function every frame for some reason, the timer may never execute.
+	vol = UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel)
 end
 
 function SlashCo.AudioSystem.StopBackgroundMusic()
@@ -421,7 +429,7 @@ function SlashCo.AudioSystem.PlayBackgroundMusic(fileName)
 		channel:Play()
 		channel:EnableLooping(true)
 		channel:SetTime(SlashCo.AudioSystem.GetBackgroundMusicTime())
-		SlashCo.AudioSystem.FadeTo(channel, 5, SlashCo.AudioSystem.GetBackgroundMusicVolume())
+		SlashCo.AudioSystem.FadeTo(channel, 3, SlashCo.AudioSystem.GetBackgroundMusicVolume())
 	end)
 end
 
@@ -444,7 +452,7 @@ end
 -- Did you know? This was one too >:3
 local function OnBackgroundMusicVolumeChange(ent, name, old, new)
 	if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
-		SlashCo.AudioSystem.FadeTo(SlashCo.AudioSystem.BackgroundChannel, 5, new)
+		SlashCo.AudioSystem.FadeTo(SlashCo.AudioSystem.BackgroundChannel, 3, new)
 	end
 end
 
