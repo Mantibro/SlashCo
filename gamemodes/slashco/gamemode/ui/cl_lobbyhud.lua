@@ -31,10 +31,8 @@ local function UpdateLobbyState()
 	end
 
 	longest_name = longest_name or 0
-	if not plynum or plynum ~= #Lobby_Players then
-		longest_name = 0
-		plynum = #Lobby_Players
-	end
+	plynum = #Lobby_Players
+	CL_LobbyPlayers = plynum
 end
 
 net.Receive("mantislashco_GiveLobbyInfo", function(len)
@@ -85,14 +83,6 @@ hook.Add("HUDPaint", "LobbyInfoText", function()
 		if not clientReadiness or not Lobby_Players then
 			UpdateLobbyState()
 		end
-
-		longest_name = longest_name or 0
-		if not plynum or plynum ~= #Lobby_Players then
-			longest_name = 0
-			plynum = #Lobby_Players
-		end
-
-		CL_LobbyPlayers = plynum
 
 		if isClientinLobby then
 			surface.SetDrawColor(255, 255, 255, 255)
