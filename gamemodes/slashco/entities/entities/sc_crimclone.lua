@@ -78,7 +78,7 @@ if SERVER then
 	end
 
 	function ENT:Think()
-		if not IsValid(self.SlasherPlayer) then return end
+		if not IsValid(self.SlasherPlayer) then
 			self:Remove()
 			return
 		end
