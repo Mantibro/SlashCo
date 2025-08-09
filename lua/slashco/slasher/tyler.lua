@@ -266,7 +266,21 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 
 				-- NOTE: We use WorldSpaceCenter so that the gas cans spawn a bit in the air, this stops them from somehow bugging and falling through the floor.
-				SlashCo.CreateGasCan(slasher:WorldSpaceCenter(), Angle(0, 0, 0)) -- Gasolina en el Pie :eyes:
+				local startPos = slasher:WorldSpaceCenter()
+				local goodPos = startPos + (slasher:GetAimVector() * 50)
+				local tr = util.TraceLine({
+					start = startPos,
+					endpos = goodPos,
+					mask = MASK_PLAYERSOLID,
+					collisiongroup = COLLISION_GROUP_PLAYER,
+					filter = slasher
+				})
+
+				if tr.Hit then -- Something is in the way, so we'll change pos
+					goodPos = startPos
+				end
+
+				SlashCo.CreateGasCan(goodPos, Angle(0, 0, 0)) -- Gasolina en el Pie :eyes:
 				SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 			end)
 
