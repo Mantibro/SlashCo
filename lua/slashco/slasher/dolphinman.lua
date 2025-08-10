@@ -393,7 +393,7 @@ if CLIENT then
 			end
 
 			if v:GetNWBool("DolphinHunting") then
-				local tlight = DynamicLight(v:EntIndex() + 915)
+				local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
 				if tlight then
 					tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
 					tlight.r = 249

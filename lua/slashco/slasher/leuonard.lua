@@ -358,7 +358,7 @@ if CLIENT then
 	hook.Add("Think", "LeuonardLight", function()
 		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if slasher:GetNWBool("LeuonardFullRoid") then
-				local tlight = DynamicLight(slasher:EntIndex() + 965)
+				local tlight = DynamicLight(MAX_EDICT + slasher:EntIndex())
 				if (tlight) then
 					tlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))
 					tlight.r = 255

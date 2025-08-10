@@ -336,7 +336,7 @@ if CLIENT then
 			end
 
 			if v:GetNWBool("SpeedrunnerSacrificeTwo") then
-				local tlight = DynamicLight(v:EntIndex() + 965)
+				local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
 				if tlight then
 					tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
 					tlight.r = 80

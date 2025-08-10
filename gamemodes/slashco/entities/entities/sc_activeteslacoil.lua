@@ -224,7 +224,7 @@ else
 
 			if intensity < 0 then return end
 
-			local dlight = DynamicLight(self:EntIndex() + 99996)
+			local dlight = DynamicLight(self:EntIndex())
 			if dlight then
 				dlight.pos = self:GetPos()
 				dlight.r = 255

@@ -15,15 +15,14 @@ local nvgSoundFile = {
 	[2] = "slashco/nvg_on.mp3"
 }
 
-function GenDynLight(color)
-	local dlight = DynamicLight(963001)
-		if dlight then
-			if color == 1 then
-				dlight.r = 19
-				dlight.g = 194
-				dlight.b = 107
-			end
-		end
+function GenDynLight(entIndex)
+	local dlight = DynamicLight(MAX_EDICT + entIndex)
+	if dlight then
+		dlight.r = 19
+		dlight.g = 194
+		dlight.b = 107
+	end
+
 	return dlight
 end
 
@@ -91,7 +90,7 @@ hook.Add("RenderScreenspaceEffects", "NightVision", function()
 	if GameData.LocalPlayer:GetNWBool("NightVision") then
 	
 		local tr = ply:GetEyeTraceNoCursor()
-		local dlight = GenDynLight(1)
+		local dlight = GenDynLight(ply:EntIndex())
 
 		if dlight then
 			dlight.pos = tr.StartPos

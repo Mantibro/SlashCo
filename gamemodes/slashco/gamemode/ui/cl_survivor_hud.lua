@@ -451,7 +451,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 	local curTime = CurTime()
 	for _, clone in ipairs(ents.FindByClass("sc_crimclone")) do
 		if clone:GetMainRageClone() then
-			local tlight = DynamicLight(clone:EntIndex() + 1)
+			local tlight = DynamicLight(clone:EntIndex())
 			if tlight then
 				tlight.pos = clone:LocalToWorld(chaseLightOffset)
 				tlight.r = 255
@@ -468,7 +468,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if slasher:GetNWBool("TrollgeStage2") then
-			local tlight = DynamicLight(slasher:EntIndex() + 1)
+			local tlight = DynamicLight(slasher:EntIndex())
 			if tlight then
 				tlight.pos = slasher:LocalToWorld(chaseLightOffset)
 				tlight.r = 255
@@ -479,6 +479,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 				tlight.Size = 2500
 				tlight.DieTime = curTime + 1
 			end
+			continue
 		end
 
 		if slasher:GetNWBool("TylerFlash") then
@@ -494,6 +495,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 				dlight.Size = size
 				dlight.DieTime = curTime + 1
 			end
+			continue
 		end
 
 		if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage") then

@@ -256,6 +256,7 @@ GameData.TotalSlots = game.MaxPlayers()
 GameData.IsSinglePlayer = game.SinglePlayer()
 GameData.IsLan = GetConVar("sv_lan"):GetBool()
 GameData.World = GameData.World or game.GetWorld()
+MAX_EDICT = math.pow(2, MAX_EDICT_BITS)
 
 if CLIENT then
 	--GameData.LocalPlayer = nil

@@ -230,7 +230,7 @@ hook.Add("Think", "Spectator_Vision_Light", function()
 
 	--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright )
 
-	local dlight = DynamicLight(GameData.LocalPlayer:EntIndex() + 984)
+	local dlight = DynamicLight(GameData.LocalPlayer:EntIndex())
 	if dlight then
 		dlight.pos = GameData.LocalPlayer:GetShootPos()
 		dlight.r = 255

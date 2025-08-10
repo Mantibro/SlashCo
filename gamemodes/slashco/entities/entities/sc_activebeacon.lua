@@ -106,7 +106,7 @@ else
 		if self:GetArmingBeacon() then
 			intensity = intensity + (FrameTime() * 300)
 
-			local dlight = DynamicLight(self:EntIndex() + 99996)
+			local dlight = DynamicLight(self:EntIndex())
 			if dlight then
 				dlight.pos = self:GetPos()
 				dlight.r = 255
