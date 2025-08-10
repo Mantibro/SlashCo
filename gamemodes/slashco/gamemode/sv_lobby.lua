@@ -15,122 +15,111 @@ local function lobbySaveCurData()
 	local survivors = {}
 	local slashers = {}
 
-	if SERVER then
-		--Clear the database before saving
-		--RunConsoleCommand("debug_datatest_delete")
+	--Clear the database before saving
+	--RunConsoleCommand("debug_datatest_delete")
 
-		if SlashCo.LobbyData.PickedSlasher == "None" then
-			--If the slasher wasn't selected, randomize it based on possible options
+	if SlashCo.LobbyData.PickedSlasher == "None" then
+		--If the slasher wasn't selected, randomize it based on possible options
 
-			:: retry ::
+		:: retry ::
 
-			local rand_name = GetRandomSlasher()
-
-			if SlashCo.LobbyData.SelectedSlasherInfo.CLASS == SlashCo.SlasherClass.Unknown then
-				--Check if the random id of slasher has the appropriate class for the difficulty
-
-				--The difficulty allows for any class.
-			else
-				if SlashCo.LobbyData.SelectedSlasherInfo.CLASS ~= SlashCoSlashers[rand_name].Class then
-					goto retry
-				end --the random slasher's class does not match.
-			end
-
-			if SlashCo.LobbyData.SelectedSlasherInfo.DANGER == SlashCo.DangerLevel.Unknown then
-				--Check if the random id of slasher has the appropriate danger level for the difficulty
-
-				--The difficulty allows for any danger level.
-			else
-				if SlashCo.LobbyData.SelectedSlasherInfo.DANGER ~= SlashCoSlashers[rand_name].DangerLevel then
-					goto retry
-				end --the random slasher's danger level does not match.
-			end
-
-			SlashCo.ChooseTheSlasherLobby(rand_name)
+		local rand_name = GetRandomSlasher()
+		if SlashCo.LobbyData.SelectedSlasherInfo.CLASS == SlashCo.SlasherClass.Unknown then
+			--Check if the random id of slasher has the appropriate class for the difficulty
+			--The difficulty allows for any class.
+		else
+			if SlashCo.LobbyData.SelectedSlasherInfo.CLASS ~= SlashCoSlashers[rand_name].Class then
+				goto retry
+			end --the random slasher's class does not match.
 		end
 
-		local slasher1id = SlashCo.LobbyData.PickedSlasher
-		local slasher2id = GetRandomSlasher()
+		if SlashCo.LobbyData.SelectedSlasherInfo.DANGER == SlashCo.DangerLevel.Unknown then
+			--Check if the random id of slasher has the appropriate danger level for the difficulty
 
-		print("Now beginning database...")
-
-		if not sql.TableExists("slashco_table_basedata") then
-			--Create the database table
-
-			sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER, SlasherDanger NUMBER, SlasherClass NUMBER, SlasherID TEXT, Offering NUMBER, SlasherIDPrimary TEXT, SlasherIDSecondary TEXT, SurviorGasMod NUMBER);")
-			sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
-			sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
+			--The difficulty allows for any danger level.
+		else
+			if SlashCo.LobbyData.SelectedSlasherInfo.DANGER ~= SlashCoSlashers[rand_name].DangerLevel then
+				goto retry
+			end --the random slasher's danger level does not match.
 		end
 
-		local allSurvivors = team.GetPlayers(TEAM_SURVIVOR)
-		if allSurvivors ~= nil and #allSurvivors > 0 then
-			for i = 1, #allSurvivors do
-				--Save the Current Survivors to the database
+		SlashCo.ChooseTheSlasherLobby(rand_name)
+	end
 
-				table.insert(survivors, { steamid = allSurvivors[i]:SteamID64() })
-			end
-		end
+	local slasher1id = SlashCo.LobbyData.PickedSlasher
+	local slasher2id = GetRandomSlasher()
 
-		local allSpectators = team.GetPlayers(TEAM_SPECTATOR)
-		if allSpectators ~= nil and SlashCo.LobbyData.AssignedSlashers ~= nil then
-			for i = 1, #allSpectators do
-				--Save the Current Spectators to the database
+	print("Now beginning database...")
+	if not sql.TableExists("slashco_table_basedata") then
+		--Create the database table
 
-				--[[				if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[1].steamid then
+		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER, SlasherDanger NUMBER, SlasherClass NUMBER, SlasherID TEXT, Offering NUMBER, SlasherIDPrimary TEXT, SlasherIDSecondary TEXT, SurviorGasMod NUMBER);")
+		sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
+		sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
+	end
 
-									if SlashCo.LobbyData.AssignedSlashers[2] ~= nil and team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[2].steamid then
-
-										--They're just a regular Spectator
-
-									end]]
-
-				if allSpectators[i]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
-					--If the Spectator is the Slasher, save them as the Slasher
-					table.insert(slashers, { steamid = allSpectators[i]:SteamID64() })
-				end
-			end
-		end
-
-		if SlashCo.LobbyData.AssignedSlashers[2] ~= nil then
-			table.insert(slashers, { steamid = SlashCo.LobbyData.AssignedSlashers[2].steamid })
-		end
-
-		--Major data dump
-		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.DANGER or SlashCo.DangerLevel.Unknown) .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.CLASS or SlashCo.DangerLevel.Unknown) .. ", '" .. (SlashCo.LobbyData.SelectedSlasherInfo.ID or 0) .. "', " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
-
-		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+	local allSurvivors = team.GetPlayers(TEAM_SURVIVOR)
+	if allSurvivors ~= nil and #allSurvivors > 0 then
+		for i = 1, #allSurvivors do
 			--Save the Current Survivors to the database
 
-			local item = p:GetItem("item2")
-			if item == "none" then
-				item = p:GetItem("item")
-			end
-			sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. p:SteamID64() .. ", " .. sql.SQLStr(item) .. " );")
+			table.insert(survivors, { steamid = allSurvivors[i]:SteamID64() })
 		end
-
-		if #slashers > 0 then
-			for i = 1, #slashers do
-				--Save the Current Slashers to the database
-
-				sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( " .. slashers[i].steamid .. " );")
-			end
-		else
-			print("[SlashCo] Error! No assigned Slasher(s) to database! Restarting the lobby...")
-
-			--RunConsoleCommand("debug_datatest_delete")
-
-			--for i, ply in ipairs( player.GetAll() ) do
-			--	ply:SetTeam(TEAM_SPECTATOR)
-			--	ply:Spawn()
-			--end
-		end
-
-		print(sql.LastError())
-
-		print("DATA SAVED.")
-
-		SlashCo.ChangeMap(SlashCo.LobbyData.SelectedMap)
 	end
+
+	local allSpectators = team.GetPlayers(TEAM_SPECTATOR)
+	if allSpectators ~= nil and SlashCo.LobbyData.AssignedSlashers ~= nil then
+		for i = 1, #allSpectators do
+			--Save the Current Spectators to the database
+
+			--[[				if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[1].steamid then
+								if SlashCo.LobbyData.AssignedSlashers[2] ~= nil and team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[2].steamid then
+									--They're just a regular Spectator
+								end]]
+
+			if allSpectators[i]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
+				--If the Spectator is the Slasher, save them as the Slasher
+				table.insert(slashers, { steamid = allSpectators[i]:SteamID64() })
+			end
+		end
+	end
+
+	if SlashCo.LobbyData.AssignedSlashers[2] ~= nil then
+		table.insert(slashers, { steamid = SlashCo.LobbyData.AssignedSlashers[2].steamid })
+	end
+
+	--Major data dump
+	sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.DANGER or SlashCo.DangerLevel.Unknown) .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.CLASS or SlashCo.DangerLevel.Unknown) .. ", '" .. (SlashCo.LobbyData.SelectedSlasherInfo.ID or 0) .. "', " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
+
+	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		--Save the Current Survivors to the database
+		local item = p:GetItem("item2")
+		if item == "none" then
+			item = p:GetItem("item")
+		end
+		sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. p:SteamID64() .. ", " .. sql.SQLStr(item) .. " );")
+	end
+
+	if #slashers > 0 then
+		for i = 1, #slashers do
+			--Save the Current Slashers to the database
+			sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( " .. slashers[i].steamid .. " );")
+		end
+	else
+		print("[SlashCo] Error! No assigned Slasher(s) to database! Restarting the lobby...")
+
+		--RunConsoleCommand("debug_datatest_delete")
+
+		--for i, ply in ipairs( player.GetAll() ) do
+		--	ply:SetTeam(TEAM_SPECTATOR)
+		--	ply:Spawn()
+		--end
+	end
+
+	print(sql.LastError())
+	print("DATA SAVED.")
+
+	SlashCo.ChangeMap(SlashCo.LobbyData.SelectedMap)
 end
 
 --Only run this and the removePlayerFromLobby function using the GM:PlayerChangedTeam hook: https://wiki.facepunch.com/gmod/GM:PlayerChangedTeam
@@ -216,30 +205,24 @@ end
 --				***Begin the post-ready timer***
 local function lobbyReadyTimer(count)
 	timer.Create("AllReadyLobby", count, 1, function()
-		if SERVER then
-			RunConsoleCommand("lobby_debug_proceed")
-		end
+		RunConsoleCommand("lobby_debug_proceed")
 	end)
 end
 --				***Begin the transition timer***
 local function lobbyTransitionTimer()
 	timer.Create("LobbyTransition", math.max(SlashCo.LobbyBanter(), 10), 1, function()
-		if SERVER then
-			RunConsoleCommand("lobby_debug_brief")
-			SlashCo.LobbyPlayerBriefing()
+		RunConsoleCommand("lobby_debug_brief")
+		SlashCo.LobbyPlayerBriefing()
 
-			timer.Simple(8, function()
-				RunConsoleCommand("lobby_openitems")
-			end)
-		end
+		timer.Simple(8, function()
+			RunConsoleCommand("lobby_openitems")
+		end)
 	end)
 end
 --				***Begin the leaving timer***
 local function lobbyLeaveTimer()
 	timer.Create("LobbyLeave", 20, 1, function()
-		if SERVER then
-			RunConsoleCommand("lobby_leave")
-		end
+		RunConsoleCommand("lobby_leave")
 	end)
 end
 
@@ -264,194 +247,186 @@ end
 
 --				***Assign the values for the incoming Round***
 local function lobbyRoundSetup()
-	if SERVER then
-		SlashCo.BroadcastGlobalData()
+	SlashCo.BroadcastGlobalData()
+
+	for _, play in ipairs(player.GetAll()) do
+		--local pid = play:SteamID64()
+		SlashCo.BroadcastMasterDatabaseForClient(play)
+	end
+
+	SlashCo.LobbyData.SelectedDifficulty = math.random(0, #SlashCo.DifficultyLevel) --Randomizing the Difficulty
+
+	local diff = math.min(GetConVar("slashco_force_difficulty"):GetInt(), #SlashCo.DifficultyLevel)
+	if diff > -1 then
+		SlashCo.LobbyData.SelectedDifficulty = diff
+	end
+
+	--Difficulty-based Slasher Selection:
+
+	if SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.EASY then
+		local rand_name = GetRandomSlasher()
+
+		SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
+		SlashCo.LobbyData.SelectedSlasherInfo.CLASS = SlashCoSlashers[rand_name].Class
+		SlashCo.LobbyData.SelectedSlasherInfo.DANGER = SlashCoSlashers[rand_name].DangerLevel
+		SlashCo.LobbyData.SelectedSlasherInfo.NAME = rand_name
+		SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlashers[rand_name].ProTip
+
+		SlashCo.LobbyData.PickedSlasher = rand_name
+	elseif SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.NOVICE then
+		SlashCo.LobbyData.SelectedSlasherInfo.CLASS = math.random(1, #SlashCo.SlasherClass)
+	elseif SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.INTERMEDIATE then
+		SlashCo.LobbyData.SelectedSlasherInfo.DANGER = math.random(1, #SlashCo.DangerLevel)
+	end
+
+	--SlashCo.LobbyData.DeathwardsLeft = 2 - SlashCo.LobbyData.SelectedDifficulty
+
+	for ply, readyState in pairs(SlashCo.LobbyData.Players) do
+		--Setup for assigning that players' in-game teams
+
+		if readyState == 1 then
+			table.insert(SlashCo.LobbyData.PotentialSurvivors, { steamid = ply:SteamID64() })
+			print("(Debug) " .. ply:GetName() .. " now is a potential Survivor.")
+		elseif readyState == 2 then
+			table.insert(SlashCo.LobbyData.PotentialSlashers, { steamid = ply:SteamID64() })
+			print("(Debug) " .. ply:GetName() .. " now is a potential Slasher.")
+		end
+	end
+
+	if SlashCo.LobbyData.PotentialSurvivors[1] ~= nil or SlashCo.LobbyData.PotentialSlashers[1] ~= nil then
+		--Assigning that players' teams
+
+		if SlashCo.LobbyData.PotentialSlashers[1] == nil then
+			--If no none readied as Slasher, the slasher will be randomly picked from the survivor-ready players.
+
+			local randid = math.random(1, #SlashCo.LobbyData.PotentialSurvivors)
+
+			for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
+				if i == randid then
+					table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
+					print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Slasher.")
+				else
+					table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
+					print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Survivor.")
+				end
+			end
+		elseif SlashCo.LobbyData.PotentialSurvivors[1] == nil then
+			--If no none readied as Survivor, the slasher will be randomly picked from the slasher-ready players.
+
+			local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
+
+			for i = 1, #SlashCo.LobbyData.PotentialSlashers do
+				if i == randid then
+					table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
+				else
+					table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
+				end
+			end
+		else
+			--If the ready states are mixed, pick the slasher from slasher-ready players.
+
+			local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
+			for i = 1, #SlashCo.LobbyData.PotentialSlashers do
+				if i == randid then
+					table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
+				else
+					table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
+				end
+			end
+
+			for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
+				table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
+			end
+		end
+	end
+
+	--[[if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
+		SlashCo.LobbyData.Offering = 0
 
 		for _, play in ipairs(player.GetAll()) do
-			--local pid = play:SteamID64()
-			SlashCo.BroadcastMasterDatabaseForClient(play)
+			play:ChatPrint("[SlashCo] No Spectators, Duality Offering was cleared.")
+		end
+	end]]
+
+	if SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
+		--Duality Slasher
+
+		local dual_random = 0
+
+		:: reroll ::
+
+		dual_random = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
+		local lobbyPlys = team.GetPlayers(TEAM_LOBBY)
+
+		if lobbyPlys[dual_random]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
+			goto reroll
 		end
 
-		SlashCo.LobbyData.SelectedDifficulty = math.random(0, #SlashCo.DifficultyLevel) --Randomizing the Difficulty
+		table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = lobbyPlys[dual_random]:SteamID64() })
 
-		local diff = math.min(GetConVar("slashco_force_difficulty"):GetInt(), #SlashCo.DifficultyLevel)
-		if diff > -1 then
-			SlashCo.LobbyData.SelectedDifficulty = diff
+		local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
+		p:ChatText("second_slasher")
+	end
+
+	--Finalize teams
+	if SlashCo.LobbyData.AssignedSurvivors[1] ~= nil and SlashCo.LobbyData.AssignedSlashers[1] ~= nil then
+		--print(player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[1].steamid):GetName() .. player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid):GetName())
+
+		for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
+			--The Survivors become survivors
+
+			local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid)
+			ply:SetTeam(TEAM_SURVIVOR)
+			ply:Spawn()
+			ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
+
+			print("Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
 		end
 
-		--Difficulty-based Slasher Selection:
+		for i = 1, #SlashCo.LobbyData.AssignedSlashers do
+			--The Slasher becomes a spectator in the lobby.
 
-		if SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.EASY then
-			local rand_name = GetRandomSlasher()
+			local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[i].steamid)
 
-			SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
-			SlashCo.LobbyData.SelectedSlasherInfo.CLASS = SlashCoSlashers[rand_name].Class
-			SlashCo.LobbyData.SelectedSlasherInfo.DANGER = SlashCoSlashers[rand_name].DangerLevel
-			SlashCo.LobbyData.SelectedSlasherInfo.NAME = rand_name
-			SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlashers[rand_name].ProTip
-
-			SlashCo.LobbyData.PickedSlasher = rand_name
-		elseif SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.NOVICE then
-			SlashCo.LobbyData.SelectedSlasherInfo.CLASS = math.random(1, #SlashCo.SlasherClass)
-		elseif SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.INTERMEDIATE then
-			SlashCo.LobbyData.SelectedSlasherInfo.DANGER = math.random(1, #SlashCo.DangerLevel)
+			ply:SetTeam(TEAM_SPECTATOR)
+			ply:Spawn()
 		end
+	end
 
-		--SlashCo.LobbyData.DeathwardsLeft = 2 - SlashCo.LobbyData.SelectedDifficulty
+	SlashCo.LobbyRoundData()
 
-		for ply, readyState in pairs(SlashCo.LobbyData.Players) do
-			--Setup for assigning that players' in-game teams
+	--Assign the map randomly
+	SlashCo.LobbyData.SelectedMap = GetRandomMap(#SlashCo.LobbyData.AssignedSurvivors)
+	SlashCo.PrecacheNextMap()
 
-			if readyState == 1 then
-				table.insert(SlashCo.LobbyData.PotentialSurvivors, { steamid = ply:SteamID64() })
-				print("(Debug) " .. ply:GetName() .. " now is a potential Survivor.")
-			elseif readyState == 2 then
-				table.insert(SlashCo.LobbyData.PotentialSlashers, { steamid = ply:SteamID64() })
-				print("(Debug) " .. ply:GetName() .. " now is a potential Slasher.")
-			end
-		end
-
-		if SlashCo.LobbyData.PotentialSurvivors[1] ~= nil or SlashCo.LobbyData.PotentialSlashers[1] ~= nil then
-			--Assigning that players' teams
-
-			if SlashCo.LobbyData.PotentialSlashers[1] == nil then
-				--If no none readied as Slasher, the slasher will be randomly picked from the survivor-ready players.
-
-				local randid = math.random(1, #SlashCo.LobbyData.PotentialSurvivors)
-
-				for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
-					if i == randid then
-						table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
-						print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Slasher.")
-					else
-						table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
-						print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Survivor.")
-					end
-				end
-			elseif SlashCo.LobbyData.PotentialSurvivors[1] == nil then
-				--If no none readied as Survivor, the slasher will be randomly picked from the slasher-ready players.
-
-				local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
-
-				for i = 1, #SlashCo.LobbyData.PotentialSlashers do
-					if i == randid then
-						table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-					else
-						table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-					end
-				end
-			else
-				--If the ready states are mixed, pick the slasher from slasher-ready players.
-
-				local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
-
-				for i = 1, #SlashCo.LobbyData.PotentialSlashers do
-					if i == randid then
-						table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-					else
-						table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-					end
-				end
-
-				for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
-					table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
-				end
-			end
-		end
-
-		--[[if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
-			SlashCo.LobbyData.Offering = 0
-
-			for _, play in ipairs(player.GetAll()) do
-				play:ChatPrint("[SlashCo] No Spectators, Duality Offering was cleared.")
-			end
-		end]]
-
-		if SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
-			--Duality Slasher
-
-			local dual_random = 0
-
-			:: reroll ::
-
-			dual_random = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
-			local lobbyPlys = team.GetPlayers(TEAM_LOBBY)
-
-			if lobbyPlys[dual_random]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
-				goto reroll
-			end
-
-			table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = lobbyPlys[dual_random]:SteamID64() })
-
-			local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
-			p:ChatText("second_slasher")
-		end
-
-		--Finalize teams
-		if SlashCo.LobbyData.AssignedSurvivors[1] ~= nil and SlashCo.LobbyData.AssignedSlashers[1] ~= nil then
-			--print(player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[1].steamid):GetName() .. player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid):GetName())
-
-			for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
-				--The Survivors become survivors
-
-				local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid)
-
-				ply:SetTeam(TEAM_SURVIVOR)
-				ply:Spawn()
-				ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
-
-				print("Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
-			end
-
-			for i = 1, #SlashCo.LobbyData.AssignedSlashers do
-				--The Slasher becomes a spectator in the lobby.
-
-				local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[i].steamid)
-
-				ply:SetTeam(TEAM_SPECTATOR)
-				ply:Spawn()
-			end
-		end
-
-		SlashCo.LobbyRoundData()
-
-		--Assign the map randomly
-		SlashCo.LobbyData.SelectedMap = GetRandomMap(#SlashCo.LobbyData.AssignedSurvivors)
-		SlashCo.PrecacheNextMap()
-
-		if SlashCo.LobbyData.SelectedDifficulty > 0 then
-			BeginSlasherSelection()
-		end
+	if SlashCo.LobbyData.SelectedDifficulty > 0 then
+		BeginSlasherSelection()
 	end
 end
 
 net.Receive("mantislashco_SelectSlasher", function(_, ply)
-	if SERVER then
-		local rec_id = net.ReadString()
-		if SlashCo.IsSlasherBanned(rec_id) then
-			print("[SlashCo] \"" .. ply:Name() .. "\" tried to pick a banned slasher! (" .. rec_id .. ")")
-			if SlashCo.AwaitPlayerToSelectSlasher then
-				SlashCo.AwaitPlayerToSelectSlasher(ply, nil)
-			end
-			return
-		end
-
-		print("[SlashCo] Received. (" .. rec_id .. ")")
-		SlashCo.ChooseTheSlasherLobby(rec_id)
-
+	local rec_id = net.ReadString()
+	if SlashCo.IsSlasherBanned(rec_id) then
+		print("[SlashCo] \"" .. ply:Name() .. "\" tried to pick a banned slasher! (" .. rec_id .. ")")
 		if SlashCo.AwaitPlayerToSelectSlasher then
-			SlashCo.AwaitPlayerToSelectSlasher(ply, rec_id)
+			SlashCo.AwaitPlayerToSelectSlasher(ply, nil)
 		end
+		return
+	end
+
+	print("[SlashCo] Received. (" .. rec_id .. ")")
+	SlashCo.ChooseTheSlasherLobby(rec_id)
+
+	if SlashCo.AwaitPlayerToSelectSlasher then
+		SlashCo.AwaitPlayerToSelectSlasher(ply, rec_id)
 	end
 end)
 
 function SlashCo.ChooseTheSlasherLobby(id)
 	if not GameData.IsLobby then return end
 
-	if SERVER then
-		SlashCo.LobbyData.PickedSlasher = id
-		print("[SlashCo] Slasher Picked. (" .. id .. ")")
-	end
+	SlashCo.LobbyData.PickedSlasher = id
+	print("[SlashCo] Slasher Picked. (" .. id .. ")")
 
 	SlashCo.BroadcastLobbySlasherInformation()
 end
@@ -659,38 +634,9 @@ hook.Add("Tick", "LobbyTickEvent", function()
 end)
 
 hook.Add("PlayerDisconnected", "Playerleave", function(ply)
-	--If a player disconnects after the Lobby stage is underway, reset the lobby.
-	if GameData.IsLobby then
-		if SlashCo.LobbyData.LOBBYSTATE > 0 then
-			if ply:Team() == TEAM_SURVIVOR then
-				ply:ChatPrint("[SlashCo] A Survivor has left during the Lobby Setup! Lobby will now reset.")
-				if SERVER then
-					RunConsoleCommand("lobby_reset")
-					return
-				end
-
-				for _, play in ipairs(player:GetAll()) do
-					play:SetTeam(TEAM_SPECTATOR)
-					play:Spawn()
-				end
-			end
-
-			if ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid or (SlashCo.LobbyData.AssignedSlashers[2] ~= nil and ply:SteamID64() == SlashCo.LobbyData.AssignedSlashers[2].steamid) then
-				ply:ChatPrint("[SlashCo] The Slasher has left during the Lobby Setup! Lobby will now reset.")
-				if SERVER then
-					RunConsoleCommand("lobby_reset")
-				end
-
-				for _, play in ipairs(player.GetAll()) do
-					play:SetTeam(TEAM_SPECTATOR)
-					play:Spawn()
-				end
-			end
-		end
-
-		if ply:Team() == TEAM_LOBBY then
-			removePlayerFromLobby(ply)
-		end
+	-- If the slasher disconnects after they were already picked, a new one will be picked before the next round starts, we don't need to reset the lobby.
+	if GameData.IsLobby and ply:Team() == TEAM_LOBBY then
+		removePlayerFromLobby(ply)
 	end
 end)
 
@@ -768,39 +714,37 @@ concommand.Add("lobby_debug_proceed", function(ply)
 		return
 	end
 
-	if SERVER then
-		SlashCo.LobbyData.LOBBYSTATE = 1
-		SlashCo.LobbyData.ElevatorEnterTime = CurTime() + 30 -- It will proceed on its own
+	SlashCo.LobbyData.LOBBYSTATE = 1
+	SlashCo.LobbyData.ElevatorEnterTime = CurTime() + 30 -- It will proceed on its own
 
-		local doors = ents.FindByName("Slashco_Elev_Shutter")
-		doors[1]:Fire("Open")
-		doors[2]:Fire("Open")
+	local doors = ents.FindByName("Slashco_Elev_Shutter")
+	doors[1]:Fire("Open")
+	doors[2]:Fire("Open")
 
-		for ply, readyState in pairs(SlashCo.LobbyData.Players) do
-			--If someone is not ready, force them as ready survivor.
+	for ply, readyState in pairs(SlashCo.LobbyData.Players) do
+		--If someone is not ready, force them as ready survivor.
 
-			if getReadyState(ply) < 1 then
-				lobbyPlayerReadying(ply, 1)
-			end
+		if getReadyState(ply) < 1 then
+			lobbyPlayerReadying(ply, 1)
 		end
-
-		net.Start("mantislashco_GiveLobbyStatus")
-		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
-		net.Broadcast()
-
-		table.Empty(SlashCo.LobbyData.PotentialSlashers)
-		table.Empty(SlashCo.LobbyData.PotentialSurvivors)
-		table.Empty(SlashCo.LobbyData.AssignedSurvivors)
-		table.Empty(SlashCo.LobbyData.AssignedSlashers)
-
-		SlashCo.LobbyData.SelectedSlasherInfo.NAME = "Unknown"
-		SlashCo.LobbyData.SelectedSlasherInfo.ID = 0
-		SlashCo.LobbyData.SelectedSlasherInfo.CLASS = SlashCo.SlasherClass.Unknown
-		SlashCo.LobbyData.SelectedSlasherInfo.DANGER = SlashCo.DangerLevel.Unknown
-		SlashCo.LobbyData.SelectedSlasherInfo.TIP = "--//--"
-
-		lobbyRoundSetup()
 	end
+
+	net.Start("mantislashco_GiveLobbyStatus")
+		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+	net.Broadcast()
+
+	table.Empty(SlashCo.LobbyData.PotentialSlashers)
+	table.Empty(SlashCo.LobbyData.PotentialSurvivors)
+	table.Empty(SlashCo.LobbyData.AssignedSurvivors)
+	table.Empty(SlashCo.LobbyData.AssignedSlashers)
+
+	SlashCo.LobbyData.SelectedSlasherInfo.NAME = "Unknown"
+	SlashCo.LobbyData.SelectedSlasherInfo.ID = 0
+	SlashCo.LobbyData.SelectedSlasherInfo.CLASS = SlashCo.SlasherClass.Unknown
+	SlashCo.LobbyData.SelectedSlasherInfo.DANGER = SlashCo.DangerLevel.Unknown
+	SlashCo.LobbyData.SelectedSlasherInfo.TIP = "--//--"
+
+	lobbyRoundSetup()
 end)
 
 concommand.Add("lobby_debug_transition", function(ply)
@@ -808,26 +752,22 @@ concommand.Add("lobby_debug_transition", function(ply)
 		return
 	end
 
-	if SERVER then
-		SlashCo.LobbyData.LOBBYSTATE = 2
+	SlashCo.LobbyData.LOBBYSTATE = 2
 
-		local doors = ents.FindByName("Slashco_Elev_Shutter")
-		doors[1]:Fire("Close")
-		doors[2]:Fire("Close")
+	local doors = ents.FindByName("Slashco_Elev_Shutter")
+	doors[1]:Fire("Close")
+	doors[2]:Fire("Close")
 
-		timer.Simple(3, function()
-			local elevator = table.Random(ents.FindByName("Slashco_Elev"))
-			elevator:Fire("Open")
+	timer.Simple(3, function()
+		local elevator = table.Random(ents.FindByName("Slashco_Elev"))
+		elevator:Fire("Open")
 
-			lobbyTransitionTimer()
-		end)
+		lobbyTransitionTimer()
+	end)
 
-		if SERVER then
-			net.Start("mantislashco_GiveLobbyStatus")
-			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
-			net.Broadcast()
-		end
-	end
+	net.Start("mantislashco_GiveLobbyStatus")
+		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+	net.Broadcast()
 end)
 
 concommand.Add("lobby_debug_brief", function(ply)
@@ -835,19 +775,15 @@ concommand.Add("lobby_debug_brief", function(ply)
 		return
 	end
 
-	if SERVER then
-		SlashCo.LobbyData.LOBBYSTATE = 3
+	SlashCo.LobbyData.LOBBYSTATE = 3
 
-		local doors = ents.FindByName("Slashco_Elev_Exit")
-		doors[1]:Fire("Open")
-		doors[2]:Fire("Open")
+	local doors = ents.FindByName("Slashco_Elev_Exit")
+	doors[1]:Fire("Open")
+	doors[2]:Fire("Open")
 
-		if SERVER then
-			net.Start("mantislashco_GiveLobbyStatus")
-			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
-			net.Broadcast()
-		end
-	end
+	net.Start("mantislashco_GiveLobbyStatus")
+		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
+	net.Broadcast()
 end)
 
 concommand.Add("timer_start", function(ply)
@@ -855,43 +791,7 @@ concommand.Add("timer_start", function(ply)
 		return
 	end
 
-	if SERVER then
-		lobbyReadyTimer(30)
-	end
-end)
-
-concommand.Add("lobby_reset", function(ply)
-	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
-		return
-	end
-
-	SlashCo.GoToLobby()
-
-	--[[
-	if SERVER then
-		SlashCo.LobbyData.LOBBYSTATE = 0
-
-		table.Empty(SlashCo.LobbyData.Players)
-		table.Empty(SlashCo.LobbyData.AssignedSlashers)
-		table.Empty(SlashCo.LobbyData.AssignedSurvivors)
-
-		SlashCo.LobbyData.ButtonDoorPrimaryClose = table.Random(ents.FindByName("door_lobby_primary"))
-		SlashCo.LobbyData.ButtonDoorPrimaryClose:Fire("Close")
-
-		SlashCo.LobbyData.ButtonDoorSecondaryClose = table.Random(ents.FindByName("door_lobby_secondary"))
-		SlashCo.LobbyData.ButtonDoorSecondaryClose:Fire("Close")
-
-		timer.Remove("AllReadyLobby")
-
-		if SERVER then
-			net.Start("mantislashco_GiveLobbyStatus")
-			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
-			net.Broadcast()
-		end
-
-		ply:ChatPrint("(Debug) Lobby reset.")
-	end
-	--]]
+	lobbyReadyTimer(30)
 end)
 
 concommand.Add("lobby_openitems", function(ply)
@@ -899,11 +799,9 @@ concommand.Add("lobby_openitems", function(ply)
 		return
 	end
 
-	if SERVER then
-		local door = table.Random(ents.FindByName("door_itembox"))
-		if IsValid(door) then
-			door:Fire("Open")
-		end
+	local door = table.Random(ents.FindByName("door_itembox"))
+	if IsValid(door) then
+		door:Fire("Open")
 	end
 end)
 
@@ -912,13 +810,11 @@ concommand.Add("lobby_leave", function(ply)
 		return
 	end
 
-	if SERVER then
-		SlashCo.ClearDatabase()
+	SlashCo.ClearDatabase()
 
-		timer.Simple(1, function()
-			lobbySaveCurData()
-		end)
-	end
+	timer.Simple(1, function()
+		lobbySaveCurData()
+	end)
 end)
 
 util.AddNetworkString("slashCo_SpectatorSceneToPVS")

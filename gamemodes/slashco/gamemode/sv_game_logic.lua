@@ -43,19 +43,22 @@ function SlashCo.LoadCurRoundData()
 		--First we insert the Slasher. If the Slasher does not join in time the game cannot begin.
 
 		--Insert the First and second Slasher into the table
-		for e = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
-			table.insert(SlashCo.CurRound.ExpectedPlayers,
-					{ steamid = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[e].Slashers })
+		local slasherData = sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}
+		for e = 1, #slasherData do
+			table.insert(SlashCo.CurRound.ExpectedPlayers, {steamid = slasherData[e].Slashers})
 		end
+
+		SlashCo.CurRound.ForceSlasherSelection = #slasherData == 0
 
 		SlashCo.SetupExpectedPlayersFailsafe()
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
+		local survivorData = sql.Query("SELECT * FROM slashco_table_survivordata;") or {}
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
 			--All survivors will become slashers.
 
-			local query = sql.Query("SELECT * FROM slashco_table_survivordata; ")
+			local query = survivorData
 			for i = 1, #query do
 				local id = query[i].Survivors
 
@@ -70,8 +73,8 @@ function SlashCo.LoadCurRoundData()
 
 			--Slasher becomes the sole survivor
 
-			for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
-				local sr_id = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[s].Slashers
+			for s = 1, #slasherData do
+				local sr_id = slasherData[s].Slashers
 
 				--table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sr_id })
 				--For the slasher's clientside view also
@@ -87,7 +90,7 @@ function SlashCo.LoadCurRoundData()
 		--Survivors don't necessarily have to join in time, as the game can continue with at least 1.
 		--TODO: timer which starts the game premature if some survivors don't join in time.
 
-		local query = sql.Query("SELECT * FROM slashco_table_survivordata; ")
+		local query = survivorData
 		for i = 1, #query do
 			if query[i].Survivors ~= nil then
 				--Survivors due to connect
@@ -99,8 +102,8 @@ function SlashCo.LoadCurRoundData()
 			end
 		end
 
-		for s = 1, #sql.Query("SELECT * FROM slashco_table_slasherdata; ") do
-			local id = sql.Query("SELECT * FROM slashco_table_slasherdata; ")[s].Slashers
+		for s = 1, #slasherData do
+			local id = slasherData[s].Slashers
 			if id == "90071996842377216" then
 				break
 			end
@@ -228,53 +231,56 @@ function AskPlayersToBecomeSlasher()
 	end)
 end
 
+function SlashCo.ForceNewSlasherSelection()
+	if SlashCo.CurRound.AntiLoopSpawn then return end
+	timer.Remove("SlashCo:ExpectedPlayersFailsafe")
+
+	if player.GetCount() < 2 then
+		SlashCo.Abort("Not enouth players to start a round")
+		return
+	end
+
+	local expected_count = 0
+	local plys = player.GetAll()
+	for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
+		if data.disconnected then
+			expected_count = expected_count + 1
+			continue
+		end
+
+		for _, ply in ipairs(plys) do
+			if data.steamid == ply:SteamID64() then
+				expected_count = expected_count + 1
+				print("[SlashCo] Expected player " .. expected_count .. " in!" .. "(" .. ply:Name() .. ")")
+				break
+			end
+		end
+	end
+
+	local foundSlasher = false
+	local slashers = SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}, "Slashers") or {}
+	for _, ply in ipairs(plys) do
+		if slashers[ply:SteamID64()] then
+			foundSlasher = true
+			break
+		end
+	end
+
+	if not foundSlasher then
+		print("[SlashCo] Missing a slasher to start with! Time to ask the others.")
+		AskPlayersToBecomeSlasher()
+	else
+		print("[SlashCo] Force starting the round since it took too long for players to connect.")
+		StartRound(true)
+	end
+end
+
 function SlashCo.SetupExpectedPlayersFailsafe()
 	SlashCo.AudioSystem.EnableBackgroundMusic()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/ambienttrack/mf_mid.ogg", 1)
 
 	SlashCo.CurRound.DisconnectedPlayers = {}
-	timer.Create("SlashCo:ExpectedPlayersFailsafe", 90, 1, function()
-		if SlashCo.CurRound.AntiLoopSpawn then return end
-
-		if player.GetCount() < 2 then
-			SlashCo.Abort("Not enouth players to start a round")
-			return
-		end
-
-		local expected_count = 0
-		local plys = player.GetAll()
-		for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
-			if data.disconnected then
-				expected_count = expected_count + 1
-				continue
-			end
-
-			for _, ply in ipairs(plys) do
-				if data.steamid == ply:SteamID64() then
-					expected_count = expected_count + 1
-					print("[SlashCo] Expected player " .. expected_count .. " in!" .. "(" .. ply:Name() .. ")")
-					break
-				end
-			end
-		end
-
-		local foundSlasher = false
-		local slashers = SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata; "), "Slashers") or {}
-		for _, ply in ipairs(plys) do
-			if slashers[ply:SteamID64()] then
-				foundSlasher = true
-				break
-			end
-		end
-
-		if not foundSlasher then
-			print("[SlashCo] Missing a slasher to start with! Time to ask the others.")
-			AskPlayersToBecomeSlasher()
-		else
-			print("[SlashCo] Force starting the round since it took too long for players to connect.")
-			StartRound(true)
-		end
-	end)
+	timer.Create("SlashCo:ExpectedPlayersFailsafe", 90, 1, SlashCo.ForceNewSlasherSelection)
 
 	gameevent.Listen("player_disconnect")
 	hook.Add("player_disconnect", "SlashCo:OnPlayerDisconnect", function(data)
@@ -319,6 +325,16 @@ function SlashCo.AwaitExpectedPlayers()
 	end
 
 	if expected_count == #SlashCo.CurRound.ExpectedPlayers then
+		if #plys < 2 then
+			SlashCo.Abort("Not enouth players to start a round")
+			return
+		end
+
+		if SlashCo.CurRound.ForceSlasherSelection then
+			SlashCo.ForceNewSlasherSelection()
+			return
+		end
+
 		--All players that need to be in are in, begin.
 		StartRound(false)
 	end
