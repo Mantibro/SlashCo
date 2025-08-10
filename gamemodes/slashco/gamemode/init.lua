@@ -584,9 +584,9 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
 						if GameData.SurvivorData then
 							local itemEntry = GameData.SurvivorData[steamID]
 							if itemEntry then
-								SlashCo.DropAllItems(survivor)
-								SlashCo.ChangeSurvivorItem(survivor, itemEntry.Item, true)
-								SlashCo.SendValue(survivor, "preItem", itemEntry.Item)
+								SlashCo.DropAllItems(ply)
+								SlashCo.ChangeSurvivorItem(ply, itemEntry.Item, true)
+								SlashCo.SendValue(ply, "preItem", itemEntry.Item)
 							end
 						end
 						break
