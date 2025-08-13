@@ -14,14 +14,14 @@ SLASHER.Model = "models/slashco/slashers/covenant/covenant.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 150
-SLASHER.ChaseSpeed = 275
+SLASHER.ChaseSpeed = 297
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 3
-SLASHER.KillDistance = 135
+SLASHER.KillDistance = 137
 SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.7
-SLASHER.ChaseDuration = 30.0
-SLASHER.ChaseCooldown = 7
+SLASHER.ChaseDuration = 15.0
+SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2.0
 SLASHER.ChaseMusic = "slashco/slasher/covenant/covenant_chase.ogg"
 SLASHER.KillSound = ""
@@ -30,6 +30,7 @@ SLASHER.ProTip = "Covenant_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
+SLASHER.DisableHelicopterMusic = false
 
 function SLASHER.OnSpawn(slasher)
 	slasher:PlayGlobalSound("slashco/slasher/covenant/covenant_ritual" .. math.random(1, 6) .. ".mp3", 100)
@@ -78,6 +79,11 @@ function SLASHER.OnTickBehaviour(slasher, cloak)
 			end
 		end
 	end
+	
+	if slasher.RockSummoned then
+		SLASHER.ProwlSpeed = 175
+		SLASHER.ChaseSpeed = 275
+	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
 	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
@@ -92,7 +98,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 	
-	if slasher:GetPos():Distance(target:GetPos()) >= 135 then
+	if slasher:GetPos():Distance(target:GetPos()) >= 137 then
 		return
 	end
 
