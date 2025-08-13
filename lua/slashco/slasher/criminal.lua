@@ -40,7 +40,7 @@ function SLASHER.OnSpawn(slasher)
 
 	clone:SetPos(slasher:GetPos())
 	clone:SetAngles(slasher:GetAngles())
-	clone.AssignedSlasher = slasher:SteamID64()
+	clone:SetOwner(slasher)
 	clone.IsMain = true
 	clone:Spawn()
 	clone:Activate()
@@ -132,7 +132,7 @@ function SLASHER.OnSecondaryFire(slasher)
 
 			clone:SetPos(slasher:GetPos())
 			clone:SetAngles(slasher:GetAngles())
-			clone.AssignedSlasher = slasher:SteamID64()
+			clone:SetOwner(slasher)
 			clone.IsMain = false
 			clone:Spawn()
 			clone:Activate()
@@ -163,7 +163,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 		clone:SetPos(slasher:GetPos())
 		clone:SetAngles(slasher:GetAngles())
-		clone.AssignedSlasher = slasher:SteamID64()
+		clone:SetOwner(slasher)
 		clone.IsMain = false
 		clone:Spawn()
 		clone:Activate()

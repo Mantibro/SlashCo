@@ -21,12 +21,6 @@ function ENT:Initialize()
 	self:SetModel("models/slashco/slashers/criminal/criminal.mdl")
 	self:SetNotSolid(true)
 	self.RandPos = 0.12
-
-	if not self.AssignedSlasher then
-		error("Expected self.AssignedSlasher to be valid!")
-	end
-
-	self.SlasherPlayer = player.GetBySteamID64(self.AssignedSlasher)
 end
 
 function ENT:OnTakeDamage()
@@ -35,7 +29,7 @@ end
 
 function ENT:RunBehaviour()
 	while true do
-		if not IsValid(self.SlasherPlayer) then return end
+		if not IsValid(self:GetOwner()) then return end
 
 		local rage_switch = slasher:GetNWBool("CriminalRage")
 		self:StartActivity(ACT_IDLE)
@@ -78,12 +72,13 @@ if SERVER then
 	end
 
 	function ENT:Think()
-		if not IsValid(self.SlasherPlayer) then
+		local owner = self:GetOwner()
+		if not IsValid(owner) then
 			self:Remove()
 			return
 		end
 
-		local rage_switch = self.SlasherPlayer:GetNWBool("CriminalRage")
+		local rage_switch = owner:GetNWBool("CriminalRage")
 
 		if not self.IsMain then
 			if rage_switch then
@@ -94,8 +89,8 @@ if SERVER then
 
 			self.RandPos = self.RandPos - FrameTime()
 
-			if self.RandPos < 0.01 or self.SlasherPlayer:GetPos():Distance(self:GetPos()) > 1200 then
-				local n_pos = SlashCo.LocalizedTraceHullLocator(self.SlasherPlayer, 1000)
+			if self.RandPos < 0.01 or owner:GetPos():Distance(self:GetPos()) > 1200 then
+				local n_pos = SlashCo.LocalizedTraceHullLocator(owner, 1000)
 
 				if n_pos then
 					self:SetPos(n_pos)
@@ -105,10 +100,10 @@ if SERVER then
 				self.RandPos = math.random(1, 15)
 			end
 		else
-			local c_pos = self.SlasherPlayer:GetPos()
-			local c_ang = self.SlasherPlayer:GetAngles()
+			local c_pos = owner:GetPos()
+			local c_ang = owner:GetAngles()
 
-			if self.SlasherPlayer:GetVelocity():Length() < 5 then
+			if owner:GetVelocity():Length() < 5 then
 				self:SetPos(c_pos)
 				self:SetAngles(c_ang)
 			end
