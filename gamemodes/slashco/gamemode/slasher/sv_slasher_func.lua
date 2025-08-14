@@ -231,6 +231,10 @@ function SlashCo.Jumpscare(slasher, target)
 			135) and not target:GetNWBool("SurvivorBeingJumpscared") then
 		return
 	end
+	
+	if slasher:SlasherFunction("CanJumpscare", target) then
+		return
+	end
 
 	target:SetNWBool("SurvivorBeingJumpscared", true)
 	target:SetNWBool("SurvivorJumpscare_" .. slasher:GetNWString("Slasher"), true)
