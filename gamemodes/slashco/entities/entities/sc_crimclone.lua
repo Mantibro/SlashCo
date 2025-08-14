@@ -29,9 +29,10 @@ end
 
 function ENT:RunBehaviour()
 	while true do
-		if not IsValid(self:GetOwner()) then return end
+		local owner = self:GetOwner()
+		if not IsValid(owner) then return end
 
-		local rage_switch = slasher:GetNWBool("CriminalRage")
+		local rage_switch = owner:GetNWBool("CriminalRage")
 		self:StartActivity(ACT_IDLE)
 		if self.IsMain ~= true then
 			if rage_switch then
