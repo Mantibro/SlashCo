@@ -67,7 +67,7 @@ local TYLER_SPECTER = 0
 local TYLER_CREATOR = 1
 local TYLER_PRE_DESTROYER = 2
 local TYLER_DESTROYER = 3
-local function SwitchForm(slasher, newForm)
+function TylerSwitchForm(slasher, newForm)
 	local anger = SlashCo.GetSlasherAnger(slasher)
 	if newForm == TYLER_CREATOR and anger > 50 and math.random(1, 200 - anger) == 1 then
 		newForm = TYLER_PRE_DESTROYER -- When becoming Creator, he has a random chance to become a destroyer instead if his anger is already above 20.
@@ -116,7 +116,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher.TimeAsTylerForm = 0
 	slasher.TimeAsTylerSpecter = 0
 	slasher.TylerBlink = 0
-	SwitchForm(slasher, TYLER_SPECTER)
+	TylerSwitchForm(slasher, TYLER_SPECTER)
 end
 
 function SLASHER.Precache()
@@ -137,7 +137,7 @@ function SLASHER.OnHelicopterSummon(slasher)
 	SlashCo.AudioSystem.StopSound("TylerTheme", 1)
 	SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
 	SlashCo.AudioSystem.StopSound("TylerSong", 0)
-	SwitchForm(slasher, TYLER_PRE_DESTROYER)
+	TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 end
 
 if CLIENT then
@@ -155,7 +155,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if (TylerState == 0 or TylerState == 1) and endlessChase then
-		SwitchForm(slasher, TYLER_PRE_DESTROYER)
+		TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 		SlashCo.AudioSystem.StopSound("TylerSong", 0)
 		slasher.TylerSongPickedID = nil
 		SlashCo.AddSlasherAnger(slasher, 100) -- Max it out
@@ -184,7 +184,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		if slasher.TimeAsTylerSpecter > SLASHER.TimeAsSpecter then
-			SwitchForm(slasher, TYLER_CREATOR)
+			TylerSwitchForm(slasher, TYLER_CREATOR)
 			slasher:SetVisible(true)
 		end
 
@@ -235,7 +235,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		--Time ran out
 		if (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
 			slasher.TylerSongPickedID = nil
-			SwitchForm(slasher, TYLER_PRE_DESTROYER)
+			TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
 			return
 		end
@@ -296,7 +296,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 
 				slasher:SetNWBool("TylerCreating", false)
-				SwitchForm(slasher, TYLER_SPECTER)
+				TylerSwitchForm(slasher, TYLER_SPECTER)
 				slasher.GasCanCreated = slasher.GasCanCreated + 1
 				slasher.TylerBlink = 0
 				slasher:Freeze(false)
@@ -386,7 +386,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			slasher:Freeze(false)
-			SwitchForm(slasher, TYLER_DESTROYER)
+			TylerSwitchForm(slasher, TYLER_DESTROYER)
 
 			SetGlobal2Bool("DisplayTylerTheDestroyerEffects", true)
 		end
@@ -413,7 +413,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_perception = 2.0
 
 		if TimeAsTylerForm > math.max((((3 + SlashCo.MapSize) / 4) * anger), SLASHER.MinChase) and not endlessChase then
-			SwitchForm(slasher, TYLER_SPECTER)
+			TylerSwitchForm(slasher, TYLER_SPECTER)
 		end
 	end
 
@@ -485,12 +485,12 @@ local function DestroyItem(slasher, target)
 	dissolver:Fire("Kill", "", 1)
 end
 
-local function StopTyperChase(slasher, switchForm)
+local function StopTyperChase(slasher, TylerSwitchForm)
 	if IsValid(slasher) then
 		slasher:Freeze(false)
-		if not EndlessChase() and switchForm then
+		if not EndlessChase() and TylerSwitchForm then
 			SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
-			SwitchForm(slasher, TYLER_SPECTER)
+			TylerSwitchForm(slasher, TYLER_SPECTER)
 		end
 	end
 end
@@ -594,7 +594,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		return
 	end
 
-	SwitchForm(slasher, TYLER_CREATOR)
+	TylerSwitchForm(slasher, TYLER_CREATOR)
 	slasher:SetVisible(true)
 end
 
