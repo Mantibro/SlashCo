@@ -649,6 +649,20 @@ end
 
 hook.Add("InitPostEntity", "LegacySetupSpawns", SlashCo.LegacySetup)
 
+function SlashCo.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	if GetGlobal2Int("SlashCoGeneratorsNeeded", 0) != 0 or GetGlobal2Int("SlashCoGeneratorsToSpawn", 0) != 0 then
+		return -- Map has forced the generator count. GG
+	end
+
+	local totalGens = SlashCo.GensNeeded
+	if additionalSurvivors > 0 then
+		totalGens = totalGens + math.floor(additionalSurvivors / 8) -- For every 8 additional survivors, there will be one more gen.
+	end
+
+	GetGlobal2Int("SlashCoGeneratorsNeeded", totalGens)
+	GetGlobal2Int("SlashCoGeneratorsToSpawn", totalGens)
+end
+
 ---main body of round starting function
 local function startRound(noSetup)
 	SlashCo.RoundStarted = true
@@ -685,6 +699,15 @@ local function startRound(noSetup)
 		SlashCo.SetupPlayers()
 	end
 
+	local survivors = team.GetPlayers(TEAM_SURVIVOR)
+	for _, ply in ipairs(survivors) do
+		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
+		ply:SetHealth(ply:GetMaxHealth())
+	end
+	GameData.RoundStartSurvivorCount = #survivors
+
+	SlashCo.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+
 	SlashCo.SpawnGenerators()
 
 	if SlashCo.CurRound.OfferingData.CurrentOffering ~= SCInfo.Offering.Nightmare then
@@ -698,13 +721,6 @@ local function startRound(noSetup)
 	SlashCo.UpdateHelicopterSeek(SlashCo.CurRound.HelicopterIntroPosition)
 	SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterTargetPosition, SlashCo.CurRound.HelicopterIntroAngle)
 	SlashCo.BroadcastCurrentRoundData(true)
-
-	local survivors = team.GetPlayers(TEAM_SURVIVOR)
-	for _, ply in ipairs(survivors) do
-		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
-		ply:SetHealth(ply:GetMaxHealth())
-	end
-	GameData.RoundStartSurvivorCount = #survivors
 
 	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}
 	local dangerLevel = SlashCo.DangerLevel.Unknown
