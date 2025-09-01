@@ -171,8 +171,68 @@ function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetNWInt("Slasher_Perception", final_perception)
 end
 
+local function IsPlayerHoldingCookie(target, removeCookie)
+	if target:ItemValue("EntClass", false, true) == "sc_cookie" then -- eat the Cookie >:3
+		if removeCookie then
+			SlashCo.RemoveItem(target, true)
+		end
+
+		return true
+	end
+
+	if target:ItemValue("EntClass", false, false) == "sc_cookie" then -- eat the Cookie >:3
+		if removeCookie then
+			SlashCo.RemoveItem(target, false)
+		end
+
+		return true
+	end
+
+	return false
+end
+
+local function EatCookie(slasher, target)
+	target:SetPos(slasher:WorldSpaceCenter() + (slasher:GetForward() * 29)) -- Make the cookie align for the animation :3
+	target:DropToFloor()
+
+	slasher:SetNWBool("SidEating", true)
+	slasher.Pacification = 99
+	slasher:EmitSound("slashco/slasher/sid/sid_cookie" .. math.random(1, 2) .. ".mp3")
+
+	target:SetNWBool("BeingEaten", true)
+
+	timer.Simple(1.3, function()
+		slasher:EmitSound("slashco/slasher/sid/sid_eating.mp3")
+	end)
+
+	slasher:Freeze(true)
+
+	timer.Simple(10, function()
+		if not IsValid(slasher) then
+			return
+		end
+
+		slasher:Freeze(false)
+		slasher:SetNWBool("SidEating", false)
+		slasher:SetNWBool("DemonPacified", true)
+		slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
+		slasher.Pacification = math.random(15, 25)
+
+		if IsValid(target) then
+			target:Remove()
+		end
+	end)
+end
+
 function SLASHER.OnPrimaryFire(slasher, target)
 	if not slasher:GetNWBool("SidGun") then
+		if IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true) then
+			target = SlashCo.CreateItem("sc_cookie", target:WorldSpaceCenter(), angle_zero)
+			target:DropToFloor()
+			EatCookie(slasher, target)
+			return
+		end
+
 		SlashCo.Jumpscare(slasher, target)
 		return
 	end
@@ -409,32 +469,9 @@ function SLASHER.OnSecondaryFire(slasher)
 	end
 end
 
-local function IsPlayerHoldingCookie(target, removeCookie)
-	if target:ItemValue("EntClass", false, true) == "sc_cookie" then -- eat the Cookie >:3
-		if removeBaby then
-			SlashCo.RemoveItem(target, true)
-		end
-
-		return true
-	end
-
-	if target:ItemValue("EntClass", false, false) == "sc_cookie" then -- eat the Cookie >:3
-		if removeBaby then
-			SlashCo.RemoveItem(target, false)
-		end
-
-		return true
-	end
-
-	return false
-end
-
 function SLASHER.OnMainAbilityFire(slasher, target)
-	local Satiation = SlashCo.CurRound.OfferingData.Satiation
-
 	if (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
-		target = SlashCo.CreateItem("sc_cookie")
-		target:SetPos(ply:WorldSpaceCenter())
+		target = SlashCo.CreateItem("sc_cookie", target:WorldSpaceCenter(), angle_zero)
 		target:DropToFloor()
 	end
 
@@ -446,33 +483,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		return
 	end
 
-	slasher:SetNWBool("SidEating", true)
-	slasher.Pacification = 99
-	slasher:EmitSound("slashco/slasher/sid/sid_cookie" .. math.random(1, 2) .. ".mp3")
-
-	target:SetNWBool("BeingEaten", true)
-
-	timer.Simple(1.3, function()
-		slasher:EmitSound("slashco/slasher/sid/sid_eating.mp3")
-	end)
-
-	slasher:Freeze(true)
-
-	timer.Simple(10, function()
-		if not IsValid(slasher) then
-			return
-		end
-
-		slasher:Freeze(false)
-		slasher:SetNWBool("SidEating", false)
-		slasher:SetNWBool("DemonPacified", true)
-		slasher.EatedCookies = slasher.EatedCookies + 1 + Satiation
-		slasher.Pacification = math.random(15, 25)
-
-		if IsValid(target) then
-			target:Remove()
-		end
-	end)
+	EatCookie(slasher, target)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
@@ -861,4 +872,3 @@ if CLIENT then
 end
 
 SlashCo.RegisterSlasher(SLASHER, "Sid")
-
