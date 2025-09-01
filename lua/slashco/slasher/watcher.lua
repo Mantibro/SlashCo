@@ -38,7 +38,7 @@ SLASHER.MediumAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.o
 SLASHER.HighAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_high.ogg"
 -- Balancement Vars
 SLASHER.SurveyLength = 10 -- How long a survey goes
-slasher.SurveyCooldown = 100 -- How long the survey cooldown is.
+SLASHER.SurveyCooldown = 100 -- How long the survey cooldown is.
 SLASHER.SurveyDisplayLength = 5 -- How long the survey texture is displayed on survivors screen.
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)

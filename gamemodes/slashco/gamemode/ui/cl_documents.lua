@@ -176,13 +176,14 @@ local selection = {
 		draw.SimpleText("<", "TVCDMedium", w / 2.3 + (pointerRow * w / 2.1), (h / 18) * pointerCount, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		-- After the code above, we expect selectedDocument to NEVER be nil.
-		local slasher = SlashCo.HasDocument(selectedDocument.Name) and SlashCoSlashers[selectedDocument.Slasher] or nil
+		local hasDocument = SlashCo.HasDocument(selectedDocument.Name)
+		local slasher = hasDocument and SlashCoSlashers[selectedDocument.Slasher] or nil
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(slasher and Material("slashco/ui/icons/slasher/s_" .. slasher.ID) or (selectedDocument.ID and Material("slashco/ui/icons/slasher/s_" .. selectedDocument.ID) or unknownIcon))
 		surface.DrawTexturedRect(w / 20, h - (h / 2.7), w / 3, h / 3)
 
-		draw.SimpleText("[" .. string.upper(slasher and slasher.Name or (selectedDocument.Name or "UNKNOWN")) .. "]", "TVCDMediumBig", h / 1.45, w / 1.3, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("[" .. string.upper(hasDocument and (slasher and slasher.Name or selectedDocument.Name) or "UNKNOWN") .. "]", "TVCDMediumBig", h / 1.45, w / 1.3, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		if slasher or (selectedDocument.DangerLevel and selectedDocument.Class) then
 			draw.SimpleText(string.upper(SlashCo.DangerLevel[slasher and slasher.DangerLevel or selectedDocument.DangerLevel] .. " " .. SlashCo.SlasherClass[slasher and slasher.Class or selectedDocument.Class]), "TVCDMedium", h / 1.45, w / 1.17, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		else

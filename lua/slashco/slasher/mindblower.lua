@@ -209,7 +209,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER not ply:GetNWBool("InSlasherChaseMode") then
+	if SERVER and not ply:GetNWBool("InSlasherChaseMode") then
 		return false
 	end
 
