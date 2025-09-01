@@ -192,13 +192,15 @@ if SERVER then
 			end
 		end
 
-		if not userEnteredAlready and not GameData.IsLobby then
+		if not userEnteredAlready then
 			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
 
-			-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
-			activator.QuickEscape = SlashCo.GetRoundTime() < SlashCo.QuickEscapeTime
-			activator.SlowEscape = SlashCo.GetRoundTime() > SlashCo.SlowEscapeTime
-			activator:SetNW2Float("EscapeTime", SlashCo.GetRoundTime())
+			if not GameData.IsLobby then
+				-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
+				activator.QuickEscape = SlashCo.GetRoundTime() < SlashCo.QuickEscapeTime
+				activator.SlowEscape = SlashCo.GetRoundTime() > SlashCo.SlowEscapeTime
+				activator:SetNW2Float("EscapeTime", SlashCo.GetRoundTime())
+			end
 		end
 
 		local vehicle = ents.Create("prop_vehicle_prisoner_pod")

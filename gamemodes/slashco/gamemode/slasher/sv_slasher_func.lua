@@ -381,57 +381,75 @@ function SlashCo.StartChaseMode(slasher)
 	})
 end
 
-function SlashCo.BustDoor(slasher, target, force)
+function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 	if not IsValid(target) then
+		if callback then
+			callback(false)
+		end
 		return
 	end
 
 	if target:GetClass() ~= "prop_door_rotating" then
+		if callback then
+			callback(false)
+		end
 		return
 	end
 
-	if SERVER then
-		target:Fire("Open")
+	target:Fire("Open")
+
+	local doors = {}
+	local name = target:GetName()
+	for _, v in ipairs(ents.FindInSphere(target:WorldSpaceCenter(), 100)) do
+		if v:GetName() == name then
+			table.insert(doors, v)
+		end
 	end
 
 	timer.Simple(0.05, function()
-		local tr = util.TraceLine({
-			start = slasher:EyePos(),
-			endpos = slasher:EyePos() + slasher:GetForward() * 10000,
-			filter = slasher
-		})
-
-		if not target:IsValid() then
+		if not IsValid(slasher) then
+			if callback then
+				callback(false)
+			end
 			return
 		end
 
-		local prop = ents.Create("sc_broken_door")
-		local model = target:GetModel()
-		prop:SetModel(model)
-		prop:SetMoveType(MOVETYPE_NONE)
-		--prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
-		prop:SetPos(target:GetPos() + slasher:GetForward() * 6 + Vector(0, 0, 1))
-		prop:SetAngles(target:GetAngles())
-		prop:Spawn()
-		prop:Activate()
-		prop:PhysicsInit(SOLID_VPHYSICS)
-		prop:SetSkin(target:GetSkin())
-		local phys = prop:GetPhysicsObject()
-		if phys:IsValid() then
-			phys:Wake()
-		end
-		phys:ApplyForceCenter(slasher:GetForward() * force)
+		for _, door in ipairs(doors) do
+			if not IsValid(door) then continue end
 
-		local surf = util.GetSurfaceData(tr.SurfaceProps)
-		if surf then
-			if surf.name == "wood" then
-				target:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
-			elseif surf.name == "metal" then
-				target:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+			local prop = ents.Create("sc_broken_door")
+			local model = door:GetModel()
+			prop:SetModel(model)
+			prop:SetMoveType(MOVETYPE_NONE)
+			--prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
+			prop:SetPos(door:GetPos() + slasher:GetForward() * 6 + Vector(0, 0, 1))
+			prop:SetAngles(door:GetAngles())
+			prop:Spawn()
+			prop:Activate()
+			prop:PhysicsInit(SOLID_VPHYSICS)
+			prop:SetSkin(door:GetSkin())
+			local phys = prop:GetPhysicsObject()
+			if phys:IsValid() then
+				phys:Wake()
 			end
+			phys:ApplyForceCenter(isvector(force) and force or (slasher:GetForward() * force))
+
+			local doorPhys = door:GetPhysicsObject()
+			local surf = IsValid(doorPhys) and doorPhys:GetMaterial() or nil
+			if surf then
+				if surf.name == "wood" then
+					door:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
+				elseif surf.name == "metal" then
+					door:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+				end
+			end
+
+			door:Remove()
 		end
 
-		target:Remove()
+		if callback then
+			callback(true)
+		end
 	end)
 end
 

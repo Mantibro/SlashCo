@@ -13,17 +13,19 @@ end
 function ITEM.OnUse(ply)
 	ply:EmitSound("Weapon_Crowbar.Miss")
 	ply:ViewPunch(Angle(-10, 0, 0))
-	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:LocalToWorld(Vector(0, 0, 60)), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-	droppeditem:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 1400)
+	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
+	droppeditem:SetBrickVelocity(ply:GetAimVector() * 1500)
 	SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
 
-	droppeditem:SetCollisionGroup(COLLISION_GROUP_NONE)
+	droppeditem:SetCollisionGroup(COLLISION_GROUP_PLAYER)
 	droppeditem:SetCustomCollisionCheck(true)
+	droppeditem:CollisionRulesChanged()
 	timer.Simple(0.2, function()
 		if not IsValid(droppeditem) then
 			return
 		end
 		droppeditem:SetCustomCollisionCheck(false)
+		droppeditem:CollisionRulesChanged()
 	end)
 	timer.Simple(3, function()
 		if not IsValid(droppeditem) then
