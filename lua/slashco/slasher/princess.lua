@@ -35,7 +35,9 @@ SLASHER.AngerPassiveGain = 0.04
 SLASHER.AngerChaseGain = 0
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	SLASHER.ChaseSpeed = 280 + (7.5 * additionalSurvivors)
+	-- If we have more than the default survivors, the ChaseSpeed is increased by 7.5, if we have less than the default, we only decrease it by 2.5
+	SLASHER.ChaseSpeed = 280 + (((additionalSurvivors > 0) and 7.5 or 2.5) * additionalSurvivors)
+
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 	if additionalSurvivors > 0 then -- Only increase these if we have more than the default survivors.
 		SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
