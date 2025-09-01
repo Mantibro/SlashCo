@@ -656,11 +656,12 @@ function SlashCo.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 
 	local totalGens = SlashCo.GensNeeded
 	if additionalSurvivors > 0 then
-		totalGens = totalGens + math.floor(additionalSurvivors / 8) -- For every 8 additional survivors, there will be one more gen.
+		totalGens = totalGens + math.floor(additionalSurvivors / GameData.BaseMaxSurvivors) -- For every 6 additional survivors, there will be one more gen.
 	end
 
-	GetGlobal2Int("SlashCoGeneratorsNeeded", totalGens)
-	GetGlobal2Int("SlashCoGeneratorsToSpawn", totalGens)
+	print("Spawning a total of " .. totalGens .. " generators (additional survivors: " .. additionalSurvivors .. ")")
+	SetGlobal2Int("SlashCoGeneratorsNeeded", totalGens)
+	SetGlobal2Int("SlashCoGeneratorsToSpawn", totalGens)
 end
 
 ---main body of round starting function
