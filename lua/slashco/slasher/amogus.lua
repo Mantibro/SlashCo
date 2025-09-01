@@ -50,11 +50,13 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local DisguiseT = slasher.DisguiseTimer or 0 -- Time spent disguised and near survivors
 	local DisguiseCD = slasher.DisguiseCooldown or 0 -- Disguising Cooldown
-	local Entity = slasher.DisguiseEntity or nil -- Entity Index
+	local Entity = slasher.DisguiseEntity or nil -- Entity
 	local Speech = slasher.AmogusSpeech or 0 -- Time to speak
 
 	if IsValid(Entity) then
 		Entity:SetAngles(Angle(0, slasher:EyeAngles()[2], 0))
+		Entity:SetPos(slasher:WorldSpaceCenter())
+		Entity:DropToFloor()
 	end
 
 	if DisguiseCD > 0 then
@@ -244,7 +246,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			prop:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 			prop:Spawn()
 
-			prop:FollowBone(slasher, slasher:LookupBone("Hips"))
+			-- Instead we update it's position every frame, it may be more expensive but it should be more reliable.
+			--prop:FollowBone(slasher, slasher:LookupBone("Hips"))
 
 			local id = prop:EntIndex()
 			slasher.DisguiseEntity = prop
