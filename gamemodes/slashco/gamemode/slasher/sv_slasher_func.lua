@@ -431,8 +431,8 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 			local phys = prop:GetPhysicsObject()
 			if phys:IsValid() then
 				phys:Wake()
+				phys:ApplyForceCenter(isvector(force) and force or (slasher:GetForward() * force))
 			end
-			phys:ApplyForceCenter(isvector(force) and force or (slasher:GetForward() * force))
 
 			local doorPhys = door:GetPhysicsObject()
 			local surf = IsValid(doorPhys) and doorPhys:GetMaterial() or nil
