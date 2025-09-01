@@ -23,8 +23,10 @@ local colors = {
 	["$pp_colour_mulb"] = 0
 }
 
+local halo_color = Color(255, 0, 0)
 function EFFECT.Screenspace()
 	local blur, pos = 99999
+	local slashers = {}
 	for _, v in pairs(ents.FindInSphere(GameData.LocalPlayer:EyePos(), 1000)) do
 		if v:IsPlayer() and v:Team() == TEAM_SLASHER then
 			local dist = math.max(8 - (v:WorldSpaceCenter():DistToSqr(GameData.LocalPlayer:EyePos()) * 0.000008), 0)
@@ -32,8 +34,19 @@ function EFFECT.Screenspace()
 				blur = dist
 				pos = v:WorldSpaceCenter()
 			end
+			table.insert(slashers, v)
 		end
 	end
+
+	halo.Render({
+		Ents = slashers,
+		Color = halo_color,
+		BlurX = 1,
+		BlurY = 1,
+		DrawPasses = 1,
+		Additive = true,
+		IgnoreZ = true,
+	})
 
 	if blur < 99999 then
 		local diff = pos - GameData.LocalPlayer:GetShootPos()

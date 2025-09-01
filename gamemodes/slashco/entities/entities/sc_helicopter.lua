@@ -192,7 +192,7 @@ if SERVER then
 			end
 		end
 
-		if not userEnteredAlready then
+		if not userEnteredAlready and not GameData.IsLobby then
 			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
 
 			-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
