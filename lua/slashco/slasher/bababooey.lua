@@ -30,8 +30,21 @@ SLASHER.ProTip = "Bababooey_tip"
 SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
+-- Balancement Vars
+SLASHER.CooldownReduction = 0 -- Additional number that is added to FrameTime to decrease cooldowns.
+SLASHER.AppearCooldownReduction = 0 -- Appear Cooldown reduction, same as above but used when quitely appearing
+SLASHER.MaxClones = 1 -- How many clones he can have.
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.CooldownReduction = (SO * 0.04) + (0.01 * additionalSurvivors)
+	SLASHER.AppearCooldownReduction = (SO * 6) + (0.25 * additionalSurvivors)
+	SLASHER.MaxClones = 1 + SO
+	if additionalSurvivors > 0 then -- If we got more than the default players, we allow more clones.
+		SLASHER.MaxClones = SLASHER.MaxClones + math.floor(additionalSurvivors / 4) -- For every 4 additional survivors we allow one more clone.
+	end
+
 	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 298 + (7.5 * additionalSurvivors)
 	SLASHER.KillDistance = 135 + (5 * additionalSurvivors)
@@ -57,14 +70,12 @@ function SLASHER.DoSound(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local TriggerCD = slasher.TriggerCooldown or 0 --Cooldown for being able to trigger
 	local KillCD = slasher.KillCooldown or 0 --Cooldown for being able to kill
 	local SpookCD = slasher.SpookCooldown or 0 --Cooldown for spook animation
 
 	if TriggerCD > 0 then
-		slasher.TriggerCooldown = TriggerCD - (FrameTime() + (SO * 0.04))
+		slasher.TriggerCooldown = TriggerCD - (FrameTime() + SLASHER.CooldownReduction)
 	end
 
 	if KillCD > 0 then
@@ -82,10 +93,11 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if KillCD > 0 then
-		slasher.KillCooldown = KillCD - (FrameTime() + (SO * 0.04))
+		slasher.KillCooldown = KillCD - (FrameTime() + SLASHER.CooldownReduction)
 	end
+
 	if SpookCD > 0 then
-		slasher.SpookCooldown = SpookCD - (FrameTime() + (SO * 0.04))
+		slasher.SpookCooldown = SpookCD - (FrameTime() + SLASHER.CooldownReduction)
 	end
 
 	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
@@ -101,8 +113,6 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local cooldown = slasher.TriggerCooldown
 
 	if cooldown > 0 then
@@ -167,7 +177,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		:: SKIP ::
 
 		--Quiet appear
-		slasher.KillCooldown = math.random(3, 13 - (SO * 6))
+		slasher.KillCooldown = math.random(3, 13 - SLASHER.AppearCooldownReduction)
 		slasher.TriggerCooldown = 8
 
 		:: SPOOKAPPEAR ::
@@ -180,9 +190,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
-	if #ents.FindByClass("sc_babaclone") > SO then
+	if #ents.FindByClass("sc_babaclone") >= SLASHER.MaxClones then
 		return
 	end
 
@@ -220,18 +228,21 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply:GetNWBool("BababooeyInvisibility") then
-			return true
-		end
-
-		ply:EmitSound("slashco/slasher/bababooey/babastep_0" .. math.random(1, 3) .. ".mp3")
-		return true
+	if SERVER and not ply:GetNWBool("BababooeyInvisibility") then
+		local idx = math.random(1, 3)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
+			identifier = "BababooeyFootstep" .. idx,
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			unreliable = true,
+		})
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()

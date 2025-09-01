@@ -46,7 +46,9 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		soundData.position = (isnumber(soundData.entity) and Entity(soundData.entity) or soundData.entity):GetPos()
 	end
 
-	net.Start("slashCo_AudioSystem_PlaySound")
+	-- using soundData.unreliable can allow sounds to be played with lower delays though they'll be unreliable and could be lost.
+	-- This can be useful if you play only a short sound like a footstep where having a smaller delay can affect gameplay.
+	net.Start("slashCo_AudioSystem_PlaySound", soundData.unreliable or false)
 		WriteSoundField(soundData.soundPath, net.WriteString)
 		WriteSoundField(soundData.fallbackSoundPath, net.WriteString)
 		WriteSoundField(soundData.entity, WriteEntIndex)
@@ -74,6 +76,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		WriteSoundField(soundData.dynamicPan, net.WriteBool)
 		WriteSoundField(soundData.boundConVar, net.WriteString)
 		WriteSoundField(soundData.pulseEffect, WritePulseEffect)
+		WriteSoundField(soundData.makeUniqueToEntity, net.WriteBool)
 		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 
 	if not soundData.sendToEntity then -- serverside only, its networked only to the player its being played od

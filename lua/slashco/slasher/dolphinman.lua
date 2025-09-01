@@ -29,8 +29,17 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.CannotBeSpectated = true
+-- Balancement Vars
+SLASHER.HuntPowerDiv = 1 -- Used to divide FrameTime, raising it will make his hunt last longer.
+SLASHER.HuntPowerGainDiv = 2 -- Used to divide FrameTime, raising it will make him gain hunt power SLOWER
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	-- math.max so it cannot go below 0.5.
+	SLASHER.HuntPowerDiv = math.max(1 + SO + (0.1 * additionalSurvivors), 0.5)
+	SLASHER.HuntPowerGainDiv = math.max(2 - (0.5 * SO) - (0.02 * additionalSurvivors), 0.5)
+
 	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 315 + (5 * additionalSurvivors)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
@@ -66,10 +75,7 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local HuntPower = slasher.HuntPower or 0 --Hunt power
-
 	local hunt_boost = 0
-
-	local SO = SlashCo.CurRound.OfferingData.Singularity
 	
 	if math.random(1, 1000) == 1 then
 		SlashCo.AudioSystem.PlaySound({
@@ -92,7 +98,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		--get hunt yes.....
 		if HuntPower < 100 then
-			slasher.HuntPower = HuntPower + (FrameTime() / (2 - ((SO - 1) / 2)))
+			slasher.HuntPower = HuntPower + (FrameTime() / SLASHER.HuntPowerGainDiv)
 		end
 
 		--Survivore finderore
@@ -185,7 +191,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			hunt_boost = 1
 
 			--oh fuck i'm losing my hunt!!
-			slasher.HuntPower = HuntPower - (FrameTime() / 1 + SO)
+			slasher.HuntPower = HuntPower - (FrameTime() / SLASHER.HuntPowerDiv)
 
 			--damn shit
 			if HuntPower <= 0 then
@@ -323,6 +329,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			unreliable = true,
 		})
 	end
 

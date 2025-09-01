@@ -29,6 +29,13 @@ SLASHER.ProTip = "FreeSmiley_tip"
 SLASHER.SpeedRating = "★☆☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
+SLASHER.SummonCooldown = 50 -- Summon cooldown
+
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.SummonCooldown = 50 - (25 * SO)
+end
 
 function SLASHER.OnSpawn(slasher)
 	SLASHER.SmileyIdle(slasher)
@@ -81,8 +88,6 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
 		return
 	end
@@ -100,7 +105,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	slasher.SummonCooldown = 50 - (SO * 25)
+	slasher.SummonCooldown = SLASHER.SummonCooldown
 
 	slasher:SetNWBool("FreeSmileySummoning", true)
 
@@ -166,20 +171,25 @@ function SLASHER.Footstep(ply)
 		if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then
 			ply.SmileyStepTick = 0
 		end
+
 		if ply.SmileyStepTick == 0 then
-			ply:EmitSound("npc/footsteps/hardboot_generic" .. math.random(1, 6) .. ".wav", 50, 70, 0.75)
-			ply.SmileyStepTick = ply.SmileyStepTick + 1
-			return false
+			local idx = math.random(1, 6)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
+				identifier = "FreeSmileyFootstep" .. idx,
+				minDistance = 200,
+				maxDistance = 500,
+				entity = ply,
+				volume = 1,
+				fadeIn = 0,
+				unreliable = true,
+			})
 		end
 
 		ply.SmileyStepTick = ply.SmileyStepTick + 1
-
-		return true
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 local dealTable = {

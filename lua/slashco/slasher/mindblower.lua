@@ -29,6 +29,15 @@ SLASHER.ProTip = "Mindblower_tip"
 SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
+SLASHER.SurvivorSpeedAddition = 0 -- Additional Survivor Speed added for each survivor in range
+SLASHER.PacificationAddition = 0 -- Additional Pacification added each frame.
+
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.SurvivorSpeedAddition = 0.02 * SO
+	SLASHER.PacificationAddition = 0.04 * SO
+end
 
 function SLASHER.OnSpawn(slasher)
 	SlashCo.CreateItem("sc_pancake", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
@@ -37,14 +46,13 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
 	local SurvSpeed = slasher.SurvivorSpeed or 0 --Survivor speed decrease when being chased
 	local Pacification = slasher.Pacification or 0 --Pacification
 	local _ents = ents.FindInSphere(self:GetPos())
 	
 	for _, v in ipairs(_ents) do
 		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(slasher:GetPos()) < 1700 and SurvSpeed < 160 and slasher:GetNWBool("InSlasherChaseMode") then
-			slasher.SurvivorSpeed = SurvSpeed + (FrameTime() + (SO * 0.02)) + (FrameTime() * 0.5)
+			slasher.SurvivorSpeed = SurvSpeed + (FrameTime() + SLASHER.SurvivorSpeedAddition) + (FrameTime() * 0.5)
 			v:SetSlowWalkSpeed(SlowWalkSpeed - (SurvSpeed / 0.5))
 			v:SetWalkSpeed(WalkSpeed - (SurvSpeed / 0.5))
 			v:SetRunSpeed(RunSpeed - (SurvSpeed / 0.5))
@@ -54,7 +62,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	
 	if Pacification > 0 then
-		slasher.Pacification = Pacification - (FrameTime() + (SO * 0.04))
+		slasher.Pacification = Pacification - (FrameTime() + SLASHER.PacificationAddition)
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
 	else
@@ -201,12 +209,8 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply:GetNWBool("InSlasherChaseMode") then
-			return true
-		else
-			return false
-		end
+	if SERVER not ply:GetNWBool("InSlasherChaseMode") then
+		return false
 	end
 
 	return true

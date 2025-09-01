@@ -25,8 +25,15 @@ SLASHER.ProTip = "Male07_tip"
 SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
+SLASHER.PrimaryDamage = 50 -- How much damage he does with his primary attack.
+SLASHER.GameProgressMult = 1 -- Used to multiply the GameProgress when deciding if he should become a monster. Raising it will allow him to enter the monster form earlier.
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.GameProgressMult = math.max(1 + SO + (0.05 * additionalSurvivors), 0.5)
+	SLASHER.PrimaryDamage = 50 + (SO * 50) + (2 * additionalSurvivors)
+
 	SLASHER.ProwlSpeed = 100 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 302 + (7.5 * additionalSurvivors)
 	if additionalSurvivors > 0 then -- Only increase the chase duration if we have more than the default survivors.
@@ -49,8 +56,6 @@ function SLASHER.Precache()
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local State = slasher.MaleState or 0 --State
 	local ChaseAsHuman = slasher.TimeChasingAsHuman or 0 --Time Spent Human Chasing
 	local MaleCD = slasher.MaleCooldown or 0 --Cooldown
@@ -110,8 +115,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			--Timer - 10 seconds + Game Progress (1-10) ^ 3 (SO - x2)
 
-			if ChaseAsHuman > 1 + (SlashCo.CurRound.GameProgress * 1.5) + (0.75 * math.pow(SlashCo.CurRound.GameProgress,
-					2)) * (1 + SO) then
+			if ChaseAsHuman > 1 + (SlashCo.CurRound.GameProgress * 1.5) + (0.75 * math.pow(SlashCo.CurRound.GameProgress, 2)) * SLASHER.GameProgressMult then
 				--Become Monster
 
 				slasher:SetModel(monsterModelName)
@@ -160,8 +164,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	if slasher.MaleState == 0 then
 		return
 	end
@@ -176,7 +178,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			if SERVER then
 				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
-						Vector(-30, -40, -60), Vector(30, 40, 60), 50 + (SO * 50), DMG_SLASH, 2, false)
+						Vector(-30, -40, -60), Vector(30, 40, 60), SLASHER.PrimaryDamage, DMG_SLASH, 2, false)
 
 				if not target1:IsValid() then
 					return
@@ -330,15 +332,7 @@ function SLASHER.OnItemSpawn()
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply:IsVisible() then
-			return true
-		else
-			return false
-		end
-	end
-
-	return true
+	return not ply:IsVisible()
 end
 
 local possessTable = {

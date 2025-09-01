@@ -28,6 +28,13 @@ SLASHER.ProTip = "Leuonard_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
+SLASHER.RoidMult = 0.3 -- Roid multiplier used to multiply FrameTime by. Higher means more Roid is gained.
+
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.RoidMult = 0.3 + (SO * 0.3)
+end
 
 function SLASHER.OnSpawn(slasher)
 	SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
@@ -40,8 +47,6 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local Roid = slasher.LeuonardRoid or 0 --Roid
 	local MouseTick = slasher.MouseDriftTick or 0 --Tick to change mouse drift
 
@@ -56,7 +61,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		if not slasher:GetNWBool("LeuonardRoiding") then
-			slasher.LeuonardRoid = Roid + (FrameTime() * (0.3 + (SO * 0.3)))
+			slasher.LeuonardRoid = Roid + (FrameTime() * SLASHER.RoidMult)
 
 			--sound
 
@@ -281,13 +286,20 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/leuonard/leuonard_step" .. math.random(1, 3) .. ".mp3")
-		return true
+		local idx = math.random(1, 3)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/leuonard/leuonard_step" .. idx .. ".mp3",
+			identifier = "LeuonardFootstep" .. idx,
+			minDistance = 200,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			unreliable = true,
+		})
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 function SLASHER.InitHud(_, hud)

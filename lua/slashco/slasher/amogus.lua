@@ -282,24 +282,25 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply:GetNWBool("AmogusFuelDisguise") then
-			return true
-		end
-		if ply:GetNWBool("AmogusSurvivorDisguise") then
-			return false
-		end
-
-		ply:EmitSound("slashco/slasher/amogus/amogus_step" .. math.random(1, 3) .. ".mp3")
-		return true
+	if ply:GetNWBool("AmogusSurvivorDisguise") then
+		return false
 	end
 
-	if CLIENT then
-		if ply:GetNWBool("AmogusSurvivorDisguise") then
-			return false
-		end
-		return true
+	if SERVER and not ply:GetNWBool("AmogusFuelDisguise") then
+		local idx = math.random(1, 3)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/amogus/amogus_step" .. idx .. ".mp3",
+			identifier = "AmongusFootstep" .. idx,
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			unreliable = true,
+		})
 	end
+
+	return true
 end
 
 hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()

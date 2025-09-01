@@ -30,8 +30,23 @@ SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 SLASHER.CannotBeSpectated = true
+SLASHER.NestedRange = 1000 -- When nested, this range is used to check for any nearby survivors.
+SLASHER.AdditionalAngerMult = 0 -- Used to multiply FrameTime which is then added additionally to the Anger.
+SLASHER.JumpStrengthForward = 800 -- forward Velocity used when jumping
+SLASHER.JumpStrengthUp = 200 -- up Velocity used when jumping
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.NestedRange = 1000 + (SO * 750) + (50 * additionalSurvivors)
+	SLASHER.AdditionalAngerMult = SO + (0.05 * additionalSurvivors)
+
+	SLASHER.JumpStrengthForward = 800 + (SO * 500) + (30 * additionalSurvivors)
+	SLASHER.JumpStrengthUp = 200 + (SO * 100)
+	if additionalSurvivors > 0 then
+		SLASHER.JumpStrengthUp = SLASHER.JumpStrengthUp + (5 * additionalSurvivors)
+	end
+
 	SLASHER.ProwlSpeed = 250 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 315 + (7.5 * additionalSurvivors)
 	if additionalSurvivors > 0 then -- Only increase the chase duration if we have more than the default survivors.
@@ -51,8 +66,6 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local Target = slasher.TargetPlayer or 0 --Target SteamID
 	local LeapCD = slasher.LeapCooldown or 0 --Leap Cooldown
 	local TimeNested = slasher.TimeNested or 0 --Time spend nested
@@ -105,7 +118,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				continue
 			end
 
-			if s:GetPos():Distance(slasher:GetPos()) >= (1000 + (TimeNested * 3) + (SO * 750)) then
+			if s:GetPos():Distance(slasher:GetPos()) >= (SLASHER.NestedRange + (TimeNested * 3)) then
 				continue
 			end
 
@@ -161,7 +174,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					continue
 				end
 
-				slasher.Aggression = Aggression + (FrameTime() * ((250 - d) / 2000)) + (SO * FrameTime())
+				slasher.Aggression = Aggression + (FrameTime() * ((250 - d) / 2000)) + (SLASHER.AdditionalAngerMult * FrameTime())
 
 				if Aggression > 100 then
 					slasher.TargetPlayer = s:SteamID64()
@@ -271,8 +284,6 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	if slasher.LeapCooldown > 0 then
 		return
 	end
@@ -299,10 +310,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			return
 		end
 
-		local strength_forward = 800 + (SO * 500)
-		local strength_up = 200 + (SO * 100)
-
-		slasher:SetVelocity((slasher:EyeAngles():Forward() * strength_forward) + Vector(0, 0, strength_up))
+		slasher:SetVelocity((slasher:EyeAngles():Forward() * SLASHER.JumpStrengthForward) + Vector(0, 0, SLASHER.JumpStrengthUp))
 		slasher:Freeze(false)
 	end)
 end
@@ -332,13 +340,19 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/manspider/manspider_step.mp3")
-		return true
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/manspider/manspider_step.mp3",
+			identifier = "ManspiderFootstep",
+			minDistance = 250,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			unreliable = true,
+		})
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 local mat = Material("lights/white")

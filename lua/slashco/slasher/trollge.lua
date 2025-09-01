@@ -553,10 +553,6 @@ function SLASHER.CanSeeFlashlights(ply)
 	return false
 end
 
-function SLASHER.Footstep()
-	return true
-end
-
 local avatarTable = {
 	default = Material("slashco/ui/icons/slasher/s_3"),
 	stage1 = Material("slashco/ui/icons/slasher/s_3_s1"),
@@ -660,13 +656,11 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			unreliable = true,
 		})
-		return false
 	end
 
-	if CLIENT then
-		return false
-	end
+	return true
 end
 
 if CLIENT then

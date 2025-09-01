@@ -29,8 +29,21 @@ SLASHER.ProTip = "Borgmire_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
+-- Balancement Vars
+SLASHER.PunchDamage = 35
+SLASHER.ThrowStrengthForward = 1600 -- forward Velocity used when throwing a player
+SLASHER.ThrowStrengthUp = 800 -- up Velocity used when throwing a player
+SLASHER.ChaseDecreaseMult = 14 -- Multiplier used when decreasing the chase duration
+SLASHER.PunchSlowdownDiv = 2 -- Used to divide FrameTime making the PunchSlowdown last longer, the lower, the shorter the Slowdown becomes. 
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.PunchDamage = 35 + (SO * 20) + (1.5 * additionalSurvivors)
+	SLASHER.ThrowStrengthForward = 1600 + (SO * 450)  + (30 * additionalSurvivors)
+	SLASHER.ThrowStrengthUp = 800 + (SO * 150) + (10 * additionalSurvivors)
+	SLASHER.PunchSlowdownDiv = math.max((2 / SO) - (0.05 * additionalSurvivors), 0.5)
+
 	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 325 + (7.5 * additionalSurvivors)
 	SLASHER.ChaseDuration = 12.0 + (1 * additionalSurvivors)
@@ -49,8 +62,6 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local ChaseTime = slasher.TimeChasing or 0 --Time Spent chasing
 	local PunchCD = slasher.PunchCooldown or 0 --Punch Cooldown
 	local PunchSD = slasher.PunchSlowdown or 0 --Punch Slowdown
@@ -65,7 +76,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if PunchSD > 1 then
-		slasher.PunchSlowdown = PunchSD - (FrameTime() / (2 - SO))
+		slasher.PunchSlowdown = PunchSD - (FrameTime() / SLASHER.PunchSlowdownDiv)
 	end
 	if PunchSD < 1 then
 		slasher.PunchSlowdown = 1
@@ -120,8 +131,6 @@ function SLASHER.OnPrimaryFire(slasher)
 		return
 	end
 
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	if slasher.PunchCooldown < 0.01 then
 		slasher:SetNWBool("BorgmirePunch", false)
 		slasher.BorgPunching = true
@@ -137,7 +146,7 @@ function SLASHER.OnPrimaryFire(slasher)
 			slasher.PunchSlowdown = 2
 
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
-					Vector(-35, -45, -60), Vector(35, 45, 60), 35 + (SO * 20), DMG_SLASH, 5, false)
+					Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.PunchDamage, DMG_SLASH, 5, false)
 
 			if not target:IsValid() then
 				return
@@ -189,8 +198,6 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		return
 	end
 
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then
 		return
 	end
@@ -213,7 +220,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 
 		for i = 1, 13 do
 			timer.Simple(0.1 + (i / 10), function()
-				if not IsValid(target) then
+				if not IsValid(target) or not IsValid(slasher) then
 					return
 				end
 
@@ -222,16 +229,12 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		end
 
 		timer.Simple(1.5, function()
-			if not IsValid(target) then
+			if not IsValid(target) or not IsValid(slasher) then
 				return
 			end
 
 			target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
-
-			local strength_forward = 1600 + (SO * 450)
-			local strength_up = 800 + (SO * 150)
-
-			target:SetVelocity((slasher:GetForward() * strength_forward) + Vector(0, 0, strength_up))
+			target:SetVelocity((slasher:GetForward() * SLASHER.ThrowStrengthForward) + Vector(0, 0, SLASHER.ThrowStrengthUp))
 
 			target:Freeze(false)
 			if target:Health() > 1 then
@@ -242,7 +245,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		end)
 
 		timer.Simple(2, function()
-			if not IsValid(target) then
+			if not IsValid(target) or not IsValid(slasher) then
 				return
 			end
 
@@ -301,12 +304,20 @@ function SLASHER.Footstep(ply)
 		end
 
 		if ply.BorgStepTick == 0 then
-			ply:EmitSound("slashco/slasher/borgmire/borgmire_step" .. math.random(1, 4) .. ".mp3")
+			local idx = math.random(1, 4)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/borgmire/borgmire_step" .. idx .. ".mp3",
+				identifier = "BorgmireFootstep" .. idx,
+				minDistance = 400,
+				maxDistance = 700,
+				entity = ply,
+				volume = 1,
+				fadeIn = 0,
+				unreliable = true,
+			})
 		end
 
 		ply.BorgStepTick = ply.BorgStepTick + 1
-
-		return true
 	end
 
 	return true

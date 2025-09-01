@@ -1,5 +1,6 @@
 SlashCo = SlashCo or {} -- We load VERY early.
 SlashCo.AudioSystem = SlashCo.AudioSystem or {}
+SlashCo.AudioSystem.RegisteredSounds = SlashCo.AudioSystem.RegisteredSounds or {}
 
 --[[
 	The Background music is networked & syncronized.
@@ -63,6 +64,42 @@ end
 
 function SlashCo.AudioSystem.GetBackgroundMusicVolume(fallBack)
 	return GetGlobal2Float("SlashCo:BackgroundMusicVolume", fallBack or 1)
+end
+
+function SlashCo.AudioSystem.RegisterSound(registerName, soundTable)
+	SlashCo.AudioSystem.RegisteredSounds[registerName] = soundTable
+end
+
+-- Creates a copy of the given table.
+-- We don't care about any userdata since our soundTable should have none at all.
+local function CopyTable(input, references)
+	local output = {}
+	references = references or {} -- to prevent loops
+	if references[input] then
+		print("CopyTable was called with looping references!")
+		return output
+	end
+	references[input] = true
+
+	for key, value in pairs(input) do
+		if type(value) == "table" then
+			output[key] = CopyTable(value, references)
+		else
+			output[key] = value
+		end
+	end
+
+	return output
+end
+
+-- Returns a copy of the soundTable that can freely be modified and used, or returns nil if no sound was registered with the given name
+function SlashCo.AudioSystem.GetRegisteredSound(registerName)
+	local soundTable = SlashCo.AudioSystem.RegisteredSounds[registerName]
+	if not soundTable then
+		return nil -- There is no song registered with this name
+	end
+
+	return CopyTable(soundTable)
 end
 
 function SlashCo.AudioSystem.PrecacheSound(soundFile)

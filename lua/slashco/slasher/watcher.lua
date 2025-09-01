@@ -36,6 +36,18 @@ SLASHER.AngerWatchingGain = 0.15 -- Anger thats gained per second when hes watch
 SLASHER.LowAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
 SLASHER.MediumAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_med.ogg"
 SLASHER.HighAngerBackgroundMusic = "slashco/slasher/watcher/watchertheme_high.ogg"
+-- Balancement Vars
+SLASHER.SurveyLength = 10 -- How long a survey goes
+slasher.SurveyCooldown = 100 -- How long the survey cooldown is.
+SLASHER.SurveyDisplayLength = 5 -- How long the survey texture is displayed on survivors screen.
+
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.SurveyLength = 10 + (SO * 10) + (1 * additionalSurvivors)
+	slasher.SurveyCooldown = 100 + (SO * 35) + (2.5 * additionalSurvivors)
+	SLASHER.SurveyDisplayLength = 5 + (SO * 5)
+end
 
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 100))
@@ -56,8 +68,6 @@ function SLASHER.OnAngerTick(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	--local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local SurveyLG = slasher.SurveyLength or 0 --Survey Length
 	local SurveyCD = slasher.SurveyCooldown or 0 --Survey Cooldown
 	local Watched = slasher.WatcherWatched or 0 --Watched
@@ -229,8 +239,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 		return
 	end
 
-	slasher.SurveyLength = 10 + (SO * 10)
-	slasher.SurveyCooldown = 100 - (SO * 35)
+	slasher.SurveyLength = SLASHER.SurveyLength
+	slasher.SurveyCooldown = SLASHER.SurveyCooldown
 
 	slasher:PlayGlobalSound("slashco/slasher/watcher/watcher_locate.mp3", 100)
 
@@ -239,7 +249,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		p:EmitSound("slashco/slasher/watcher/watcher_see.mp3")
 	end
 
-	timer.Simple(5 + (SO * 5), function()
+	timer.Simple(SLASHER.SurveyDisplayLength, function()
 		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			p:SetNWBool("WatcherSurveyed", false)
 		end
@@ -302,13 +312,11 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			unreliable = true,
 		})
-		return false
 	end
 
-	if CLIENT then
-		return false
-	end
+	return false
 end
 
 local surveyTable = {

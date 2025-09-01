@@ -695,11 +695,15 @@ end)
 		boolean dynamicPan - If set it will calculate the pan for the channel giving the sound a 3D effect.
 		string fallbackSoundPath - The fallback sound when the bound ConVar is disabled.
 		string boundConVar - A ConVar the sound is bound to, when the ConVar is false then it will instead play the set fallbackSoundPath
+		boolean disableUniqueToEntity - If set, the entity index is NOT added to the identifier allowing the sound to be played only ONCE and NOT by multiple entities.
 
 		table pulseEffect - A table for the pulse effect. NOTE: This is still WIP and should not be used.
 		-> Entity entity - A entity that should pulse
 		-> string entityClass - The class of which all entities should pulse like sc_gascan
 		-> number frequency - The sound frequency that should be checked for - currently unused.
+
+	Internal fields:
+		boolean isServerside - Set if the sound was sent to us by the server.
 
 	Notes:
 		When the entity is set to the world, the sound is played as mono and NOT 3d!
@@ -735,6 +739,10 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		entIndex = soundData.entity
 	elseif IsValid(soundData.entity) then
 		entIndex = soundData.entity:EntIndex() -- ToDo: Should we also support clientside entities? Probably.
+	end
+
+	if not soundData.disableUniqueToEntity then
+		soundData.identifier = soundData.identifier .. entIndex
 	end
 
 	local existingCreationData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier]
@@ -843,7 +851,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			soundData.callback(channel)
 		end
 
-		if soundData.group then
+		if soundData.group then -- This will be useful later when adding perks that modify the sound of things
 			hook.Run("SlashCo:AudioSystem:PlaySound:" .. soundData.group, soundData, channel)
 		end
 
@@ -923,13 +931,14 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 		return
 	end
 
-	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier]
+	-- We use or and do identifier .. entIndex since if a sound has makeUniqueToEntity set, it will append the EntIndex to our identifier
+	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier] or SlashCo.AudioSystem.CreatingChannels[identifier .. entIndex]
 	if creationSounData then -- The channel wasn't created yet, so we cannot stop it. Instead we'll set a flag.
 		creationSounData.DESTROYCHANNEL = true
 		return
 	end
 
-	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier)
+	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier) or SlashCo.AudioSystem.GetChannelByIdentifier(identifier .. entIndex)
 	if not channel then return end
 
 	SlashCo.AudioSystem.DestroyChannel(channel, fadeOut)
@@ -985,6 +994,7 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		dynamicPan = ReadSoundField(net.ReadBool),
 		boundConVar = ReadSoundField(net.ReadString),
 		pulseEffect = ReadSoundField(ReadPulseEffect),
+		makeUniqueToEntity = ReadSoundField(net.ReadBool),
 	}
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
@@ -992,6 +1002,8 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 	if soundData.entity ~= nil and soundData.entity == SlashCo.AudioSystem.LocalEntIndex then
 		soundData.forceSterio = true -- We are playing the sound on the local player, so we switch it to sterio for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
 	end
+
+	soundData.isServerside = true -- Sound was played by the server.
 
 	SlashCo.AudioSystem.PlaySound(soundData)
 end)

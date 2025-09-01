@@ -29,8 +29,21 @@ SLASHER.ProTip = "Criminal_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
+-- Balancement Vars
+SLASHER.ChaseSpeedDecreaseInRageDiv = 4
+SLASHER.ChaseSpeedDecreaseDiv = 5
+SLASHER.AdditionalClones = 0 -- Additional clones on secondary attack
+SLASHER.AdditionalSpecialClones = 0 -- Additional clones on special ability
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.ChaseSpeedDecreaseDiv = 4 + SO
+	SLASHER.ChaseSpeedDecreaseDiv = 5 + SO
+	-- Gets one more clone for every 4 survivors & math.max to not let it go below 0
+	SLASHER.AdditionalClones = math.max((3 * SO) + math.floor(additionalSurvivors / 4), 0)
+	SLASHER.AdditionalSpecialClones = math.max((2 * SO) + math.floor(additionalSurvivors / 5), 0)
+
 	SLASHER.ProwlSpeed = 200 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 310 + (5 * additionalSurvivors)
 end
@@ -52,8 +65,6 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local ClonTimer = slasher.ClonDuration or 0 --Cloning Duration
 
 	local final_eyesight = SLASHER.Eyesight
@@ -74,13 +85,13 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.ClonDuration = ClonTimer + FrameTime()
 
 		if not slasher:GetNWBool("CriminalRage") then
-			local speed = SLASHER.ChaseSpeed - (ClonTimer / (4 + SO))
+			local speed = SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseInRageDiv)
 
 			slasher:SetSlowWalkSpeed(speed)
 			slasher:SetWalkSpeed(speed)
 			slasher:SetRunSpeed(speed)
 		else
-			local speed = 25 + SLASHER.ChaseSpeed - (ClonTimer / (5 + SO))
+			local speed = 25 + SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseDiv)
 
 			slasher:SetSlowWalkSpeed(speed)
 			slasher:SetWalkSpeed(speed)
@@ -127,7 +138,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		slasher:SetNWBool("CriminalCloning", false)
 		slasher:SetNWBool("CriminalRage", false)
 	else
-		for i = 1, math.random(4 + (SO * 3), 6 + (SO * 3)) do
+		for i = 1, math.random(4 + SLASHER.AdditionalClones, 6 + SLASHER.AdditionalClones) do
 			local clone = ents.Create("sc_crimclone")
 
 			clone:SetPos(slasher:GetPos())
@@ -146,8 +157,6 @@ function SLASHER.OnMainAbilityFire()
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	if not slasher:GetNWBool("CriminalCloning") then
 		return
 	end
@@ -158,7 +167,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	for i = 1, math.random(2 + (SO * 2), 4 + (SO * 2)) do
+	for i = 1, math.random(2 + SLASHER.AdditionalSpecialClones, 4 + SLASHER.AdditionalSpecialClones) do
 		local clone = ents.Create("sc_crimclone")
 
 		clone:SetPos(slasher:GetPos())
@@ -186,11 +195,20 @@ function SLASHER.Footstep(ply)
 		end
 
 		if ply.CrimStepTick == 0 then
-			ply:EmitSound("slashco/slasher/criminal/criminal_step" .. math.random(1, 6) .. ".mp3")
+			local idx = math.random(1, 6)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
+				identifier = "CriminalFootstep" .. idx,
+				minDistance = 200,
+				maxDistance = 500,
+				entity = ply,
+				volume = 1,
+				fadeIn = 0,
+				unreliable = true,
+			})
 		end
 
 		ply.CrimStepTick = ply.CrimStepTick + 1
-		return true
 	end
 
 	return true

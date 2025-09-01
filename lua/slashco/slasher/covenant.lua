@@ -207,13 +207,20 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/bababooey/babastep_0" .. math.random(1, 3) .. ".mp3")
-		return true
+		local idx = math.random(1, 3)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
+			identifier = "CovenantFootstep" .. idx,
+			minDistance = 200,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			unreliable = true,
+		})
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 function SLASHER.InitHud(_, hud)

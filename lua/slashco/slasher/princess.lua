@@ -536,6 +536,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			unreliable = true,
 		})
 
 		timer.Simple(0.15, function()
@@ -547,6 +548,7 @@ function SLASHER.Footstep(ply)
 				entity = ply,
 				volume = 1,
 				fadeIn = 0,
+				unreliable = true,
 			})
 		end)
 	end

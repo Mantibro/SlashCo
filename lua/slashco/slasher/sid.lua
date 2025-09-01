@@ -30,8 +30,32 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.ItemToSpawn = "Cookie"
+-- Balancement Vars
+SLASHER.ChaseIncreaseAddition = 0 -- By how much the chase is increased additionally
+SLASHER.PacificationAddition = 0 -- By how much the Pacification is additionally increased each tick
+SLASHER.GunSpreadDecrease = 0. --- By how much the gun spread should be reduced each tick
+SLASHER.GunCooldownAddition = 0 -- By how much the gun cooldown is additionally reduced each tick
+SLASHER.EquipGunCooldownDecrease = 0 -- By how much the GunCooldown and Pacification are decreased when the special ability is used
+SLASHER.GunRageEyeSight = 0 -- His EyeSight when he's in gun rage
+SLASHER.GunRagePerception = 0 -- His Perception when he's in gun rage
+SLASHER.GunEyeSight = 0 -- His EyeSight when he has a gun but is NOT in rage
+SLASHER.GunPerception = 0 -- His Perception when he has a gun but is NOT in rage
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.PacificationAddition = 0.04 * SO
+	SLASHER.GunSpreadDecrease = 0.02 + (0.08 * SO)
+	SLASHER.GunCooldownAddition = 0.04 * SO
+	SLASHER.EquipGunCooldownDecrease = 2 * SO
+	SLASHER.ChaseIncreaseAddition = 0.02 * SO
+
+	SLASHER.GunRageEyeSight = SLASHER.Eyesight + 2 + (SO * 2)
+	SLASHER.GunRagePerception = SLASHER.Perception + 1.5 + (SO * 1)
+
+	SLASHER.GunEyeSight = SLASHER.Eyesight + 5 + (SO * 2)
+	SLASHER.GunPerception = SLASHER.Perception + 1 + (SO * 3)
+
 	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 275 + (7.5 * additionalSurvivors)
 end
@@ -45,8 +69,6 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	local Cookies = math.Clamp(slasher.EatedCookies, 0, 5) --Cookies Eaten
 	slasher.EatedCookies = Cookies
 	local Pacification = slasher.Pacification or 0
@@ -58,7 +80,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if Pacification > 0 then
-		slasher.Pacification = Pacification - (FrameTime() + (SO * 0.04))
+		slasher.Pacification = Pacification - (FrameTime() + SLASHER.PacificationAddition)
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
 	elseif slasher:GetNWBool("SidGun", false) then
@@ -72,14 +94,14 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if GunCD > 0 then
-		slasher.GunCooldown = GunCD - (FrameTime() + (SO * 0.04))
+		slasher.GunCooldown = math.max(GunCD - (FrameTime() + SLASHER.GunCooldownAddition), 0)
 	end
 	if GunSP > 0 then
-		slasher.GunSpread = GunSP - (0.02 + (SO * 0.08))
+		slasher.GunSpread = math.max(GunSP - SLASHER.GunSpreadDecrease, 0)
 	end
 
 	if ChaseIN < 160 and slasher:GetNWBool("InSlasherChaseMode") then
-		slasher.ChaseIncrease = ChaseIN + (FrameTime() + (SO * 0.02)) + (Cookies * FrameTime() * 0.5)
+		slasher.ChaseIncrease = ChaseIN + (FrameTime() + SLASHER.ChaseIncreaseAddition) + (Cookies * FrameTime() * 0.5)
 		slasher:SetRunSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
 		slasher:SetWalkSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
 	else
@@ -92,11 +114,11 @@ function SLASHER.OnTickBehaviour(slasher)
 			final_perception = SLASHER.Perception
 		else
 			if not slasher:GetNWBool("SidGunRage") then
-				final_eyesight = SLASHER.Eyesight + (2 + (SO * 2))
-				final_perception = SLASHER.Perception + (1.5 + (SO * 1))
+				final_eyesight = SLASHER.GunRageEyeSight
+				final_perception = SLASHER.GunRagePerception
 			else
-				final_eyesight = SLASHER.Eyesight + (5 + (SO * 2))
-				final_perception = SLASHER.Perception + (1 + (SO * 3))
+				final_eyesight = SLASHER.GunEyeSight
+				final_perception = SLASHER.GunPerception
 			end
 		end
 	else
@@ -408,7 +430,6 @@ local function IsPlayerHoldingCookie(target, removeCookie)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
 	local Satiation = SlashCo.CurRound.OfferingData.Satiation
 
 	if (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
@@ -459,15 +480,13 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
 	if not slasher:GetNWBool("SidGun") and slasher.GunCooldown < 0.01 and slasher.EatedCookies > 0 then
 		--Equip the gun
 		slasher:SetNWBool("SidGun", true)
 		slasher:SetNWBool("SidGunEquipping", true)
 		slasher:Freeze(true)
-		slasher.GunCooldown = 4 - (SO * 2)
-		slasher.Pacification = 4 - (SO * 2)
+		slasher.GunCooldown = 4 - SLASHER.EquipGunCooldownDecrease
+		slasher.Pacification = 4 - SLASHER.EquipGunCooldownDecrease
 
 		slasher.EatedCookies = slasher.EatedCookies - 1 --Deplete the uses
 
@@ -595,13 +614,21 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/sid/sid_step" .. math.random(1, 2) .. ".mp3")
-		return true
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_step" .. idx .. ".mp3",
+			identifier = "SIDFootstep" .. idx,
+			minDistance = 300,
+			maxDistance = 600,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			makeUniqueToEntity = true,
+			unreliable = true,
+		})
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 local gunTable = {
