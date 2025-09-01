@@ -51,9 +51,9 @@ if CLIENT then
 	function ENT:Draw()
 		if self:GetTarget() ~= GameData.LocalPlayer then return end
 
-        rotationAngle[2] = (GameData.LocalPlayer:GetPos() - self:GetPos()):GetNormalized():Angle()[2]
-        self:SetAngles(rotationAngle)
-        self:SetupBones() -- Required as else the model might flicker for some reason.
+		rotationAngle[2] = (GameData.LocalPlayer:GetPos() - self:GetPos()):GetNormalized():Angle()[2]
+		self:SetAngles(rotationAngle)
+		self:SetupBones() -- Required as else the model might flicker for some reason.
 
 		self:DrawModel()
 	end

@@ -136,7 +136,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			else
 				local slashPlys = team.GetPlayers(TEAM_SLASHER)
 				if slashPlys == 6 then
-				    return
+					return
 				else
 					timer.Simple(4, function() -- Next victims becomes Cloaks
 						SLASHER.SummonCovenantMembers(target)

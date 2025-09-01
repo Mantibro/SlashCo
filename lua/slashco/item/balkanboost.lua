@@ -33,7 +33,7 @@ function ITEM.OnUse(ply)
 		
 		timer.Simple(164, function()
 			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-			    ply:SetNWBool("SurvivorBalkanFull", false)
+				ply:SetNWBool("SurvivorBalkanFull", false)
 				ply:SetNWBool("SurvivorBalkan", false)
 				ply:SetNWBool("MarkedBySmiley", false)
 				ply:AddEffect("Slowness", 9999)

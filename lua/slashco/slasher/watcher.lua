@@ -264,7 +264,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		soundPath = "slashco/slasher/watcher/watcher_rage.ogg",
 		identifier = "WatcherRage",
 		minDistance = 1000 * SlashCo.MapSize,
-	    maxDistance = 2000 * SlashCo.MapSize,
+		maxDistance = 2000 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 1,
@@ -297,10 +297,10 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/watcher/watcher_boot" .. idx .. ".mp3",
 			identifier = "WatcherFootstep" .. idx,
-		    minDistance = 250,
+			minDistance = 250,
 			maxDistance = 550,
 			entity = ply,
-		    volume = 1,
+			volume = 1,
 			fadeIn = 0,
 		})
 		return false

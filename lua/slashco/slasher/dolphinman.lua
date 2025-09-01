@@ -213,7 +213,7 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
-    -- i'm crying
+	-- i'm crying
 	slasher:SetNWBool("DolphinFound", false)
 	slasher:SetNWBool("DolphinInHiding", false)
 	slasher:SetNWBool("DolphinHunting", false)
@@ -242,7 +242,7 @@ end
 function SLASHER.OnPrimaryFire(slasher, target)
 	if SlashCo.Jumpscare(slasher, target) then
 		if slasher:GetNWBool("DolphinHunting") then
-		    slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
+			slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
 			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 		else
 			slasher.HuntPower = math.min(100, slasher.HuntPower + 20)
