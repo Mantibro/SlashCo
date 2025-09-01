@@ -171,6 +171,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 		slasher:SetNWBool("TylerTheCreator", false)
+		slasher:SetCanSeePlayers(false)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = 0
 		slasher:SetNWBool("CanKill", false)
@@ -205,6 +206,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
 		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanSeePlayers(false)
 		final_perception = 0.0
 
 		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
@@ -407,6 +409,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
 		slasher:SetNWBool("CanKill", true)
+		slasher:SetCanSeePlayers(true)
 		final_perception = 2.0
 
 		if TimeAsTylerForm > math.max((((3 + SlashCo.MapSize) / 4) * anger), SLASHER.MinChase) and not endlessChase then

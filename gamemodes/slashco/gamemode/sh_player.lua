@@ -87,8 +87,21 @@ function PLAYER:GetFogMult()
 	return self:GetNW2Float("FogMult", 1)
 end
 
+function PLAYER:SetCanSeePlayers(canSee)
+	self:SetNW2Bool("CanSeePlayers", canSee)
+end
+
+function PLAYER:CanSeePlayers()
+	return self:GetNW2Bool("CanSeePlayers", false)
+end
+
 -- This function is VERY expensive, BUT it shouldn't be called too frequent anyways.
 function PLAYER:FindPlayersInView(dist, radius, notrace)
+	local areWeSlasher = self:Team() == TEAM_SLASHER
+	if areWeSlasher and not self:CanSeePlayers() then
+		return {}
+	end
+
 	local pos = self:EyePos()
 	local foundEnts = ents.FindInCone(pos, self:GetAimVector(), dist, radius)
 	local results = {}
@@ -109,7 +122,7 @@ function PLAYER:FindPlayersInView(dist, radius, notrace)
 		end
 	end
 
-	if self:Team() == TEAM_SLASHER then
+	if areWeSlasher then
 		for idx, ply in ipairs(results) do
 			if self:SlasherFunction("Visibility", ply) == 0 then
 				table.remove(results, idx)

@@ -67,6 +67,8 @@ function SlashCo.OnSlasherSpawned(ply)
 		]]
 	end
 
+	ply:SetCanSeePlayers(true) -- Enabled by default
+
 	ply:SetRunSpeed(slasherTbl.ProwlSpeed)
 	ply:SetWalkSpeed(slasherTbl.ProwlSpeed)
 	ply:SetNW2Float("SlasherAnger", 0)
