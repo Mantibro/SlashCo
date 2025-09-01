@@ -30,10 +30,11 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.ItemToSpawn = "Cookie"
+SLASHER.GunShotDecay = 1.5 -- How long he'll be in the shooting animation.
 -- Balancement Vars
 SLASHER.ChaseIncreaseAddition = 0 -- By how much the chase is increased additionally
 SLASHER.PacificationAddition = 0 -- By how much the Pacification is additionally increased each tick
-SLASHER.GunSpreadDecrease = 0. --- By how much the gun spread should be reduced each tick
+SLASHER.GunSpreadDecrease = 0 --- By how much the gun spread should be reduced each tick
 SLASHER.GunCooldownAddition = 0 -- By how much the gun cooldown is additionally reduced each tick
 SLASHER.EquipGunCooldownDecrease = 0 -- By how much the GunCooldown and Pacification are decreased when the special ability is used
 SLASHER.GunRageEyeSight = 0 -- His EyeSight when he's in gun rage
@@ -241,15 +242,12 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	local dist = SLASHER.KillDistance
 
 	if slasher:GetNWBool("SidGunAimed") and spread < 2.4 then
-		slasher:SetNWBool("SidGunShoot", false)
-		timer.Remove("SidGunDecay")
-
 		timer.Simple(0.05, function()
 			if not IsValid(slasher) then
 				return
 			end
 
-			slasher:SetNWBool("SidGunShoot", true)
+			slasher:SetNWFloat("SidGunShoot", CurTime())
 
 			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot_farthest.mp3", 150)
 			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot.mp3", 85)
@@ -281,14 +279,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			util.Effect("ShellEject", shell)
 
 			slasher.GunSpread = 3
-
-			timer.Create("SidGunDecay", 1.5, 1, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				slasher:SetNWBool("SidGunShoot", false)
-			end)
 		end)
 	else
 		--Executing a Survivor
@@ -549,7 +539,7 @@ function SLASHER.Animator(ply)
 	local gun_state = ply:GetNWBool("SidGunEquipped")
 	local aiming_gun = ply:GetNWBool("SidGunAiming")
 	local aimed_gun = ply:GetNWBool("SidGunAimed")
-	local gun_shooting = ply:GetNWBool("SidGunShoot")
+	local gun_shooting = (CurTime() - ply:GetNWFloat("SidGunShoot", 0)) < SLASHER.GunShotDecay
 
 	if gun_state then
 		gun_prefix = "g_"

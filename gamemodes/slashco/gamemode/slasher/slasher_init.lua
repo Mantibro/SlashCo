@@ -13,6 +13,15 @@ function SlashCo.RegisterSlasher(table, name)
 
 	name = name or table.Name
 	SlashCoSlashers[name] = table
+
+	if SERVER then
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
+			if slasherTbl.OnBalanceForPlayers then
+				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+			end
+		end
+	end
 end
 
 function SlashCo.GetSlasherTable(name)
