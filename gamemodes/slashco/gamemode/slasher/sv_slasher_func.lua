@@ -389,21 +389,24 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 		return
 	end
 
-	if target:GetClass() ~= "prop_door_rotating" then
+	local doors = {}
+	local name = target:GetName()
+	for _, ent in ipairs(ents.FindInSphere(target:WorldSpaceCenter(), 100)) do
+		if ent:GetName() == name and ent:GetClass() == "prop_door_rotating" then
+			print("Found door", name, ent)
+			table.insert(doors, ent)
+		end
+	end
+
+	if #doors == 0 then
 		if callback then
 			callback(false)
 		end
 		return
 	end
 
-	target:Fire("Open")
-
-	local doors = {}
-	local name = target:GetName()
-	for _, v in ipairs(ents.FindInSphere(target:WorldSpaceCenter(), 100)) do
-		if v:GetName() == name then
-			table.insert(doors, v)
-		end
+	for _, door in ipairs(doors) do
+		door:Fire("Open")
 	end
 
 	timer.Simple(0.05, function()
