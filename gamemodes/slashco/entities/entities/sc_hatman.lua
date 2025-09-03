@@ -15,7 +15,7 @@ if SERVER then
 end
 
 function ENT:Initialize()
-	self:SetModel("models/slashco/shadowman.mdl")
+	self:SetModel("models/slashco/hatman.mdl")
 	self:SetSolid(SOLID_NONE)
 	self:SetNotSolid(true)
 

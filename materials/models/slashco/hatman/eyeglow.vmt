@@ -20,7 +20,7 @@
 	"$model" 1
 
 	"$detail" "models/slashco/shadowman/eyeglow"
-    "$detailblendmode" "5"
-    "$detailscale" "1"
-    "$detailblendfactor" "1"
+	"$detailblendmode" "5"
+	"$detailscale" "1"
+	"$detailblendfactor" "1"
 }
