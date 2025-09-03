@@ -10,25 +10,7 @@ ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
 
 function ITEM.OnUse(ply)
-	local found = {}
-
-	local plyPos = ply:EyePos()
-	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if slasher:EyePos():Distance(plyPos) > 200 then
-			continue
-		end
-
-		local tr = util.TraceLine({
-			start = plyPos,
-			endpos = slasher:WorldSpaceCenter(),
-			filter = ply
-		})
-
-		if tr.Entity == slasher then
-			table.insert(found, slasher)
-		end
-	end
-
+	local found = SlashCo.FindPlayersInRange(ply:EyePos(), 200, TEAM_SLASHER, ply)
 	if table.IsEmpty(found) then
 		return true
 	end

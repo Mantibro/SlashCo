@@ -61,6 +61,20 @@ function PLAYER:SlasherFunction(value, ...)
 	end
 end
 
+function PLAYER:SlasherStunDeafen(duration)
+	local currentDuration = self:GetNW2Float("DeafenTime", 0) - CurTime()
+	if currentDuration < 0 then
+		currentDuration = 0
+	end
+
+	if currentDuration > duration then return end -- Something already deafened him for longer. So we return to avoid conflicts.
+	self:SetNW2Float("DeafenTime", CurTime() + duration)
+end
+
+function PLAYER:SlasherIsStunDeaf()
+	return self:GetNW2Float("DeafenTime", 0) > CurTime()
+end
+
 function TranslateSlasherClass(id)
 	return SlashCo.SlasherClass[id]
 end
@@ -141,7 +155,9 @@ if CLIENT then
 			emitter = ParticleEmitter(Vector(0, 0, 0))
 		end
 
-		if GameData.LocalPlayer:GetNW2Bool("Slasher:NoFootsteps") then
+		GameData.LocalPlayer:SlasherFunction("ClientSideEffect")
+
+		if GameData.LocalPlayer:GetNW2Bool("Slasher:NoFootsteps") or GameData.LocalPlayer:SlasherIsStunDeaf() then
 			return
 		end
 
@@ -185,8 +201,6 @@ if CLIENT then
 				part:SetEndSize(0)
 			end
 		end
-
-		GameData.LocalPlayer:SlasherFunction("ClientSideEffect")
 	end)
 
 	hook.Add("RenderScreenspaceEffects", "SlasherVision", function()

@@ -548,6 +548,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		PlayBreathing(slasher)
 	end)
 end
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 
 function SLASHER.CanSeeFlashlights(ply)
 	return false

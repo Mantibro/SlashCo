@@ -155,6 +155,27 @@ function PLAYER:IsStuck(worldOnly)
 	return tr.Hit
 end
 
+function SlashCo.FindPlayersInRange(origin, range, specificTeam, ignoreEntity)
+	local results = {}
+	for _, ply in ipairs(specificTeam and team.GetPlayers(specificTeam) or player.GetAll()) do
+		if ply:EyePos():Distance(origin) > range then
+			continue
+		end
+
+		local tr = util.TraceLine({
+			start = origin,
+			endpos = ply:WorldSpaceCenter(),
+			filter = ignoreEntity
+		})
+
+		if tr.Entity == ply then
+			table.insert(results, ply)
+		end
+	end
+
+	return results
+end
+
 --[[
 	Using sv_lan we can use -multirun and join the game with multiple gmod instances,
 	but now we have to ensure that they won't use the same steamid's.

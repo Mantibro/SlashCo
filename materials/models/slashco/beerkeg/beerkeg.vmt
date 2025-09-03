@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/beerkeg/beerkeg"
+	"$translucent" 1
+	"$model" 1
+}

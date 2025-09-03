@@ -393,7 +393,6 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 	local name = target:GetName()
 	for _, ent in ipairs(ents.FindInSphere(target:WorldSpaceCenter(), 100)) do
 		if ent:GetName() == name and ent:GetClass() == "prop_door_rotating" then
-			print("Found door", name, ent)
 			table.insert(doors, ent)
 		end
 	end

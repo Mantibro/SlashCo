@@ -202,6 +202,9 @@ SlashCo.LangTable["StepDecoy_desc"] = "If placed on a solid surface, this will i
 SlashCo.LangTable["TeslaCoil"] = "Tesla Coil"
 SlashCo.LangTable["TeslaCoil_desc"] = "Stuns all slashers on the entire map for 15 seconds"
 
+SlashCo.LangTable["BeerKeg"] = "Beer Keg"
+SlashCo.LangTable["BeerKeg_desc"] = "Stuns all slashers nearby deafening them for a minimum of 25 seconds"
+
 --GameInfo
 
 SlashCo.LangTable["SurvivorInfo"] = [[Welcome to the SlashCo Power Recovery Program.
