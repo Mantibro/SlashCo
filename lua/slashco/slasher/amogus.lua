@@ -245,6 +245,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			prop:SetModel(SlashCoItems.GasCan.Model)
 			prop:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 			prop:Spawn()
+			prop:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 			-- Instead we update it's position every frame, it may be more expensive but it should be more reliable.
 			--prop:FollowBone(slasher, slasher:LookupBone("Hips"))

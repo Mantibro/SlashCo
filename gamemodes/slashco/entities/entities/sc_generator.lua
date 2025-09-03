@@ -185,6 +185,7 @@ function ENT:MakeBattery(model)
 	battery:SetParent(self)
 	battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
 	battery:EmitSound("slashco/battery_insert.mp3", 125, 100, 1)
+	battery:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	SlashCo.SpawnSlasher()
 end
@@ -205,6 +206,7 @@ function ENT:MakeGasCan(model)
 	gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
 	gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
 	gasCan:SetParent(self)
+	gasCan:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	SlashCo.SpawnSlasher()
 end

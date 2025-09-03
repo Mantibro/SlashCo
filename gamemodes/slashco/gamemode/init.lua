@@ -665,6 +665,7 @@ function GM:PlayerDeath(victim)
 		ragdoll:SetModel(victim:GetModel())
 		ragdoll.PingType = "DEAD BODY"
 		ragdoll.SurvivorSteamID = victim:SteamID64()
+		ragdoll:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 		victim.DeadBody = ragdoll
 		if victim.Devastate then

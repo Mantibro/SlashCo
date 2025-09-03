@@ -493,6 +493,7 @@ local function makeEnt(class, config)
 
 	local ent = ents.Create(class)
 	ent:SetPos(Vector(unpack(config.pos)))
+	ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	if isnumber(config.ang) then
 		ent:SetAngles(Angle(0, config.ang, 0))

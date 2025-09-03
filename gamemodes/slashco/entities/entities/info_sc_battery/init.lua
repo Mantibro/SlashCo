@@ -64,6 +64,7 @@ function ENT:OnSpawn()
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	return Ent
 end

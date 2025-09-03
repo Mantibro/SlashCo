@@ -32,6 +32,7 @@ local function SetupMapLua()
 	local mapLua = ents.Create("lua_run")
 	mapLua:SetName("triggerhook")
 	mapLua:Spawn()
+	mapLua:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	for _, v in ipairs(ents.FindByClass("prop_door_rotating")) do
 		setDoorState(v, v:GetInternalVariable("m_eDoorState") ~= 0)

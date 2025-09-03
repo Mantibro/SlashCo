@@ -6,7 +6,7 @@ ITEM.Name = "Beacon"
 ITEM.Icon = "slashco/ui/icons/items/item_9"
 ITEM.Price = 15
 ITEM.Description = "Beacon_desc"
-ITEM.CamPos = Vector(50,0,35)
+ITEM.CamPos = Vector(50, 0, 35)
 function ITEM.MaxAllowed()
 	return 1
 end

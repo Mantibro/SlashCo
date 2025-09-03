@@ -162,6 +162,7 @@ function SlashCo.CreateGasCan(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	return Ent
 end
@@ -180,6 +181,7 @@ function SlashCo.CreateItem(class, pos, ang)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
 	Ent:Activate()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	return Ent
 end
@@ -197,6 +199,7 @@ function SlashCo.CreateHelicopter(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	return Ent
 end
@@ -214,10 +217,9 @@ function SlashCo.CreateItemStash(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-	local id = Ent:EntIndex()
-
-	return id
+	return Ent:EntIndex()
 end
 
 --Spawn the offering table
@@ -233,10 +235,9 @@ function SlashCo.CreateOfferTable(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-	local id = Ent:EntIndex()
-
-	return id
+	return Ent:EntIndex()
 end
 
 --Spawn the radio
@@ -252,10 +253,9 @@ function SlashCo.CreateRadio(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-	local id = Ent:EntIndex()
-
-	return id
+	return Ent:EntIndex()
 end
 
 function SlashCo.RemoveAllCurRoundEnts()

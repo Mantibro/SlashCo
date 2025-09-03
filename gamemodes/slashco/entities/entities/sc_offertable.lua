@@ -33,6 +33,7 @@ if SERVER then
 		offer:SetPos(self:LocalToWorld(Vector(50, 0, 48)))
 		offer:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 0)))
 		offer:SetParent(self)
+		offer:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 	end
 
 	function ENT:Think()

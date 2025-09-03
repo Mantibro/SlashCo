@@ -23,6 +23,7 @@ function ENT:Initialize()
 		self.ragdoll:SetNoDraw(false)
 		self.ragdoll:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 		self.ragdoll:Spawn()
+		self.ragdoll:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 		self:SetModel("models/slashco/items/labmeat.mdl")
 		self:SetSolid(SOLID_VPHYSICS)

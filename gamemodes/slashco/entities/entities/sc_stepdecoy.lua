@@ -30,6 +30,7 @@ function ENT:Initialize()
 		self.steppa:SetRenderMode(RENDERMODE_TRANSCOLOR)
 		self.steppa:SetColor(color_transparent)
 		self.steppa:SetModelScale(0.0001, 0.0001)
+		self.steppa:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 		timer.Simple(0.1, function()
 			if not IsValid(self) or not IsValid(self.steppa) then
