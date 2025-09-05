@@ -45,7 +45,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ChaseDuration = 7.0 + (1 * additionalSurvivors)
 end
 
-function SLASHER.OnSpawn(slasher)
+local function PlayBreathing(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/abomignat/abomignat_breathing.mp3",
 		identifier = "AbomignatBreath",
@@ -56,6 +56,14 @@ function SLASHER.OnSpawn(slasher)
 		volume = 1,
 		fadeIn = 0,
 	})
+end
+
+local function StopBreathing()
+	SlashCo.AudioSystem.StopSound("AbomignatBreath", 0.5)
+end
+
+function SLASHER.OnSpawn(slasher)
+	PlayBreathing(slasher)
 
 	slasher.AbomignatKills = 0
 
@@ -234,7 +242,17 @@ function SLASHER.OnPrimaryFire(slasher)
 	slasher:SlasherHudFunc("ShakeControl", "LMB")
 
 	local function SlashFinish()
-		slasher:EmitSound("slashco/slasher/trollge/trollge_swing.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/abomignat/abomignat_swing.wav",
+			identifier = "AbomignatSwing",
+			minDistance = 600,
+			maxDistance = 800,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+			unreliable = true,
+		})
+
 		slasher:Freeze(true)
 		slasher.FowardCharge = 0
 
@@ -246,6 +264,8 @@ function SLASHER.OnPrimaryFire(slasher)
 		SlashCo.BustDoor(slasher, target, 20000)
 
 		timer.Simple(1.3, function()
+			if not IsValid(slasher) then return end
+
 			slasher:SetNWBool("AbomignatSlashing", false)
 			slasher:Freeze(false)
 		end)
@@ -422,9 +442,11 @@ end
 
 function SLASHER.Footstep(ply)
 	if SERVER then
+		local chase = ply:GetNWBool("InSlasherChaseMode")
+
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/abomignat/abomignat_step" .. idx .. ".mp3",
+			soundPath = "slashco/slasher/abomignat/abomignat_" .. (chase and "hardstep" or "step") .. idx .. ".ogg",
 			identifier = "AbomignatFootstep" .. idx,
 			minDistance = 200,
 			maxDistance = 400,
@@ -437,6 +459,27 @@ function SLASHER.Footstep(ply)
 
 	return true
 end
+
+function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
+	StopBreathing()
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/abomignat/abomignat_rage" .. math.random(1, 2) .. ".ogg",
+		identifier = "AbomignatBlinded",
+		minDistance = 1000,
+		maxDistance = 2000,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+
+	SlashCo.AddSlasherAnger(slasher, 5 + (additionalRage or 0)) -- We did not like that
+	timer.Simple(3.5, function()
+		if not IsValid(slasher) then return end
+
+		PlayBreathing(slasher)
+	end)
+end
+SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 5) end -- +5 additioal anger just because it deafened us.
 
 local controlTable = {
 	default = Material("slashco/ui/icons/slasher/s_slash"),

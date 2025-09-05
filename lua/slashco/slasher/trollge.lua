@@ -530,7 +530,7 @@ function SLASHER.Animator(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-function SLASHER.OnHitByPocketSand(slasher, ply)
+function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage) -- additionalRage is used by OnHitByBeerKeg
 	StopBreathing()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/trollge/troll_blind_" .. math.random(1, 2) .. ".mp3",
@@ -541,14 +541,15 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		volume = 1,
 		fadeIn = 0,
 	})
-	SlashCo.AddSlasherAnger(slasher, 5) -- We did not like that
+
+	SlashCo.AddSlasherAnger(slasher, 5 + (additionalRage or 0)) -- We did not like that
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
 		PlayBreathing(slasher)
 	end)
 end
-SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end -- When hit by a BeerKeg we in total add +15 anger.
 
 function SLASHER.CanSeeFlashlights(ply)
 	return false

@@ -155,6 +155,24 @@ function PLAYER:IsStuck(worldOnly)
 	return tr.Hit
 end
 
+-- Currently we use target:EmitSound("slashco/slasher/trollge/trollge_hit.mp3") in a lot of places, this funcion should take it's place.
+function PLAYER:TakeDamageWithEffect(damageAmount, attacker, inflictor)
+	local additionalRange = math.Clamp(damageAmount, 0, self:Health()) * 2
+	local rng = math.random(1, 4)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/damage" .. rng .. ".mp3",
+		identifier = "TakeDamage" .. rng,
+		minDistance = 200 + additionalRange,
+		maxDistance = 400 + additionalRange,
+		entity = self,
+		volume = 0.8,
+		fadeIn = 0,
+		unreliable = true,
+	})
+
+	self:TakeDamage(damageAmount, attacker, inflictor)
+end
+
 function SlashCo.FindPlayersInRange(origin, range, specificTeam, ignoreEntity)
 	local results = {}
 	for _, ply in ipairs(specificTeam and team.GetPlayers(specificTeam) or player.GetAll()) do
