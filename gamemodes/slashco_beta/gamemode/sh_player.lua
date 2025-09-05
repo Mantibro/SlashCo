@@ -155,9 +155,9 @@ function PLAYER:IsStuck(worldOnly)
 	return tr.Hit
 end
 
--- Currently we use target:EmitSound("slashco/slasher/trollge/trollge_hit.mp3") in a lot of places, this funcion should take it's place.
-function PLAYER:TakeDamageWithEffect(damageAmount, attacker, inflictor)
-	local additionalRange = math.Clamp(damageAmount, 0, self:Health()) * 2
+function PLAYER:PlayDamageSound(additionalRange)
+	additionalRange = additionalRange or 0
+
 	local rng = math.random(1, 4)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/damage" .. rng .. ".mp3",
@@ -169,7 +169,13 @@ function PLAYER:TakeDamageWithEffect(damageAmount, attacker, inflictor)
 		fadeIn = 0,
 		unreliable = true,
 	})
+end
 
+-- Currently we use target:EmitSound("slashco/slasher/trollge/trollge_hit.mp3") in a lot of places, this funcion should take it's place.
+function PLAYER:TakeDamageWithEffect(damageAmount, attacker, inflictor)
+	local additionalRange = math.Clamp(damageAmount, 0, self:Health()) * 2
+
+	self:PlayDamageSound(additionalRange)
 	self:TakeDamage(damageAmount, attacker, inflictor)
 end
 

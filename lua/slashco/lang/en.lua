@@ -161,6 +161,7 @@ SlashCo.LangTable["Cookie"] = "Cookie"
 SlashCo.LangTable["Cookie_desc"] = "Gain a temporary bonus to fuel pouring on use.\nA certain Slasher seems to really like this item."
 
 SlashCo.LangTable["DeathWard"] = "Deathward"
+SlashCo.LangTable["DeathWard (Used)"] = "Deathward (Used)"
 SlashCo.LangTable["DeathWard_desc"] = "Survive death once, but become unable to hold any other items when triggered. Occasionally receive minor healing while holding."
 
 SlashCo.LangTable["DevilDie"] = "Devil's Gamble"
@@ -204,6 +205,21 @@ SlashCo.LangTable["TeslaCoil_desc"] = "Stuns all slashers on the entire map for 
 
 SlashCo.LangTable["BeerKeg"] = "Beer Keg"
 SlashCo.LangTable["BeerKeg_desc"] = "Stuns all slashers nearby deafening them for a minimum of 25 seconds"
+
+SlashCo.LangTable["PorchLight"] = "The Porchlight"
+SlashCo.LangTable["PorchLight_desc"] = "Purpose-built for use at 1 AM in suburban environments, just to make sure you can see what's outside your front door. With the power of 20,000 Watts, nothing can hide in the dark anymore!"
+
+SlashCo.LangTable["CostcoPizza"] = "Costco Frozen Pizza"
+SlashCo.LangTable["CostcoPizza_desc"] = "It would seem someone froze this box a bit TOO solid. No luck in trying to eat it, you can use it as a riot shield instead."
+
+SlashCo.LangTable["JelloCup"] = "Orange Jello"
+SlashCo.LangTable["JelloCup_desc"] = "Nope, this is DEFINITELY laced. You don't just take a cup of mystery jello from a crackhead and expect simply a tasty treat. Consuming it will grant minor healing and temporary damage resistance."
+
+SlashCo.LangTable["Newports"] = "Newport Menthols"
+SlashCo.LangTable["Newports_desc"] = "The US might try as hard as it can to ban these cigarettes, but we at SLASHCO will NOT stand for it. They say if you eat the whole pack in one go you will gain temporary nightvision."
+
+SlashCo.LangTable["JonklerCart"] = "Evil Jonkler Cart"
+SlashCo.LangTable["JonklerCart_desc"] = "A noisemaking speaker, sure to drive anything near it furious and insane, including the Slasher."
 
 --GameInfo
 

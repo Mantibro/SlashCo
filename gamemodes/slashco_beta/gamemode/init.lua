@@ -737,6 +737,15 @@ function GM:PlayerSpray(ply)
 	end
 end
 
+function GM:EntityTakeDamage(target, dmg)
+	if target:IsPlayer() then
+		local result = target:ItemFunction("OnOwnerTakeDamage")
+		if result != nil then
+			return result
+		end
+	end
+end
+
 --Dynamic Flashlight by RiggsMacKay
 --https://github.com/RiggsMackay/Dynamic-Flashlight
 

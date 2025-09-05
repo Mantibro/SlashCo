@@ -165,7 +165,7 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 		targetFogEnd = targetFogStart * 1.5
 	end
 
-	local mult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult()) / 2
+	local mult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult() + (GameData.ClientSideFogMult or 0)) / 2
 	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * mult)
 	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * mult)
 
