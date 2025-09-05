@@ -1,7 +1,7 @@
-"slashco"
+"slashco_beta"
 {
 	"base"		"base"
-	"title"		"SlashCo"
+	"title"		"SlashCo (Beta)"
 	"maps"		"^sc_"
 	"category"	"pvp"
 	"menusystem"	"1"
