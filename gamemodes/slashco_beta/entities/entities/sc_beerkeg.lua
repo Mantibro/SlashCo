@@ -121,7 +121,7 @@ function ENT:PhysicsCollide(data)
 	if (self.LastCollideTick or 0) == tick or self.Exploded or CurTime() < (self.NextImpact or 0) then return end -- Sometimes it can collide multiple times in the same frame. We don't want toes to count.
 
 	self.LastCollideTick = tick	
-	self.ExplodeMeter = self.ExplodeMeter + math.random(0.1, 0.25) + 10
+	self.ExplodeMeter = self.ExplodeMeter + math.random(0.1, 0.25)
 	self.NextImpact = CurTime() + 0.5
 
 	if self.ExplodeMeter >= 1 then
