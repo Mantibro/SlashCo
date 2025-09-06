@@ -1,4 +1,4 @@
-"slashco_beta"
+"slashco"
 {
 	"base"		"base"
 	"title"		"SlashCo (Beta)"
