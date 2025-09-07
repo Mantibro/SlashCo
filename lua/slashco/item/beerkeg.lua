@@ -6,7 +6,7 @@ ITEM.EntClass = "sc_beerkeg"
 ITEM.Price = 30
 ITEM.Description = "BeerKeg_desc"
 ITEM.CamPos = Vector(150, 0, 0)
-ITEM.ReplacesWorldProps = true
+ITEM.IsSpawnable = true
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
@@ -22,7 +22,7 @@ ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(45, -70, -120),
-	size = Vector(0.5, 0.5, 0.5),
+	size = Vector(0.4, 0.4, 0.4),
 	color = color_white,
 	surpresslightning = false,
 	material = "",
@@ -34,7 +34,7 @@ ITEM.WorldModelHolstered = {
 	bone = "ValveBiped.Bip01_Pelvis",
 	pos = Vector(10, 2, 5),
 	angle = Angle(110, -80, 0),
-	size = Vector(1, 1, 1),
+	size = Vector(0.5, 0.5, 0.5),
 	color = color_white,
 	surpresslightning = false,
 	material = "",
@@ -42,12 +42,12 @@ ITEM.WorldModelHolstered = {
 	bodygroup = {}
 }
 ITEM.WorldModel = {
-	holdtype = "slam",
+	holdtype = "duel",
 	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
-	pos = Vector(1, 4.5, -1),
+	pos = Vector(1, 10.0, -1),
 	angle = Angle(180, 0, 0),
-	size = Vector(1, 1, 1),
+	size = Vector(0.7, 0.7, 0.7),
 	color = color_white,
 	surpresslightning = false,
 	material = "",
