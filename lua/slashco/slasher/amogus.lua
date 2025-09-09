@@ -33,7 +33,8 @@ SLASHER.DiffRating = "★★★☆☆"
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 296 + (5 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 296 + (1.5 * additionalSurvivors)
+	SLASHER.KillDistance = 130 + (5 * additionalSurvivors)
 end
 
 function SLASHER.OnSpawn(slasher)
@@ -122,7 +123,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlashers.Tyler.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then
+	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlashers.Amogus.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then
 		return
 	end
 
@@ -201,8 +202,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 		slasher:SetVisible(true)
 
-		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
+		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 
 		slasher.KillDelayTick = 2 - (SO * 1.95)
 
