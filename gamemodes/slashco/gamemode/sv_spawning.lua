@@ -16,6 +16,7 @@ function SlashCo.Abort(reason)
 	for _, v in ipairs(player.GetAll()) do
 		v:ChatPrint("Aborting round: " .. reason)
 	end
+	print("Aborting round: " .. reason)
 
 	if GameData.IsLobby then return end -- We aborted in lobby? GG
 

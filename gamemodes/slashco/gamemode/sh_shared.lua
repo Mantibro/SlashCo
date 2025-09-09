@@ -350,15 +350,15 @@ function GM:CreateTeams()
 	end
 
 	TEAM_SURVIVOR = 1
-	team.SetUp(TEAM_SURVIVOR, "Survivor", Color(255, 255, 255))
+	team.SetUp(TEAM_SURVIVOR, "Survivor", Color(255, 255, 255), false)
 
 	TEAM_SLASHER = 2
-	team.SetUp(TEAM_SLASHER, "Slasher", Color(255, 0, 0))
+	team.SetUp(TEAM_SLASHER, "Slasher", Color(255, 0, 0), false)
 
 	TEAM_LOBBY = 3
-	team.SetUp(TEAM_LOBBY, "Lobby", Color(230, 255, 230))
+	team.SetUp(TEAM_LOBBY, "Lobby", Color(230, 255, 230), false)
 
-	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235))
+	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235), false)
 end
 
 local DoorSlamWhitelist = {

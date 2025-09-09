@@ -226,6 +226,8 @@ local function lobbyLeaveTimer()
 	end)
 end
 
+-- A table containing all players that are allowed to pick a slasher, if they send the mantislashco_SelectSlasher net message without being in here, they will be rejected.
+SlashCo.AllowedPlayerSlasherSelection = SlashCo.AllowedPlayerSlasherSelection or {}
 local function BeginSlasherSelection()
 	print("Slasher Selecting!")
 	
@@ -235,14 +237,17 @@ local function BeginSlasherSelection()
 		return
 	end
 
+	local slasher = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid)
+	if not IsValid(slasher) then return end
+
 	net.Start("mantislashco_PickingSlasher")
 		net.WriteTable({
-			slashersteamid = SlashCo.LobbyData.AssignedSlashers[1].steamid,
 			slashClass = SlashCo.LobbyData.SelectedSlasherInfo.CLASS,
 			slashDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER,
 			bannedSlashers = SlashCo.GetBannedSlashers(true),
 		})
-	net.Broadcast()
+	net.Send(slasher)
+	SlashCo.AllowedPlayerSlasherSelection[slasher] = true
 end
 
 --				***Assign the values for the incoming Round***
@@ -412,6 +417,13 @@ net.Receive("mantislashco_SelectSlasher", function(_, ply)
 			SlashCo.AwaitPlayerToSelectSlasher(ply, nil)
 		end
 		return
+	end
+
+	if not SlashCo.AllowedPlayerSlasherSelection[ply] then
+		print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a slasher when they were never asked to!")
+		return
+	else
+		SlashCo.AllowedPlayerSlasherSelection[ply] = nil -- Only allow them to pick once!
 	end
 
 	print("[SlashCo] Received. (" .. rec_id .. ")")

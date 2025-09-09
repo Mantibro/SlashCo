@@ -31,17 +31,20 @@ end
 
 function SlashCo.PrepareSlasherForSpawning()
 	--[[
-
-	If the Difficulty is Hard, the Slasher immediately spawns with them. On other difficulties the Slasher has a spawn delay.
-	(1,2 - 30 seconds), (0 - 60 seconds)
-	(The Delay is cancelled once the Survivors have performed any kind of action on a Generator).
-	The Slasher will spawn at a spawn powint furthest away from the Survivors.
-
+		If the Difficulty is Hard, the Slasher immediately spawns with them. On other difficulties the Slasher has a spawn delay.
+		(1,2 - 30 seconds), (0 - 60 seconds)
+		(The Delay is cancelled once the Survivors have performed any kind of action on a Generator).
+		The Slasher will spawn at a spawn powint furthest away from the Survivors.
 	]]
 
 	if SERVER then
-		local delay = 1
-		delay = 1 + (4 - SlashCo.CurRound.Difficulty) * 20
+		local delay = (4 - SlashCo.CurRound.Difficulty) * 20
+		for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			local slasherSpawnDelay = slasher:SlasherValue("SpawnDelay", -1)
+			if slasherSpawnDelay ~= -1 and delay > slasherSpawnDelay then
+				delay = slasherSpawnDelay
+			end
+		end
 
 		print("[SlashCo] Slasher set to spawn in " .. delay .. " seconds.")
 
