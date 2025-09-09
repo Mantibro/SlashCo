@@ -55,7 +55,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.TimeAsSpecter = 30 + additionalSurvivors
 	SLASHER.ItemPriceDivisionMultiplier = 2 + math.Clamp(additionalSurvivors / 10, 0, 3)
 	SLASHER.TimeAddedForPlayerKill = 180 - (10 * additionalSurvivors)
-	slasher.TimeRemovedWhenFound = math.max(10 - additionalSurvivors, 2) -- For every missing survivor we add time increasing it up to 15, for every additional we reduce it by 1
+	SLASHER.TimeRemovedWhenFound = math.max(10 - additionalSurvivors, 2) -- For every missing survivor we add time increasing it up to 15, for every additional we reduce it by 1
 
 	SLASHER.MinTylerTime = math.Clamp(5 + (-0.5 * additionalSurvivors), 2, 30)
 end
