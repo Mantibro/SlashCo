@@ -1,16 +1,16 @@
 local ITEM = {}
 
 ITEM.Model = "models/slashco/newports.mdl"
-ITEM.Name = "Newport Menthols (Unfinished)" -- ToDo (Unfinished), still need to finish the ITEM.OnUse function
+ITEM.Name = "Newport Menthols"
 ITEM.EntClass = "sc_newports"
-ITEM.Price = 150
+ITEM.Price = 40
 ITEM.Description = "Newports_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.ReplacesWorldProps = true
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
-function ITEM.OnUse(ply)
+function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fog.
 	GameData.ClientSideFogMult = 5
 
 	timer.Simple(math.random(140, 200), function()
