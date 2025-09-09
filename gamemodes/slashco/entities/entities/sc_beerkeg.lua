@@ -26,6 +26,7 @@ function ENT:SetBeerKegVelocity(velocity)
 		phys:SetVelocity(velocity)
 		self.DisableGravity = CurTime() + 1
 	end
+	self.EnableExposion = true
 	self.DONTPICKUP = true -- Block being picked up again
 end
 
@@ -117,6 +118,8 @@ function ENT:Explode()
 end
 
 function ENT:PhysicsCollide(data)
+	if not self.EnableExposion then return end
+
 	local tick = engine.TickCount()
 	if (self.LastCollideTick or 0) == tick or self.Exploded or CurTime() < (self.NextImpact or 0) then return end -- Sometimes it can collide multiple times in the same frame. We don't want toes to count.
 

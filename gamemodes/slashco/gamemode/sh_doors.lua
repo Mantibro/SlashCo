@@ -17,6 +17,14 @@ if CLIENT then return end
 
 SlashCo.OpenDoors = SlashCo.OpenDoors or {}
 
+local function doorBreakRng(door)
+	door.OpenCount = (door.OpenCount or 0) + 1
+
+	if math.random(1, 200 - door.OpenCount) == 1 then
+		SlashCo.BustDoor(door, door, 200)
+	end
+end
+
 local function setDoorState(door, state)
 	if state == false then
 		state = nil
@@ -25,6 +33,10 @@ local function setDoorState(door, state)
 	door.IsOpen = state
 	SlashCo.SendValue(nil, "door", door, state)
 	SlashCo.OpenDoors[door:EntIndex()] = state
+
+	if state then
+		doorBreakRng(door)
+	end
 end
 
 --initialize door state listener
@@ -46,6 +58,16 @@ local function SetupMapLua()
 end
 
 hook.Add("InitPostEntity", "SetupMapLua", SetupMapLua)
+
+hook.Add("PlayerUse", "SlashCoDoors", function(ply, ent)
+	if ent:GetClass() ~= "prop_door_rotating" then return end
+
+	if (ent.NextDoorUse or 0) > CurTime() then
+		return false -- Block use
+	end
+
+	ent.NextDoorUse = CurTime() + 0.2
+end)
 
 hook.Add("DoorOpen", "SlashCoDoors", function()
 	setDoorState(CALLER, true)

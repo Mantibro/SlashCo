@@ -78,7 +78,7 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 
 			if not ErrorList[soundFile] then
 				ErrorList[soundFile] = true
-				error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. "," .. soundFile .. ")\n")
+				error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", " .. soundFile .. ")\n")
 			end
 			return
 		end

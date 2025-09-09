@@ -47,6 +47,7 @@ SLASHER.MinimumAudioRange = 250 -- The minimum range that he is required to have
 SLASHER.TimeAsSpecter = 30 -- How long he can stay as specter
 SLASHER.TimeAddedForPlayerKill = 180 -- if he kills a player, we add this amount of time to his TimeAsTylerForm
 SLASHER.ItemPriceDivisionMultiplier = 2 -- We use this multiplier when converting the item price to the time that is added to TimeAsTylerForm
+SLASHER.TimeRemovedWhenFound = 10 -- Number of seconds removed if tyler was found.
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ProwlSpeed = 300 + (5 * additionalSurvivors)
@@ -54,6 +55,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.TimeAsSpecter = 30 + additionalSurvivors
 	SLASHER.ItemPriceDivisionMultiplier = 2 + math.Clamp(additionalSurvivors / 10, 0, 3)
 	SLASHER.TimeAddedForPlayerKill = 180 - (10 * additionalSurvivors)
+	slasher.TimeRemovedWhenFound = math.max(10 - additionalSurvivors, 2) -- For every missing survivor we add time increasing it up to 15, for every additional we reduce it by 1
 
 	SLASHER.MinTylerTime = math.Clamp(5 + (-0.5 * additionalSurvivors), 2, 30)
 end
@@ -209,7 +211,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanSeePlayers(false)
 		final_perception = 0.0
 
-		if not slasher:GetNWBool("TylerCreating") and slasher.TylerSongPickedID == nil then
+		local isCreating = slasher:GetNWBool("TylerCreating")
+		if not isCreating and slasher.TylerSongPickedID == nil then
 			local rnd = math.random(1, 9)
 			slasher.TylerSongPickedID = "slashco/slasher/tyler/tyler_song_" .. rnd .. (rnd <= 6 and ".mp3" or ".ogg")
 			SlashCo.AudioSystem.PlaySound({
@@ -233,7 +236,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCo.AudioSystem.SetBackgroundMusicVolume(math.Round((math.Clamp(100 - anger, 0, 100) / 100) * math.Clamp(1 - (TimeAsTylerForm / slasher.TylerTime), 0, 1), 3))
 
 		--Time ran out
-		if (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
+		if not isCreating and (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
 			slasher.TylerSongPickedID = nil
 			TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0)
@@ -245,10 +248,10 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			local surv = team.GetPlayers(TEAM_SURVIVOR)[i]
 
-			if not slasher:GetNWBool("TylerCreating") and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
+			if not isCreating and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
+				isCreating = true
+				slasher.TimeAsTylerForm = math.max(slasher.TimeAsTylerForm - SLASHER.TimeRemovedWhenFound, 0) -- Can never go below 0
 				slasher:SetNWBool("TylerCreating", true)
-				slasher.TimeAsTylerForm = 0
-				slasher.TimeAsTylerSpecter = 0
 				slasher.TylerSongPickedID = nil
 				timer.Simple(0.5, function()
 					if not IsValid(slasher) then
@@ -256,13 +259,12 @@ function SLASHER.OnTickBehaviour(slasher)
 					end
 					SlashCo.AudioSystem.StopSound("TylerSong", 0)
 				end)
+				break
 			end
 		end
 
-		if slasher:GetNWBool("TylerCreating") and slasher.TylerBlink ~= 1.8 then
+		if isCreating and slasher.TylerBlink ~= 1.8 then
 			slasher.TylerBlink = 1.8
-			slasher.TimeAsTylerForm = 0
-			slasher.TimeAsTylerSpecter = 0
 
 			slasher:EmitSound("slashco/slasher/tyler/tyler_create.mp3")
 

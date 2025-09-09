@@ -39,7 +39,7 @@ function SlashCo.PrepareSlasherForSpawning()
 
 	if SERVER then
 		local delay = (4 - SlashCo.CurRound.Difficulty) * 20
-		for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			local slasherSpawnDelay = slasher:SlasherValue("SpawnDelay", -1)
 			if slasherSpawnDelay ~= -1 and delay > slasherSpawnDelay then
 				delay = slasherSpawnDelay
@@ -518,6 +518,7 @@ timer.Create("SlashCo:SlasherAnger", 1, 0, function()
 		SlashCo.AddSlasherAnger(slasher, addAnger)
 
 		slasher:SlasherFunction("OnAngerTick")
+		hook.Run("SlashCo:OnAngerTick", slasher)
 
 		if slasher:SlasherValue("CustomBackgroundMusic", false) then
 			hasCustomBackgroundMusic = true -- One of the slashers has custom background music, so we shouldn't interfere with it.

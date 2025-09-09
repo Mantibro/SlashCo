@@ -48,8 +48,8 @@ function ENT:PhysicsCollide(data)
 		if data.HitEntity:IsPlayer() and data.HitEntity:Team() == TEAM_SLASHER then
 			local previousFriction = data.HitEntity:GetFriction()
 			data.HitEntity:SetFriction(0)
-			data.HitEntity:SetVelocity(velocity)
-			timer.Simple(0.3, function()
+			data.HitEntity:SetVelocity(velocity * 5)
+			timer.Simple(0.5, function()
 				if not IsValid(data.HitEntity) then return end
 
 				data.HitEntity:SetFriction(previousFriction)

@@ -6,11 +6,21 @@ ITEM.EntClass = "sc_newports"
 ITEM.Price = 40
 ITEM.Description = "Newports_desc"
 ITEM.CamPos = Vector(150, 0, 0)
-ITEM.ReplacesWorldProps = true
+ITEM.IsSpawnable = true
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
 function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fog.
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/newports_eat.ogg", -- It's so cold that we consider it to be concrete at this point :hehe:
+		identifier = "NewportsEat",
+		minDistance = 300,
+		maxDistance = 500,
+		entity = self,
+		volume = 0.8,
+		fadeIn = 0,
+	})
+
 	GameData.ClientSideFogMult = 5
 
 	timer.Simple(math.random(140, 200), function()

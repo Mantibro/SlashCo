@@ -1,9 +1,9 @@
 local ITEM = {}
 
 ITEM.Model = "models/slashco/jonklercart.mdl"
-ITEM.Name = "Evil Jonkler Cart (Unfinished)" -- ToDo (Unfinished), still need to finish the ITEM.OnUse function
+ITEM.Name = "Evil Jonkler Cart"
 ITEM.EntClass = "sc_jonklercart"
-ITEM.Price = 150
+ITEM.Price = 50
 ITEM.Description = "JonklerCart_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.ReplacesWorldProps = true
@@ -11,13 +11,8 @@ function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
 function ITEM.OnUse(ply)
-	GameData.ClientSideFogMult = 5
-
-	timer.Simple(math.random(140, 200), function()
-		if GameData.ClientSideFogMult != 5 then return end -- Something overwrote us? ok... us sad now :cry:
-
-		GameData.ClientSideFogMult = nil
-	end)
+	local ent = SlashCo.CreateItem(ITEM.EntClass, ply:WorldSpaceCenter(), Angle(0, 0, 0))
+	ent:EnableJonkler()
 end
 ITEM.ViewModel = {
 	model = ITEM.Model,
