@@ -35,7 +35,9 @@ hook.Add("SlashCo:OnAngerTick", "JonklerCart", function(slasher)
 		end
 	end
 
-	SlashCo.AddSlasherAnger(slasher, 0.5) -- Adds 0.5 anger every second.
+	if not isActive then return end
+
+	SlashCo.AddSlasherAnger(slasher, 0.5) -- Adds 0.5 anger every second while a jonkler cart is active.
 end)
 
 function ENT:DestroyJonkler()
