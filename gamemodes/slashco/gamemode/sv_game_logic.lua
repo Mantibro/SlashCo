@@ -204,14 +204,16 @@ function AskPlayersToBecomeSlasher()
 				return
 			end
 
+			local selectionData = {
+				slashClass = SlashCo.CurRound.SlasherClass,
+				slashDanger = SlashCo.CurRound.SlasherDanger,
+				bannedSlashers = SlashCo.GetBannedSlashers(true),
+			}
+
 			net.Start("mantislashco_PickingSlasher")
-				net.WriteTable({
-					slashClass = SlashCo.CurRound.SlasherClass,
-					slashDanger = SlashCo.CurRound.SlasherDanger,
-					bannedSlashers = SlashCo.GetBannedSlashers(true),
-				})
+				net.WriteTable(selectionData)
 			net.Send(selectedPly)
-			SlashCo.AllowedPlayerSlasherSelection[selectedPly] = true
+			SlashCo.AllowedPlayerSlasherSelection[selectedPly] = selectionData
 
 			timer.Create("SlashCo:WaitingForPlayerToPickSlasher", 15, 1, function()
 				if SlashCo.CurRound.AntiLoopSpawn then return end

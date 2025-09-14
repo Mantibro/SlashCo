@@ -240,14 +240,16 @@ local function BeginSlasherSelection()
 	local slasher = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid)
 	if not IsValid(slasher) then return end
 
+	local selectionData = {
+		slasherClass = SlashCo.LobbyData.SelectedSlasherInfo.CLASS,
+		slasherDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER,
+		bannedSlashers = SlashCo.GetBannedSlashers(true),
+	}
+
 	net.Start("mantislashco_PickingSlasher")
-		net.WriteTable({
-			slashClass = SlashCo.LobbyData.SelectedSlasherInfo.CLASS,
-			slashDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER,
-			bannedSlashers = SlashCo.GetBannedSlashers(true),
-		})
+		net.WriteTable(selectionData)
 	net.Send(slasher)
-	SlashCo.AllowedPlayerSlasherSelection[slasher] = true
+	SlashCo.AllowedPlayerSlasherSelection[slasher] = selectionData
 end
 
 --				***Assign the values for the incoming Round***
@@ -410,27 +412,53 @@ local function lobbyRoundSetup()
 end
 
 net.Receive("mantislashco_SelectSlasher", function(_, ply)
-	local rec_id = net.ReadString()
-	if SlashCo.IsSlasherBanned(rec_id) then
-		print("[SlashCo] \"" .. ply:Name() .. "\" tried to pick a banned slasher! (" .. rec_id .. ")")
+	local selectedSlasher = net.ReadString()
+	if SlashCo.IsSlasherBanned(selectedSlasher) then
+		print("[SlashCo] \"" .. ply:Name() .. "\" tried to pick a banned slasher! (" .. selectedSlasher .. ")")
 		if SlashCo.AwaitPlayerToSelectSlasher then
 			SlashCo.AwaitPlayerToSelectSlasher(ply, nil)
 		end
 		return
 	end
 
-	if not SlashCo.AllowedPlayerSlasherSelection[ply] then
+	local selectionData = SlashCo.AllowedPlayerSlasherSelection[ply]
+	if not selectionData then
 		print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a slasher when they were never asked to!")
 		return
 	else
+		local slasher = SlashCoSlashers[selectedSlasher]
+		if not slasher then
+			print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a non-existent slasher! (\"" .. selectedSlasher .. "\")")
+			net.Start("mantislashco_PickingSlasher") -- Force the client to select a new slasher again since he fucked up!
+				net.WriteTable(selectionData)
+			net.Send(ply)
+			return
+		end
+
+		if selectionData.slasherClass and selectionData.slasherClass ~= SlashCo.SlasherClass.Unknown and selectionData.slasherClass ~= slasher.Class then
+			print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a slasher that was not of the allowed class! (\"" .. selectedSlasher .. "\")")
+			net.Start("mantislashco_PickingSlasher") -- Force the client to select a new slasher again since he fucked up!
+				net.WriteTable(selectionData)
+			net.Send(ply)
+			return
+		end
+
+		if selectionData.slasherDanger and selectionData.slasherDanger ~= SlashCo.DangerLevel.Unknown and selectionData.slasherDanger ~= slasher.DangerLevel then
+			print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a slasher that was not of the allowed danger level! (\"" .. selectedSlasher .. "\")")
+			net.Start("mantislashco_PickingSlasher") -- Force the client to select a new slasher again since he fucked up!
+				net.WriteTable(selectionData)
+			net.Send(ply)
+			return
+		end
+
 		SlashCo.AllowedPlayerSlasherSelection[ply] = nil -- Only allow them to pick once!
 	end
 
-	print("[SlashCo] Received. (" .. rec_id .. ")")
-	SlashCo.ChooseTheSlasherLobby(rec_id)
+	print("[SlashCo] Received. (" .. selectedSlasher .. ")")
+	SlashCo.ChooseTheSlasherLobby(selectedSlasher)
 
 	if SlashCo.AwaitPlayerToSelectSlasher then
-		SlashCo.AwaitPlayerToSelectSlasher(ply, rec_id)
+		SlashCo.AwaitPlayerToSelectSlasher(ply, selectedSlasher)
 	end
 end)
 
