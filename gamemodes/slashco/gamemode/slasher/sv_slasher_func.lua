@@ -55,6 +55,20 @@ function SlashCo.PrepareSlasherForSpawning()
 end
 
 function SlashCo.OnSlasherSpawned(ply)
+	-- We setup variables as the first thing to hopefully prevent any issues when in OnSpawn or such it errors.
+	ply:SetCanSeePlayers(true) -- Enabled by default
+
+	ply.ChaseActivationCooldown = 0
+	ply.KillDelayTick = 0
+	ply.CurrentChaseTick = 0
+	
+	-- ToDo: Move away from these values, they make the code painful to read and it serves no use to have them like this.
+	ply.SlasherValue1 = 0
+	ply.SlasherValue2 = 0
+	ply.SlasherValue3 = 0
+	ply.SlasherValue4 = 0
+	ply.SlasherValue5 = 0
+
 	local slasherTbl = SlashCoSlashers[ply:GetNWString("Slasher")]
 	if slasherTbl.OnBalanceForPlayers then
 		slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
@@ -70,28 +84,16 @@ function SlashCo.OnSlasherSpawned(ply)
 		]]
 	end
 
-	ply:SetCanSeePlayers(true) -- Enabled by default
-
 	ply:SetRunSpeed(slasherTbl.ProwlSpeed)
 	ply:SetWalkSpeed(slasherTbl.ProwlSpeed)
 	ply:SetNW2Float("SlasherAnger", 0)
-
-	ply.ChaseActivationCooldown = 0
-	ply.KillDelayTick = 0
-	ply.CurrentChaseTick = 0
-	
-	-- ToDo: Move away from these values, they make the code painful to read and it serves no use to have them like this.
-	ply.SlasherValue1 = 0
-	ply.SlasherValue2 = 0
-	ply.SlasherValue3 = 0
-	ply.SlasherValue4 = 0
-	ply.SlasherValue5 = 0
 
 	ply:SlasherFunction("OnSpawn")
 
 	if not SlashCo.NotPerfect and GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) > 1 then
 		ply:SetPoints("slasher_perfect")
 	end
+	ply.SuccessfulSpawn = true
 end
 
 
@@ -107,8 +109,16 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 	--Calculate the Game Progress Value
 	--The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (0 - 10)
 
-	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		local slasher = v
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		if not slasher.SuccessfulSpawn then
+			local succ, err = pcall(SlashCo.OnSlasherSpawned, slasher) -- if succ == false then we had an error in spawning. We also need pcall to be sure.
+			if not slasher.SuccessfulSpawn and not succ then
+				slasher:SetTeam(TEAM_SPECTATOR)
+				print("[SlashCo] Player \"" .. slasher:Name() .. "\" was set to spectator because we were unable to properly spawn them! (Error: \"" .. err .. "\"")
+				continue -- Skip the loop.
+			end
+		end
+
 		local dist = slasher:SlasherValue("ChaseRange", 600) + (SO * 250)
 		local inv = -0.2
 

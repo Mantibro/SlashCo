@@ -232,7 +232,7 @@ end
 function SLASHER.OnMainAbilityFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	if slasher.SurveyCooldown > 0 then
+	if (slasher.SurveyCooldown or 0) > 0 then
 		return
 	end
 	if slasher:GetNWBool("WatcherRage") then

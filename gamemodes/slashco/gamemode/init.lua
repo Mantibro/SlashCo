@@ -739,7 +739,7 @@ end
 
 function GM:EntityTakeDamage(target, dmg)
 	if target:IsPlayer() then
-		local result = target:ItemFunction("OnOwnerTakeDamage")
+		local result = target:ItemFunction("OnOwnerTakeDamage", dmg)
 		if result != nil then
 			return result
 		end
