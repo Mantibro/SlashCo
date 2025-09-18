@@ -102,8 +102,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 			return
 		end
 
-		SlashCo.AudioSystem.StopSound("Speedrun1", 0.5)
-		SlashCo.AudioSystem.StopSound("Speedrun2", 0.5)
+		SlashCo.AudioSystem.StopSound("Speedrun1", 0.5, slasher)
+		SlashCo.AudioSystem.StopSound("Speedrun2", 0.5, slasher)
 	end)
 
 	slasher:Freeze(true)

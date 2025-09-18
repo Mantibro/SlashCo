@@ -131,8 +131,8 @@ function SLASHER.OnSecondaryFire(slasher)
 			if clone.IsMain ~= true then
 				clone:Remove()
 			end
-			SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5)
-			SlashCo.AudioSystem.StopSound("CriminalRage", 0.5)
+			SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5, slasher)
+			SlashCo.AudioSystem.StopSound("CriminalRage", 0.5, slasher)
 		end
 
 		slasher:SetNWBool("CriminalCloning", false)

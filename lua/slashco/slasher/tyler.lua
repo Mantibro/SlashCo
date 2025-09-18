@@ -76,8 +76,8 @@ function TylerSwitchForm(slasher, newForm)
 	end
 
 	if slasher.TylerState == TYLER_DESTROYER then
-		SlashCo.AudioSystem.StopSound("TylerTheme", 1)
-		SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
+		SlashCo.AudioSystem.StopSound("TylerTheme", 1, slasher)
+		SlashCo.AudioSystem.StopSound("TylerWhisper", 1, slasher)
 
 		slasher:SetVisible(false)
 		slasher:SetNWBool("TylerFlash", false)
@@ -135,10 +135,10 @@ end
 	This causes the right song to play & the survivors get a few more seconds since he goes through the whole pre-destroyer state again.
 ]]
 function SLASHER.OnHelicopterSummon(slasher)
-	SlashCo.AudioSystem.StopSound("TylerAlarm", 0.5)
-	SlashCo.AudioSystem.StopSound("TylerTheme", 1)
-	SlashCo.AudioSystem.StopSound("TylerWhisper", 1)
-	SlashCo.AudioSystem.StopSound("TylerSong", 0)
+	SlashCo.AudioSystem.StopSound("TylerAlarm", 0.5, slasher)
+	SlashCo.AudioSystem.StopSound("TylerTheme", 1, slasher)
+	SlashCo.AudioSystem.StopSound("TylerWhisper", 1, slasher)
+	SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
 	TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 end
 
@@ -158,7 +158,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if (TylerState == 0 or TylerState == 1) and endlessChase then
 		TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
-		SlashCo.AudioSystem.StopSound("TylerSong", 0)
+		SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
 		slasher.TylerSongPickedID = nil
 		SlashCo.AddSlasherAnger(slasher, 100) -- Max it out
 		anger = SlashCo.GetSlasherAnger(slasher)
@@ -239,7 +239,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if not isCreating and (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
 			slasher.TylerSongPickedID = nil
 			TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
-			SlashCo.AudioSystem.StopSound("TylerSong", 0)
+			SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
 			return
 		end
 
@@ -257,7 +257,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					if not IsValid(slasher) then
 						return
 					end
-					SlashCo.AudioSystem.StopSound("TylerSong", 0)
+					SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
 				end)
 				break
 			end
@@ -314,7 +314,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:Freeze(true)
 
 		if slasher.tyler_destroyer_entrance_antispam == nil then
-			SlashCo.AudioSystem.StopSound("TylerSong", 0)
+			SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = endlessChase and "slashco/slasher/tyler/tyler_whatsgood_intro.ogg" or "slashco/slasher/tyler/tyler_alarm.ogg",
 				fallbackSoundPath = endlessChase and "slashco/slasher/tyler/tyler_alarm.ogg" or nil,
@@ -335,7 +335,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if slasher.tyler_destroyer_entrance_antispam < (endlessChase and 15.5 or (18 - decay)) then
 			slasher.tyler_destroyer_entrance_antispam = slasher.tyler_destroyer_entrance_antispam + FrameTime()
 		else
-			SlashCo.AudioSystem.StopSound("TylerAlarm", 0.5)
+			SlashCo.AudioSystem.StopSound("TylerAlarm", 0.5, slasher)
 
 			if anger < 50 then -- switch up songs if his anger is below 50.
 				SlashCo.AudioSystem.PlaySound({

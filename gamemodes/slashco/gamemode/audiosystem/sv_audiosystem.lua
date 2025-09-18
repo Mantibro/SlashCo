@@ -4,6 +4,8 @@
 
 -- This table contains all tables that were played, this was done to support full updates properly later on. Currently Unused.
 SlashCo.AudioSystem.Sounds = SlashCo.AudioSystem.Sounds or {}
+SlashCo.AudioSystem.DeltaSoundCache = SlashCo.AudioSystem.DeltaSoundCache or {}
+SlashCo.AudioSystem.PlayerDeltaSoundCache = SlashCo.AudioSystem.PlayerDeltaSoundCache or {}
 
 -- Needed since WriteSoundField else wouldn't work.
 -- ToDo: Why do we even use the EntIndex and not the Entity handle?
@@ -30,25 +32,71 @@ local function WritePulseEffect(table)
 	WriteSoundField(table.frequency, net.ReadUInt, 16)
 end
 
-util.AddNetworkString("slashCo_AudioSystem_PlaySound")
-function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for documentation of the table.
-	if not istable(soundData) then
-		error("PlaySound: didn't get the table that it wants!")
+local function WriteDeltaSoundField(value, deltaValue, writeFunc, ...)
+	local isNil = value == nil or value == deltaValue
+	net.WriteBool(isNil)
+	if not isNil then
+		writeFunc(value, ...)
 	end
+end
 
-	if not isstring(soundData.soundPath) then -- the only requirement that exists.
-		error("PlaySound: Missing soundPath field!")
-	end
+local function WriteDeltaPulseEffect(table, deltaTable)
+	WriteDeltaSoundField(table.entity, (deltaTable and deltaTable.entity or nil), WriteEntIndex)
+	WriteDeltaSoundField(table.entityClass, (deltaTable and deltaTable.entityClass or nil), net.WriteString)
+	WriteDeltaSoundField(table.frequency, (deltaTable and deltaTable.frequency or nil), net.ReadUInt, 16)
+end
 
-	-- Fallback code to ensure that if an entity wasn't networked to a client yet,
-	-- the sound would still have the right volume calculated when used with any of the fields that require a position to calculate the volume with.
-	if not soundData.position and (soundData.minDistance or soundData.maxDistance or soundData.startDistance or soundData.startEndDistance) and soundData.entity and (isnumber(soundData.entity) or IsValid(soundData.entity)) then
-		soundData.position = (isnumber(soundData.entity) and Entity(soundData.entity) or soundData.entity):GetPos()
-	end
-
-	-- using soundData.unreliable can allow sounds to be played with lower delays though they'll be unreliable and could be lost.
-	-- This can be useful if you play only a short sound like a footstep where having a smaller delay can affect gameplay.
+local function SendToPlayersWithDelta(playerList, soundData, deltaList)
+	local identifier = soundData.identifier or soundData.soundPath
 	net.Start("slashCo_AudioSystem_PlaySound", soundData.unreliable or false)
+		net.WriteBool(true)
+		if soundData.identifier == identifier then -- We cannot apply delta to the soundPath if it's the delta identifier!
+			WriteSoundField(soundData.soundPath, net.WriteString)
+		else
+			WriteDeltaSoundField(soundData.soundPath, deltaList.soundPath, net.WriteString)
+		end
+		WriteDeltaSoundField(soundData.fallbackSoundPath, deltaList.fallbackSoundPath, net.WriteString)
+		WriteDeltaSoundField(soundData.entity, deltaList.entity, WriteEntIndex)
+		WriteDeltaSoundField(soundData.soundLevel, deltaList.soundLevel, net.WriteUInt, 14)
+		WriteDeltaSoundField(soundData.volume, deltaList.volume, net.WriteFloat)
+		WriteDeltaSoundField(soundData.looping, deltaList.looping, net.WriteBool)
+		WriteDeltaSoundField(soundData.startTick, deltaList.startTick, net.WriteUInt, 32)
+		if soundData.identifier == identifier then -- We cannot apply delta to the identifier if it's the delta identifier!
+			WriteSoundField(soundData.identifier, net.WriteString)
+		else
+			WriteDeltaSoundField(soundData.identifier, deltaList.identifier, net.WriteString)
+		end
+		WriteDeltaSoundField(soundData.minDistance, deltaList.minDistance, net.WriteUInt, 16)
+		WriteDeltaSoundField(soundData.maxDistance, deltaList.maxDistance, net.WriteUInt, 16)
+		WriteDeltaSoundField(soundData.startDistance, deltaList.startDistance, net.WriteUInt, 16)
+		WriteDeltaSoundField(soundData.startEndDistance, deltaList.startEndDistance, net.WriteUInt, 16)
+		WriteDeltaSoundField(soundData.position, deltaList.position, net.WriteVector)
+		WriteDeltaSoundField(soundData.modes, deltaList.modes, net.WriteString)
+		WriteDeltaSoundField(soundData.pan, deltaList.pan, net.WriteFloat)
+		WriteDeltaSoundField(soundData.playbackRate, deltaList.playbackRate, net.WriteFloat)
+		WriteDeltaSoundField(soundData.group, deltaList.group, net.WriteString)
+		WriteDeltaSoundField(soundData.deleteWhenDone, deltaList.deleteWhenDone, net.WriteBool)
+		WriteDeltaSoundField(soundData.fadeIn, deltaList.fadeIn, net.WriteFloat)
+		WriteDeltaSoundField(soundData.fadeOut, deltaList.fadeOut, net.WriteFloat)
+		WriteDeltaSoundField(soundData.fadeOutStart, deltaList.fadeOutStart, net.WriteFloat)
+		WriteDeltaSoundField(soundData.forceMono, deltaList.forceMono, net.WriteBool)
+		WriteDeltaSoundField(soundData.forceSterio, deltaList.forceSterio, net.WriteBool)
+		WriteDeltaSoundField(soundData.noWorldSpace, deltaList.noWorldSpace, net.WriteBool)
+		WriteDeltaSoundField(soundData.dynamicPan, deltaList.dynamicPan, net.WriteBool)
+		WriteDeltaSoundField(soundData.boundConVar, deltaList.boundConVar, net.WriteString)
+		WriteDeltaSoundField(soundData.pulseEffect, deltaList.pulseEffect, WriteDeltaPulseEffect)
+		WriteDeltaSoundField(soundData.disableUniqueToEntity, deltaList.disableUniqueToEntity, net.WriteBool)
+		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
+	if not playerList then
+		net.Broadcast()
+	else
+		net.Send(playerList)
+	end
+end
+
+local function SendToPlayersWithNoDelta(playerList, soundData)
+	net.Start("slashCo_AudioSystem_PlaySound", soundData.unreliable or false)
+		net.WriteBool(false)
 		WriteSoundField(soundData.soundPath, net.WriteString)
 		WriteSoundField(soundData.fallbackSoundPath, net.WriteString)
 		WriteSoundField(soundData.entity, WriteEntIndex)
@@ -76,14 +124,96 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		WriteSoundField(soundData.dynamicPan, net.WriteBool)
 		WriteSoundField(soundData.boundConVar, net.WriteString)
 		WriteSoundField(soundData.pulseEffect, WritePulseEffect)
-		WriteSoundField(soundData.makeUniqueToEntity, net.WriteBool)
+		WriteSoundField(soundData.disableUniqueToEntity, net.WriteBool)
 		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
-
-	if not soundData.sendToEntity then -- serverside only, its networked only to the player its being played od
+	if not playerList then
 		net.Broadcast()
 	else
-		net.Send(soundData.sendToEntity)
+		net.Send(playerList)
 	end
+end
+
+local deltaMerge
+local function DeltaMerge(deltaTable, baseTable) -- This one works differently than the clientside version as we always update only the deltaTable.
+	for key, val in pairs(baseTable) do
+		local deltaTableVal = deltaTable[key]
+		if deltaTableVal then
+			if istable(deltaTableVal) then
+				deltaMerge(deltaTableVal, baseTable[key])
+				continue -- We got nothing to change :3
+			end
+		end
+
+		deltaTable[key] = val
+	end
+end
+deltaMerge = DeltaMerge
+
+util.AddNetworkString("slashCo_AudioSystem_PlaySound")
+function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for documentation of the table.
+	if not istable(soundData) then
+		error("PlaySound: didn't get the table that it wants!")
+	end
+
+	if not isstring(soundData.soundPath) then -- the only requirement that exists.
+		error("PlaySound: Missing soundPath field!")
+	end
+
+	-- Fallback code to ensure that if an entity wasn't networked to a client yet,
+	-- the sound would still have the right volume calculated when used with any of the fields that require a position to calculate the volume with.
+	if not soundData.position and (soundData.minDistance or soundData.maxDistance or soundData.startDistance or soundData.startEndDistance) and soundData.entity and (isnumber(soundData.entity) or IsValid(soundData.entity)) then
+		soundData.position = (isnumber(soundData.entity) and Entity(soundData.entity) or soundData.entity):GetPos()
+	end
+
+	if not soundData.looping then
+		soundData.deleteWhenDone = true -- For serverside sounds, we force this if their not looping sounds.
+	end
+
+	local identifier = soundData.identifier or soundData.soundPath
+	local deltaTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
+	if deltaTable then
+		local deltaPlayers = {}
+		local revDeltaPlayers = {}
+		if soundData.sendToEntity then
+			local deltaList = SlashCo.AudioSystem.PlayerDeltaSoundCache[soundData.sendToEntity]
+			if deltaList and deltaList[identifier] then
+				table.insert(deltaList, soundData.sendToEntity)
+				revDeltaPlayers[soundData.sendToEntity] = true
+			end
+		else
+			for ply, deltaList in pairs(SlashCo.AudioSystem.PlayerDeltaSoundCache) do
+				if not IsValid(ply) then
+					SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = nil -- Yes, this is how we'll clean it.
+					continue
+				end
+
+				if deltaList[identifier] then
+					table.insert(deltaPlayers, ply)
+					revDeltaPlayers[ply] = true
+				end
+			end
+		end
+
+		SendToPlayersWithDelta(deltaPlayers, soundData, deltaTable)
+
+		local noDeltaPlayers = {}
+		for _, ply in player.Iterator() do
+			if revDeltaPlayers[ply] then continue end
+
+			table.insert(noDeltaPlayers, ply)
+		end
+
+		if #noDeltaPlayers > 0 then
+			SendToPlayersWithNoDelta(noDeltaPlayers, soundData)
+		end
+	else
+		SendToPlayersWithNoDelta(nil, soundData)
+		deltaTable = {}
+	end
+
+	DeltaMerge(deltaTable, soundData)
+	
+	SlashCo.AudioSystem.DeltaSoundCache[identifier] = deltaTable
 
 	--[[table.insert(SlashCo.AudioSystem.Sounds, {
 		filePath = soundPath,
@@ -119,3 +249,27 @@ function SlashCo.AudioSystem.FadeSound(identifier, fadeTime, targetVolume) -- To
 		net.WriteFloat(targetVolume)
 	net.Broadcast()
 end
+
+util.AddNetworkString("slashCo_AudioSystem_AcknowledgeDelta")
+net.Receive("slashCo_AudioSystem_AcknowledgeDelta", function(_, ply)
+	local identifier = net.ReadString()
+	if SlashCo.AudioSystem.DeltaSoundCache[identifier] then
+		local plyTable = SlashCo.AudioSystem.PlayerDeltaSoundCache[ply]
+		if not plyTable then
+			plyTable = {}
+			SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = plyTable
+		end
+
+		plyTable[identifier] = true
+		-- print("Player " .. tostring(ply) .. "(" .. ply:Name() .. ")" .. " acknowledged delta!", identifier)
+	else
+		-- Player tried to acknowledge a sound for delta when we as the server don't even know it?!? How...
+	end
+end)
+
+util.AddNetworkString("slashCo_AudioSystem_EntityRemoved")
+hook.Add("EntityRemoved", "AudioSystem:EntityRemoved", function(ent)
+	net.Start("slashCo_AudioSystem_EntityRemoved")
+		net.WriteUInt(ent:EntIndex(), MAX_EDICT_BITS)
+	net.Broadcast()
+end)

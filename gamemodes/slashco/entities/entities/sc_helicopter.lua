@@ -145,10 +145,10 @@ function ENT:PlayHeliSounds()
 end
 
 function ENT:QuietHeli()
-	SlashCo.AudioSystem.StopSound("HelicopterEngineDistant", 0.5)
-	SlashCo.AudioSystem.StopSound("HelicopterRotorsDistant", 0.5)
-	SlashCo.AudioSystem.StopSound("HelicopterEngineClose", 0.5)
-	SlashCo.AudioSystem.StopSound("HelicopterRotorsClose", 0.5)
+	SlashCo.AudioSystem.StopSound("HelicopterEngineDistant", 0.5, self)
+	SlashCo.AudioSystem.StopSound("HelicopterRotorsDistant", 0.5, self)
+	SlashCo.AudioSystem.StopSound("HelicopterEngineClose", 0.5, self)
+	SlashCo.AudioSystem.StopSound("HelicopterRotorsClose", 0.5, self)
 end
 
 function sign(number)

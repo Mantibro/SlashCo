@@ -311,7 +311,7 @@ function ENT:Think()
 			v:SetNWBool("MarkedBySmiley", false)
 			v.BeenMarked = nil
 			timer.Remove("zanyMark_" .. v:UserID())
-			SlashCo.AudioSystem.StopSound("ZanyAttack", 0)
+			SlashCo.AudioSystem.StopSound("ZanyAttack", 0, self)
 			self:Remove()
 		end
 	end

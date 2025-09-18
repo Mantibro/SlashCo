@@ -1,6 +1,7 @@
 SlashCo.AudioSystem.Channels = SlashCo.AudioSystem.Channels or {} -- All IGModAudioChannel instances, use pairs to iterate as it will have holes.
 SlashCo.AudioSystem.CreatingChannels = SlashCo.AudioSystem.CreatingChannels or {} -- Sounds that are currently being created.
 SlashCo.AudioSystem.PrecacheSounds = SlashCo.AudioSystem.PrecacheSounds or {}
+SlashCo.AudioSystem.DeltaSoundCache = SlashCo.AudioSystem.DeltaSoundCache or {}
 SlashCo.AudioSystem.BackgroundChannel = SlashCo.AudioSystem.BackgroundChannel or nil
 SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs or 0 -- Incremental number to assign channel id's
 SlashCo.AudioSystem.UpdateFrequency = 0.05 -- How often timers execute to update the volume when fading it to a new value.
@@ -100,7 +101,7 @@ function SlashCo.AudioSystem.SetChannelIdentifier(channel, identifier)
 	SlashCo.AudioSystem.Channels[channel].identifier = identifier
 end
 
-function SlashCo.AudioSystem.GetChannelByIdentifier(identifier)
+function SlashCo.AudioSystem.GetChannelByIdentifier(identifier, entIndex)
 	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
 		if channelData.identifier == identifier and channelData.State == ChannelStates.OK then
 			return channel
@@ -695,7 +696,8 @@ end)
 		boolean dynamicPan - If set it will calculate the pan for the channel giving the sound a 3D effect.
 		string fallbackSoundPath - The fallback sound when the bound ConVar is disabled.
 		string boundConVar - A ConVar the sound is bound to, when the ConVar is false then it will instead play the set fallbackSoundPath
-		boolean disableUniqueToEntity - (DISABLED/REMOVED) If set, the entity index is NOT added to the identifier allowing the sound to be played only ONCE and NOT by multiple entities.
+		boolean disableUniqueToEntity - If set, the entity index is NOT added to the identifier allowing the sound to be played only ONCE and NOT by multiple entities.
+		boolean disableAutoRemove - If set, the channel won't be removed after the entity of the channel was removed.
 
 		table pulseEffect - A table for the pulse effect. NOTE: This is still WIP and should not be used.
 		-> Entity entity - A entity that should pulse
@@ -732,8 +734,6 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	soundData.looping = soundData.looping or false
 	soundData.modes = soundData.modes or ""
 
-	SlashCo.AudioSystem.StopSound(soundData.identifier, 0.5)
-
 	local entIndex = 0
 	if isnumber(soundData.entity) then
 		entIndex = soundData.entity
@@ -741,9 +741,11 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		entIndex = soundData.entity:EntIndex() -- ToDo: Should we also support clientside entities? Probably.
 	end
 
-	--[[if not soundData.disableUniqueToEntity then
+	if not soundData.disableUniqueToEntity then
 		soundData.identifier = soundData.identifier .. entIndex
-	end]]
+	end
+
+	SlashCo.AudioSystem.StopSound(soundData.identifier, 0.5)
 
 	local existingCreationData = SlashCo.AudioSystem.CreatingChannels[soundData.identifier]
 	local isAlreadyInCreation = existingCreationData ~= nil
@@ -899,8 +901,8 @@ function SlashCo.AudioSystem.GetEntityChannels(entity)
 	end
 
 	local results = {}
-	for channel, entTbl in pairs(SlashCo.AudioSystem.Channels) do
-		if entTbl.entIndex ~= entIndex then continue end
+	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
+		if channelData.entIndex ~= entIndex then continue end
 		
 		table.insert(results, channel)
 	end
@@ -915,6 +917,10 @@ end
 ]]
 function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 	fadeOut = fadeOut or 1
+
+	if not isnumber(entIndex) and IsValid(entIndex) then
+		entIndex = entIndex:EntIndex()
+	end
 
 	if not identifier then -- No identifier? then we want to stop all sounds.
 		if not entIndex then -- No entitiy? Then we want to stop all sounds globally.
@@ -932,13 +938,13 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 	end
 
 	-- We use or and do identifier .. entIndex since if a sound has makeUniqueToEntity set, it will append the EntIndex to our identifier
-	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier]-- or SlashCo.AudioSystem.CreatingChannels[identifier .. (entIndex or "")]
+	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier] or SlashCo.AudioSystem.CreatingChannels[identifier .. (entIndex or "")]
 	if creationSounData then -- The channel wasn't created yet, so we cannot stop it. Instead we'll set a flag.
 		creationSounData.DESTROYCHANNEL = true
 		return
 	end
 
-	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier)-- or SlashCo.AudioSystem.GetChannelByIdentifier(identifier .. (entIndex or ""))
+	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier) or SlashCo.AudioSystem.GetChannelByIdentifier(identifier .. (entIndex or ""))
 	if not channel then return end
 
 	SlashCo.AudioSystem.DestroyChannel(channel, fadeOut)
@@ -965,7 +971,26 @@ local function ReadPulseEffect()
 	}
 end
 
+local deltaMerge
+local function DeltaMerge(deltaTable, baseTable)
+	for key, val in pairs(baseTable) do
+		local deltaTableVal = deltaTable[key]
+		if deltaTableVal then
+			if istable(deltaTableVal) then
+				deltaMerge(deltaTableVal, baseTable[key])
+			else
+				baseTable[key] = val -- We inherit from the current deltaTable so that our baseTable is always up to date containing the same data from the last request
+			end
+			continue -- We got nothing to change :3
+		end
+
+		deltaTable[key] = val
+	end
+end
+deltaMerge = DeltaMerge
+
 net.Receive("slashCo_AudioSystem_PlaySound", function()
+	local isDelta = net.ReadBool()
 	local soundData = {
 		soundPath = ReadSoundField(net.ReadString),
 		fallbackSoundPath = ReadSoundField(net.ReadString),
@@ -994,8 +1019,26 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		dynamicPan = ReadSoundField(net.ReadBool),
 		boundConVar = ReadSoundField(net.ReadString),
 		pulseEffect = ReadSoundField(ReadPulseEffect),
-		makeUniqueToEntity = ReadSoundField(net.ReadBool),
+		disableUniqueToEntity = ReadSoundField(net.ReadBool),
+		disableAutoRemove = ReadSoundField(net.ReadBool),
 	}
+
+	local identifier = soundData.identifier or soundData.soundPath
+	if isDelta then
+		local baseTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
+		if baseTable then
+			DeltaMerge(soundData, baseTable)
+		else
+			-- Uh oh... Fuck... How did this happen?
+		end
+	else
+		SlashCo.AudioSystem.DeltaSoundCache[identifier] = table.Copy(soundData)
+		net.Start("slashCo_AudioSystem_AcknowledgeDelta")
+			net.WriteString(identifier)
+		net.SendToServer()
+	end
+
+	PrintTable(soundData)
 
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
 	-- While clientside, the channel could be moved after PlaySound was called so if we forced it into mono we could break things.
@@ -1025,4 +1068,8 @@ net.Receive("slashCo_AudioSystem_FadeSound", function() -- ToDo: Fix this functi
 	if not channel then return end
 
 	SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVolume)
+end)
+
+net.Receive("slashCo_AudioSystem_EntityRemoved", function()
+	local entIndex = net.ReadUInt(MAX_EDICT_BITS)
 end)

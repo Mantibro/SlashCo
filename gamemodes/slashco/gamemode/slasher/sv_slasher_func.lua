@@ -290,7 +290,7 @@ function SlashCo.StopChase(slasher)
 	slasher:SetNWFloat("SlasherChaseBegin", 0)
 	slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
-	SlashCo.AudioSystem.StopSound("ChaseMusic", 5)
+	SlashCo.AudioSystem.StopSound("ChaseMusic", 5, slasher)
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 
 	timer.Remove("SlashCoEndChase_" .. slasher:UserID())
@@ -299,7 +299,7 @@ function SlashCo.StopChase(slasher)
 		if not IsValid(slasher) then
 			return
 		end
-		SlashCo.AudioSystem.StopSound("ChaseMusic", 5)
+		SlashCo.AudioSystem.StopSound("ChaseMusic", 5, slasher)
 	end)
 
 	for _, pl in ipairs(player.GetAll()) do

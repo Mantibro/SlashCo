@@ -196,8 +196,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			--damn shit
 			if HuntPower <= 0 then
 				slasher:SetNWBool("DolphinHunting", false)
-				SlashCo.AudioSystem.StopSound("DolfinCall", 0.5)
-				SlashCo.AudioSystem.StopSound("DolfinCallFar", 0.5)
+				SlashCo.AudioSystem.StopSound("DolfinCall", 0.5, slasher)
+				SlashCo.AudioSystem.StopSound("DolfinCallFar", 0.5, slasher)
 				
 				slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
 				for i = 1, 8 do

@@ -60,8 +60,8 @@ function ENT:RunBehaviour()
 			end
 		end
 		coroutine.wait(10)
-		SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5)
-		SlashCo.AudioSystem.StopSound("CriminalRage", 0.5)
+		SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5, self)
+		SlashCo.AudioSystem.StopSound("CriminalRage", 0.5, self)
 
 		coroutine.yield()
 	end

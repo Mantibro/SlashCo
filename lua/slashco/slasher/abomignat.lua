@@ -58,8 +58,8 @@ local function PlayBreathing(slasher)
 	})
 end
 
-local function StopBreathing()
-	SlashCo.AudioSystem.StopSound("AbomignatBreath", 0.5)
+local function StopBreathing(slasher)
+	SlashCo.AudioSystem.StopSound("AbomignatBreath", 0.5, slasher)
 end
 
 function SLASHER.OnSpawn(slasher)
@@ -461,7 +461,7 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
-	StopBreathing()
+	StopBreathing(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/abomignat/abomignat_rage" .. math.random(1, 2) .. ".ogg",
 		identifier = "AbomignatBlinded",

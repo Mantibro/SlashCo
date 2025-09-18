@@ -522,7 +522,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher:SetNWBool("SidGun", false)
 		slasher:SetBodygroup(1, 0)
 		slasher:SetNWBool("SidGunLetterC", false)
-		SlashCo.AudioSystem.StopSound("SidLetterC", 0.5)
+		SlashCo.AudioSystem.StopSound("SidLetterC", 0.5, slasher)
 		slasher.Pacification = math.random(5, 15)
 	end
 end

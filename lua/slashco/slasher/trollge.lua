@@ -52,8 +52,8 @@ local function PlayBreathing(slasher)
 	})
 end
 
-local function StopBreathing()
-	SlashCo.AudioSystem.StopSound("TrollgeBreath", 0.5)
+local function StopBreathing(slasher)
+	SlashCo.AudioSystem.StopSound("TrollgeBreath", 0.5, slasher)
 end
 
 function SLASHER.OnSpawn(slasher)
@@ -139,7 +139,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	if not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage1") and SlashCo.CurRound.GameProgress > 4 and stage < 1 then
 		slasher:SetNWBool("TrollgeTransition", true)
 		slasher:Freeze(true)
-		StopBreathing()
+		StopBreathing(slasher)
 		slasher:StopSound("slashco/slasher/trollge_breathing.wav")
 		slasher:PlayGlobalSound("slashco/slasher/trollge/trollge_transition.mp3", 125)
 
@@ -149,7 +149,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		timer.Simple(7, function()
 			--transit
-			StopBreathing()
+			StopBreathing(slasher)
 			slasher.TrollgeStage = 1
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
@@ -177,7 +177,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	if not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage2") and SlashCo.CurRound.GameProgress > (10 - (Blood / 2)) and stage == 1 then
 		slasher:SetNWBool("TrollgeTransition", true)
 		slasher:Freeze(true)
-		SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5)
+		SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
 		slasher:PlayGlobalSound("slashco/slasher/trollge/trollge_transition.mp3", 125)
 
 		for _, ply in ipairs(player.GetAll()) do
@@ -190,7 +190,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			--transit
-			SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5)
+			SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
 			slasher.TrollgeStage = 2
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:Freeze(false)
@@ -278,7 +278,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.TrollgeBlood = 8
 			slasher:SetNWBool("TrollgeTransition", true)
 			slasher:Freeze(true)
-			StopBreathing()
+			StopBreathing(slasher)
 	 		slasher:PlayGlobalSound("slashco/slasher/trollge/trollge_transition.mp3", 125)
 
 			for _, ply in ipairs(player.GetAll()) do
@@ -291,7 +291,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 
 				--transit
-				StopBreathing()
+				StopBreathing(slasher)
 				slasher.TrollgeStage = 2
 				slasher:SetNWBool("TrollgeTransition", false)
 				slasher:Freeze(false)
@@ -531,7 +531,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage) -- additionalRage is used by OnHitByBeerKeg
-	StopBreathing()
+	StopBreathing(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/trollge/troll_blind_" .. math.random(1, 2) .. ".mp3",
 		identifier = "TrollgeBlinded",
