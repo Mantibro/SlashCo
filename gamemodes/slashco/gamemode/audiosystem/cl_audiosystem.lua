@@ -213,7 +213,7 @@ end
 	if no startDistance or no startEndDistance is set, the initial Silent zone won't exist.
 	if no minDistance or no maxDistance is set, the final Silent zone won't exist.
 ]]
-local function CalculateFadeVolume(playerPos, channelPos, initialVolume, soundData)
+local function CalculateChannelFadeVolume(playerPos, channelPos, initialVolume, soundData)
 	local distance = channelPos:Distance(playerPos)
 
 	local startDistance = soundData.startDistance
@@ -249,19 +249,183 @@ end
 
 local fallbackPosition = Vector(0, 0, 0)
 local function GetLocalPlayerPosition() -- We can get net messages received before the local player is valid, so we fallback to the world origin until them.
-	return SlashCo.AudioSystem.ValidLocalPlayer and SlashCo.AudioSystem.LocalPlayer:GetPos() or fallbackPosition
+	return SlashCo.AudioSystem.ValidLocalPlayer and SlashCo.AudioSystem.LocalPlayer:EyePos() or fallbackPosition
 end
 
--- Helper function to wrap around CalculateFadeVolume
+local function ReflectRay(incident, normal)
+	return incident - 2 * incident:Dot(normal) * normal
+end
+
+local function BounceRay(trace, playerPos, debugDraw, inDir, bounces)
+	local tr = trace
+	local totalBounces = bounces
+	for k=1, bounces do -- Time to make some ray's bounce.
+		local incidentDir = k == 1 and inDir or (tr.HitPos - tr.StartPos):GetNormalized()
+		local bounceDir = ReflectRay(incidentDir, tr.HitNormal)
+		bounceDir:Mul(1000)
+		tr = util.TraceLine({
+			start = tr.HitPos,
+			endpos = tr.HitPos + bounceDir,
+			filter = filterEnts,
+			mask = MASK_VISIBLE_AND_NPCS,
+			collisiongroup = COLLISION_GROUP_INTERACTIVE
+		})
+
+		--print(tr.StartPos, engine.TickCount(), bounceDir, incidentDir)
+
+		if debugDraw then
+			debugoverlay.Line(tr.StartPos, tr.HitPos, 1, Color(255, 0, 0))
+			debugoverlay.Axis(tr.HitPos, tr.HitNormal:Angle(), 10)
+		end
+
+		local playerTR = util.TraceLine({
+			start = tr.HitPos,
+			endpos = playerPos,
+			filter = filterEnts,
+			mask = MASK_VISIBLE_AND_NPCS,
+			collisiongroup = COLLISION_GROUP_WORLD
+		})
+
+		if not playerTR.Hit then
+			if debugDraw then
+				debugoverlay.Line(tr.HitPos, playerPos - Vector(0, 0, 20), 1, Color(0, 255, 0)) -- We offset playerPos since else it's difficult to see
+				debugoverlay.Axis(tr.HitPos, tr.HitNormal:Angle(), 10, 1)
+			end
+
+			return tr, k, playerTR
+		end
+	end
+
+	return tr, totalBounces
+end
+
+local function RotateDirection(direction, angleDegrees, axis)
+	local ang = direction:Angle()
+	ang:RotateAroundAxis(axis, angleDegrees)
+	return ang:Forward()
+end
+
+--[[ This doesn't achieve great results :/
+
+local raytraceVectors = {}
+local raytraceYawSteps = 8
+local raytracePitchSteps = 6
+local raytraceBaseDir = Vector(1, 1, 1)
+local raytraceVec001 = Vector(0, 0, 1)
+for yaw = -60, 60, 120 / raytraceYawSteps do
+	for pitch = -30, 30, 60 / raytracePitchSteps do
+		local dir = RotateDirection(raytraceBaseDir, yaw, raytraceVec001)
+		dir = RotateDirection(dir, pitch, dir:Cross(raytraceVec001))
+		table.insert(raytraceVectors, dir)
+	end
+end]]
+
+local function AverageVectors(vectors)
+	local sum = Vector(0, 0, 0)
+	if #vectors == 0 then
+		return sum
+	end
+
+	for _, vec in ipairs(vectors) do
+		sum = sum + vec
+	end
+
+	return sum / #vectors
+end
+
+local nextDebugDraw = 0
+local function CalculateRayTracedVolume(channel, channelData, soundData, channelPos, playerPos, initialVolume)
+	if not soundData.raytraced or initialVolume <= 0 then
+		return initialVolume
+	end
+
+	local filterEnts = {channelData.ent, SlashCo.AudioSystem.LocalPlayer}
+	local tr = util.TraceLine({
+		start = channelPos,
+		endpos = playerPos,
+		filter = filterEnts,
+		mask = MASK_VISIBLE_AND_NPCS,
+		collisiongroup = COLLISION_GROUP_INTERACTIVE
+	})
+
+	if not tr.Hit then
+		return initialVolume
+	end
+
+	local debugDraw = nextDebugDraw < CurTime()
+	if debugDraw then
+		--debugoverlay.Line(tr.StartPos, tr.HitPos, 1)
+		--debugoverlay.Axis(tr.HitPos, tr.HitNormal:Angle(), 10)
+		nextDebugDraw = CurTime() + 0.1
+	end
+
+	local raytraceVectors = {}
+	local raytraceYawSteps = 12
+	local raytracePitchSteps = 8
+	local raytraceBaseDir = (playerPos - channelPos):GetNormalized()
+	local raytraceVec001 = Vector(0, 0, 1)
+	for yaw = -60, 60, 120 / raytraceYawSteps do
+		for pitch = -30, 30, 60 / raytracePitchSteps do
+			local dir = RotateDirection(raytraceBaseDir, yaw, raytraceVec001)
+			dir = RotateDirection(dir, pitch, dir:Cross(raytraceVec001))
+			table.insert(raytraceVectors, dir)
+		end
+	end
+
+	local hitPos = {} -- We contain all traces that managed to reach the player
+	local totalBounces = 8
+	local shortestBounce = totalBounces
+	tr.HitPos = channelPos
+	for _, dir in ipairs(raytraceVectors) do
+		local tr = util.TraceLine({
+			start = channelPos,
+			endpos = channelPos + dir * 1000,
+			filter = filterEnts,
+			mask = MASK_VISIBLE_AND_NPCS,
+			collisiongroup = COLLISION_GROUP_INTERACTIVE
+		})
+
+		local tr, totalBounces, playerTR = BounceRay(tr, playerPos, debugDraw, dir, totalBounces)
+		if shortestBounce > totalBounces then
+			shortestBounce = totalBounces
+		end
+
+		if playerTR then
+			table.insert(hitPos, playerTR.StartPos)
+			--debugoverlay.Sphere(playerTR.StartPos, 10, 1, Color(0, 0, 255), true)
+		end
+	end
+
+	--print(initialVolume - ((totalBounces - (totalBounces - shortestBounce)) / 10), LerpVector(0.5, channelPos, AverageVectors(hitPos)))
+	if #hitPos > 0 then
+		channelData.raytracedTarget = LerpVector(0.75, channelPos, AverageVectors(hitPos)) -- We lerp all hit traces into one and change the channel position giving the illusion that the audio source moved.
+	end
+
+	channelData.raytracedPos = LerpVector(0.05, channelData.raytracedPos or channelData.pos, channelData.raytracedTarget or channelData.pos)
+	channelData.pos = channelData.raytracedPos -- We can't save it in .pos since it's reset every frame
+
+	local vol = CalculateChannelFadeVolume(playerPos, channelData.pos, initialVolume, soundData)
+	initialVolume = initialVolume - (initialVolume - vol) -- Not perfect but it helps against stopping it from jumping up in volume since the distance changes
+
+	if debugDraw then
+		debugoverlay.Sphere(channelData.pos, 10, 1, Color(0, 0, 255), true)
+	end
+
+	return math.max(initialVolume - ((totalBounces - (totalBounces - shortestBounce)) / 10), 0)
+end
+
+-- Helper function to wrap around CalculateChannelFadeVolume
 local function CalculateChannelVolume(channel, targetVol)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
 	if channelData.is3D or channelData.pos then
-		local channelData = SlashCo.AudioSystem.Channels[channel]
-		if channelData then
-			local soundData = channelData.soundData
-			if soundData then
-				return CalculateFadeVolume(GetLocalPlayerPosition(), channelData.pos or channel:GetPos(), targetVol, soundData)
-			end
+		local soundData = channelData.soundData
+		if soundData then
+			local playerPos = GetLocalPlayerPosition()
+			local channelPos = channelData.pos or channel:GetPos()
+			local volume = CalculateChannelFadeVolume(playerPos, channelPos, targetVol, soundData)
+			volume = CalculateRayTracedVolume(channel, channelData, soundData, channelPos, playerPos, volume)
+
+			return volume
 		end
 	end
 
@@ -519,7 +683,7 @@ function CalculatePan(ply, channelPos)
 	return math.Clamp(pan, -1, 1)
 end
 
-local function UpdateChannelPosition(channel, channelData, localPlyPos)
+local function UpdateChannelPositionAndVolume(channel, channelData, localPlyPos)
 	local soundData = channelData.soundData
 	if not soundData then return end
 
@@ -533,16 +697,16 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 				newPos = ent:WorldSpaceCenter() -- If possible, use the EyePos, but if the EyePos matches the Entity's position, we use the WorldSpaceCenter as a better position.
 			end
 
-			if channelData.is3D then -- We don't need to call it when the position isn't saved anyways as for non-3d channels the position is always Vector(0, 0, 0)
+			if channelData.is3D and not soundData.raytraced then -- We don't need to call it when the position isn't saved anyways as for non-3d channels the position is always Vector(0, 0, 0)
 				channel:SetPos(newPos)
-			else
-				channelData.pos = newPos -- Since non-3d channels :GetPos will always be the world origin, we store our position in here instead.
 			end
+			
+			channelData.pos = newPos -- Since non-3d channels :GetPos will always be the world origin, we store our position in here instead.
 		end
 	end
 
 	if newPos and soundData.minDistance and soundData.maxDistance then
-		local volume = CalculateFadeVolume(localPlyPos or GetLocalPlayerPosition(), newPos, channelData.volume or soundData.volume, soundData)
+		local volume = CalculateChannelVolume(channel, channelData.volume or soundData.volume)
 		
 		if soundData.dynamicPan then
 			channel:SetPan(CalculatePan(SlashCo.AudioSystem.LocalPlayer, newPos))
@@ -559,22 +723,26 @@ local function UpdateChannelPosition(channel, channelData, localPlyPos)
 		end]]
 		--print("3D", channel, channelData.ID, volume)
 	end
+
+	if soundData.raytraced then -- It may change the channel position
+		channel:SetPos(channelData.pos)
+	end
 end
 
-local function UpdateChannelPositions()
+local function UpdateChannelPositionsAndVolumes()
 	local localPlyPos = GetLocalPlayerPosition()
 	for channel, channelData in pairs(SlashCo.AudioSystem.Channels) do
 		--[[
 			Why don't we remove the channel if the parent is gone?
 			Because on full updates, the parent might disappear and then reappear.
 		]]
-		UpdateChannelPosition(channel, channelData, localPlyPos)
+		UpdateChannelPositionAndVolume(channel, channelData, localPlyPos)
 	end
 end
 
 function SlashCo.AudioSystem.Think()
 	UpdateBackgroundMusic()
-	UpdateChannelPositions()
+	UpdateChannelPositionsAndVolumes()
 end
 
 --[[
@@ -698,6 +866,7 @@ end)
 		string boundConVar - A ConVar the sound is bound to, when the ConVar is false then it will instead play the set fallbackSoundPath
 		boolean disableUniqueToEntity - If set, the entity index is NOT added to the identifier allowing the sound to be played only ONCE and NOT by multiple entities.
 		boolean disableAutoRemove - If set, the channel won't be removed after the entity of the channel was removed.
+		boolean raytraced - If set, it will use traces to change the volume and position based off the environment. NOTE: This is WIP, Experiental and eats performance like hell rn
 
 		table pulseEffect - A table for the pulse effect. NOTE: This is still WIP and should not be used.
 		-> Entity entity - A entity that should pulse
@@ -842,7 +1011,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		if IsEntity(soundData.entity) then -- If they gave us an entity, copy it over and use it to support clientside entities since we cannot use the EntIndex for thoes.
 			channelData.ent = soundData.entity
 		end
-		UpdateChannelPosition(channel, channelData) -- Update the channel position so that when we play it, there won't be a audio bug for 1 frame where it would play from the world origin.
+		UpdateChannelPositionAndVolume(channel, channelData) -- Update the channel position so that when we play it, there won't be a audio bug for 1 frame where it would play from the world origin.
 
 		if not soundData.noplay and (timeLeft > 0 or soundData.looping) then -- We call Play only here since some settings might change how it can be heard.
 			channel:Play()
@@ -989,9 +1158,8 @@ local function DeltaMerge(deltaTable, baseTable)
 end
 deltaMerge = DeltaMerge
 
-net.Receive("slashCo_AudioSystem_PlaySound", function()
-	local isDelta = net.ReadBool()
-	local soundData = {
+local function ReadSoundData()
+	return {
 		soundPath = ReadSoundField(net.ReadString),
 		fallbackSoundPath = ReadSoundField(net.ReadString),
 		entity = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS),
@@ -1020,26 +1188,11 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 		boundConVar = ReadSoundField(net.ReadString),
 		pulseEffect = ReadSoundField(ReadPulseEffect),
 		disableUniqueToEntity = ReadSoundField(net.ReadBool),
-		disableAutoRemove = ReadSoundField(net.ReadBool),
+		raytraced = ReadSoundField(net.ReadBool),
 	}
+end
 
-	local identifier = soundData.identifier or soundData.soundPath
-	if isDelta then
-		local baseTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
-		if baseTable then
-			DeltaMerge(soundData, baseTable)
-		else
-			-- Uh oh... Fuck... How did this happen?
-		end
-	else
-		SlashCo.AudioSystem.DeltaSoundCache[identifier] = table.Copy(soundData)
-		net.Start("slashCo_AudioSystem_AcknowledgeDelta")
-			net.WriteString(identifier)
-		net.SendToServer()
-	end
-
-	PrintTable(soundData)
-
+local function PlayServerReceivedSound(soundData)
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
 	-- While clientside, the channel could be moved after PlaySound was called so if we forced it into mono we could break things.
 	if soundData.entity ~= nil and soundData.entity == SlashCo.AudioSystem.LocalEntIndex then
@@ -1049,6 +1202,62 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 	soundData.isServerside = true -- Sound was played by the server.
 
 	SlashCo.AudioSystem.PlaySound(soundData)
+end
+
+local nextMissID = 0
+local deltaMissRecovery = {}
+net.Receive("slashCo_AudioSystem_MissingDelta", function()
+	local identifier = net.ReadString()
+	local missID = net.ReadUInt(32)
+
+	local soundData = deltaMissRecovery[missID]
+	if not soundData then return end -- We failed to get the sound data that we had received on delta miss?!?
+
+	local deltaData = ReadSoundData()
+	SlashCo.AudioSystem.DeltaSoundCache[identifier] = table.Copy(deltaData)
+	deltaMissRecovery[missID] = nil
+
+	DeltaMerge(soundData, deltaData)
+
+	net.Start("slashCo_AudioSystem_AcknowledgeDelta")
+		net.WriteString(identifier)
+	net.SendToServer()
+
+	-- print("Received delta recovery")
+	PlayServerReceivedSound(soundData)
+end)
+
+net.Receive("slashCo_AudioSystem_PlaySound", function()
+	local isDelta = net.ReadBool()
+	local soundData = ReadSoundData()
+	local identifier = soundData.identifier or soundData.soundPath
+	if isDelta then
+		local baseTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
+		if baseTable then
+			DeltaMerge(soundData, baseTable)
+		else
+			-- Uh oh... Fuck... How did this happen? Normally this CANNOT happen! This is purely for absolute safety!
+			local missID = nextMissID
+			nextMissID = nextMissID + 1
+
+			deltaMissRecovery[nextMissID] = soundData
+
+			net.Start("slashCo_AudioSystem_MissingDelta")
+				net.WriteString(identifier)
+				net.WriteUInt(missID, 32)
+			net.SendToServer()
+			-- print("Triggering delta recovery")
+			return -- The server will resend the delta to recover from our failure after which we can play it properly.
+		end
+	else
+		SlashCo.AudioSystem.DeltaSoundCache[identifier] = table.Copy(soundData)
+		net.Start("slashCo_AudioSystem_AcknowledgeDelta")
+			net.WriteString(identifier)
+		net.SendToServer()
+	end
+
+	-- PrintTable(soundData)
+	PlayServerReceivedSound(soundData)
 end)
 
 net.Receive("slashCo_AudioSystem_StopSound", function()
@@ -1072,4 +1281,6 @@ end)
 
 net.Receive("slashCo_AudioSystem_EntityRemoved", function()
 	local entIndex = net.ReadUInt(MAX_EDICT_BITS)
+
+	SlashCo.AudioSystem.StopSound(nil, 1, entIndex)
 end)

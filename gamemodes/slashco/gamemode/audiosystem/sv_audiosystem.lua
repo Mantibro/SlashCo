@@ -36,6 +36,7 @@ local function WriteDeltaSoundField(value, deltaValue, writeFunc, ...)
 	local isNil = value == nil or value == deltaValue
 	net.WriteBool(isNil)
 	if not isNil then
+		-- print("Writing delta value", type(value), value)
 		writeFunc(value, ...)
 	end
 end
@@ -86,6 +87,7 @@ local function SendToPlayersWithDelta(playerList, soundData, deltaList)
 		WriteDeltaSoundField(soundData.boundConVar, deltaList.boundConVar, net.WriteString)
 		WriteDeltaSoundField(soundData.pulseEffect, deltaList.pulseEffect, WriteDeltaPulseEffect)
 		WriteDeltaSoundField(soundData.disableUniqueToEntity, deltaList.disableUniqueToEntity, net.WriteBool)
+		WriteDeltaSoundField(soundData.raytraced, deltaList.raytraced, net.WriteBool)
 		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 	if not playerList then
 		net.Broadcast()
@@ -94,9 +96,12 @@ local function SendToPlayersWithDelta(playerList, soundData, deltaList)
 	end
 end
 
-local function SendToPlayersWithNoDelta(playerList, soundData)
-	net.Start("slashCo_AudioSystem_PlaySound", soundData.unreliable or false)
-		net.WriteBool(false)
+local function SendToPlayersWithNoDelta(playerList, soundData, manualSend)
+	if not manualSend then -- In case we are calling this for delta recovery
+		net.Start("slashCo_AudioSystem_PlaySound", soundData.unreliable or false)
+			net.WriteBool(false)
+	end
+
 		WriteSoundField(soundData.soundPath, net.WriteString)
 		WriteSoundField(soundData.fallbackSoundPath, net.WriteString)
 		WriteSoundField(soundData.entity, WriteEntIndex)
@@ -125,7 +130,9 @@ local function SendToPlayersWithNoDelta(playerList, soundData)
 		WriteSoundField(soundData.boundConVar, net.WriteString)
 		WriteSoundField(soundData.pulseEffect, WritePulseEffect)
 		WriteSoundField(soundData.disableUniqueToEntity, net.WriteBool)
+		WriteSoundField(soundData.raytraced, net.WriteBool)
 		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
+	if manualSend then return end
 	if not playerList then
 		net.Broadcast()
 	else
@@ -188,6 +195,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 				end
 
 				if deltaList[identifier] then
+					-- print("Added for delta update " .. ply:Name())
 					table.insert(deltaPlayers, ply)
 					revDeltaPlayers[ply] = true
 				end
@@ -204,16 +212,20 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		end
 
 		if #noDeltaPlayers > 0 then
+			-- print("We had no delta for " .. #noDeltaPlayers)
 			SendToPlayersWithNoDelta(noDeltaPlayers, soundData)
 		end
 	else
 		SendToPlayersWithNoDelta(nil, soundData)
 		deltaTable = {}
-	end
+		-- print("We had no delta :sob:")
 
-	DeltaMerge(deltaTable, soundData)
+		-- Yes, this is not the best way, we should probably ALWAYS update the delta though I don't like that idea really as then delta recover gets tricky.
+		-- Also really only position & entity fields should change.
+		DeltaMerge(deltaTable, soundData)
 	
-	SlashCo.AudioSystem.DeltaSoundCache[identifier] = deltaTable
+		SlashCo.AudioSystem.DeltaSoundCache[identifier] = deltaTable
+	end
 
 	--[[table.insert(SlashCo.AudioSystem.Sounds, {
 		filePath = soundPath,
@@ -265,6 +277,23 @@ net.Receive("slashCo_AudioSystem_AcknowledgeDelta", function(_, ply)
 	else
 		-- Player tried to acknowledge a sound for delta when we as the server don't even know it?!? How...
 	end
+end)
+
+util.AddNetworkString("slashCo_AudioSystem_MissingDelta")
+net.Receive("slashCo_AudioSystem_MissingDelta", function(_, ply)
+	local identifier = net.ReadString()
+	local missID = net.ReadUInt(32)
+	SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = nil -- Yeet, since you can't do anything :(
+
+	local deltaTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
+	if not deltaTable then return end -- GG
+
+	net.Start("slashCo_AudioSystem_MissingDelta")
+		net.WriteString(identifier)
+		net.WriteUInt(missID, 32) -- The client needs this to keep track in case multiple delta misses happen
+		SendToPlayersWithNoDelta(ply, deltaTable, true)
+	net.Send(ply)
+	-- print("Sent delta recovery")
 end)
 
 util.AddNetworkString("slashCo_AudioSystem_EntityRemoved")
