@@ -1,23 +1,16 @@
 local ITEM = {}
 
 ITEM.Model = "models/slashco/porchlight.mdl"
-ITEM.Name = "PorchLight"
-ITEM.EntClass = "sc_porchlight"
+ITEM.Name = "PorchLight (Broken)"
+ITEM.EntClass = "sc_brokenporchlight"
 ITEM.Price = 150
-ITEM.Description = "PorchLight_desc"
+ITEM.Description = "BrokenPorchLight_desc"
+ITEM.ToolTip = "BrokenPorchLight_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.ReplacesWorldProps = true
+ITEM.IsSpawnable = false
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
-end
-function ITEM.OnUse(ply)
-	ply:EmitSound("Weapon_Crowbar.Miss")
-	ply:ViewPunch(Angle(-10, 0, 0))
-	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-	SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
-	droppeditem:SetOwner(ply)
-	droppeditem:DropToFloor()
-	droppeditem:BecomeTheSun()
 end
 ITEM.ViewModel = {
 	model = ITEM.Model,
@@ -56,4 +49,4 @@ ITEM.WorldModel = {
 	bodygroup = {}
 }
 
-SlashCo.RegisterItem(ITEM, "PorchLight")
+SlashCo.RegisterItem(ITEM, "PorchLight (Broken)")

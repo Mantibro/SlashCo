@@ -86,9 +86,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("CanChase", false)
 		slasher:SetNWBool("CanKill", false)
 
-		local numP = team.NumPlayers(TEAM_SURVIVOR)
-		if numP < 2 and numP > 0 then
-			slasher.TargetPlayer = team.GetPlayers(TEAM_SURVIVOR)[1]:SteamID64()
+		local survivors = team.GetPlayers(TEAM_SURVIVOR)
+		if #survivors == 1 then
+			slasher.TargetPlayer = survivors[1]:SteamID64()
 
 			slasher:SetNWBool("CanChase", true)
 			slasher:SetNWBool("CanKill", true)
@@ -412,6 +412,7 @@ function SLASHER.InitHud(_, hud)
 				hook.Add("HUDPaint", "SlashCoPreyReal", function()
 					if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not IsValid(targetEnt) then
 						hook.Remove("HUDPaint", "SlashCoPreyReal")
+						return
 					end
 
 					targetPaint(targetEnt)

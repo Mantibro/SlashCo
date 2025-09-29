@@ -858,8 +858,8 @@ end)
 		number fadeIn - How many seconds it takes for the song to fade in at the start of it.
 		number fadeOut - How many seconds before the ending it should start to fade out, and when it faded out the channel is destroyed.
 		number fadeOutStart - How many seconds after the sound start it should begin to fade out. Use negative number to use a time based off the end of the sound instead of the start.
-		boolean forceMono - Forces the sound to play as mono. Perferably use forceSterio since it won't butcher the sound quality.
-		boolean forceSterio - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
+		boolean forceMono - Forces the sound to play as mono. Perferably use forceStereo since it won't butcher the sound quality.
+		boolean forceStereo - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
 		boolean noWorldSpace - If set it will use the entities EyePos instead of falling back to using it's WorldSpaceCenter position.
 		boolean dynamicPan - If set it will calculate the pan for the channel giving the sound a 3D effect.
 		string fallbackSoundPath - The fallback sound when the bound ConVar is disabled.
@@ -883,9 +883,9 @@ end)
 		startDistance and startEndDistance act as a distance to fadeOut the volume when you get too close, where startEndDistance is the point when the sound is on full volume while at startDistance it will be completely faded out.
 		See the comment above the CalculateFadeVolume for reference.
 
-		all distance fields work regardless of the channel being in 3D or not, so you can use forceSterio and still use minDistance/maxDistance without issues.
+		all distance fields work regardless of the channel being in 3D or not, so you can use forceStereo and still use minDistance/maxDistance without issues.
 
-		You can combine forceSterio and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in sterio/using multiple channels instead of the normal 3D that forces them into mono.
+		You can combine forceStereo and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in sterio/using multiple channels instead of the normal 3D that forces them into mono.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
 	local soundPath = soundData.soundPath
@@ -943,7 +943,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	end
 
 	-- Useful when it has a position/entity but you still want to play it as sterio.
-	if soundData.forceSterio then
+	if soundData.forceStereo then
 		useMode = ""
 	end
 
@@ -1182,7 +1182,7 @@ local function ReadSoundData()
 		fadeOut = ReadSoundField(net.ReadFloat),
 		fadeOutStart = ReadSoundField(net.ReadFloat),
 		forceMono = ReadSoundField(net.ReadBool),
-		forceSterio = ReadSoundField(net.ReadBool),
+		forceStereo = ReadSoundField(net.ReadBool),
 		noWorldSpace = ReadSoundField(net.ReadBool),
 		dynamicPan = ReadSoundField(net.ReadBool),
 		boundConVar = ReadSoundField(net.ReadString),
@@ -1196,7 +1196,7 @@ local function PlayServerReceivedSound(soundData)
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
 	-- While clientside, the channel could be moved after PlaySound was called so if we forced it into mono we could break things.
 	if soundData.entity ~= nil and soundData.entity == SlashCo.AudioSystem.LocalEntIndex then
-		soundData.forceSterio = true -- We are playing the sound on the local player, so we switch it to sterio for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
+		soundData.forceStereo = true -- We are playing the sound on the local player, so we switch it to sterio for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
 	end
 
 	soundData.isServerside = true -- Sound was played by the server.

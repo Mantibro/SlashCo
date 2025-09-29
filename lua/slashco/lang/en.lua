@@ -209,6 +209,9 @@ SlashCo.LangTable["BeerKeg_desc"] = "Stuns all slashers nearby deafening them fo
 SlashCo.LangTable["PorchLight"] = "The Porchlight"
 SlashCo.LangTable["PorchLight_desc"] = "Purpose-built for use at 1 AM in suburban environments, just to make sure you can see what's outside your front door. With the power of 20,000 Watts, nothing can hide in the dark anymore!"
 
+SlashCo.LangTable["PorchLight (Broken)"] = "The Porchlight (Broken)"
+SlashCo.LangTable["BrokenPorchLight_desc"] = "BRO, THE ELECTRIC BILL"
+
 SlashCo.LangTable["CostcoPizza"] = "Costco Frozen Pizza"
 SlashCo.LangTable["CostcoPizza_desc"] = "It would seem someone froze this box a bit TOO solid. No luck in trying to eat it, you can use it as a riot shield instead."
 

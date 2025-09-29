@@ -35,6 +35,7 @@ SLASHER.ThrowStrengthForward = 1600 -- forward Velocity used when throwing a pla
 SLASHER.ThrowStrengthUp = 800 -- up Velocity used when throwing a player
 SLASHER.ChaseDecreaseMult = 14 -- Multiplier used when decreasing the chase duration
 SLASHER.PunchSlowdownDiv = 2 -- Used to divide FrameTime making the PunchSlowdown last longer, the lower, the shorter the Slowdown becomes. 
+SLASHER.ChaseSpeedReduction = 0
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
@@ -43,6 +44,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ThrowStrengthForward = 1600 + (SO * 450)  + (30 * additionalSurvivors)
 	SLASHER.ThrowStrengthUp = 800 + (SO * 150) + (10 * additionalSurvivors)
 	SLASHER.PunchSlowdownDiv = math.max((2 / SO) - (0.05 * additionalSurvivors), 0.5)
+	SLASHER.ChaseSpeedReduction = (SO * 7) + (0.5 * additionalSurvivors)
 
 	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
 	SLASHER.ChaseSpeed = 325 + (7.5 * additionalSurvivors)
@@ -105,8 +107,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		slasher.TimeChasing = ChaseTime + FrameTime()
 
-		slasher:SetRunSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - (SO * 7)))) / PunchSD)
-		slasher:SetWalkSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - (SO * 7)))) / PunchSD)
+		slasher:SetRunSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - SLASHER.ChaseSpeedReduction))) / PunchSD)
+		slasher:SetWalkSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - SLASHER.ChaseSpeedReduction))) / PunchSD)
 
 		if slasher.ChaseSound == nil then
 			slasher:PlayGlobalSound("slashco/slasher/borgmire/borgmire_breath_chase.mp3", 70, nil, true)

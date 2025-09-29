@@ -327,6 +327,13 @@ else
 		if GameData.IsLan then
 			SlashCo.SetupLanOverrides()
 		end
+
+		local FogController = ents.FindByClass("env_fog_controller")[1]
+		if IsValid(FogController) then
+			local keys = FogController:GetKeyValues()
+			local col = string.Split(keys["fogcolor"], " ")
+			SlashCo.SetGlobalFogColor(Color(col[1], col[2], col[3]))
+		end
 	end
 end
 

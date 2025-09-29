@@ -145,6 +145,14 @@ local function drawItemDisplay(item, notUsable, moveUp, shift)
 	surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.95 - 24 - y, parsedItem:GetWidth() + 8, 27)
 	parsedItem:Draw(ScrW() * 0.975 - 4 - shift, ScrH() * 0.95 - y, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
+	if SlashCoItems[item].ToolTip then
+		local str = string.format("<font=TVCD>[%s%s%s]</font>", space, string.upper(SlashCo.Language(SlashCoItems[item].ToolTip)), space)
+		local parsedItem = markup.Parse(str)
+		surface.SetDrawColor(100, 100, 0, 255)
+		surface.DrawRect(ScrW() * 0.975 - parsedItem:GetWidth() - shift - 8, ScrH() * 0.962 - y, parsedItem:GetWidth() + 8, 27)
+		parsedItem:Draw(ScrW() * 0.975 - 4 - shift, ScrH() * 0.962 + 24 - y, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	end
+
 	if notUsable then
 		return true, parsedItem:GetWidth() + 48
 	end

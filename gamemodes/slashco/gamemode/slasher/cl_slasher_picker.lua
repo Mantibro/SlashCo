@@ -23,8 +23,8 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 	local SlasherPickingDANGER = SlashCo.DangerLevel.Unknown
 	local bannedSlashers = {}
 	if pickSlasherTbl ~= nil then
-		--SlasherPickingCLASS = pickSlasherTbl.slasherClass
-		--SlasherPickingDANGER = pickSlasherTbl.slasherDanger
+		SlasherPickingCLASS = pickSlasherTbl.slasherClass
+		SlasherPickingDANGER = pickSlasherTbl.slasherDanger
 		bannedSlashers = pickSlasherTbl.bannedSlashers
 	end
 

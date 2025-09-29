@@ -232,7 +232,7 @@ function ENT:BehaveUpdate(interval)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/benadryl/benadryl_high" .. math.random(1, 4) .. ".ogg",
 			identifier = "HatManLookedAt",
-			forceSterio = true, -- Better quality :3
+			forceStereo = true, -- Better quality :3
 			entity = 0,
 			sendToEntity = target, -- only play it for this specific player
 			volume = 1,
