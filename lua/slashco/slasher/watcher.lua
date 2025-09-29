@@ -45,7 +45,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	SLASHER.SurveyLength = 10 + (SO * 10) + (1 * additionalSurvivors)
-	slasher.SurveyCooldown = 100 + (SO * 35) + (2.5 * additionalSurvivors)
+	SLASHER.SurveyCooldown = 100 + (SO * 35) + (2.5 * additionalSurvivors)
 	SLASHER.SurveyDisplayLength = 5 + (SO * 5)
 end
 
