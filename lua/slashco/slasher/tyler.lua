@@ -487,10 +487,10 @@ local function DestroyItem(slasher, target)
 	dissolver:Fire("Kill", "", 1)
 end
 
-local function StopTyperChase(slasher, TylerSwitchForm)
+local function StopTyperChase(slasher, switchForm)
 	if IsValid(slasher) then
 		slasher:Freeze(false)
-		if not EndlessChase() and TylerSwitchForm then
+		if not EndlessChase() and switchForm then
 			SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
 			TylerSwitchForm(slasher, TYLER_SPECTER)
 		end
