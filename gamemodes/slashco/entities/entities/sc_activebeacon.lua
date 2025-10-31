@@ -80,6 +80,7 @@ if SERVER then
 
 				self:SetArmingBeacon(false)
 				SlashCo.BeaconArming = nil
+				SlashCo.CurRound.DistressBeaconUsed = false
 				self:PhysicsInit(SOLID_VPHYSICS)
 				self:SetMoveType(MOVETYPE_VPHYSICS)
 
