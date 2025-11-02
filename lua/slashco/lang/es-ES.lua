@@ -77,6 +77,8 @@ SlashCo.LangTable["map_already_selected"] = "Este Mapa ya fue elegido."
 SlashCo.LangTable["map_notenough"] = "No tienes suficientes puntos para garantizar el Mapa."
 SlashCo.LangTable["map_guaranteed_to"] = "%s gasto %s puntos para poner la mision en %s."
 
+SlashCo.LangTable["ask_to_become_slasher"] = "Quieres ser el Slasher?"
+
 SlashCo.LangTable["playermodel_choose"] = "[ESCOGE...]"
 
 SlashCo.LangTable["GameInfo"] = "[%s] INFORMACIÓN"
@@ -165,7 +167,8 @@ SlashCo.LangTable["Brick_desc"] = "Un Bloque de Cemento que nos robamos, tíralo
 SlashCo.LangTable["Cookie"] = "Galleta"
 SlashCo.LangTable["Cookie_desc"] = "Puedes llenar los generadores más rápido Temporariamente.\nUn Slasher específico le encantaría una."
 
-SlashCo.LangTable["DeathWard"] = "Tótem Inmortal"
+SlashCo.LangTable["DeathWard"] = "Totem Inmortal"
+SlashCo.LangTable["DeathWard (Used)"] = "Totem Inmortal (Usado)"
 SlashCo.LangTable["DeathWard_desc"] = "Puedes regresar de la muerte, pero solo una vez y no puedes aguantar ningún otro Equipo mientras activo. Ocasionalmente recibirás vida extra mientras lo aguantas."
 
 SlashCo.LangTable["DevilDie"] = "Dado del Diablo"
@@ -207,7 +210,26 @@ SlashCo.LangTable["NightVisionGoggles_desc"] = "Te proporciona vision nocturna a
 SlashCo.LangTable["TeslaCoil"] = "Rayo Tesla"
 SlashCo.LangTable["TeslaCoil_desc"] = "Paraliza a todos los slashers durante 15 segundos"
 
-SlashCo.LangTable["Pregnant"] = "EMBARAZADO"
+SlashCo.LangTable["BeerKeg"] = "Barril de Cerveza"
+SlashCo.LangTable["BeerKeg_desc"] = "Aturde y ensordece a todos los slashers cercanos por minimo 25 segundos."
+
+SlashCo.LangTable["PorchLight"] = "Luz de Porche"
+SlashCo.LangTable["PorchLight_desc"] = "Con el poder de 20,000 Watts, nada podra esconderce en la oscuridad!"
+
+SlashCo.LangTable["PorchLight (Broken)"] = "Luz de Porche (Rota)"
+SlashCo.LangTable["BrokenPorchLight_desc"] = "BRO, THE ELECTRIC BILL"
+
+SlashCo.LangTable["CostcoPizza"] = "Pizza congelada del Costco"
+SlashCo.LangTable["CostcoPizza_desc"] = "Parece que alguien congelo esta pizza DEMASIADO. No te molestes en intentar comerla, pero puedes usarla como escudo."
+
+SlashCo.LangTable["JelloCup"] = "Gelatina Naranja"
+SlashCo.LangTable["JelloCup_desc"] = "Esto definitivamente esta vencido. Simplemente no tomas una gelatina misteriosa de un drogadicto y esperas que este rico. Consumirlo te curara un poco y aumentara temporalmente tu resistencia."
+
+SlashCo.LangTable["Newports"] = "Newport Mentolados"
+SlashCo.LangTable["Newports_desc"] = "USA puede intentar todo lo que quiera banear estos cigarros, pero aqui en SLASHCO NO lo toleraremos. Dicen que si te comes el paquete entero ganaras vision nocturna."
+
+SlashCo.LangTable["JonklerCart"] = "Carta Malvada del Jonkler"
+SlashCo.LangTable["JonklerCart_desc"] = "Un parlante que hace ruido, cualquier cosa cercana a el se llenara de furia al instante, incluyendo al Slasher."
 
 --GameInfo
 
@@ -258,6 +280,8 @@ SlashCo.LangTable["cur_assignment"] = "Misión: %s"
 SlashCo.LangTable["slasher_assess"] = "-Asesoría de Slasher-"
 
 SlashCo.LangTable["offering_idle"] = "Has una Ofrenda"
+
+SlashCo.LangTable["server_announcement"] = "ANUNCIO"
 
 --Survivor
 SlashCo.LangTable["item_use"] = "[%s] USAR"
