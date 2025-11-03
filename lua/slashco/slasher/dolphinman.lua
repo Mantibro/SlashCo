@@ -77,16 +77,18 @@ function SLASHER.OnTickBehaviour(slasher)
 	local HuntPower = slasher.HuntPower or 0 --Hunt power
 	local hunt_boost = 0
 	
-	if math.random(1, 1000) == 1 then
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/dolfin/dolfin_click" .. math.random(1, 2) .. ".ogg",
-			identifier = "DolfinClick",
-			minDistance = 350,
-			maxDistance = 800,
-			entity = slasher,
-			volume = 1,
-			fadeIn = 0,
-		})
+	if not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
+		if math.random(1, 1000) == 1 then
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/dolfin/dolfin_click" .. math.random(1, 2) .. ".ogg",
+				identifier = "DolfinClick",
+				minDistance = 350,
+				maxDistance = 800,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+		end
 	end
 
 	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
