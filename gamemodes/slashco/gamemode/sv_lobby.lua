@@ -49,7 +49,7 @@ local function lobbySaveCurData()
 	local slasher1id = SlashCo.LobbyData.PickedSlasher
 	local slasher2id = GetRandomSlasher()
 
-	print("Now beginning database...")
+	print("[SlashCo] Now beginning database...")
 	if not sql.TableExists("slashco_table_basedata") then
 		--Create the database table
 
@@ -116,8 +116,7 @@ local function lobbySaveCurData()
 		--end
 	end
 
-	print(sql.LastError())
-	print("DATA SAVED.")
+	print("[SlashCo] DATA SAVED. (" .. (sql.LastError() or "") .. ")")
 
 	SlashCo.ChangeMap(SlashCo.LobbyData.SelectedMap)
 end
@@ -229,8 +228,6 @@ end
 -- A table containing all players that are allowed to pick a slasher, if they send the mantislashco_SelectSlasher net message without being in here, they will be rejected.
 SlashCo.AllowedPlayerSlasherSelection = SlashCo.AllowedPlayerSlasherSelection or {}
 local function BeginSlasherSelection()
-	print("Slasher Selecting!")
-	
 	-- We did this previously clientside, but there's no reason to go server -> client -> server when the client gets no choice.
 	if SlashCo.LobbyData.SelectedSlasherInfo.ID ~= 0 then
 		SlashCo.ChooseTheSlasherLobby(SlashCo.LobbyData.SelectedSlasherInfo.ID)
@@ -306,45 +303,24 @@ local function lobbyRoundSetup()
 		if SlashCo.LobbyData.PotentialSlashers[1] == nil then
 			--If no none readied as Slasher, the slasher will be randomly picked from the survivor-ready players.
 
-			local randid = math.random(1, #SlashCo.LobbyData.PotentialSurvivors)
-
-			for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
-				if i == randid then
-					table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
-					print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Slasher.")
-				else
-					table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
-					print("(Debug) " .. player.GetBySteamID64(SlashCo.LobbyData.PotentialSurvivors[i].steamid):GetName() .. " has been assigned Survivor.")
-				end
-			end
+			local randomSlasher = table.remove(SlashCo.LobbyData.PotentialSurvivors, math.random(1, #SlashCo.LobbyData.PotentialSurvivors))
+			table.insert(SlashCo.LobbyData.AssignedSlashers, randomSlasher)
+			print("(Debug) " .. player.GetBySteamID64(randomSlasher.steamid):GetName() .. " has been assigned Slasher.")
 		elseif SlashCo.LobbyData.PotentialSurvivors[1] == nil then
 			--If no none readied as Survivor, the slasher will be randomly picked from the slasher-ready players.
 
-			local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
-
-			for i = 1, #SlashCo.LobbyData.PotentialSlashers do
-				if i == randid then
-					table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-				else
-					table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-				end
-			end
+			local randomSlasher = table.remove(SlashCo.LobbyData.PotentialSlashers, math.random(1, #SlashCo.LobbyData.PotentialSlashers))
+			table.insert(SlashCo.LobbyData.AssignedSlashers, randomSlasher)
 		else
 			--If the ready states are mixed, pick the slasher from slasher-ready players.
+			-- RaphaelIT7: This case shouldn't be possible?
 
-			local randid = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
-			for i = 1, #SlashCo.LobbyData.PotentialSlashers do
-				if i == randid then
-					table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-				else
-					table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSlashers[i].steamid })
-				end
-			end
-
-			for i = 1, #SlashCo.LobbyData.PotentialSurvivors do
-				table.insert(SlashCo.LobbyData.AssignedSurvivors, { steamid = SlashCo.LobbyData.PotentialSurvivors[i].steamid })
-			end
+			local randomSlasher = table.remove(SlashCo.LobbyData.PotentialSlashers, math.random(1, #SlashCo.LobbyData.PotentialSlashers))
+			table.insert(SlashCo.LobbyData.AssignedSlashers, randomSlasher)
 		end
+
+		-- RaphaelIT7: If you later use table.remove on AssignedSurvivors or PotentialSurvivors the change affects both since both variables are the same table
+		SlashCo.LobbyData.AssignedSurvivors = SlashCo.LobbyData.PotentialSurvivors -- Move table since its now finalized (Slashers were removed)
 	end
 
 	--[[if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
@@ -358,21 +334,21 @@ local function lobbyRoundSetup()
 	if SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
 		--Duality Slasher
 
-		local dual_random = 0
-
-		:: reroll ::
-
-		dual_random = math.random(1, #SlashCo.LobbyData.PotentialSlashers)
-		local lobbyPlys = team.GetPlayers(TEAM_LOBBY)
-
-		if lobbyPlys[dual_random]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
-			goto reroll
+		local randomPly
+		if #SlashCo.LobbyData.PotentialSlashers > 0 then
+			randomPly = table.remove(SlashCo.LobbyData.PotentialSlashers, math.random(1, #SlashCo.LobbyData.PotentialSlashers))
+		elseif #SlashCo.LobbyData.PotentialSurvivors > 1 then -- There must be more than 1 survivor left!
+			randomPly = table.remove(SlashCo.LobbyData.PotentialSurvivors, math.random(1, #SlashCo.LobbyData.PotentialSurvivors))
 		end
 
-		table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = lobbyPlys[dual_random]:SteamID64() })
+		if randomPly then
+			table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = randomPly:SteamID64() })
 
-		local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
-		p:ChatText("second_slasher")
+			local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
+			p:ChatText("second_slasher")
+		else
+			print("[SlashCo] Found no player that could fill the second slasher slot")
+		end
 	end
 
 	--Finalize teams
@@ -387,7 +363,7 @@ local function lobbyRoundSetup()
 			ply:Spawn()
 			ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
 
-			print("Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
+			print("[SlashCo] Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
 		end
 
 		for i = 1, #SlashCo.LobbyData.AssignedSlashers do
