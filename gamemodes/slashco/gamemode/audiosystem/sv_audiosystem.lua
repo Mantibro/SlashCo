@@ -51,7 +51,7 @@ local function SendToPlayersWithDelta(playerList, soundData, deltaList)
 	local identifier = soundData.identifier or soundData.soundPath
 	net.Start("slashCo_AudioSystem_PlaySound", soundData.unreliable or false)
 		net.WriteBool(true)
-		if soundData.identifier == identifier then -- We cannot apply delta to the soundPath if it's the delta identifier!
+		if soundData.soundPath == identifier then -- We cannot apply delta to the soundPath if it's the delta identifier!
 			WriteSoundField(soundData.soundPath, net.WriteString)
 		else
 			WriteDeltaSoundField(soundData.soundPath, deltaList.soundPath, net.WriteString)

@@ -724,7 +724,7 @@ local function UpdateChannelPositionAndVolume(channel, channelData, localPlyPos)
 		--print("3D", channel, channelData.ID, volume)
 	end
 
-	if soundData.raytraced then -- It may change the channel position
+	if soundData.raytraced and channelData.pos then -- It may change the channel position
 		channel:SetPos(channelData.pos)
 	end
 end
