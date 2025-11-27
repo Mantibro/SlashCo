@@ -524,4 +524,64 @@ if not GameData.IsLobby then
 			end
 		end
 	end)
+
+	-- RaphaelIT7: Ambient sound stuff
+	local ambientSounds = {}
+	for k=1, 8 do
+		table.insert(ambientSounds, "clutter" .. k .. ".mp3")
+	end
+
+	for k=1, 10 do
+		table.insert(ambientSounds, "creak" .. k .. ".mp3")
+	end
+
+	for k=1, 7 do
+		table.insert(ambientSounds, "scrape" .. k .. ".mp3")
+	end
+
+	local function randomAmbientVector(minDistance, maxDistance)
+		local x = math.random(minDistance, maxDistance)
+		local y = math.random(minDistance, maxDistance)
+		local z = math.random(minDistance, maxDistance) / 2
+
+		return Vector(
+			(math.random(0, 1) == 1 and x or -x),
+			(math.random(0, 1) == 1 and y or -y),
+			(math.random(0, 1) == 1 and z or -z)
+		)
+	end
+
+	timer.Create("SlashCo:RandomAmbientSound", 1, 0, function()
+		if SlashCo.State ~= SlashCo.States.IN_GAME then return end -- Not in game, so lets do nothing.
+
+		for _, ply in player.Iterator() do
+			local plyTeam = ply:Team()
+
+			local chance = 2
+			if plyTeam == TEAM_SURVIVOR then
+				chance = (GameData.RoundStartSurvivorCount > GameData.BaseMaxSurvivors) and 3 or 1 -- More players = higher chance | less players = lower chance
+			elseif plyTeam == TEAM_SLASHER then
+				chance = (GameData.RoundStartSurvivorCount > GameData.BaseMaxSurvivors) and 1 or 5 -- More players = lower chance | less players = higher chance
+			end
+
+			if math.random(1, 100) > chance then continue end
+			
+			local pos = randomAmbientVector(150, 400)
+			pos:Add(ply:GetPos())
+
+			local soundName = ambientSounds[math.random(1, #ambientSounds)]
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/mapambient/" .. soundName,
+				identifier = "AmbientSound-" .. soundName .. "-" .. ply:EntIndex(),
+				volume = 1,
+				entity = game.GetWorld(),
+				fadeIn = 0,
+				position = pos,
+				minDistance = 250,
+				maxDistance = 500,
+				disableUniqueToEntity = true,
+				deleteWhenDone = true, -- Else we'll have easily 100+ dead channels
+			})
+		end
+	end)
 end
