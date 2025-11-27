@@ -71,9 +71,8 @@ if SERVER then
 
 		if self.activateWalk == true then
 			if SlashCo.CurRound.SlasherEntities[entIndex].PostActivation == false then
-				for s = 1, #team.GetPlayers(TEAM_SLASHER) do
-					local sl = team.GetPlayers(TEAM_SLASHER)[s]
-					sl:ChatPrint("A Bababooey Clone has been tripped!")
+				for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+					slasher:ChatPrint("A Bababooey Clone has been tripped!")
 				end
 			end
 
@@ -97,9 +96,8 @@ if SERVER then
 			if etr.Hit then table.RemoveByValue(SlashCo.CurRound.SlasherEntities, entIndex) self:Remove()  end
 		elseif SlashCo.CurRound.SlasherEntities[entIndex].activateSpook == true then
 			if SlashCo.CurRound.SlasherEntities[entIndex].PostActivation == false then
-				for s = 1, #team.GetPlayers(TEAM_SLASHER) do
-					local sl = team.GetPlayers(TEAM_SLASHER)[s]
-					sl:ChatPrint("A Bababooey Clone has been tripped!")
+				for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+					slasher:ChatPrint("A Bababooey Clone has been tripped!")
 				end
 			end
 
@@ -125,12 +123,10 @@ if SERVER then
 			end)
 		end
 
-		for i = 1, team.NumPlayers(TEAM_SURVIVOR) do
-			local ply = team.GetPlayers(TEAM_SURVIVOR)[i]
-
-			if ply:GetPos():Distance(self:GetPos()) < 150 then
+		for _, survivors in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if survivors:GetPos():Distance(self:GetPos()) < 150 then
 				SlashCo.CurRound.SlasherEntities[entIndex].activateSpook = true
-				self:SetAngles(Angle(0, (ply:GetPos() - self:GetPos()):Angle()[2], 0))
+				self:SetAngles(Angle(0, (survivors:GetPos() - self:GetPos()):Angle()[2], 0))
 			end
 		end
 

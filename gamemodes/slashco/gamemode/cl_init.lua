@@ -495,8 +495,8 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 	for i = 1, #SurvivorTeam do
 		--Survivor team visualization before game start
 
-		for x = 1, #team.GetPlayers(TEAM_SPECTATOR) do
-			if team.GetPlayers(TEAM_SPECTATOR)[x]:SteamID64() == SurvivorTeam[i].id then
+		for _, spectators in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
+			if spectators:SteamID64() == SurvivorTeam[i].id then
 				surface.SetMaterial(SurvivorIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
@@ -520,8 +520,8 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 	for i = 1, #SlasherTeam do
 		--Slashers visualization before game start
 
-		for x = 1, #team.GetPlayers(TEAM_SPECTATOR) do
-			if team.GetPlayers(TEAM_SPECTATOR)[x]:SteamID64() == SlasherTeam[i].s_id then
+		for _, spectators in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
+			if spectators:SteamID64() == SlasherTeam[i].s_id then
 				surface.SetMaterial(KillIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset + 50, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
@@ -729,7 +729,7 @@ hook.Add("Think", "amb_vol", function()
 		AmbientMusic:SetVolume(AmbientVol)
 	end
 
-	if GameData.LocalPlayer:GetNWBool("SurvivorChased") then
+	if IsValid(GameData.LocalPlayer:GetNWEntity("SurvivorChased")) then
 		if AmbientVol > 0 then
 			AmbientVol = AmbientVol - RealFrameTime()
 		end

@@ -372,7 +372,7 @@ function ENT:Think()
 
 	if CurTime() >= self.TimeUntilFueled then
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
-			self.CurrentPourer:AddPoints("working", 5 + (#team.GetPlayers(TEAM_SLASHER) * 15))
+			self.CurrentPourer:AddPoints("working", 5 + (team.NumPlayers(TEAM_SLASHER) * 15))
 		else
 			self.CurrentPourer:AddPoints("working")
 		end

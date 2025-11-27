@@ -66,11 +66,8 @@ function ITEM.OnUse(ply)
 				util.Effect("TeslaZap", healfx)
 			end
 		elseif rand == 4 then
-			if team.NumPlayers(TEAM_SLASHER) < 1 then
-				return
-			end
-
 			local slasher = team.GetPlayers(TEAM_SLASHER)[1]
+			if not IsValid(slasher) then return end
 
 			ply:SetPos(slasher:LocalToWorld(Vector(100, 0, 10)))
 			ply:AddEffect("Slowness", 5)

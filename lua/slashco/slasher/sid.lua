@@ -773,9 +773,8 @@ end
 function SLASHER.SidRage(ply)
 	local pos = ply:GetPos()
 
-	for i = 1, #team.GetPlayers(TEAM_SLASHER) do
-		local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
-		local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+	for _, slasher = team.GetPlayers(TEAM_SLASHER) do
+		local slasherid = slasher:SteamID64()
 
 		if SlashCoSlashers[slasher:GetNWString("Slasher")].ID ~= 2 then
 			return

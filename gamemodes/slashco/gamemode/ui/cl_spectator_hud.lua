@@ -63,7 +63,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 		if GameData.IsNewPlayer then
 			blip = SlashCo.Language("newplayer_spawnnotice", "Q") --"Press [Q] to Spawn"
 		else
-			if #team.GetPlayers(TEAM_LOBBY) > (GameData.MaxPlayers - 1) then
+			if team.NumPlayers(TEAM_LOBBY) > (GameData.MaxPlayers - 1) then
 				blip = "☓ [Q] ☓"
 			else
 				flash = flash + RealFrameTime()

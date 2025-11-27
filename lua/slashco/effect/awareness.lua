@@ -80,6 +80,7 @@ if CLIENT then
 		for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			ply:DrawModel()
 		end
+
 		for _, v in ipairs(ents.FindByClass("sc_generator")) do
 			v:DrawModel()
 		end

@@ -177,10 +177,10 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 			slasher:EmitSound("slashco/slasher/amogus/amogus_sus.mp3")
 
-			local s = team.GetPlayers(TEAM_SURVIVOR)
+			local survivors = team.NumPlayers(TEAM_SURVIVOR)
 			local modelname = "models/slashco/survivor/male_01.mdl"
-			if #s > 0 then
-				modelname = s[math.random(1, #s)]:GetModel()
+			if survivors > 0 then
+				modelname = s[math.random(1, survivors)]:GetModel()
 			end
 			slasher:SetModel(modelname)
 

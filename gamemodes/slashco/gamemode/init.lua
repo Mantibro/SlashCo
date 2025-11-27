@@ -612,7 +612,7 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 		--SlashCo.PlayerData[pid].Lives = 1
 	end
 
-	if new == TEAM_LOBBY and #team.GetPlayers(TEAM_LOBBY) > 5 then
+	if new == TEAM_LOBBY and team.NumPlayers(TEAM_LOBBY) > 5 then
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()
 	end

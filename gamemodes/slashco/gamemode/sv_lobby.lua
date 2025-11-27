@@ -323,7 +323,7 @@ local function lobbyRoundSetup()
 		SlashCo.LobbyData.AssignedSurvivors = SlashCo.LobbyData.PotentialSurvivors -- Move table since its now finalized (Slashers were removed)
 	end
 
-	--[[if #team.GetPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
+	--[[if team.NumPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
 		SlashCo.LobbyData.Offering = 0
 
 		for _, play in ipairs(player.GetAll()) do
@@ -694,7 +694,7 @@ end
 function SlashCo.OfferingVoteSuccess(id)
 	local fail = false
 
-	--[[if id == 4 and #team.GetPlayers(TEAM_SPECTATOR) < 1 then
+	--[[if id == 4 and team.NumPlayers(TEAM_SPECTATOR) < 1 then
 		for _, ply in player.Iterator() do
 			ply:ChatText("offervote_duality_fail")
 			SlashCo.EndOfferingVote(ply)

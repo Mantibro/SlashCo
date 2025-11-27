@@ -158,21 +158,12 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 				find_p = eyeTrace.Entity
 			end
 
-			if IsValid(find_p) and not find_p:GetNWBool("SurvivorChased") then
-				find_p:SetNWBool("SurvivorChased", true)
+			if IsValid(find_p) and not IsValid(find_p:GetNWEntity("SurvivorChased")) then
+				find_p:SetNWEntity("SurvivorChased", slasher)
 			end
 
 			if slasher.CurrentChaseTick > slasher:SlasherValue("ChaseDuration", 10) then
 				SlashCo.StopChase(slasher)
-			end
-
-			if not slasher:GetNWBool("InSlasherChaseMode") then
-				for p = 1, team.NumPlayers(TEAM_SURVIVOR) do
-					local ply = team.GetPlayers(TEAM_SURVIVOR)[p]
-					if ply:GetNWBool("SurvivorChased") then
-						ply:SetNWBool("SurvivorChased", false)
-					end
-				end
 			end
 		end
 
@@ -302,9 +293,9 @@ function SlashCo.StopChase(slasher)
 		SlashCo.AudioSystem.StopSound("ChaseMusic", 5, slasher)
 	end)
 
-	for _, pl in ipairs(player.GetAll()) do
-		if pl:GetNWBool("SurvivorChased") then
-			pl:SetNWBool("SurvivorChased", false)
+	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if ply:GetNWEntity("SurvivorChased") == slasher then
+			ply:SetNWEntity("SurvivorChased", NULL)
 		end
 	end
 end
