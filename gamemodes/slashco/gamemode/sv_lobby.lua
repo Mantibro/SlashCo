@@ -342,7 +342,7 @@ local function lobbyRoundSetup()
 		end
 
 		if randomPly then
-			table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = randomPly:SteamID64() })
+			table.insert(SlashCo.LobbyData.AssignedSlashers, randomPly)
 
 			local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
 			p:ChatText("second_slasher")
@@ -350,6 +350,12 @@ local function lobbyRoundSetup()
 			print("[SlashCo] Found no player that could fill the second slasher slot")
 		end
 	end
+
+	-- Move leftover slashers over
+	for key, slasher in ipairs(SlashCo.LobbyData.PotentialSlashers) do
+		table.insert(SlashCo.LobbyData.AssignedSurvivors, slasher)
+	end
+	SlashCo.LobbyData.PotentialSlashers = {}
 
 	--Finalize teams
 	if SlashCo.LobbyData.AssignedSurvivors[1] ~= nil and SlashCo.LobbyData.AssignedSlashers[1] ~= nil then
