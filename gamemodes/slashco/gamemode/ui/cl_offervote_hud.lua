@@ -1,4 +1,4 @@
-net.Receive("mantislashco_OfferingVoteOut", function()
+net.Receive("SlashCo:OfferingVoteOut", function()
 	local offeror = net.ReadEntity()
 	GameData.OfferingName = net.ReadString()
 	GameData.OfferorName = IsValid(offeror) and offeror:GetName() or nil
@@ -16,7 +16,7 @@ net.Receive("mantislashco_OfferingVoteOut", function()
 	GameData.ShowVoteScreen = true
 end)
 
-net.Receive("mantislashco_OfferingEndVote", function()
+net.Receive("SlashCo:OfferingEndVote", function()
 	local steamID64 = net.ReadUInt64()
 
 	if steamID64 ~= GameData.LocalSteamID64 then
@@ -26,7 +26,7 @@ net.Receive("mantislashco_OfferingEndVote", function()
 	GameData.ShowVoteScreen = false
 end)
 
-net.Receive("mantislashco_OfferingVoteFinished", function()
+net.Receive("SlashCo:OfferingVoteFinished", function()
 	GameData.OfferingRarity = net.ReadUInt(2)
 
 	GameData.ShowOfferingResultScreen = true

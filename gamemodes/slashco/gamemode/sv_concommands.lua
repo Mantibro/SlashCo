@@ -177,7 +177,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 	end
 
 	if not found then
-		table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = steamid, slasherkey = args[1] })
+		table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = steamid, slasherID = args[1] })
 	end
 
 	SlashCo.SelectSlasher(args[1], target:SteamID64())

@@ -139,7 +139,7 @@ function ENT:ChangeCanProgress(amount)
 end
 
 function ENT:SendData(ply)
-	net.Start("mantislashco_GasPourProgress")
+	net.Start("SlashCo:GasPourProgress")
 		net.WriteUInt(TimeToFuel, 8)
 		net.WriteUInt(self.FuelingCan:EntIndex(), MAX_EDICT_BITS) -- NOTE: We require this since we might send this net message before the Entity was networked, so we need to accout for that.
 		net.WriteBool(self.IsFueling)
@@ -224,6 +224,7 @@ function ENT:CheckProgress(dontFailStart)
 		SlashCo.AudioSystem.PlaySound({ -- Let everyone hear that a generator was started
 			soundPath = "slashco/generator_start.mp3",
 			identifier = "GeneratorStart",
+			group = "Generator",
 			minDistance = 1500,
 			maxDistance = 10000,
 			entity = self,
@@ -235,6 +236,7 @@ function ENT:CheckProgress(dontFailStart)
 			SlashCo.AudioSystem.PlaySound({ -- Let everyone hear that a generator was started
 				soundPath = "slashco/generator_loop.mp3",
 				identifier = "GeneratorLoop",
+				group = "Generator",
 				minDistance = 250,
 				maxDistance = 750,
 				entity = self,
@@ -247,6 +249,7 @@ function ENT:CheckProgress(dontFailStart)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/generator_failstart.mp3",
 			identifier = "GeneratorFailedStart",
+			group = "Generator",
 			minDistance = 500,
 			maxDistance = 1500,
 			entity = self,
@@ -269,7 +272,7 @@ function ENT:Use(activator)
 
 		--shift TimeToFuel and TimeUntilFueled
 		local unShift = DefaultTimeToFuel / TimeToFuel
-		TimeToFuel = DefaultTimeToFuel / activator:ItemValue("FuelSpeed", 1)
+		TimeToFuel = DefaultTimeToFuel / activator:ItemValue("FuelSpeed", 1) / activator:PerkValue("FuelSpeed", 1)
 		if self.FuelProgress then
 			self.FuelProgress = self.FuelProgress * unShift * (TimeToFuel / DefaultTimeToFuel)
 		end
@@ -366,6 +369,7 @@ function ENT:Think()
 		self:StopSound("slashco/generator_fill.mp3")
 		return
 	end
+
 	local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
 	self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25 + fuelprog * 40)))
 	self.FuelingCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035 + fuelprog * 10)))

@@ -26,8 +26,9 @@ AddCSLuaFile("cl_limitedzone.lua")
 AddCSLuaFile("sh_bhop.lua")
 AddCSLuaFile("ui/cl_pings.lua")
 AddCSLuaFile("sh_roundpoints.lua")
+AddCSLuaFile("sh_experience.lua")
+AddCSLuaFile("sh_perks.lua")
 AddCSLuaFile("sh_canbeseen.lua")
-AddCSLuaFile("cl_thirdperson.lua")
 AddCSLuaFile("sh_content.lua")
 AddCSLuaFile("sh_player.lua")
 
@@ -55,9 +56,10 @@ include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
 include("sh_bhop.lua")
-include("sv_ghostping.lua")
 include("sv_objectives.lua")
 include("sh_roundpoints.lua")
+include("sh_experience.lua")
+include("sh_perks.lua")
 include("sh_canbeseen.lua")
 include("sh_player.lua")
 include("sv_holylib.lua")
@@ -89,29 +91,13 @@ hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
 end)
 
 function GM:Initialize()
-	--If there is no data folder then make one.
-	if not file.Exists("slashco", "DATA") then
-		print("[SlashCo] The data folder for this gamemode doesn't appear to exist, creating it now.")
-		file.CreateDir("slashco/playerdata")
-
-		--Return to the lobby if no game is in progress and we just loaded in.
-		if SlashCo.State == SlashCo.States.LOBBY and not GameData.IsLobby then
-			SlashCo.GoToLobby()
-			SlashCo.State = SlashCo.States.LOBBY
-		else
-			SlashCo.State = SlashCo.States.IN_GAME
-		end
-	end
-
-	if SERVER then
-		resource.AddFile("resource/fonts/ANKLEPAN.tff")
-		resource.AddFile("resource/fonts/KILOTON1.tff")
-		resource.AddFile("resource/fonts/forcible.tff")
-		resource.AddFile("resource/fonts/terminatortwo.tff")
-		resource.AddFile("resource/fonts/glare.tff")
-		resource.AddFile("resource/fonts/Comic_Papyrus.tff")
-		resource.AddFile("resource/fonts/Alternative.tff")
-	end
+	resource.AddFile("resource/fonts/ANKLEPAN.tff")
+	resource.AddFile("resource/fonts/KILOTON1.tff")
+	resource.AddFile("resource/fonts/forcible.tff")
+	resource.AddFile("resource/fonts/terminatortwo.tff")
+	resource.AddFile("resource/fonts/glare.tff")
+	resource.AddFile("resource/fonts/Comic_Papyrus.tff")
+	resource.AddFile("resource/fonts/Alternative.tff")
 end
 
 hook.Add("AllowPlayerPickup", "PickupNotSpectator", function(ply, ent)
@@ -357,7 +343,7 @@ function GM:PlayerShouldTakeDamage(ply, attacker)
 	return ply:Team() == TEAM_SURVIVOR
 end
 
-hook.Add("OnPlayerChangedTeam", "octoSlashCoOnPlayerChangedTeam", function(ply, oldTeam, newTeam)
+hook.Add("OnPlayerChangedTeam", "SlashCo:OnPlayerChangedTeam", function(ply, oldTeam, newTeam)
 	-- Here's an immediate respawn thing by default. If you want to
 	-- re-create something more like CS or some shit you could probably
 	-- change to a spectator or something while dead.
@@ -392,19 +378,18 @@ hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, oldTeam
 	end
 end)
 
-hook.Add("InitPostEntity", "octoSlashCoInitPostEntity", function()
+hook.Add("InitPostEntity", "SlashCo:InitPostEntity", function()
 	print("[SlashCo] InitPostEntity Started.")
 	RunConsoleCommand("sv_alltalk", "2")
 
 	if not GameData.IsLobby then
-		SlashCo.State = SlashCo.States.IN_GAME
+		SlashCo.State = SlashCo.States.STARTING
 
 		SlashCo.LoadCurRoundData()
 		SlashCo.CurRound.GameProgress = -1
 	end
 end)
 
---local setupPlayerData = false
 local function Think()
 	local plys = player.GetAll()
 	if engine.TickCount() % math.floor(5 / engine.TickInterval()) == 0 then
@@ -510,9 +495,9 @@ local function Think()
 	end
 end
 
-hook.Add("PostGamemodeLoaded", "octoSlashCoPostGamemodeLoaded", function()
+hook.Add("PostGamemodeLoaded", "SlashCo:PostGamemodeLoaded", function()
 	timer.Simple(1, function()
-		hook.Add("Think", "octoSlashCoCoreThink", Think)
+		hook.Add("Think", "SlashCo:CoreThink", Think)
 	end)
 end)
 
@@ -530,87 +515,58 @@ hook.Add("player_activate", "slashCoPreItem", function(data)
 	end
 end)
 
-hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
+hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 	ply:SetTeam(TEAM_SPECTATOR)
 	ply:Spawn()
 
-	local pid = ply:SteamID64()
-	local data = {}
-
-	--Don't load playerdata if it's already loaded
-	if SlashCo.PlayerData[ply:SteamID64()] then
-		return
-	end
-
-	--If the player doesn't have a save file then create one for them.
-	if not file.Exists("slashco/playerdata/" .. tostring(ply:SteamID64()) .. ".json", "DATA") then
-		local json = '{ "Stats": { "RoundsWon": { "Survivor": 0, "Slasher": 0 }, "Achievements": [] } }'
-
-		print("[SlashCo] No playerdata file found for '" .. ply:GetName() .. "', making one for them.")
-
-		data = util.JSONToTable(json)
-		file.Write("slashco/playerdata/" .. tostring(ply:SteamID64()) .. ".json", json)
-	else
-		data = util.JSONToTable(file.Read("slashco/playerdata/" .. tostring(ply:SteamID64()) .. ".json", "DATA"))
-	end
-
-	print("[SlashCo] Loaded playerdata for '" .. ply:GetName() .. "'")
-
-	SlashCo.PlayerData[pid] = {}
-	ply.Lives = 1
-	--SlashCo.PlayerData[pid].Lives = 1
-	SlashCo.PlayerData[pid].RoundsWonSurvivor = data.Stats.RoundsWon.Survivor or 0
-	SlashCo.PlayerData[pid].RoundsWonSlasher = data.Stats.RoundsWon.Slasher or 0
-	SlashCo.PlayerData[pid].PointsTotal = 0
-
 	hook.Run("LobbyInfoText")
 
-	SlashCoDatabase.OnPlayerJoined(pid)
+	SlashCoDatabase.OnPlayerJoined(ply:SteamID64())
 
 	SlashCo.AwaitExpectedPlayers()
 	SlashCo.BroadcastGlobalData()
+	
+	if SlashCo.CurRound then
+		SlashCo.CurRound.DisconnectedPlayers[ply:SteamID64()] = nil -- cleanup :^
+	end
 
 	timer.Simple(2, function()
-		if IsValid(ply) then
-			SlashCo.BroadcastMasterDatabaseForClient(ply)
-
-			if not GameData.IsLobby and SlashCo.RoundStarted and SlashCo.GetRoundTime() < SlashCo.MaximumLateJoinTime then
-				local steamID = ply:SteamID64()
-				for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
-					if data.steamid ~= steamID then continue end
-					
-					ply:SetTeam(TEAM_SURVIVOR)
-					ply:Spawn()
-
-					if not GameData.SurvivorData then break end
-					
-					local itemEntry = GameData.SurvivorData[steamID]
-					if not itemEntry then break end
-						
-
-					SlashCo.DropAllItems(ply)
-					SlashCo.ChangeSurvivorItem(ply, itemEntry.Item, true)
-					SlashCo.ChangeSurvivorItem(ply, itemEntry.Item2, true)
-					SlashCo.SendValue(ply, "preItem", itemEntry.Item)
-				end
-			end
-		end
-
 		SlashCo.BroadcastCurrentRoundData(false)
 		SlashCo.BroadcastGlobalData()
+
+		if not IsValid(ply) then return end
+		SlashCo.BroadcastMasterDatabaseForClient(ply)
+
+		if GameData.IsLobby or not SlashCo.RoundStarted or SlashCo.GetRoundTime() > SlashCo.MaximumLateJoinTime then return end
+		local steamID = ply:SteamID64()
+		for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
+			if data.steamid ~= steamID then continue end
+					
+			ply:SetTeam(TEAM_SURVIVOR)
+			ply:Spawn()
+
+			if not GameData.SurvivorData then break end
+					
+			local itemEntry = GameData.SurvivorData[steamID]
+			if not itemEntry then break end
+
+			SlashCo.DropAllItems(ply)
+			SlashCo.ChangeSurvivorItem(ply, itemEntry.Item, true)
+			SlashCo.ChangeSurvivorItem(ply, itemEntry.Item2, true)
+			SlashCo.SendValue(ply, "preItem", itemEntry.Item)
+		end
 	end)
 end)
 
-hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old, new)
+hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, old, new)
 	if CLIENT then
 		return
 	end
 
 	SlashCo.BroadcastMasterDatabaseForClient(ply)
 
-	if new == TEAM_SURVIVOR and SlashCo.PlayerData then
+	if new == TEAM_SURVIVOR then
 		ply.Lives = 1
-		--SlashCo.PlayerData[pid].Lives = 1
 	end
 
 	if new == TEAM_LOBBY and team.NumPlayers(TEAM_LOBBY) > 5 then
@@ -627,7 +583,7 @@ hook.Add("PlayerChangedTeam", "octoSlashCoPlayerChangedTeam", function(ply, old,
 	end
 
 	if GameData.IsLobby then
-		net.Start("mantislashco_GiveLobbyStatus")
+		net.Start("SlashCo:GiveLobbyStatus")
 			net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
 		net.Broadcast()
 	end
@@ -652,9 +608,6 @@ function GM:PlayerDeath(victim)
 	end
 
 	SlashCo.DropAllItems(victim)
-	--local pid = victim:SteamID64()
-	--local lives = SlashCo.PlayerData[pid].Lives
-	--SlashCo.PlayerData[pid].Lives = tonumber(lives) - 1
 	victim.Lives = victim.Lives or 1
 	victim.Lives = victim.Lives - 1
 
@@ -717,7 +670,7 @@ function GM:PlayerDeath(victim)
 		end
 
 		if team.NumPlayers(TEAM_SURVIVOR) == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
-			team.GetPlayers(TEAM_SURVIVOR)[1]:SetPoints("last_survive")
+			team.GetPlayers(TEAM_SURVIVOR)[1]:SetRoundPoints("last_survive")
 		end
 
 		victim:SetTeam(TEAM_SPECTATOR)
@@ -771,9 +724,9 @@ hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, sta
 	return false
 end)
 
-util.AddNetworkString("slashCo_FlashWindows")
+util.AddNetworkString("SlashCo:FlashWindows")
 function SlashCo.FlashWindows(players)
-	net.Start("slashCo_FlashWindows")
+	net.Start("SlashCo:FlashWindows")
 
 	if players then
 		net.Send(players)
@@ -781,6 +734,15 @@ function SlashCo.FlashWindows(players)
 		net.Broadcast()
 	end
 end
+
+hook.Add("PlayerButtonDown", "SlashCo:SpectatorFunctions", function(ply, button)
+	if ply:Team() ~= TEAM_SPECTATOR then return end
+	if not GetGlobal2Bool("SpectatorsCanPing") then return end
+	if button ~= MOUSE_MIDDLE then return end
+	if ply.LastPinged and CurTime() - ply.LastPinged < 30 then return end
+
+	ply:SurvivorPing()
+end)
 
 SC_SERVER_LOADED = true
 

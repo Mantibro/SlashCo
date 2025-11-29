@@ -44,9 +44,9 @@ function SlashCo.Language(key, ...)
 	end
 
 	if SlashCo.LangTable[key] then
-		return string.format(SlashCo.LangTable[key], unpack(vars))
+		return #vars > 0 and string.format(SlashCo.LangTable[key], unpack(vars)) or SlashCo.LangTable[key]
 	elseif SlashCo.LangTableFallback[key] then
-		return string.format(SlashCo.LangTableFallback[key], unpack(vars))
+		return #vars > 0 and string.format(SlashCo.LangTableFallback[key], unpack(vars)) or SlashCo.LangTableFallback[key]
 	else
 		return string.format(Localize("slashco." .. string.gsub(key, " ", "_"), key), unpack(vars))
 	end
@@ -74,12 +74,14 @@ include("ui/cl_spectator_hud.lua")
 include("ui/cl_playermodel_picker.lua")
 include("ui/cl_gameinfo.lua")
 include("ui/cl_pings.lua")
-include("ui/cl_documents.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
 include("sh_bhop.lua")
 include("sh_roundpoints.lua")
+include("sh_experience.lua")
+include("sh_perks.lua")
+include("ui/cl_documents.lua") -- Depends on sh_perks.lua
 include("sh_canbeseen.lua")
 include("sh_player.lua")
 
@@ -90,7 +92,6 @@ include("ui/slasher_stock/cl_slasher_meter.lua")
 include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("cl_limitedzone.lua")
-include("cl_thirdperson.lua")
 
 CreateClientConVar("slashco_cl_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
 CreateClientConVar("slashco_cl_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
@@ -223,8 +224,8 @@ hook.Add("KeyPress", "PlayerSelect", function(ply, key)
 	end
 end)
 
-net.Receive("octoSlashCoTestConfigHalos", function()
-	hook.Add("PreDrawHalos", "octoSlashCoTestConfigPreDrawHalos", function()
+net.Receive("SlashCo:TestConfigHalos", function()
+	hook.Add("PreDrawHalos", "SlashCo:TestConfigPreDrawHalos", function()
 		halo.Add(ents.FindByClass("prop_physics"), Color(255, 0, 0), 2, 2, 8, true, true)
 		halo.Add(ents.FindByClass("sc_*"), Color(0, 255, 255), 2, 2, 4, true, true)
 	end)
@@ -269,7 +270,7 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	halo.Add(_ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil, noZ)
 end
 
-hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
+hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 	g_SlashCoDrawingHalos = true
 
 	local ply = GameData.LocalPlayer
@@ -372,7 +373,7 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 	end
 end)
 
-net.Receive("mantislashco_GiveSlasherData", function()
+net.Receive("SlashCo:GiveSlasherData", function()
 	local SlasherTable = net.ReadTable()
 	local ply = GameData.LocalPlayer
 	if not IsValid(ply) then
@@ -456,7 +457,7 @@ local function addSound(soundPath, entID)
 	SlashCo.GlobalSounds[entID .. soundPath] = { snd = snd, permanent = permanent, entID = entID }
 end
 
-net.Receive("mantislashco_GlobalSound", function()
+net.Receive("SlashCo:GlobalSound", function()
 	local isRemove = net.ReadBool()
 	local soundPath = net.ReadString()
 	local entID = net.ReadUInt(MAX_EDICT_BITS)
@@ -546,11 +547,11 @@ hook.Add("SlashCo:DrawHUD", "AwaitingPlayersHUD", function()
 	end
 end)
 
-net.Receive("mantislashco_SendGlobalInfoTable", function()
+net.Receive("SlashCo:SendGlobalInfoTable", function()
 	SCInfo = net.ReadTable()
 end)
 
-net.Receive("mantislashco_Briefing", function()
+net.Receive("SlashCo:Briefing", function()
 	BriefingTable = net.ReadTable()
 end)
 
@@ -642,7 +643,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
 
 			if slasherID and slasherID ~= 0 then
-				icondrawid = slasherID
+				icondrawid = SlashCoSlashers[slasherID].ID
 			end
 		else
 			draw.SimpleText("...", "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
@@ -658,7 +659,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 	end
 end)
 
-net.Receive("mantislashco_HelicopterVoice", function()
+net.Receive("SlashCo:HelicopterVoice", function()
 	local t = net.ReadUInt(4)
 	local id = net.ReadUInt(4)
 
@@ -687,7 +688,7 @@ local AmbientMusic
 local AmbientLength
 local AmbientVol = 0.8
 
-net.Receive("mantislashco_MapAmbientPlay", function()
+net.Receive("SlashCo:MapAmbientPlay", function()
 	timer.Simple(math.random(1, 8), function()
 		SlashCoMapAmbience()
 	end)
@@ -776,8 +777,49 @@ function SlashCo.FlashWindows()
 	system.FlashWindow()
 end
 
-net.Receive("slashCo_FlashWindows", function()
+net.Receive("SlashCo:FlashWindows", function()
 	SlashCo.FlashWindows()
+end)
+
+hook.Add("CalcView", "SlashCo:ThirdPerson", function(ply, pos, angles, fov, znear, zfar)
+	local _team = ply:Team()
+	if _team == TEAM_SURVIVOR then
+		if not ply:ItemFunction("Thirdperson") then
+			return
+		end
+	elseif _team == TEAM_SLASHER then
+		if not ply:SlasherFunction("Thirdperson") then
+			return
+		end
+	else
+		return
+	end
+
+	local view = {
+		fov = fov,
+		znear = znear,
+		zfar = zfar,
+		drawviewer = true
+	}
+
+	angles.p = angles.p + 15
+
+	local traceData = {}
+	traceData.start = pos
+	traceData.endpos = traceData.start + angles:Forward() * -120
+	traceData.filter = ply
+
+	local trace = util.TraceLine(traceData)
+
+	pos = trace.HitPos
+	if trace.Fraction < 1.0 then
+		pos = pos + trace.HitNormal * 5
+	end
+
+	view.origin = pos
+	view.angles = angles
+
+	return view
 end)
 
 SC_CLIENT_LOADED = true

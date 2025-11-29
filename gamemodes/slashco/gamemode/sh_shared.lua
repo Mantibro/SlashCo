@@ -211,6 +211,15 @@ SlashCo.DifficultyLevel = {
 }
 
 --[[
+	Lobby ready states
+]]
+SlashCo.ReadyState = {
+	NotReady = 0,
+	Survivor = 1,
+	Slasher = 2
+}
+
+--[[
 	Round States
 ]]
 
@@ -239,8 +248,9 @@ SlashCo.RoundState = {
 
 SlashCo.States = {
 	LOBBY = 1,
-	IN_GAME = 2,
-	ENDING = 3,
+	STARTING = 2,
+	IN_GAME = 3,
+	ENDING = 4,
 }
 SlashCo.State = SlashCo.State or SlashCo.States.LOBBY
 SlashCo.IsPlayable = SlashCo.IsPlayable or false -- false if were missing maps to play on.
@@ -351,20 +361,15 @@ function GM:Initialize()
 	-- Do stuff
 end
 
+TEAM_SURVIVOR = 1
+TEAM_SLASHER = 2
+TEAM_LOBBY = 3
 function GM:CreateTeams()
-	if not GAMEMODE.TeamBased then
-		return
-	end
+	if not GAMEMODE.TeamBased then return end
 
-	TEAM_SURVIVOR = 1
 	team.SetUp(TEAM_SURVIVOR, "Survivor", Color(255, 255, 255), false)
-
-	TEAM_SLASHER = 2
 	team.SetUp(TEAM_SLASHER, "Slasher", Color(255, 0, 0), false)
-
-	TEAM_LOBBY = 3
 	team.SetUp(TEAM_LOBBY, "Lobby", Color(230, 255, 230), false)
-
 	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235), false)
 end
 

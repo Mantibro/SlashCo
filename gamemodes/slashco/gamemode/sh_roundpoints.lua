@@ -155,6 +155,6 @@ hook.Add("scValue_removeRoundPointsKey", "RemoveRoundPointsKey", function(key)
 	GameData.LocalPlayer:RemoveRoundPointsKey(key)
 end)
 
-hook.Add("scValue_setRoundPoints", "SetPoints", function(key, amount, num)
+hook.Add("scValue_setRoundPoints", "SetRoundPoints", function(key, amount, num)
 	GameData.LocalPlayer:SetRoundPoints(key, amount, num)
 end)

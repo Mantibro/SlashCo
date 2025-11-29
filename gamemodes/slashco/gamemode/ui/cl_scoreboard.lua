@@ -11,7 +11,7 @@ surface.CreateFont("ScoreboardDefaultTitle", {
 	weight	= 800
 })
 
-net.Receive("mantislashco_SendRoundData", function()
+net.Receive("SlashCo:SendRoundData", function()
 	SlashCo.PlayerData = net.ReadTable()
 
 	local isSlasher = false
@@ -90,9 +90,7 @@ local PLAYER_LINE = {
 		end
 
 		for _, v in ipairs(SlashCo.PlayerData.survivors) do
-			local check = v.steamid
-
-			if check == ply:SteamID64() then
+			if v.steamid == ply:SteamID64() then
 				self.team_status = TEAM_SURVIVOR
 				self.teamcolor = Color(128, 128, 255, 255)
 				self.teamorder = 0
@@ -107,9 +105,7 @@ local PLAYER_LINE = {
 		end
 
 		for _, v in ipairs(SlashCo.PlayerData.slashers) do
-			local check = v.steamid
-
-			if check == ply:SteamID64() then
+			if v.steamid == ply:SteamID64() then
 				self.team_status = TEAM_SLASHER
 				self.teamcolor = Color(255, 64, 64, 255)
 				self.teamorder = -500

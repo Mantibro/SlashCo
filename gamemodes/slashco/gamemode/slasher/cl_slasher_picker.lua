@@ -1,4 +1,4 @@
-net.Receive("mantislashco_PickingSlasher", function()
+net.Receive("SlashCo:PickingSlasher", function()
 	DrawTheSlasherSelectorBox(net.ReadTable())
 end)
 
@@ -11,7 +11,7 @@ function HideSelection()
 end
 
 function SlasherChosen(pickedSlasher)
-	net.Start("mantislashco_SelectSlasher")
+	net.Start("SlashCo:SelectSlasher")
 		net.WriteString(pickedSlasher)
 	net.SendToServer()
 
@@ -25,9 +25,9 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 	local SlasherPickingDANGER = SlashCo.DangerLevel.Unknown
 	local bannedSlashers = {}
 	if pickSlasherTbl then
-		SlasherPickingCLASS = pickSlasherTbl.slasherClass
-		SlasherPickingDANGER = pickSlasherTbl.slasherDanger
-		bannedSlashers = pickSlasherTbl.bannedSlashers
+		SlasherPickingCLASS = pickSlasherTbl.slasherClass or SlashCo.SlasherClass.Unknown
+		SlasherPickingDANGER = pickSlasherTbl.slasherDanger or SlashCo.DangerLevel.Unknown
+		bannedSlashers = pickSlasherTbl.bannedSlashers or {}
 	end
 
 	GameData.SelectedSlasher = "None"

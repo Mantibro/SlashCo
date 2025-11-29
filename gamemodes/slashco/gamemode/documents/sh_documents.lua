@@ -1,14 +1,11 @@
 AddCSLuaFile()
 
-SlashCo = SlashCo or {}
 SlashCoDocuments = SlashCoDocuments or {} -- a table containing all existing documents.
 SlashCoDocumentTypes = SlashCoDocumentTypes or {} -- a table containing all documents split into the different types
 
----load items and effects
-
 function SlashCo.RegisterDocument(table)
 	if SC_LOADEDDOCUMENTS then
-		error("Tried to register an item illegally", 2)
+		error("Tried to register an document illegally", 2)
 		return
 	end
 
@@ -31,8 +28,7 @@ end
 
 SC_LOADEDDOCUMENTS = nil
 
-local document_files = file.Find("slashco/documents/*.lua", "LUA")
-for _, v in ipairs(document_files) do
+for _, v in ipairs(file.Find("slashco/documents/*.lua", "LUA")) do
 	AddCSLuaFile("slashco/documents/" .. v)
 	include("slashco/documents/" .. v)
 end

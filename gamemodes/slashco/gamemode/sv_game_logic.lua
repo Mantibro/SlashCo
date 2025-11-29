@@ -42,7 +42,10 @@ function SlashCo.LoadCurRoundData()
 		--Insert the First and second Slasher into the table
 		local slasherData = sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}
 		for _, slasherData in ipairs(slasherData) do
-			table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = slasherData.SteamID })
+			table.insert(SlashCo.CurRound.ExpectedPlayers, {
+				steamid = slasherData.SteamID,
+				disconnected = SlashCo.CurRound.DisconnectedPlayers[slasherData.SteamID] ~= nil
+			})
 		end
 
 		SlashCo.CurRound.ForceSlasherSelection = #slasherData == 0
@@ -54,36 +57,26 @@ function SlashCo.LoadCurRoundData()
 		local survivorData = sql.Query("SELECT * FROM slashco_table_survivordata;") or {}
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
 			--All survivors will become slashers.
-
-			local query = survivorData
-			for i = 1, #query do
-				local id = query[i].Survivors
-
+			for _, survivorData in ipairs(survivorData) do
 				local slasher_pick = GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
-
-				SlashCo.SelectSlasher(slasher_pick, id)
-				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = id, slasherkey = slasher_pick })
-				table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = id })
+				SlashCo.SelectSlasher(slasher_pick, survivorData.SteamID)
+				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = survivorData.SteamID, slasherID = slasher_pick })
+				table.insert(SlashCo.CurRound.ExpectedPlayers, {
+					steamid = survivorData.SteamID,
+					disconnected = SlashCo.CurRound.DisconnectedPlayers[survivorData.SteamID] ~= nil
+				})
 			end
 
 			--Slasher becomes the sole survivor
-
-			for s = 1, #slasherData do
-				local sr_id = slasherData[s].Slashers
-
-				--table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sr_id })
+			for _, slasherData in ipairs(slasherData) do
 				--For the slasher's clientside view also
-				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = sr_id })
+				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = slasherData.SteamID })
 			end
 
 			return
 		end
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>>>>
-
-
-		--Survivors don't necessarily have to join in time, as the game can continue with at least 1.
-		--TODO: timer which starts the game premature if some survivors don't join in time.
 
 		for _, survivorData in ipairs(survivorData) do
 			table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = survivorData.SteamID })
@@ -98,17 +91,19 @@ function SlashCo.LoadCurRoundData()
 				end
 
 				SlashCo.SelectSlasher(slasherData.SlasherID, slasherData.SteamID)
-				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = slasherData.SteamID, slasherkey = slasherData.SlasherID })
+				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = slasherData.SteamID, slasherID = slasherData.SlasherID })
 				continue
 			end
 
 			if SlashCo.PresentCovenant == nil then
 				SlashCo.SelectSlasher(slasherData.SlasherID, slasherData.SteamID)
-				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = slasherData.SteamID, slasherkey = slasherData.SlasherID })
+				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = slasherData.SteamID, slasherID = slasherData.SlasherID })
 			else
 				table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = slasherData.SteamID })
 			end
 		end
+
+		table.Empty(SlashCo.CurRound.DisconnectedPlayers) -- Not needed anymore
 	else
 		if game.SinglePlayer() then
 			SlashCo.SinglePlayerSetup()
@@ -137,12 +132,41 @@ local function StartRound(instant)
 	SlashCo.FlashWindows() -- RaphaelIT7: Tell all players they should tab in.
 end
 
-function AskPlayersToBecomeSlasher()
-	if SlashCo.CurRound.AntiLoopSpawn then return end
+ function RefundSurvivorItems(ply)
+ 	local steamID64 = IsValid(ply) and ply:SteamID64() or ply -- if it's a string - it must be a SteamID64!
+	local survivorData = sql.Query("SELECT * FROM slashco_table_survivordata WHERE SteamID = " .. sql.SQLStr(steamID64) .. ";")
+	if not survivorData or not survivorData[1] then return end
 
-	SlashCo.AudioSystem.EnableBackgroundMusic()
-	SlashCo.AudioSystem.SetBackgroundMusic("slashco/ambienttrack/mf_high.ogg", 1)
+	survivorData = survivorData[1]
+	local totalRefund = 0
+	if survivorData.Item and survivorData.Item ~= "none" then
+		local itemData = SlashCoItems[survivorData.Item]
+		if itemData and itemData.Price and itemData.Price > 0 then
+			totalRefund = totalRefund + itemData.Price
+		end
+	end
 
+	if survivorData.Item2 and survivorData.Item2 ~= "none" then
+		local itemData = SlashCoItems[survivorData.Item2]
+		if itemData and itemData.Price and itemData.Price > 0 then
+			totalRefund = totalRefund + itemData.Price
+		end
+	end
+
+	if totalRefund == 0 then return end
+
+	print("[SlashCo] Player \"" .. (IsValid(ply) and ply:Name() or steamID64) .. "\" was refunded " .. tostring(totalRefund) .. " points for his items since became a slasher")
+
+	if IsValid(ply) then
+		ply:ChatText({"item_refund", tostring(totalRefund)})
+	end
+
+	SlashCoDatabase.UpdateStats(steamID64, "Points", totalRefund)
+	sql.Query("DELETE FROM slashco_table_survivordata WHERE SteamID = " .. sql.SQLStr(steamID64) .. ";")
+end
+
+local _DoSlasherSelection
+local function DoGlobalSlasherSelection()
 	local timeToAsk = 15 -- How many seconds they have to decide
 	net.Start("SlashCo:AskToBecomeSlasher")
 		net.WriteUInt(timeToAsk, 8)
@@ -156,66 +180,103 @@ function AskPlayersToBecomeSlasher()
 	end)
 
 	timer.Create("SlashCo:AskToBecomeSlasherTimeLimit", timeToAsk, 1, function()
-		if SlashCo.CurRound.AntiLoopSpawn then return end
-		for idx, ply in ipairs(becomeSlasher) do
-			if not IsValid(ply) then
-				table.remove(becomeSlasher, idx)
-				continue
-			end
-		end
-	
-		local slasherSelection
-		local function RunSlasherSelection()
-			local selectedPlyIndex = math.random(#becomeSlasher)
-			local selectedPly = becomeSlasher[math.random(#becomeSlasher)]
-			if not IsValid(selectedPly) then
-				if SlashCo.CurRound.AntiLoopSpawn then return end
-				SlashCo.Abort("No one wanted to become the slasher... Well GG")
-				return
-			end
-
-			SlashCo.AwaitPlayerToSelectSlasher = function(ply, id) -- if id is nil, then they took too long!
-				SlashCo.AwaitPlayerToSelectSlasher = nil
-				if SlashCo.CurRound.AntiLoopSpawn then return end
-
-				local id = id or GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
-				sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( " .. ply:SteamID64() .. ", '" .. sql.SQLStr(id) .. "' );")
-				SlashCo.SelectSlasher(id, ply:SteamID64())
-				StartRound(true)
-			end
-
-			if string.len(SlashCo.CurRound.SlasherID or "") > 2 then
-				SlashCo.AwaitPlayerToSelectSlasher(selectedPly, SlashCo.CurRound.SlasherID)
-				return
-			end
-
-			local selectionData = {
-				slashClass = SlashCo.CurRound.SlasherClass,
-				slashDanger = SlashCo.CurRound.SlasherDanger,
-				bannedSlashers = SlashCo.GetBannedSlashers(true),
-			}
-
-			net.Start("mantislashco_PickingSlasher")
-				net.WriteTable(selectionData)
-			net.Send(selectedPly)
-			SlashCo.AllowedPlayerSlasherSelection[selectedPly] = selectionData
-
-			timer.Create("SlashCo:WaitingForPlayerToPickSlasher", 15, 1, function()
-				if SlashCo.CurRound.AntiLoopSpawn then return end
-				if not IsValid(selectedPly) then
-					table.remove(becomeSlasher, selectedPlyIndex)
-					slasherSelection() -- Run the selection again since our selected player disconnected when he was supposed to become the slasher.
-					return
-				end
-
-				if SlashCo.AwaitPlayerToSelectSlasher then
-					SlashCo.AwaitPlayerToSelectSlasher(selectedPly, nil)
-				end
-			end)
-		end
-		slasherSelection = RunSlasherSelection
-		RunSlasherSelection()
+		_DoSlasherSelection(becomeSlasher, false)
 	end)
+end
+
+local function DoSlasherSelection(slashers, usingPotentialSlashers)
+	if SlashCo.CurRound.AntiLoopSpawn then return end
+	for idx, ply in ipairs(slashers) do
+		if not IsValid(ply) then
+			table.remove(slashers, idx)
+			continue
+		end
+	end
+	
+	local slasherSelection
+	local function RunSlasherSelection()
+		local selectedPlyIndex = math.random(#slashers)
+		local selectedPly = slashers[math.random(#slashers)]
+		if not IsValid(selectedPly) then
+			if SlashCo.CurRound.AntiLoopSpawn then return end
+			if usingPotentialSlashers then
+				DoGlobalSlasherSelection()
+			else
+				SlashCo.Abort("No one wanted to become the slasher... Well GG")
+			end
+			return
+		end
+
+		SlashCo.AwaitPlayerToSelectSlasher = function(ply, slasherID) -- if id is nil, then they took too long!
+			SlashCo.AwaitPlayerToSelectSlasher = nil
+			if SlashCo.CurRound.AntiLoopSpawn then return end
+
+			local slasherID = slasherID or GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
+			sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( " .. sql.SQLStr(ply:SteamID64()) .. ", " .. sql.SQLStr(slasherID) .. " );")
+			table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = ply:SteamID64(), slasherID = slasherID })
+			RefundSurvivorItems(ply)
+			SlashCo.SelectSlasher(slasherID, ply:SteamID64())
+			StartRound(true)
+		end
+
+		if string.len(SlashCo.CurRound.SlasherID or "") > 2 then
+			SlashCo.AwaitPlayerToSelectSlasher(selectedPly, SlashCo.CurRound.SlasherID)
+			return
+		end
+
+		local selectionData = {
+			slashClass = SlashCo.CurRound.SlasherClass,
+			slashDanger = SlashCo.CurRound.SlasherDanger,
+			bannedSlashers = SlashCo.GetBannedSlashers(true),
+		}
+
+		net.Start("SlashCo:PickingSlasher")
+			net.WriteTable(selectionData)
+		net.Send(selectedPly)
+		SlashCo.AllowedPlayerSlasherSelection[selectedPly] = selectionData
+		selectedPly:ChatText("slasher_replacement")
+
+		timer.Create("SlashCo:WaitingForPlayerToPickSlasher", 15, 1, function()
+			if SlashCo.CurRound.AntiLoopSpawn then return end
+			if not IsValid(selectedPly) then
+				table.remove(slashers, selectedPlyIndex)
+				slasherSelection() -- Run the selection again since our selected player disconnected when he was supposed to become the slasher.
+				return
+			end
+
+			if SlashCo.AwaitPlayerToSelectSlasher then
+				SlashCo.AwaitPlayerToSelectSlasher(selectedPly, nil)
+			end
+		end)
+	end
+	slasherSelection = RunSlasherSelection
+	RunSlasherSelection()
+end
+_DoSlasherSelection = DoSlasherSelection
+
+function AskPlayersToBecomeSlasher()
+	if SlashCo.CurRound.AntiLoopSpawn then return end
+
+	SlashCo.AudioSystem.EnableBackgroundMusic()
+	SlashCo.AudioSystem.SetBackgroundMusic("slashco/ambienttrack/mf_high.ogg", 1)
+
+	if sql.TableExists("slashco_table_potentialslashers") then
+		local potentialSlashers = sql.Query("SELECT * FROM slashco_table_potentialslashers;") or {}
+		local slashers = {}
+		for _, potentialSlasher in ipairs(potentialSlashers) do
+			local ply = player.GetBySteamID64(potentialSlasher.SteamID)
+			if not IsValid(ply) then continue end
+
+			table.insert(slashers, ply)
+		end
+
+		if #slashers > 0 then
+			DoSlasherSelection(slashers, true)
+			return
+		end
+	end
+
+	DoGlobalSlasherSelection()
 end
 
 function SlashCo.ForceNewSlasherSelection()
@@ -266,7 +327,6 @@ function SlashCo.SetupExpectedPlayersFailsafe()
 	SlashCo.AudioSystem.EnableBackgroundMusic()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/ambienttrack/mf_mid.ogg", 1)
 
-	SlashCo.CurRound.DisconnectedPlayers = {}
 	timer.Create("SlashCo:ExpectedPlayersFailsafe", 90, 1, SlashCo.ForceNewSlasherSelection)
 
 	gameevent.Listen("player_disconnect")
@@ -282,6 +342,11 @@ function SlashCo.SetupExpectedPlayersFailsafe()
 				break
 			end
 		end
+		
+		-- Until we fetched SQL we'll store disconnects here and apply the later
+		if #SlashCo.CurRound.ExpectedPlayers == 0 then
+			SlashCo.CurRound.DisconnectedPlayers[steamID64] = true
+		end
 	end)
 end
 
@@ -295,24 +360,22 @@ function SlashCo.AwaitExpectedPlayers()
 	print("[SlashCo] Now running player expectation...")
 
 	local expected_count = 0
-	local plys = player.GetAll()
 	for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
 		if data.disconnected then
 			expected_count = expected_count + 1
 			continue
 		end
 
-		for _, ply in ipairs(plys) do
-			if data.steamid == ply:SteamID64() then
-				expected_count = expected_count + 1
-				print("[SlashCo] Expected player " .. expected_count .. " in!" .. "(" .. ply:Name() .. ")")
-				break
-			end
+		local ply = player.GetBySteamID64(data.steamid)
+		if IsValid(ply) then
+			expected_count = expected_count + 1
+			print("[SlashCo] Expected player " .. expected_count .. " in!" .. "(" .. ply:Name() .. ")")
+			break
 		end
 	end
 
 	if expected_count == #SlashCo.CurRound.ExpectedPlayers then
-		if #plys < 2 then
+		if #player.GetCount() < 2 then
 			SlashCo.Abort("Not enouth players to start a round")
 			return
 		end
@@ -551,7 +614,7 @@ if not GameData.IsLobby then
 
 			if math.random(1, 100) > chance then continue end
 			if ply:Team() == TEAM_SLASHER then
-				
+				if not ply:SlasherFunction("ShouldPlayAmbientSound") then continue end
 			end
 			
 			local pos = randomAmbientVector(150, 400)

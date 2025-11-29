@@ -24,6 +24,8 @@ SlashCo.LangTable["NoneRescued"] = "The dispatched SlashCo Workers could not be 
 SlashCo.LangTable["Cursed"] = "Your soul is now forfeit."
 SlashCo.LangTable["Judgement"] = "JUDGEMENT"
 SlashCo.LangTable["newplayer_spawnnotice"] = "Press [%s] to Spawn"
+SlashCo.LangTable["slasher_replacement"] = "You were picked as the new slasher"
+SlashCo.LangTable["item_refund"] = "You were refunded %s points for your items"
 
 SlashCo.LangTable["HP"] = "HP"
 SlashCo.LangTable["FUEL"] = "FUEL"
@@ -628,3 +630,12 @@ SlashCo.LangTable["points_quickescape"] = "[%s] QUICK ESCAPE"
 SlashCo.LangTable["points_slowescape"] = "[%s] SLOW ESCAPE"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] DOING YOUR JOB"
+
+-- Perks
+
+SlashCo.LangTable["perk_buy"] = "Buy Perk"
+SlashCo.LangTable["perk_enable"] = "Enable Perk"
+SlashCo.LangTable["perk_disable"] = "Disable Perk"
+
+SlashCo.LangTable["faster_fueling"] = "Faster Fueling"
+SlashCo.LangTable["faster_fueling_desc"] = "Increases the fueling speed by 25% at the cost of 10% walking speed while holding fuel"

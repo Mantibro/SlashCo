@@ -270,7 +270,7 @@ function SlashCo.LobbyBanter()
 	return totalLength
 end
 
-net.Receive("mantislashco_SurvivorVoicePrompt", function(_, ply)
+net.Receive("SlashCo:SurvivorVoicePrompt", function(_, ply)
 	if GameData.IsLobby and SlashCo.LobbyData.LOBBYSTATE == 2 then
 		return
 	end

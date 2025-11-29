@@ -50,7 +50,7 @@ local function antiDupePings(ping)
 	end
 end
 
-net.Receive("mantislashco_SurvivorPings", function()
+net.Receive("SlashCo:SurvivorPings", function()
 	local ping = net.ReadTable()
 
 	antiDupePings(ping)

@@ -62,8 +62,8 @@ local function DrawTextWithHitbox(text, font, x, y, color, xAlign, yAlign)
 
 		cacheEntry.width = width
 		cacheEntry.height = height
-		cacheEntry.mins = Vector(-(width * worldScale / 2), -(height * worldScale / 2), 0)
-		cacheEntry.maxs = Vector((width * worldScale) / 2, (height * worldScale) / 2, 1)
+		cacheEntry.mins = Vector(-(width * worldScale / 2), -(height * worldScale / 2), -1)
+		cacheEntry.maxs = Vector((width * worldScale) / 2, (height * worldScale) / 2, 0)
 
 		local pos = screenPos * 1
 		pos[1] = pos[1] - (x * worldScale)
@@ -73,6 +73,43 @@ local function DrawTextWithHitbox(text, font, x, y, color, xAlign, yAlign)
 
 	local hitPos = util.IntersectRayWithOBB(playerShootPos, playerAimVec, cacheEntry.pos, screenAngle, cacheEntry.mins, cacheEntry.maxs)
 
+	-- Debug to check the text hitboxes
+	-- debugoverlay.BoxAngles(cacheEntry.pos, cacheEntry.mins, cacheEntry.maxs, screenAngle, 0.02, Color(0, 255, 0, 10))
+
+	callID = callID + 1
+	return hitPos != nil
+end
+
+local function DrawTextureWithHitbox(material, x, y, width, height)
+	local cacheEntry = textCache.Box
+	if not cacheEntry then
+		cacheEntry = {}
+		textCache.Box = cacheEntry
+	end
+
+	cacheEntry = cacheEntry[callID]
+	if not cacheEntry then
+		cacheEntry = {}
+		textCache.Box[callID] = cacheEntry
+
+		cacheEntry.width = width
+		cacheEntry.height = height
+		cacheEntry.mins = Vector(0, -(height * worldScale), -1)
+		cacheEntry.maxs = Vector((width * worldScale), 0, 0)
+		cacheEntry.material = Material(material)
+
+		local pos = screenPos * 1
+		pos[1] = pos[1] - (x * worldScale)
+		pos[3] = pos[3] - (y * worldScale)
+		cacheEntry.pos = pos
+	end
+
+	surface.SetDrawColor(255, 255, 255, 255)
+	surface.SetMaterial(cacheEntry.material)
+	surface.DrawTexturedRect(x, y, width, height)
+
+	local hitPos = util.IntersectRayWithOBB(playerShootPos, playerAimVec, cacheEntry.pos, screenAngle, cacheEntry.mins, cacheEntry.maxs)
+	
 	-- Debug to check the text hitboxes
 	-- debugoverlay.BoxAngles(cacheEntry.pos, cacheEntry.mins, cacheEntry.maxs, screenAngle, 0.02, Color(0, 255, 0, 10))
 
@@ -110,23 +147,31 @@ end
 
 local selection = {
 	["Selection"] = function(w, h)
-		if DrawTextWithHitbox("[SLASHERS]", "TVCDBig", w / 2, (h / 2) - (h / 6), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+		if DrawTextWithHitbox("[SLASHERS]", "TVCDBig", w / 2, (h / 2) - (h / 4), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 			GameData.DocumentPointer = 0
 		end
 
-		if DrawTextWithHitbox("[LOCATIONS]", "TVCDBig", w / 2, (h / 2), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+		if DrawTextWithHitbox("[LOCATIONS]", "TVCDBig", w / 2, (h / 2) - (h / 12), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 			GameData.DocumentPointer = 1
 		end
 
-		if DrawTextWithHitbox("[ARCHIVE]", "TVCDBig", w / 2, (h / 2) + (h / 6), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+		if DrawTextWithHitbox("[ARCHIVE]", "TVCDBig", w / 2, (h / 2) + (h / 12), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 			GameData.DocumentPointer = 2
+		end
+
+		if DrawTextWithHitbox("[PERKS]", "TVCDBig", w / 2, (h / 2) + (h / 4), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+			GameData.DocumentPointer = 3
 		end
 
 		local pointerPos = h / 2
 		if GameData.DocumentPointer == 0 then
-			pointerPos = pointerPos - (h / 6)
+			pointerPos = pointerPos - (h / 4)
+		elseif GameData.DocumentPointer == 1 then
+			pointerPos = pointerPos - (h / 12)
 		elseif GameData.DocumentPointer == 2 then
-			pointerPos = pointerPos + (h / 6)
+			pointerPos = pointerPos + (h / 12)
+		elseif GameData.DocumentPointer == 3 then
+			pointerPos = pointerPos + (h / 4)
 		end
 
 		draw.SimpleText("<", "TVCDBig", w - (w / 16), pointerPos, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -138,6 +183,8 @@ local selection = {
 				SwitchSelection("Locations")
 			elseif GameData.DocumentPointer == 2 then
 				SwitchSelection("Archive")
+			elseif GameData.DocumentPointer == 3 then
+				SwitchSelection("Perks")
 			end
 		end
 	end, 
@@ -207,6 +254,71 @@ local selection = {
 	end,
 	["Archive"] = function(w, h)
 		draw.SimpleText("WIP", "TVCDBig", w / 2, h / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+		if IsPressing(MOUSE_RIGHT) then
+			SwitchSelection("Selection", true)
+		end
+	end,
+	["Perks"] = function(w, h)
+		draw.SimpleText("WIP :3", "TVCDBig", w / 2, h / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+		local sortedPerks = {}
+		for _, perk in ipairs(SlashCo.GetPerks()) do
+			if not sortedPerks[perk.Level] then
+				sortedPerks[perk.Level] = {}
+			end
+
+			table.insert(sortedPerks[perk.Level], perk)
+			table.insert(sortedPerks[perk.Level], perk)
+
+			if not sortedPerks[perk.Level + 1] then
+				sortedPerks[perk.Level + 1] = {}
+			end
+
+			table.insert(sortedPerks[perk.Level + 1], perk)
+		end
+
+		local currentPerk = nil
+		local currentOffset = 0
+		local currentPlayerLevel = SlashCo.ExperienceToLevel(GameData.LocalPlayer:GetExperience())
+		for level, perks in pairs(sortedPerks) do
+			currentOffset = currentOffset + (h / 50)
+			draw.SimpleText("-- Level " .. level .. " --", "TVCDMedium", w / 2, currentOffset, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			currentOffset = currentOffset + (h / 30)
+
+			local pos = 0
+			local row = 0
+			for _, perk in ipairs(perks) do
+				local widthPerEntry = w
+				widthPerEntry = widthPerEntry - (w / 50) -- Edge padding
+				widthPerEntry = widthPerEntry / 10 -- 5 entries per row
+
+				if DrawTextureWithHitbox(perk.Icon, (w / 50) + (widthPerEntry * pos), currentOffset, w / 12, h / 12) then
+					surface.SetDrawColor(255, 0, 0, 255)
+					surface.DrawOutlinedRect((w / 50) + (widthPerEntry * pos), currentOffset, w / 12, h / 12, 6)
+					currentPerk = perk
+				end
+
+
+				if level > currentPlayerLevel or not SlashCo.OwnsPerk(GameData.LocalPlayer, perk.ID) then
+					surface.SetDrawColor(0, 0, 0, 200)
+					surface.DrawRect((w / 50) + (widthPerEntry * pos), currentOffset, w / 12, h / 12)
+				end
+
+				pos = pos + 1
+				if pos >= 10 then
+					currentOffset = currentOffset + (h / 12) + (h / 50)
+					row = row + 1
+					pos = 0
+				end
+			end
+
+			currentOffset = currentOffset + (h / 12)
+		end
+
+		if IsPressing(MOUSE_LEFT) and currentPerk then
+			SwitchSelection("Perk-" .. currentPerk.ID)
+		end
 
 		if IsPressing(MOUSE_RIGHT) then
 			SwitchSelection("Selection", true)
@@ -326,7 +438,79 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 	end
 end
 
-hook.Add("PostDrawOpaqueRenderables", "LobbyDocumentScreen", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
+for _, perk in ipairs(SlashCo.GetPerks()) do
+	local icon = Material(perk.Icon)
+	local descriptionRows = SplitTextIntoRows(SlashCo.Language(perk.Description), "TVCD", screenSize / 1.01)
+	local buyText = SlashCo.Language("perk_buy")
+	local enableText = SlashCo.Language("perk_enable")
+	local disableText = SlashCo.Language("perk_disable")
+	local wasHit = false -- RaphaelIT7: Will have a 1 tick render delay but who cares
+	local allowedColor = Color(100, 255, 100)
+	local deniedColor = Color(255, 100, 100)
+	local unpressed = true
+	selection["Perk-" .. perk.ID] = function(w, h)
+		local row = 1
+		local rowSize = w / 28
+		draw.SimpleText("NAME: \"" .. SlashCo.Language(perk.Name) .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+
+		row = row + 1
+		draw.SimpleText("PRICE: " .. perk.Price .. "P", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+
+		row = row + 1
+		draw.SimpleText("TEAM: " .. team.GetName(perk.Team), "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+
+		surface.SetDrawColor(255, 255, 255, 255)
+		surface.SetMaterial(icon)
+		surface.DrawTexturedRect(w - (w / 2.8), h - (h / 1.02), w / 3, h / 3)
+
+		local textColor = color_white
+		if wasHit then
+			textColor = perk.Price > GameData.LocalPlayer:GetPoints() and deniedColor or allowedColor
+		end
+
+		local text = buyText
+		if SlashCo.OwnsPerk(GameData.LocalPlayer, perk.ID) then
+			text = SlashCo.IsActivePerk(GameData.LocalPlayer, perk.ID) and disableText or enableText
+		end
+
+		surface.SetFont("TVCDMedium")
+		local width = surface.GetTextSize(text)
+
+		row = row + 2
+		wasHit = DrawTextWithHitbox("[" .. text .. "]", "TVCDMedium", (h / 30) + (width / 2), rowSize * row, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+
+		row = row + 5
+		draw.SimpleText("[Description]", "TVCD", h / 100, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+
+		row = row + 1
+		for _, rowText in ipairs(descriptionRows) do
+			draw.SimpleText(rowText, "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+			row = row + 1
+		end
+
+		if wasHit then
+			if IsPressing(MOUSE_LEFT) and unpressed then
+				unpressed = false
+
+				if text == buyText then
+					SlashCo.BuyPerk(perk.ID)
+				elseif text == enableText then
+					SlashCo.EnablePerk(perk.ID)
+				else -- disable
+					SlashCo.DisablePerk(perk.ID)
+				end
+			elseif not IsPressing(MOUSE_LEFT) and not unpressed then
+				unpressed = true
+			end
+		end
+
+		if IsPressing(MOUSE_RIGHT) then
+			SwitchSelection("Perks", true)
+		end
+	end
+end
+
+hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
 	if not GameData.IsLobby then
 		return
 	end
@@ -367,6 +551,15 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyDocumentScreen", function(bDrawingDe
 			if drawFunc then
 				callID = 0
 				drawFunc(w, h)
+			end
+
+			local hitPos = util.IntersectRayWithOBB(playerShootPos, playerAimVec, screenPos, screenAngle, Vector(0, -(w * worldScale), -1), Vector(w * worldScale, 0, 0))
+			if hitPos then
+				debugoverlay.BoxAngles(screenPos, Vector(0, -(w * worldScale), 0), Vector(w * worldScale, 0, 1), screenAngle, 0.02, Color(0, 255, 0, 10))
+				surface.SetDrawColor(255, 255, 255, 255)
+				hitPos = WorldToLocal(hitPos, Angle(), screenPos, screenAngle)
+				hitPos:Div(worldScale)
+				surface.DrawRect(hitPos.x - 2, -(hitPos.y - 2), 4, 4)
 			end
 		else
 			--GameData.DocumentOption = fallBackOption -- Reset.

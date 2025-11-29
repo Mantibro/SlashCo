@@ -145,8 +145,6 @@ if not SlashCo.CurRound then
 	SlashCo.ResetCurRoundData()
 end
 
-SlashCo.PlayerData = SlashCo.PlayerData or {} --Holds all loaded playerdata
-
 --Spawn a gas can
 function SlashCo.CreateGasCan(pos, ang)
 	local Ent = ents.Create("sc_gascan")
@@ -468,7 +466,7 @@ function SlashCo.HelicopterLeaveForIntro()
 			SlashCo.QuietHeli()
 			SlashCo.RemoveHelicopter()
 
-			net.Start("mantislashco_MapAmbientPlay")
+			net.Start("SlashCo:MapAmbientPlay")
 			net.Broadcast()
 		end)
 	end)

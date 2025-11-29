@@ -194,7 +194,7 @@ function PLAYER:SurvivorPing()
 	end
 
 	ping_info.Entity = look
-	net.Start("mantislashco_SurvivorPings")
+	net.Start("SlashCo:SurvivorPings")
 		net.WriteTable(ping_info)
 		local players = team.GetPlayers(TEAM_SURVIVOR)
 		table.Add(players, team.GetPlayers(TEAM_SPECTATOR))

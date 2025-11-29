@@ -61,4 +61,4 @@ function HeadBob(pl, pos, ang, fov)
 
 	return GAMEMODE:CalcView(pl, v.pos, v.ang, v.fov)
 end
-hook.Add("CalcView", "octoSlashCoCalcViewHeadBob", HeadBob)
+hook.Add("CalcView", "SlashCo:CalcViewHeadBob", HeadBob)

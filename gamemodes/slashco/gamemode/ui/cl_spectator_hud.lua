@@ -92,7 +92,7 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 	end
 
 	local pickedSlasher = GameData.LocalPlayer:GetPickedSlasher()
-	if pickedSlasher ~= "" then
+	if pickedSlasher and pickedSlasher ~= "" then
 		if slashershow_tick < 255 then
 			slashershow_tick = slashershow_tick + (FrameTime() * 10)
 		else
@@ -102,9 +102,7 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 		draw.SimpleText("You will play as: " .. pickedSlasher, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.6, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
-	if GameData.IsLobby then
-		return
-	end
+	if GameData.IsLobby then return end
 
 	local show_slasher_anticipation = false
 

@@ -278,7 +278,7 @@ end
 
 -- RaphaelIT7: There intentionally is no callback function due to the nature of DTs being possibly received more than once! If you really need it tell me - I got that code already done
 
-SetupSlashCoNetworkVar("Int", 0, "Level")
+SetupSlashCoNetworkVar("Int", 0, "Experience")
 SetupSlashCoNetworkVar("Int", 1, "Points")
 SetupSlashCoNetworkVar("Int", 2, "SurvivorRoundsWon")
 SetupSlashCoNetworkVar("Int", 3, "SlasherRoundsWon")
@@ -289,3 +289,5 @@ SetupSlashCoNetworkVar("Bool", 0, "CanSeePlayers")
 SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")
 
 SetupSlashCoNetworkVar("String", 0, "PickedSlasher") -- RaphaelIT7: Only used to display which slasher they'll be.
+SetupSlashCoNetworkVar("String", 1, "ActivePerks")
+SetupSlashCoNetworkVar("String", 2, "OwnedPerks") -- RaphaelIT7: I do not like this... a problem for later me

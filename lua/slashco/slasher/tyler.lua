@@ -142,6 +142,10 @@ function SLASHER.OnHelicopterSummon(slasher)
 	TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 end
 
+function SLASHER.ShouldPlayAmbientSound(slasher)
+	return slasher.TylerState ~= TYLER_SPECTER -- RaphaelIT7: If he's a specter we don't want him to play these
+end
+
 if CLIENT then
 	CreateClientConVar("slashco_tyler_endless_chase_music", "1", true, false, "When 0 the endless chase music is changed to be the normal one", 0, 1)
 end
@@ -156,7 +160,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
 
-	if (TylerState == 0 or TylerState == 1) and endlessChase then
+	if (TylerState == TYLER_SPECTER or TylerState == TYLER_CREATOR) and endlessChase then
 		TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 		SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
 		slasher.TylerSongPickedID = nil

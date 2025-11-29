@@ -41,8 +41,11 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+local MALE07_GHOST = 0
+local MALE07_POSESSED = 1
+local MALE07_MONSTER = 2
 function SLASHER.OnSpawn(slasher)
-	slasher.MaleState = 1
+	slasher.MaleState = MALE07_GHOST
 	slasher.TimeChasingAsHuman = 0
 	slasher.MaleCooldown = 0
 	slasher.SlashCooldown = 0
@@ -55,8 +58,12 @@ function SLASHER.Precache()
 	SlashCo.PrecacheModel(maleModelName)
 end
 
+function SLASHER.ShouldPlayAmbientSound(slasher)
+	return slasher.MaleState ~= MALE07_GHOST -- RaphaelIT7: If he's a ghost we don't want him to play these
+end
+
 function SLASHER.OnTickBehaviour(slasher)
-	local State = slasher.MaleState or 0 --State
+	local State = slasher.MaleState or MALE07_STATE_GHOST --State
 	local ChaseAsHuman = slasher.TimeChasingAsHuman or 0 --Time Spent Human Chasing
 	local MaleCD = slasher.MaleCooldown or 0 --Cooldown
 	local SlashCD = slasher.SlashCooldown or 0 --Slash Cooldown
@@ -143,7 +150,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					end
 				end)
 
-				slasher.MaleState = 2
+				slasher.MaleState = MALE07_MONSTER
 			end
 		end
 	else
@@ -159,12 +166,12 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher.MaleState == 1 then
+	if slasher.MaleState == MALE07_POSESSED then
 		SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
-	if slasher.MaleState == 0 then
+	if slasher.MaleState == MALE07_GHOST then
 		return
 	end
 
@@ -235,7 +242,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:SetVisible(true)
 		slasher:SetMoveType(MOVETYPE_WALK)
 
-		slasher.MaleState = 1
+		slasher.MaleState = MALE07_POSESSED
 		slasher.CurrentChaseTick = 0
 		slasher.MaleCooldown = 3
 
@@ -245,14 +252,14 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		return
 	end
 
-	if slasher.MaleState > 0 then
+	if slasher.MaleState ~= MALE07_GHOST then
 		slasher:SetModel(maleModelName)
 
 		slasher:SetVisible(false)
 
 		SlashCo.CreateItem("sc_maleclone", slasher:GetPos(), slasher:GetAngles())
 
-		slasher.MaleState = 0
+		slasher.MaleState = MALE07_GHOST
 		slasher:EmitSound("slashco/slasher/male07/male07_unpossess" .. math.random(1, 2) .. ".mp3")
 		slasher.MaleCooldown = 3
 

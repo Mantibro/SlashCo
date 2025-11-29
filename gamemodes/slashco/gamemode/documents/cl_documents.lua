@@ -1,6 +1,7 @@
 include("sh_documents.lua")
 
 SlashCo.Documents = SlashCo.Documents or {} -- a table containing all collected documents of thelocal player
+
 function SlashCo.HasDocument(name)
 	return SlashCo.Documents[name] != nil
 end

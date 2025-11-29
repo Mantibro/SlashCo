@@ -35,7 +35,7 @@ local function showScreenMessage()
 	parsedItem:Draw(ScrW() / 2, ScrH() / 2, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
 
-net.Receive("mantislashco_GasPourProgress", function()
+net.Receive("SlashCo:GasPourProgress", function()
 	TimeToFuel = net.ReadUInt(8)
 	FuelingCanIndex = net.ReadUInt(MAX_EDICT_BITS)
 	IsFueling = net.ReadBool()
