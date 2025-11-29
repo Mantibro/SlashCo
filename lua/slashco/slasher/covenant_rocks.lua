@@ -155,9 +155,9 @@ function SLASHER.InitHud(_, hud)
 	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
 	
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	hook.Add("HUDPaint", "SlashCoZanySurvey", function()
+	hook.Add("SlashCo:DrawHUD", "SlashCoZanySurvey", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("HUDPaint", "SlashCoZanySurvey")
+			hook.Remove("SlashCo:DrawHUD", "SlashCoZanySurvey")
 		end
 
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do

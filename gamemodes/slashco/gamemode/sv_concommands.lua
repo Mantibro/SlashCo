@@ -70,7 +70,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 
 	local id = target:SteamID64()
 	for k, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
-		if v.s_id == id then
+		if v.steamid == id then
 			SlashCo.CurRound.SlasherData.AllSlashers[k] = nil
 			break
 		end
@@ -78,7 +78,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 
 	local found
 	for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-		if v.id == id then
+		if v.steamid == id then
 			found = true
 			break
 		end
@@ -87,7 +87,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 	SlashCo.CurRound.Slashers[target:SteamID64()] = nil
 
 	if not found then
-		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = id })
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = id })
 	end
 
 	doPrint(ply, "New Survivor successfully assigned.")
@@ -160,9 +160,9 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		end
 	end
 
-	local id = target:SteamID64()
+	local steamid = target:SteamID64()
 	for k, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-		if v.id == id then
+		if v.steamid == steamid then
 			SlashCo.CurRound.SlasherData.AllSurvivors[k] = nil
 			break
 		end
@@ -170,14 +170,14 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 
 	local found
 	for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
-		if v.s_id == id then
+		if v.steamid == steamid then
 			found = true
 			break
 		end
 	end
 
 	if not found then
-		table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = args[1] })
+		table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = steamid, slasherkey = args[1] })
 	end
 
 	SlashCo.SelectSlasher(args[1], target:SteamID64())
@@ -266,7 +266,7 @@ concommand.Add("slashco_debug_run_survivor", function(ply)
 			k:SetTeam(TEAM_SURVIVOR)
 			k:Spawn()
 
-			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = k:SteamID64() })
+			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = k:SteamID64() })
 			doPrint(ply, k:Name() .. " is now a survivor")
 		end
 	end)
@@ -282,19 +282,15 @@ concommand.Add("slashco_debug_datatest_makedummy", function(ply)
 		return
 	end
 
-	if CLIENT then
-		return
-	end
-
 	if not sql.TableExists("slashco_table_basedata") and not sql.TableExists("slashco_table_survivordata") and not sql.TableExists("slashco_table_slasherdata") then
 		--Create the database table
 
 		local diff = SlashCo.LobbyData.SelectedDifficulty
 		local offer = SlashCo.LobbyData.Offering
 		local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
-		--local slasher1id = GetRandomSlasher()
+		--local slasher1id = SlashCo.GetRandomSlasher()
 		local slasher1id = "Abomignat"
-		local slasher2id = GetRandomSlasher()
+		local slasher2id = SlashCo.GetRandomSlasher()
 
 		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary TEXT , SlasherIDSecondary TEXT , SurviorGasMod NUMBER);")
 		sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
@@ -318,21 +314,17 @@ concommand.Add("slashco_debug_datatest_makedummy", function(ply)
 end, nil, "Make a bare-minimum data table to be able to run a round.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_datatest_read", function(ply)
-	if CLIENT then
-		return
-	end
-
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
 		doPrint(ply, "Only admins can use debug commands!")
 		return
 	end
 
 	doPrint(ply, "basedata: ")
-	PrintTable(sql.Query("SELECT * FROM slashco_table_basedata; ") or "nil")
+	PrintTable(sql.Query("SELECT * FROM slashco_table_basedata;") or "nil")
 	doPrint(ply, "survivordata: ")
-	PrintTable(sql.Query("SELECT * FROM slashco_table_survivordata; ") or "nil")
+	PrintTable(sql.Query("SELECT * FROM slashco_table_survivordata;") or "nil")
 	doPrint(ply, "slasherdata: ")
-	PrintTable(sql.Query("SELECT * FROM slashco_table_slasherdata; ") or "nil")
+	PrintTable(sql.Query("SELECT * FROM slashco_table_slasherdata;") or "nil")
 end, nil, "Read out the current data table.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_datatest_error", function(ply, _, _)
@@ -341,24 +333,16 @@ concommand.Add("slashco_debug_datatest_error", function(ply, _, _)
 		return
 	end
 
-	if SERVER then
-		doPrint(ply, sql.LastError())
-	end
+	doPrint(ply, sql.LastError())
 end, nil, "Print the latest data error.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_datatest_delete", function(_, _, _)
-	if SERVER then
-		SlashCo.ClearDatabase()
-	end
+	SlashCo.ClearDatabase()
 end, nil, "Delete the current data table.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 --//items//--
 
 concommand.Add("slashco_give_item", function(ply, _, args)
-	if CLIENT then
-		return
-	end
-
 	if ply:Team() ~= TEAM_SURVIVOR then
 		doPrint(ply, "Only survivors can have items")
 		return
@@ -556,7 +540,7 @@ hook.Add("StartCommand", "LobbyBot", function(ply, cmd)
 			ply:SetPos(elevator:GetPos() + Vector(0, 0, 10))
 		end
 
-		if (CurTime() - (ply._REACHED_ELEVATOR or 0)) > 30 then
+		if (CurTime() - (ply._REACHED_ELEVATOR or 0)) > 30 and not g_SlashCoDebug then
 			if not IsValid(SlashCo.Helicopter) then return end
 			if ply:InVehicle() then return end -- RaphaelIT7: Holy shit, since I had forgotten this, the bot spammed entered... 7000+ helicoper seats got created
 

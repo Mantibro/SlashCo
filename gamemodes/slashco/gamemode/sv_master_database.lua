@@ -36,7 +36,7 @@ function SlashCoDatabase.UpdateStats(id, s_type, increase)
 	end
 
 	local database = sql.Query("SELECT " .. s_type .. " FROM slashco_master_database WHERE PlayerID ='" .. id .. "';")
-	local name = sql.Query("SELECT PlayerName FROM slashco_master_database WHERE PlayerID ='" .. id .. "'; ")[1].PlayerName
+	local name = sql.Query("SELECT PlayerName FROM slashco_master_database WHERE PlayerID ='" .. id .. "';")[1].PlayerName
 	local current_stat
 	if s_type == "SurvivorRoundsWon" then
 		current_stat = database[1].SurvivorRoundsWon
@@ -89,7 +89,7 @@ function SlashCoDatabase.GetStat(id, s_type)
 end
 
 function SlashCoDatabase.OnPlayerJoined(id)
-	local database = sql.Query("SELECT * FROM slashco_master_database; ")
+	local database = sql.Query("SELECT * FROM slashco_master_database;")
 
 	local ply = player.GetBySteamID64(id)
 	if not ply then return end -- The SteamID is not valid...

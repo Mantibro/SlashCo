@@ -61,13 +61,13 @@ local PLAYER_LINE = {
 		self:SetHeight(32 + 3 * 2)
 		self:DockMargin(2, 0, 2, 2)
 	end,
-	Setup = function(self, pl)
-		if pl == GameData.LocalPlayer then
+	Setup = function(self, ply)
+		if ply == GameData.LocalPlayer then
 			self.Mute:Hide()
 			self.Shift:Show()
 		end
 
-		self.Player = pl
+		self.Player = ply
 
 		self.team_status = TEAM_SPECTATOR
 		self.teamcolor = color_white
@@ -75,7 +75,7 @@ local PLAYER_LINE = {
 
 		self.IsDead = self.Player:GetNWBool("ConfirmedDead")
 
-		self.Avatar:SetPlayer(pl)
+		self.Avatar:SetPlayer(ply)
 
 		if not SlashCo.PlayerData then
 			return
@@ -90,14 +90,14 @@ local PLAYER_LINE = {
 		end
 
 		for _, v in ipairs(SlashCo.PlayerData.survivors) do
-			local check = v.id or v.steamid
+			local check = v.steamid
 
-			if check == pl:SteamID64() then
+			if check == ply:SteamID64() then
 				self.team_status = TEAM_SURVIVOR
 				self.teamcolor = Color(128, 128, 255, 255)
 				self.teamorder = 0
 
-				if GameData.LocalPlayer:Team() ~= TEAM_SURVIVOR and pl:Team() == TEAM_SPECTATOR then
+				if GameData.LocalPlayer:Team() ~= TEAM_SURVIVOR and ply:Team() == TEAM_SPECTATOR then
 					self.teamcolor = Color(64, 64, 192, 255)
 					self.teamorder = 500
 				end
@@ -107,9 +107,9 @@ local PLAYER_LINE = {
 		end
 
 		for _, v in ipairs(SlashCo.PlayerData.slashers) do
-			local check = v.s_id or v.steamid
+			local check = v.steamid
 
-			if check == pl:SteamID64() then
+			if check == ply:SteamID64() then
 				self.team_status = TEAM_SLASHER
 				self.teamcolor = Color(255, 64, 64, 255)
 				self.teamorder = -500

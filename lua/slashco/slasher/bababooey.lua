@@ -246,7 +246,7 @@ function SLASHER.Footstep(ply)
 	return true
 end
 
-hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 	if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Bababooey") == true then
 		if GameData.LocalPlayer.baba_f == nil then
 			GameData.LocalPlayer.baba_f = 0

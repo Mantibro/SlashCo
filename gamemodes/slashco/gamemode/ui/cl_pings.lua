@@ -72,7 +72,7 @@ net.Receive("mantislashco_SurvivorPings", function()
 end)
 
 --ping display
-hook.Add("HUDPaint", "PingDisplay", function()
+hook.Add("SlashCo:DrawHUD", "PingDisplay", function()
 	if GameData.LocalPlayer:Team() == TEAM_SLASHER then
 		global_pings = {}
 		return

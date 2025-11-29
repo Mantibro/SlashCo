@@ -749,7 +749,7 @@ if CLIENT then
 	local iconT = 0
 	local iconTL = 0
 
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Tyler") == true then
 			if GameData.LocalPlayer.tyl_f == nil then
 				GameData.LocalPlayer.tyl_f = 0

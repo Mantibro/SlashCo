@@ -41,11 +41,9 @@ hook.Add("SlashCo:Precache", "PrecacheSurvivorModels", function()
 end)
 
 function PLAYER:SetModel()
-	local cl_modelname = self.Player:GetInfo("slashco_cl_playermodel")
-	local allow = SlashCo.SurvivorModels[cl_modelname] ~= nil
-
 	local modelname
-	if allow then
+	local cl_modelname = self.Player:GetInfo("slashco_cl_playermodel")
+	if SlashCo.SurvivorModels[cl_modelname] then
 		modelname = cl_modelname
 	else
 		modelname = SlashCo.SurvivorModels[math.random(1, #SlashCo.SurvivorModels)]

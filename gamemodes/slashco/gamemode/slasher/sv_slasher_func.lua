@@ -1,14 +1,14 @@
 local SlashCo = SlashCo
 
-function SlashCo.SelectSlasher(slasher_name, plyid)
-	SlashCo.CurRound.Slashers[plyid] = {}
-	SlashCo.CurRound.Slashers[plyid].SlasherID = slasher_name
-	SlashCo.CurRound.Slashers[plyid].GasCanMod = SlashCoSlashers[slasher_name].GasCanMod
-	SlashCo.PrecacheSlasher(slasher_name)
+function SlashCo.SelectSlasher(slasherID, steamID64)
+	SlashCo.CurRound.Slashers[steamID64] = {}
+	SlashCo.CurRound.Slashers[steamID64].SlasherID = slasherID
+	SlashCo.CurRound.Slashers[steamID64].GasCanMod = SlashCoSlashers[slasherID].GasCanMod
+	SlashCo.PrecacheSlasher(slasherID)
 end
 
 function SlashCo.ApplySlasherToPlayer(ply)
-	if SlashCo.CurRound.Slashers[ply:SteamID64()] ~= nil then
+	if SlashCo.CurRound.Slashers[ply:SteamID64()] then
 		--Set the correct Slasher
 		print("[SlashCo] Assigning the correct Slasher to the player.")
 		ply:SetNWString("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
@@ -91,7 +91,7 @@ function SlashCo.OnSlasherSpawned(ply)
 	ply:SlasherFunction("OnSpawn")
 
 	if not SlashCo.NotPerfect and GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) > 1 then
-		ply:SetPoints("slasher_perfect")
+		ply:SetRoundPoints("slasher_perfect")
 	end
 	ply.SuccessfulSpawn = true
 end
@@ -100,9 +100,7 @@ end
 --On-Tick Behaviour
 hook.Add("Tick", "HandleSlasherAbilities", function()
 	local gens = ents.FindByClass("sc_generator")
-	if #gens < 1 then
-		return
-	end
+	if #gens == 0 then return end
 
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
@@ -133,7 +131,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 		end
 
 		for _, ply in ipairs(slasher:FindPlayersInView(slasher:SlasherValue("Eyesight") * 100, slasher:SlasherValue("ChaseRadius", 0.91) + inv)) do
-			ply:MarkAsSeenBySlasher() -- They were seen.
+			ply:SetWasSeenBySlasher(true) -- They were seen.
 		end
 
 		if slasher:GetNWBool("InSlasherChaseMode") then
@@ -142,8 +140,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 			--local inv = (1 - SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseRadius) / 2
 
 			local eyeTrace = slasher:GetEyeTrace()
-			local find = ents.FindInCone(slasher:GetPos(), eyeTrace.Normal, dist * 2,
-					slasher:SlasherValue("ChaseRadius", 0.91) + inv)
+			local find = ents.FindInCone(slasher:GetPos(), eyeTrace.Normal, dist * 2, slasher:SlasherValue("ChaseRadius", 0.91) + inv)
 			local find_p = NULL
 
 			for p = 1, #find do
@@ -177,16 +174,11 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 
 		slasher:SlasherFunction("OnTickBehaviour")
 
-		slasher:SetNW2Float("FogMult", 0.5 + (slasher:GetNWFloat("Slasher_Eyesight", 1) / 5))
+		slasher:SetFogMult(0.5 + (slasher:GetNWFloat("Slasher_Eyesight", 1) / 5))
 	end
 
-	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then
-		return
-	end
-
-	if SlashCo.CurRound.GameProgress <= -1 then
-		return
-	end
+	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then return end
+	if SlashCo.CurRound.GameProgress <= -1 then return end
 
 	local needed = GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded)
 	local genProgs = {}
@@ -510,7 +502,7 @@ local midAmbientTracks = {
 	"slashco/ambienttrack/ambient_mid5.ogg",
 }
 timer.Create("SlashCo:SlasherAnger", 1, 0, function()
-	if GameData.IsLobby or not SlashCo.RoundStarted then return end
+	if GameData.IsLobby or SlashCo.State ~= SlashCo.States.IN_GAME then return end
 
 	local hasCustomBackgroundMusic = false
 	local backgroundMusic = nil -- change the file later.

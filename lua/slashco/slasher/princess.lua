@@ -55,6 +55,7 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.DoSound(slasher)
+	if SlashCo.State ~= SlashCo.States.IN_GAME then return end -- RaphaelIT7: Before/After a game you should shut up! >:(
 	if not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessMaulingSurvivor") and not slasher:GetNWBool("PrincessSniffing") then
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			slasher:EmitSound("slashco/slasher/princess/princess_chase" .. math.random(1, 15) .. ".mp3")
@@ -585,9 +586,9 @@ function SLASHER.InitHud(_, hud)
 
 		local inaccuracy = math.max(self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) / 12, 50)
 		self.SniffRandom = VectorRand(-inaccuracy, inaccuracy)
-		hook.Add("HUDPaint", "SlashCoSniff", function()
+		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not self.SniffPos or self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) < 150 then
-				hook.Remove("HUDPaint", "SlashCoSniff")
+				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
 				return
 			end
 

@@ -32,8 +32,8 @@ net.Receive("mantislashco_OfferingVoteFinished", function()
 	GameData.ShowOfferingResultScreen = true
 end)
 
-hook.Add("HUDPaint", "OfferingVoteHUD", function()
-	if GameData.ShowOfferingResultScreen == true then
+hook.Add("SlashCo:DrawHUD", "OfferingVoteHUD", function()
+	if GameData.ShowOfferingResultScreen then
 		if GameData.OfferingSoundAntiSpam == nil then
 			local ID = "offering_" .. (GameData.OfferingRarity or 1)
 			--[[SlashCo.AudioSystem.PlaySound({

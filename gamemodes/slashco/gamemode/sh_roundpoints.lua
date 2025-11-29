@@ -20,29 +20,29 @@ local pointAmounts = {
 	working = 5 --
 }
 
-local plyPoints = {}
+GameData.RoundPoints = GameData.RoundPoints or {}
 
 ---adds points the player will earn at game end
-function PLAYER:AddPoints(key, amount)
+function PLAYER:AddRoundPoints(key, amount)
 	if not amount then
 		amount = pointAmounts[key] or 5
 	end
 
 	local steamID64 = self:SteamID64()
-	plyPoints[steamID64] = plyPoints[steamID64] or {}
-	plyPoints[steamID64][key] = plyPoints[steamID64][key] or {}
+	GameData.RoundPoints[steamID64] = GameData.RoundPoints[steamID64] or {}
+	GameData.RoundPoints[steamID64][key] = GameData.RoundPoints[steamID64][key] or {}
 
-	table.insert(plyPoints[steamID64][key], amount)
+	table.insert(GameData.RoundPoints[steamID64][key], amount)
 
 	if SERVER then
-		SlashCo.SendValue(self, "addPoints", key, amount)
+		SlashCo.SendValue(self, "addRoundPoints", key, amount)
 	end
 end
 
 ---set a point type the player will earn at game end
-function PLAYER:SetPoints(key, amount, num)
+function PLAYER:SetRoundPoints(key, amount, num)
 	local steamID64 = self:SteamID64()
-	if not plyPoints[steamID64] then
+	if not GameData.RoundPoints[steamID64] then
 		return
 	end
 
@@ -50,66 +50,66 @@ function PLAYER:SetPoints(key, amount, num)
 		amount = pointAmounts[key] or 5
 	end
 
-	plyPoints[steamID64] = plyPoints[steamID64] or {}
-	plyPoints[steamID64][key] = {}
+	GameData.RoundPoints[steamID64] = GameData.RoundPoints[steamID64] or {}
+	GameData.RoundPoints[steamID64][key] = {}
 
 	num = num or 1
 
 	for i = 1, num do
-		table.insert(plyPoints[steamID64][key], amount)
+		table.insert(GameData.RoundPoints[steamID64][key], amount)
 	end
 
 	if SERVER then
-		SlashCo.SendValue(self, "setPoints", key, amount, num)
+		SlashCo.SendValue(self, "setRoundPoints", key, amount, num)
 	end
 end
 
 ---remove an entire set of points to earn from a player
-function PLAYER:RemovePointsKey(key)
+function PLAYER:RemoveRoundPointsKey(key)
 	local steamID64 = self:SteamID64()
-	if not plyPoints[steamID64] then
+	if not GameData.RoundPoints[steamID64] then
 		return
 	end
 
-	plyPoints[steamID64][key] = nil
+	GameData.RoundPoints[steamID64][key] = nil
 
 	if SERVER then
-		SlashCo.SendValue(self, "removePointsKey", key)
+		SlashCo.SendValue(self, "removeRoundPointsKey", key)
 	end
 end
 
 ---get the keys of a player's points table
-function PLAYER:GetPointsKeys()
+function PLAYER:GetRoundPointsKeys()
 	local steamID64 = self:SteamID64()
-	if not plyPoints[steamID64] then
+	if not GameData.RoundPoints[steamID64] then
 		return {}
 	end
 
-	return table.GetKeys(plyPoints[steamID64])
+	return table.GetKeys(GameData.RoundPoints[steamID64])
 end
 
 ---get the amount of points for a particular key
-function PLAYER:GetPoints(key)
+function PLAYER:GetRoundPoints(key)
 	local steamID64 = self:SteamID64()
-	if not plyPoints[steamID64] or not plyPoints[steamID64][key] then
+	if not GameData.RoundPoints[steamID64] or not GameData.RoundPoints[steamID64][key] then
 		return 0
 	end
 
 	local tot = 0
-	for _, v in ipairs(plyPoints[steamID64][key]) do
+	for _, v in ipairs(GameData.RoundPoints[steamID64][key]) do
 		tot = tot + v
 	end
 
-	return tot, #plyPoints[steamID64][key]
+	return tot, #GameData.RoundPoints[steamID64][key]
 end
 
 local function getTotal(id)
-	if not plyPoints[id] then
+	if not GameData.RoundPoints[id] then
 		return 0
 	end
 
 	local tot = 0
-	for _, v in pairs(plyPoints[id]) do
+	for _, v in pairs(GameData.RoundPoints[id]) do
 		for _, v1 in ipairs(v) do
 			tot = tot + v1
 		end
@@ -119,21 +119,22 @@ local function getTotal(id)
 end
 
 ---get the total points a player has
-function PLAYER:GetTotalPoints()
+function PLAYER:GetTotalRoundPoints()
 	return getTotal(self:SteamID64())
 end
 
 if SERVER then
 	---set the total points for the round into the database
-	function SlashCo.CommitPoints()
-		for k, _ in pairs(plyPoints) do
+	function SlashCo.CommitRoundPoints()
+		for k, _ in pairs(GameData.RoundPoints) do
 			local total = getTotal(k)
-			plyPoints[k] = nil
+			GameData.RoundPoints[k] = nil
 			if total == 0 then
 				return
 			end
 
-			SlashCoDatabase.UpdateStats(k, "Points", SlashCo.PlayerData[k].PointsTotal + total)
+			SlashCoDatabase.UpdateStats(k, "Points", total)
+			SlashCoDatabase.UpdateStats(k, "Experience", math.floor(total / 2))
 		end
 	end
 
@@ -141,19 +142,19 @@ if SERVER then
 		if not IsValid(attacker) then return end
 
 		if victim:Team() ~= TEAM_SLASHER and attacker.Team and attacker:Team() == TEAM_SLASHER then
-			attacker:AddPoints("slasher_kill")
+			attacker:AddRoundPoints("slasher_kill")
 		end
 	end)
 end
 
-hook.Add("scValue_addPoints", "AddPoints", function(key, amount)
-	GameData.LocalPlayer:AddPoints(key, amount)
+hook.Add("scValue_addRoundPoints", "AddRoundPoints", function(key, amount)
+	GameData.LocalPlayer:AddRoundPoints(key, amount)
 end)
 
-hook.Add("scValue_removePointsKey", "RemovePointsKey", function(key)
-	GameData.LocalPlayer:RemovePointsKey(key)
+hook.Add("scValue_removeRoundPointsKey", "RemoveRoundPointsKey", function(key)
+	GameData.LocalPlayer:RemoveRoundPointsKey(key)
 end)
 
-hook.Add("scValue_setPoints", "SetPoints", function(key, amount, num)
-	GameData.LocalPlayer:SetPoints(key, amount, num)
+hook.Add("scValue_setRoundPoints", "SetPoints", function(key, amount, num)
+	GameData.LocalPlayer:SetRoundPoints(key, amount, num)
 end)

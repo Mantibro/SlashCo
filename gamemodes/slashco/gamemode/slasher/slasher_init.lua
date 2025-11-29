@@ -83,15 +83,22 @@ function TranslateDangerLevel(id)
 	return SlashCo.DangerLevel[id]
 end
 
-function GetRandomSlasher()
-	local keys = table.GetKeys(SlashCoSlashers)
-	local rand, rand_name
-	repeat
-		rand = math.random(1, #keys)
-		rand_name = keys[rand] --random id for this roll
-	until SlashCoSlashers[rand_name].IsSelectable and rand_name ~= "Leuonard"
+function SlashCo.GetRandomSlasher(dangerlevel, slasherClass)
+	dangerlevel = dangerlevel or SlashCo.DangerLevel.Unknown
+	slasherClass = slasherClass or SlashCo.SlasherClass.Unknown
 
-	return rand_name
+	local acceptableSlashers = {}
+	for id, slasher in pairs(SlashCoSlashers) do
+		if not slasher.IsSelectable then continue end
+		if slasher.Name == "Leuonard" then continue end
+
+		if dangerlevel ~= SlashCo.DangerLevel.Unknown and dangerlevel ~= slasher.DangerLevel then continue end
+		if slasherClass ~= SlashCo.SlasherClass.Unknown and slasherClass ~= slasher.Class then continue end
+
+		table.insert(acceptableSlashers, id)
+	end
+
+	return acceptableSlashers[math.random(1, #acceptableSlashers)]
 end
 
 --Slasher Animation Controller

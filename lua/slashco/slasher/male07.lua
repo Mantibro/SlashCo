@@ -413,7 +413,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Male07") == true then
 			if GameData.LocalPlayer.male_f == nil then
 				GameData.LocalPlayer.male_f = 0

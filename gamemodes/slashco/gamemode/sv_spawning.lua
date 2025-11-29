@@ -352,13 +352,14 @@ function SlashCo.SpawnSlasher()
 		return
 	end
 
-	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
-		if not IsValid(p) then continue end
+	for _, ply in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if not IsValid(ply) then continue end
 
-		p:SetTeam(TEAM_SLASHER)
-		p:Spawn()
+		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
+		ply:SetTeam(TEAM_SLASHER)
+		ply:Spawn()
 
-		SlashCo.OnSlasherSpawned(p)
+		SlashCo.OnSlasherSpawned(ply)
 	end
 
 	GameData.SlasherSpawned = true
@@ -376,7 +377,7 @@ local function singlePlayerTable()
 end
 
 -- Flips a table to have the given key as the actual key instead of the normal DB 1, 2, 3 stuff.
-function SQLTableToLuaTable(data, keyName)
+function SlashCo.SQLTableToLuaTable(data, keyName)
 	local resultTable = {}
 	for _, tbl in ipairs(data) do
 		resultTable[tbl[keyName]] = tbl
@@ -403,24 +404,21 @@ function SlashCo.SetupPlayers()
 
 	local becameCovenant = 0
 	local spawn_queue = 0
-	local survivors = SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_survivordata; "), "Survivors") or singlePlayerTable()
-	local slashers = SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata; "), "Slashers") or {}
-	local plys = player.GetAll()
-	for _, ply in ipairs(plys) do
-		--Assign the teams for the current round
-		local id = ply:SteamID64()
-		-- print("name: " .. ply:Name())
+	local survivors = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_survivordata;"), "SteamID") or singlePlayerTable()
+	local slashers = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata;"), "SteamID") or {}
+	for _, ply in ipairs(player.GetAll()) do
+		local steamid = ply:SteamID64()
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
-			if slashers[id] then
+			if slashers[steamid] then
 				print(ply:Name() .. " now Survivor for Nightmare.")
 				ply:SetTeam(TEAM_SURVIVOR)
 				ply:Spawn()
 				continue
 			end
 
-			if survivors[id] then
+			if survivors[steamid] then
 				ply:SetTeam(TEAM_SPECTATOR)
 				ply:Spawn()
 
@@ -437,9 +435,9 @@ function SlashCo.SetupPlayers()
 		end
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
-		if slashers[id] then
+		if slashers[steamid] then
 			for _, v in ipairs(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant) do
-				if v.steamid == id then
+				if v.steamid == steamid then
 					print(ply:Name() .. " will become part of the Covenant.")
 					ply:SetTeam(TEAM_SPECTATOR)
 					ply:Spawn()
@@ -456,7 +454,7 @@ function SlashCo.SetupPlayers()
 			continue
 		end
 
-		if survivors[id] or SlashCo.AllowLateJoin then
+		if survivors[steamid] or SlashCo.AllowLateJoin then
 			ply:SetTeam(TEAM_SURVIVOR)
 			ply:Spawn()
 			print(ply:Name() .. " now Survivor")
@@ -470,7 +468,7 @@ function SlashCo.SetupPlayers()
 		spawn_queue = spawn_queue + 1
 
 		if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
-			table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
+			table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = steamid })
 			becameCovenant = becameCovenant + 1
 		end
 	end
@@ -481,6 +479,7 @@ function SlashCo.SetupPlayers()
 		if survivorEntry then
 			SlashCo.DropAllItems(survivor) -- if somehow a player grabs an item beforehand
 			SlashCo.ChangeSurvivorItem(survivor, survivorEntry.Item, true)
+			SlashCo.ChangeSurvivorItem(survivor, survivorEntry.Item2, true)
 			SlashCo.SendValue(survivor, "preItem", survivorEntry.Item)
 		end
 	end
@@ -725,7 +724,7 @@ local function startRound(noSetup)
 	SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterTargetPosition, SlashCo.CurRound.HelicopterIntroAngle)
 	SlashCo.BroadcastCurrentRoundData(true)
 
-	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}
+	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}
 	local dangerLevel = SlashCo.DangerLevel.Unknown
 	for _, slasher in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		if not IsValid(slasher) then continue end

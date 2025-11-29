@@ -129,7 +129,7 @@ function ENT:ChangeCanProgress(amount)
 
 	if self.CansRemaining == 0 then
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			v:RemovePointsKey("slasher_perfect")
+			v:RemoveRoundPointsKey("slasher_perfect")
 		end
 
 		SlashCo.NotPerfect = true
@@ -372,9 +372,9 @@ function ENT:Think()
 
 	if CurTime() >= self.TimeUntilFueled then
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
-			self.CurrentPourer:AddPoints("working", 5 + (team.NumPlayers(TEAM_SLASHER) * 15))
+			self.CurrentPourer:AddRoundPoints("working", 5 + (team.NumPlayers(TEAM_SLASHER) * 15))
 		else
-			self.CurrentPourer:AddPoints("working")
+			self.CurrentPourer:AddRoundPoints("working")
 		end
 
 		if IsValid(self.SpawnedAt) then

@@ -346,7 +346,7 @@ function SLASHER.PreDrawHalos()
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Leuonard") == true then
 			if GameData.LocalPlayer.leuo_f == nil then
 				GameData.LocalPlayer.leuo_f = 0

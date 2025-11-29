@@ -162,7 +162,7 @@ if SERVER then
 	return
 end
 
-hook.Add("HUDPaint", "JugVisions", function()
+hook.Add("SlashCo:DrawHUD", "JugVisions", function()
 	if GameData.LocalPlayer:GetNWBool("JugCurseActivate") then
 		local Overlay = Material("slashco/ui/overlays/jug_freeze")
 

@@ -773,10 +773,10 @@ function PANEL:MakeSurvivorsCard()
 	card:Dock(BOTTOM)
 	card:SetTall(80)
 
-	for _, v in ipairs(SurvivorTeam) do
+	for _, survivorData in ipairs(SurvivorTeam) do
 		local survivor = card:Add("Panel")
 		survivor.Rotate = math.random(-7, 7)
-		survivor.Entity = player.GetBySteamID64(v.id)
+		survivor.Entity = player.GetBySteamID64(survivorData.steamid)
 		survivor:Dock(LEFT)
 		survivor:SetWide(80)
 		function survivor.Paint(_, w, h)

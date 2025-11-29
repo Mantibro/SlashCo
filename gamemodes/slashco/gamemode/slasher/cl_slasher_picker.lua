@@ -15,14 +15,16 @@ function SlasherChosen(pickedSlasher)
 		net.WriteString(pickedSlasher)
 	net.SendToServer()
 
-	print("Slasher chosen with the Name of " .. pickedSlasher)
+	-- print("[SlashCo] Slasher chosen \"" .. pickedSlasher .. "\"")
 end
 
 function DrawTheSlasherSelectorBox(pickSlasherTbl)
+	SlashCo.FlashWindows() -- RaphaelIT7: Let's notify the player that they can pick
+
 	local SlasherPickingCLASS = SlashCo.SlasherClass.Unknown
 	local SlasherPickingDANGER = SlashCo.DangerLevel.Unknown
 	local bannedSlashers = {}
-	if pickSlasherTbl ~= nil then
+	if pickSlasherTbl then
 		SlasherPickingCLASS = pickSlasherTbl.slasherClass
 		SlasherPickingDANGER = pickSlasherTbl.slasherDanger
 		bannedSlashers = pickSlasherTbl.bannedSlashers
@@ -36,7 +38,7 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create("DFrame")
 	SlasherSelectFrame:SetTitle("")
-	SlasherSelectFrame:ParentToHUD()
+	--SlasherSelectFrame:ParentToHUD() -- RaphaelIT7: We don't parent to HUD since we want this rendered even if the mainmenu is open
 
 	local x = ScrW() / 50
 	local y = ScrH() / 25

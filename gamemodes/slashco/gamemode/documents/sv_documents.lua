@@ -137,7 +137,7 @@ hook.Add("SlashCo:EndRound", "SlashCo:HandoutDocuments", function(winners)
 		if not ply.WasSurvivor then continue end
 
 		local rating = 3
-		if ply:WasSeenBySlasher() then
+		if ply:GetWasSeenBySlasher() then
 			rating = rating - 1
 		end
 

@@ -39,6 +39,7 @@ function ENT:Think()
 	if math.random(1, math.max(50 - math.min(nearbyFuelCans * 3, 35), 1)) == 1 then
 		nearbyFuelCans = math.max(nearbyFuelCans, 1) -- Just for the math below to play nice.
 		SlashCo.AudioSystem.PlaySound({
+			deleteWhenDone = true,
 			soundPath = "slashco/canisterheavyimpact" .. math.random(1, 3) .. ".mp3",
 			identifier = "FuelCanSound",
 			minDistance = 100 + (150 * SlashCo.MapSize * math.min(nearbyFuelCans, 5)), -- It should at best only multiply by 5 fuel cans or else the range can become too big.

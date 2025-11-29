@@ -12,108 +12,41 @@ local function lobbySaveCurData()
 	local diff = SlashCo.LobbyData.SelectedDifficulty
 	local offer = SlashCo.LobbyData.Offering
 	local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
-	local survivors = {}
-	local slashers = {}
 
 	--Clear the database before saving
 	--RunConsoleCommand("debug_datatest_delete")
-
-	if SlashCo.LobbyData.PickedSlasher == "None" then
-		--If the slasher wasn't selected, randomize it based on possible options
-
-		:: retry ::
-
-		local rand_name = GetRandomSlasher()
-		if SlashCo.LobbyData.SelectedSlasherInfo.CLASS == SlashCo.SlasherClass.Unknown then
-			--Check if the random id of slasher has the appropriate class for the difficulty
-			--The difficulty allows for any class.
-		else
-			if SlashCo.LobbyData.SelectedSlasherInfo.CLASS ~= SlashCoSlashers[rand_name].Class then
-				goto retry
-			end --the random slasher's class does not match.
-		end
-
-		if SlashCo.LobbyData.SelectedSlasherInfo.DANGER == SlashCo.DangerLevel.Unknown then
-			--Check if the random id of slasher has the appropriate danger level for the difficulty
-
-			--The difficulty allows for any danger level.
-		else
-			if SlashCo.LobbyData.SelectedSlasherInfo.DANGER ~= SlashCoSlashers[rand_name].DangerLevel then
-				goto retry
-			end --the random slasher's danger level does not match.
-		end
-
-		SlashCo.ChooseTheSlasherLobby(rand_name)
-	end
-
-	local slasher1id = SlashCo.LobbyData.PickedSlasher
-	local slasher2id = GetRandomSlasher()
 
 	print("[SlashCo] Now beginning database...")
 	if not sql.TableExists("slashco_table_basedata") then
 		--Create the database table
 
-		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER, SlasherDanger NUMBER, SlasherClass NUMBER, SlasherID TEXT, Offering NUMBER, SlasherIDPrimary TEXT, SlasherIDSecondary TEXT, SurviorGasMod NUMBER);")
-		sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
-		sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
-	end
-
-	local allSurvivors = team.GetPlayers(TEAM_SURVIVOR)
-	if allSurvivors ~= nil and #allSurvivors > 0 then
-		for i = 1, #allSurvivors do
-			--Save the Current Survivors to the database
-
-			table.insert(survivors, { steamid = allSurvivors[i]:SteamID64() })
-		end
-	end
-
-	local allSpectators = team.GetPlayers(TEAM_SPECTATOR)
-	if allSpectators ~= nil and SlashCo.LobbyData.AssignedSlashers ~= nil then
-		for i = 1, #allSpectators do
-			--Save the Current Spectators to the database
-
-			--[[				if team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[1].steamid then
-								if SlashCo.LobbyData.AssignedSlashers[2] ~= nil and team.GetPlayers(TEAM_SPECTATOR)[i]:SteamID64() ~= SlashCo.LobbyData.AssignedSlashers[2].steamid then
-									--They're just a regular Spectator
-								end]]
-
-			if allSpectators[i]:SteamID64() == SlashCo.LobbyData.AssignedSlashers[1].steamid then
-				--If the Spectator is the Slasher, save them as the Slasher
-				table.insert(slashers, { steamid = allSpectators[i]:SteamID64() })
-			end
-		end
-	end
-
-	if SlashCo.LobbyData.AssignedSlashers[2] ~= nil then
-		table.insert(slashers, { steamid = SlashCo.LobbyData.AssignedSlashers[2].steamid })
+		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER, SlasherDanger NUMBER, SlasherClass NUMBER, SlasherID TEXT, Offering NUMBER, SurviorGasMod NUMBER);")
+		sql.Query("CREATE TABLE slashco_table_survivordata(SteamID TEXT, Item TEXT, Item2 TEXT);")
+		sql.Query("CREATE TABLE slashco_table_slasherdata(SteamID TEXT, SlasherID TEXT);")
+		sql.Query("CREATE TABLE slashco_table_potentialslashers(SteamID TEXT);") -- RaphaelIT7: used in case the slasher quits and can be faster
 	end
 
 	--Major data dump
-	sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.DANGER or SlashCo.DangerLevel.Unknown) .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.CLASS or SlashCo.DangerLevel.Unknown) .. ", '" .. (SlashCo.LobbyData.SelectedSlasherInfo.ID or 0) .. "', " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
+	sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SurviorGasMod ) VALUES( " .. diff .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.DANGER or SlashCo.DangerLevel.Unknown) .. ", " .. sql.SQLStr(SlashCo.LobbyData.SelectedSlasherInfo.CLASS or SlashCo.DangerLevel.Unknown) .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.ID or 0) .. ", " .. offer .. ", " .. survivorgasmod .. " );")
 
-	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		--Save the Current Survivors to the database
-		local item = p:GetItem("item2")
-		if item == "none" then
-			item = p:GetItem("item")
-		end
-		sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( " .. p:SteamID64() .. ", " .. sql.SQLStr(item) .. " );")
+	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do -- RaphaelIT7: Why not using SlashCo.LobbyData.AssignedSurvivors? Because people could have been set survivor, idk what servers might do.
+		--Save the Current Survivors Items to the database
+		sql.Query("INSERT INTO slashco_table_survivordata( SteamID, Item, Item2 ) VALUES( " .. p:SteamID64() .. ", " .. sql.SQLStr(p:GetItem("item")) .. ", " .. sql.SQLStr(p:GetItem("item2")) .. " );")
 	end
 
-	if #slashers > 0 then
-		for i = 1, #slashers do
-			--Save the Current Slashers to the database
-			sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( " .. slashers[i].steamid .. " );")
+	for _, slasher in ipairs(SlashCo.LobbyData.AssignedSlashers) do
+		--Save the Current Slashers to the database
+		local slasherID = slasher.slasherID -- if the slasher data contains slasher.slasherid then its a forced id by SlashCo.AssignSlasher
+		if not slasherID or slasherID == "" then
+			slasherID = SlashCo.GetRandomSlasher(SlashCo.LobbyData.SelectedSlasherInfo.DANGER, SlashCo.LobbyData.SelectedSlasherInfo.CLASS)
 		end
-	else
-		print("[SlashCo] Error! No assigned Slasher(s) to database! Restarting the lobby...")
 
-		--RunConsoleCommand("debug_datatest_delete")
+		sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( " .. slasher.steamid .. ", " .. sql.SQLStr(slasherID) ..  " );")
+	end
 
-		--for i, ply in ipairs( player.GetAll() ) do
-		--	ply:SetTeam(TEAM_SPECTATOR)
-		--	ply:Spawn()
-		--end
+	for _, potentialSlasher in ipairs(SlashCo.LobbyData.NonPickedPotentialSlashers) do
+		-- RaphaelIT7: Save all players who wanted to be a slasher but didn't make it
+		sql.Query("INSERT INTO slashco_table_potentialslashers( SteamID ) VALUES( " .. potentialSlasher.steamid .. " );")
 	end
 
 	print("[SlashCo] DATA SAVED. (" .. (sql.LastError() or "") .. ")")
@@ -204,7 +137,7 @@ end
 --				***Begin the post-ready timer***
 local function lobbyReadyTimer(count)
 	timer.Create("AllReadyLobby", count, 1, function()
-		RunConsoleCommand("lobby_debug_proceed")
+		SlashCo.LobbyRoundSetup()
 	end)
 end
 --				***Begin the transition timer***
@@ -227,26 +160,30 @@ end
 
 -- A table containing all players that are allowed to pick a slasher, if they send the mantislashco_SelectSlasher net message without being in here, they will be rejected.
 SlashCo.AllowedPlayerSlasherSelection = SlashCo.AllowedPlayerSlasherSelection or {}
-local function BeginSlasherSelection()
-	-- We did this previously clientside, but there's no reason to go server -> client -> server when the client gets no choice.
-	if SlashCo.LobbyData.SelectedSlasherInfo.ID ~= 0 then
-		SlashCo.ChooseTheSlasherLobby(SlashCo.LobbyData.SelectedSlasherInfo.ID)
-		return
+local function BeginSlasherSelection(specificSlasher)
+	for _, slasherData in ipairs(SlashCo.LobbyData.AssignedSlashers) do
+		if specificSlasher and specificSlasher ~= slasherData.steamid then continue end
+
+		local slasher = player.GetBySteamID64(slasherData.steamid)
+		if not IsValid(slasher) or slasher:GetPickedSlasher() ~= "" then continue end
+
+		-- We did this previously clientside, but there's no reason to go server -> client -> server when the client gets no choice.
+		if SlashCo.LobbyData.SelectedSlasherInfo.ID ~= 0 then
+			SlashCo.PlayerPickedLobbySlasher(slasher, SlashCo.LobbyData.SelectedSlasherInfo.ID)
+			continue
+		end
+
+		local selectionData = {
+			slasherClass = SlashCo.LobbyData.SelectedSlasherInfo.CLASS,
+			slasherDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER,
+			bannedSlashers = SlashCo.GetBannedSlashers(true),
+		}
+
+		net.Start("mantislashco_PickingSlasher")
+			net.WriteTable(selectionData)
+		net.Send(slasher)
+		SlashCo.AllowedPlayerSlasherSelection[slasher] = selectionData
 	end
-
-	local slasher = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid)
-	if not IsValid(slasher) then return end
-
-	local selectionData = {
-		slasherClass = SlashCo.LobbyData.SelectedSlasherInfo.CLASS,
-		slasherDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER,
-		bannedSlashers = SlashCo.GetBannedSlashers(true),
-	}
-
-	net.Start("mantislashco_PickingSlasher")
-		net.WriteTable(selectionData)
-	net.Send(slasher)
-	SlashCo.AllowedPlayerSlasherSelection[slasher] = selectionData
 end
 
 --				***Assign the values for the incoming Round***
@@ -268,15 +205,13 @@ local function lobbyRoundSetup()
 	--Difficulty-based Slasher Selection:
 
 	if SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.EASY then
-		local rand_name = GetRandomSlasher()
+		local randomSlasherID = SlashCo.GetRandomSlasher()
 
-		SlashCo.LobbyData.SelectedSlasherInfo.ID = rand
-		SlashCo.LobbyData.SelectedSlasherInfo.CLASS = SlashCoSlashers[rand_name].Class
-		SlashCo.LobbyData.SelectedSlasherInfo.DANGER = SlashCoSlashers[rand_name].DangerLevel
-		SlashCo.LobbyData.SelectedSlasherInfo.NAME = rand_name
-		SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlashers[rand_name].ProTip
-
-		SlashCo.LobbyData.PickedSlasher = rand_name
+		SlashCo.LobbyData.SelectedSlasherInfo.ID = randomSlasherID
+		SlashCo.LobbyData.SelectedSlasherInfo.CLASS = SlashCoSlashers[randomSlasherID].Class
+		SlashCo.LobbyData.SelectedSlasherInfo.DANGER = SlashCoSlashers[randomSlasherID].DangerLevel
+		SlashCo.LobbyData.SelectedSlasherInfo.NAME = SlashCoSlashers[randomSlasherID].Name
+		SlashCo.LobbyData.SelectedSlasherInfo.TIP = SlashCoSlashers[randomSlasherID].ProTip
 	elseif SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.NOVICE then
 		SlashCo.LobbyData.SelectedSlasherInfo.CLASS = math.random(1, #SlashCo.SlasherClass)
 	elseif SlashCo.LobbyData.SelectedDifficulty == SlashCo.DifficultyLevel.INTERMEDIATE then
@@ -344,7 +279,7 @@ local function lobbyRoundSetup()
 		if randomPly then
 			table.insert(SlashCo.LobbyData.AssignedSlashers, randomPly)
 
-			local p = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[2].steamid)
+			local p = player.GetBySteamID64(randomPly.steamid)
 			p:ChatText("second_slasher")
 		else
 			print("[SlashCo] Found no player that could fill the second slasher slot")
@@ -355,7 +290,9 @@ local function lobbyRoundSetup()
 	for key, slasher in ipairs(SlashCo.LobbyData.PotentialSlashers) do
 		table.insert(SlashCo.LobbyData.AssignedSurvivors, slasher)
 	end
+	SlashCo.LobbyData.NonPickedPotentialSlashers = SlashCo.LobbyData.PotentialSlashers -- RaphaelIT7: Moved over since the selection is over and these were all players who wanted to become a slasher but did not make it.
 	SlashCo.LobbyData.PotentialSlashers = {}
+	SlashCo.LobbyData.FinishedPicking = true
 
 	--Finalize teams
 	if SlashCo.LobbyData.AssignedSurvivors[1] ~= nil and SlashCo.LobbyData.AssignedSlashers[1] ~= nil then
@@ -388,21 +325,54 @@ local function lobbyRoundSetup()
 	SlashCo.LobbyData.SelectedMap = GetRandomMap(#SlashCo.LobbyData.AssignedSurvivors)
 	SlashCo.PrecacheNextMap()
 
-	if SlashCo.LobbyData.SelectedDifficulty > 0 then
-		BeginSlasherSelection()
+	BeginSlasherSelection()
+end
+
+-- RaphaelIT7: Function only exists for servers or other addons to use
+function SlashCo.AssignSlasher(steamid, forceSlasherID)
+	if not GameData.IsLobby then
+		error("This function is only functional in the lobby!")
+		return
+	end
+
+	if not isstring(steamid) then
+		error("Expected a steamid/string!")
+		return
+	end
+
+	-- For conveniance we support an input of a normal steamid and steamid64
+	if string.StartsWith(steamid, "STEAM") then
+		steamid = util.SteamIDTo64(steamid)
+	end
+
+	if SlashCo.LobbyData.FinishedPicking then
+		for key, slasher in ipairs(SlashCo.LobbyData.NonPickedPotentialSlashers) do
+			if slasher.steamid == steamid then
+				table.remove(SlashCo.LobbyData.NonPickedPotentialSlashers, key)
+				break
+			end
+		end
+	end
+
+	local isSlasher = false
+	for _, slasher in ipairs(SlashCo.LobbyData.AssignedSlashers) do
+		if slasher.steamid == steamid then
+			isSlasher = true
+			break
+		end
+	end
+
+	if not isSlasher then
+		table.insert(SlashCo.LobbyData.AssignedSlashers, { steamid = steamid, slasherid = forceSlasherID })
+	end
+
+	if SlashCo.LobbyData.FinishedPicking then
+		BeginSlasherSelection(steamid) -- Allow him to pick since picking already started
 	end
 end
 
 net.Receive("mantislashco_SelectSlasher", function(_, ply)
 	local selectedSlasher = net.ReadString()
-	if SlashCo.IsSlasherBanned(selectedSlasher) then
-		print("[SlashCo] \"" .. ply:Name() .. "\" tried to pick a banned slasher! (" .. selectedSlasher .. ")")
-		if SlashCo.AwaitPlayerToSelectSlasher then
-			SlashCo.AwaitPlayerToSelectSlasher(ply, nil)
-		end
-		return
-	end
-
 	local selectionData = SlashCo.AllowedPlayerSlasherSelection[ply]
 	if not selectionData then
 		print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a slasher when they were never asked to!")
@@ -433,24 +403,49 @@ net.Receive("mantislashco_SelectSlasher", function(_, ply)
 			return
 		end
 
+		if selectionData.bannedSlashers and selectionData.bannedSlashers[selectedSlasher]  then
+			print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a slasher that was banned! (\"" .. selectedSlasher .. "\")")
+			net.Start("mantislashco_PickingSlasher") -- Force the client to select a new slasher again since he fucked up!
+				net.WriteTable(selectionData)
+			net.Send(ply)
+			return
+		end
+
+		if SlashCo.IsSlasherBanned(selectedSlasher)  then
+			print("[SlashCo] Player \"" .. ply:Name() .. "\" tried to pick a slasher that was banned while they were selecting! (\"" .. selectedSlasher .. "\")")
+			net.Start("mantislashco_PickingSlasher") -- Force the client to select a new slasher again since it wasn't their fault for this event
+				net.WriteTable(selectionData)
+			net.Send(ply)
+			return
+		end
+
 		SlashCo.AllowedPlayerSlasherSelection[ply] = nil -- Only allow them to pick once!
 	end
 
-	print("[SlashCo] Received. (" .. selectedSlasher .. ")")
-	SlashCo.ChooseTheSlasherLobby(selectedSlasher)
+	print("[SlashCo] Player \"" .. ply:Name() .. "\" picked slasher \"" .. selectedSlasher .. "\"")
 
 	if SlashCo.AwaitPlayerToSelectSlasher then
 		SlashCo.AwaitPlayerToSelectSlasher(ply, selectedSlasher)
 	end
+
+	if GameData.IsLobby then
+		SlashCo.PlayerPickedLobbySlasher(ply, selectedSlasher)
+	end
 end)
 
-function SlashCo.ChooseTheSlasherLobby(id)
+function SlashCo.PlayerPickedLobbySlasher(ply, slasherID)
 	if not GameData.IsLobby then return end
+	
+	ply:SetPickedSlasher(slasherID)
 
-	SlashCo.LobbyData.PickedSlasher = id
-	print("[SlashCo] Slasher Picked. (" .. id .. ")")
+	local steamid = ply:SteamID64()
+	for _, slasher in ipairs(SlashCo.LobbyData.AssignedSlashers) do
+		if slasher.steamid ~= steamid then continue end
 
-	SlashCo.BroadcastLobbySlasherInformation()
+		-- RaphaelIT7: We store the slasherID in this table since if the player crashes/disconnects and wants to rejoin the SetPickedSlasher field was nuked.
+		slasher.slasherID = slasherID
+		break
+	end
 end
 
 local function pickItem(ply, item)
@@ -607,7 +602,7 @@ hook.Add("Tick", "LobbyTickEvent", function()
 
 		if seek >= num then
 			timer.Remove("AllReadyLobby")
-			RunConsoleCommand("lobby_debug_proceed")
+			SlashCo.LobbyRoundSetup()
 		end
 
 		if (num < 2 or seek <= (num / 2)) and SlashCo.LobbyData.ReadyTimerStarted then
@@ -731,11 +726,7 @@ end
 
 --//lobby concommands//--
 
-concommand.Add("lobby_debug_proceed", function(ply)
-	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
-		return
-	end
-
+function SlashCo.LobbyRoundSetup()
 	SlashCo.LobbyData.LOBBYSTATE = 1
 	SlashCo.LobbyData.ElevatorEnterTime = CurTime() + 30 -- It will proceed on its own
 
@@ -767,7 +758,7 @@ concommand.Add("lobby_debug_proceed", function(ply)
 	SlashCo.LobbyData.SelectedSlasherInfo.TIP = "--//--"
 
 	lobbyRoundSetup()
-end)
+end
 
 concommand.Add("lobby_debug_transition", function(ply)
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then

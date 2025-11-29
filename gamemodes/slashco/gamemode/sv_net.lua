@@ -21,7 +21,6 @@ util.AddNetworkString("mantislashco_VoteForOffering")
 util.AddNetworkString("mantislashco_OfferingEndVote")
 util.AddNetworkString("mantislashco_OfferingVoteFinished")
 util.AddNetworkString("mantislashco_SendRoundData")
-util.AddNetworkString("mantislashco_LobbySlasherInformation")
 util.AddNetworkString("mantislashco_SurvivorVoicePrompt")
 util.AddNetworkString("mantislashco_SurvivorPings")
 util.AddNetworkString("mantislashco_HelicopterVoice")
@@ -83,12 +82,6 @@ end
 -- DEPRECATED avoid using this
 PlayGlobalSound = SlashCo.PlayGlobalSound
 
-function SlashCo.BroadcastLobbySlasherInformation()
-	net.Start("mantislashco_LobbySlasherInformation")
-		net.WriteTable({ player = SlashCo.LobbyData.AssignedSlasher, slasher = SlashCo.LobbyData.PickedSlasher })
-	net.Broadcast()
-end
-
 function SlashCo.LobbyRoundData()
 	local offering = ""
 	if SlashCo.LobbyData.Offering > 0 then
@@ -96,13 +89,21 @@ function SlashCo.LobbyRoundData()
 	end
 
 	net.Start("mantislashco_SendRoundData")
-		net.WriteTable({ survivors = SlashCo.LobbyData.AssignedSurvivors, slashers = SlashCo.LobbyData.AssignedSlashers, offering = offering })
+		net.WriteTable({
+			survivors = SlashCo.LobbyData.AssignedSurvivors,
+			slashers = SlashCo.LobbyData.AssignedSlashers,
+			offering = offering
+		})
 	net.Broadcast()
 end
 
 function SlashCo.BroadcastCurrentRoundData(readygame)
 	net.Start("mantislashco_SendRoundData")
-		net.WriteTable({ survivors = SlashCo.CurRound.SlasherData.AllSurvivors, slashers = SlashCo.CurRound.SlasherData.AllSlashers, offering = SlashCo.CurRound.OfferingData.OfferingName })
+		net.WriteTable({
+			survivors = SlashCo.CurRound.SlasherData.AllSurvivors,
+			slashers = SlashCo.CurRound.SlasherData.AllSlashers,
+			offering = SlashCo.CurRound.OfferingData.OfferingName
+		})
 	net.Broadcast()
 
 	net.Start("mantislashco_GiveSlasherData")
@@ -191,20 +192,20 @@ end
 local pointState = {
 	[SlashCo.RoundState.WON_ALL_ALIVE] = function(ply)
 		if #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
-			ply:SetPoints("all_survive")
+			ply:SetRoundPoints("all_survive")
 		end
 
-		ply:SetPoints("objective")
+		ply:SetRoundPoints("objective")
 	end,
 	[SlashCo.RoundState.WON_SOME_DEAD] = function(ply)
-		ply:SetPoints("objective")
+		ply:SetRoundPoints("objective")
 	end,
 	[SlashCo.RoundState.WON_ALL_DEAD] = function(ply)
-		ply:SetPoints("objective")
+		ply:SetRoundPoints("objective")
 	end,
 	[SlashCo.RoundState.LOST] = function() end,
 	[SlashCo.RoundState.WON_DISTRESS] = function(ply)
-		ply:SetPoints("escape")
+		ply:SetRoundPoints("escape")
 	end,
 	[SlashCo.RoundState.CURSED] = function() end,
 }
@@ -213,13 +214,13 @@ local pointStateSlasher = {
 	[SlashCo.RoundState.WON_ALL_ALIVE] = function(ply) end,
 	[SlashCo.RoundState.WON_SOME_DEAD] = function(ply) end,
 	[SlashCo.RoundState.WON_ALL_DEAD] = function(ply)
-		ply:SetPoints("slasher_win")
+		ply:SetRoundPoints("slasher_win")
 	end,
 	[SlashCo.RoundState.LOST] = function(ply)
-		ply:SetPoints("slasher_win")
+		ply:SetRoundPoints("slasher_win")
 	end,
 	[SlashCo.RoundState.WON_DISTRESS] = function(ply)
-		ply:SetPoints("slasher_escape")
+		ply:SetRoundPoints("slasher_escape")
 	end,
 	[SlashCo.RoundState.CURSED] = function() end,
 }
@@ -232,8 +233,9 @@ function SlashCo.RoundOverScreen(state)
 	--yucky yucky
 	local goodSurvivorTable = {}
 	for _, ply in player.Iterator() do
-		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-			if ply:SteamID64() == v.id then
+		local steamID = ply:SteamID64()
+		for _, survivorData in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
+			if steamID == survivorData.steamid then
 				table.insert(goodSurvivorTable, ply)
 				pointState[state](ply)
 			end
@@ -264,14 +266,14 @@ function SlashCo.BroadcastMasterDatabaseForClient(ply)
 		return
 	end
 
-	local data = sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='" .. ply:SteamID64() .. "'; ")
+	local data = sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='" .. ply:SteamID64() .. "';")
 	if data == nil or data == false or data[1] == nil then
 		return
 	end
 
-	ply:SetNW2Int("SurvivorRoundsWon", data[1].SurvivorRoundsWon)
-	ply:SetNW2Int("SlasherRoundsWon", data[1].SlasherRoundsWon)
-	ply:SetNW2Int("Points", data[1].Points)
+	ply:SetSurvivorRoundsWon(data[1].SurvivorRoundsWon)
+	ply:SetSlasherRoundsWon(data[1].SlasherRoundsWon)
+	ply:SetPoints(data[1].Points)
 end
 
 -- All types are defined in sh_shared.lua -> SlashCo.HelicopterVoices

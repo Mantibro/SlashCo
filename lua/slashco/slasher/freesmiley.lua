@@ -264,9 +264,9 @@ function SLASHER.InitHud(_, hud)
 	end
 
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	hook.Add("HUDPaint", "SlashCoZanySurvey", function()
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("HUDPaint", "SlashCoZanySurvey")
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
 		end
 
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -297,7 +297,7 @@ function SLASHER.SmileyIdle(slasher)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_FreeSmiley") == true then
 			local Overlay = Material("slashco/ui/overlays/jumpscare_13")
 

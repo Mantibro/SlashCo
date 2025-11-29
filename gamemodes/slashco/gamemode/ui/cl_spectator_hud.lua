@@ -1,7 +1,3 @@
-net.Receive("mantislashco_LobbySlasherInformation", function()
-	LobbySlasherInfo = net.ReadTable()
-end)
-
 local blur = Material("pp/blurscreen")
 function SlashCo.Blur(panel)
 	local x, y = 0, 0
@@ -39,17 +35,17 @@ end
 
 local spin = 0
 local flash = 0
-
-hook.Add("HUDPaint", "Spectator_Vision", function()
+local slashershow_tick = 0
+hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 	local plyTeam = GameData.LocalPlayer:Team()
 	if plyTeam ~= TEAM_SPECTATOR then
 		return
 	end
 
 	--Cool Spectator Lobby Menu
-	if GameData.IsLobby and #team.GetPlayers(TEAM_SURVIVOR) < 1 then
-		local srvwin_count = GameData.LocalPlayer:GetNW2Int("SurvivorRoundsWon", 0)
-		local slswin_count = GameData.LocalPlayer:GetNW2Int("SlasherRoundsWon", 0)
+	if GameData.IsLobby and team.NumPlayers(TEAM_SURVIVOR) == 0 then
+		local srvwin_count = GameData.LocalPlayer:GetSurvivorRoundsWon(0)
+		local slswin_count = GameData.LocalPlayer:GetSlasherRoundsWon(0)
 
 		SlashCo.Blur()
 
@@ -86,7 +82,7 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 		draw.SimpleText(blip, "TVCD", ScrW() / 2, ScrH() / 2,
 				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
-		local players = CL_LobbyPlayers or #team.GetPlayers(TEAM_LOBBY)
+		local players = CL_LobbyPlayers or team.NumPlayers(TEAM_LOBBY)
 
 		draw.SimpleText("[" .. players .. " / " .. GameData.MaxPlayers .. "]", "TVCD", ScrW() / 2, ScrH() / 2.5,
 				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -95,18 +91,15 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 				"TVCD", ScrW() * 0.5, ScrH() * 0.75, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 
-	if LobbySlasherInfo ~= nil then
-		if LobbySlasherInfo.player ~= GameData.LocalSteamID64 then
-			return
+	local pickedSlasher = GameData.LocalPlayer:GetPickedSlasher()
+	if pickedSlasher ~= "" then
+		if slashershow_tick < 255 then
+			slashershow_tick = slashershow_tick + (FrameTime() * 10)
+		else
+			slashershow_tick = 255
 		end
 
-		if slashershow_tick == nil then
-			slashershow_tick = 0
-		end
-
-		slashershow_tick = slashershow_tick + 0.25
-
-		draw.SimpleText("You will play as: " .. LobbySlasherInfo.slasher, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.6, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		draw.SimpleText("You will play as: " .. pickedSlasher, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.6, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
 	if GameData.IsLobby then
@@ -117,8 +110,8 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	if SlasherTeam then
 		local localSlasher = GameData.LocalPlayer:GetNWString("Slasher")
-		for i = 1, #SlasherTeam do
-			if SlasherTeam[i] and SlasherTeam[i].s_id == GameData.LocalSteamID64 then
+		for _, slasherData in ipairs(SlasherTeam) do
+			if slasherData.steamid == GameData.LocalSteamID64 then
 				if localSlasher and localSlasher ~= show_slasher_anticipation then
 					local shower = "UNASSIGNED!"
 					if SlashCoSlashers[localSlasher] then

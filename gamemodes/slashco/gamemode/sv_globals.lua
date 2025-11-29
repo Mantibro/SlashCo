@@ -40,23 +40,21 @@ SlashCo.LobbyData = SlashCo.LobbyData or {
 	ReadyTimerStarted = false,
 	PotentialSurvivors = {},
 	PotentialSlashers = {},
+	NonPickedPotentialSlashers = {}, -- RaphaelIT7: After slashers were picked this table contains all now survivors who wanted to be an slasher but weren't picked
 	AssignedSurvivors = {},
 	AssignedSlashers = {},
+	FinishedPicking = false,
 	SelectedDifficulty = SlashCo.DifficultyLevel.EASY,
 	SurvivorGasMod = 0,
 	SelectedSlasherInfo = {
-
 		ID = 0,
 		CLASS = 0,
 		DANGER = 0,
 		NAME = 0,
 		TIP = "--//--"
-
 	},
 	SelectedMap = "sc_summercamp",
-	PickedSlasher = "None",
 	--DeathwardsLeft = 0 --not used
-
 }
 
 --Holds all the information about the ongoing round
@@ -521,11 +519,12 @@ function SlashCo.RadialTester(ent, dist, secondary)
 end
 
 function SlashCo.ClearDatabase()
-	if SERVER then
-		print("[SlashCo] Clearing Database. . .")
+	if CLIENT then return end
+	
+	print("[SlashCo] Clearing Database. . .")
 
-		sql.Query("DROP TABLE slashco_table_basedata;")
-		sql.Query("DROP TABLE slashco_table_survivordata;")
-		sql.Query("DROP TABLE slashco_table_slasherdata;")
-	end
+	sql.Query("DROP TABLE slashco_table_basedata;")
+	sql.Query("DROP TABLE slashco_table_survivordata;")
+	sql.Query("DROP TABLE slashco_table_slasherdata;")
+	sql.Query("DROP TABLE slashco_table_potentialslashers;")
 end

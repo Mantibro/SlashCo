@@ -354,9 +354,9 @@ function SLASHER.InitHud(_, hud)
 		draw.SimpleText("STALK TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("WatcherStalkTime"), 1), "TVCD", 4, 18, red)
 	end
 
-	hook.Add("HUDPaint", "SlashCoWatcher", function()
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("HUDPaint", "SlashCoWatcher")
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
 			return
 		end
 
@@ -391,7 +391,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Watcher") == true then
 			local Overlay = Material("slashco/ui/overlays/watcher_see")
 

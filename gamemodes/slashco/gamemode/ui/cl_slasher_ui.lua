@@ -12,7 +12,7 @@
 --local SlashID = 0
 
 local BeaconIcon = Material("slashco/ui/slasher_beacon")
-hook.Add("HUDPaint", "BaseSlasherHUD", function()
+hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	local ply = GameData.LocalPlayer
 
 	if ply:Team() ~= TEAM_SLASHER then
@@ -127,7 +127,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		--Survivor team visualization
 
 		for x = 1, team.NumPlayers(TEAM_SURVIVOR) do
-			if team.GetPlayers(TEAM_SURVIVOR)[x]:SteamID64() == SurvivorTeam[i].id then
+			if team.GetPlayers(TEAM_SURVIVOR)[x]:SteamID64() == SurvivorTeam[i].steamid then
 				--The survivor is alive (is the Survivors Team)
 				surface.SetMaterial(SurvivorIcon)
 				surface.DrawTexturedRect((cx + (cx / 1.25)) - xoffset, mainiconposy + (cy / 6), ScrW() / 12,

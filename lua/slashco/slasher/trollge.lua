@@ -699,7 +699,7 @@ if CLIENT then
 		end
 	end)
 
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if drawIcon and GameData.LocalPlayer:CanBeSeen() then
 			surface.SetMaterial(eyeball)
 			surface.SetDrawColor(255, 255, 255, SLASHER.Visibility(GameData.LocalPlayer))

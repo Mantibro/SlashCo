@@ -813,7 +813,7 @@ function SLASHER.SidRage(ply)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Sid") == true then
 			if GameData.LocalPlayer.sid_f == nil then
 				GameData.LocalPlayer.sid_f = 0

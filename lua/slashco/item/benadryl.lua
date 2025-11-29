@@ -10,7 +10,7 @@ function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
 function ITEM.OnUse(ply)
-	ply:AddPoints("benadryl")
+	ply:AddRoundPoints("benadryl")
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/benadryl/benadryl_cornstarch.ogg",
 		identifier = "BenadrylEat",

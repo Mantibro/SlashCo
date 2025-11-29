@@ -71,34 +71,10 @@ hook.Add("PlayerNoClip", "SlashCo:PreventSpectators", function(ply)
 	end
 end)
 
-function PLAYER:MarkAsSeenBySlasher()
-	self:SetNW2Bool("WasSeenBySlasher", true)
-end
-
-function PLAYER:WasSeenBySlasher()
-	return self:GetNW2Bool("WasSeenBySlasher", false)
-end
-
-function PLAYER:SetFogMult(mult)
-	self:SetNW2Float("FogMult", mult)
-end
-
-function PLAYER:GetFogMult()
-	return self:GetNW2Float("FogMult", 1)
-end
-
-function PLAYER:SetCanSeePlayers(canSee)
-	self:SetNW2Bool("CanSeePlayers", canSee)
-end
-
-function PLAYER:CanSeePlayers()
-	return self:GetNW2Bool("CanSeePlayers", false)
-end
-
 -- This function is VERY expensive, BUT it shouldn't be called too frequent anyways.
 function PLAYER:FindPlayersInView(dist, radius, notrace)
 	local areWeSlasher = self:Team() == TEAM_SLASHER
-	if areWeSlasher and not self:CanSeePlayers() then
+	if areWeSlasher and not self:GetCanSeePlayers() then
 		return {}
 	end
 
@@ -252,3 +228,64 @@ function SlashCo.SetupLanOverrides() -- Called from sh_shared.lua -> GM:InitPost
 		return self:OrigUniqueID()
 	end
 end
+
+
+--[[
+	DTVar Networking (Since NW2 is broken / hasn't been fixed yet)
+
+	Unlike the whole SetupDataTables shit, our function exist in the metatable and are always available.
+	So we don't have to worry about shit like Player:SetSlasher not existing for like 1 tick until SetupDataTables was called
+]]
+
+SlashCo_DTNetworking = SlashCo_DTNetworking or {}
+local plyMeta = FindMetaTable("Player")
+local entMeta = FindMetaTable("Entity")
+local function SetupSlashCoNetworkVar(type, index, name) -- Same order as :NetworkVar
+	if not SlashCo_DTNetworking[type] then
+		SlashCo_DTNetworking[type] = {}
+	end
+
+	local defaultFallbacks = {
+		["Int"] = 0,
+		["Float"] = 0,
+		["String"] = "",
+		["Entity"] = nil,
+		["Bool"] = false,
+		["Vector"] = Vector(0, 0, 0),
+		["Angle"] = Angle(0, 0, 0),
+	}
+
+	local SetDTFunc = entMeta["SetDT" .. type]
+	local defaultFallback = defaultFallbacks[type]
+	plyMeta["Set" .. name] = function(self, value)
+		SetDTFunc(self, index, value or defaultFallback)
+	end
+
+	local GetDTFunc = entMeta["GetDT" .. type]
+	plyMeta["Get" .. name] = function(self, fallback)
+		return GetDTFunc(self, index) or (fallback or defaultFallback)
+	end
+
+	SlashCo_DTNetworking[type][index] = name
+	SlashCo_DTNetworking[name] = {
+		callbackName = type .. "_" .. index,
+		type = type,
+		index = index,
+		get = plyMeta["Get" .. name],
+		set = plyMeta["Set" .. name],
+	}
+end
+
+-- RaphaelIT7: There intentionally is no callback function due to the nature of DTs being possibly received more than once! If you really need it tell me - I got that code already done
+
+SetupSlashCoNetworkVar("Int", 0, "Level")
+SetupSlashCoNetworkVar("Int", 1, "Points")
+SetupSlashCoNetworkVar("Int", 2, "SurvivorRoundsWon")
+SetupSlashCoNetworkVar("Int", 3, "SlasherRoundsWon")
+
+SetupSlashCoNetworkVar("Float", 0, "FogMult")
+
+SetupSlashCoNetworkVar("Bool", 0, "CanSeePlayers")
+SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")
+
+SetupSlashCoNetworkVar("String", 0, "PickedSlasher") -- RaphaelIT7: Only used to display which slasher they'll be.

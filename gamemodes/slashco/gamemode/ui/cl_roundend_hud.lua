@@ -1,7 +1,7 @@
 local function showPointSummary(cur)
 	local stuff = {}
 
-	local pKeys = GameData.LocalPlayer:GetPointsKeys()
+	local pKeys = GameData.LocalPlayer:GetRoundPointsKeys()
 	if table.IsEmpty(pKeys) then
 		table.insert(stuff, "point_nil")
 	else
@@ -23,9 +23,9 @@ local function showPointSummary(cur)
 		if v == "point_summary" or v == "point_nil" then
 			langText = SlashCo.Language(v)
 		elseif v == "point_total" then
-			langText = SlashCo.Language(v, GameData.LocalPlayer:GetTotalPoints())
+			langText = SlashCo.Language(v, GameData.LocalPlayer:GetTotalRoundPoints())
 		else
-			local amount, num = GameData.LocalPlayer:GetPoints(v)
+			local amount, num = GameData.LocalPlayer:GetRoundPoints(v)
 			if amount > 0 then
 				amount = "+" .. amount
 			end

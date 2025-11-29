@@ -238,7 +238,7 @@ function ENT:BehaveUpdate(interval)
 			volume = 1,
 			fadeIn = 0,
 		})
-		target:SetNW2Float("FogMult", 0.5)
+		target:SetFogMult(0.5)
 
 		timer.Create("HatManSoundReset", 1, 1, function()
 			if not IsValid(target) then return end
@@ -247,7 +247,7 @@ function ENT:BehaveUpdate(interval)
 
 		timer.Create("HatManFogReset", 6, 1, function()
 			if not IsValid(target) then return end
-			target:SetNW2Float("FogMult", 1)
+			target:SetFogMult(1)
 		end)
 	end
 

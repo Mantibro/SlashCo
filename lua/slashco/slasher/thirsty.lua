@@ -348,7 +348,7 @@ function SLASHER.ThirstyRage(ply)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Thirsty") == true then
 			if GameData.LocalPlayer.thrs_f == nil then
 				GameData.LocalPlayer.thrs_f = 0

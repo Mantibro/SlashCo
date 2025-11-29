@@ -1,4 +1,4 @@
-hook.Add("HUDPaint", "GameInfo_Info", function()
+hook.Add("SlashCo:DrawHUD", "GameInfo_Info", function()
 	if GameData.LocalPlayer:Team() ~= TEAM_LOBBY then return end
 
 	draw.SimpleText(SlashCo.Language("GameInfo", "F6"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)

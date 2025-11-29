@@ -244,7 +244,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Speedrunner") == true then
 			if GameData.LocalPlayer.spd_f == nil then
 				GameData.LocalPlayer.spd_f = 0

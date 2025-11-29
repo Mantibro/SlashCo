@@ -92,11 +92,11 @@ if CLIENT then
 
 	hook.Add("scValue_Awareness", "SlashCoAwareness", function(state)
 		if state then
-			hook.Add("HUDPaint", "SlashCoAwareness", showSurvivors)
+			hook.Add("SlashCo:DrawHUD", "SlashCoAwareness", showSurvivors)
 			return
 		end
 
-		hook.Remove("HUDPaint", "SlashCoAwareness")
+		hook.Remove("SlashCo:DrawHUD", "SlashCoAwareness")
 	end)
 end
 

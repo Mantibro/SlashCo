@@ -420,7 +420,7 @@ local function Think()
 
 	if SlashCo.CurRound.GameProgress == -1 then
 		for _, v in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
-			if SlashCo.CurRound.Slashers[v:SteamID64()] ~= nil and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
+			if SlashCo.CurRound.Slashers[v:SteamID64()] and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
 				SlashCo.ApplySlasherToPlayer(v)
 			end
 		end
@@ -521,11 +521,11 @@ hook.Add("player_activate", "slashCoPreItem", function(data)
 	local ply = Player(data.userid)
 
 	if SlashCo.CurRound and SlashCo.CurRound.SlasherData and SlashCo.CurRound.SlasherData.AllSurvivors then
-		local id = ply:SteamID64()
-		for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-			if v.id == id then
-				SlashCo.SendValue(ply, "preItem", v.Item)
-			end
+		local steamid = ply:SteamID64()
+		for _, survivorData in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
+			if survivorData.steamid ~= steamid then continue end
+			
+			SlashCo.SendValue(ply, "preItem", survivorData.Item)
 		end
 	end
 end)
@@ -538,7 +538,7 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
 	local data = {}
 
 	--Don't load playerdata if it's already loaded
-	if SlashCo.PlayerData[ply:SteamID64()] ~= nil then
+	if SlashCo.PlayerData[ply:SteamID64()] then
 		return
 	end
 
@@ -577,20 +577,21 @@ hook.Add("PlayerInitialSpawn", "octoSlashCoPlayerInitialSpawn", function(ply)
 			if not GameData.IsLobby and SlashCo.RoundStarted and SlashCo.GetRoundTime() < SlashCo.MaximumLateJoinTime then
 				local steamID = ply:SteamID64()
 				for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
-					if data.steamid == steamID then
-						ply:SetTeam(TEAM_SURVIVOR)
-						ply:Spawn()
+					if data.steamid ~= steamID then continue end
+					
+					ply:SetTeam(TEAM_SURVIVOR)
+					ply:Spawn()
 
-						if GameData.SurvivorData then
-							local itemEntry = GameData.SurvivorData[steamID]
-							if itemEntry then
-								SlashCo.DropAllItems(ply)
-								SlashCo.ChangeSurvivorItem(ply, itemEntry.Item, true)
-								SlashCo.SendValue(ply, "preItem", itemEntry.Item)
-							end
-						end
-						break
-					end
+					if not GameData.SurvivorData then break end
+					
+					local itemEntry = GameData.SurvivorData[steamID]
+					if not itemEntry then break end
+						
+
+					SlashCo.DropAllItems(ply)
+					SlashCo.ChangeSurvivorItem(ply, itemEntry.Item, true)
+					SlashCo.ChangeSurvivorItem(ply, itemEntry.Item2, true)
+					SlashCo.SendValue(ply, "preItem", itemEntry.Item)
 				end
 			end
 		end
@@ -769,6 +770,17 @@ hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, sta
 
 	return false
 end)
+
+util.AddNetworkString("slashCo_FlashWindows")
+function SlashCo.FlashWindows(players)
+	net.Start("slashCo_FlashWindows")
+
+	if players then
+		net.Send(players)
+	else
+		net.Broadcast()
+	end
+end
 
 SC_SERVER_LOADED = true
 

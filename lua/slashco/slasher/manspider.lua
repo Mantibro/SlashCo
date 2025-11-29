@@ -399,7 +399,7 @@ function SLASHER.InitHud(_, hud)
 		local target = GameData.LocalPlayer:GetNWString("ManspiderTarget")
 		if target ~= hud.prevTarget then
 			if target == "" then
-				hook.Remove("HUDPaint", "SlashCoPreyReal")
+				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
 			else
 				local targetEnt
 				for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -409,9 +409,9 @@ function SLASHER.InitHud(_, hud)
 					end
 				end
 
-				hook.Add("HUDPaint", "SlashCoPreyReal", function()
+				hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 					if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not IsValid(targetEnt) then
-						hook.Remove("HUDPaint", "SlashCoPreyReal")
+						hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
 						return
 					end
 
@@ -462,7 +462,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Manspider") == true then
 			if GameData.LocalPlayer.mans_f == nil then
 				GameData.LocalPlayer.mans_f = 0

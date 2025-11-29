@@ -8,7 +8,7 @@ function SlashCo.SinglePlayerSetup()
 
 	hook.Add("PlayerInitialSpawn", "SinglePlayerSetup", function(ply)
 		table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = ply:SteamID64() })
-		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = ply:SteamID64() })
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = ply:SteamID64() })
 	end)
 end
 
@@ -16,11 +16,9 @@ function SlashCo.LoadCurRoundData()
 	table.Empty(SlashCo.CurRound.ExpectedPlayers)
 	if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
 		--Load relevant data from the database
-		local baseData = sql.Query("SELECT * FROM slashco_table_basedata; ")[1]
+		local baseData = sql.Query("SELECT * FROM slashco_table_basedata;")[1]
 		local diff = baseData.Difficulty
 		local offering = baseData.Offering
-		local slasher1id = baseData.SlasherIDPrimary
-		local slasher2id = baseData.SlasherIDSecondary
 		local survivorgasmod = baseData.SurviorGasMod
 		local slasherDanger = baseData.SlasherDanger
 		local slasherClass = baseData.SlasherClass
@@ -38,14 +36,13 @@ function SlashCo.LoadCurRoundData()
 		SlashCo.CurRound.SlasherDanger = tonumber(slasherDanger)
 		SlashCo.CurRound.SlasherClass = tonumber(slasherClass)
 		SlashCo.CurRound.SlasherID = tonumber(slasherID)
-		SlashCo.CurRound.FirstSelectedSlasherID = slasher1id
 
 		--First we insert the Slasher. If the Slasher does not join in time the game cannot begin.
 
 		--Insert the First and second Slasher into the table
 		local slasherData = sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}
-		for e = 1, #slasherData do
-			table.insert(SlashCo.CurRound.ExpectedPlayers, {steamid = slasherData[e].Slashers})
+		for _, slasherData in ipairs(slasherData) do
+			table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = slasherData.SteamID })
 		end
 
 		SlashCo.CurRound.ForceSlasherSelection = #slasherData == 0
@@ -62,13 +59,11 @@ function SlashCo.LoadCurRoundData()
 			for i = 1, #query do
 				local id = query[i].Survivors
 
-				timer.Simple(1, function()
-					local slasher_pick = GetRandomSlasher()
+				local slasher_pick = GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
 
-					SlashCo.SelectSlasher(slasher_pick, id)
-					table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher_pick })
-					table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = id })
-				end)
+				SlashCo.SelectSlasher(slasher_pick, id)
+				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = id, slasherkey = slasher_pick })
+				table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = id })
 			end
 
 			--Slasher becomes the sole survivor
@@ -78,7 +73,7 @@ function SlashCo.LoadCurRoundData()
 
 				--table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = sr_id })
 				--For the slasher's clientside view also
-				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = sr_id })
+				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = sr_id })
 			end
 
 			return
@@ -90,42 +85,29 @@ function SlashCo.LoadCurRoundData()
 		--Survivors don't necessarily have to join in time, as the game can continue with at least 1.
 		--TODO: timer which starts the game premature if some survivors don't join in time.
 
-		local query = survivorData
-		for i = 1, #query do
-			if query[i].Survivors ~= nil then
-				--Survivors due to connect
-
-				local steamid = query[i].Survivors
-				table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = steamid })
-				--For the slasher's clientside view also
-				table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = steamid })
-			end
+		for _, survivorData in ipairs(survivorData) do
+			table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = survivorData.SteamID })
+			--For the slasher's clientside view also
+			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = survivorData.SteamID })
 		end
 
-		for s = 1, #slasherData do
-			local id = slasherData[s].Slashers
-			if id == "90071996842377216" then
-				break
+		for _, slasherData in ipairs(slasherData) do
+			if not SlashCo.PresentCovenant then
+				if slasherData.SlasherID == "Covenant" then
+					SlashCo.PresentCovenant = slasherData.SteamID
+				end
+
+				SlashCo.SelectSlasher(slasherData.SlasherID, slasherData.SteamID)
+				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = slasherData.SteamID, slasherkey = slasherData.SlasherID })
+				continue
 			end
 
-			timer.Simple(1, function()
-				if s == 1 then
-					if slasher1id == "Covenant" then
-						SlashCo.PresentCovenant = id
-					end
-					SlashCo.SelectSlasher(slasher1id, id)
-					table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = slasher1id })
-				end
-				if s == 2 then
-					if SlashCo.PresentCovenant == nil then
-						SlashCo.SelectSlasher(slasher2id, id)
-						table.insert(SlashCo.CurRound.SlasherData.AllSlashers,
-								{ s_id = id, slasherkey = slasher2id })
-					else
-						table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
-					end
-				end
-			end)
+			if SlashCo.PresentCovenant == nil then
+				SlashCo.SelectSlasher(slasherData.SlasherID, slasherData.SteamID)
+				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = slasherData.SteamID, slasherkey = slasherData.SlasherID })
+			else
+				table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = slasherData.SteamID })
+			end
 		end
 	else
 		if game.SinglePlayer() then
@@ -152,6 +134,7 @@ local function StartRound(instant)
 	print("[SlashCo] All players connected. " .. (instant and "Starting now" or "Starting in 10 seconds") .. ". . .")
 	SlashCo.CurRound.SlasherData.GameReadyToBegin = true
 	SlashCo.RoundBeginTimer(instant)
+	SlashCo.FlashWindows() -- RaphaelIT7: Tell all players they should tab in.
 end
 
 function AskPlayersToBecomeSlasher()
@@ -191,11 +174,13 @@ function AskPlayersToBecomeSlasher()
 				return
 			end
 
-			SlashCo.AwaitPlayerToSelectSlasher = function(ply, id) -- if id is nil, then they tried to select a banned slasher or they took too long!
+			SlashCo.AwaitPlayerToSelectSlasher = function(ply, id) -- if id is nil, then they took too long!
 				SlashCo.AwaitPlayerToSelectSlasher = nil
 				if SlashCo.CurRound.AntiLoopSpawn then return end
-				sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( " .. ply:SteamID64() .. " );")
-				SlashCo.SelectSlasher(id or SlashCo.CurRound.FirstSelectedSlasherID, ply:SteamID64())
+
+				local id = id or GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
+				sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( " .. ply:SteamID64() .. ", '" .. sql.SQLStr(id) .. "' );")
+				SlashCo.SelectSlasher(id, ply:SteamID64())
 				StartRound(true)
 			end
 
@@ -253,14 +238,14 @@ function SlashCo.ForceNewSlasherSelection()
 		for _, ply in ipairs(plys) do
 			if data.steamid == ply:SteamID64() then
 				expected_count = expected_count + 1
-				print("[SlashCo] Expected player " .. expected_count .. " in!" .. "(" .. ply:Name() .. ")")
+				print("[SlashCo] Expected " .. expected_count .. " players in!" .. "(" .. ply:Name() .. ")")
 				break
 			end
 		end
 	end
 
 	local foundSlasher = false
-	local slashers = SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}, "Slashers") or {}
+	local slashers = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}, "SteamID") or {}
 	for _, ply in ipairs(plys) do
 		if slashers[ply:SteamID64()] then
 			foundSlasher = true
@@ -370,11 +355,11 @@ function SlashCo.EndRound()
 	local survivors = team.GetPlayers(TEAM_SURVIVOR)
 	for _, ply in ipairs(survivors) do
 		if ply.QuickEscape then
-			ply:AddPoints("quickescape")
+			ply:AddRoundPoints("quickescape")
 		end
 
 		if ply.SlowEscape then
-			ply:AddPoints("slowescape")
+			ply:AddRoundPoints("slowescape")
 		end
 	end
 
@@ -434,17 +419,17 @@ function SlashCo.EndRound()
 
 			SlashCoDatabase.UpdateStats(v:SteamID64(), "SurvivorRoundsWon", 1)
 
-			v:SetPoints("survive")
+			v:SetRoundPoints("survive")
 			winners[v:SteamID64()] = true
 		end
 
 		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
-			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetPoints("last_survive")
+			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetRoundPoints("last_survive")
 		end
 
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if not winners[v:SteamID64()] then
-				v:SetPoints("left_behind")
+				v:SetRoundPoints("left_behind")
 			end
 		end
 	end
@@ -456,7 +441,7 @@ function SlashCo.EndRound()
 
 	timer.Simple(lobbyDelay, function()
 		SlashCo.RemoveHelicopter()
-		SlashCo.CommitPoints()
+		SlashCo.CommitRoundPoints()
 
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		local slashers = team.GetPlayers(TEAM_SLASHER)
@@ -552,7 +537,7 @@ if not GameData.IsLobby then
 	end
 
 	timer.Create("SlashCo:RandomAmbientSound", 1, 0, function()
-		if SlashCo.State ~= SlashCo.States.IN_GAME then return end -- Not in game, so lets do nothing.
+		if GameData.IsLobby or SlashCo.State ~= SlashCo.States.IN_GAME then return end -- Not in game, so lets do nothing.
 
 		for _, ply in player.Iterator() do
 			local plyTeam = ply:Team()
@@ -565,6 +550,9 @@ if not GameData.IsLobby then
 			end
 
 			if math.random(1, 100) > chance then continue end
+			if ply:Team() == TEAM_SLASHER then
+				
+			end
 			
 			local pos = randomAmbientVector(150, 400)
 			pos:Add(ply:GetPos())

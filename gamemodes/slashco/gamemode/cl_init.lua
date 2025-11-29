@@ -474,7 +474,7 @@ local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
 local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
 local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
-hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
+hook.Add("SlashCo:DrawHUD", "AwaitingPlayersHUD", function()
 	if GameData.IsLobby then
 		return
 	end
@@ -492,11 +492,11 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 	local xoffset = (#SurvivorTeam + #SlasherTeam) * -50 - 25
 	--local xoffset = -250
 
-	for i = 1, #SurvivorTeam do
+	for _, survivorData in ipairs(SurvivorTeam) do
 		--Survivor team visualization before game start
 
 		for _, spectators in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
-			if spectators:SteamID64() == SurvivorTeam[i].id then
+			if spectators:SteamID64() == survivorData.steamid then
 				surface.SetMaterial(SurvivorIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
@@ -504,9 +504,8 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 			end
 		end
 
-		if GameData.LocalSteamID64 == SurvivorTeam[i].id then
-			draw.SimpleText(SCInfo.Survivor, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.7,
-					Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		if GameData.LocalSteamID64 == survivorData.steamid then
+			draw.SimpleText(SCInfo.Survivor, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.7, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		end
 
 		surface.SetMaterial(SurvivorDeadIcon)
@@ -521,7 +520,7 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 		--Slashers visualization before game start
 
 		for _, spectators in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
-			if spectators:SteamID64() == SlasherTeam[i].s_id then
+			if spectators:SteamID64() == SlasherTeam[i].steamid then
 				surface.SetMaterial(KillIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset + 50, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
@@ -573,7 +572,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
 		local text = SlashCo.Language("offering_idle")
 
-		if GameData.OfferingName ~= nil then
+		if GameData.OfferingName then
 			text = SlashCo.Language("Offering_name", GameData.OfferingName)
 		end
 
@@ -642,7 +641,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		if b_tick > 200 then
 			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
 
-			if slasherID ~= nil and slasherID ~= 0 then
+			if slasherID and slasherID ~= 0 then
 				icondrawid = slasherID
 			end
 		else
@@ -762,6 +761,24 @@ function SlashCo.ReadSound(fileName)
 
 	return _sound
 end
+
+-- RaphaelIT7: We use PostDrawHUD instead of DrawOverlay to avoid rendering OVER the main menu.
+hook.Add("PostDrawHUD", "SlashCo:DrawHUD", function()
+	if not GameData.LocalPlayer then return end -- DrawHUD is only called when the localplayer is valid!
+
+	cam.Start2D() -- Wiki says we need this :/
+		hook.Run("SlashCo:DrawHUD")
+	cam.End2D()
+end)
+
+-- RaphaelIT7: We use this to notify a user when something happened ingame, like if they have to select a slasher, the round starts or something else.
+function SlashCo.FlashWindows()
+	system.FlashWindow()
+end
+
+net.Receive("slashCo_FlashWindows", function()
+	SlashCo.FlashWindows()
+end)
 
 SC_CLIENT_LOADED = true
 

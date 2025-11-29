@@ -325,7 +325,7 @@ if SERVER then
 			phys:EnableDrag(false)
 		end
 
-		if self.EnableMovement and TargetPosition ~= nil then
+		if self.EnableMovement and TargetPosition then
 			local targetPos = Vector(self.targsmoothx * self.acceleration - self.sway_x,
 					self.targsmoothy * self.acceleration - self.sway_y,
 					self.targsmoothz * self.acceleration - self.sway_z)

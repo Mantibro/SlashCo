@@ -55,13 +55,13 @@ end)
 local ReadyCheck = Material("slashco/ui/lobby_ready")
 local UnReadyCheck = Material("slashco/ui/lobby_unready")
 
-hook.Add("HUDPaint", "LobbyInfoText", function()
+hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
 	if not GameData.IsLobby then return end
 
 	local localPly = GameData.LocalPlayer
 
 	local scrW, scrH = ScrW(), ScrH()
-	local point_count = localPly:GetNW2Int("Points", 0)
+	local point_count = localPly:GetPoints()
 	local localTeam = localPly:Team()
 	if localTeam == TEAM_SPECTATOR then return end
 

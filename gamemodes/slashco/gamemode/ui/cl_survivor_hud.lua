@@ -419,7 +419,7 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 	return true
 end)
 
-hook.Add("HUDPaint", "SurvivorHUD", function()
+hook.Add("SlashCo:DrawHUD", "SurvivorHUD", function()
 	local ply = GameData.LocalPlayer
 	
 	local team = ply:Team()
