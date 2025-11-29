@@ -558,6 +558,7 @@ hook.Add("StartCommand", "LobbyBot", function(ply, cmd)
 
 		if (CurTime() - (ply._REACHED_ELEVATOR or 0)) > 30 then
 			if not IsValid(SlashCo.Helicopter) then return end
+			if ply:InVehicle() then return end -- RaphaelIT7: Holy shit, since I had forgotten this, the bot spammed entered... 7000+ helicoper seats got created
 
 			SlashCo.Helicopter:Use(ply, ply)
 		end

@@ -56,6 +56,7 @@ function ENT:Initialize()
 		self.targsmoothy = self.targsmoothy or 0
 		self.targsmoothz = self.targsmoothz or 0
 		self.vel = self.vel or 0
+		self.Seats = {}
 	end
 
 	if CLIENT then
@@ -86,6 +87,13 @@ function ENT:OnRemove()
 		if SlashCo.Helicopter == self then
 			SlashCo.Helicopter = nil
 			self:QuietHeli()
+		end
+
+		-- RaphaelIT7: Cleanup after ourselves!
+		for _, seat in ipairs(self.Seats) do
+			if not IsValid(seat) then return end
+
+			seat:Remove()
 		end
 	end
 end
@@ -180,6 +188,12 @@ if SERVER then
 		if activator:Team() ~= TEAM_SURVIVOR --[[or not availabilityHeli]] then
 			return
 		end
+
+		local activatorVehicle = activator:GetVehicle()
+		if IsValid(activatorVehicle) and activatorVehicle.IsHelicopterSeat then
+			return -- RaphaelIT7: They are already sitting in the helicoper!
+		end 
+
 		--The Player is sat down in the helicopter
 
 		if activator:GetNW2Bool("DynamicFlashlight") then
@@ -208,6 +222,11 @@ if SERVER then
 		end
 
 		local vehicle = ents.Create("prop_vehicle_prisoner_pod")
+		if not IsValid(vehicle) then
+			ErrorNoHaltWithStack("[SlashCo] Failed to create helicopter seat! Why did we hit the entity limit!")
+			return
+		end
+
 		--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
 
 		--if t == false then
@@ -276,6 +295,8 @@ if SERVER then
 		vehicle.VehicleName = "Airboat Seat"
 		vehicle.ClassOverride = "prop_vehicle_prisoner_pod"
 		vehicle:SetParent(self)
+		vehicle.IsHelicopterSeat = true
+		table.insert(self.Seats, vehicle)
 
 		activator:EnterVehicle(vehicle)
 
