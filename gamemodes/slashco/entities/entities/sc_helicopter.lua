@@ -94,6 +94,7 @@ function ENT:PlayHeliSounds()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_engine_distant.mp3",
 		identifier = "HelicopterEngineDistant",
+		group = "Helicopter",
 		minDistance = 750,
 		maxDistance = 1000,
 		startDistance = 200,
@@ -108,6 +109,7 @@ function ENT:PlayHeliSounds()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_rotors_distant.mp3",
 		identifier = "HelicopterRotorsDistant",
+		group = "Helicopter",
 		minDistance = 4000,
 		maxDistance = 8000,
 		startDistance = 750,
@@ -122,6 +124,7 @@ function ENT:PlayHeliSounds()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_engine_close.mp3",
 		identifier = "HelicopterEngineClose",
+		group = "Helicopter",
 		minDistance = 250,
 		maxDistance = 500,
 		looping = true,
@@ -134,6 +137,7 @@ function ENT:PlayHeliSounds()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/helicopter_rotors_close.mp3",
 		identifier = "HelicopterRotorsClose",
+		group = "Helicopter",
 		minDistance = 750,
 		maxDistance = 1500,
 		looping = true,

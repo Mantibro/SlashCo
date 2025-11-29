@@ -302,3 +302,16 @@ hook.Add("EntityRemoved", "AudioSystem:EntityRemoved", function(ent)
 		net.WriteUInt(ent:EntIndex(), MAX_EDICT_BITS)
 	net.Broadcast()
 end)
+
+util.AddNetworkString("slashCo_AudioSystem_SetGroupVolume")
+function SlashCo.AudioSystem.SetGroupVolume(groupName, groupVolume, lerpTime, sendToEntity)
+	net.Start("slashCo_AudioSystem_SetGroupVolume")
+		net.WriteString(groupName)
+		net.WriteFloat(groupVolume)
+		net.WriteFloat(lerpTime)
+	if not sendToEntity then
+		net.Broadcast()
+	else
+		net.Send(sendToEntity)
+	end
+end

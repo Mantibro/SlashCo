@@ -5,6 +5,8 @@ SlashCo.AudioSystem.DeltaSoundCache = SlashCo.AudioSystem.DeltaSoundCache or {}
 SlashCo.AudioSystem.BackgroundChannel = SlashCo.AudioSystem.BackgroundChannel or nil
 SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs or 0 -- Incremental number to assign channel id's
 SlashCo.AudioSystem.UpdateFrequency = 0.05 -- How often timers execute to update the volume when fading it to a new value.
+SlashCo.AudioSystem.ServerGroupVolumes = SlashCo.AudioSystem.ServerGroupVolumes or {} -- Group volume mulipliers added on top of channel volumes controlled by the server
+SlashCo.AudioSystem.ClientGroupVolumes = SlashCo.AudioSystem.ClientGroupVolumes or {} -- Group volume mulipliers added on top of channel volumes controlled by the client
 
 local ErrorList = {} -- A table containing all the files we failed to open, if the file is in this list and we fail loading again, then we won't throw another error.
 
@@ -424,6 +426,18 @@ local function CalculateChannelVolume(channel, targetVol)
 			local channelPos = channelData.pos or channel:GetPos()
 			local volume = CalculateChannelFadeVolume(playerPos, channelPos, targetVol, soundData)
 			volume = CalculateRayTracedVolume(channel, channelData, soundData, channelPos, playerPos, volume)
+
+			if channelData.group then
+				local serverGroupVolume = SlashCo.AudioSystem.ServerGroupVolumes[channelData.group]
+				if serverGroupVolume then
+					volume = volume * math.Clamp(serverGroupVolume, 0, 5)
+				end
+
+				local clientGroupVolume = SlashCo.AudioSystem.ClientGroupVolumes[channelData.group]
+				if clientGroupVolume then
+					volume = volume * math.Clamp(clientGroupVolume, 0, 5)
+				end
+			end
 
 			return volume
 		end
@@ -1284,3 +1298,15 @@ net.Receive("slashCo_AudioSystem_EntityRemoved", function()
 
 	SlashCo.AudioSystem.StopSound(nil, 1, entIndex)
 end)
+
+net.Receive("slashCo_AudioSystem_SetGroupVolume", function()
+	local groupName = net.ReadString()
+	local groupVolume = net.ReadFloat()
+	local lerpTime = net.ReadFloat() -- ToDo
+
+	SlashCo.AudioSystem.ServerGroupVolumes[groupName] = groupVolume
+end)
+
+function SlashCo.AudioSystem.SetGroupVolume(groupName, groupVolume, lerpTime)
+	SlashCo.AudioSystem.ClientGroupVolumes[groupName] = groupVolume
+end
