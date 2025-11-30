@@ -233,8 +233,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	slasher:SetNWInt("LeuonardRoid", math.floor(Roid))
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
@@ -290,6 +290,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/leuonard/leuonard_step" .. idx .. ".mp3",
 			identifier = "LeuonardFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 200,
 			maxDistance = 500,
 			entity = ply,

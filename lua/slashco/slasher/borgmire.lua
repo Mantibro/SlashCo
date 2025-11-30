@@ -125,8 +125,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
@@ -311,6 +311,7 @@ function SLASHER.Footstep(ply)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/borgmire/borgmire_step" .. idx .. ".mp3",
 				identifier = "BorgmireFootstep" .. idx,
+				group = "SlasherFootstep",
 				minDistance = 400,
 				maxDistance = 700,
 				entity = ply,

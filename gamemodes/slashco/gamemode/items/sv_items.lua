@@ -26,7 +26,7 @@ function SlashCo.UseItem(ply)
 	if SlashCoItems[item] and SlashCoItems[item].OnUse then
 		local doNotRemove = SlashCoItems[item].OnUse(ply)
 		if not doNotRemove then
-			SlashCo.ChangeSurvivorItem(ply, "none")
+			SlashCo.ChangeSurvivorItem(ply, "item", "none")
 		end
 	end
 end
@@ -156,13 +156,14 @@ function SlashCo.RemoveItem(ply, isSec)
 	ply:SetItem(slot, "none")
 end
 
-function SlashCo.ChangeSurvivorItem(ply, id, noSound)
+function SlashCo.ChangeSurvivorItem(ply, slot, id, noSound)
+	slot = slot or "item"
 	if SlashCoItems[id] then
 		if SlashCoItems[id].OnPickUp then
 			SlashCoItems[id].OnPickUp(ply)
 		end
 
-		if SlashCoItems[id].IsSecondary then
+		if slot == "item2" or SlashCoItems[id].IsSecondary then
 			local item = ply:GetItem("item2")
 			ply:ItemFunction2("OnSwitchFrom", item)
 			ply:SetItem("item2", id)
@@ -180,7 +181,7 @@ function SlashCo.ChangeSurvivorItem(ply, id, noSound)
 			end
 		end
 	elseif id == "none" then
-		ply:SetItem("item", "none")
+		ply:SetItem(slot, "none")
 	end
 end
 
@@ -231,7 +232,7 @@ function SlashCo.ItemPickUp(ply, itemindex, item)
 		itemEnt.SpawnedAt.SpawnedEntity = nil
 	end
 
-	SlashCo.ChangeSurvivorItem(ply, item)
+	SlashCo.ChangeSurvivorItem(ply, slot, item)
 	itemEnt:Remove()
 
 	return true

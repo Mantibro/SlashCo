@@ -478,9 +478,8 @@ function SlashCo.SetupPlayers()
 		local survivorEntry = survivors[survivor:SteamID64()]
 		if survivorEntry then
 			SlashCo.DropAllItems(survivor) -- if somehow a player grabs an item beforehand
-			SlashCo.ChangeSurvivorItem(survivor, survivorEntry.Item, true)
-			SlashCo.ChangeSurvivorItem(survivor, survivorEntry.Item2, true)
-			SlashCo.SendValue(survivor, "preItem", survivorEntry.Item)
+			SlashCo.ChangeSurvivorItem(survivor, "item", survivorEntry.Item, true)
+			SlashCo.ChangeSurvivorItem(survivor, "item2", survivorEntry.Item2, true)
 		end
 	end
 	GameData.SurvivorData = survivors -- Save the data so that when players join late we can still give them their items.

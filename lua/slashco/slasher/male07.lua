@@ -161,8 +161,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("Male07State", State)
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", eyesight_final)
-	slasher:SetNWInt("Slasher_Perception", perception_final)
+	slasher:SetEyeSight(eyesight_final)
+	slasher:SetPerception(perception_final)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)

@@ -551,9 +551,8 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 			if not itemEntry then break end
 
 			SlashCo.DropAllItems(ply)
-			SlashCo.ChangeSurvivorItem(ply, itemEntry.Item, true)
-			SlashCo.ChangeSurvivorItem(ply, itemEntry.Item2, true)
-			SlashCo.SendValue(ply, "preItem", itemEntry.Item)
+			SlashCo.ChangeSurvivorItem(ply, "item", itemEntry.Item, true)
+			SlashCo.ChangeSurvivorItem(ply, "item2", itemEntry.Item2, true)
 		end
 	end)
 end)

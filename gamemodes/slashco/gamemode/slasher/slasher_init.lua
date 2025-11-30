@@ -62,17 +62,17 @@ function PLAYER:SlasherFunction(value, ...)
 end
 
 function PLAYER:SlasherStunDeafen(duration)
-	local currentDuration = self:GetNW2Float("DeafenTime", 0) - CurTime()
+	local currentDuration = self:GetDeafenTime() - CurTime()
 	if currentDuration < 0 then
 		currentDuration = 0
 	end
 
 	if currentDuration > duration then return end -- Something already deafened him for longer. So we return to avoid conflicts.
-	self:SetNW2Float("DeafenTime", CurTime() + duration)
+	self:SetDeafenTime(CurTime() + duration)
 end
 
 function PLAYER:SlasherIsStunDeaf()
-	return self:GetNW2Float("DeafenTime", 0) > CurTime()
+	return self:GetDeafenTime() > CurTime()
 end
 
 function TranslateSlasherClass(id)
@@ -102,22 +102,22 @@ function SlashCo.GetRandomSlasher(dangerlevel, slasherClass)
 end
 
 --Slasher Animation Controller
-hook.Add("CalcMainActivity", "SlashCoSlasherAnimator", function(ply, vel)
+hook.Add("CalcMainActivity", "SlashCo:SlasherAnimator", function(ply, vel)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Animator", vel)
 end)
 
-hook.Add("PlayerFootstep", "SlashCoSlasherFootstep", function(ply)
+hook.Add("PlayerFootstep", "SlashCo:SlasherFootstep", function(ply)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Footstep")
 end)
 
-hook.Add("Move", "SlashCoSlasherMove", function(ply, mv)
+hook.Add("Move", "SlashCo:SlasherMove", function(ply, mv)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Move", mv)
 end)
 
-hook.Add("FinishMove", "SlashCoSlasherFinishMove", function(ply, mv)
+hook.Add("FinishMove", "SlashCo:SlasherFinishMove", function(ply, mv)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("FinishMove", mv)
 end)
@@ -126,12 +126,12 @@ if CLIENT then
 	local StepNotice = Material("slashco/ui/particle/step_notice")
 	local timeSinceLast = 0
 	local emitter = nil
-	hook.Add("Think", "Slasher_Vision_Light", function()
+	hook.Add("Think", "SlashCo:SlasherVisionLight", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			return
 		end
 
-		local Eyesight = GameData.LocalPlayer:GetNWInt("Slasher_Eyesight")
+		local Eyesight = GameData.LocalPlayer:GetEyeSight(1)
 
 		--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright )
 
@@ -141,16 +141,16 @@ if CLIENT then
 			dlight.r = 50 + (Eyesight * 2)
 			dlight.g = 50 + (Eyesight * 2)
 			dlight.b = 50 + (Eyesight * 2)
-			dlight.brightness = 0.1 + Eyesight / 50
+			dlight.brightness = 0.2 + Eyesight / 50
 			dlight.Decay = 1000
-			dlight.Size = 70 + 250 * Eyesight
+			dlight.Size = 100 + 250 * Eyesight
 			dlight.DieTime = CurTime() + 1
 		end
 
 		local slasherpos = GameData.LocalPlayer:GetPos()
 		local PerceptionReal = 0
 		if not GameData.LocalPlayer:GetNWBool("InSlasherChaseMode") then
-			PerceptionReal = GameData.LocalPlayer:GetNWInt("Slasher_Perception")
+			PerceptionReal = GameData.LocalPlayer:GetPerception()
 		end
 
 		timeSinceLast = timeSinceLast + FrameTime() / 3
@@ -210,12 +210,12 @@ if CLIENT then
 		end
 	end)
 
-	hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
+	hook.Add("RenderScreenspaceEffects", "SlashCo:SlasherVision", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			return
 		end
 
-		local Eyesight = GameData.LocalPlayer:GetNWInt("Slasher_Eyesight")
+		local Eyesight = GameData.LocalPlayer:GetEyeSight(1)
 
 		local tab = {
 			["$pp_colour_addr"] = 0.01,

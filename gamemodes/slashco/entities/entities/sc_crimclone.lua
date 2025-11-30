@@ -43,7 +43,7 @@ function ENT:RunBehaviour()
 					maxDistance = 1550 * SlashCo.MapSize,
 					looping = true,
 					entity = self,
-					volume = 1,
+					volume = 0.8,
 					fadeIn = 0,
 				})
 			else
@@ -54,7 +54,7 @@ function ENT:RunBehaviour()
 					maxDistance = 1240 * SlashCo.MapSize,
 					looping = true,
 					entity = self,
-					volume = 1,
+					volume = 0.8,
 					fadeIn = 0,
 				}) 
 			end

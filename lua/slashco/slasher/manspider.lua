@@ -200,8 +200,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
@@ -343,6 +343,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/manspider/manspider_step.mp3",
 			identifier = "ManspiderFootstep",
+			group = "SlasherFootstep",
 			minDistance = 250,
 			maxDistance = 500,
 			entity = ply,

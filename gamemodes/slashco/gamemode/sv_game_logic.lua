@@ -370,12 +370,12 @@ function SlashCo.AwaitExpectedPlayers()
 		if IsValid(ply) then
 			expected_count = expected_count + 1
 			print("[SlashCo] Expected player " .. expected_count .. " in!" .. "(" .. ply:Name() .. ")")
-			break
+			continue
 		end
 	end
 
 	if expected_count == #SlashCo.CurRound.ExpectedPlayers then
-		if #player.GetCount() < 2 then
+		if player.GetCount() < 2 then
 			SlashCo.Abort("Not enouth players to start a round")
 			return
 		end

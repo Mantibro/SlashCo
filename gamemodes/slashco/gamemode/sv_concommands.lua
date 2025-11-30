@@ -349,9 +349,9 @@ concommand.Add("slashco_give_item", function(ply, _, args)
 	end
 
 	if SlashCoItems[args[1]] then
-		SlashCo.ChangeSurvivorItem(ply, args[1])
+		SlashCo.ChangeSurvivorItem(ply, "item", args[1])
 	else
-		SlashCo.ChangeSurvivorItem(ply, "none")
+		SlashCo.ChangeSurvivorItem(ply, "item", "none")
 	end
 end, function(cmd, args)
 	--this is for autocomplete

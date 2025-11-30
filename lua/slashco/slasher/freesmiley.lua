@@ -57,8 +57,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetNWInt("SmileySummonCooldown", math.floor(SummonCD))
 	slasher:SetNWInt("SmileySummonSelect", SummonChoose)
 
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
@@ -177,6 +177,7 @@ function SLASHER.Footstep(ply)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
 				identifier = "FreeSmileyFootstep" .. idx,
+				group = "SlasherFootstep",
 				minDistance = 200,
 				maxDistance = 500,
 				entity = ply,

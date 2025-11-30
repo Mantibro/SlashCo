@@ -115,8 +115,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("ThirstyMilkDrank", Milks)
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", eyesight_final)
-	slasher:SetNWInt("Slasher_Perception", perception_final)
+	slasher:SetEyeSight(eyesight_final)
+	slasher:SetPerception(perception_final)
 end
 
 function SLASHER.Thirdperson(ply)

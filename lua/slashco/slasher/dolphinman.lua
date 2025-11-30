@@ -216,8 +216,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("DolphinHunt", math.floor(HuntPower))
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight + (hunt_boost * 5))
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception * 1.4 ^ (slasher.DolphinKills or 0) + (hunt_boost * 3))
+	slasher:SetEyeSight(SLASHER.Eyesight + (hunt_boost * 5))
+	slasher:SetPerception(SLASHER.Perception * 1.4 ^ (slasher.DolphinKills or 0) + (hunt_boost * 3))
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
@@ -326,6 +326,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/dolfin/dolphin_step" .. idx .. ".mp3",
 			identifier = "DolphinFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 250,
 			maxDistance = 400,
 			entity = ply,

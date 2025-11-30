@@ -214,8 +214,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	slasher:SetNWInt("WatcherStalkTime", Stalking)
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
@@ -307,6 +307,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/watcher/watcher_boot" .. idx .. ".mp3",
 			identifier = "WatcherFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 250,
 			maxDistance = 550,
 			entity = ply,

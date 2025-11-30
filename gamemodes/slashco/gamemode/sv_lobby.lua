@@ -135,7 +135,7 @@ local function lobbyChooseItem(plyid, id)
 
 	--Change the survivor's chosen item.
 
-	SlashCo.ChangeSurvivorItem(player.GetBySteamID64(plyid), id)
+	SlashCo.ChangeSurvivorItem(player.GetBySteamID64(plyid), "item", id)
 
 	if SlashCoItems[id].OnBuy then
 		SlashCoItems[id].OnBuy()

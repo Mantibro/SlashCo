@@ -168,8 +168,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	--]]
 
-	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
-	slasher:SetNWInt("Slasher_Perception", final_perception)
+	slasher:SetEyeSight(final_eyesight)
+	slasher:SetPerception(final_perception)
 end
 
 local function IsPlayerHoldingCookie(target, removeCookie)
@@ -444,18 +444,9 @@ function SLASHER.OnSecondaryFire(slasher)
 		slasher.GunCooldown = 2
 		slasher:SetNWBool("SidGunAiming", false)
 		slasher:SetNWBool("SidGunAimed", false)
-		--slasher:SetSlowWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-		--slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
 		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-
-		if not gunrage then
-			--slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-		else
-			--slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-		end
+		slasher:SetRunSpeed(gunrage and SLASHER.ChaseSpeed or SLASHER.ProwlSpeed)
 	end
 end
 
@@ -513,7 +504,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher.GunCooldown = 2
 
 			if slasher:GetNWBool("SidGunRage") then
-				--slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
 				slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 			end
 		end)
@@ -540,12 +530,7 @@ function SLASHER.Animator(ply)
 	local aiming_gun = ply:GetNWBool("SidGunAiming")
 	local aimed_gun = ply:GetNWBool("SidGunAimed")
 	local gun_shooting = (CurTime() - ply:GetNWFloat("SidGunShoot", 0)) < SLASHER.GunShotDecay
-
-	if gun_state then
-		gun_prefix = "g_"
-	else
-		gun_prefix = ""
-	end
+	local gun_prefix = gun_state and "g_" or ""
 
 	if not eating and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then
 		ply.anim_antispam = false
@@ -619,12 +604,12 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/sid/sid_step" .. idx .. ".mp3",
 			identifier = "SIDFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 300,
 			maxDistance = 600,
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
-			makeUniqueToEntity = true,
 			unreliable = true,
 		})
 	end
@@ -772,17 +757,9 @@ end
 
 function SLASHER.SidRage(ply)
 	local pos = ply:GetPos()
-
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		local slasherid = slasher:SteamID64()
-
-		if SlashCoSlashers[slasher:GetNWString("Slasher")].ID ~= 2 then
-			return
-		end
-
-		if slasher:GetPos():Distance(pos) > 1800 then
-			return
-		end
+		if SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
+		if slasher:GetPos():Distance(pos) > 1800 then return end
 
 		slasher.EatedCookies = slasher.EatedCookies + 2
 

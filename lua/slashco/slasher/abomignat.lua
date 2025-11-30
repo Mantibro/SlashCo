@@ -183,8 +183,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("AbomignatCanMainSlash", true)
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", eyesight_final)
-	slasher:SetNWInt("Slasher_Perception", perception_final)
+	slasher:SetEyeSight(eyesight_final)
+	slasher:SetPerception(perception_final)
 end
 
 hook.Add("PlayerDeath", "AbomignatCountKills", function(victim, _, attacker)
@@ -448,6 +448,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/abomignat/abomignat_" .. (chase and "hardstep" or "step") .. idx .. ".ogg",
 			identifier = "AbomignatFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 200,
 			maxDistance = 400,
 			entity = ply,

@@ -135,8 +135,8 @@ function SLASHER.OnTickBehaviour(slasher, target)
 		SLASHER.TackleFail(slasher)
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
@@ -216,6 +216,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
 			identifier = "CovenantCloakFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 200,
 			maxDistance = 500,
 			entity = ply,

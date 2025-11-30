@@ -125,7 +125,7 @@ function SLASHER.Precache()
 end
 
 function SLASHER.HideTime(slasher)
-	slasher.TylerTime = math.max((25 + SlashCo.MapSize * 25) - ((SlashCo.GetSlasherAnger(slasher) / 3) / SlashCo.MapSize) - team.NumPlayers(TEAM_SURVIVOR), SLASHER.MinTylerTime)
+	slasher.TylerTime = math.max((30 + SlashCo.MapSize * 20) - ((SlashCo.GetSlasherAnger(slasher) / 1.5) / SlashCo.MapSize) - team.NumPlayers(TEAM_SURVIVOR), SLASHER.MinTylerTime)
 	-- print("Tyler transformation time: " .. slasher.TylerTime)
 end
 
@@ -173,9 +173,9 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		slasher.TylerSongPickedID = nil
 		slasher:SetNWBool("TylerFlash", false)
-		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
+		slasher:SetRunSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
+		slasher:SetWalkSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
 		slasher:SetNWBool("TylerTheCreator", false)
 		slasher:SetCanSeePlayers(false)
 		slasher:SetBodygroup(0, 0)
@@ -443,8 +443,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("TylerState", TylerState)
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
-	slasher:SetNWInt("Slasher_Perception", final_perception)
+	slasher:SetEyeSight(final_eyesight)
+	slasher:SetPerception(final_perception)
 end
 
 local function DestroyItem(slasher, target)

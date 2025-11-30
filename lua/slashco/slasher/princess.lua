@@ -215,8 +215,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", eyesight)
-	slasher:SetNWInt("Slasher_Perception", perception)
+	slasher:SetEyeSight(eyesight)
+	slasher:SetPerception(perception)
 end
 
 local function IsPlayerHoldingBaby(target, removeBaby)
@@ -532,6 +532,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
 			identifier = "PrincessFootstep1",
+			group = "SlasherFootstep",
 			minDistance = 300,
 			maxDistance = 700,
 			entity = ply,
@@ -544,6 +545,7 @@ function SLASHER.Footstep(ply)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
 				identifier = "PrincessFootstep2",
+				group = "SlasherFootstep",
 				minDistance = 300,
 				maxDistance = 700,
 				entity = ply,

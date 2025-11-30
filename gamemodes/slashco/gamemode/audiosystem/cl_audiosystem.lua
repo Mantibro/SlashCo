@@ -1120,7 +1120,7 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 		return
 	end
 
-	-- We use or and do identifier .. entIndex since if a sound has makeUniqueToEntity set, it will append the EntIndex to our identifier
+	-- We use or and do identifier .. entIndex since if a sound didn't use disableUniqueToEntity, it will append the EntIndex to our identifier
 	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier] or SlashCo.AudioSystem.CreatingChannels[identifier .. (entIndex or "")]
 	if creationSounData then -- The channel wasn't created yet, so we cannot stop it. Instead we'll set a flag.
 		creationSounData.DESTROYCHANNEL = true

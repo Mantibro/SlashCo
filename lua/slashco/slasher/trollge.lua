@@ -319,8 +319,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
-	slasher:SetNWInt("Slasher_Perception", final_perception)
+	slasher:SetEyeSight(final_eyesight)
+	slasher:SetPerception(final_perception)
 end
 
 function SLASHER.Move(ply, mv)
@@ -653,6 +653,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/trollge/troll_step" .. idx .. ".mp3",
 			identifier = "TrollgeFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 150,
 			maxDistance = 500,
 			entity = ply,

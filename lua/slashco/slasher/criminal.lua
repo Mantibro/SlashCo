@@ -110,8 +110,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_eyesight = 6
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
-	slasher:SetNWInt("Slasher_Perception", final_perception)
+	slasher:SetEyeSight(final_eyesight)
+	slasher:SetPerception(final_perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
@@ -199,6 +199,7 @@ function SLASHER.Footstep(ply)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
 				identifier = "CriminalFootstep" .. idx,
+				group = "SlasherFootstep",
 				minDistance = 200,
 				maxDistance = 500,
 				entity = ply,

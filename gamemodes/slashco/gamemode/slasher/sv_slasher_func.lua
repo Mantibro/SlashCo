@@ -174,7 +174,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 
 		slasher:SlasherFunction("OnTickBehaviour")
 
-		slasher:SetFogMult(0.5 + (slasher:GetNWFloat("Slasher_Eyesight", 1) / 5))
+		slasher:SetFogMult(0.5 + (slasher:GetEyeSight() / 5))
 	end
 
 	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then return end

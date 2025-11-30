@@ -12,7 +12,7 @@ function ITEM.MaxAllowed()
 end
 ITEM.IsSpawnable = true
 function ITEM.OnDie(ply)
-	SlashCo.ChangeSurvivorItem(ply, "DeathWard (Used)", true)
+	SlashCo.ChangeSurvivorItem(ply, "item", "DeathWard (Used)", true)
 	local pos = ply:WorldSpaceCenter()
 	SlashCo.DropItem(ply, function(ply, item, droppedItem, phys)
 		phys:SetPos(pos, true)

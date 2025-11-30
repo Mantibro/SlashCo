@@ -68,8 +68,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("SpeedrunnerSpeed", math.floor(Speed))
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
