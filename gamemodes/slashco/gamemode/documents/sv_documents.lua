@@ -52,7 +52,7 @@ function PLAYER:NetworkDocument(name)
 end
 
 function PLAYER:LoadDocuments()
-	local sqlDocuments = sql.Query("SELECT * FROM slashco_documents WHERE PlayerID ='" .. self:SteamID64() .. "';") or {}
+	local sqlDocuments = sql.Query("SELECT * FROM slashco_documents WHERE PlayerID = " .. sql.SQLStr(self:SteamID64()) .. ";") or {}
 	local documents = {}
 	self.Documents = documents
 
@@ -90,13 +90,13 @@ end
 function PLAYER:GiveDocument(name, rating)
 	local documents = (self.Documents or {})
 	if not documents[name] then
-		sql.Query("INSERT INTO slashco_documents(PlayerID, Document, Rating) VALUES('" .. self:SteamID64() .. "', '".. name .. "', " .. rating .. ");")
+		sql.Query("INSERT INTO slashco_documents(PlayerID, Document, Rating) VALUES(" .. sql.SQLStr(self:SteamID64()) .. ", ".. sql.SQLStr(name) .. ", " .. rating .. ");")
 		documents[name] = {
 			rating = rating
 		}
 	else
 		if documents[name].rating < rating then -- We only allow a increase in the rating in this function
-			sql.Query("UPDATE slashco_documents SET Rating = " .. rating .. " WHERE PlayerID = '" .. self:SteamID64() .. "';")
+			sql.Query("UPDATE slashco_documents SET Rating = " .. rating .. " WHERE PlayerID = " .. sql.SQLStr(self:SteamID64()) .. ";")
 			documents[name].rating = rating
 		end
 	end
@@ -106,7 +106,7 @@ end
 
 -- You've lost your document privileges >:3
 function PLAYER:RevokeDocument(name)
-	sql.Query("DELETE FROM slashco_documents WHERE PlayerID = '" .. self:SteamID64() .. "' AND Document = '" .. name .. "';")
+	sql.Query("DELETE FROM slashco_documents WHERE PlayerID = " .. sql.SQLStr(self:SteamID64()) .. " AND Document = " .. sql.SQLStr(name) .. ";")
 	self.Documents = self.Documents or {}
 	self.Documents[name] = nil
 

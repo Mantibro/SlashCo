@@ -49,7 +49,12 @@ local function lobbySaveCurData()
 		sql.Query("INSERT INTO slashco_table_potentialslashers( SteamID ) VALUES( " .. sql.SQLStr(potentialSlasher.steamid) .. " );")
 	end
 
-	print("[SlashCo] DATA SAVED. (" .. (sql.LastError() or "") .. ")")
+	local lastSQLError = sql.LastError() or ""
+	if lastSQLError ~= "" then
+		ErrorNoHaltWithStack("Encountered some SQL error while writing lobby data! Report this: \"" .. lastSQLError .. "\"")
+	end
+
+	print("[SlashCo] DATA SAVED.")
 
 	SlashCo.ChangeMap(SlashCo.LobbyData.SelectedMap)
 end

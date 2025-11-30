@@ -253,7 +253,7 @@ end
 function SlashCo.BroadcastMasterDatabaseForClient(ply)
 	if not IsValid(ply) then return end
 
-	local data = sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID ='" .. ply:SteamID64() .. "';")
+	local data = sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(ply:SteamID64()) .. ";")
 	if not data or not data[1] then return end
 
 	ply:SetSurvivorRoundsWon(data[1].SurvivorRoundsWon)
