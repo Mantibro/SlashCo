@@ -256,10 +256,10 @@ function SlashCo.BroadcastMasterDatabaseForClient(ply)
 	local data = sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(ply:SteamID64()) .. ";")
 	if not data or not data[1] then return end
 
-	ply:SetSurvivorRoundsWon(data[1].SurvivorRoundsWon)
-	ply:SetSlasherRoundsWon(data[1].SlasherRoundsWon)
-	ply:SetPoints(data[1].Points)
-	ply:SetExperience(data[1].Experience)
+	ply:SetSurvivorRoundsWon(tonumber(data[1].SurvivorRoundsWon))
+	ply:SetSlasherRoundsWon(tonumber(data[1].SlasherRoundsWon))
+	ply:SetPoints(tonumber(data[1].Points))
+	ply:SetExperience(tonumber(data[1].Experience))
 	ply:SetActivePerks(data[1].ActivePerks)
 	ply:SetOwnedPerks(data[1].OwnedPerks)
 end
