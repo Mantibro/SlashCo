@@ -99,7 +99,7 @@ function SlashCoDatabase.OnPlayerJoined(steamid)
 	if not ply then return end -- The SteamID is not valid...
 
 	if not database then
-		sql.Query("INSERT INTO slashco_master_database(PlayerID, PlayerName, SurvivorRoundsWon, SlasherRoundsWon, Points, Experience) VALUES(" .. sql.SQLStr(steamid) .. ", " .. sql.SQLStr(ply:GetName()) .. ", 0, 0, 0, 0);")
+		sql.Query("INSERT INTO slashco_master_database(PlayerID, PlayerName, SurvivorRoundsWon, SlasherRoundsWon, Points, Experience, ActivePerks, OwnedPerks) VALUES(" .. sql.SQLStr(steamid) .. ", " .. sql.SQLStr(ply:GetName()) .. ", 0, 0, 0, 0, '', '');")
 
 		print("[SlashCo] Master Database has no entries. This Player will be the first entry.")
 		return
@@ -116,7 +116,7 @@ function SlashCoDatabase.OnPlayerJoined(steamid)
 	end
 
 	if not hasEntry then
-		sql.Query("INSERT INTO slashco_master_database(PlayerID, PlayerName, SurvivorRoundsWon, SlasherRoundsWon, Points, Experience) VALUES(" .. sql.SQLStr(steamid) .. ", " .. sql.SQLStr(ply:GetName()) .. ", 0, 0, 0, 0);")
+		sql.Query("INSERT INTO slashco_master_database(PlayerID, PlayerName, SurvivorRoundsWon, SlasherRoundsWon, Points, Experience, ActivePerks, OwnedPerks) VALUES(" .. sql.SQLStr(steamid) .. ", " .. sql.SQLStr(ply:GetName()) .. ", 0, 0, 0, 0, '', '');")
 
 		print("[SlashCo] This Player is not in the Database, and has been inserted.")
 	elseif hasEntry then
