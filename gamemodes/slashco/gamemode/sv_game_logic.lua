@@ -58,7 +58,7 @@ function SlashCo.LoadCurRoundData()
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
 			--All survivors will become slashers.
 			for _, survivorData in ipairs(survivorData) do
-				local slasher_pick = GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
+				local slasher_pick = SlashCo.GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
 				SlashCo.SelectSlasher(slasher_pick, survivorData.SteamID)
 				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = survivorData.SteamID, slasherID = slasher_pick })
 				table.insert(SlashCo.CurRound.ExpectedPlayers, {
@@ -211,7 +211,7 @@ local function DoSlasherSelection(slashers, usingPotentialSlashers)
 			SlashCo.AwaitPlayerToSelectSlasher = nil
 			if SlashCo.CurRound.AntiLoopSpawn then return end
 
-			local slasherID = slasherID or GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
+			local slasherID = slasherID or SlashCo.GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
 			sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( " .. sql.SQLStr(ply:SteamID64()) .. ", " .. sql.SQLStr(slasherID) .. " );")
 			table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = ply:SteamID64(), slasherID = slasherID })
 			RefundSurvivorItems(ply)

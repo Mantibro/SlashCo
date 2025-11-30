@@ -64,7 +64,7 @@ function SlashCoDatabase.UpdateStats(steamid, statType, increase)
 		increase = sql.SQLStr(increase)
 	end
 
-	local newAmount = validStats[statType] == "number" and (current_stat + increase) or increase
+	local newAmount = validStats[statType] == "number" and (tonumber(current_stat) + increase) or increase
 	sql.Query("UPDATE slashco_master_database SET " .. statType .. " = " .. newAmount .. " WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")
 
 	local ply = player.GetBySteamID64(steamid)

@@ -148,18 +148,17 @@ end
 --				***Begin the transition timer***
 local function lobbyTransitionTimer()
 	timer.Create("LobbyTransition", math.max(SlashCo.LobbyBanter(), 10), 1, function()
-		RunConsoleCommand("lobby_debug_brief")
-		SlashCo.LobbyPlayerBriefing()
+		SlashCo.LobbyBriefingTransition()
 
 		timer.Simple(8, function()
-			RunConsoleCommand("lobby_openitems")
+			SlashCo.LobbyOpenItems()
 		end)
 	end)
 end
 --				***Begin the leaving timer***
 local function lobbyLeaveTimer()
 	timer.Create("LobbyLeave", 20, 1, function()
-		RunConsoleCommand("lobby_leave")
+		SlashCo.LobbyLeave()
 	end)
 end
 
@@ -648,8 +647,8 @@ hook.Add("Tick", "LobbyTickEvent", function()
 			break
 		end
 
-		if (all_players_in or (CurTime() > (SlashCo.LobbyData.ElevatorEnterTime or CurTime()))) and SERVER then
-			RunConsoleCommand("lobby_debug_transition")
+		if all_players_in or (CurTime() > (SlashCo.LobbyData.ElevatorEnterTime or CurTime())) then
+			SlashCo.LobbyEvelatorTransition()
 		end
 	end
 end)
@@ -764,11 +763,7 @@ function SlashCo.LobbyRoundSetup()
 	lobbyRoundSetup()
 end
 
-concommand.Add("lobby_debug_transition", function(ply)
-	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
-		return
-	end
-
+function SlashCo.LobbyEvelatorTransition()
 	SlashCo.LobbyData.LOBBYSTATE = 2
 
 	local doors = ents.FindByName("Slashco_Elev_Shutter")
@@ -785,14 +780,12 @@ concommand.Add("lobby_debug_transition", function(ply)
 	net.Start("SlashCo:GiveLobbyStatus")
 		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
 	net.Broadcast()
-end)
+end
 
-concommand.Add("lobby_debug_brief", function(ply)
-	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
-		return
-	end
-
+function SlashCo.LobbyBriefingTransition()
 	SlashCo.LobbyData.LOBBYSTATE = 3
+
+	SlashCo.LobbyPlayerBriefing()
 
 	local doors = ents.FindByName("Slashco_Elev_Exit")
 	doors[1]:Fire("Open")
@@ -801,38 +794,22 @@ concommand.Add("lobby_debug_brief", function(ply)
 	net.Start("SlashCo:GiveLobbyStatus")
 		net.WriteUInt(SlashCo.LobbyData.LOBBYSTATE, 3)
 	net.Broadcast()
-end)
+end
 
-concommand.Add("timer_start", function(ply)
-	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
-		return
-	end
-
-	lobbyReadyTimer(30)
-end)
-
-concommand.Add("lobby_openitems", function(ply)
-	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
-		return
-	end
-
+function SlashCo.LobbyOpenItems()
 	local door = table.Random(ents.FindByName("door_itembox"))
 	if IsValid(door) then
 		door:Fire("Open")
 	end
-end)
+end
 
-concommand.Add("lobby_leave", function(ply)
-	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
-		return
-	end
-
+function SlashCo.LobbyLeave()
 	SlashCo.ClearDatabase()
 
 	timer.Simple(1, function()
 		lobbySaveCurData()
 	end)
-end)
+end
 
 util.AddNetworkString("slashCo_SpectatorSceneToPVS")
 if GameData.IsLobby then

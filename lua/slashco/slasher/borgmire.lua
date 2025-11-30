@@ -43,7 +43,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.PunchDamage = 35 + (SO * 20) + (1.5 * additionalSurvivors)
 	SLASHER.ThrowStrengthForward = 1600 + (SO * 450)  + (30 * additionalSurvivors)
 	SLASHER.ThrowStrengthUp = 800 + (SO * 150) + (10 * additionalSurvivors)
-	SLASHER.PunchSlowdownDiv = math.max((2 / SO) - (0.05 * additionalSurvivors), 0.5)
+	SLASHER.PunchSlowdownDiv = math.Clamp((SO / 2) - (0.05 * additionalSurvivors), 0.5, 2)
 	SLASHER.ChaseSpeedReduction = (SO * 7) + (0.5 * additionalSurvivors)
 
 	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
@@ -80,6 +80,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	if PunchSD > 1 then
 		slasher.PunchSlowdown = PunchSD - (FrameTime() / SLASHER.PunchSlowdownDiv)
 	end
+
 	if PunchSD < 1 then
 		slasher.PunchSlowdown = 1
 	end

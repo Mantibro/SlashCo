@@ -62,6 +62,7 @@ function SlashCo.ResetCurRoundData()
 	SlashCo.CurRound = {
 		Difficulty = SlashCo.DifficultyLevel.EASY,
 		ExpectedPlayers = {},
+		DisconnectedPlayers = {},
 		--ExpectedPlayersLoaded = false, --not used
 		--ConnectedPlayers = {}, --not used
 		AntiLoopSpawn = false,
