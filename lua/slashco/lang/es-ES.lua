@@ -24,6 +24,8 @@ SlashCo.LangTable["NoneRescued"] = "Ningún empleado de SlashCo fue rescatado."
 SlashCo.LangTable["Cursed"] = "Te han hecho brujería."
 SlashCo.LangTable["Judgement"] = "JUICIO"
 SlashCo.LangTable["newplayer_spawnnotice"] = "Presiona [%s] para entrar"
+SlashCo.LangTable["slasher_replacement"] = "Has sido elegido como el nuevo slasher"
+SlashCo.LangTable["item_refund"] = "Se te han reembolsado %s puntos por tus objetos"
 
 SlashCo.LangTable["HP"] = "VIDA"
 SlashCo.LangTable["FUEL"] = "COMBUSTIBLE"

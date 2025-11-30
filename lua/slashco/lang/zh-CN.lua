@@ -24,6 +24,8 @@ SlashCo.LangTable["NoneRescued"] = "派出的SlashCo工作人员无法被救援�
 SlashCo.LangTable["Cursed"] = "你的灵魂现在被没收了。"
 SlashCo.LangTable["Judgement"] = "审判"
 SlashCo.LangTable["newplayer_spawnnotice"] = "按 [%s] 生成"
+SlashCo.LangTable["slasher_replacement"] = "你被选为新的屠戮者"
+SlashCo.LangTable["item_refund"] = "你的物品已返还 %s 点数"
 
 SlashCo.LangTable["HP"] = "生命值"
 SlashCo.LangTable["FUEL"] = "燃料"

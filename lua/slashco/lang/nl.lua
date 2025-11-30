@@ -24,6 +24,8 @@ SlashCo.LangTable["NoneRescued"] = "Het uitgezonden SlashCo-personeel kon niet g
 SlashCo.LangTable["Cursed"] = "Je ziel is nu opgeofferd."
 SlashCo.LangTable["Judgement"] = "OORDEEL"
 SlashCo.LangTable["newplayer_spawnnotice"] = "Druk op [%s] om te spawnen"
+SlashCo.LangTable["slasher_replacement"] = "Je bent gekozen als de nieuwe slasher"
+SlashCo.LangTable["item_refund"] = "Je hebt %s punten teruggekregen voor je items"
 
 SlashCo.LangTable["InLobby"] = "In Lobby"
 SlashCo.LangTable["InGame"] = "In Game (%s)"

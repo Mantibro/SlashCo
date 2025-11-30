@@ -5,15 +5,9 @@ PERK.Name = "faster_fueling"
 PERK.Description = "faster_fueling_desc"
 PERK.Icon = "slashco/ui/perks/faster_fueling"
 PERK.FuelSpeed = 1.25
-PERK.FuelWalkSpeed = 0.9
+PERK.FuelWalkSpeed = 0.9 -- ToDo: Implement this
 PERK.Team = TEAM_SURVIVOR
 PERK.Level = 0
-PERK.Price = 1
+PERK.Price = 100
 
 SlashCo.RegisterPerk(PERK, PERK.ID)
-SlashCo.RegisterPerk(PERK, PERK.ID .. "2")
-SlashCo.RegisterPerk(PERK, PERK.ID .. "3")
-SlashCo.RegisterPerk(PERK, PERK.ID .. "4")
-SlashCo.RegisterPerk(PERK, PERK.ID .. "5")
-SlashCo.RegisterPerk(PERK, PERK.ID .. "6")
-SlashCo.RegisterPerk(PERK, PERK.ID .. "7")

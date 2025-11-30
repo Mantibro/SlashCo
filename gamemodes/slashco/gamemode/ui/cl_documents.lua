@@ -269,13 +269,6 @@ local selection = {
 			end
 
 			table.insert(sortedPerks[perk.Level], perk)
-			table.insert(sortedPerks[perk.Level], perk)
-
-			if not sortedPerks[perk.Level + 1] then
-				sortedPerks[perk.Level + 1] = {}
-			end
-
-			table.insert(sortedPerks[perk.Level + 1], perk)
 		end
 
 		local currentPerk = nil
