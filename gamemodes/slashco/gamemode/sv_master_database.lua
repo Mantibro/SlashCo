@@ -15,14 +15,19 @@ function SlashCoDatabase.EstablishDatabase()
 
 		if not columns["Experience"] then
 			print("Adding missing database column Experience")
-			sql.Query("ALTER TABLE slashco_master_database ADD COLUMN Experience NUMBER;")
+			sql.Query("ALTER TABLE slashco_master_database ADD COLUMN Experience NUMBER DEFAULT 0;")
 		end
 
 		if not columns["ActivePerks"] then
 			print("Adding missing database column ActivePerks")
-			sql.Query("ALTER TABLE slashco_master_database ADD COLUMN ActivePerks TEXT;")
-			sql.Query("ALTER TABLE slashco_master_database ADD COLUMN OwnedPerks TEXT;")
+			sql.Query("ALTER TABLE slashco_master_database ADD COLUMN ActivePerks TEXT DEFAULT '';")
+			sql.Query("ALTER TABLE slashco_master_database ADD COLUMN OwnedPerks TEXT DEFAULT '';")
 		end
+
+		-- RaphaelITT7: Hotpatch since I screwed up the db by not adding defaults...
+		sql.Query("UPDATE slashco_master_database SET Experience = 0 WHERE Experience IS NULL;")
+		sql.Query("UPDATE slashco_master_database SET ActivePerks = '' WHERE ActivePerks IS NULL;")
+		sql.Query("UPDATE slashco_master_database SET OwnedPerks = '' WHERE OwnedPerks IS NULL;")
 
 		return
 	end --Create the database table for basic statistics
@@ -31,7 +36,7 @@ function SlashCoDatabase.EstablishDatabase()
 		ply:ChatPrint("[SlashCo] The Master Database does not exist. Creating it now.")
 	end
 
-	sql.Query("CREATE TABLE slashco_master_database(PlayerID TEXT, PlayerName TEXT, SurvivorRoundsWon NUMBER, SlasherRoundsWon NUMBER, Points NUMBER, Experience NUMBER, ActivePerks TEXT, OwnedPerks TEXT);")
+	sql.Query("CREATE TABLE slashco_master_database(PlayerID TEXT, PlayerName TEXT, SurvivorRoundsWon NUMBER DEFAULT 0, SlasherRoundsWon NUMBER DEFAULT 0, Points NUMBER DEFAULT 0, Experience NUMBER DEFAULT 0, ActivePerks TEXT DEFAULT '', OwnedPerks TEXT DEFAULT '');")
 end
 SlashCoDatabase.EstablishDatabase()
 
@@ -51,10 +56,8 @@ function SlashCoDatabase.UpdateStats(steamid, statType, increase)
 		return
 	end
 
-	local database = sql.Query("SELECT " .. statType .. " FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")
+	local current_stat = SlashCoDatabase.GetStat(steamid, statType)
 	local name = sql.Query("SELECT PlayerName FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")[1].PlayerName
-	local current_stat = database[1][statType]
-
 	if not current_stat then
 		ErrorNoHaltWithStack("[SlashCo] Database Error. Bad read. (" .. statType .. ")")
 		return
@@ -62,6 +65,7 @@ function SlashCoDatabase.UpdateStats(steamid, statType, increase)
 
 	if validStats[statType] == "string" then
 		increase = sql.SQLStr(increase)
+		current_stat = nil
 	end
 
 	local newAmount = validStats[statType] == "number" and (tonumber(current_stat) + increase) or increase
@@ -89,7 +93,7 @@ function SlashCoDatabase.GetStat(steamid, statType)
 	end
 
 	local database = sql.Query("SELECT " .. statType .. " FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")
-	return database[1][statType] or 0
+	return (database[1][statType] and database[1][statType] ~= "NULL") and database[1][statType] or (validStats[statType] == "number" and 0 or "")
 end
 
 function SlashCoDatabase.OnPlayerJoined(steamid)

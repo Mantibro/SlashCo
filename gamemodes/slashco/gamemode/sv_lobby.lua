@@ -23,6 +23,9 @@ local function lobbySaveCurData()
 		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER, SlasherDanger NUMBER, SlasherClass NUMBER, SlasherID TEXT, Offering NUMBER, SurviorGasMod NUMBER);")
 		sql.Query("CREATE TABLE slashco_table_survivordata(SteamID TEXT, Item TEXT, Item2 TEXT);")
 		sql.Query("CREATE TABLE slashco_table_slasherdata(SteamID TEXT, SlasherID TEXT);")
+	end
+
+	if not sql.TableExists("slashco_table_potentialslashers") then
 		sql.Query("CREATE TABLE slashco_table_potentialslashers(SteamID TEXT);") -- RaphaelIT7: used in case the slasher quits and can be faster
 	end
 
