@@ -402,7 +402,7 @@ else
 		SetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers)
 	end, "slashco_maxplayers_refresh")
 
-	CreateConVar("slashco_playerpingdelay2", tostring(SlashCo.PlayerPingDelay), {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NEVER_AS_STRING}, "The time in seconds player have to wait before they can ping again", 0, 300)
+	CreateConVar("slashco_playerpingdelay", tostring(SlashCo.PlayerPingDelay), {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NEVER_AS_STRING}, "The time in seconds player have to wait before they can ping again", 0, 300)
 	function GM:InitPostEntity()
 		GameData.World = game.GetWorld()
 
