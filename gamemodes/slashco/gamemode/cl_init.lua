@@ -151,7 +151,7 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 		targetFogEnd = 3000
 	end
 
-	if GetGlobal2Bool("DisableWorldFog") then
+	if SlashCo.IsGlobalFogDisabled() then
 		targetFogStart = 9000
 		targetFogEnd = 10000
 	end

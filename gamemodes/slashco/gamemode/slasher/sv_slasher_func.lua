@@ -17,13 +17,31 @@ end
 
 -- Used for debugging.
 function SlashCo.SpawnPlayerAsSlasher(ply, slasherName)
+	local foundSlasherName = nil
+	for name, slasherTbl in pairs(SlashCoSlashers) do -- In case we screw up upper/lower case
+		if name:lower() == slasherName:lower() then
+			foundSlasherName = name
+			break
+		end
+
+		if slasherTbl.Name:lower() == slasherName:lower() then
+			foundSlasherName = slasherTbl.Name
+			break
+		end
+	end
+
+	if not foundSlasherName then
+		ErrorNoHaltWithStack("[SlashCo] Tried to set player " .. ply:Name() .. " as an invalid slasher \"" .. slasherName .. "\"")
+		return
+	end
+
 	if SlashCo.CurRound.GameProgress == -1 then -- We didn't spawn them yet, so just mark them as having the slasher selected.
-		SlashCo.SelectSlasher(slasherName, ply:SteamID64())
+		SlashCo.SelectSlasher(foundSlasherName, ply:SteamID64())
 		return
 	end
 
 	SlashCo.AudioSystem.StopSound(nil, 1, ply) -- Stop any sounds that were playing from the player in case we switched from one slasher to another.
-	ply:SetNWString("Slasher", slasherName)
+	ply:SetNWString("Slasher", foundSlasherName)
 	ply:SetTeam(TEAM_SLASHER)
 	ply:Spawn()
 	SlashCo.OnSlasherSpawned(ply)
@@ -90,7 +108,7 @@ function SlashCo.OnSlasherSpawned(ply)
 
 	ply:SlasherFunction("OnSpawn")
 
-	if not SlashCo.NotPerfect and GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) > 1 then
+	if not SlashCo.NotPerfect and SlashCo.GetGeneratorsNeeded() > 1 then
 		ply:SetRoundPoints("slasher_perfect")
 	end
 	ply.SuccessfulSpawn = true
@@ -180,13 +198,13 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then return end
 	if SlashCo.CurRound.GameProgress <= -1 then return end
 
-	local needed = GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded)
 	local genProgs = {}
 	for k, v in ipairs(gens) do
 		genProgs[k] = v.Progress
 	end
 
 	local progress = 0
+	local needed = SlashCo.GetGeneratorsNeeded()
 	for i = 1, needed do
 		local maxProg, progVal = 0
 		for k, v in ipairs(genProgs) do

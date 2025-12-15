@@ -154,8 +154,13 @@ end
 
 ---Spawn generators for the round
 function SlashCo.SpawnGenerators()
-	local gensToSpawn = SlashCo.SelectSpawns(ents.FindByClass("info_sc_generator"),
-			GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators), genCondForced, genCondNonForced, true)
+	local gensToSpawn = SlashCo.SelectSpawns(
+		ents.FindByClass("info_sc_generator"),
+		SlashCo.GetGeneratorsToSpawn(),
+		genCondForced,
+		genCondNonForced,
+		true
+	)
 
 	if table.IsEmpty(gensToSpawn) then
 		SlashCo.Abort("Missing generator spawn entities")
@@ -199,9 +204,9 @@ end
 
 ---Spawn gas cans for the round
 function SlashCo.SpawnGasCans()
-	local gasCanCount = GetGlobal2Int("SlashCoGasCansToSpawn", -1)
-	local cansPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
-	local gens = GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators)
+	local gasCanCount = SlashCo.GetGasCansToSpawn()
+	local cansPerGen = SlashCo.GetGasCansPerGenerator()
+	local gens = SlashCo.GetGeneratorsToSpawn()
 
 	-- base count is for compatibility with older configs
 	local baseCount = SlashCo.BaseCans or (cansPerGen * gens)
@@ -547,11 +552,11 @@ local function convertLegacyConfig(name, skip)
 	local gens = {}
 	if istable(config.Generators) then
 		if isnumber(config.Generators.Count) then
-			SetGlobal2Int("SlashCoGeneratorsToSpawn", config.Generators.Count)
+			SlashCo.SetGeneratorsToSpawn(config.Generators.Count)
 		end
 
 		if isnumber(config.Generators.Needed) then
-			SetGlobal2Int("SlashCoGeneratorsNeeded", config.Generators.Needed)
+			SlashCo.SetGeneratorsNeeded(config.Generators.Needed)
 		end
 
 		if istable(config.Generators.Spawnpoints) then
@@ -583,13 +588,13 @@ local function convertLegacyConfig(name, skip)
 	end
 	if istable(config.GasCans) then
 		if config.GasCans.CountIsDirect and isnumber(config.GasCans.Count) then
-			SetGlobal2Int("SlashCoGasCansToSpawn", config.GasCans.Count)
+			SlashCo.SetGasCansToSpawn(config.GasCans.Count)
 		else
 			SlashCo.BaseCans = config.GasCans.Count
 		end
 
 		if isnumber(config.GasCans.NeededPerGenerator) then
-			SetGlobal2Int("SlashCoGasCansPerGenerator", config.GasCans.NeededPerGenerator)
+			SlashCo.GasCansPerGenerator(config.GasCans.NeededPerGenerator)
 		end
 
 		if istable(config.GasCans.Spawnpoints) then
@@ -650,7 +655,7 @@ end
 hook.Add("InitPostEntity", "LegacySetupSpawns", SlashCo.LegacySetup)
 
 function SlashCo.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	if GetGlobal2Int("SlashCoGeneratorsNeeded", 0) != 0 or GetGlobal2Int("SlashCoGeneratorsToSpawn", 0) != 0 then
+	if SlashCo.GetGeneratorsNeeded() != SlashCo.GensNeeded or SlashCo.GetGeneratorsToSpawn() != SlashCo.Generators then
 		return -- Map has forced the generator count. GG
 	end
 
@@ -660,8 +665,8 @@ function SlashCo.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 
 	print("Spawning a total of " .. totalGens .. " generators (additional survivors: " .. additionalSurvivors .. ")")
-	SetGlobal2Int("SlashCoGeneratorsNeeded", totalGens)
-	SetGlobal2Int("SlashCoGeneratorsToSpawn", totalGens)
+	SlashCo.SetGeneratorsNeeded(totalGens)
+	SlashCo.SetGeneratorsToSpawn(totalGens)
 end
 
 ---main body of round starting function
@@ -674,9 +679,9 @@ local function startRound(noSetup)
 		BroadcastLua([[if IsValid(SlashCo.RoundEndPanel) then SlashCo.RoundEndPanel:Remove() end]]) -- Remove the round ending panel if it exists.
 	end
 
-	SetGlobal2Float("SCStartTime", CurTime())
+	SlashCo.SetRoundStartTime(CurTime())
 	timer.Simple(SlashCo.GhostPingDelay, function()
-		SetGlobal2Bool("SpectatorsCanPing", true)
+		SlashCo.AllowSpectatorsToPing(true)
 		for _, v in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
 			v:ChatText("spectators_can_ping")
 		end
@@ -685,7 +690,6 @@ local function startRound(noSetup)
 	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Satiation then
 		SlashCo.CurRound.OfferingData.ItemMod = -2
 		SlashCo.CurRound.OfferingData.Satiation = 1
-		SetGlobal2Int("Satiation", SlashCo.CurRound.OfferingData.Satiation)
 	end
 
 	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Duality then
@@ -767,7 +771,7 @@ local function startRound(noSetup)
 		settingsEnt:TriggerOutput("OnRoundStarted", settingsEnt, settingsEnt, #SlashCo.CurRound.ExpectedPlayers)
 	end
 
-	SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.INCOMPLETE, GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded))
+	SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.INCOMPLETE, SlashCo.GetGeneratorsNeeded())
 	SlashCo.SendObjectives()
 end
 

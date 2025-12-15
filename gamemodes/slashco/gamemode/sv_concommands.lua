@@ -388,7 +388,7 @@ concommand.Add("slashco_debug_printents", function(ply, _, args)
 
 		if class == "sc_generator" then
 			genCount = genCount + 1
-			cansNeeded = cansNeeded + (v.CansRemaining or GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen))
+			cansNeeded = cansNeeded + (v.CansRemaining or SlashCo.GetGasCansPerGenerator())
 			if not v.HasBattery then
 				batsNeeded = batsNeeded + 1
 			end

@@ -32,7 +32,6 @@ local function UpdateLobbyState()
 
 	longest_name = longest_name or 0
 	plynum = #Lobby_Players
-	CL_LobbyPlayers = plynum
 end
 
 net.Receive("SlashCo:GiveLobbyInfo", function(len)
@@ -104,26 +103,27 @@ hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
 			local width, height = draw.SimpleText("[" .. plynum .. "/" .. GameData.MaxPlayers .. "] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
 					TEXT_ALIGN_TOP)
 
-			for i = 1, #Lobby_Players do
+			local lobbyPlayerCount = #Lobby_Players
+			local shouldCompress = lobbyPlayerCount > 8
+			for i = 1, lobbyPlayerCount do
 				local lobbyPly = Lobby_Players[i]
-				local pos_y = 0.27
+				local pos_y = 0.265
 				local x_pos = scrW * 0.025
 				local iconsize = ScrW() / 45
 
 				surface.SetDrawColor(0, 0, 0)
-				surface.DrawRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, 60)
+				surface.DrawRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, shouldCompress and 50 or 60)
 				surface.SetDrawColor((lobbyPly.Ready == 2 and 50 or 0) + 50, (lobbyPly.Ready == 1 and 50 or 0) + 50, 50)
-				surface.DrawOutlinedRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, 60, 3)
+				surface.DrawOutlinedRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, shouldCompress and 50 or 60, 3)
 
 				if string.len(lobbyPly.Name) * 15 > longest_name then
 					longest_name = string.len(Lobby_Players[i].Name) * 15
 				end
 
-				draw.SimpleText(lobbyPly.Name, "PlayersFont", scrW * 0.025, scrH * (pos_y * mul_y),
-						color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+				draw.SimpleText(lobbyPly.Name, "PlayersFont", scrW * 0.025, scrH * (pos_y * mul_y) - (shouldCompress and 5 or 0), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 				local icon_pos_x = x_pos + longest_name
-				local icon_pos_y = (scrH * (pos_y * mul_y)) - 8
+				local icon_pos_y = (scrH * (pos_y * mul_y)) - (shouldCompress and 13 or 8)
 
 				surface.SetDrawColor(255, 255, 255, 255)
 				if Lobby_Players[i].Ready > 0 then
@@ -134,21 +134,21 @@ hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
 
 				surface.DrawTexturedRect(icon_pos_x, icon_pos_y, iconsize, iconsize)
 
-				mul_y = mul_y + 0.25
+				mul_y = mul_y + (shouldCompress and 0.2 or 0.25)
 			end
 
 			if clientReadiness then
 				if clientReadiness == SlashCo.ReadyState.NotReady then
-					draw.SimpleText("[" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025 + width,
-							scrH * 0.22, grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+					draw.SimpleText("[" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
+						grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == SlashCo.ReadyState.Survivor then
 					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
-							green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+						string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
+						green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == SlashCo.ReadyState.Slasher then
 					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22, red,
-							TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+						string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
+						red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				end
 			end
 		end

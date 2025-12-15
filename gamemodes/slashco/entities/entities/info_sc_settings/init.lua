@@ -19,22 +19,22 @@ function ENT:KeyValue(key, value)
 
 	key = string.lower(key)
 	if key == "generators_needed" then
-		SetGlobal2Int("SlashCoGeneratorsNeeded", valNum)
+		SlashCo.SetGeneratorsNeeded(valNum)
 		return
 	end
 
 	if key == "generators_spawned" then
-		SetGlobal2Int("SlashCoGeneratorsToSpawn", valNum)
+		SlashCo.SetGeneratorsToSpawn(valNum)
 		return
 	end
 
 	if key == "gascans_needed" then
-		SetGlobal2Int("SlashCoGasCansPerGenerator", valNum)
+		SlashCo.GasCansPerGenerator(valNum)
 		return
 	end
 
 	if key == "gascans_spawned" then
-		SetGlobal2Int("SlashCoGasCansToSpawn", valNum)
+		SlashCo.SetGasCansToSpawn(valNum)
 		return
 	end
 
@@ -59,21 +59,24 @@ function ENT:AcceptInput(name, activator, _, value)
 		return
 	end
 
-	local name1 = string.lower(name)
-	if name1 == "set_generators_needed" then
-		SetGlobal2Int("SlashCoGeneratorsNeeded", valNum)
+	name = string.lower(name)
+	if name == "set_generators_needed" then
+		SlashCo.SetGeneratorsNeeded(valNum)
 		return true
 	end
-	if name1 == "set_generators_spawned" then
-		SetGlobal2Int("SlashCoGeneratorsToSpawn", valNum)
+
+	if name == "set_generators_spawned" then
+		SlashCo.SetGeneratorsToSpawn(valNum)
 		return true
 	end
-	if name1 == "set_gascans_needed" then
-		SetGlobal2Int("SlashCoGasCansPerGenerator", valNum)
+
+	if name == "set_gascans_needed" then
+		SlashCo.GasCansPerGenerator(valNum)
 		return true
 	end
-	if name1 == "set_gascans_spawned" then
-		SetGlobal2Int("SlashCoGasCansToSpawn", valNum)
+
+	if name == "set_gascans_spawned" then
+		SlashCo.SetGasCansToSpawn(valNum)
 		return true
 	end
 end

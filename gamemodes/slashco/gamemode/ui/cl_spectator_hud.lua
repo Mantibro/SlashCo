@@ -82,9 +82,7 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 		draw.SimpleText(blip, "TVCD", ScrW() / 2, ScrH() / 2,
 				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
-		local players = CL_LobbyPlayers or team.NumPlayers(TEAM_LOBBY)
-
-		draw.SimpleText("[" .. players .. " / " .. GameData.MaxPlayers .. "]", "TVCD", ScrW() / 2, ScrH() / 2.5,
+		draw.SimpleText("[" .. team.NumPlayers(TEAM_LOBBY) .. " / " .. GameData.MaxPlayers .. "]", "TVCD", ScrW() / 2, ScrH() / 2.5,
 				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText("[" .. srvwin_count .. " " .. SlashCo.Language("SurvivorWins") .. "]  [" .. slswin_count .. " " .. SlashCo.Language("SlasherWins") .. "]",
@@ -132,7 +130,7 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 	end
 
 	if not show_slasher_anticipation then
-		if GetGlobal2Bool("SpectatorsCanPing") then
+		if SlashCo.CanSpectatorsPing() then
 			draw.SimpleText(SlashCo.Language("surv_ping", "MMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 230, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 		
@@ -289,7 +287,7 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 		return
 	end
 
-	if GetGlobal2Bool("IsLobbyStarting") then
+	if SlashCo.IsLobbyStarting() then
 		local helicopter = SlashCo.Helicopter
 		if not helicopter:IsValid() then return end
 

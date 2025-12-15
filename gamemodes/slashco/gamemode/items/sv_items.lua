@@ -2,10 +2,6 @@ local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
 
 function SlashCo.UseItem(ply)
-	if CLIENT then
-		return
-	end
-
 	if GameData.IsLobby then
 		return
 	end
@@ -41,10 +37,6 @@ function SlashCo.DropAllItems(ply, noEffect)
 end
 
 function SlashCo.DropItem(ply, dropCallback, ignoreField)
-	if CLIENT then
-		return
-	end
-
 	if GameData.IsLobby then
 		if dropCallback then
 			dropCallback(nil)
@@ -72,7 +64,6 @@ function SlashCo.DropItem(ply, dropCallback, ignoreField)
 	end
 
 	if not SlashCoItems[item] then
-		SlashCo.SendValue(ply, "preItem")
 		return
 	end
 

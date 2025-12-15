@@ -82,7 +82,7 @@ if CLIENT then
 		self:DrawModel()
 
 		-- Small fuel UI showing how full a generator is
-		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+		local gasPerGen = SlashCo.GetGasCansPerGenerator()
 		local remaining = self:GetCansRemaining()
 		if remaining < 0 then
 			remaining = 0
@@ -116,13 +116,12 @@ function ENT:Initialize()
 	self:SetUseType(SIMPLE_USE)
 	self.Progress = 0
 
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
-	self.CansRemaining = gasPerGen
+	self.CansRemaining = SlashCo.GetGasCansPerGenerator()
 	self:SetCansRemaining(self.CansRemaining)
 end
 
 function ENT:ChangeCanProgress(amount)
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	self.CansRemaining = math.Clamp((self.CansRemaining or gasPerGen) - amount, 0, gasPerGen)
 	self:SetCansRemaining(self.CansRemaining)
 	self.Progress = math.Clamp((gasPerGen - self.CansRemaining) * (4 / gasPerGen), 0, 4) + (self.HasBattery and 1 or 0)
@@ -149,7 +148,7 @@ end
 
 function ENT:Touch(otherEnt)
 	local class = otherEnt:GetClass()
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	if not self.MakingItem and not self.FuelingCan and class == "sc_gascan"
 			and (self.CansRemaining or gasPerGen) > 0 then
 
@@ -212,7 +211,7 @@ function ENT:MakeGasCan(model)
 end
 
 function ENT:CheckProgress(dontFailStart)
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	if (self.CansRemaining or gasPerGen) <= 0 and self.HasBattery and not self.IsRunning then
 		if IsValid(self.SpawnedAt) then
 			self.SpawnedAt:TriggerOutput("OnComplete", self.CurrentPourer)
@@ -284,7 +283,7 @@ function ENT:Use(activator)
 		self:EmitSound("slashco/generator_fill.mp3")
 	elseif not self.MakingItem then
 		self:SlasherHint()
-		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+		local gasPerGen = SlashCo.GetGasCansPerGenerator()
 		if activator:ItemValue("IsFuel", false, true) then
 			if self.FuelingCan or (self.CansRemaining or gasPerGen) <= 0 then
 				SlashCo.SendValue(activator, "cantFuel")
@@ -330,7 +329,7 @@ end
 
 function ENT:SlasherObserve()
 	local observed
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if v:GetEyeTrace().Entity == self and (not v.GenCooldown or CurTime() - v.GenCooldown > 3) then
 			timer.Remove(self:GetCreationID() .. "_slasherHint_" .. v:UserID())

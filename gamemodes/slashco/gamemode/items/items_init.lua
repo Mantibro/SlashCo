@@ -215,11 +215,11 @@ function PLAYER:ItemFunction2OrElse(funcName, item, fallback, ...)
 	return unpack(fallback)
 end
 
-if SERVER then
-	function PLAYER:GetItem(slot)
-		return self:GetNWString(slot, "none")
-	end
+function PLAYER:GetItem(slot)
+	return self:GetNW2String(slot, "none")
+end
 
+if SERVER then
 	-- slot can be omitted if desired
 	local validSlots = {
 		item2 = true,
@@ -245,51 +245,12 @@ if SERVER then
 			return
 		end
 
-		self:SetNWString(slot, item)
-		SlashCo.SendValue(self, "preItem", item) -- networking on nwvars can be slow, this acts as a backup
-	end
-else
-	SlashCo.PreItem = SlashCo.PreItem or "none"
-
-	hook.Add("scValue_preItem", "SlashCoPreItem", function(item, slot)
-		if not slot then
-			SlashCo.PreItem = item or "none"
+		if item ~= "none" and not SlashCoItems[item] and not SlashCoEffects[item] then
+			error("Tried to set an invalid item! (Item: " .. (tostring(item) or "") .. ")")
 			return
 		end
 
-		if not SlashCoItems[SlashCo.PreItem] then
-			return
-		end
-
-		local isSecondary = slot == "item2"
-		local itemSecondary = SlashCoItems[SlashCo.PreItem].IsSecondary or false
-		if itemSecondary == isSecondary then
-			SlashCo.PreItem = "none"
-		end
-	end)
-
-	function PLAYER:GetItem(slot)
-		local item = self:GetNWString(slot, "none")
-
-		if self ~= GameData.LocalPlayer or SlashCo.PreItem == "none" or slot == "itemEffect" then
-			return item
-		end
-
-		if not SlashCoItems[SlashCo.PreItem] then
-			return item
-		end
-
-		local isSecondary = slot == "item2"
-		local itemSecondary = SlashCoItems[SlashCo.PreItem].IsSecondary or false
-		if itemSecondary == isSecondary then
-			if item == "none" and SlashCoItems[SlashCo.PreItem] then
-				return SlashCo.PreItem
-			end
-
-			SlashCo.PreItem = "none"
-		end
-
-		return item
+		self:SetNW2String(slot, item)
 	end
 end
 

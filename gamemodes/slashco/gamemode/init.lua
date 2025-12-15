@@ -428,15 +428,10 @@ local function Think()
 			end
 		end
 
-		local allRunning = true
-		if runningCount < GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) then
-			allRunning = false
-		end
-
 		--//drainage//--
 		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Drainage then
 			local totalCansRemaining = 0
-			local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+			local gasPerGen = SlashCo.GetGasCansPerGenerator()
 			for _, v in ipairs(gens) do
 				totalCansRemaining = totalCansRemaining + (v.CansRemaining or gasPerGen)
 			end
@@ -453,6 +448,7 @@ local function Think()
 		end
 
 		--//helicopters//--
+		local allRunning = runningCount >= SlashCo.GetGeneratorsNeeded()
 		if allRunning and not SlashCo.CurRound.EscapeHelicopterSummoned then
 			--(SPAWN HELICOPTER)
 
@@ -499,20 +495,6 @@ hook.Add("PostGamemodeLoaded", "SlashCo:PostGamemodeLoaded", function()
 	timer.Simple(1, function()
 		hook.Add("Think", "SlashCo:CoreThink", Think)
 	end)
-end)
-
-gameevent.Listen("player_activate")
-hook.Add("player_activate", "slashCoPreItem", function(data)
-	local ply = Player(data.userid)
-
-	if SlashCo.CurRound and SlashCo.CurRound.SlasherData and SlashCo.CurRound.SlasherData.AllSurvivors then
-		local steamid = ply:SteamID64()
-		for _, survivorData in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-			if survivorData.steamid ~= steamid then continue end
-			
-			SlashCo.SendValue(ply, "preItem", survivorData.Item)
-		end
-	end
 end)
 
 hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
@@ -736,9 +718,9 @@ end
 
 hook.Add("PlayerButtonDown", "SlashCo:SpectatorFunctions", function(ply, button)
 	if ply:Team() ~= TEAM_SPECTATOR then return end
-	if not GetGlobal2Bool("SpectatorsCanPing") then return end
+	if not SlashCo.CanSpectatorsPing() then return end
 	if button ~= MOUSE_MIDDLE then return end
-	if ply.LastPinged and CurTime() - ply.LastPinged < 30 then return end
+	if ply.LastPinged and (CurTime() - ply.LastPinged) < SlashCo.PingDelay then return end
 
 	ply:SurvivorPing()
 end)

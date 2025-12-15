@@ -323,11 +323,11 @@ function SLASHER.Maul(slasher, target)
 
 		if IsValid(slasher.ref_child) then
 			slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
-			slasher.Aggression = Aggression - math.random(25, Aggression + 26)
+			slasher.Aggression = slasher.Aggression - math.random(25, slasher.Aggression + 26)
 
-			slasher:SetNWBool("PrincessMaulingChild", false)
 			slasher.ref_child:Remove()
 		end
+		slasher:SetNWBool("PrincessMaulingChild", false) -- Just to be sure
 
 		if not IsValid(slasher.victimragdoll) then
 			return

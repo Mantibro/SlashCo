@@ -855,7 +855,7 @@ function PANEL:MakeGenEntry(gen, i, model)
 		end
 	end)
 
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	entry.angle = math.pi / ((gasPerGen + 1) / 2) * i
 	--local x, y = gen:GetPos()
 
@@ -895,7 +895,7 @@ function PANEL:MakeGeneratorsCard()
 		gen:SetDistance(400)
 		self:ModelFog(gen)
 
-		gen.CansRemaining = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+		gen.CansRemaining = SlashCo.GetGasCansPerGenerator()
 
 		gen.Entries = {}
 		PANEL:MakeGenEntry(gen, 0, "models/items/car_battery01.mdl")
@@ -1077,7 +1077,7 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 		if panel.CansRemainingNew then
 			playSound = true
 
-			local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+			local gasPerGen = SlashCo.GetGasCansPerGenerator()
 			for i = 2, 1 + gasPerGen - panel.CansRemainingNew do
 				if 5 - i < panel.CansRemaining then
 					panel.Entries[i].Spin:Start(1)

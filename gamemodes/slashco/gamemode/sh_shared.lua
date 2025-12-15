@@ -15,7 +15,7 @@ PrecacheParticleSystem("pocketsand")
 SlashCo = SlashCo or {}
 
 SlashCo.GasPerGen = 4 --Default number of gas cans required to fill up a generator
-SlashCo.Generators = 2 --Default number of generators
+SlashCo.Generators = 3 --Default number of generators
 SlashCo.GensNeeded = 2 --Default number of generators needed
 SlashCo.GeneratorModel = "models/slashco/other/generator/generator.mdl" --Model path for the generators
 SlashCo.HelicopterModel = "models/slashco/other/helicopter/helicopter.mdl" --Model path for the helicopter
@@ -25,6 +25,7 @@ SlashCo.SlowEscapeTime = 1200 -- Time in seconds to count as a slow escape
 SlashCo.OverTime = SlashCo.SlowEscapeTime - 300 -- Time in seconds when the survivors should be warned that they got only 5 minutes left before its a slow run. NOTE: At this point, some hints will be given to survivors like fuel cans will make sounds
 SlashCo.AllowLateJoin = true -- If enabled, players that joined after the lobby was created BUT before the round was started will get spawned as survivors.
 SlashCo.MaximumLateJoinTime = 180 -- Time in seconds in which players will still be spawned as survivors if they just took ages to load, though they won't be spawned a survivors if they weren't expected to join!
+SlashCo.PlayerPingDelay = 30 -- Default time in seconds to wait before a player can ping again. Can be changed by servers using the convar slashco_pingdelay
 
 SlashCo.HelicopterVoices = {
 	INTRO = 1,
@@ -37,8 +38,12 @@ function SlashCo.CopyColor(col)
 	return Color(col:Unpack())
 end
 
+function SlashCo.SetRoundStartTime(time)
+	SetGlobal2Float("SlashCo:StartTime", time or CurTime())
+end
+
 function SlashCo.GetRoundStartTime()
-	return GetGlobal2Float("SCStartTime", CurTime()) -- We fallback to CurTime() since if we haven't started yet, the time should be 0 when calculated.
+	return GetGlobal2Float("SlashCo:StartTime", CurTime()) -- We fallback to CurTime() since if we haven't started yet, the time should be 0 when calculated.
 end
 
 function SlashCo.GetRoundTime()
@@ -72,12 +77,99 @@ function SlashCo.GetClassColor(class)
 	return class == SlashCo.SlasherClass.Unknown and SlashCo.UnknownCol or SlashCo.KnownCol
 end
 
+--[[
+	Global networked variables.
+	All kept together to simplify modifying them.
+]]
+
+-- Global Fog
+function SlashCo.EnableGlobalFog()
+	SetGlobal2Bool("SlashCo:DisableWorldFog", false)
+end
+
+function SlashCo.DisableGlobalFog()
+	SetGlobal2Bool("SlashCo:DisableWorldFog", true)
+end
+
+function SlashCo.IsGlobalFogDisabled()
+	return GetGlobal2Bool("SlashCo:DisableWorldFog", false)
+end
+
 function SlashCo.SetGlobalFogMult(mult)
-	SetGlobal2Float("FogMult", mult)
+	SetGlobal2Float("SlashCo:FogMult", mult)
 end
 
 function SlashCo.GetGlobalFogMult()
-	return GetGlobal2Float("FogMult", 1)
+	return GetGlobal2Float("SlashCo:FogMult", 1)
+end
+
+-- Global Settings
+function SlashCo.SetGeneratorsNeeded(amount)
+	SetGlobal2Int("SlashCo:GeneratorsNeeded", amount)
+end
+
+function SlashCo.GetGeneratorsNeeded()
+	-- NOTE: If the fallback variable SlashCo.GensNeeded is switched out, update SlashCo.OnBalanceForPlayers too!
+	return GetGlobal2Int("SlashCo:GeneratorsNeeded", SlashCo.GensNeeded)
+end
+
+function SlashCo.SetGeneratorsToSpawn(amount)
+	SetGlobal2Int("SlashCo:GeneratorsToSpawn", amount)
+end
+
+function SlashCo.GetGeneratorsToSpawn()
+	-- NOTE: If the fallback variable SlashCo.Generators is switched out, update SlashCo.OnBalanceForPlayers too!
+	return GetGlobal2Int("SlashCo:GeneratorsToSpawn", SlashCo.Generators)
+end
+
+function SlashCo.GasCansPerGenerator(amount)
+	SetGlobal2Int("SlashCo:GasCansToSpawn", amount)
+end
+
+function SlashCo.GetGasCansPerGenerator()
+	return GetGlobal2Int("SlashCo:GasCansPerGenerator", SlashCo.GasPerGen)
+end
+
+function SlashCo.SetGasCansToSpawn(amount)
+	SetGlobal2Int("SlashCo:GasCansToSpawn", amount)
+end
+
+function SlashCo.GetGasCansToSpawn()
+	return GetGlobal2Int("SlashCo:GasCansToSpawn", -1)
+end
+
+-- Map info
+function SlashCo.SetMapSize(size)
+	SetGlobal2Int("SlashCo:MapSize", size)
+end
+
+function SlashCo.GetMapSize()
+	-- Serverside SlashCo.MapSize is set which is faster :^
+	return SlashCo.MapSize or GetGlobal2Int("SlashCo:MapSize", 1)
+end
+
+-- Lobby info
+-- This var controlls when the spectators camera is bound to the helicopter and suicide will be disallowed.
+function SlashCo.MarkLobbyStarting()
+	SetGlobal2Bool("SlashCo:IsLobbyStarting", true)
+end
+
+function SlashCo.IsLobbyStarting()
+	return GetGlobal2Bool("SlashCo:IsLobbyStarting", false)
+end
+
+-- Spectator vars
+function SlashCo.AllowSpectatorsToPing(allowed)
+	SetGlobal2Bool("SlashCo:SpectatorsCanPing", allowed)
+end
+
+function SlashCo.CanSpectatorsPing()
+	return GetGlobal2Bool("SlashCo:SpectatorsCanPing", false)
+end
+
+-- Serevr settings
+function SlashCo.GetPlayerPingDelay()
+	return GetConVarNumber("slashco_playerpingdelay")
 end
 
 -- Accepts a vector or color as input.
@@ -310,6 +402,7 @@ else
 		SetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers)
 	end, "slashco_maxplayers_refresh")
 
+	CreateConVar("slashco_playerpingdelay2", tostring(SlashCo.PlayerPingDelay), {FCVAR_ARCHIVE, FCVAR_REPLICATED, FCVAR_NEVER_AS_STRING}, "The time in seconds player have to wait before they can ping again", 0, 300)
 	function GM:InitPostEntity()
 		GameData.World = game.GetWorld()
 
@@ -511,7 +604,7 @@ hook.Add("GameContentChanged", "SlashCo:RefreshMapConfigs", SlashCo.LoadMapConfi
 
 -- determine if a position is far enough away from generators and survivors
 function SlashCo.IsPositionLegalForSlashers(pos, noSurvivorCheck, distFactor)
-	local dist = (600 + GetGlobal2Int("SlashCoMapSize", 1) * 150) * (distFactor or 1)
+	local dist = (600 + SlashCo.GetMapSize() * 150) * (distFactor or 1)
 
 	-- removing this may not be the best solution, need to check if theres a better way
 	-- to prevent unplayable rounds for slashers that use this function

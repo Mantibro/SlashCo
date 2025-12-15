@@ -526,4 +526,7 @@ function SlashCo.ClearDatabase()
 	sql.Query("DROP TABLE slashco_table_survivordata;")
 	sql.Query("DROP TABLE slashco_table_slasherdata;")
 	sql.Query("DROP TABLE slashco_table_potentialslashers;")
+
+	-- RaphaelIT7: If a table already did not exist it will have thrown an error. But we do not care.
+	sql.m_strError = nil
 end

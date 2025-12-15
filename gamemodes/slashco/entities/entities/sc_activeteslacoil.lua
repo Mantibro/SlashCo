@@ -66,13 +66,13 @@ if SERVER then
 			self:SetNoLight(false)
 			self:SetBrightnessTime(curTime)
 			util.ScreenShake(self:GetPos(), 30, 100, 5, 5000, true)
-			SetGlobal2Bool("DisableWorldFog", true)
+			SlashCo.DisableGlobalFog()
 		end
 
 		if (curTime - startTime) > 25.5 and state == 4 then
 			self:SetChargeState(5)
 			self:SetBrightnessTime(curTime + 3)
-			SetGlobal2Bool("DisableWorldFog", false)
+			SlashCo.EnableGlobalFog()
 			for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 				ply:PlayGlobalSound("slashco/survivor/teslacoil_stun.mp3", 100, 5)
 			end
@@ -86,12 +86,12 @@ if SERVER then
 				slasher:ScreenFade(SCREENFADE.OUT, Color(0, 0, 0), 0.5, stunTime)
 				slasher:SlasherFunction("OnHitByTeslaCoil")
 			end
-			SetGlobal2Bool("DisableWorldFog", true)
+			SlashCo.DisableGlobalFog()
 		end
 
 		if (curTime - startTime) > 32 and state == 6 then
 			self:SetChargeState(7)
-			SetGlobal2Bool("DisableWorldFog", false)
+			SlashCo.EnableGlobalFog()
 		end
 	end
 else

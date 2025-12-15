@@ -26,7 +26,7 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 		unreliable = true,
 	})
 
-	if math.random(1, 5) == 1 then
+	if math.random(1, 3) == 1 or dmg:GetDamage() > 100 then
 		SlashCo.RemoveItem(owner, false)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -41,8 +41,11 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 		})
 	end
 
-	dmg:SetDamage(0)
-	return true
+	-- if damage is above 200 it must be an insta kill. GG No save for you. Else we'll block it. Insta kill often is around 9999 damage
+	if dmg:GetDamage() < 200 then
+		dmg:SetDamage(0)
+		return true
+	end
 end
 ITEM.ViewModel = {
 	model = ITEM.Model,
