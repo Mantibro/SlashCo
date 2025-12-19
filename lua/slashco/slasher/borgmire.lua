@@ -245,7 +245,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	if slasher.KickCooldown < 0.01 then
 		slasher:SetNWBool("BorgmireKick", false)
 		timer.Remove("BorgmireKickDecay")
-		slasher.KickCooldown = 7
+		slasher.KickCooldown = 15
 		
 		timer.Simple(2.0, function()
 			slasher:EmitSound("slashco/slasher/borgmire/borgmire_swing" .. math.random(1, 2) .. ".mp3")
