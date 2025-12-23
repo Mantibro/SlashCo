@@ -30,6 +30,19 @@ local function UpdateLobbyState()
 		end
 	end
 
+	for _, lobbyPly in ipairs(Lobby_Players) do
+		local length = string.len(lobbyPly.Name)
+		if length > 20 then
+			length = 20
+			lobbyPly.Name = lobbyPly.Name:sub(0, 20)
+			lobbyPly.Name = lobbyPly.Name .. "..."
+		end
+		
+		if (length * 15) > (longest_name or 0) then
+			longest_name = length * 14
+		end
+	end
+
 	longest_name = longest_name or 0
 	plynum = #Lobby_Players
 end
@@ -99,57 +112,63 @@ hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
 						TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 
-			local mul_y = 1
-			local width, height = draw.SimpleText("[" .. plynum .. "/" .. GameData.MaxPlayers .. "] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
-					TEXT_ALIGN_TOP)
-
-			local lobbyPlayerCount = #Lobby_Players
-			local shouldCompress = lobbyPlayerCount > 8
-			for i = 1, lobbyPlayerCount do
-				local lobbyPly = Lobby_Players[i]
-				local pos_y = 0.265
-				local x_pos = scrW * 0.025
-				local iconsize = ScrW() / 45
-
-				surface.SetDrawColor(0, 0, 0)
-				surface.DrawRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, shouldCompress and 50 or 60)
-				surface.SetDrawColor((lobbyPly.Ready == 2 and 50 or 0) + 50, (lobbyPly.Ready == 1 and 50 or 0) + 50, 50)
-				surface.DrawOutlinedRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, shouldCompress and 50 or 60, 3)
-
-				if string.len(lobbyPly.Name) * 15 > longest_name then
-					longest_name = string.len(Lobby_Players[i].Name) * 15
-				end
-
-				draw.SimpleText(lobbyPly.Name, "PlayersFont", scrW * 0.025, scrH * (pos_y * mul_y) - (shouldCompress and 5 or 0), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
-
-				local icon_pos_x = x_pos + longest_name
-				local icon_pos_y = (scrH * (pos_y * mul_y)) - (shouldCompress and 13 or 8)
-
-				surface.SetDrawColor(255, 255, 255, 255)
-				if Lobby_Players[i].Ready > 0 then
-					surface.SetMaterial(ReadyCheck)
-				else
-					surface.SetMaterial(UnReadyCheck)
-				end
-
-				surface.DrawTexturedRect(icon_pos_x, icon_pos_y, iconsize, iconsize)
-
-				mul_y = mul_y + (shouldCompress and 0.2 or 0.25)
-			end
+			local currentYPos = scrH * 0.22
+			local width, height = draw.SimpleText("[" .. plynum .. "/" .. GameData.MaxPlayers .. "] ", "TVCD", scrW * 0.025, currentYPos, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 			if clientReadiness then
 				if clientReadiness == SlashCo.ReadyState.NotReady then
-					draw.SimpleText("[" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
+					draw.SimpleText("[" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025 + width, currentYPos,
 						grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == SlashCo.ReadyState.Survivor then
 					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
-						string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
+						string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025 + width, currentYPos,
 						green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				elseif clientReadiness == SlashCo.ReadyState.Slasher then
 					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
-						string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025 + width, scrH * 0.22,
+						string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025 + width, currentYPos,
 						red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				end
+			end
+
+			currentYPos = currentYPos + height
+
+			local lobbyPlayerCount = #Lobby_Players
+			local boxSize = 55
+			local screenHeight = ScrH()
+			if (GameData.CachedLobbyPlayerListCount or -1) == lobbyPlayerCount then
+				boxSize = GameData.CachedLobbyPlayerListSize
+			else
+				while screenHeight < (currentYPos + ((boxSize + 5) * lobbyPlayerCount)) and boxSize != 15 do
+					boxSize = boxSize > 15 and (boxSize - 1) or boxSize
+				end
+				GameData.CachedLobbyPlayerListCount = lobbyPlayerCount
+				GameData.CachedLobbyPlayerListSize = boxSize
+			end
+
+			local iconsize = boxSize - 10 -- Icons always have a padding
+			for i = 1, lobbyPlayerCount do
+				local lobbyPly = Lobby_Players[i]
+				local x_pos = scrW * 0.025
+
+				currentYPos = currentYPos + 5
+				surface.SetDrawColor(0, 0, 0)
+				surface.DrawRect(scrW * 0.018, currentYPos, longest_name + iconsize, boxSize)
+
+				surface.SetDrawColor((lobbyPly.Ready == 2 and 50 or 0) + 50, (lobbyPly.Ready == 1 and 50 or 0) + 50, 50)
+				surface.DrawOutlinedRect(scrW * 0.018, currentYPos, longest_name + iconsize, boxSize, 3)
+
+				surface.SetFont("PlayersFont")
+				surface.SetTextColor(255, 255, 255, 255)
+
+				local _, nameHeight = surface.GetTextSize(lobbyPly.Name)
+				surface.SetTextPos(scrW * 0.025, currentYPos + (boxSize / 2) - (nameHeight / 2))
+				surface.DrawText(lobbyPly.Name)
+
+				surface.SetDrawColor(255, 255, 255, 255)
+				surface.SetMaterial((Lobby_Players[i].Ready > 0) and ReadyCheck or UnReadyCheck)
+				surface.DrawTexturedRect((scrW * 0.018) + longest_name - 5, currentYPos + 5, iconsize, iconsize)
+
+				currentYPos = currentYPos + boxSize
 			end
 		end
 	end
