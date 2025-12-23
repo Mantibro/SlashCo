@@ -124,9 +124,15 @@ local wasRightMousePressed = false
 if GameData.IsLobby then
 	SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_1.mp3", "mono", "DocumentRightClick")
 	SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_2.mp3", "mono", "DocumentLeftClick")
+
+	hook.Add("StartCommand", "SlashCo:LobbyDocumentScreen", function(ply, cmd)
+		GameData.DocumentMouseWheelDelta = cmd:GetMouseWheel()
+	end)
 end
 local function SwitchSelection(newSelection, isRightMouse)
 	GameData.DocumentOption = newSelection
+	GameData.CurrentDocumentScroll = 0
+	textCache = {}
 
 	if isRightMouse then
 		wasRightMousePressed = true
@@ -189,38 +195,62 @@ local selection = {
 		end
 	end, 
 	["Slashers"] = function(w, h) -- BUG: This will work fine for under 20 slashers. Have more and we'll got a problem as it'll go out of screen. Issue: We currently have exactly 20 slashers... well...
-		local row = 0
-		local count = 1
-		local rowSplit = 10 -- number of rows before it's split into a new one
+		local count = 0
+		local row = 1
+		local rowSplit = 10 -- number of rows before it's cut off
+		local scrollAmount = GameData.CurrentDocumentScroll
+		if scrollAmount > 0 then
+			GameData.CurrentDocumentScroll = 0
+			scrollAmount = 0
+		end
+
+		-- we gotta clear the cache as else collisions won't update
+		if GameData.CurrentDocumentScroll != (GameData.LastSlasherDocumentScroll or 0) then
+			textCache = {}
+			GameData.LastSlasherDocumentScroll = GameData.CurrentDocumentScroll
+		end
+
+		local startRow = 0
+		while ((h / 18) * startRow + scrollAmount) < 0 do
+			startRow = startRow + 1
+		end
+
+		local totalRows = math.floor(table.Count(SlashCoDocumentTypes["Slasher"] or {}) / 2) + 1
+		if totalRows > 0 and (totalRows - startRow) < rowSplit then -- Scrolled too far down
+			startRow = startRow - (rowSplit - (totalRows - startRow))
+			scrollAmount = -((h / 18) * startRow)
+			GameData.CurrentDocumentScroll = scrollAmount
+		end
+
+		GameData.LastSelectedSlasherDocumentHeight = GameData.LastSelectedSlasherDocumentHeight or (h / 18)
 		local documents = {}
 		for _, document in SortedPairs(SlashCoDocumentTypes["Slasher"] or {}) do
-			local hasDocument = SlashCo.HasDocument(document.Slasher or document.Name)
-			if DrawTextWithHitbox("[" .. string.upper(hasDocument and document.Name or " ??? ") .. "]", "TVCDMedium", w / 5 + (row * w / 2.1), (h / 18) * count, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
-				GameData.DocumentPointer = count + (row * rowSplit) -- if we changed rows, we need to 
+			if ((h / 18) * row + scrollAmount) > 0 and row <= (rowSplit + startRow) then
+				local hasDocument = SlashCo.HasDocument(document.Slasher or document.Name)
+				if DrawTextWithHitbox("[" .. string.upper(hasDocument and document.Name or " ??? ") .. "]", "TVCDMedium", w / 5 + ((count % 2) * w / 2.1), (h / 18) * row + scrollAmount, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+					GameData.DocumentPointer = count
+					GameData.LastSelectedSlasherDocumentHeight = (h / 18) * row
+				end
 			end
 
 			table.insert(documents, document)
-			count = count + 1
-			if count > rowSplit then
-				count = 1
+
+			if count % 2 == 1 then
 				row = row + 1
 			end
+			count = count + 1
 		end
 
-		local selectedDocument = documents[GameData.DocumentPointer]
+		local selectedDocument = documents[GameData.DocumentPointer + 1]
 		if not selectedDocument then
 			GameData.DocumentPointer = 1 -- In case the GameData.DocumentPointer managed to be invalid?!?
 			selectedDocument = documents[GameData.DocumentPointer]
 		end
 
-		local pointerRow = math.floor(GameData.DocumentPointer / rowSplit)
-		local pointerCount = GameData.DocumentPointer - (pointerRow * rowSplit) -- minimum value is 1
-		if pointerCount == 0 and pointerRow > 0 then
-			pointerRow = pointerRow - 1
-			pointerCount = rowSplit
+		local pointerRow = math.floor(GameData.DocumentPointer / 2) + 1
+		if (GameData.LastSelectedSlasherDocumentHeight + scrollAmount) > 0 and pointerRow <= (rowSplit + startRow) then
+			draw.SimpleText("<", "TVCDMedium", w / 2.3 + ((GameData.DocumentPointer % 2) * w / 2.1), GameData.LastSelectedSlasherDocumentHeight + scrollAmount, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
-
-		draw.SimpleText("<", "TVCDMedium", w / 2.3 + (pointerRow * w / 2.1), (h / 18) * pointerCount, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		-- After the code above, we expect selectedDocument to NEVER be nil.
 		local hasDocument = SlashCo.HasDocument(selectedDocument.Name)
@@ -503,6 +533,7 @@ for _, perk in ipairs(SlashCo.GetPerks()) do
 	end
 end
 
+GameData.CurrentDocumentScroll = GameData.CurrentDocumentScroll or 0
 hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
 	if not GameData.IsLobby then
 		return
@@ -520,8 +551,8 @@ hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bD
 		surface.SetDrawColor(0, 0, 0, 255)
 		surface.DrawRect(0, 0, w, h)
 
-		draw.SimpleText("[Left Click] = Enter Page", "TVCD", w * 1.55, (h / 2), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_RIGHT)
-		draw.SimpleText("[Right Click] = Exit Page", "TVCD", w * 1.55, (h / 2) + (h / 20), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_RIGHT)
+		draw.SimpleText("[Left Click] = Enter Page", "TVCD", w, (h / 2), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT)
+		draw.SimpleText("[Right Click] = Exit Page", "TVCD", w, (h / 2) + (h / 20), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT)
 
 		-- Debug to check screen Mins/Maxs values
 		-- debugoverlay.BoxAngles( screenPos, screenMins, screenMaxs, screenAngle, 0.02, hitPos != nil and Color(0,255,0) or Color( 255,0, 0, 10) )
@@ -533,6 +564,11 @@ hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bD
 
 			if wasRightMousePressed and not input.IsButtonDown(MOUSE_RIGHT) then
 				wasRightMousePressed = false
+			end
+
+			if GameData.DocumentMouseWheelDelta then
+				GameData.CurrentDocumentScroll = (GameData.CurrentDocumentScroll or 0) + (GameData.DocumentMouseWheelDelta * 2)
+				GameData.DocumentMouseWheelDelta = nil
 			end
 
 			local drawFunc = selection[GameData.DocumentOption]
@@ -548,7 +584,7 @@ hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bD
 
 			local hitPos = util.IntersectRayWithOBB(playerShootPos, playerAimVec, screenPos, screenAngle, Vector(0, -(w * worldScale), -1), Vector(w * worldScale, 0, 0))
 			if hitPos then
-				debugoverlay.BoxAngles(screenPos, Vector(0, -(w * worldScale), 0), Vector(w * worldScale, 0, 1), screenAngle, 0.02, Color(0, 255, 0, 10))
+				-- debugoverlay.BoxAngles(screenPos, Vector(0, -(w * worldScale), 0), Vector(w * worldScale, 0, 1), screenAngle, 0.02, Color(0, 255, 0, 10))
 				surface.SetDrawColor(255, 255, 255, 255)
 				hitPos = WorldToLocal(hitPos, Angle(), screenPos, screenAngle)
 				hitPos:Div(worldScale)
