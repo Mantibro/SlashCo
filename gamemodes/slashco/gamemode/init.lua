@@ -63,6 +63,7 @@ include("sh_perks.lua")
 include("sh_canbeseen.lua")
 include("sh_player.lua")
 include("sv_holylib.lua")
+include("sv_maptools.lua")
 
 --Initialize global variable to hold functions.
 SlashCo = SlashCo or {}

@@ -555,6 +555,16 @@ net.Receive("SlashCo:Briefing", function()
 	BriefingTable = net.ReadTable()
 end)
 
+local function GetBriefingScreenPos()
+	local pos = GetGlobal2Vector("SlashCo:BriefingUIPos", vector_origin)
+	if pos:IsZero() then
+		return nil, nil
+	end
+
+	local ang = GetGlobal2Angle("SlashCo:BriefingUIAng", angle_zero)
+	return pos, ang
+end
+
 local b_tick = -500
 hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 	if not GameData.IsLobby then
@@ -591,10 +601,9 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 	end
 
 	do
-		local angle = Angle(0, -90, 90)
-		local pos = Vector(-133, 400, 80)
+		local pos, angle = GetBriefingScreenPos()
 
-		if BriefingTable == nil then
+		if BriefingTable == nil or not pos then
 			return
 		end
 

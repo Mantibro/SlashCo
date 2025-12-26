@@ -423,8 +423,8 @@ function SlashCo.HelicopterLand(pos)
 end
 
 function SlashCo.HelicopterTakeOff()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],
-			SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition)
+	SlashCo.CurRound.HelicopterTargetPosition[3] = SlashCo.CurRound.HelicopterTargetPosition[3] + 1000
 
 	timer.Simple(9, function()
 		SlashCo.HelicopterFinalLeave()
@@ -432,8 +432,8 @@ function SlashCo.HelicopterTakeOff()
 end
 
 function SlashCo.HelicopterTakeOffIntro()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],
-			SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition)
+	SlashCo.CurRound.HelicopterTargetPosition[3] = SlashCo.CurRound.HelicopterTargetPosition[3] + 1000
 
 	timer.Simple(9, function()
 		SlashCo.HelicopterLeaveForIntro()
@@ -441,21 +441,18 @@ function SlashCo.HelicopterTakeOffIntro()
 end
 
 function SlashCo.HelicopterFinalLeave()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
-			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3])
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition)
 end
 
 function SlashCo.HelicopterLeaveForIntro()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
-			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3])
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition)
 
 	local heli = SlashCo.Helicopter
 	if not IsValid(heli) then
 		return
 	end
 
-	local delay = math.sqrt(heli:GetPos():Distance(Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
-			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3]))) / 5
+	local delay = math.sqrt(heli:GetPos():Distance(SlashCo.CurRound.HelicopterSpawnPosition)) / 5
 
 	timer.Simple(delay, function()
 		if not IsValid(heli) then

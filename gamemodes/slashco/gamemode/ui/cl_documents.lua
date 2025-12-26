@@ -22,10 +22,11 @@
 ]]
 local textCache = {}
 
-local screenAngle = Angle(0, -180, 90)
-local screenUp = screenAngle:Up()
-local screenPos = Vector(850, 127, -65)
-local screenSize = 800
+local rawScreenPos = Vector(790, 127, -125)
+local screenPos = nil -- set on the first render - reading from networking
+local screenAngle = nil
+local screenUp = nil
+local screenSize = 800 -- in world space it's 120 | 800 * 0.15 = 120
 local worldScale = 0.15  -- Scale factor to convert from screen pixels to world units
 local screenMins = Vector(0, 0, 0)
 local screenMaxs = Vector(screenSize * worldScale, -screenSize * worldScale, 1)
@@ -533,11 +534,40 @@ for _, perk in ipairs(SlashCo.GetPerks()) do
 	end
 end
 
+local function GetDocumentScreenPos()
+	local pos = GetGlobal2Vector("SlashCo:DocumentUIPos", vector_origin)
+	if pos:IsZero() then
+		return nil, nil
+	end
+
+	local ang = GetGlobal2Angle("SlashCo:DocumentUIAng", angle_zero)
+	return pos, ang
+end
+
 GameData.CurrentDocumentScroll = GameData.CurrentDocumentScroll or 0
 hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
 	if not GameData.IsLobby then
 		return
 	end
+
+	if not screenPos or SlashCo.MapTools.IsEnabled() then
+		local networkPos, networkAng = GetDocumentScreenPos()
+		if not networkPos then return end
+
+		screenAngle = networkAng
+		screenUp = screenAngle:Up()
+
+		local halfSize = screenSize * worldScale / 2
+		local right = screenAngle:Right()
+		local forward = screenAngle:Forward()
+
+		screenPos = networkPos - right * halfSize - forward * halfSize
+	end
+
+	if not screenPos or not screenAngle or not screenUp then return end
+
+	--debugoverlay.Sphere(rawScreenPos, 10, 1, Color(255, 0, 0), false)
+	--debugoverlay.Sphere(screenPos, 10, 1, Color(0, 255, 0), false)
 
 	playerShootPos = GameData.LocalPlayer:GetShootPos()
 

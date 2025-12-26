@@ -30,6 +30,7 @@ if SERVER then
 	function ENT:Use(activator)
 		if activator:Team() == TEAM_SURVIVOR and not activator.CantBuy then
 			SlashCo.SendValue(activator, "openItemPicker")
+			activator.LastUsedItemStash = self
 		end
 	end
 else

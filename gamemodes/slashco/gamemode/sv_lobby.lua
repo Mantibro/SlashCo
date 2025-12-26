@@ -467,15 +467,16 @@ local function pickItem(ply, item)
 		return
 	end
 
-	if SlashCoItems[item].Price > balance then
+	local itemTbl = SlashCoItems[item]
+	if itemTbl.Price > balance then
 		ply:ChatText("item_afford")
 		return
 	end
 
-	if SlashCoItems[item].MaxAllowed then
-		local numAllowed = SlashCoItems[item].MaxAllowed()
+	if itemTbl.MaxAllowed then
+		local numAllowed = itemTbl.MaxAllowed()
 		local itemCount = 0
-		local slot = SlashCoItems[item].IsSecondary and "item2" or "item"
+		local slot = itemTbl.IsSecondary and "item2" or "item"
 		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if v:GetItem(slot) == item then
 				itemCount = itemCount + 1
@@ -497,15 +498,16 @@ local function pickItem(ply, item)
 
 	if not SlashCo.LobbyData.VendorCooldown then
 		SlashCo.LobbyData.VendorCooldown = CurTime()
-		LobbyVendorVoice(item)
+		LobbyVendorVoice(ply, item)
 	elseif (CurTime() - SlashCo.LobbyData.VendorCooldown) > 5 then
 		SlashCo.LobbyData.VendorCooldown = CurTime()
-		LobbyVendorVoice(item)
+		LobbyVendorVoice(ply, item)
 	end
 end
 
-function LobbyVendorVoice(item)
-	local vendor = ents.FindByClass("sc_itemstash")[1]
+function LobbyVendorVoice(ply, item)
+	local vendor = IsValid(ply.LastUsedItemStash) and ply.LastUsedItemStash or nil
+	if not vendor then return end -- RaphaelIT7: Should never happen.
 
 	if item == "DeathWard" then
 		vendor:EmitSound("slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
@@ -516,7 +518,6 @@ function LobbyVendorVoice(item)
 	end
 end
 
-local MapForceCost = 100
 local function pickMap(ply, map)
 	local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
@@ -525,19 +526,19 @@ local function pickMap(ply, map)
 		return
 	end
 
-	if balance < MapForceCost then
+	if balance < SlashCo.MapForceCost then
 		ply:ChatText("map_notenough")
 		return
 	end
 
 	for _, play in ipairs(player.GetAll()) do
-		play:ChatText({"map_guaranteed_to", ply:Nick(), MapForceCost, SCInfo.Maps[map].NAME})
+		play:ChatText({"map_guaranteed_to", ply:Nick(), SlashCo.MapForceCost, SCInfo.Maps[map].NAME})
 	end
 
-	SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -MapForceCost)
+	SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -SlashCo.MapForceCost)
 	SlashCo.LobbyData.SelectedMap = map
-	MapForceCost = MapForceCost + 50
-	SlashCo.SendValue(nil, "mapGuar", SlashCo.LobbyData.SelectedMap, MapForceCost)
+	SlashCo.MapForceCost = SlashCo.MapForceCost + SlashCo.MapForceCostIncrease
+	SlashCo.SendValue(nil, "mapGuar", SlashCo.LobbyData.SelectedMap, SlashCo.MapForceCost)
 	SlashCo.PrecacheNextMap()
 end
 
@@ -624,27 +625,10 @@ hook.Add("Tick", "LobbyTickEvent", function()
 	end
 
 	if SlashCo.LobbyData.LOBBYSTATE == 1 then
-		local minx = -60
-		local maxx = 60
-		local miny = 640
-		local maxy = 785
-
 		local all_players_in = true
 
-		if table.IsEmpty(SlashCo.LobbyData.AssignedSurvivors) then
-			return
-		end
-
-		for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
-			local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid)
-			if not ply then continue end
-			local pos = ply:GetPos()
-			local x = pos[1]
-			local y = pos[2]
-
-			if (x > minx and x < maxx) and (y > miny and y < maxy) then
-				continue
-			end
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if GameData.PlayersInElevatorZone[survivor] then continue end
 
 			all_players_in = false
 			break
@@ -671,7 +655,8 @@ function lobbyFinish()
 	SlashCo.LobbyData.LOBBYSTATE = 4
 	SlashCo.MarkLobbyStarting()
 
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1], SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 500)
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition)
+	SlashCo.CurRound.HelicopterTargetPosition[3] = SlashCo.CurRound.HelicopterTargetPosition[3] + 500
 
 	timer.Simple(8, function()
 		SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1] + 5000, SlashCo.CurRound.HelicopterTargetPosition[2] + 4000, SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
@@ -832,3 +817,10 @@ if GameData.IsLobby then
 		AddOriginToPVS(ply.spectatorScenePos)
 	end)
 end
+
+hook.Add("SlashCo:SetupLobbyEntities", "SlashCo:Lobby", function()
+	-- RaphaelIT7: The for loop is intentionally, in case any mapper decides they want more than just one helicopter in the lobby.
+	for _, ent in ipairs(ents.FindByClass("info_sc_helicopter")) do
+		SlashCo.CreateHelicopter(ent:GetPos(), ent:GetAngles())
+	end
+end)

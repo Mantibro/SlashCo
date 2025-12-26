@@ -26,6 +26,8 @@ SlashCo.OverTime = SlashCo.SlowEscapeTime - 300 -- Time in seconds when the surv
 SlashCo.AllowLateJoin = true -- If enabled, players that joined after the lobby was created BUT before the round was started will get spawned as survivors.
 SlashCo.MaximumLateJoinTime = 180 -- Time in seconds in which players will still be spawned as survivors if they just took ages to load, though they won't be spawned a survivors if they weren't expected to join!
 SlashCo.PlayerPingDelay = 30 -- Default time in seconds to wait before a player can ping again. Can be changed by servers using the convar slashco_pingdelay
+SlashCo.MapForceCost = 100 -- Default cost to force a map
+SlashCo.MapForceCostIncrease = 50 -- Default amount of points that the cost to force a map is increased by every time someone tires to force it
 
 SlashCo.HelicopterVoices = {
 	INTRO = 1,
@@ -410,9 +412,7 @@ else
 			GameData.Lobby = GameData.Map
 			cookie.Set("SlashCo:LastLobby", GameData.Lobby)
 
-			SlashCo.CreateHelicopter(Vector(644.594, -423.175, 40.004), Angle(0, 45, 0))
-			SlashCo.CreateItemStash(Vector(-483.500, -260.000, 88.000), Angle(90, 180, 180))
-			SlashCo.CreateOfferTable(Vector(940.838, 890.909, -191.853), Angle(0, -90, 0))
+			hook.Run("SlashCo:SetupLobbyEntities")
 		else
 			--[[
 				Restore the last lobby value, if you for example started on sc_lobby_v2 and play a round.
@@ -657,3 +657,10 @@ SlashCo.ObjStatus = {
 	COMPLETE = 1,
 	FAILED = 2
 }
+
+--  Map tools, this is the only clientside function used by some places where we'd need to always show the current value instead of a cached one.
+SlashCo.MapTools = SlashCo.MapTools or {}
+local slashco_enablemaptools = GetConVar("slashco_enablemaptools")
+function SlashCo.MapTools.IsEnabled()
+	return slashco_enablemaptools and slashco_enablemaptools:GetBool()
+end
