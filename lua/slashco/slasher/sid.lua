@@ -445,16 +445,25 @@ end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
 	if (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
-		target = SlashCo.CreateItem("sc_cookie", target:WorldSpaceCenter(), angle_zero)
-		target:DropToFloor()
-		
-		target:FollowBone(slasher, slasher:LookupBone("HandR"))
+		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
+		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
+
+		local cookie = ents.Create("prop_physics")
+
+		cookie:SetMoveType(MOVETYPE_NONE)
+		cookie:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		cookie:SetModel(SlashCoItems.Cookie.Model)
+		cookie:SetPos(pos)
+		cookie:SetAngles(ang)
+		cookie:FollowBone(slasher, slasher:LookupBone("HandR"))
+
 		slasher:SetNWBool("SidEatingSurvCookie", true)
 		slasher:Freeze(true)
+		slasher:EmitSound("slashco/slasher/sid/sid_cookie" .. math.random(1, 2) .. ".mp3")
 		
-		timer.Simple(3.5, function()
+		timer.Simple(3.55, function()
 			slasher:EmitSound("slashco/slasher/sid/sid_eating.mp3")
-			target:Remove()
+			cookie:Remove()
 		end)
 		
 		timer.Simple(10, function()
@@ -567,11 +576,13 @@ function SLASHER.Animator(ply)
 				else
 					ply.CalcSeqOverride = ply:LookupSequence(gun_prefix .. "float")
 				end
-			elseif eating_surv then
-				ply.CalcSeqOverride = ply:LookupSequence("eat2")
-				if ply.anim_antispam == nil or ply.anim_antispam == false then
-					ply:SetCycle(0)
-					ply.anim_antispam = true
+				
+				if eating_surv then
+					ply.CalcSeqOverride = ply:LookupSequence("eat2")
+					if ply.anim_antispam == nil or ply.anim_antispam == false then
+						ply:SetCycle(0)
+						ply.anim_antispam = true
+					end
 				end
 			else
 				ply.CalcSeqOverride = ply:LookupSequence("eat1")
