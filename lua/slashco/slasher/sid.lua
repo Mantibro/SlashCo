@@ -476,7 +476,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		return
 	end
 
-	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("SidEating") or slasher:GetNWBool("SidGun") then
+	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("SidEating") or slasher:GetNWBool("SidEatingSurvCookie") or slasher:GetNWBool("SidGun") then
 		return
 	end
 
