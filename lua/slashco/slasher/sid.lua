@@ -227,13 +227,6 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if not slasher:GetNWBool("SidGun") then
-		if IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true) then
-			target = SlashCo.CreateItem("sc_cookie", target:WorldSpaceCenter(), angle_zero)
-			target:DropToFloor()
-			EatCookie(slasher, target)
-			return
-		end
-
 		SlashCo.Jumpscare(slasher, target)
 		return
 	end
@@ -454,6 +447,29 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	if (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
 		target = SlashCo.CreateItem("sc_cookie", target:WorldSpaceCenter(), angle_zero)
 		target:DropToFloor()
+		
+		target:FollowBone(slasher, slasher:LookupBone("HandR"))
+		slasher:SetNWBool("SidEatingSurvCookie", true)
+		slasher:Freeze(true)
+		
+		timer.Simple(3.5, function()
+			slasher:EmitSound("slashco/slasher/sid/sid_eating.mp3")
+			target:Remove()
+		end)
+		
+		timer.Simple(10, function()
+			if not IsValid(slasher) and not IsValid(target) then
+				return
+			end
+
+			slasher:SetNWBool("SidEatingSurvCookie", false)
+			slasher:SetNWBool("DemonPacified", true)
+			slasher:Freeze(false)
+			slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
+			slasher.Pacification = math.random(15, 25)
+		end)
+
+		return
 	end
 
 	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then
@@ -523,6 +539,7 @@ end
 
 function SLASHER.Animator(ply)
 	local eating = ply:GetNWBool("SidEating")
+	local eating_surv = ply:GetNWBool("SidEatingSurvCookie")
 	local equipping_gun = ply:GetNWBool("SidGunEquipping")
 	local sid_executing = ply:GetNWBool("SidExecuting")
 
@@ -532,7 +549,7 @@ function SLASHER.Animator(ply)
 	local gun_shooting = (CurTime() - ply:GetNWFloat("SidGunShoot", 0)) < SLASHER.GunShotDecay
 	local gun_prefix = gun_state and "g_" or ""
 
-	if not eating and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then
+	if not eating and not eating_surv and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then
 		ply.anim_antispam = false
 	end
 
@@ -550,8 +567,14 @@ function SLASHER.Animator(ply)
 				else
 					ply.CalcSeqOverride = ply:LookupSequence(gun_prefix .. "float")
 				end
+			elseif eating_surv then
+				ply.CalcSeqOverride = ply:LookupSequence("eat2")
+				if ply.anim_antispam == nil or ply.anim_antispam == false then
+					ply:SetCycle(0)
+					ply.anim_antispam = true
+				end
 			else
-				ply.CalcSeqOverride = ply:LookupSequence("eat")
+				ply.CalcSeqOverride = ply:LookupSequence("eat1")
 				if ply.anim_antispam == nil or ply.anim_antispam == false then
 					ply:SetCycle(0)
 					ply.anim_antispam = true
