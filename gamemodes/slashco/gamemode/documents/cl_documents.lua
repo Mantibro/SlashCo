@@ -29,4 +29,7 @@ net.Receive("SlashCo:NetworkDocuments", function()
 			rating = rating,
 		}
 	end
+
+	print("Received Documents:")
+	PrintTable(SlashCo.Documents)
 end)
