@@ -18,6 +18,14 @@ hook.Add("ShouldCollide", "SlashCo:Impervious", function(ent1, ent2)
 		--see the warning in https://wiki.facepunch.com/gmod/GM:ShouldCollide to see why this matters
 		return false
 	end
+	
+	if (ent1:IsPlayer() or ent1:GetClass() == "func_door_rotating") and (ent2:IsPlayer() or ent2:GetClass() == "func_door_rotating") then
+		return false
+	end
+
+	if (ent1:IsPlayer() or ent1:GetClass() == "prop_static") and (ent2:IsPlayer() or ent2:GetClass() == "prop_static") then
+		return false
+	end
 end)
 
 function PLAYER:SetImpervious(state)
