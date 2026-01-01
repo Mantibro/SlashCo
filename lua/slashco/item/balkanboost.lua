@@ -102,7 +102,6 @@ end
 
 hook.Add("RenderScreenspaceEffects", "BalkanBoost", function()
 	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
-
 		local tab = {
 			["$pp_colour_addr"] = 0.07,
 			["$pp_colour_addg"] = 0,
@@ -119,30 +118,32 @@ hook.Add("RenderScreenspaceEffects", "BalkanBoost", function()
 	end
 end)
 
-local BalkanSound
-
 hook.Add("Think", "BalkanBoost", function()
 	if GameData.LocalPlayer:GetNWBool("SurvivorBalkan") then
-		if not BalkanSound then
-			sound.PlayFile("sound/slashco/balkan_icantstopnow.mp3", "noplay", function(music, errCode, errStr)
-				if IsValid(music) then
-					BalkanSound = music
+		if not IsValid(GameData.BalkanSound) and CurTime() > ((GameData.BalkanSoundLastCreation or 0) + 5) then
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/balkan_icantstopnow.mp3",
+				identifier = "BalkanBoost",
+				entity = GameData.LocalPlayer,
+				volume = 3,
+				fadeIn = 0,
+				forceStereo = true,
+				modifyGroup = "BackgroundMusic",
+				modifyGroupVolumeMult = 0, -- Silence background music while were playing
+				modifyGroupVolumeFadeTime = 3,
+				callback = function(channel)
+					GameData.BalkanSound = channel
 
-					timer.Simple(0.01, function()
-						BalkanSound:Play()
-					end)
-
+					-- RaphaelIT7: I did not yet implement modifyGroupVolumeFadeTime so hacky workaround till then.
+					if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
+						SlashCo.AudioSystem.FadeTo(SlashCo.AudioSystem.BackgroundChannel, 3, 0)
+					end
 				end
-			end)
-		else
-			local vol = 3
-			BalkanSound:SetVolume(vol)
+			})
+
+			GameData.BalkanSoundLastCreation = CurTime()
 		end
-
-		local frequency = 0
-
-	elseif IsValid(BalkanSound) then
-		BalkanSound:Stop()
-		BalkanSound = nil
+	elseif IsValid(GameData.BalkanSound) then
+		SlashCo.AudioSystem.DestroyChannel(GameData.BalkanSound, 1)
 	end
 end)

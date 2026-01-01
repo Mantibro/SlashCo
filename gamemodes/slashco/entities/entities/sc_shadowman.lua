@@ -53,6 +53,7 @@ function ENT:Initialize()
 			entity = self,
 			volume = 0.25,
 			fadeIn = 0,
+			deleteWhenDone = true,
 		})
 	end
 end

@@ -13,7 +13,7 @@ function SlashCo.GetDocumentRating(name)
 	return document.rating or 0
 end
 
-net.Receive("slashCo_NetworkDocuments", function()
+net.Receive("SlashCo:NetworkDocuments", function()
 	local deletions = net.ReadBool()
 	for k=1, 500 do -- would do while true but I don't like the idea of a possible infinite loop even if its impossible in this setup
 		local name = net.ReadString()

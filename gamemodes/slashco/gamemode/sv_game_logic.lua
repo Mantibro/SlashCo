@@ -14,9 +14,9 @@ end
 
 function SlashCo.LoadCurRoundData()
 	table.Empty(SlashCo.CurRound.ExpectedPlayers)
-	if sql.TableExists("slashco_table_basedata") and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
+	if cookie.GetString("slashco_table_basedata") ~= nil and sql.TableExists("slashco_table_survivordata") and sql.TableExists("slashco_table_slasherdata") then
 		--Load relevant data from the database
-		local baseData = sql.Query("SELECT * FROM slashco_table_basedata;")[1]
+		local baseData = util.JSONToTable(cookie.GetString("slashco_table_basedata") or "") or {}
 		local diff = baseData.Difficulty
 		local offering = baseData.Offering
 		local survivorgasmod = baseData.SurviorGasMod
@@ -111,7 +111,7 @@ function SlashCo.LoadCurRoundData()
 		end
 
 		print("[SlashCo] Something went wrong while trying to load the round data from the Database! Restart imminent. (init)")
-		local baseTable = sql.TableExists("slashco_table_basedata") and "present" or "nil"
+		local baseTable = (cookie.GetString("slashco_table_basedata") ~= nil) and "present" or "nil"
 		local survivorTable = sql.TableExists("slashco_table_survivordata") and "present" or "nil"
 		local slasherTable = sql.TableExists("slashco_table_slasherdata") and "present" or "nil"
 		print("base table: " .. baseTable)

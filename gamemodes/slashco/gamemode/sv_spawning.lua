@@ -16,7 +16,7 @@ function SlashCo.Abort(reason)
 	for _, v in ipairs(player.GetAll()) do
 		v:ChatPrint("Aborting round: " .. reason)
 	end
-	print("Aborting round: " .. reason)
+	ErrorNoHaltWithStack("Aborting round: " .. reason)
 
 	if GameData.IsLobby then return end -- We aborted in lobby? GG
 
@@ -393,9 +393,7 @@ end
 
 ---Set up players for the round
 function SlashCo.SetupPlayers()
-	if not game.SinglePlayer() and (not sql.TableExists("slashco_table_basedata") or not sql.TableExists("slashco_table_survivordata")
-			or not sql.TableExists("slashco_table_slasherdata")) then
-
+	if not game.SinglePlayer() and ((cookie.GetString("slashco_table_basedata") == nil) or not sql.TableExists("slashco_table_survivordata") or not sql.TableExists("slashco_table_slasherdata")) then
 		SlashCo.Abort("Missing SQL table data")
 		return
 	end

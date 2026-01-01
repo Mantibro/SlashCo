@@ -88,6 +88,9 @@ local function SendToPlayersWithDelta(playerList, soundData, deltaList)
 		WriteDeltaSoundField(soundData.pulseEffect, deltaList.pulseEffect, WriteDeltaPulseEffect)
 		WriteDeltaSoundField(soundData.disableUniqueToEntity, deltaList.disableUniqueToEntity, net.WriteBool)
 		WriteDeltaSoundField(soundData.raytraced, deltaList.raytraced, net.WriteBool)
+		WriteDeltaSoundField(soundData.modifyGroup, deltaList.modifyGroup, net.WriteString)
+		WriteDeltaSoundField(soundData.modifyGroupVolumeMult, deltaList.modifyGroupVolumeMult, net.WriteFloat)
+		WriteDeltaSoundField(soundData.modifyGroupVolumeFadeTime, deltaList.modifyGroupVolumeFadeTime, net.WriteFloat)
 		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 	if not playerList then
 		net.Broadcast()
@@ -131,6 +134,9 @@ local function SendToPlayersWithNoDelta(playerList, soundData, manualSend)
 		WriteSoundField(soundData.pulseEffect, WritePulseEffect)
 		WriteSoundField(soundData.disableUniqueToEntity, net.WriteBool)
 		WriteSoundField(soundData.raytraced, net.WriteBool)
+		WriteSoundField(soundData.modifyGroup, net.WriteString)
+		WriteSoundField(soundData.modifyGroupVolumeMult, net.WriteFloat)
+		WriteSoundField(soundData.modifyGroupVolumeFadeTime, net.WriteFloat)
 		-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 	if manualSend then return end
 	if not playerList then
@@ -181,20 +187,35 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 	if deltaTable then
 		local deltaPlayers = {}
 		local revDeltaPlayers = {}
-		if soundData.sendToEntity then
+		local targetPlayers = {}
+		if IsEntity(soundData.sendToEntity) then
 			local deltaList = SlashCo.AudioSystem.PlayerDeltaSoundCache[soundData.sendToEntity]
 			if deltaList and deltaList[identifier] then
 				table.insert(deltaList, soundData.sendToEntity)
+
+				table.insert(deltaPlayers, soundData.sendToEntity)
 				revDeltaPlayers[soundData.sendToEntity] = true
 			end
 		else
+			if istable(soundData.sendToEntity) then
+				for k, ply in ipairs(soundData.sendToEntity) do
+					targetPlayers[ply] = true
+					targetPlayers[k] = ply
+				end
+			else
+				for k, ply in player.Iterator() do
+					targetPlayers[ply] = true
+					targetPlayers[k] = ply
+				end
+			end
+
 			for ply, deltaList in pairs(SlashCo.AudioSystem.PlayerDeltaSoundCache) do
 				if not IsValid(ply) then
 					SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = nil -- Yes, this is how we'll clean it.
 					continue
 				end
 
-				if deltaList[identifier] then
+				if targetPlayers[ply] and deltaList[identifier] then
 					-- print("Added for delta update " .. ply:Name())
 					table.insert(deltaPlayers, ply)
 					revDeltaPlayers[ply] = true
@@ -205,7 +226,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		SendToPlayersWithDelta(deltaPlayers, soundData, deltaTable)
 
 		local noDeltaPlayers = {}
-		for _, ply in player.Iterator() do
+		for _, ply in ipairs(targetPlayers) do
 			if revDeltaPlayers[ply] then continue end
 
 			table.insert(noDeltaPlayers, ply)
@@ -216,7 +237,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 			SendToPlayersWithNoDelta(noDeltaPlayers, soundData)
 		end
 	else
-		SendToPlayersWithNoDelta(nil, soundData)
+		SendToPlayersWithNoDelta(soundData.sendToEntity, soundData)
 		deltaTable = {}
 		-- print("We had no delta :sob:")
 

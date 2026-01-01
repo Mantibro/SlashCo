@@ -519,7 +519,7 @@ function SlashCo.ClearDatabase()
 	
 	print("[SlashCo] Clearing Database. . .")
 
-	sql.Query("DROP TABLE slashco_table_basedata;")
+	cookie.Delete("slashco_table_basedata")
 	sql.Query("DROP TABLE slashco_table_survivordata;")
 	sql.Query("DROP TABLE slashco_table_slasherdata;")
 	sql.Query("DROP TABLE slashco_table_potentialslashers;")

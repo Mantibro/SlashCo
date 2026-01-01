@@ -17,10 +17,9 @@ local function lobbySaveCurData()
 	--RunConsoleCommand("debug_datatest_delete")
 
 	print("[SlashCo] Now beginning database...")
-	if not sql.TableExists("slashco_table_basedata") then
+	if not sql.TableExists("slashco_table_survivordata") then
 		--Create the database table
 
-		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER, SlasherDanger NUMBER, SlasherClass NUMBER, SlasherID TEXT, Offering NUMBER, SurviorGasMod NUMBER);")
 		sql.Query("CREATE TABLE slashco_table_survivordata(SteamID TEXT, Item TEXT, Item2 TEXT);")
 		sql.Query("CREATE TABLE slashco_table_slasherdata(SteamID TEXT, SlasherID TEXT);")
 	end
@@ -30,7 +29,15 @@ local function lobbySaveCurData()
 	end
 
 	--Major data dump
-	sql.Query("INSERT INTO slashco_table_basedata( Difficulty, SlasherDanger, SlasherClass, SlasherID, Offering, SurviorGasMod ) VALUES( " .. diff .. ", " .. (SlashCo.LobbyData.SelectedSlasherInfo.DANGER or SlashCo.DangerLevel.Unknown) .. ", " .. sql.SQLStr(SlashCo.LobbyData.SelectedSlasherInfo.CLASS or SlashCo.DangerLevel.Unknown) .. ", " .. sql.SQLStr(SlashCo.LobbyData.SelectedSlasherInfo.ID or 0) .. ", " .. offer .. ", " .. survivorgasmod .. " );")
+	-- RapahelIT7: This uses cookie.Set as it makes no sense to setup an entire sql table for 1 row that would contain the data...
+	cookie.Set("slashco_table_basedata", util.TableToJSON({
+		Difficulty = diff,
+		SlasherDanger = SlashCo.LobbyData.SelectedSlasherInfo.DANGER or SlashCo.DangerLevel.Unknown,
+		SlasherClass = SlashCo.LobbyData.SelectedSlasherInfo.CLASS or SlashCo.DangerLevel.Unknown,
+		SlasherID = SlashCo.LobbyData.SelectedSlasherInfo.ID or 0,
+		Offering = offer,
+		SurviorGasMod = survivorgasmod,
+	}))
 
 	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do -- RaphaelIT7: Why not using SlashCo.LobbyData.AssignedSurvivors? Because people could have been set survivor, idk what servers might do.
 		--Save the Current Survivors Items to the database

@@ -206,14 +206,19 @@ local function SetupItems()
 		v:Remove()
 	end
 
-	for k, v in SortedPairs(SlashCoItems) do
-		if not v.Price then
-			continue
-		end
+	local items = {}
+	for itemID, itemTbl in pairs(SlashCoItems) do
+		if not itemTbl.Price then continue end
+
+		items[itemID] = SlashCo.Language(itemID)
+	end
+
+	local orderID = 0
+	for itemID, itemName in SortedPairsByValue(items) do
 		local item = vgui.Create("DButton", leftSide)
 		function item.DoClick()
 			leftSide.Items[selectedItem]:SetEnabled(true)
-			selectedItem = k
+			selectedItem = itemID
 			setItemLabel()
 			leftSide.Items[selectedItem]:SetEnabled(false)
 			SlashCo.AudioSystem.PlayPrecachedChannel("ItemPickerDisplayClick")
@@ -221,15 +226,17 @@ local function SetupItems()
 		item:Dock(TOP)
 		item:SetHeight(30)
 		item:DockMargin(0, 5, 0, 0)
-		item:SetText(string.upper( SlashCo.Language( k ) ))
+		item:SetText(string.upper( SlashCo.Language( itemID ) ))
 		item:SetFont("TVCD_small")
 		item:SetTextColor(color_white)
+		orderID = orderID + 1
+		item:SetZPos(orderID) -- RaphaelIT7: VGUI uses this to order items when updating the layout
 		local wi = item:GetTextSize()
 		if wi > width then
 			width = wi
 		end
 
-		if selectedItem == k then
+		if selectedItem == itemID then
 			item:SetEnabled(false)
 		end
 
@@ -245,7 +252,7 @@ local function SetupItems()
 			end
 			surface.DrawRect(0, 0, w, h)
 		end
-		leftSide.Items[k] = item
+		leftSide.Items[itemID] = item
 	end
 
 	leftSide:SetWidth(math.min(width + 10, 250))

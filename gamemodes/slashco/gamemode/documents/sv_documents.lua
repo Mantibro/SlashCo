@@ -27,10 +27,10 @@ include("sh_documents.lua")
 
 local PLAYER = FindMetaTable("Player")
 
-util.AddNetworkString("slashCo_NetworkDocuments")
+util.AddNetworkString("SlashCo:NetworkDocuments")
 function PLAYER:NetworkDocuments()
 	local documents = self.Documents or {}
-	net.Start("slashCo_NetworkDocuments")
+	net.Start("SlashCo:NetworkDocuments")
 		net.WriteBool(false)
 		for name, documentTbl in pairs(documents) do
 			net.WriteString(name)
@@ -42,7 +42,7 @@ end
 -- Re-networks the document to the player even when it was deleted
 function PLAYER:NetworkDocument(name)
 	local documentTbl = (self.Documents or {})[name]
-	net.Start("slashCo_NetworkDocuments")
+	net.Start("SlashCo:NetworkDocuments")
 		net.WriteBool(not documentTbl)
 		net.WriteString(name)
 		if documentTbl then

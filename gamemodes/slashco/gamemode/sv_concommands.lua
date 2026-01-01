@@ -282,27 +282,33 @@ concommand.Add("slashco_debug_datatest_makedummy", function(ply)
 		return
 	end
 
-	if not sql.TableExists("slashco_table_basedata") and not sql.TableExists("slashco_table_survivordata") and not sql.TableExists("slashco_table_slasherdata") then
+	if cookie.GetString("slashco_table_basedata") == nil and not sql.TableExists("slashco_table_survivordata") and not sql.TableExists("slashco_table_slasherdata") then
 		--Create the database table
 
 		local diff = SlashCo.LobbyData.SelectedDifficulty
 		local offer = SlashCo.LobbyData.Offering
 		local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
-		--local slasher1id = SlashCo.GetRandomSlasher()
 		local slasher1id = "Abomignat"
-		local slasher2id = SlashCo.GetRandomSlasher()
 
-		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary TEXT , SlasherIDSecondary TEXT , SurviorGasMod NUMBER);")
-		sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
-		sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
+		sql.Query("CREATE TABLE slashco_table_survivordata(SteamID TEXT, Item TEXT, Item2 TEXT);")
+		sql.Query("CREATE TABLE slashco_table_slasherdata(SteamID TEXT, SlasherID TEXT);")
 
-		sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( 76561198070087838 );")
-		sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( 90071996842377216, " .. sql.SQLStr("none") .. " );")
-		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
+		sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( 76561198070087838, " .. sql.SQLStr(slasher1id) .. " );")
+		sql.Query("INSERT INTO slashco_table_survivordata( SteamID, Item, Item2 ) VALUES( 90071996842377216, " .. sql.SQLStr("none") .. ", " .. sql.SQLStr("none") .. " );")
+
+		local slasherTable = SlashCo.GetSlasherTable(slasher1id)
+		cookie.Set("slashco_table_basedata", util.TableToJSON({
+			Difficulty = diff,
+			SlasherDanger = SlashCo.DangerLevel.Unknown,
+			SlasherClass = SlashCo.DangerLevel.Unknown,
+			SlasherID = 0,
+			Offering = offer,
+			SurviorGasMod = survivorgasmod,
+		}))
 		doPrint(ply, "Dummy Database made.")
 	else
 		doPrint(ply, "Database already exists.")
-		local baseTable = sql.TableExists("slashco_table_basedata") and "present" or "nil"
+		local baseTable = (cookie.GetString("slashco_table_basedata") ~= nil) and "present" or "nil"
 		local survivorTable = sql.TableExists("slashco_table_survivordata") and "present" or "nil"
 		local slasherTable = sql.TableExists("slashco_table_slasherdata") and "present" or "nil"
 		doPrint(ply, "base table: " .. baseTable)
@@ -320,7 +326,7 @@ concommand.Add("slashco_debug_datatest_read", function(ply)
 	end
 
 	doPrint(ply, "basedata: ")
-	PrintTable(sql.Query("SELECT * FROM slashco_table_basedata;") or "nil")
+	PrintTable(util.JSONToTable(cookie.Get("slashco_table_basedata") or "") or {})
 	doPrint(ply, "survivordata: ")
 	PrintTable(sql.Query("SELECT * FROM slashco_table_survivordata;") or "nil")
 	doPrint(ply, "slasherdata: ")

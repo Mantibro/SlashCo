@@ -7,6 +7,7 @@ SlashCo.AudioSystem.ChannelIDs = SlashCo.AudioSystem.ChannelIDs or 0 -- Incremen
 SlashCo.AudioSystem.UpdateFrequency = 0.05 -- How often timers execute to update the volume when fading it to a new value.
 SlashCo.AudioSystem.ServerGroupVolumes = SlashCo.AudioSystem.ServerGroupVolumes or {} -- Group volume mulipliers added on top of channel volumes controlled by the server
 SlashCo.AudioSystem.ClientGroupVolumes = SlashCo.AudioSystem.ClientGroupVolumes or {} -- Group volume mulipliers added on top of channel volumes controlled by the client
+SlashCo.AudioSystem.ModifiedChannelGroups = SlashCo.AudioSystem.ModifiedChannelGroups or {}
 
 local ErrorList = {} -- A table containing all the files we failed to open, if the file is in this list and we fail loading again, then we won't throw another error.
 
@@ -81,7 +82,11 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 
 			if not ErrorList[soundFile] then
 				ErrorList[soundFile] = true
-				error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", " .. soundFile .. ")\n")
+
+				-- RaphaelIT7: Temporary debug stuff for Rubat.
+				local size = file.Size(soundFile, "GAME")
+				local content = file.Read(soundFile, "GAME")
+				error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", " .. soundFile .. " | Debug Info: File Size:" .. tostring(size or -1) .. " File Content Size:" .. tostring(conent and string.len(conent) or -1) .. " File Content Hash:" .. (content and util.CRC(content) or "[no content]") .. ")\n")
 			end
 			return
 		end
@@ -416,9 +421,64 @@ local function CalculateRayTracedVolume(channel, channelData, soundData, channel
 	return math.max(initialVolume - ((totalBounces - (totalBounces - shortestBounce)) / 10), 0)
 end
 
+local function AddModifyChannelGroup(channel, channelData)
+	if not channelData.modifyGroups or not channelData.modifyGroupVolumeMult then return end
+
+	for _, name in ipairs(channelData.modifyGroups) do
+		local groupTbl = SlashCo.AudioSystem.ModifiedChannelGroups[name]
+		if not groupTbl then
+			groupTbl = {}
+			SlashCo.AudioSystem.ModifiedChannelGroups[name] = groupTbl
+		end
+
+		groupTbl[channel] = true
+		if (groupTbl.modifyGroupVolumeMult or 99) > channelData.modifyGroupVolumeMult then
+			groupTbl.modifyGroupVolumeMult = channelData.modifyGroupVolumeMult
+		end
+	end
+end
+
+local function RemoveModifyChannelGroup(channel, channelData)
+	if not channelData.modifyGroups then return end
+
+	for _, name in ipairs(channelData.modifyGroups) do
+		local groupTbl = SlashCo.AudioSystem.ModifiedChannelGroups[name]
+		if not groupTbl then continue end
+
+		groupTbl[channel] = nil
+		if (groupTbl.modifyGroupVolumeMult or 99) == channelData.modifyGroupVolumeMult then
+			-- We were the one enforcing, so now we gotta find someone else.
+			groupTbl.modifyGroupVolumeMult = 99
+			local found = false
+			for otherChannel, val in pairs(groupTbl) do
+				if not isbool(val) or not IsValid(otherChannel) then continue end
+
+				local otherChannelData = SlashCo.AudioSystem.Channels[otherChannel]
+				if not otherChannelData or not otherChannelData.modifyGroupVolumeMult then continue end
+
+				if groupTbl.modifyGroupVolumeMult > otherChannelData.modifyGroupVolumeMult then
+					groupTbl.modifyGroupVolumeMult = otherChannelData.modifyGroupVolumeMult
+				end
+			end
+
+			if not found then
+				-- Found no alternative? Nuke group.
+				SlashCo.AudioSystem.ModifiedChannelGroups[name] = nil
+			end
+		end
+	end
+end
+
 -- Helper function to wrap around CalculateChannelFadeVolume
 local function CalculateChannelVolume(channel, targetVol)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
+	if channelData.group then
+		local modifyGroupTbl = SlashCo.AudioSystem.ModifiedChannelGroups[channelData.group]
+		if modifyGroupTbl then
+			targetVol = targetVol * modifyGroupTbl.modifyGroupVolumeMult
+		end
+	end
+
 	if channelData.is3D or channelData.pos then
 		local soundData = channelData.soundData
 		if soundData then
@@ -455,6 +515,13 @@ function SlashCo.AudioSystem.EnsureValidVolume(volume)
 	return 0 -- math.Clamp(volume, -10, 10) -- We return 0 as else if it would clamp to 10 it could errape the client.
 end
 
+-- Callback called before a channel is gc'd / completely destroyed.
+local function OnDestoryChannel(channel, channelData)
+	if not channelData then return end -- Should never happen, though you never know.
+
+	RemoveModifyChannelGroup(channel, channelData)
+end
+
 --[[
 	Fades out and destroys the channel.
 	callback = function(channelData) end
@@ -476,6 +543,8 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime, callback)
 					channelData.volume = nil
 					if IsValid(channel) then
 						channel:Stop()
+
+						OnDestoryChannel(channel, channelData)
 						channel:__gc()
 					end
 					SlashCo.AudioSystem.CheckChannels()
@@ -501,15 +570,18 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime, callback)
 		end
 	end
 
-	SlashCo.AudioSystem.CheckChannels()
-	SlashCo.AudioSystem.Channels[channel] = nil
 	if IsValid(channel) then
+		OnDestoryChannel(channel, SlashCo.AudioSystem.Channels[channel])
+
 		channel:__gc()
 
 		if callback then
 			callback(channelData)
 		end
 	end
+
+	SlashCo.AudioSystem.CheckChannels()
+	SlashCo.AudioSystem.Channels[channel] = nil
 end
 
 --[[
@@ -609,6 +681,7 @@ function SlashCo.AudioSystem.PlayBackgroundMusic(fileName)
 
 	SlashCo.AudioSystem.CreateChannel(backgroundMusic, "noplay", function(channel)
 		SlashCo.AudioSystem.BackgroundChannel = channel
+		SlashCo.AudioSystem.Channels[channel].group = "BackgroundMusic"
 
 		channel:SetVolume(0)
 		channel:Play()
@@ -881,6 +954,9 @@ end)
 		boolean disableUniqueToEntity - If set, the entity index is NOT added to the identifier allowing the sound to be played only ONCE and NOT by multiple entities.
 		boolean disableAutoRemove - If set, the channel won't be removed after the entity of the channel was removed.
 		boolean raytraced - If set, it will use traces to change the volume and position based off the environment. NOTE: This is WIP, Experiental and eats performance like hell rn
+		string modifyGroup - A string containing all channel groups that should be modified while this channel is playing
+		number modifyGroupVolumeMult - The volume multiplier that should be enforced onto all channels
+		number modifyGroupVolumeFadeTime - (NOT IMPLEMENTED) Time in seconds for the volume to fade to the enforced multiplier. Clamped between a minimum of 0 and maximum of 30
 
 		table pulseEffect - A table for the pulse effect. NOTE: This is still WIP and should not be used.
 		-> Entity entity - A entity that should pulse
@@ -1026,6 +1102,15 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channelData.ent = soundData.entity
 		end
 		UpdateChannelPositionAndVolume(channel, channelData) -- Update the channel position so that when we play it, there won't be a audio bug for 1 frame where it would play from the world origin.
+
+		if soundData.modifyGroup then
+			channelData.modifyGroups = string.Split(soundData.modifyGroup, "|")
+			channelData.modifyGroupVolumeMult = math.Clamp(soundData.modifyGroupVolumeMult or 0, 0, 2)
+			channelData.modifyGroupVolumeFadeTime = math.Clamp(modifyGroupVolumeFadeTime, 0, 30)
+			channelData.modifyGroupStart = CurTime()
+
+			AddModifyChannelGroup(channel, channelData)
+		end
 
 		if not soundData.noplay and (timeLeft > 0 or soundData.looping) then -- We call Play only here since some settings might change how it can be heard.
 			channel:Play()
@@ -1203,6 +1288,9 @@ local function ReadSoundData()
 		pulseEffect = ReadSoundField(ReadPulseEffect),
 		disableUniqueToEntity = ReadSoundField(net.ReadBool),
 		raytraced = ReadSoundField(net.ReadBool),
+		modifyGroup = ReadSoundField(net.ReadString),
+		modifyGroupVolumeMult = ReadSoundField(net.ReadFloat),
+		modifyGroupVolumeFadeTime = ReadSoundField(net.ReadFloat),
 	}
 end
 
