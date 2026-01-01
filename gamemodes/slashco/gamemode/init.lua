@@ -721,7 +721,7 @@ hook.Add("PlayerButtonDown", "SlashCo:SpectatorFunctions", function(ply, button)
 	if ply:Team() ~= TEAM_SPECTATOR then return end
 	if not SlashCo.CanSpectatorsPing() then return end
 	if button ~= MOUSE_MIDDLE then return end
-	if ply.LastPinged and (CurTime() - ply.LastPinged) < SlashCo.PingDelay then return end
+	if ply.LastPinged and (CurTime() - ply.LastPinged) < SlashCo.GetPlayerPingDelay() then return end
 
 	ply:SurvivorPing()
 end)
