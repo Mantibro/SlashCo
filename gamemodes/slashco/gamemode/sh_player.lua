@@ -307,3 +307,4 @@ SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")
 SetupSlashCoNetworkVar("String", 0, "PickedSlasher") -- RaphaelIT7: Only used to display which slasher they'll be.
 SetupSlashCoNetworkVar("String", 1, "ActivePerks")
 SetupSlashCoNetworkVar("String", 2, "OwnedPerks") -- RaphaelIT7: I do not like this... a problem for later me
+SetupSlashCoNetworkVar("String", 3, "ActiveEffects")

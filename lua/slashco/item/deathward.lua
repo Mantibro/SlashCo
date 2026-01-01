@@ -19,6 +19,9 @@ function ITEM.OnDie(ply)
 		phys:SetVelocityInstantaneous(vector_origin)
 	end)
 
+	hook.Run("SlashCo:OnDeathWardUsed", ply)
+
+	ply:ClearEffects()
 	ply:SetVisible(false)
 	ply:SetImpervious(true)
 	ply:GodEnable()

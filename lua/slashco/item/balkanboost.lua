@@ -17,30 +17,26 @@ end
 function ITEM.OnUse(ply)
 	ply:EmitSound("slashco/survivor/balkan_eat.wav")
 
-	timer.Simple(0.01, function()
-		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-			ply:SetNWBool("SurvivorBalkan", true)
-			ply:AddEffect("Slowness", 31.5)
-		end
+	ply:SetNWBool("SurvivorBalkan", true)
+	ply:AddEffect("Slowness", 31.5)
 
-	   	timer.Simple(32, function()
-			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-				ply:SetNWBool("SurvivorBalkanFull", true)
-				ply:SetNWBool("MarkedBySmiley", true)
-				ply:AddEffect("BalkanTrip", 132)
-			end
-		end)
+	timer.Create("BalkanBoostStart:" .. ply:UserID(), 32, 1, function()
+		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+			ply:SetNWBool("SurvivorBalkanFull", true)
+			ply:SetNWBool("MarkedBySmiley", true)
+			ply:AddEffect("BalkanTrip", 132)
+		end
+	end)
 		
-		timer.Simple(164, function()
-			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-				ply:SetNWBool("SurvivorBalkanFull", false)
-				ply:SetNWBool("SurvivorBalkan", false)
-				ply:SetNWBool("MarkedBySmiley", false)
-				ply:AddEffect("Slowness", 9999)
-				local hpafter = ply:Health() / 6
-				ply:SetHealth(hpafter)
-			end
-		end)
+	timer.Create("BalkanBoostFinish:" .. ply:UserID(), 164, 1, function()
+		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
+			ply:SetNWBool("SurvivorBalkanFull", false)
+			ply:SetNWBool("SurvivorBalkan", false)
+			ply:SetNWBool("MarkedBySmiley", false)
+			ply:AddEffect("Slowness", 9999)
+			local hpafter = ply:Health() / 6
+			ply:SetHealth(hpafter)
+		end
 	end)
 end
 ITEM.ViewModel = {
@@ -83,24 +79,25 @@ ITEM.WorldModel = {
 SlashCo.RegisterItem(ITEM, "BalkanBoost")
 
 if SERVER then
-	hook.Add("Think", "BalkanBoost", function()
-		for _, ply in ipairs(player.GetAll()) do
-			if ply:Team() ~= TEAM_SURVIVOR then
-				if ply:GetNWBool("SurvivorBalkan") then
-					ply:SetNWBool("SurvivorBalkan", false)
-				end
-				
-				if ply:GetNWBool("SurvivorBalkanFull") then
-					ply:SetNWBool("SurvivorBalkanFull", false)
-				end
-			end
-		end
+	hook.Add("PlayerChangedTeam", "SlashCo:BalkanBoost", function(ply)
+		ply:SetNWBool("SurvivorBalkan", false)
+		ply:SetNWBool("SurvivorBalkanFull", false)
+		ply:SetNWBool("MarkedBySmiley", false)
+	end)
+
+	hook.Add("SlashCo:OnDeathWardUsed", "SlashCo:CancelBalkanBoost", function(ply)
+		timer.Remove("BalkanBoostStart:" .. ply:UserID())
+		timer.Remove("BalkanBoostFinish:" .. ply:UserID())
+
+		ply:SetNWBool("SurvivorBalkan", false)
+		ply:SetNWBool("SurvivorBalkanFull", false)
+		ply:SetNWBool("MarkedBySmiley", false)
 	end)
 
 	return
 end
 
-hook.Add("RenderScreenspaceEffects", "BalkanBoost", function()
+hook.Add("RenderScreenspaceEffects", "SlashCo:BalkanBoost", function()
 	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
 		local tab = {
 			["$pp_colour_addr"] = 0.07,
@@ -118,7 +115,7 @@ hook.Add("RenderScreenspaceEffects", "BalkanBoost", function()
 	end
 end)
 
-hook.Add("Think", "BalkanBoost", function()
+hook.Add("Think", "SlashCo:BalkanBoost", function()
 	if GameData.LocalPlayer:GetNWBool("SurvivorBalkan") then
 		if not IsValid(GameData.BalkanSound) and CurTime() > ((GameData.BalkanSoundLastCreation or 0) + 5) then
 			SlashCo.AudioSystem.PlaySound({

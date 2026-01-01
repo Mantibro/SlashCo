@@ -29,7 +29,7 @@ end
 
 function SlashCo.DropAllItems(ply, noEffect)
 	if not noEffect then
-		ply:ClearEffect()
+		ply:ClearEffects()
 	end
 
 	SlashCo.DropItem(ply)

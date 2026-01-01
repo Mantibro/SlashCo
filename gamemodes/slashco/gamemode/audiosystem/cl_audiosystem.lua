@@ -1106,7 +1106,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		if soundData.modifyGroup then
 			channelData.modifyGroups = string.Split(soundData.modifyGroup, "|")
 			channelData.modifyGroupVolumeMult = math.Clamp(soundData.modifyGroupVolumeMult or 0, 0, 2)
-			channelData.modifyGroupVolumeFadeTime = math.Clamp(modifyGroupVolumeFadeTime, 0, 30)
+			channelData.modifyGroupVolumeFadeTime = math.Clamp(soundData.modifyGroupVolumeFadeTime or 0, 0, 30)
 			channelData.modifyGroupStart = CurTime()
 
 			AddModifyChannelGroup(channel, channelData)

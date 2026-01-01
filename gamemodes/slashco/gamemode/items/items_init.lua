@@ -72,17 +72,58 @@ end
 
 local PLAYER = FindMetaTable("Player")
 
----gives a player an effect
-function PLAYER:AddEffect(value, duration)
-	if not self:EffectFunction("OnRemoved") then
-		self:EffectFunction("OnExpired")
+local function RemoveEmptyEntires(perkTable)
+	for id, entry in ipairs(perkTable) do
+		if entry == "" or entry == "," then
+			table.remove(perkTable, id)
+		end
 	end
-	self:SetItem("itemEffect", value)
-	self:EffectFunction("OnApplied")
+end
+
+local function HasEffect(ply, effectName)
+	return string.find(ply:GetActiveEffects(), effectName) ~= nil
+end
+
+local function GetEffects(ply)
+	return string.Split(ply:GetActiveEffects(), ",")
+end
+
+local function AddEffect(ply, effectName)
+	if HasEffect(ply, effectName) then return end
+
+	local effects = GetEffects(ply)
+	table.insert(effects, effectName)
+	RemoveEmptyEntires(effects)
+
+	ply:SetActiveEffects(table.concat(effects, ","))
+end
+
+local function RemoveEffect(ply, effectName)
+	if not HasEffect(ply, effectName) then return end
+
+	local effects = GetEffects(ply)
+	for id, effName in ipairs(effects) do
+		if effName == effectName then
+			table.remove(effects, id)
+			break
+		end
+	end
+	RemoveEmptyEntires(effects)
+
+	ply:SetActiveEffects(table.concat(effects, ","))
+end
+
+---gives a player an effect
+function PLAYER:AddEffect(effectName, duration)
+	if not self:EffectFunction(effectName, "OnRemoved") then
+		self:EffectFunction(effectName, "OnExpired")
+	end
+	AddEffect(self, effectName)
+	self:EffectFunction(effectName, "OnApplied")
 	GameData.EffectCounter = (GameData.EffectCounter or 0) + 1
 	local effectID = GameData.EffectCounter
 	self.ActiveEffects = self.ActiveEffects or {}
-	self.ActiveEffects[effectID] = true
+	self.ActiveEffects[effectID] = effectName
 	timer.Create("itemEffectExpire_" .. GameData.EffectCounter, duration, 1, function()
 		if not IsValid(self) then
 			return
@@ -90,29 +131,48 @@ function PLAYER:AddEffect(value, duration)
 
 		self.ActiveEffects[effectID] = nil
 		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-		self:EffectFunction("OnExpired")
-		self:SetItem("itemEffect", "none")
+		self:EffectFunction(effectName, "OnExpired")
+		RemoveEffect(self, effectName)
 	end)
 end
 
 ---calls the <funcName> function of a player's effect with passed args
-function PLAYER:EffectFunction(funcName, ...)
-	local effect = self:GetItem("itemEffect")
-	if SlashCoEffects[effect] and SlashCoEffects[effect][funcName] then
-		return SlashCoEffects[effect][funcName](self, ...)
+function PLAYER:EffectFunction(effectName, funcName, ...)
+	if not HasEffect(self, effectName) then return end
+
+	if SlashCoEffects[effectName] and SlashCoEffects[effectName][funcName] then
+		return SlashCoEffects[effectName][funcName](self, ...)
 	end
 end
 
 ---removes a player's effect
-function PLAYER:ClearEffect()
-	if not self:EffectFunction("OnRemoved") then
-		self:EffectFunction("OnExpired")
-	end
-	if self:GetItem("itemEffect") ~= "none" then
-		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+function PLAYER:ClearEffect(effectName)
+	if not HasEffect(self, effectName) then return end
+	if not self:EffectFunction(effectName, "OnRemoved") then
+		self:EffectFunction(effectName, "OnExpired")
 	end
 
-	self:SetItem("itemEffect", "none")
+	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+
+	RemoveEffect(self, effectName)
+	for effectID, effName in pairs(self.ActiveEffects or {}) do
+		if effName == effectName then
+			timer.Remove("itemEffectExpire_" .. effectID)
+		end
+	end
+end
+
+function PLAYER:ClearEffects()
+	local effects = GetEffects(self)
+	for _, effectName in ipairs(effects) do
+		if not self:EffectFunction(effectName, "OnRemoved") then
+			self:EffectFunction(effectName, "OnExpired")
+		end
+
+		RemoveEffect(self, effectName)
+	end
+
+	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 	for effectID, _ in pairs(self.ActiveEffects or {}) do
 		timer.Remove("itemEffectExpire_" .. effectID)
 	end
@@ -121,7 +181,7 @@ end
 ---check the <valueName> value of a player's item in a specific slot
 --this doesn't include a team check because we assume that it's in a survivor-only context
 function PLAYER:ItemValue(valueName, fallback, isSecondary)
-	local effect = self:GetItem("itemEffect")
+	local effects = GetEffects(self)
 	if SlashCoEffects[effect] and SlashCoEffects[effect][valueName] then
 		return SlashCoEffects[effect][valueName]
 	end
@@ -139,9 +199,11 @@ end
 function PLAYER:ItemValue2(value, fallback, noEffect)
 	local item
 	if not noEffect then
-		item = self:GetItem("itemEffect")
-		if SlashCoItems[item] and SlashCoItems[item][value] then
-			return SlashCoItems[item][value]
+		item = GetEffects(self)
+		for _, effectName in ipairs(item) do
+			if SlashCoEffects[effectName] and SlashCoEffects[effectName][value] then
+				return SlashCoEffects[effectName][value]
+			end
 		end
 	end
 
@@ -226,15 +288,11 @@ if SERVER then
 		"item2", -- added for table.concat to work as it needs a sequential table.
 		item = true,
 		"item",
-		itemEffect = true,
-		"itemEffect",
 	}
 	function PLAYER:SetItem(slot, item)
 		if not slot then
 			if SlashCoItems[item] then
 				slot = SlashCoItems[item].IsSecondary and "item2" or "item"
-			elseif SlashCoEffects[item] then
-				slot = "itemEffect"
 			else
 				return
 			end
@@ -256,9 +314,16 @@ end
 
 ---internal: checks effect function first before checking the specified slot
 function PLAYER:ItemFunctionInternal(value, slot, ...)
-	local effect = self:GetItem("itemEffect")
-	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
-		return SlashCoEffects[effect][value](self, ...)
+	local effects = GetEffects(self)
+	for _, effectName in ipairs(effects) do
+		if SlashCoEffects[effectName] and SlashCoEffects[effectName][value] then
+			local ret = SlashCoEffects[effectName][value](self, ...)
+			-- RaphaelIT7: If an effect returns nothing we will continue the next active effects.
+			-- This allows multiple effects to for example render Screenscpace at once.
+			if ret ~= nil then
+				return ret
+			end
+		end
 	end
 
 	local item = self:GetItem(slot)
