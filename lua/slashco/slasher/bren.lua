@@ -91,16 +91,12 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	
 	local anger = SlashCo.GetSlasherAnger(slasher)
-	if anger > 50 then
-		slasher:SetNWBool("CanNoclip", true)
-	else
-		slasher:SetNWBool("CanNoclip", false)
-	end
+	slasher:SetNWBool("CanNoclip", anger > 50)
 
 	if not slasher:GetNWBool("BrenNoclip") then
 		slasher:SetJumpPower(0)
 		slasher:SetMoveType(MOVETYPE_WALK)
-		
+
 		final_eyesight = SLASHER.Eyesight
 	else
 		slasher:SetMoveType(MOVETYPE_NOCLIP)
@@ -126,79 +122,82 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetNWBool("BrenNoclip") then return end
-
+	
+	if slasher.MainCooldown > 0.01 then return end
+	
+	if not IsValid(target) and not target:IsPlayer() then return end
+	
+	if target:Team() ~= TEAM_SURVIVOR then return end
+	
 	local dist = SLASHER.KillDistance
-	if slasher.MainCooldown < 0.01 then
-		if IsValid(target) and target:IsPlayer() then
-			if target:Team() ~= TEAM_SURVIVOR then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then
+		return
+	end
 
-			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then
+	slasher:Freeze(true)
+	timer.Simple(0.1, function()
+		if not IsValid(slasher) or not IsValid(target) then return end
+
+		target:Freeze(true)
+		target:EmitSound("ambient/voices/citizen_beaten4.wav")
+
+		slasher.MainCooldown = 5
+		slasher:SetNWBool("CanChase", false)
+		slasher:SetNWBool("BrenKill", true)
+
+		timer.Simple(1.5, function()
+			if not IsValid(slasher) then return end
+			if not IsValid(target) then
+				slasher:Freeze(false)
+				slasher:SetNWBool("BrenKill", false)
+				slasher:SetNWBool("CanChase", true)
+				SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 				return
 			end
 
-			slasher:Freeze(true)
-			timer.Simple(0.1, function()
-				if not IsValid(slasher) or not IsValid(target) then return end
+			target:Freeze(false)
+			target:TakeDamage(99999, slasher, slasher)
 
-				target:Freeze(true)
-				target:EmitSound("ambient/voices/citizen_beaten4.wav")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/bren/bren_kill.mp3",
+				identifier = "BrenKillSound",
+				minDistance = 800,
+				maxDistance = 900,
+				entity = slasher,
+				volume = 2,
+				fadeIn = 0,
+			})
 
-				slasher.MainCooldown = 5
-				slasher:SetNWBool("CanChase", false)
-				slasher:SetNWBool("BrenKill", true)
+			timer.Simple(FrameTime(), function()
+				local ragdoll = target.DeadBody
 
-				timer.Simple(1.5, function()
-					if not IsValid(slasher) or not IsValid(target) then return end
-
-					target:Freeze(false)
-					if IsValid(slasher) then
-						target:TakeDamage(99999, slasher, slasher)
-					else
-						target:Kill()
-					end
-
-					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/bren/bren_kill.mp3",
-						identifier = "BrenKillSound",
-						minDistance = 800,
-						maxDistance = 900,
-						entity = slasher,
-						volume = 2,
-						fadeIn = 0,
-					})
-
-					timer.Simple(FrameTime(), function()
-						local ragdoll = target.DeadBody
-
-						timer.Simple(0.5, function()			
-							local Dissolver = ents.Create("env_entity_dissolver")
-							timer.Simple(1, function()
-								if IsValid(Dissolver) then
-									Dissolver:Remove()
-								end
-							end)
-
-							Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
-							Dissolver:SetKeyValue("dissolvetype", 0)
-							Dissolver:SetKeyValue("magnitude", 1)
-							Dissolver:SetPos(ragdoll:GetPos())
-							Dissolver:SetPhysicsAttacker(slasher)
-							Dissolver:Spawn()
-
-							ragdoll:SetName(Dissolver.Target)
-							Dissolver:Fire("Dissolve", Dissolver.Target, 0)
-							Dissolver:Fire("Kill", "", 0.5)
-						end)
+				timer.Simple(0.5, function()			
+					local Dissolver = ents.Create("env_entity_dissolver")
+					timer.Simple(1, function()
+						if IsValid(Dissolver) then
+							Dissolver:Remove()
+						end
 					end)
 
-					slasher:Freeze(false)
-					slasher:SetNWBool("BrenKill", false)
-					slasher:SetNWBool("CanChase", true)
-					SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
+					Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
+					Dissolver:SetKeyValue("dissolvetype", 0)
+					Dissolver:SetKeyValue("magnitude", 1)
+					Dissolver:SetPos(ragdoll:GetPos())
+					Dissolver:SetPhysicsAttacker(slasher)
+					Dissolver:Spawn()
+
+					ragdoll:SetName(Dissolver.Target)
+					Dissolver:Fire("Dissolve", Dissolver.Target, 0)
+					Dissolver:Fire("Kill", "", 0.5)
 				end)
 			end)
-		end
-	end
+
+			slasher:Freeze(false)
+			slasher:SetNWBool("BrenKill", false)
+			slasher:SetNWBool("CanChase", true)
+			SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
+		end)
+	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
@@ -210,11 +209,10 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 	if not slasher:GetNWBool("BrenNoclip") then
 		if !slasher:OnGround() and slasher:WaterLevel() == 0 and !slasher:IsStuck() then return end
+		if slasher.NoclipCooldown > 0.01 then return end
 
-		if slasher.NoclipCooldown < 0.01 then
-			slasher:SetNWBool("BrenNoclip", true)
-			slasher:SetNWBool("CanChase", false)
-		end
+		slasher:SetNWBool("BrenNoclip", true)
+		slasher:SetNWBool("CanChase", false)
 	else
 		local trace = util.TraceHull({
 			start = slasher:GetPos(),
@@ -236,38 +234,37 @@ end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if slasher:GetNWBool("BrenKill") then return end
+	if slasher.SnapCooldown > 0.01 then return end
 
-	if slasher.SnapCooldown < 0.01 then
-		slasher.SnapCooldown = 60
-		slasher:SetNWBool("BrenSnapAnim", true)
-		slasher:Freeze(true)
+	slasher.SnapCooldown = 60
+	slasher:SetNWBool("BrenSnapAnim", true)
+	slasher:Freeze(true)
 
-		timer.Simple(1.0, function()
-			if not IsValid(slasher) then return end
+	timer.Simple(1.0, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("BrenSnapAnim", false)
+		slasher:Freeze(false)
+		slasher:EmitSound("slashco/slasher/bren/bren_snap.mp3")
+
+		for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			surv:SetNWBool("BrenSnap", true)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/bren/bren_near.mp3",
+				identifier = "BrenFog",
+				entity = surv,
+				volume = 1,
+				fadeIn = 0,
+			})
+		end
 			
-			slasher:SetNWBool("BrenSnapAnim", false)
-			slasher:Freeze(false)
-			slasher:EmitSound("slashco/slasher/bren/bren_snap.mp3")
-
+		timer.Simple(SLASHER.FogIncreaseLength, function()
 			for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-				surv:SetNWBool("BrenSnap", true)
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/bren/bren_near.mp3",
-					identifier = "BrenFog",
-					entity = surv,
-					volume = 1,
-					fadeIn = 0,
-				})
+				surv:SetNWBool("BrenSnap", false)
+				SlashCo.AudioSystem.StopSound("BrenFog", 0.5, surv)
 			end
-			
-			timer.Simple(SLASHER.FogIncreaseLength, function()
-				for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-					surv:SetNWBool("BrenSnap", false)
-					SlashCo.AudioSystem.StopSound("BrenFog", 0.5, surv)
-				end
-			end)
 		end)
-	end
+	end)
 end
 
 function SLASHER.Animator(ply)
