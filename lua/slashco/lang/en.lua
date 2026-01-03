@@ -571,6 +571,16 @@ SlashCo.LangTable["Watcher_watched"] = "YOU ARE BEING WATCHED"
 SlashCo.LangTable["Watcher_observe"] = "OBSERVING A SURVIVOR. . ."
 SlashCo.LangTable["Watcher_stalktime"] = "STALK TIME: "
 
+--BREN
+SlashCo.LangTable["Bren"] = "BREN"
+SlashCo.LangTable["Bren_desc"] = [[A terrifying Umbra which can phase through solid objects. Extremely aggressive.
+
+-Bren can phase through doors and walls when he's angry.
+-He can increase the fog with a simple snap.
+-This slasher has a very bad eyesight.]]
+SlashCo.LangTable["Bren_tip"] = "-Watch yourself."
+SlashCo.LangTable["snap"] = "snap"
+
 --THE BRICKLAYER
 SlashCo.LangTable["Kamenchik"] = "THE BRICKLAYER"
 SlashCo.LangTable["Kamenchik_desc"] = [[The Overwhelming Slasher who works for 3 days with no salary.

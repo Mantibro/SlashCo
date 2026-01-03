@@ -574,6 +574,16 @@ SlashCo.LangTable["Watcher_watched"] = "ALGUIEN TE VE"
 SlashCo.LangTable["Watcher_observe"] = "OBSERVANDO UN SOBREVIVIENTE..."
 SlashCo.LangTable["Watcher_stalktime"] = "TIEMPO OBSERVANDO: "
 
+--BREN
+SlashCo.LangTable["Bren"] = "BREN"
+SlashCo.LangTable["Bren_desc"] = [[Un terrorifico Umbra que puede atravesar superficies. Extremadamente agresivo.
+
+-Bren puede atravesar paredes cuando esta enojado.
+-Puede incrementar la niebla con un simple chasquido.
+-Este slasher tiene una vision muy mala.]]
+SlashCo.LangTable["Bren_tip"] = "-Cuida tu espalda."
+SlashCo.LangTable["snap"] = "chasquido"
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Los espectadores ahora pueden marcar."
 SlashCo.LangTable["unhide"] = "levantarse" -- for dolphinman to unhide
