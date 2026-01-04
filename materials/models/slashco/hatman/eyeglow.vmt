@@ -1,6 +1,6 @@
 "VertexLitGeneric"
 {
-	"$basetexture" "models/slashco/shadowman/eyeglow"
+	"$basetexture" "models/slashco/hatman/eyeglow"
 
 	"$selfillum" "1"
 	"$selfillummask" "models/slashco/shadowman/eyeglow"
