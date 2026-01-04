@@ -132,10 +132,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	slasher:Freeze(true)
 	timer.Simple(0.1, function()
 		if not IsValid(slasher) or not IsValid(target) then return end
 
+		slasher:Freeze(true)
 		target:Freeze(true)
 		target:EmitSound("ambient/voices/citizen_beaten4.wav")
 
@@ -202,6 +202,7 @@ end
 
 function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("BrenKill") then return end
+	if not slasher:GetNWBool("CanNoclip") then return end
 
 	if not slasher:GetNWBool("BrenNoclip") then
 		if !slasher:OnGround() and slasher:WaterLevel() == 0 and !slasher:IsStuck() then return end
