@@ -36,6 +36,7 @@ function PLAYER:NetworkDocuments()
 			net.WriteString(name)
 			net.WriteUInt(documentTbl.rating, 2)
 		end
+		net.WriteString("")
 	net.Send(self)
 end
 
@@ -48,6 +49,7 @@ function PLAYER:NetworkDocument(name)
 		if documentTbl then
 			net.WriteUInt(documentTbl.rating, 2)
 		end
+		net.WriteString("")
 	net.Send(self)
 end
 
@@ -119,7 +121,7 @@ end)
 
 function SlashCo.CreateDocumentsDB()
 	if sql.TableExists("slashco_documents") then return end --Create the database table for basic statistics
-	for _, ply in ipairs( player.GetAll() ) do
+	for _, ply in player.Iterator() do
 		ply:ChatPrint("[SlashCo] The Documents Database does not exist. Creating it now.")
 	end
 
@@ -133,7 +135,7 @@ hook.Add("SlashCo:EndRound", "SlashCo:HandoutDocuments", function(winners)
 		slashers[ply:GetNWString("Slasher")] = true
 	end
 
-	for _, ply in ipairs(player.GetAll()) do
+	for _, ply in player.Iterator() do
 		if not ply.WasSurvivor then continue end
 
 		local rating = 3
