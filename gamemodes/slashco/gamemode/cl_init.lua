@@ -122,7 +122,9 @@ local skyBoxVec = Vector(0, 0, 100000)
 function GM:SetupWorldFog() -- A basic world fog that dynamicly changes depending on the environment
 	-- if not dynamicfog:GetBool() then return end
 	if GameData.IsLobby then return end
-	if GameData.LocalPlayer:Team() == TEAM_SPECTATOR then return end
+
+	local localPlyTeam = GameData.LocalPlayer:Team()
+	if localPlyTeam == TEAM_SPECTATOR then return end
 
 	local r, g, b = SlashCo.GetGlobalFogColor(2)
 	render.FogMode(MATERIAL_FOG_LINEAR)
@@ -166,7 +168,14 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 		targetFogEnd = targetFogStart * 1.5
 	end
 
-	local mult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult() + (GameData.ClientSideFogMult or 0)) / 2
+	local teamMult = 1
+	if localPlyTeam == TEAM_SURVIVOR then
+		teamMult = SlashCo.GetSurvivorFogMult()
+	elseif localPlyTeam == TEAM_SLASHER then
+		teamMult = SlashCo.GetSlasherFogMult()
+	end
+
+	local mult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult() + teamMult + (GameData.ClientSideFogMult or 1)) / 4
 	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * mult)
 	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * mult)
 

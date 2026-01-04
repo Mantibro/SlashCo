@@ -162,6 +162,10 @@ local function DeltaMerge(deltaTable, baseTable) -- This one works differently t
 end
 deltaMerge = DeltaMerge
 
+--[[
+	Serverside only fields:
+		number sendToTeam - Sends the given sound only to the specific team
+]]
 util.AddNetworkString("slashCo_AudioSystem_PlaySound")
 function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for documentation of the table.
 	if not istable(soundData) then
@@ -180,6 +184,14 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 
 	if not soundData.looping then
 		soundData.deleteWhenDone = true -- For serverside sounds, we force this if their not looping sounds.
+	end
+
+	if soundData.sendToTeam then
+		if not team.Valid(soundData.sendToTeam) then
+			error("PlaySound: Tried to use an invalid Team in soundData.sendToTeam")
+		end
+
+		soundData.sendToEntity = team.GetPlayers(sendToEntity)
 	end
 
 	local identifier = soundData.identifier or soundData.soundPath
@@ -270,6 +282,10 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entity, sendToEntity
 	if not sendToEntity then
 		net.Broadcast()
 	else
+		if isnumber(sendToEntity) and team.Valid(sendToEntity) then
+			sendToEntity = team.GetPlayers(sendToEntity)
+		end
+
 		net.Send(sendToEntity)
 	end
 end

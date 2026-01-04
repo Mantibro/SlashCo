@@ -105,6 +105,22 @@ function SlashCo.GetGlobalFogMult()
 	return GetGlobal2Float("SlashCo:FogMult", 1)
 end
 
+function SlashCo.SetSurvivorFogMult(mult)
+	SetGlobal2Float("SlashCo:SurvivorFogMult", mult)
+end
+
+function SlashCo.GetSurvivorFogMult()
+	return GetGlobal2Float("SlashCo:SurvivorFogMult", 1)
+end
+
+function SlashCo.SetSlasherFogMult(mult)
+	SetGlobal2Float("SlashCo:SlasherFogMult", mult)
+end
+
+function SlashCo.GetSlasherFogMult()
+	return GetGlobal2Float("SlashCo:SlasherFogMult", 1)
+end
+
 -- Global Settings
 function SlashCo.SetGeneratorsNeeded(amount)
 	SetGlobal2Int("SlashCo:GeneratorsNeeded", amount)

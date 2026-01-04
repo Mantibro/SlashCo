@@ -243,22 +243,22 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		slasher:Freeze(false)
 		slasher:EmitSound("slashco/slasher/bren/bren_snap.mp3")
 
-		for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			surv:SetNWBool("BrenSnap", true)
+		SlashCo.SetSurvivorFogMult(0.3)
+
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/bren/bren_near.mp3",
 				identifier = "BrenFog",
-				entity = surv,
+				entity = survivor,
 				volume = 1,
 				fadeIn = 0,
+				fadeOutStart = SLASHER.FogIncreaseLength,
+				fadeOut = 0.5,
 			})
 		end
-			
+
 		timer.Simple(SLASHER.FogIncreaseLength, function()
-			for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-				surv:SetNWBool("BrenSnap", false)
-				SlashCo.AudioSystem.StopSound("BrenFog", 0.5, surv)
-			end
+			SlashCo.SetSurvivorFogMult(1)
 		end)
 	end)
 end
@@ -369,15 +369,5 @@ function SLASHER.InitHud(_, hud)
 		end
 	end
 end
-
-hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-	if GameData.LocalPlayer:GetNWBool("BrenSnap") == true then
-		GameData.ClientSideFogMult = -0.7
-	else
-		if GameData.ClientSideFogMult != -0.7 then return end
-
-		GameData.ClientSideFogMult = nil
-	end
-end)
 
 SlashCo.RegisterSlasher(SLASHER, "Bren")
