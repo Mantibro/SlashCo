@@ -506,11 +506,17 @@ end
 SCInfo = {}
 
 SCInfo.Offering = {} // use ipairs to iterate, if you use pairs you will get errors as the enums -> Exposure and such will be included.
+SCInfo.OrderedOffering = {}
 function SlashCo.AddOffering(offeringTbl)
 	-- Rarity can only range from 1 to 3. Their used only for the sound that is played when their enabled.
 	offeringTbl.Rarity = math.Clamp(offeringTbl.Rarity, 1, 3)
+	offeringTbl.ID = table.insert(SCInfo.Offering, offeringTbl)
 
-	SCInfo.Offering[offeringTbl.Name] = table.insert(SCInfo.Offering, offeringTbl)
+	-- Double linked, though makes SortedPairs fail on the table.
+	SCInfo.Offering[offeringTbl.Name] = offeringTbl.ID
+	
+	-- for UIs to use with SortedPairs
+	SCInfo.OrderedOffering[offeringTbl.Name] = offeringTbl
 end
 
 SlashCo.AddOffering({
@@ -534,7 +540,8 @@ SlashCo.AddOffering({
 SlashCo.AddOffering({
 	Name = "Duality",
 	Rarity = 3,
-	GasCanMod = 0
+	GasCanMod = 0,
+	MinimumPlayers = 3,
 })
 
 SlashCo.AddOffering({

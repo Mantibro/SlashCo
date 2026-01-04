@@ -121,10 +121,10 @@ function SlashCo.OfferingVoteFinished(rarity) -- rarity can range from 1 to 3.
 	net.Broadcast()
 end
 
-hook.Add("scValue_sendOffer", "slashCo_StartOfferingVote", function(ply, offer)
+hook.Add("scValue_sendOffer", "slashCo_StartOfferingVote", function(ply, offerID)
 	table.insert(SlashCo.LobbyData.Offerors, ply:SteamID64())
-	SlashCo.BroadcastOfferingVote(ply, offer)
-	SlashCo.LobbyData.VotedOffering = offer
+	SlashCo.BroadcastOfferingVote(ply, offerID)
+	SlashCo.LobbyData.VotedOffering = offerID
 
 	timer.Create("OfferingVoteTimer", 20, 1, function()
 		SlashCo.OfferingVoteFail()
@@ -137,10 +137,10 @@ function SlashCo.OfferingVote(ply, agreement)
 	table.insert(SlashCo.LobbyData.Offerors, { steamid = ply:SteamID64() })
 end
 
-function SlashCo.BroadcastOfferingVote(offeror, o_id)
+function SlashCo.BroadcastOfferingVote(offeror, offerID)
 	net.Start("SlashCo:OfferingVoteOut")
 		net.WriteEntity(offeror)
-		net.WriteString(SCInfo.Offering[o_id].Name)
+		net.WriteString(SCInfo.Offering[offerID].Name)
 	net.Broadcast()
 end
 

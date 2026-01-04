@@ -48,23 +48,23 @@ if SERVER then
 	end
 
 	function ENT:Use(activator)
-		if activator:Team() == TEAM_LOBBY then
-			if #SlashCo.LobbyData.Offerors > 0 or SlashCo.LobbyData.Offering ~= 0 then
-				activator:ChatText("offer_made_already")
-				return
-			end
+		if activator:Team() ~= TEAM_LOBBY then return end
+		
+		if #SlashCo.LobbyData.Offerors > 0 or SlashCo.LobbyData.Offering ~= 0 then
+			activator:ChatText("offer_made_already")
+			// return
+		end
 
-			if SlashCo.LobbyData.ReadyTimerStarted then
-				activator:ChatText("offer_too_late")
-				return
-			end
+		if SlashCo.LobbyData.ReadyTimerStarted then
+			activator:ChatText("offer_too_late")
+			return
+		end
 
-			if getReadyState(activator) < 1 then
-				SlashCo.BroadcastGlobalData()
-				SlashCo.SendValue(activator, "openOfferingPicker")
-			else
-				activator:ChatText("offer_not_ready")
-			end
+		if getReadyState(activator) < 1 then
+			SlashCo.BroadcastGlobalData()
+			SlashCo.SendValue(activator, "openOfferingPicker")
+		else
+			activator:ChatText("offer_not_ready")
 		end
 	end
 else

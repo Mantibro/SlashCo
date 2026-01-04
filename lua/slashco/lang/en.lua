@@ -59,6 +59,7 @@ SlashCo.LangTable["Devastating"] = "Devastating"
 
 SlashCo.LangTable["Offering"] = "Offering"
 SlashCo.LangTable["Offering_name"] = "%s Offering"
+SlashCo.LangTable["Offering_required_minimum_players"] = "Requires a minimum of %s players"
 
 SlashCo.LangTable["offervote_1"] = "%s wants to make an Offering. Do you accept the %s?"
 SlashCo.LangTable["offervote_success"] = "%s will be active for the following round."
