@@ -9,7 +9,9 @@ SlashCo.AudioSystem.ServerGroupVolumes = SlashCo.AudioSystem.ServerGroupVolumes 
 SlashCo.AudioSystem.ClientGroupVolumes = SlashCo.AudioSystem.ClientGroupVolumes or {} -- Group volume mulipliers added on top of channel volumes controlled by the client
 SlashCo.AudioSystem.ModifiedChannelGroups = SlashCo.AudioSystem.ModifiedChannelGroups or {}
 
+-- These intentionally are nuked on autorefresh
 local ErrorList = {} -- A table containing all the files we failed to open, if the file is in this list and we fail loading again, then we won't throw another error.
+local Fake3DList = {}
 
 -- So that we don't depend on the GameData table as this system is meant to also work as a standalone library.
 SlashCo.AudioSystem.IsSinglePlayer = SlashCo.AudioSystem.IsSinglePlayer or game.SinglePlayer()
@@ -77,7 +79,8 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 	soundFunc(soundFile, mode, function(channel, errCode, errStr)
 		if not IsValid(channel) then
 			if errorCallback then
-				errorCallback(errCode, errStr)
+				-- an error callback can return true to cancel us throwing an error
+				if errorCallback(errCode, errStr) then return end
 			end
 
 			if not ErrorList[soundFile] then
@@ -1026,6 +1029,12 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	local useMode = "" -- By default we use sterio since it sounds far better than mono.
 	if entIndex > 0 or soundData.position then
 		useMode = "3d"
+
+		-- The sound is played in 3D when it isn't mono, so we fake 3D
+		if Fake3DList[soundPath] then
+			useMode = ""
+			soundData.dynamicPan = true
+		end
 	end
 
 	if soundData.forceMono then
@@ -1151,6 +1160,14 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 	end, function(errCode, errStr)
 		SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil -- Error happened, just clear it out from creation.
+
+		if errStr == "BASS_ERROR_NO3D" and not Fake3DList[soundPath] then
+			print("[SlashCo] Sound \"" .. soundPath .. "\" was attempted to be played as 3D when it's not. Falling back to fake 3D!")
+			Fake3DList[soundPath] = true
+			SlashCo.AudioSystem.PlaySound(soundData)
+
+			return true
+		end
 	end)
 end
 

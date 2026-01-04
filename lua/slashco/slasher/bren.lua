@@ -122,11 +122,9 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetNWBool("BrenNoclip") then return end
-	
 	if slasher.MainCooldown > 0.01 then return end
-	
-	if not IsValid(target) and not target:IsPlayer() then return end
-	
+
+	if not IsValid(target) or not target:IsPlayer() then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	
 	local dist = SLASHER.KillDistance
@@ -147,13 +145,13 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 		timer.Simple(1.5, function()
 			if not IsValid(slasher) then return end
-			if not IsValid(target) then
-				slasher:Freeze(false)
-				slasher:SetNWBool("BrenKill", false)
-				slasher:SetNWBool("CanChase", true)
-				SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
-				return
-			end
+
+			slasher:Freeze(false)
+			slasher:SetNWBool("BrenKill", false)
+			slasher:SetNWBool("CanChase", true)
+			SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
+
+			if not IsValid(target) then return end
 
 			target:Freeze(false)
 			target:TakeDamage(99999, slasher, slasher)
@@ -169,15 +167,16 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			})
 
 			timer.Simple(FrameTime(), function()
-				local ragdoll = target.DeadBody
+				if not IsValid(target) then return end
 
-				timer.Simple(0.5, function()			
+				local ragdoll = target.DeadBody
+				if not IsValid(ragdoll) then return end
+
+				timer.Simple(0.5, function()
+					if not IsValid(slasher) then return end
+
 					local Dissolver = ents.Create("env_entity_dissolver")
-					timer.Simple(1, function()
-						if IsValid(Dissolver) then
-							Dissolver:Remove()
-						end
-					end)
+					if not IsValid(Dissolver) then return end
 
 					Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
 					Dissolver:SetKeyValue("dissolvetype", 0)
@@ -189,13 +188,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					ragdoll:SetName(Dissolver.Target)
 					Dissolver:Fire("Dissolve", Dissolver.Target, 0)
 					Dissolver:Fire("Kill", "", 0.5)
+
+					SafeRemoveEntityDelayed(Dissolver, 1)
 				end)
 			end)
-
-			slasher:Freeze(false)
-			slasher:SetNWBool("BrenKill", false)
-			slasher:SetNWBool("CanChase", true)
-			SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 		end)
 	end)
 end

@@ -2,7 +2,7 @@ function EFFECT:Init(data)
 	local vOffset = data:GetOrigin()
 	--local Dir = data:GetStart()
 
-	local Dir = Entity(1):EyeAngles():Forward()
+	local Dir = data:GetEntity():EyeAngles():Forward()
 
 	local NumParticles = 32
 
