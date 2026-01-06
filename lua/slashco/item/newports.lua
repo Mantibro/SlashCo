@@ -20,13 +20,11 @@ function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fo
 		volume = 0.8,
 		fadeIn = 0,
 	})
-
-	GameData.ClientSideFogMult = 5
+	
+	SlashCo.AddClientsideFog("Newports", 5, 1)
 
 	timer.Simple(math.random(140, 200), function()
-		if GameData.ClientSideFogMult != 5 then return end -- Something overwrote us? ok... us sad now :cry:
-
-		GameData.ClientSideFogMult = nil
+		SlashCo.RemoveClientsideFog("Newports")
 	end)
 end
 ITEM.ViewModel = {

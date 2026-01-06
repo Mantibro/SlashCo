@@ -117,6 +117,33 @@ hook.Add("HUDShouldDraw", "DisableDefaultHUD", function(name)
 	return not disable[name]
 end)
 
+GameData.ClientSideFogMult = GameData.ClientSideFogMult or {}
+function SlashCo.AddClientsideFog(name, multiplier, priority)
+	GameData.ClientSideFogMult[name] = table.insert(GameData.ClientSideFogMult, {
+		multiplier = multiplier,
+		priority = priority,
+	})
+end
+
+function SlashCo.RemoveClientsideFog(name)
+	if not GameData.ClientSideFogMult[name] then return end
+
+	table.remove(GameData.ClientSideFogMult, GameData.ClientSideFogMult[name])
+end
+
+local function GetHighestPriorityClientFog()
+	local highest = -999999
+	local highestFogInfo = nil
+	for _, fogInfo in ipairs(GameData.ClientSideFogMult) do
+		if fogInfo.priority < highest then continue end
+
+		highest = fogInfo.priority
+		highestFogInfo = fogInfo
+	end
+
+	return highestFogInfo and highestFogInfo.multiplier or 1
+end
+
 local skyBoxVec = Vector(0, 0, 100000)
 -- local dynamicfog = CreateConVar("slashco_dynamicfog", "1", FCVAR_ARCHIVE, "Experimental - Dynamic fog that changes based on your location", 0, 1)
 function GM:SetupWorldFog() -- A basic world fog that dynamicly changes depending on the environment
@@ -175,9 +202,10 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 		teamMult = SlashCo.GetSlasherFogMult()
 	end
 
-	local mult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult() + teamMult + (GameData.ClientSideFogMult or 1)) / 4
-	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * mult)
-	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * mult)
+	local clientMult = GetHighestPriorityClientFog()
+	local fogMult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult() + teamMult + clientMult) / 4
+	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * fogMult)
+	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * fogMult)
 
 	render.FogStart(GameData.LastFogStart)
 	render.FogEnd(GameData.LastFogEnd)
