@@ -338,21 +338,15 @@ function SLASHER.InitHud(_, hud)
 	hud:AddControl("R", "noclip", Material("slashco/ui/icons/slasher/s_bren_noclip"))
 	hud:AddControl("F", "snap", Material("slashco/ui/icons/slasher/s_bren_snap"))
 	
+	hud:TieControl("R", "CanNoclip")
+	hud:TieControlVisible("R", "CanNoclip")
+	
 	hud:AddMeter("anger", 100, "", nil, true)
 	hud:TieMeterInt("anger", "BrenAnger")
 	
 	function hud.AlsoThink()
-		local canNoclip = GameData.LocalPlayer:GetNWBool("CanNoclip")
 		local BrenNoclipCooldown = GameData.LocalPlayer:GetNWInt("NoclipCooldown")
 		local BrenSnapCooldown = GameData.LocalPlayer:GetNWInt("SnapCooldown")
-		
-		if not canNoclip then
-			hud:SetControlEnabled("R", false)
-			hud:SetControlVisible("R", false)
-		else
-			hud:SetControlEnabled("R", true)
-			hud:SetControlVisible("R", true)
-		end
 		
 		if BrenNoclipCooldown > 0 then
 			hud:SetControlEnabled("R", false)
