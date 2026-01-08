@@ -343,7 +343,6 @@ function SLASHER.InitHud(_, hud)
 	
 	function hud.AlsoThink()
 		local canNoclip = GameData.LocalPlayer:GetNWBool("CanNoclip")
-		local BrenNoclip = GameData.LocalPlayer:GetNWBool("BrenNoclip")
 		local BrenNoclipCooldown = GameData.LocalPlayer:GetNWInt("NoclipCooldown")
 		local BrenSnapCooldown = GameData.LocalPlayer:GetNWInt("SnapCooldown")
 		
