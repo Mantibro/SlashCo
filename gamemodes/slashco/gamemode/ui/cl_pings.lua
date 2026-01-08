@@ -73,6 +73,7 @@ end)
 
 --ping display
 hook.Add("SlashCo:DrawHUD", "PingDisplay", function()
+	if not IsValid(GameData.LocalPlayer) then return end -- RaphaelIT7: iirc on 64x DrawHUD can be called BEFORE LocalPlayer is valid.
 	if GameData.LocalPlayer:Team() == TEAM_SLASHER then
 		global_pings = {}
 		return

@@ -41,6 +41,11 @@ function ENT:KeyValue(key, value)
 	if key == "islobby" and tobool(value) then
 		GameData.IsLobby = true -- NOTE: This value is networked for clients inside GM:InitPostEntity() -> sh_shared.lua
 	end
+
+	if key == "normal_lights_name" then
+		GameData.NonAlarmLightsName = value
+		return
+	end
 end
 
 function ENT:AcceptInput(name, activator, _, value)
@@ -77,6 +82,16 @@ function ENT:AcceptInput(name, activator, _, value)
 
 	if name == "set_gascans_spawned" then
 		SlashCo.SetGasCansToSpawn(valNum)
+		return true
+	end
+
+	if name == "EnableAlarmLights" then
+		SlashCo.EnableAlarmLights()
+		return true
+	end
+
+	if name == "DisableAlarmLights" then
+		SlashCo.DisableAlarmLights()
 		return true
 	end
 end

@@ -868,6 +868,10 @@ hook.Add("CalcView", "SlashCo:ThirdPerson", function(ply, pos, angles, fov, znea
 	return view
 end)
 
+net.Receive("SlashCo:UpdateLightMap", function()
+	render.RedownloadAllLightmaps(GameData.IsLobby, GameData.IsLobby)
+end)
+
 SC_CLIENT_LOADED = true
 
 ---load patch files; these are specifically intended to modify existing addon code

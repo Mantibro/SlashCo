@@ -534,7 +534,7 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime, callback)
 		local vol = channel:GetVolume()
 		if vol > 0 then
 			local id = SlashCo.AudioSystem.GetChannelID(channel)
-			timer.Remove("SlashCo:FadeToAudioChannel" .. id) -- Remove any fadeIn timer that might exist
+			timer.Remove("SlashCo:FadeToVolumeAudioChannel" .. id) -- Remove any fadeIn timer that might exist
 			local timerName = "SlashCo:ShutdownAudioChannel" .. id
 			local updateFreq = SlashCo.AudioSystem.UpdateFrequency
 			local volumeDecrement = vol / math.ceil(fadeOutTime / updateFreq)
@@ -593,7 +593,7 @@ end
 
 	NOTE: When called multiple times, the callback will only be called when the fade actually finishes, when its overwritten it won't be called.
 ]]
-local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel)
+local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, isVolume)
 	local reachedTarget = false
 	if lowerVol then
 		reachedTarget = targetVol >= vol
@@ -602,7 +602,11 @@ local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, cha
 	end
 
 	if !IsValid(channel) or reachedTarget then
-		channelData.volume = nil
+		if isVolume then
+			channelData.volume = nil
+		else
+			channelData.playbackRate = nil
+		end
 		timer.Remove(timerName)
 		if callback then
 			callback(channel, channelData)
@@ -616,29 +620,55 @@ local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, cha
 		vol = vol + volumeIncrement
 	end
 
-	local channelVolume = CalculateChannelVolume(channel, vol)
-	channelData.volume = channelVolume
-	channel:SetVolume(SlashCo.AudioSystem.EnsureValidVolume(channelVolume))
+	if isVolume then
+		local channelVolume = CalculateChannelVolume(channel, vol)
+		channelData.volume = SlashCo.AudioSystem.EnsureValidVolume(channelVolume)
+		channel:SetVolume(channelData.volume)
+	else
+		channelData.playbackRate = SlashCo.AudioSystem.EnsureValidVolume(vol)
+		channel:SetPlaybackRate(channelData.playbackRate)
+	end
+
 	return vol
 end
 
-function SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVol, callback)
+function SlashCo.AudioSystem.FadeToVolume(channel, fadeTime, targetVol, callback)
 	targetVol = targetVol or 1
 	fadeTime = fadeTime or 1
 
 	local vol = SlashCo.AudioSystem.EnsureValidVolume(channel:GetVolume())
 	local lowerVol = targetVol < vol
 	local id = SlashCo.AudioSystem.GetChannelID(channel)
-	local timerName = "SlashCo:FadeToAudioChannel" .. id
+	local timerName = "SlashCo:FadeToVolumeAudioChannel" .. id
 	local updateFreq = SlashCo.AudioSystem.UpdateFrequency
 	local volumeIncrement = math.abs(targetVol - vol) / math.ceil(fadeTime / updateFreq)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
 	timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
-		vol = UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel)
+		vol = UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, true)
 	end)
 
 	-- Do one update outside the timer, since if you call this function every frame for some reason, the timer may never execute.
-	vol = UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel)
+	vol = UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, true)
+end
+
+-- Sounds shit if you keep the channel synced like how the background channel does.
+function SlashCo.AudioSystem.FadeToPlaybackRate(channel, fadeTime, targetPlaybackRate, callback)
+	targetPlaybackRate = targetPlaybackRate or 1
+	fadeTime = fadeTime or 3
+
+	local vol = SlashCo.AudioSystem.EnsureValidVolume(channel:GetPlaybackRate())
+	local lowerVol = targetPlaybackRate < vol
+	local id = SlashCo.AudioSystem.GetChannelID(channel)
+	local timerName = "SlashCo:FadeToPlaybackRateAudioChannel" .. id
+	local updateFreq = SlashCo.AudioSystem.UpdateFrequency
+	local volumeIncrement = math.abs(targetPlaybackRate - vol) / math.ceil(fadeTime / updateFreq)
+	local channelData = SlashCo.AudioSystem.Channels[channel]
+	timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
+		vol = UpdateFadeToVolume(targetPlaybackRate, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, false)
+	end)
+
+	-- Do one update outside the timer, since if you call this function every frame for some reason, the timer may never execute.
+	vol = UpdateFadeToVolume(targetPlaybackRate, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, false)
 end
 
 function SlashCo.AudioSystem.StopBackgroundMusic()
@@ -648,7 +678,7 @@ end
 
 -- Returns the calculated time a channel is supposed to be at, it accounts for looping sounds
 function SlashCo.AudioSystem.CalculateTime(channel, tickCount, looping)
-	local calculateTime = (engine.TickCount() - tickCount) * engine.TickInterval()
+	local calculateTime = ((engine.TickCount() - tickCount) * engine.TickInterval()) * channel:GetPlaybackRate()
 	local fileLength = channel:GetLength()
 	if not looping then -- If we don't want looping, then we simply return the normal time without any more calculations.
 		return math.min(calculateTime, fileLength)
@@ -690,7 +720,8 @@ function SlashCo.AudioSystem.PlayBackgroundMusic(fileName)
 		channel:Play()
 		channel:EnableLooping(true)
 		channel:SetTime(SlashCo.AudioSystem.GetBackgroundMusicTime())
-		SlashCo.AudioSystem.FadeTo(channel, 3, SlashCo.AudioSystem.GetBackgroundMusicVolume())
+		channel:SetPlaybackRate(SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate())
+		SlashCo.AudioSystem.FadeToVolume(channel, 3, SlashCo.AudioSystem.GetBackgroundMusicVolume())
 	end)
 end
 
@@ -713,7 +744,14 @@ end
 -- Did you know? This was one too >:3
 local function OnBackgroundMusicVolumeChange(ent, name, old, new)
 	if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
-		SlashCo.AudioSystem.FadeTo(SlashCo.AudioSystem.BackgroundChannel, 3, new)
+		SlashCo.AudioSystem.FadeToVolume(SlashCo.AudioSystem.BackgroundChannel, 3, new)
+	end
+end
+
+-- Guess what? Another one >:3c
+local function OnBackgroundMusicPlaybackRateChange(ent, name, old, new)
+	if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
+		SlashCo.AudioSystem.BackgroundChannel:SetPlaybackRate(new)
 	end
 end
 
@@ -736,6 +774,9 @@ function SlashCo.AudioSystem.Init()
 
 	world:SetNW2VarProxy("SlashCo:BackgroundMusicVolume", OnBackgroundMusicVolumeChange)
 	OnBackgroundMusicVolumeChange(world, "SlashCo:BackgroundMusicVolume", nil, SlashCo.AudioSystem.GetBackgroundMusicVolume())
+
+	world:SetNW2VarProxy("SlashCo:BackgroundMusicPlaybackRate", OnBackgroundMusicPlaybackRateChange)
+	OnBackgroundMusicPlaybackRateChange(world, "SlashCo:BackgroundMusicPlaybackRate", nil, SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate())
 end
 
 hook.Add("InitPostEntity", "SlashCo:AudioSystem", SlashCo.AudioSystem.Init)
@@ -1074,7 +1115,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		if soundData.fadeIn and soundData.fadeIn ~= 0 then
-			SlashCo.AudioSystem.FadeTo(channel, soundData.fadeIn, soundData.volume)
+			SlashCo.AudioSystem.FadeToVolume(channel, soundData.fadeIn, soundData.volume)
 		end
 
 		if entIndex ~= 0 then
@@ -1395,7 +1436,7 @@ net.Receive("slashCo_AudioSystem_FadeSound", function() -- ToDo: Fix this functi
 	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier)
 	if not channel then return end
 
-	SlashCo.AudioSystem.FadeTo(channel, fadeTime, targetVolume)
+	SlashCo.AudioSystem.FadeToVolume(channel, fadeTime, targetVolume)
 end)
 
 net.Receive("slashCo_AudioSystem_EntityRemoved", function()

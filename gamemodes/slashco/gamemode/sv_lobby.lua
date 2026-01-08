@@ -505,16 +505,25 @@ local function pickItem(ply, item)
 
 	if not SlashCo.LobbyData.VendorCooldown then
 		SlashCo.LobbyData.VendorCooldown = CurTime()
-		LobbyVendorVoice(ply, item)
+		SlashCo.LobbyVendorVoice(ply, item)
 	elseif (CurTime() - SlashCo.LobbyData.VendorCooldown) > 5 then
 		SlashCo.LobbyData.VendorCooldown = CurTime()
-		LobbyVendorVoice(ply, item)
+		SlashCo.LobbyVendorVoice(ply, item)
 	end
 end
 
-function LobbyVendorVoice(ply, item)
+function SlashCo.LobbyVendorVoice(ply, item)
 	local vendor = IsValid(ply.LastUsedItemStash) and ply.LastUsedItemStash or nil
 	if not vendor then return end -- RaphaelIT7: Should never happen.
+
+	-- RaphaelIT7: Little secret.
+	if SlashCo.LobbyData.Offering == SCInfo.Offering.Nightmare then
+		if math.random(1, 5) == 1 then
+			-- He really hates you for what you've done.
+			vendor:EmitSound("slashco/itemvendor/itemvendor_generic4.mp3")
+		end
+		return
+	end
 
 	if item == "DeathWard" then
 		vendor:EmitSound("slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
@@ -691,24 +700,19 @@ function SlashCo.OfferingVoteFail()
 end
 
 function SlashCo.OfferingVoteSuccess(id)
-	local fail = false
-
-	--[[if id == 4 and team.NumPlayers(TEAM_SPECTATOR) < 1 then
-		for _, ply in player.Iterator() do
-			ply:ChatText("offervote_duality_fail")
-			SlashCo.EndOfferingVote(ply)
-			fail = true
-		end
-	end]]
-
-	if id == 2 then
-		--Satiation
-
+	if id == SCInfo.Offering.Satiation then
 		SlashCo.LobbyData.SelectedSlasherInfo.CLASS = SlashCo.SlasherClass.Deamon
 	end
 
-	SlashCo.LobbyData.VotedOffering = 0
+	if id == SlashCo.LobbyData.Offering then
+		return
+	end
 
+	if SCInfo.Offering[SlashCo.LobbyData.Offering] then
+		hook.Run("SlashCo:UnselectOffering", SlashCo.LobbyData.Offering)
+	end
+
+	SlashCo.LobbyData.VotedOffering = 0
 	SlashCo.LobbyData.Offering = id
 
 	timer.Remove("OfferingVoteTimer")
@@ -717,10 +721,26 @@ function SlashCo.OfferingVoteSuccess(id)
 		SlashCo.EndOfferingVote(play)
 	end
 
-	if not fail then
+	if SCInfo.Offering[id] then
 		SlashCo.OfferingVoteFinished(SCInfo.Offering[id].Rarity)
+			
+		hook.Run("SlashCo:SelectOffering", id)
 	end
 end
+
+hook.Add("SlashCo:SelectOffering", "SlashCo:NightmareEffect", function(id)
+	if id ~= SCInfo.Offering.Nightmare then return end
+
+	SlashCo.AudioSystem.SetBackgroundMusicPlaybackRate(0.3)
+	SlashCo.EnableAlarmLights()
+end)
+
+hook.Add("SlashCo:UnselectOffering", "SlashCo:NightmareEffect", function(id)
+	if id ~= SCInfo.Offering.Nightmare then return end
+
+	SlashCo.AudioSystem.SetBackgroundMusicPlaybackRate(1)
+	SlashCo.DisableAlarmLights()
+end)
 
 --//lobby concommands//--
 
@@ -831,3 +851,32 @@ hook.Add("SlashCo:SetupLobbyEntities", "SlashCo:Lobby", function()
 		SlashCo.CreateHelicopter(ent:GetPos(), ent:GetAngles())
 	end
 end)
+
+--[[
+	RaphaelIT7:
+
+	Blackout event (unfinished)
+
+	Idea:
+		You do some wacky stuff to trigger it
+		Trollge gets mad and pays a visit & gets mad
+		The bigger part of the lobby (when finished mapping) is unlocked.
+		You have to fill one gen as backup power & when we get documents, you can find a document in this area.
+		This should be something for players to find / do when bored / something for single-player.
+
+	NOTE:
+		I had this idea for a huge while / wanted to add something interresting to the lobby.
+]]
+
+function SlashCo.TriggerBlackout()
+	if not GameData.IsLobby then return end
+
+	local trollge = ents.FindByClass("sc_blackout_trollge")
+	for _, trollge in ipairs(trollge) do
+		trollge:Remove()
+	end
+
+	local trollge = ents.Create("sc_blackout_trollge")
+	trollge.Inside = true
+	trollge:Spawn()
+end

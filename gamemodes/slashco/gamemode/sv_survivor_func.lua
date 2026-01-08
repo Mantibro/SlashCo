@@ -218,6 +218,11 @@ function PLAYER:SlamDoor(door_ent)
 		return
 	end
 
+	-- RaphaelIT7: We prevent door slam on locked doors due to them else completely breaking somehow
+	if door_ent:GetInternalVariable("m_bLocked") then
+		return
+	end
+
 	door_ent:EmitSound("ambient/materials/door_hit1.wav", 80)
 
 	local pos = self:GetPos()

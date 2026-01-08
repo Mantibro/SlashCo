@@ -154,11 +154,16 @@
         0 : "No"
     ]
 
+    normal_lights_name(string) : "Normal Lights Name" : "" : "The names that normal lights use which if inserted here will be disabled when alarm lights are turned on, multiple names can be used by seperating them using ;"
+
     // Inputs
     input set_generators_needed(integer) : "Set the number of generators needed for the round to each the end state. This cannot be changed mid-round."
     input set_generators_spawned(integer) : "Set the number of generators spawned in the map. This cannot be changed mid-round."
     input set_gascans_needed(integer) : "Set the number of gas cans needed to fully fuel each generator. This cannot be changed mid-round."
     input set_gascans_spawned(integer) : "Set the default number of gas cans spawned in the map. This cannot be changed mid-round."
+
+    input EnableAlarmLights(void) : "Enables all alarm lights and updates the model of all sc_cagelight that are an alarm."
+    input DisableAlarmLights(void) : "Disables all alarm lights."
 
     // Outputs
     output OnPreRoundStarted(integer) : "Fired right before the round starts; this is intended for this entity's inputs. Receives the number of active players in the round."
@@ -170,3 +175,53 @@
 @PointClass base(Angles) studio("models/hunter/plates/plate2x2.mdl") = info_sc_lobby_briefingscreen : "SC: Position of the briefing table" []
 @PointClass base(Angles) studio("models/hunter/blocks/cube2x3x025.mdl") = sc_itemstash : "SC: Itemstash" []
 @PointClass base(Angles) studio("models/slashco/other/lobby/offertable.mdl") = sc_offertable : "SC: Offertable" []
+
+@PointClass base(Angles) studio("models/props_c17/light_cagelight02_on.mdl") = sc_cagelight : "SC: A cagelight that can be an Alarm in which case it's model is updated to fit when the alarm lights are enabled"
+[
+    // Keys
+    is_alarm_light(choices) : "Is Alarm light" : 0 : "Whether this cagelight is an alarm light or not" =
+    [
+        1 : "Yes"
+        0 : "No"
+    ]
+
+    alarm_mode(choices) : "Alarm Mode" : 0 : "How we should update our light" =
+    [
+        1 : "Always On"
+        0 : "Blinking"
+    ]
+
+    always_on(choices) : "Always On" : 0 : "Whether this cagelight is always on or not" =
+    [
+        1 : "Yes"
+        0 : "No"
+    ]
+
+    alarm_light_name(string) : "Alarm Light name" : "alarm_light" : "The name of the light this cagelight should be bound to/update with."
+]
+
+@PointClass base(Angles) studio("models/editor/spot.mdl") = sc_effect_sparks : "SC: A spark effect that can be played from Lua"
+[
+    spark_name(string) : "Spark Name" : "" : "The name for this spark effect. Multiple spark effects can have the same name to form a group"
+]
+
+@PointClass base(Angles) studio("models/editor/ground_node.mdl") = info_sc_blackout_trollge_path : "SC: A node used for the blackout even to guide trollge in the beginning"
+[
+    // Keys
+    path_type(choices) : "Path Type" : 1 : "How this path should be treated as" =
+    [
+	3 : "Finish"
+	2 : "Door"
+        1 : "Move"
+        0 : "Start"
+    ]
+
+    path_area(choices) : "Path Area" : 0 : "Whether this node belongs to the outside or inside path for Trollge" =
+    [
+        1 : "Outside"
+	0 : "Inside"
+    ]
+
+    path_name(string) : "Path Name" : "" : "The name of this path"
+    path_next(string) : "Path Next" : "" : "The name of the next path"
+]

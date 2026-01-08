@@ -133,7 +133,7 @@ hook.Add("Think", "SlashCo:BalkanBoost", function()
 
 					-- RaphaelIT7: I did not yet implement modifyGroupVolumeFadeTime so hacky workaround till then.
 					if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
-						SlashCo.AudioSystem.FadeTo(SlashCo.AudioSystem.BackgroundChannel, 3, 0)
+						SlashCo.AudioSystem.FadeToVolume(SlashCo.AudioSystem.BackgroundChannel, 3, 0)
 					end
 				end
 			})

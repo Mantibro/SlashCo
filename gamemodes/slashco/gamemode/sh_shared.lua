@@ -233,6 +233,13 @@ function SlashCo.GetGlobalFogColor(type, object)
 	end
 end
 
+--  Map tools, this is the only clientside function used by some places where we'd need to always show the current value instead of a cached one.
+SlashCo.MapTools = SlashCo.MapTools or {}
+local slashco_enablemaptools = GetConVar("slashco_enablemaptools")
+function SlashCo.MapTools.IsEnabled()
+	return slashco_enablemaptools and slashco_enablemaptools:GetBool()
+end
+
 --[[
 	DangerLevel's
 	Use the SlashCo.AddDangerLevel and NEVER manually add stuff to SlashCo.DangerLevel
@@ -400,6 +407,10 @@ if CLIENT then
 		end)
 
 		GameData.IsLobby = GetGlobal2Bool("SlashCo:IsLobby", GameData.IsLobby)
+		GameData.World:SetNW2VarProxy("SlashCo:IsLobby", function(_, _, _, newVal)
+			GameData.IsLobby = newVal
+		end)
+		
 		GameData.Lobby = GetGlobal2String("SlashCo:Lobby", GameData.Lobby)
 		GameData.IsLan = GetGlobal2Bool("SlashCo:IsLan", GameData.IsLan)
 		GameData.MaxPlayers = GetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers)
@@ -553,7 +564,7 @@ SlashCo.AddOffering({
 SlashCo.AddOffering({
 	Name = "Nightmare",
 	Rarity = 3,
-	GasCanMod = 0
+	GasCanMod = 0,
 })
 
 SCInfo.Maps = {
@@ -605,7 +616,7 @@ function SlashCo.LoadMapConfigs(initialCheck)
 		SlashCo.IsPlayable = true
 	end
 
-	if SERVER then
+	if SERVER and not SlashCo.MapTools.IsEnabled() then
 		if not SlashCo.IsPlayable then
 			timer.Simple(math.max(30 - CurTime(), 0), function() -- If the game has already been running for a while don't use a 30sec timer
 				for _, play in ipairs(player.GetAll()) do
@@ -680,10 +691,3 @@ SlashCo.ObjStatus = {
 	COMPLETE = 1,
 	FAILED = 2
 }
-
---  Map tools, this is the only clientside function used by some places where we'd need to always show the current value instead of a cached one.
-SlashCo.MapTools = SlashCo.MapTools or {}
-local slashco_enablemaptools = GetConVar("slashco_enablemaptools")
-function SlashCo.MapTools.IsEnabled()
-	return slashco_enablemaptools and slashco_enablemaptools:GetBool()
-end

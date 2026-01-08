@@ -726,6 +726,14 @@ hook.Add("PlayerButtonDown", "SlashCo:SpectatorFunctions", function(ply, button)
 	ply:SurvivorPing()
 end)
 
+util.AddNetworkString("SlashCo:UpdateLightMap")
+function SlashCo.SetLightStyle(lightStyle, lightPattern)
+	engine.LightStyle(lightStyle, lightPattern)
+
+	net.Start("SlashCo:UpdateLightMap")
+	net.Broadcast()
+end
+
 SC_SERVER_LOADED = true
 
 ---load patch files; these are specifically intended to modify existing addon code

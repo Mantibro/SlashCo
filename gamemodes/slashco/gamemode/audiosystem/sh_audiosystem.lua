@@ -54,16 +54,24 @@ function SlashCo.AudioSystem.SetBackgroundMusic(soundFile, volume)
 	end
 end
 
-function SlashCo.AudioSystem.SetBackgroundMusicVolume(volume)
-	SetGlobal2Float("SlashCo:BackgroundMusicVolume", volume or 1)
-end
-
 function SlashCo.AudioSystem.GetBackgroundMusic(fallBack)
 	return GetGlobal2String("SlashCo:BackgroundMusic", fallBack or "")
 end
 
+function SlashCo.AudioSystem.SetBackgroundMusicVolume(volume)
+	SetGlobal2Float("SlashCo:BackgroundMusicVolume", volume or 1)
+end
+
 function SlashCo.AudioSystem.GetBackgroundMusicVolume(fallBack)
 	return GetGlobal2Float("SlashCo:BackgroundMusicVolume", fallBack or 1)
+end
+
+function SlashCo.AudioSystem.SetBackgroundMusicPlaybackRate(playbackrate)
+	SetGlobal2Float("SlashCo:BackgroundMusicPlaybackRate", playbackrate or 1)
+end
+
+function SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate(fallBack)
+	return GetGlobal2Float("SlashCo:BackgroundMusicPlaybackRate", playbackrate or 1)
 end
 
 function SlashCo.AudioSystem.RegisterSound(registerName, soundTable)
