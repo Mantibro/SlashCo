@@ -207,6 +207,9 @@ function SLASHER.OnMainAbilityFire(slasher)
 	if not slasher:GetNWBool("BrenNoclip") then
 		if !slasher:OnGround() and slasher:WaterLevel() == 0 and !slasher:IsStuck() then return end
 		if slasher.NoclipCooldown > 0.01 then return end
+		
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
+		slasher:SlasherHudFunc("SetControlEnabled", "RMB", false)
 
 		slasher:SetNWBool("BrenNoclip", true)
 		slasher:SetNWBool("CanChase", false)
@@ -220,6 +223,9 @@ function SLASHER.OnMainAbilityFire(slasher)
 			mask = MASK_PLAYERSOLID,
 		})
 		if trace.Hit then return end
+		
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
+		slasher:SlasherHudFunc("SetControlEnabled", "RMB", true)
 
 		slasher:SetNWBool("BrenNoclip", false)
 		slasher:SetNWBool("CanChase", true)
@@ -347,14 +353,6 @@ function SLASHER.InitHud(_, hud)
 		else
 			hud:SetControlEnabled("R", true)
 			hud:SetControlVisible("R", true)
-		end
-		
-		if BrenNoclip then
-			hud:SetControlEnabled("LMB", false)
-			hud:SetControlEnabled("RMB", false)
-		else
-			hud:SetControlEnabled("LMB", true)
-			hud:SetControlEnabled("RMB", true)
 		end
 		
 		if BrenNoclipCooldown > 0 then
