@@ -132,7 +132,12 @@ local function StartRound(instant)
 	SlashCo.FlashWindows() -- RaphaelIT7: Tell all players they should tab in.
 end
 
- function RefundSurvivorItems(ply)
+function SlashCo.RefundSurvivorItems(ply)
+	if GameData.IsLobby then
+		ErrorNoHaltWithStack("Tried to refund a player in the lobby! This function is only meant to be used in game- not in the lobby!")
+		return
+	end
+
  	local steamID64 = IsValid(ply) and ply:SteamID64() or ply -- if it's a string - it must be a SteamID64!
 	local survivorData = sql.Query("SELECT * FROM slashco_table_survivordata WHERE SteamID = " .. sql.SQLStr(steamID64) .. ";")
 	if not survivorData or not survivorData[1] then return end
@@ -214,7 +219,7 @@ local function DoSlasherSelection(slashers, usingPotentialSlashers)
 			local slasherID = slasherID or SlashCo.GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
 			sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( " .. sql.SQLStr(ply:SteamID64()) .. ", " .. sql.SQLStr(slasherID) .. " );")
 			table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = ply:SteamID64(), slasherID = slasherID })
-			RefundSurvivorItems(ply)
+			SlashCo.RefundSurvivorItems(ply)
 			SlashCo.SelectSlasher(slasherID, ply:SteamID64())
 			StartRound(true)
 		end

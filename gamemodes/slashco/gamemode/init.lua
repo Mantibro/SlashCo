@@ -127,12 +127,12 @@ local function lobbyButtons(ply, button)
 	local plyTeam = ply:Team()
 	if SlashCo.LobbyData.LOBBYSTATE == 0 and plyTeam == TEAM_LOBBY  then
 		if button == KEY_F1 then
-			if getReadyState(ply) ~= 1 then
-				lobbyPlayerReadying(ply, 1)
-				broadcastLobbyInfo()
+			if SlashCo.GetLobbyPlayerReadyState(ply) ~= 1 then
+				SlashCo.SetLobbyPlayerReadyState(ply, 1)
+				SlashCo.LobbyBroadcastInfo()
 			else
-				lobbyPlayerReadying(ply, 0)
-				broadcastLobbyInfo()
+				SlashCo.SetLobbyPlayerReadyState(ply, 0)
+				SlashCo.LobbyBroadcastInfo()
 			end
 			local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 			Sndd:Play()
@@ -141,7 +141,7 @@ local function lobbyButtons(ply, button)
 		end
 
 		if button == KEY_F2 then
-			if getReadyState(ply) ~= 2 then
+			if SlashCo.GetLobbyPlayerReadyState(ply) ~= 2 then
 				--Check if the player has made an offering or agreed to one
 				--[[if isPlyOfferer(ply) then
 					ply:ChatPrint("Cannot ready as Slasher as you have either made or agreed to an Offering.")
@@ -152,15 +152,15 @@ local function lobbyButtons(ply, button)
 					return
 				end]]
 
-				lobbyPlayerReadying(ply, 2)
-				broadcastLobbyInfo()
+				SlashCo.SetLobbyPlayerReadyState(ply, 2)
+				SlashCo.LobbyBroadcastInfo()
 				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 				Sndd:Play()
 				Sndd:ChangeVolume(0.5, 0)
 				Sndd:ChangePitch(100, 0)
 			else
-				lobbyPlayerReadying(ply, 0)
-				broadcastLobbyInfo()
+				SlashCo.SetLobbyPlayerReadyState(ply, 0)
+				SlashCo.LobbyBroadcastInfo()
 				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 				Sndd:Play()
 				Sndd:ChangeVolume(0.5, 0)
@@ -168,7 +168,7 @@ local function lobbyButtons(ply, button)
 			end
 		end
 
-		if button == KEY_F4 and SlashCo.LobbyData.VotedOffering > 0 and not isPlyOfferer(ply) then
+		if button == KEY_F4 and SlashCo.LobbyData.VotedOffering > 0 and not SlashCo.IsLobbyPlyOfferer(ply) then
 			SlashCo.OfferingVote(ply, true)
 			SlashCo.EndOfferingVote(ply)
 		end
@@ -557,7 +557,7 @@ hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, old, ne
 	end
 
 	if old == TEAM_LOBBY then
-		lobbyPlayerReadying(ply, 0)
+		SlashCo.SetLobbyPlayerReadyState(ply, 0)
 	end
 
 	if old == TEAM_SURVIVOR then

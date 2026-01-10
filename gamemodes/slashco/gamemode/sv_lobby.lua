@@ -72,23 +72,23 @@ end
 --Only run this and the removePlayerFromLobby function using the GM:PlayerChangedTeam hook: https://wiki.facepunch.com/gmod/GM:PlayerChangedTeam
 local function addPlayerToLobby(ply)
 	SlashCo.LobbyData.Players[ply] = 0 -- Ready state
-	broadcastLobbyInfo()
+	SlashCo.LobbyBroadcastInfo()
 end
 
 local function removePlayerFromLobby(ply)
 	SlashCo.LobbyData.Players[ply] = nil
-	broadcastLobbyInfo()
+	SlashCo.LobbyBroadcastInfo()
 end
 
-function lobbyPlayerReadying(ply, state)
+function SlashCo.SetLobbyPlayerReadyState(ply, state)
 	SlashCo.LobbyData.Players[ply] = state
 end
 
-function getReadyState(ply)
-	return SlashCo.LobbyData.Players[ply]
+function SlashCo.GetLobbyPlayerReadyState(ply)
+	return SlashCo.LobbyData.Players[ply] or SlashCo.ReadyState.NotReady
 end
 
-function isPlyOfferer(ply)
+function SlashCo.IsLobbyPlyOfferer(ply)
 	local id = ply:SteamID64()
 
 	for _, v in ipairs(SlashCo.LobbyData.Offerors) do
@@ -100,19 +100,7 @@ function isPlyOfferer(ply)
 	return false
 end
 
-function lobbyReady()
-	--Is everyone ready?
-	for _, readyState in pairs(SlashCo.LobbyData.Players) do
-		if readyState == SlashCo.ReadyState.NotReady then
-			return false
-		end
-	end
-
-	--If we make it here then everyone has a readystate that isn't 0 and so everyone must be ready
-	return true
-end
-
-function broadcastLobbyInfo()
+function SlashCo.LobbyBroadcastInfo()
 	net.Start("SlashCo:GiveLobbyInfo")
 		for ply, readyState in pairs(SlashCo.LobbyData.Players) do
 			net.WriteEntity(ply)
@@ -120,9 +108,9 @@ function broadcastLobbyInfo()
 		end
 	net.Broadcast()
 
-	if timer.TimeLeft("AllReadyLobby") ~= nil then
+	if timer.TimeLeft("SlashCo:AllReadyLobby") ~= nil then
 		net.Start("SlashCo:LobbyTimerTime")
-			net.WriteUInt(math.floor(timer.TimeLeft("AllReadyLobby")), 6)
+			net.WriteUInt(math.floor(timer.TimeLeft("SlashCo:AllReadyLobby")), 6)
 		net.Broadcast()
 	end
 end
@@ -149,25 +137,66 @@ local function lobbyChooseItem(plyid, id)
 	end
 end
 
+function SlashCo.ResetLobby()
+	timer.Remove("SlashCo:AllReadyLobby")
+	timer.Remove("SlashCo:LobbyBriefingLeaveTimer")
+	timer.Remove("SlashCo:LobbyLeave")
+	timer.Remove("SlashCo:LobbyTransition")
+	timer.Remove("SlashCo:AllReadyLobby")
+	timer.Remove("SlashCo:LobbyOpenItems")
+	timer.Remove("SlashCo:LobbyFinishUpdateHelicopter")
+	timer.Remove("SlashCo:LobbyStartGameIntro")
+
+	SlashCo.ResetLobbyData()
+
+	-- RaphaelIT7: dontSendToClients MUST be set to true as else some weird things happen
+	game.CleanUpMap(true)
+
+	-- RaphaelIT7: If players were set into teams, we set them back to lobby.
+	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		ply:SetTeam(TEAM_LOBBY)
+	end
+
+	for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		ply:SetTeam(TEAM_LOBBY)
+	end
+
+	-- RaphaelIT7: We could call addPlayerToLobby but that would create lots of networking as it would result in broadcastLobbyInfo for every player.
+	-- So we do it ourselves and network once.
+	for _, ply in ipairs(team.GetPlayers(TEAM_LOBBY)) do
+		SlashCo.LobbyData.Players[ply] = 0
+	end
+
+	SlashCo.LobbyBroadcastInfo()
+end
+
 --				***Begin the post-ready timer***
 local function lobbyReadyTimer(count)
-	timer.Create("AllReadyLobby", count, 1, function()
+	timer.Create("SlashCo:AllReadyLobby", count, 1, function()
 		SlashCo.LobbyRoundSetup()
 	end)
 end
+
+local lobbyLeaveTimer = CreateConVar("slashco_lobbyleavedelay", "120", FCVAR_ARCHIVE, "The time in seconds player have to equip items and enter the helicopter before it just forces that", 1, 255)
+local function lobbyBriefingLeaveTimer()
+	timer.Create("SlashCo:LobbyBriefingLeaveTimer", lobbyLeaveTimer:GetInt(), 1, function()
+		SlashCo.LobbyFinish()
+	end)
+end
+
 --				***Begin the transition timer***
 local function lobbyTransitionTimer()
-	timer.Create("LobbyTransition", math.max(SlashCo.LobbyBanter(), 10), 1, function()
+	timer.Create("SlashCo:LobbyTransition", math.max(SlashCo.LobbyBanter(), 10), 1, function()
 		SlashCo.LobbyBriefingTransition()
 
-		timer.Simple(8, function()
+		timer.Create("SlashCo:LobbyOpenItems", 8, 1, function()
 			SlashCo.LobbyOpenItems()
 		end)
 	end)
 end
 --				***Begin the leaving timer***
 local function lobbyLeaveTimer()
-	timer.Create("LobbyLeave", 20, 1, function()
+	timer.Create("SlashCo:LobbyLeave", 20, 1, function()
 		SlashCo.LobbyLeave()
 	end)
 end
@@ -580,8 +609,8 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		lobby_tick = 0
 	end
 
-	if lobby_tick == 33 and timer.TimeLeft("AllReadyLobby") ~= nil then
-		broadcastLobbyInfo()
+	if lobby_tick == 33 and timer.TimeLeft("SlashCo:AllReadyLobby") ~= nil then
+		SlashCo.LobbyBroadcastInfo()
 	end
 
 	local num = table.Count(SlashCo.LobbyData.Players)
@@ -619,17 +648,17 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		end
 
 		if seek <= (num / 2) and SlashCo.LobbyData.ReadyTimerStarted == true then
-			timer.Remove("AllReadyLobby")
+			timer.Remove("SlashCo:AllReadyLobby")
 			SlashCo.LobbyData.ReadyTimerStarted = false
 		end
 
 		if seek >= num then
-			timer.Remove("AllReadyLobby")
+			timer.Remove("SlashCo:AllReadyLobby")
 			SlashCo.LobbyRoundSetup()
 		end
 
 		if (num < 2 or seek <= (num / 2)) and SlashCo.LobbyData.ReadyTimerStarted then
-			timer.Remove("AllReadyLobby")
+			timer.Remove("SlashCo:AllReadyLobby")
 			SlashCo.LobbyData.ReadyTimerStarted = false
 
 			net.Start("SlashCo:LobbyTimerTime")
@@ -661,9 +690,15 @@ hook.Add("PlayerDisconnected", "Playerleave", function(ply)
 	if GameData.IsLobby and ply:Team() == TEAM_LOBBY then
 		removePlayerFromLobby(ply)
 	end
+
+	-- RaphaelIT7: Reset the lobby if they started a lobby yet decided to leave
+	if player.GetCount() <= 1 and SlashCo.LobbyData.LOBBYSTATE ~= 0 then
+		print("[SlashCo] Resetting Lobby due to a prepared yet unstarted game!")
+		SlashCo.ResetLobby()
+	end
 end)
 
-function lobbyFinish()
+function SlashCo.LobbyFinish()
 	if SlashCo.LobbyData.LOBBYSTATE == 4 then
 		return
 	end
@@ -674,11 +709,15 @@ function lobbyFinish()
 	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition)
 	SlashCo.CurRound.HelicopterTargetPosition[3] = SlashCo.CurRound.HelicopterTargetPosition[3] + 500
 
-	timer.Simple(8, function()
+	timer.Create("SlashCo:LobbyFinishUpdateHelicopter", 8, 1, function()
+		if SlashCo.LobbyData.LOBBYSTATE ~= 4 then return end -- RaphaelIT7: Lobby was probably reset!
+
 		SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1] + 5000, SlashCo.CurRound.HelicopterTargetPosition[2] + 4000, SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
 	end)
 
-	timer.Simple(15, function()
+	timer.Create("SlashCo:LobbyStartGameIntro", 15, 1, function()
+		if SlashCo.LobbyData.LOBBYSTATE ~= 4 then return end -- RaphaelIT7: Lobby was probably reset!
+
 		SlashCo.StartGameIntro()
 
 		lobbyLeaveTimer()
@@ -755,8 +794,8 @@ function SlashCo.LobbyRoundSetup()
 	for ply, readyState in pairs(SlashCo.LobbyData.Players) do
 		--If someone is not ready, force them as ready survivor.
 
-		if getReadyState(ply) == SlashCo.ReadyState.NotReady then
-			lobbyPlayerReadying(ply, SlashCo.ReadyState.Survivor)
+		if SlashCo.GetLobbyPlayerReadyState(ply) == SlashCo.ReadyState.NotReady then
+			SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.Survivor)
 		end
 	end
 
@@ -786,6 +825,8 @@ function SlashCo.LobbyEvelatorTransition()
 	doors[2]:Fire("Close")
 
 	timer.Simple(3, function()
+		if SlashCo.LobbyData.LOBBYSTATE ~= 2 then return end -- RaphaelIT7: Lobby was probably reset!
+
 		local elevator = table.Random(ents.FindByName("Slashco_Elev"))
 		elevator:Fire("Open")
 

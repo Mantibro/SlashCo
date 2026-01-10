@@ -60,7 +60,7 @@ if SERVER then
 			return
 		end
 
-		if getReadyState(activator) < 1 then
+		if SlashCo.GetLobbyPlayerReadyState(activator) < 1 then
 			SlashCo.BroadcastGlobalData()
 			SlashCo.SendValue(activator, "openOfferingPicker")
 		else

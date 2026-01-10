@@ -195,6 +195,14 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 		targetFogEnd = targetFogStart * 1.5
 	end
 
+	-- RaphaelIT7: If the spectator(our local player) is spectating a player, we use that player's team fog
+	if localPlyTeam == TEAM_SPECTATOR then
+		local spectateEnt = GameData.LocalPlayer:GetObserverTarget()
+		if IsValid(spectateEnt) and spectateEnt:IsPlayer() then
+			localPlyTeam = spectateEnt:Team()
+		end
+	end
+
 	local teamMult = 1
 	if localPlyTeam == TEAM_SURVIVOR then
 		teamMult = SlashCo.GetSurvivorFogMult()

@@ -808,7 +808,7 @@ function SlashCo.FindSpawn(ply)
 	elseif ply:Team() == TEAM_SLASHER then
 		elements = ents.FindByClass("info_sc_player_slasher")
 	elseif GameData.IsLobby then
-		GameData.PlayerSpawns = GameData.PlayerSpawns or ents.FindByClass("info_player_start")
+		GameData.PlayerSpawns = ents.FindByClass("info_player_start")
 		elements = GameData.PlayerSpawns
 	end
 

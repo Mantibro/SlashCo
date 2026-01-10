@@ -5,9 +5,11 @@ SlashCo.MapTools.LastUndo = SlashCo.MapTools.LastUndo or nil -- Last undo, saved
 SlashCo.MapTools.HadError = SlashCo.MapTools.HadError or false
 
 local slashco_enablemaptools = GetConVar("slashco_enablemaptools")
-function SlashCo.MapTools.IsEnabled() -- Used by all exposed functions
+function SlashCo.MapTools.IsEnabled(hideWarning) -- Used by all exposed functions
 	if not (slashco_enablemaptools and slashco_enablemaptools:GetBool()) then
-		ErrorNoHalt("[SlashCo] Tried to use map tools while slashco_enablemaptools is disabled!\n")
+		if not hideWarning then
+			ErrorNoHaltWithStack("[SlashCo] Tried to use map tools while slashco_enablemaptools is disabled!\n")
+		end
 		return false
 	end
 

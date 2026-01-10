@@ -26,36 +26,42 @@ function GetRandomMap(ply_count)
 	return "error"
 end
 
-SlashCo.LobbyData = SlashCo.LobbyData or {
-	LOBBYSTATE = 0,
-	Offering = 0,
-	ButtonDoorPrimary = NULL,
-	ButtonDoorPrimaryClose = NULL,
-	ButtonDoorSecondary = NULL,
-	ButtonDoorSecondaryClose = NULL,
-	ButtonDoorItems = NULL,
-	Players = {},
-	Offerors = {},
-	VotedOffering = 0,
-	ReadyTimerStarted = false,
-	PotentialSurvivors = {},
-	PotentialSlashers = {},
-	NonPickedPotentialSlashers = {}, -- RaphaelIT7: After slashers were picked this table contains all now survivors who wanted to be an slasher but weren't picked
-	AssignedSurvivors = {},
-	AssignedSlashers = {},
-	FinishedPicking = false,
-	SelectedDifficulty = SlashCo.DifficultyLevel.EASY,
-	SurvivorGasMod = 0,
-	SelectedSlasherInfo = {
-		ID = 0,
-		CLASS = 0,
-		DANGER = 0,
-		NAME = 0,
-		TIP = "--//--"
-	},
-	SelectedMap = "sc_summercamp",
-	--DeathwardsLeft = 0 --not used
-}
+function SlashCo.ResetLobbyData()
+	SlashCo.LobbyData = {
+		LOBBYSTATE = 0,
+		Offering = 0,
+		ButtonDoorPrimary = NULL,
+		ButtonDoorPrimaryClose = NULL,
+		ButtonDoorSecondary = NULL,
+		ButtonDoorSecondaryClose = NULL,
+		ButtonDoorItems = NULL,
+		Players = {},
+		Offerors = {},
+		VotedOffering = 0,
+		ReadyTimerStarted = false,
+		PotentialSurvivors = {},
+		PotentialSlashers = {},
+		NonPickedPotentialSlashers = {}, -- RaphaelIT7: After slashers were picked this table contains all now survivors who wanted to be an slasher but weren't picked
+		AssignedSurvivors = {},
+		AssignedSlashers = {},
+		FinishedPicking = false,
+		SelectedDifficulty = SlashCo.DifficultyLevel.EASY,
+		SurvivorGasMod = 0,
+		SelectedSlasherInfo = {
+			ID = 0,
+			CLASS = 0,
+			DANGER = 0,
+			NAME = 0,
+			TIP = "--//--"
+		},
+		SelectedMap = "sc_summercamp",
+		--DeathwardsLeft = 0 --not used
+	}
+end
+
+if not SlashCo.LobbyData then
+	SlashCo.ResetLobbyData()
+end
 
 --Holds all the information about the ongoing round
 function SlashCo.ResetCurRoundData()

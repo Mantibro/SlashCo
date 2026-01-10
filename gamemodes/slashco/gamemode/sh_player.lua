@@ -75,7 +75,7 @@ end
 
 hook.Add("PlayerNoClip", "SlashCo:PreventSpectators", function(ply)
 	-- RaphaelIT7: If map tools are enabled, the server host is always allowed to noclip to make things easier.
-	if SlashCo.MapTools.IsEnabled() and ply:IsListenServerHost() then
+	if ply:IsListenServerHost() and SlashCo.MapTools.IsEnabled(true) then
 		return true
 	end
 	

@@ -616,7 +616,7 @@ function SlashCo.LoadMapConfigs(initialCheck)
 		SlashCo.IsPlayable = true
 	end
 
-	if SERVER and not SlashCo.MapTools.IsEnabled() then
+	if SERVER and not SlashCo.MapTools.IsEnabled(true) then
 		if not SlashCo.IsPlayable then
 			timer.Simple(math.max(30 - CurTime(), 0), function() -- If the game has already been running for a while don't use a 30sec timer
 				for _, play in ipairs(player.GetAll()) do

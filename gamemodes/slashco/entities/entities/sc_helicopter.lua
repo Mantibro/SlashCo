@@ -302,7 +302,7 @@ if SERVER then
 
 		if #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3
 				and SlashCo.LobbyData.LOBBYSTATE < 5 and SlashCo.State == SlashCo.States.LOBBY then
-			lobbyFinish()
+			SlashCo.LobbyFinish()
 		end
 	end
 

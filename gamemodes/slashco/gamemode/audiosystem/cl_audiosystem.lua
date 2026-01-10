@@ -12,6 +12,7 @@ SlashCo.AudioSystem.ModifiedChannelGroups = SlashCo.AudioSystem.ModifiedChannelG
 -- These intentionally are nuked on autorefresh
 local ErrorList = {} -- A table containing all the files we failed to open, if the file is in this list and we fail loading again, then we won't throw another error.
 local Fake3DList = {}
+local OGGRetryList = {} -- RaphaelIT7: We remapp ogg files from the VFS to a location actually on disk as it seems like things mounted through GMA cause bass to fail?
 
 -- So that we don't depend on the GameData table as this system is meant to also work as a standalone library.
 SlashCo.AudioSystem.IsSinglePlayer = SlashCo.AudioSystem.IsSinglePlayer or game.SinglePlayer()
@@ -75,23 +76,71 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 		return
 	end
 
+	local usedOGGRemap = false
+	if OGGRetryList[soundFile] then
+		soundFile = OGGRetryList[soundFile]
+		usedOGGRemap = true
+	end
+
 	local soundFunc = isURL and sound.PlayURL or sound.PlayFile
 	soundFunc(soundFile, mode, function(channel, errCode, errStr)
 		if not IsValid(channel) then
-			if errorCallback then
-				-- an error callback can return true to cancel us throwing an error
-				if errorCallback(errCode, errStr) then return end
-			end
-
 			if not ErrorList[soundFile] then
 				ErrorList[soundFile] = true
+
+				-- RaphaelIT7: This one specific OGG issue >:(
+				if string.EndsWith(soundFile, ".ogg") and errStr == "BASS_ERROR_FILEFORM" and OGGRetryList[soundFile] == nil then
+					local folderName = soundFile
+					local lastSlash = string.find(folderName, "/")
+					local currentSlash = lastSlash
+					while currentSlash do
+						lastSlash = currentSlash
+						currentSlash = string.find(folderName, "/", currentSlash + 1)
+					end
+
+					if lastSlash then
+						folderName = string.sub(folderName, 0, lastSlash)
+					end
+
+					-- RaphaelIT7: Let's write the file to disk to avoid VFS issues
+					file.CreateDir("slashco_oggcache/" .. folderName)
+
+					local oggRetryName = "slashco_oggcache/" .. soundFile
+					file.Write(oggRetryName, file.Read(soundFile, "GAME"))
+
+					oggRetryName = "data/" .. oggRetryName
+					OGGRetryList[soundFile] = oggRetryName
+					OGGRetryList[oggRetryName] = soundFile
+					
+					SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallback)
+					return
+				end
 
 				-- RaphaelIT7: Temporary debug stuff for Rubat.
 				local size = file.Size(soundFile, "GAME")
 				local content = file.Read(soundFile, "GAME")
-				error("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", " .. soundFile .. " | Debug Info: File Size:" .. tostring(size or -1) .. " File Content Size:" .. tostring(content and string.len(content) or -1) .. " File Content Hash:" .. (content and util.CRC(content) or "[no content]") .. ")\n")
+				ErrorNoHaltWithStack("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", " .. soundFile .. " | Debug Info: File Size:" .. tostring(size or -1) .. " File Content Size:" .. tostring(content and string.len(content) or -1) .. " File Content Hash:" .. (content and util.CRC(content) or "[no content]") .. "\n")
+			end
+
+			if errorCallback then
+				-- an error callback can return true to cancel us throwing an error
+				if errorCallback(errCode, errStr) then return end
 			end
 			return
+		else
+			if usedOGGRemap and game.IsDedicated() then -- RapahelIT7: Let me find this in the server logs
+				local size = file.Size(soundFile, "GAME")
+				local content = file.Read(soundFile, "GAME")
+				local VFSsize = file.Size(OGGRetryList[soundFile], "GAME")
+				local VFScontent = file.Read(OGGRetryList[soundFile], "GAME")
+				ErrorNoHaltWithStack(
+					"(Debug message - ignore this) Managed to play previously failing OGG file from disk! (" .. soundFile .. ") | Debug Info: File Size:["
+					.. tostring(size or -1) .. "/" .. tostring(VFSsize or -1) ..
+					"] File Content Size:"
+					.. tostring(content and string.len(content) or -1) .. "/" .. tostring(VFScontent and string.len(VFScontent) or -1) ..
+					" File Content Hash:"
+					.. (content and util.CRC(content) or "[no content]") .. "/" .. (VFScontent and util.CRC(VFScontent) or "[no content]") .. "\n")
+			end
 		end
 
 		SlashCo.AudioSystem.CheckChannels()

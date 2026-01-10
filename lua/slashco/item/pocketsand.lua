@@ -10,7 +10,9 @@ ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
 
 function ITEM.OnUse(ply)
-	local found = SlashCo.FindPlayersInRange(ply:EyePos(), 200, TEAM_SLASHER, ply)
+	-- RaphaelIT7: We use their center to be more accurate of the origin of the particles & as the origin to find all slashers.
+	local particlePos = ply:WorldSpaceCenter()
+	local found = SlashCo.FindPlayersInRange(particlePos, 200, TEAM_SLASHER, ply)
 	if table.IsEmpty(found) then
 		return true
 	end
@@ -18,8 +20,9 @@ function ITEM.OnUse(ply)
 	ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3")
 	ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
 
+
 	timer.Simple(0, function() -- Something causes particles to be nuked >:(
-		ParticleEffect("pocketsand", plyPos, angle_zero)
+		ParticleEffect("pocketsand", particlePos, angle_zero)
 	end)
 
 	for _, slasher in ipairs(found) do

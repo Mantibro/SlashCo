@@ -550,7 +550,7 @@ hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bD
 		return
 	end
 
-	if not screenPos or SlashCo.MapTools.IsEnabled() then
+	if not screenPos or SlashCo.MapTools.IsEnabled(true) then
 		local networkPos, networkAng = GetDocumentScreenPos()
 		if not networkPos then return end
 
