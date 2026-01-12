@@ -83,6 +83,8 @@ function SlashCo.EnableAlarmLights(noEffect)
 	end
 
 	SlashCo.SetLightStyle(0, "b")
+
+	GameData.IsBlackout = true
 end
 
 function SlashCo.DisableAlarmLights()
@@ -114,6 +116,12 @@ function SlashCo.DisableAlarmLights()
 	end
 
 	SlashCo.SetLightStyle(0, "m")
+
+	for _, ply in player.Iterator() do
+		ply:SetNW2Bool("DynamicFlashlight", false)
+	end
+
+	GameData.IsBlackout = false
 end
 
 function ENT:KeyValue(key, value)

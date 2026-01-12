@@ -687,7 +687,9 @@ end
 
 hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, state)
 	if ply:Team() ~= TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then
-		return false
+		if not (GameData.IsLobby and GameData.IsBlackout) then
+			return false
+		end
 	end
 
 	if state == false then
