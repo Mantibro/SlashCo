@@ -800,30 +800,54 @@ function SlashCo.StartRound(noSetup)
 	end)
 end
 
-function SlashCo.FindSpawn(ply)
-	local elements
-	if ply:Team() == TEAM_SURVIVOR then
-		elements = ents.FindByClass("info_sc_player_employee")
-		table.Add(elements, ents.FindByClass("info_sc_player_survivor"))
-	elseif ply:Team() == TEAM_SLASHER then
-		elements = ents.FindByClass("info_sc_player_slasher")
-	elseif GameData.IsLobby then
-		GameData.PlayerSpawns = ents.FindByClass("info_player_start")
-		elements = GameData.PlayerSpawns
+-- RaphaelIT7: Previously done in sc_spawnbase, but for better compatibility with info_player_start we do it here.
+local function UpdateSpawnEntity(ply, spawnEnt)
+	spawnEnt.SpawnedEntity = ply
+	spawnEnt.LastSpawnedEntity = CurTime()
+	ply.SpawnedAt = spawnEnt
+end
+
+-- RaphaelIT7: Finds a free spawn, if there is none, it'll just spawn them in each other.
+local function FindFreeSpawn(ply, entities)
+	local oldestSpawn = {}
+	for _, spawnEnt in ipairs(entities) do
+		if hook.Run("IsSpawnpointSuitable", ply, spawnEnt, false) then
+			return spawnEnt
+		end
+
+		oldestSpawn[CurTime() - (spawnEnt.LastSpawnedEntity or 0)] = spawnEnt
 	end
 
-	if elements and not table.IsEmpty(elements) then
-		local ent = SlashCo.SelectSpawns(elements)
-		if not IsValid(ent) then
+	-- Just take the oldest one.
+	for _, spawnEnt in SortedPairs(oldestSpawn, true) do
+		return spawnEnt
+	end
+end
+
+function SlashCo.FindSpawn(ply)
+	local spawnEnts
+	if ply:Team() == TEAM_SURVIVOR then
+		spawnEnts = ents.FindByClass("info_sc_player_employee")
+		table.Add(spawnEnts, ents.FindByClass("info_sc_player_survivor"))
+	elseif ply:Team() == TEAM_SLASHER then
+		spawnEnts = ents.FindByClass("info_sc_player_slasher")
+	elseif GameData.IsLobby then
+		GameData.PlayerSpawns = ents.FindByClass("info_player_start")
+		spawnEnts = GameData.PlayerSpawns
+	end
+
+	if spawnEnts and not table.IsEmpty(spawnEnts) then
+		local spawnEnt = FindFreeSpawn(ply, spawnEnts)
+		if not IsValid(spawnEnt) then
 			return
 		end
 
-		ent.SpawnedEntity = ply
-		if ent.SpawnEnt then -- info_player_start doesn't have this.
-			ent:SpawnEnt()
+		spawnEnt.SpawnedEntity = ply
+		if spawnEnt.SpawnEnt then -- info_player_start doesn't have this.
+			spawnEnt:SpawnEnt()
 		end
 
-		return ent
+		return spawnEnt
 	end
 end
 

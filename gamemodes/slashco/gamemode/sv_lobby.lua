@@ -165,6 +165,7 @@ function SlashCo.ResetLobby()
 	-- So we do it ourselves and network once.
 	for _, ply in ipairs(team.GetPlayers(TEAM_LOBBY)) do
 		SlashCo.LobbyData.Players[ply] = 0
+		ply:Spawn()
 	end
 
 	SlashCo.LobbyBroadcastInfo()
