@@ -130,6 +130,12 @@ function PLAYER:AddEffect(effectName, duration)
 		end
 
 		self.ActiveEffects[effectID] = nil
+
+		for _, effName in pairs(self.ActiveEffects) do
+			-- There is another effect stacked on top of this- so skip.
+			if effName == effectName then return end
+		end
+
 		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 		self:EffectFunction(effectName, "OnExpired")
 		RemoveEffect(self, effectName)
@@ -145,7 +151,7 @@ function PLAYER:EffectFunction(effectName, funcName, ...)
 	end
 end
 
----removes a player's effect
+---removes a player's effect (removes all instances of it in case it's stacked)
 function PLAYER:ClearEffect(effectName)
 	if not HasEffect(self, effectName) then return end
 	if not self:EffectFunction(effectName, "OnRemoved") then

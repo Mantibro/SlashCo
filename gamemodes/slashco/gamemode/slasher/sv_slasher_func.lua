@@ -191,8 +191,14 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 		end
 
 		slasher:SlasherFunction("OnTickBehaviour")
-
-		slasher:SetFogMult(0.5 + (slasher:GetEyeSight() / 5))
+	
+		SlashCo.AddFog({
+			name = "SlasherFog",
+			multiplier = 0.5 + (slasher:GetEyeSight() / 5),
+			priority = 0,
+			fogType = SlashCo.FogType.PLAYER,
+			entity = slasher,
+		})
 	end
 
 	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then return end

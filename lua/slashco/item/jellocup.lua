@@ -1,7 +1,7 @@
 local ITEM = {}
 
 ITEM.Model = "models/slashco/jellocup.mdl"
-ITEM.Name = "JelloCup (Unfinished)" -- ToDo (Unfinished), still need to finish the ITEM.OnUse function
+ITEM.Name = "JelloCup"
 ITEM.EntClass = "sc_jellocup"
 ITEM.Price = 150
 ITEM.Description = "JelloCup_desc"
@@ -11,7 +11,11 @@ function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
 function ITEM.OnUse(ply)
+	-- RaphaelIT7: Yes, it's intentional that it can go over the max health! It's limited to 1.5x of the max health
+	local maxHealth = ply:GetMaxHealth()
+	ply:SetHealth(math.min(ply:Health() + maxHealth / 3, maxHealth * 1.5))
 
+	ply:AddEffect("Resistance", math.random(20, 50))
 end
 ITEM.ViewModel = {
 	model = ITEM.Model,

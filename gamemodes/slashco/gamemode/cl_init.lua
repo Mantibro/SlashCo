@@ -84,6 +84,7 @@ include("sh_perks.lua")
 include("ui/cl_documents.lua") -- Depends on sh_perks.lua
 include("sh_canbeseen.lua")
 include("sh_player.lua")
+include("sh_fog.lua")
 
 include("ui/cl_projector.lua")
 include("ui/cl_voiceselect.lua")
@@ -116,110 +117,6 @@ local disable = {
 hook.Add("HUDShouldDraw", "DisableDefaultHUD", function(name)
 	return not disable[name]
 end)
-
-GameData.ClientSideFogMult = GameData.ClientSideFogMult or {}
-function SlashCo.AddClientsideFog(name, multiplier, priority)
-	GameData.ClientSideFogMult[name] = table.insert(GameData.ClientSideFogMult, {
-		multiplier = multiplier,
-		priority = priority,
-	})
-end
-
-function SlashCo.RemoveClientsideFog(name)
-	if not GameData.ClientSideFogMult[name] then return end
-
-	table.remove(GameData.ClientSideFogMult, GameData.ClientSideFogMult[name])
-end
-
-local function GetHighestPriorityClientFog()
-	local highest = -999999
-	local highestFogInfo = nil
-	for _, fogInfo in ipairs(GameData.ClientSideFogMult) do
-		if fogInfo.priority < highest then continue end
-
-		highest = fogInfo.priority
-		highestFogInfo = fogInfo
-	end
-
-	return highestFogInfo and highestFogInfo.multiplier or 1
-end
-
-local skyBoxVec = Vector(0, 0, 100000)
--- local dynamicfog = CreateConVar("slashco_dynamicfog", "1", FCVAR_ARCHIVE, "Experimental - Dynamic fog that changes based on your location", 0, 1)
-function GM:SetupWorldFog() -- A basic world fog that dynamicly changes depending on the environment
-	-- if not dynamicfog:GetBool() then return end
-	if GameData.IsLobby then return end
-
-	local localPlyTeam = GameData.LocalPlayer:Team()
-	if localPlyTeam == TEAM_SPECTATOR then return end
-
-	local r, g, b = SlashCo.GetGlobalFogColor(2)
-	render.FogMode(MATERIAL_FOG_LINEAR)
-	render.FogColor(r, g, b)
-	render.FogMaxDensity(1)
-
-	local targetFogStart = 200
-	local pos = GameData.LocalPlayer:GetPos()
-	local isVisible = util.IsSkyboxVisibleFromPoint(pos)
-	local targetFogEnd = 3000
-
-	if not isVisible then
-		targetFogEnd = 1000 -- Were somewere hidden, like in a basement.
-	else
-		targetFogEnd = 2000 -- Were somewere like in a building but outside light still reaches the player
-	end
-
-	local tr = util.TraceLine({
-		start = pos,
-		endpos = pos + skyBoxVec,
-		collisiongroup = COLLISION_GROUP_WORLD,
-		mask = MASK_VISIBLE,
-	})
-
-	if tr.HitSky then
-		targetFogEnd = 3000
-	end
-
-	if SlashCo.IsGlobalFogDisabled() then
-		targetFogStart = 9000
-		targetFogEnd = 10000
-	end
-
-	local col = render.GetLightColor(pos)
-	local brighness = (0.299 * col[1] + 0.587 * col[2] + 0.114 * col[3]) * 50
-	brighness = math.min(brighness, 1) - 0.5
-
-	targetFogEnd = targetFogEnd + (targetFogEnd * brighness)
-
-	if (targetFogStart * 1.5) >= targetFogEnd then
-		targetFogEnd = targetFogStart * 1.5
-	end
-
-	-- RaphaelIT7: If the spectator(our local player) is spectating a player, we use that player's team fog
-	if localPlyTeam == TEAM_SPECTATOR then
-		local spectateEnt = GameData.LocalPlayer:GetObserverTarget()
-		if IsValid(spectateEnt) and spectateEnt:IsPlayer() then
-			localPlyTeam = spectateEnt:Team()
-		end
-	end
-
-	local teamMult = 1
-	if localPlyTeam == TEAM_SURVIVOR then
-		teamMult = SlashCo.GetSurvivorFogMult()
-	elseif localPlyTeam == TEAM_SLASHER then
-		teamMult = SlashCo.GetSlasherFogMult()
-	end
-
-	local clientMult = GetHighestPriorityClientFog()
-	local fogMult = (GameData.LocalPlayer:GetFogMult() + SlashCo.GetGlobalFogMult() + teamMult + clientMult) / 4
-	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * fogMult)
-	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * fogMult)
-
-	render.FogStart(GameData.LastFogStart)
-	render.FogEnd(GameData.LastFogEnd)
-
-	return true
-end
 
 function GM:DrawDeathNotice()
 	return false
@@ -259,13 +156,13 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 	end
 end)
 
-hook.Add("KeyPress", "PlayerSelect", function(ply, key)
+hook.Add("PlayerButtonDown", "SlashCo:OpenPlayermodelSelector", function(ply, key)
 	if ply ~= GameData.LocalPlayer or ply:Team() ~= TEAM_LOBBY then
 		return
 	end
 
-	if key == IN_RELOAD then
-		DrawThePlayermodelSelectorBox()
+	if key == KEY_G then
+		SlashCo.OpenPlayermodelSelector()
 	end
 end)
 

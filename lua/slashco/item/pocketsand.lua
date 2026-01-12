@@ -17,9 +17,27 @@ function ITEM.OnUse(ply)
 		return true
 	end
 
-	ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3")
-	ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
+	GameData.PocketSandID = (GameData.PocketSandID or 0) + 1
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3",
+		identifier = "PocketSandThrow" .. GameData.PocketSandID,
+		minDistance = 200,
+		maxDistance = 400,
+		position = particlePos,
+		volume = 1,
+		fadeIn = 0,
+	})
 
+	GameData.PocketSandID = (GameData.PocketSandID or 0) + 1
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/pocketsand_linger.mp3",
+		identifier = "PocketSandLinger" .. GameData.PocketSandID,
+		minDistance = 200,
+		maxDistance = 400,
+		position = particlePos,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	timer.Simple(0, function() -- Something causes particles to be nuked >:(
 		ParticleEffect("pocketsand", particlePos, angle_zero)

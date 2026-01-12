@@ -15,7 +15,20 @@ function ITEM.DisplayColor()
 	return 232, 23, 55, 255
 end
 function ITEM.OnUse(ply)
-	ply:EmitSound("slashco/survivor/balkan_eat.wav")
+	-- RaphaelIT7: Disallow balkan stacking
+	if ply:GetNWBool("SurvivorBalkan") then
+		return true
+	end
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/balkan_eat.wav",
+		identifier = "BalkanEat",
+		minDistance = 250,
+		maxDistance = 550,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	ply:SetNWBool("SurvivorBalkan", true)
 	ply:AddEffect("Slowness", 31.5)

@@ -23,6 +23,16 @@ function SlashCo.UseItem(ply)
 		local doNotRemove = SlashCoItems[item].OnUse(ply)
 		if not doNotRemove then
 			SlashCo.ChangeSurvivorItem(ply, "item", "none")
+		else
+			ply.SoundCannotUseItem = (ply.SoundCannotUseItem or 0) + 1
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/ui/item_deselect.mp3",
+				identifier = "ItemUnusable" .. ply.SoundCannotUseItem,
+				playbackRate = 0.4,
+				volume = 1,
+				fadeIn = 0,
+				sendToEntity = ply,
+			})
 		end
 	end
 end
@@ -95,7 +105,7 @@ function SlashCo.DropItem(ply, dropCallback, ignoreField)
 		ply:SetItem("item", "none")
 	end
 
-	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), time, 1, function()
+	timer.Create(string.format("SlashCo:ItemSwitch_%s_%s", slot, ply:UserID()), time, 1, function()
 		if not IsValid(ply) then
 			return
 		end
@@ -139,7 +149,7 @@ end
 function SlashCo.RemoveItem(ply, isSec)
 	local slot = isSec and "item2" or "item"
 	local item = ply:GetItem(slot)
-	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), isSec and 0.25 or 0.18, 1, function()
+	timer.Create(string.format("SlashCo:ItemSwitch_%s_%s", slot, ply:UserID()), isSec and 0.25 or 0.18, 1, function()
 		if IsValid(ply) then
 			ply:ItemFunction2("OnSwitchFrom", item)
 		end
@@ -187,7 +197,7 @@ function SlashCo.ItemPickUp(ply, itemindex, item)
 	end
 
 	local slot = SlashCoItems[item].IsSecondary and "item2" or "item"
-	if timer.Exists(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID())) then
+	if timer.Exists(string.format("SlashCo:ItemSwitch_%s_%s", slot, ply:UserID())) then
 		return
 	end
 

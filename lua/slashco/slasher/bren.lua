@@ -250,7 +250,13 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		slasher:Freeze(false)
 		slasher:EmitSound("slashco/slasher/bren/bren_snap.mp3")
 
-		SlashCo.SetSurvivorFogMult(0.3)
+		SlashCo.AddFog({
+			name = "BrenSnap",
+			multiplier = 0.3,
+			priority = 10,
+			fogType = SlashCo.FogType.TEAM,
+			team = TEAM_SURVIVOR,
+		})
 
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			SlashCo.AudioSystem.PlaySound({
@@ -265,7 +271,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		end
 
 		timer.Simple(SLASHER.FogIncreaseLength, function()
-			SlashCo.SetSurvivorFogMult(1)
+			SlashCo.RemoveFog("BrenSnap", TEAM_SURVIVOR)
 		end)
 	end)
 end

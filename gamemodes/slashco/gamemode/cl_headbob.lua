@@ -8,7 +8,7 @@ local PitchReset = false
 
 local noHeadbob = CreateClientConVar("slashco_cl_disable_headbob", 0, true, false, "Disable camera bobbing effect for survivors.", 0, 1)
 function HeadBob(pl, pos, ang, fov)
-	if pl:Team() ~= TEAM_SURVIVOR or pl:GetNWBool("SurvivorSidExecution") then return end
+	if pl:Team() ~= TEAM_SURVIVOR or pl:GetNWBool("SurvivorSidExecution") or pl:GetMoveType() == MOVETYPE_NOCLIP then return end
 	if noHeadbob:GetBool() then return end
 
 	local velCoef = pl:GetVelocity():Length() / 300

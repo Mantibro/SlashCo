@@ -826,10 +826,11 @@ end
 
 function SlashCo.FindSpawn(ply)
 	local spawnEnts
-	if ply:Team() == TEAM_SURVIVOR then
+	local plyTeam = ply:Team()
+	if plyTeam == TEAM_SURVIVOR or plyTeam == TEAM_SPECTATOR then
 		spawnEnts = ents.FindByClass("info_sc_player_employee")
 		table.Add(spawnEnts, ents.FindByClass("info_sc_player_survivor"))
-	elseif ply:Team() == TEAM_SLASHER then
+	elseif plyTeam == TEAM_SLASHER then
 		spawnEnts = ents.FindByClass("info_sc_player_slasher")
 	elseif GameData.IsLobby then
 		GameData.PlayerSpawns = ents.FindByClass("info_player_start")

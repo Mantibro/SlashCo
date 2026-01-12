@@ -21,13 +21,19 @@ function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fo
 		fadeIn = 0,
 	})
 	
-	if CLIENT then
-		SlashCo.AddClientsideFog("Newports", 5, 1)
+	SlashCo.AddFog({
+		name = "Newports",
+		multiplier = 3,
+		priority = 1,
+		fogType = SlashCo.FogType.PLAYER,
+		entity = ply,
+	})
 
-		timer.Simple(math.random(140, 200), function()
-			SlashCo.RemoveClientsideFog("Newports")
-		end)
-	end
+	timer.Simple(math.random(140, 200), function()
+		if not IsValid(ply) then return end
+
+		SlashCo.RemoveFog("Newports", ply)
+	end)
 end
 ITEM.ViewModel = {
 	model = ITEM.Model,

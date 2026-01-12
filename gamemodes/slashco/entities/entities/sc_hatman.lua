@@ -97,6 +97,10 @@ function ENT:OnRemove()
 			table.remove(GameData.HatMans, idx)
 		end
 	end
+
+	if IsValid(target) then
+		SlashCo.AudioSystem.StopSound("HatManLookedAt", 0.1, nil, target)
+	end
 end
 
 hook.Add("PostPlayerDeath", "SlashCo:RemoveHatMans", function(ply)
@@ -238,7 +242,14 @@ function ENT:BehaveUpdate(interval)
 			volume = 1,
 			fadeIn = 0,
 		})
-		target:SetFogMult(0.5)
+
+		SlashCo.AddFog({
+			name = "HatMan",
+			multiplier = 0.5,
+			priority = 10,
+			fogType = SlashCo.FogType.PLAYER,
+			entity = target,
+		})
 
 		timer.Create("HatManSoundReset", 1, 1, function()
 			if not IsValid(target) then return end
@@ -247,7 +258,7 @@ function ENT:BehaveUpdate(interval)
 
 		timer.Create("HatManFogReset", 6, 1, function()
 			if not IsValid(target) then return end
-			target:SetFogMult(1)
+			SlashCo.RemoveFog("HatMan", target)
 		end)
 	end
 

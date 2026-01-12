@@ -31,6 +31,7 @@ AddCSLuaFile("sh_perks.lua")
 AddCSLuaFile("sh_canbeseen.lua")
 AddCSLuaFile("sh_content.lua")
 AddCSLuaFile("sh_player.lua")
+AddCSLuaFile("sh_fog.lua")
 
 include("sh_content.lua")
 include("sh_shared.lua")
@@ -62,6 +63,7 @@ include("sh_experience.lua")
 include("sh_perks.lua")
 include("sh_canbeseen.lua")
 include("sh_player.lua")
+include("sh_fog.lua")
 include("sv_holylib.lua")
 include("sv_maptools.lua")
 
@@ -175,8 +177,8 @@ local function lobbyButtons(ply, button)
 	end
 
 	--Switching Teams
-	-- NOTE: We check both KEY_COMMA and KEY_Q since previously the key was set to be COMMA but was changed to be Q.
-	if (button == KEY_COMMA or button == KEY_Q) and SlashCo.LobbyData.LOBBYSTATE == 0 then
+	-- NOTE: We check both KEY_COMMA and KEY_R since previously the key was set to be COMMA but was changed to be R.
+	if (button == KEY_COMMA or button == KEY_R) and SlashCo.LobbyData.LOBBYSTATE == 0 then
 		if plyTeam == TEAM_SPECTATOR then
 			if (#team.GetPlayers(TEAM_LOBBY) < GameData.MaxPlayers) then
 				ply:SetTeam(TEAM_LOBBY)

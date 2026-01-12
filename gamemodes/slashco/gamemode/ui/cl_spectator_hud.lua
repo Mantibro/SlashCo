@@ -55,18 +55,18 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 			spin = 1
 		end
 
-		local blip = "☞ [Q] ☜"
+		local blip = "☞ [R] ☜"
 		if GameData.IsNewPlayer then
-			blip = SlashCo.Language("newplayer_spawnnotice", "Q") --"Press [Q] to Spawn"
+			blip = SlashCo.Language("newplayer_spawnnotice", "R") --"Press [R] to Spawn"
 		else
 			if team.NumPlayers(TEAM_LOBBY) > (GameData.MaxPlayers - 1) then
-				blip = "☓ [Q] ☓"
+				blip = "☓ [R] ☓"
 			else
 				flash = flash + RealFrameTime()
 				if flash > 1 then flash = 0 end
 
 				if flash > 0.5 then
-					blip = "☛[Q]☚"
+					blip = "☛[R]☚"
 				end
 			end
 		end

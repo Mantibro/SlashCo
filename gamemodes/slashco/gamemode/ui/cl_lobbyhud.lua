@@ -86,11 +86,11 @@ hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
 	--LobbyFont1
 	if localTeam == TEAM_LOBBY then
 		if GameData.StateOfLobby == nil or GameData.StateOfLobby < 1 then
-			draw.SimpleText("[Q] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
+			draw.SimpleText("[R] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
 					color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 
-		draw.SimpleText("[R] " .. SlashCo.Language("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80,
+		draw.SimpleText("[G] " .. SlashCo.Language("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
 

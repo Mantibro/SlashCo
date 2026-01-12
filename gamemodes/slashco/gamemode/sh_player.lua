@@ -297,9 +297,8 @@ SetupSlashCoNetworkVar("Int", 2, "SurvivorRoundsWon")
 SetupSlashCoNetworkVar("Int", 3, "SlasherRoundsWon")
 SetupSlashCoNetworkVar("Int", 4, "Perception")
 
-SetupSlashCoNetworkVar("Float", 0, "FogMult")
-SetupSlashCoNetworkVar("Float", 1, "EyeSight")
-SetupSlashCoNetworkVar("Float", 2, "DeafenTime")
+SetupSlashCoNetworkVar("Float", 0, "EyeSight")
+SetupSlashCoNetworkVar("Float", 1, "DeafenTime")
 
 SetupSlashCoNetworkVar("Bool", 0, "CanSeePlayers")
 SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")

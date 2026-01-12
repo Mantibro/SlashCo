@@ -165,6 +165,7 @@ deltaMerge = DeltaMerge
 --[[
 	Serverside only fields:
 		number sendToTeam - Sends the given sound only to the specific team
+		Entity/Table sendToEntity - Sends the given sound only to a specific player/table of players
 ]]
 util.AddNetworkString("slashCo_AudioSystem_PlaySound")
 function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for documentation of the table.

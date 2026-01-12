@@ -85,6 +85,11 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 	local soundFunc = isURL and sound.PlayURL or sound.PlayFile
 	soundFunc(soundFile, mode, function(channel, errCode, errStr)
 		if not IsValid(channel) then
+			if errorCallback then
+				-- an error callback can return true to cancel us throwing an error
+				if errorCallback(errCode, errStr) then return end
+			end
+			
 			if not ErrorList[soundFile] then
 				ErrorList[soundFile] = true
 
@@ -120,11 +125,6 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 				local size = file.Size(soundFile, "GAME")
 				local content = file.Read(soundFile, "GAME")
 				ErrorNoHaltWithStack("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", " .. soundFile .. " | Debug Info: File Size:" .. tostring(size or -1) .. " File Content Size:" .. tostring(content and string.len(content) or -1) .. " File Content Hash:" .. (content and util.CRC(content) or "[no content]") .. "\n")
-			end
-
-			if errorCallback then
-				-- an error callback can return true to cancel us throwing an error
-				if errorCallback(errCode, errStr) then return end
 			end
 			return
 		else

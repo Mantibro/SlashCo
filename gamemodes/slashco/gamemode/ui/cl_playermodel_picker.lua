@@ -11,7 +11,7 @@ local function PlayerModelChosen(mod)
 	GetConVar("slashco_cl_playermodel"):SetString(mod)
 end
 
-function DrawThePlayermodelSelectorBox()
+function SlashCo.OpenPlayermodelSelector()
 	if IsValid(pmSelectFrame) then return end
 
 	pmSelectFrame = vgui.Create("DFrame")
