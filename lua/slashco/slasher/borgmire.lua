@@ -169,6 +169,10 @@ function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("BorgmireThrow") then
 		return
 	end
+	
+	if slasher.BorgKicking then
+		return
+	end
 
 	if slasher.PunchCooldown < 0.01 then
 		slasher:SetNWBool("BorgmirePunch", false)
@@ -244,6 +248,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 	if slasher.KickCooldown < 0.01 then
 		slasher:SetNWBool("BorgmireKick", false)
+		slasher.BorgKicking = true
 		timer.Remove("BorgmireKickDecay")
 		slasher.KickCooldown = 15
 		
@@ -287,6 +292,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 			timer.Create("BorgmireKickDecay", 2.1, 1, function()
 				slasher:SetNWBool("BorgmireKick", false)
+				slasher.BorgKicking = false
 			end)
 		end)
 	end
@@ -298,6 +304,10 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	end
 
 	if slasher.BorgPunching then
+		return
+	end
+	
+	if slasher.BorgKicking then
 		return
 	end
 
