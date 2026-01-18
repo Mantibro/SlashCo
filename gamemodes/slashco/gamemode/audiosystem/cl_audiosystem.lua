@@ -128,7 +128,7 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 			end
 			return
 		else
-			if usedOGGRemap and game.IsDedicated() then -- RapahelIT7: Let me find this in the server logs
+			--[[if usedOGGRemap and game.IsDedicated() then -- RapahelIT7: Let me find this in the server logs
 				local size = file.Size(soundFile, "GAME")
 				local content = file.Read(soundFile, "GAME")
 				local VFSsize = file.Size(OGGRetryList[soundFile], "GAME")
@@ -140,7 +140,7 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 					.. tostring(content and string.len(content) or -1) .. "/" .. tostring(VFScontent and string.len(VFScontent) or -1) ..
 					" File Content Hash:"
 					.. (content and util.CRC(content) or "[no content]") .. "/" .. (VFScontent and util.CRC(VFScontent) or "[no content]") .. "\n")
-			end
+			end]]
 		end
 
 		SlashCo.AudioSystem.CheckChannels()
