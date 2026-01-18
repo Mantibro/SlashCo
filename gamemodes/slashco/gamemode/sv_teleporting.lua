@@ -156,7 +156,7 @@ end
 SlashCo.LocalizedTraceHullLocatorAdvanced = SlashCo.LocalizedTraceHullLocator
 
 --Determines map size
-local function init()
+function SlashCo.InitMapMesh()
 	local brushSurfaces = game.GetWorld():GetBrushSurfaces()
 	if not brushSurfaces then
 		print("[SlashCo] Weird map! Entity:GetBrushSurfaces failed on the world? This will result in slightly inaccurate map bounds.")
@@ -186,9 +186,15 @@ local function init()
 		SlashCo.MinVec = verts[1]
 	end
 
-	SlashCo.MidVec = (SlashCo.MaxVec + SlashCo.MinVec) / 2
-	SlashCo.MapSizeExact = SlashCo.MaxVec:Distance(SlashCo.MinVec) / 8500
+	if not SlashCo.MaxVec then
+		print("[SlashCo] Completely failed InitMapMesh!")
+		SlashCo.MidVec = vector_origin
+		SlashCo.MapSizeExact = 2.5
+	else
+		SlashCo.MidVec = (SlashCo.MaxVec + SlashCo.MinVec) / 2
+		SlashCo.MapSizeExact = SlashCo.MaxVec:Distance(SlashCo.MinVec) / 8500
+	end
+	
 	SlashCo.MapSize = math.ceil(SlashCo.MapSizeExact)
 	SlashCo.SetMapSize(SlashCo.MapSize)
 end
-hook.Add("InitPostEntity", "SlashCo_InitMapMesh", init)

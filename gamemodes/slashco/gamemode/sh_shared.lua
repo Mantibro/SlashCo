@@ -440,6 +440,8 @@ else
 			local col = string.Split(keys["fogcolor"], " ")
 			SlashCo.SetGlobalFogColor(Color(col[1], col[2], col[3]))
 		end
+
+		SlashCo.InitMapMesh()
 	end
 end
 
