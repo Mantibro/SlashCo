@@ -384,6 +384,7 @@ end)
 hook.Add("InitPostEntity", "SlashCo:InitPostEntity", function()
 	print("[SlashCo] InitPostEntity Started.")
 	RunConsoleCommand("sv_alltalk", "2")
+	RunConsoleCommand("sv_noclipspeed", "2")
 
 	if not GameData.IsLobby then
 		SlashCo.State = SlashCo.States.STARTING

@@ -175,6 +175,9 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 	if SlasherSteamID ~= nil and SlasherSteamID == GameData.LocalSteamID64 then
 		return
 	end
+	if GameData.IsLobby then
+		return
+	end
 
 	if key == IN_RELOAD then
 		vision = not vision

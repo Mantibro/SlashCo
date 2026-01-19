@@ -108,6 +108,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("BrenAnger", math.floor(anger))
 	end
 	
+	if slasher:GetNWInt("MainCooldown") ~= math.floor(MainCD) then
+		slasher:SetNWInt("MainCooldown", math.floor(MainCD))
+	end
+	
 	if slasher:GetNWInt("SnapCooldown") ~= math.floor(SnapCD) then
 		slasher:SetNWInt("SnapCooldown", math.floor(SnapCD))
 	end
@@ -351,8 +355,15 @@ function SLASHER.InitHud(_, hud)
 	hud:TieMeterInt("anger", "BrenAnger")
 	
 	function hud.AlsoThink()
+		local BrenMainCooldown = GameData.LocalPlayer:GetNWInt("MainCooldown")
 		local BrenNoclipCooldown = GameData.LocalPlayer:GetNWInt("NoclipCooldown")
 		local BrenSnapCooldown = GameData.LocalPlayer:GetNWInt("SnapCooldown")
+		
+		if BrenMainCooldown > 0 then
+			hud:SetControlEnabled("LMB", false)
+		else
+			hud:SetControlEnabled("LMB", true)
+		end
 		
 		if BrenNoclipCooldown > 0 then
 			hud:SetControlEnabled("R", false)

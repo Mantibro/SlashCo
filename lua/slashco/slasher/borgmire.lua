@@ -144,19 +144,13 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			slasher.ChaseSound = true
 		end
-	end
-	
-	local anger = SlashCo.GetSlasherAnger(slasher)
-	if anger < 50 then
-		slasher:SetNWBool("CanThrow", false)
-	else
-		slasher:SetNWBool("CanThrow", true)
-	end
-	
-	if slasher:GetNWBool("InSlasherChaseMode") then
+		
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerChaseGain)
 	end
 	
+	local anger = SlashCo.GetSlasherAnger(slasher)
+	slasher:SetNWBool("CanThrow", anger > 50)
+
 	if slasher:GetNWInt("BorgmireAnger") ~= math.floor(anger) then
 		slasher:SetNWInt("BorgmireAnger", math.floor(anger))
 	end
@@ -367,6 +361,19 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 			slasher.ChaseActivationCooldown = 2
 		end)
 	end
+end
+
+function SLASHER.OnHitByPocketSand(slasher, ply)
+	SlashCo.StopChase(slasher)
+
+	slasher:SetNWBool("BorgmireStunned", true)
+	slasher:Freeze(true)
+	timer.Simple(9, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("BorgmireStunned", false)
+		slasher:Freeze(false)
+	end)
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
