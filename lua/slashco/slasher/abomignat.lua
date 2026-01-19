@@ -161,6 +161,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCurrentViewOffset(crawling_viewoffset)
 	else
 		slasher:SetNWBool("CanChase", slasher:GetNWBool("AbomignatCanMainSlash"))
+		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
+		slasher:SlasherHudFunc("SetControlVisible", "RMB", true)
+		slasher:SlasherHudFunc("SetControlVisible", "F", true)
 
 		eyesight_final = 6
 		perception_final = 0.5
