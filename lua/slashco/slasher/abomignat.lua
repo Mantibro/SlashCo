@@ -73,14 +73,14 @@ function SLASHER.OnSpawn(slasher)
 	slasher.LungeDuration = 0
 end
 
-local function AbomignatScream()
+local function AbomignatScream(slasher)
 	local idx = math.random(1, 3)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/abomignat/abomignat_scream" .. idx .. ".mp3",
 		identifier = "AbomignatScream" .. idx,
 		minDistance = 600,
 		maxDistance = 800,
-		entity = ply,
+		entity = slasher,
 		volume = 1,
 		fadeIn = 0,
 	})
@@ -117,7 +117,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if (slasher:GetVelocity():Length() < 450 or target:IsValid()) and LungeDuration > 30 and slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
-				AbomignatScream()
+				AbomignatScream(slasher)
 			end)
 
 			slasher:SetNWBool("AbomignatLunging", false)
@@ -241,7 +241,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	slasher.SlashCooldown = math.max(3 - SLASHER.CooldownReduction, 0)
 	slasher.FowardCharge = 6
 
-	AbomignatScream()
+	AbomignatScream(slasher)
 	slasher:SlasherHudFunc("ShakeControl", "LMB")
 
 	local function SlashFinish()
@@ -363,7 +363,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		if slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
-				AbomignatScream()
+				AbomignatScream(slasher)
 			end)
 
 			slasher:SetNWBool("AbomignatLunging", false)
