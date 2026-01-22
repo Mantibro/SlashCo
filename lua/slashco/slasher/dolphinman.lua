@@ -267,8 +267,11 @@ function SLASHER.OnMainAbilityFire(slasher)
 		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
 			return
 		end
-		
+
 		slasher:SetNWBool("DolphinInHiding", true)
+		if SlashCo.CurRound.EscapeHelicopterSummoned then
+			slasher.HuntPower = math.min(100, slasher.HuntPower + 50)
+		end
 
 		return
 	end
