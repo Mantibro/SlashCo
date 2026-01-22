@@ -252,10 +252,12 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		if slasher:GetNWBool("DolphinHunting") then
 			slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
 			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
-		else
-			slasher.HuntPower = math.min(100, slasher.HuntPower + 20)
-			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
+
+			return
 		end
+
+		slasher.HuntPower = math.min(100, slasher.HuntPower + 20)
+		slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 	end
 end
 
