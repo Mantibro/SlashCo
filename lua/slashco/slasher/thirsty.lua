@@ -154,7 +154,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	target:Remove()
 
 	local matrix = slasher:GetBoneMatrix(slasher:LookupBone("HandR"))
-	local pos = matrix:GetTranslation()
+	local pos = slasher:LocalToWorld(Vector(0, 5, 0))
 	local ang = matrix:GetAngles()
 
 	local chugjug = ents.Create("prop_physics")
