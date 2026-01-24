@@ -28,7 +28,7 @@ SLASHER.Description = "Manspider_desc"
 SLASHER.ProTip = "Manspider_tip"
 SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
-SLASHER.DiffRating = "★☆☆☆☆"
+SLASHER.DiffRating = "★★★☆☆"
 SLASHER.CannotBeSpectated = true
 SLASHER.NestedRange = 1000 -- When nested, this range is used to check for any nearby survivors.
 SLASHER.AdditionalAngerMult = 0 -- Used to multiply FrameTime which is then added additionally to the Anger.
@@ -58,6 +58,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
 	slasher.Jump = slasher:GetJumpPower()
+	slasher:SetNWBool("ManspiderClimbing", false)
 
 	slasher.TargetPlayer = 0
 	slasher.LeapCooldown = 0
@@ -176,7 +177,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				slasher.Aggression = Aggression + (FrameTime() * ((250 - d) / 2000)) + (SLASHER.AdditionalAngerMult * FrameTime())
 
-				if Aggression > 100 then
+				if Aggression >= 100 then
 					slasher.TargetPlayer = s:SteamID64()
 					slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
 				end
@@ -283,7 +284,181 @@ function SLASHER.OnMainAbilityFire(slasher)
 	end
 end
 
+local function ManspiderClimbCheck(ply, mv)
+	local eyeDir = ply:EyeAngles():Forward()
+	local traceDist = 50
+
+	local startPos = ply:EyePos()
+	local endPos = startPos + eyeDir * traceDist
+
+	local tr = util.TraceLine({
+		start = startPos,
+		endpos = endPos,
+		mask = MASK_VISIBLE,
+		filter = ply
+	})
+
+	if not tr.Hit then
+		for yawOffset = -30, 30, 15 do
+			local offsetDir = (ply:EyeAngles() + Angle(0, yawOffset, 0)):Forward()
+			tr = util.TraceLine({
+				start = startPos,
+				endpos = startPos + offsetDir * traceDist,
+				mask = MASK_VISIBLE,
+				filter = ply
+			})
+			if tr.Hit then break end
+		end
+	end
+
+	return tr
+end
+
+local function ManspiderKillCheck(ply, mv)
+	if not ply:GetNWBool("ManspiderLeaping") then return end
+
+    local velocity = ply:GetVelocity()
+    if velocity:Length() < 200 then return nil end
+
+    local speedDir = velocity:GetNormalized()
+    local traceDist = 200
+
+    local startPos = ply:GetPos() + ply:OBBCenter()
+    local endPos = startPos + speedDir * traceDist
+
+    local trLine = util.TraceLine({
+        start = startPos,
+        endpos = endPos,
+        filter = ply
+    })
+
+    if trLine.Hit then
+        local mins = Vector(-20, -20, 0)
+        local maxs = Vector(20, 20, 32)
+        local len = 64
+        local endPosition = startPos + speedDir * len
+
+        local trHull = util.TraceHull({
+            start = startPos,
+            endpos = endPosition,
+            mins = mins,
+            maxs = maxs,
+            filter = ply
+        })
+
+        return trHull
+    end
+
+    return nil
+end
+
+function SLASHER.Move(ply, mv)
+	if not ply:GetNWBool("ManspiderClimbing") then
+		ply:SetRunSpeed(SLASHER.ProwlSpeed)
+		ply:SetWalkSpeed(SLASHER.ProwlSpeed)
+		ply:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+
+		local climbEntity = ply:GetNWString("ManspiderClimbEntity")
+		local target = ply:GetGroundEntity()
+
+		if ply:OnGround() or ply:WaterLevel() > 0 then
+			ply:SetNWString("ManspiderClimbEntity", "")
+			ply:SetNWBool("ManspiderLeaping", false)
+			return
+		end
+
+		local tr = ManspiderClimbCheck(ply, mv)
+		if !tr.HitSky and tr.Hit and tr.Entity == game.GetWorld() and tr.HitNormal.z <= 0 then
+			if SERVER then
+				if tr.HitNormal.z >= -0.2 then
+					local vectoradd = Vector(0,0,0)
+					local trace = { start = ply:GetPos(), endpos = ply:GetPos() + -tr.HitNormal * 50, filter = ply }
+					local trr = util.TraceLine(trace, ply)
+
+					if (!trr.Hit or tr.Entity ~= game.GetWorld()) then
+						local trace = { start = ply:GetPos(), endpos = ply:GetPos() + Vector(0,0,64), filter = ply,
+							mins = ply:OBBMins(),
+							maxs = ply:OBBMaxs(),
+						}
+						local trr = util.TraceHull(trace)
+
+						if (!trr.Hit) then
+							vectoradd = Vector(0,0,64)
+						else
+							return
+						end
+					end
+
+					local newpos = tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28
+					local trace2 = { start = newpos, endpos = newpos, filter = ply }
+					local trr2 = util.TraceEntity(trace2, ply) 
+					if (trr2.Hit) then return end
+
+					ply:SetNWString("ManspiderClimbEntity", "wall")
+					ply:SetNWBool("ManspiderLeaping", false)
+					mv:SetOrigin(vectoradd + tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28)
+				else
+					if ply:GetNWString("ManspiderClimbEntity", "wall") == "ceiling" then
+						return
+					end
+
+					ply:SetNWString("ManspiderClimbEntity", "ceiling")
+					ply:SetNWBool("ManspiderLeaping", false)
+
+					local trace = { start = ply:GetPos(), endpos = ply:GetPos() + Vector(0,0,80), filter = ply }
+					local trr = util.TraceEntity(trace, ply)
+					if (trr.Hit) then
+						mv:SetOrigin(trr.HitPos + trr.HitNormal * 2)
+					else
+						mv:SetOrigin(tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 7)
+					end
+				end
+			
+				ply:SetNWBool("ManspiderClimbing", true)
+			end
+
+			ply:SetMoveType(MOVETYPE_NONE)
+			return
+		end
+
+		if SERVER and climbEntity == "" then
+			local tr = ManspiderKillCheck(ply, mv)
+			if !tr then return end
+
+			if tr.Entity and tr.Entity:IsPlayer() then
+				local victim = tr.Entity
+
+				victim:TakeDamage(50, ply, ply)
+
+				local edata = EffectData()
+				edata:SetOrigin(tr.HitPos)
+				edata:SetEntity(victim)
+				util.Effect("BloodImpact", edata)
+
+				victim:EmitSound("physics/body/body_medium_break3.wav")
+				ply:SetNWString("ManspiderClimbEntity", "")
+			end
+		end
+	else
+		ply:SetRunSpeed(1)
+		ply:SetWalkSpeed(1)
+		ply:SetSlowWalkSpeed(1)
+
+		return true
+	end
+end
+
 function SLASHER.OnSpecialAbilityFire(slasher)
+	if slasher:GetNWBool("ManspiderClimbing") then 
+		slasher:SetNWBool("ManspiderClimbing", false)
+		slasher:SetNWString("ManspiderClimbEntity", "")
+		slasher:SetMoveType(MOVETYPE_WALK)
+		slasher:SetVelocity((slasher:EyeAngles():Forward() * 400) + Vector(0, 0, 200))
+		slasher:SetNWBool("ManspiderLeaping", true)
+
+		return
+	end
+
 	if slasher.LeapCooldown > 0 then
 		return
 	end
@@ -310,6 +485,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			return
 		end
 
+		slasher:SetNWBool("ManspiderLeaping", true)
 		slasher:SetVelocity((slasher:EyeAngles():Forward() * SLASHER.JumpStrengthForward) + Vector(0, 0, SLASHER.JumpStrengthUp))
 		slasher:Freeze(false)
 	end)
@@ -438,6 +614,10 @@ function SLASHER.InitHud(_, hud)
 			end
 
 			hud.prevNested = nested
+		end
+		local climbing = GameData.LocalPlayer:GetNWBool("ManspiderClimbing")
+		if climbing then
+			hud:ShakeControl("F")
 		end
 
 		local hide = SlashCo.IsPositionLegalForSlashers(GameData.LocalPlayer:GetPos())
