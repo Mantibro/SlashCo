@@ -317,135 +317,144 @@ end
 local function ManspiderKillCheck(ply, mv)
 	if not ply:GetNWBool("ManspiderLeaping") then return end
 
-    local velocity = ply:GetVelocity()
-    if velocity:Length() < 200 then return nil end
+	local velocity = ply:GetVelocity()
+	if velocity:Length() < 200 then return nil end
 
-    local speedDir = velocity:GetNormalized()
-    local traceDist = 200
+	local speedDir = velocity:GetNormalized()
+	local traceDist = 200
 
-    local startPos = ply:GetPos() + ply:OBBCenter()
-    local endPos = startPos + speedDir * traceDist
+	local startPos = ply:GetPos() + ply:OBBCenter()
+	local endPos = startPos + speedDir * traceDist
 
-    local trLine = util.TraceLine({
-        start = startPos,
-        endpos = endPos,
-        filter = ply
-    })
+	local trLine = util.TraceLine({
+		start = startPos,
+		endpos = endPos,
+		filter = ply
+	})
 
-    if trLine.Hit then
-        local mins = Vector(-20, -20, 0)
-        local maxs = Vector(20, 20, 32)
-        local len = 64
-        local endPosition = startPos + speedDir * len
+	if trLine.Hit then
+		local mins = Vector(-20, -20, 0)
+		local maxs = Vector(20, 20, 32)
+		local len = 64
+		local endPosition = startPos + speedDir * len
 
-        local trHull = util.TraceHull({
-            start = startPos,
-            endpos = endPosition,
-            mins = mins,
-            maxs = maxs,
-            filter = ply
-        })
+		local trHull = util.TraceHull({
+			start = startPos,
+			endpos = endPosition,
+			mins = mins,
+			maxs = maxs,
+			filter = ply
+		})
 
-        return trHull
-    end
+		return trHull
+	end
 
-    return nil
+	return nil
 end
 
+local vectorAddNormal = Vector(0, 0, 0)
+local vectorAddHigh = Vector(0, 0, 64)
 function SLASHER.Move(ply, mv)
-	if not ply:GetNWBool("ManspiderClimbing") then
-		ply:SetRunSpeed(SLASHER.ProwlSpeed)
-		ply:SetWalkSpeed(SLASHER.ProwlSpeed)
-		ply:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-
-		local climbEntity = ply:GetNWString("ManspiderClimbEntity")
-		local target = ply:GetGroundEntity()
-
-		if ply:OnGround() or ply:WaterLevel() > 0 then
-			ply:SetNWString("ManspiderClimbEntity", "")
-			ply:SetNWBool("ManspiderLeaping", false)
-			return
-		end
-
-		local tr = ManspiderClimbCheck(ply, mv)
-		if !tr.HitSky and tr.Hit and tr.Entity == game.GetWorld() and tr.HitNormal.z <= 0 then
-			if SERVER then
-				if tr.HitNormal.z >= -0.2 then
-					local vectoradd = Vector(0,0,0)
-					local trace = { start = ply:GetPos(), endpos = ply:GetPos() + -tr.HitNormal * 50, filter = ply }
-					local trr = util.TraceLine(trace, ply)
-
-					if (!trr.Hit or tr.Entity ~= game.GetWorld()) then
-						local trace = { start = ply:GetPos(), endpos = ply:GetPos() + Vector(0,0,64), filter = ply,
-							mins = ply:OBBMins(),
-							maxs = ply:OBBMaxs(),
-						}
-						local trr = util.TraceHull(trace)
-
-						if (!trr.Hit) then
-							vectoradd = Vector(0,0,64)
-						else
-							return
-						end
-					end
-
-					local newpos = tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28
-					local trace2 = { start = newpos, endpos = newpos, filter = ply }
-					local trr2 = util.TraceEntity(trace2, ply) 
-					if (trr2.Hit) then return end
-
-					ply:SetNWString("ManspiderClimbEntity", "wall")
-					ply:SetNWBool("ManspiderLeaping", false)
-					mv:SetOrigin(vectoradd + tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28)
-				else
-					if ply:GetNWString("ManspiderClimbEntity", "wall") == "ceiling" then
-						return
-					end
-
-					ply:SetNWString("ManspiderClimbEntity", "ceiling")
-					ply:SetNWBool("ManspiderLeaping", false)
-
-					local trace = { start = ply:GetPos(), endpos = ply:GetPos() + Vector(0,0,80), filter = ply }
-					local trr = util.TraceEntity(trace, ply)
-					if (trr.Hit) then
-						mv:SetOrigin(trr.HitPos + trr.HitNormal * 2)
-					else
-						mv:SetOrigin(tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 7)
-					end
-				end
-			
-				ply:SetNWBool("ManspiderClimbing", true)
-			end
-
-			ply:SetMoveType(MOVETYPE_NONE)
-			return
-		end
-
-		if SERVER and climbEntity == "" then
-			local tr = ManspiderKillCheck(ply, mv)
-			if !tr then return end
-
-			if tr.Entity and tr.Entity:IsPlayer() then
-				local victim = tr.Entity
-
-				victim:TakeDamage(50, ply, ply)
-
-				local edata = EffectData()
-				edata:SetOrigin(tr.HitPos)
-				edata:SetEntity(victim)
-				util.Effect("BloodImpact", edata)
-
-				victim:EmitSound("physics/body/body_medium_break3.wav")
-				ply:SetNWString("ManspiderClimbEntity", "")
-			end
-		end
-	else
+	if ply:GetNWBool("ManspiderClimbing") then
 		ply:SetRunSpeed(1)
 		ply:SetWalkSpeed(1)
 		ply:SetSlowWalkSpeed(1)
 
 		return true
 	end
+
+	ply:SetRunSpeed(SLASHER.ProwlSpeed)
+	ply:SetWalkSpeed(SLASHER.ProwlSpeed)
+	ply:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+
+	if ply:OnGround() or ply:WaterLevel() > 0 then
+		ply:SetNWString("ManspiderClimbEntity", "")
+		ply:SetNWBool("ManspiderLeaping", false)
+		return
+	end
+
+	local tr = ManspiderClimbCheck(ply, mv)
+	if !tr.HitSky and tr.Hit and tr.HitWorld and tr.HitNormal.z <= 0 then
+		if SERVER then
+			if tr.HitNormal.z >= -0.2 then
+				local vectoradd = vectorAddNormal
+				local trace = {
+					start = ply:GetPos(),
+					endpos = ply:GetPos() + -tr.HitNormal * 50,
+					filter = ply
+				}
+				local trr = util.TraceEntity(trace, ply)
+
+				if not trr.Hit or not tr.HitWorld then
+					local trace = {
+						start = ply:GetPos(),
+						endpos = ply:GetPos() + vectorAddHigh,
+						filter = ply,
+						mins = ply:OBBMins(),
+						maxs = ply:OBBMaxs(),
+					}
+					local trr = util.TraceHull(trace)
+
+					if (!trr.Hit) then
+						vectoradd = vectorAddHigh
+					else
+						return
+					end
+				end
+
+				local newpos = tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28
+				local trace2 = { start = newpos, endpos = newpos, filter = ply }
+				local trr2 = util.TraceEntity(trace2, ply) 
+				if (trr2.Hit) then return end
+
+				ply:SetNWString("ManspiderClimbEntity", "wall")
+				ply:SetNWBool("ManspiderLeaping", false)
+				mv:SetOrigin(vectoradd + tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28)
+			else
+				if ply:GetNWString("ManspiderClimbEntity", "wall") == "ceiling" then
+					return
+				end
+
+				ply:SetNWString("ManspiderClimbEntity", "ceiling")
+				ply:SetNWBool("ManspiderLeaping", false)
+
+				local trace = { start = ply:GetPos(), endpos = ply:GetPos() + Vector(0,0,80), filter = ply }
+				local trr = util.TraceEntity(trace, ply)
+				if (trr.Hit) then
+					mv:SetOrigin(trr.HitPos + trr.HitNormal * 2)
+				else
+					mv:SetOrigin(tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 7)
+				end
+			end
+			
+			ply:SetNWBool("ManspiderClimbing", true)
+		end
+
+		ply:SetMoveType(MOVETYPE_NONE)
+		return
+	end
+
+	if CLIENT then return end
+
+	local climbEntity = ply:GetNWString("ManspiderClimbEntity")
+	if climbEntity ~= "" then return end
+	
+	local tr = ManspiderKillCheck(ply, mv)
+	if !tr then return end
+
+	-- RaphaelIT7: tr.Entity will never be nil - it'll be NULL, and we can use IsPlayer on NULL and if it returns true we can also be sure that it's valid-
+	if not tr.Entity:IsPlayer() then return end
+	
+	local victim = tr.Entity
+	victim:TakeDamage(50, ply, ply)
+
+	local edata = EffectData()
+	edata:SetOrigin(tr.HitPos)
+	edata:SetEntity(victim)
+	util.Effect("BloodImpact", edata)
+
+	victim:EmitSound("physics/body/body_medium_break3.wav")
+	ply:SetNWString("ManspiderClimbEntity", "")
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
