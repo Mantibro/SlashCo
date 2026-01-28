@@ -182,6 +182,7 @@ local colors = {
 	red = Color(255, 0, 0),
 	blue = Color(0, 0, 255),
 	yellow = Color(255, 255, 0),
+	green = Color(0, 255, 0),
 	gray = Color(200, 200, 200)
 }
 
@@ -234,6 +235,7 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER), "red")
 			if showGasCanHalos then
 				SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "gray")
+				SlashCo.DrawHalo(ents.FindByClass("sc_battery"), "green")
 			end
 		end
 
