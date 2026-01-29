@@ -642,7 +642,88 @@ SlashCo.LangTable["points_slowescape"] = "[%s] SLOW ESCAPE"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] DOING YOUR JOB"
 
+-- Documents
+
+SlashCo.LangTable["documentUI_one"] = "[Left Click] = Enter Page"
+SlashCo.LangTable["documentUI_two"] = "[Right Click] = Exit Page"
+SlashCo.LangTable["documentSlashers"] = "SLASHERS"
+SlashCo.LangTable["documentLocations"] = "LOCATIONS"
+SlashCo.LangTable["documentArchive"] = "ARCHIVE"
+SlashCo.LangTable["documentPerks"] = "PERKS"
+SlashCo.LangTable["documentEncounter"] = "ENCOUNTER SLASHER TO UNLOCK ENTRY"
+SlashCo.LangTable["documentEntry"] = "ENTRY: \""
+SlashCo.LangTable["documentAliases"] = "ALIASES:"
+SlashCo.LangTable["documentClass"] = "CLASS:"
+SlashCo.LangTable["documentDanger"] = "DANGER LVL:"
+SlashCo.LangTable["documentAttFile"] = "[VIEW ATTACHED FILE]"
+SlashCo.LangTable["documentSurvive"] = "[SURVIVE SLASHER FOR MORE INFO]"
+
+SlashCo.LangTable["Abomignat_docDesc"] = [[A large cryptid creature that resembles a biped mammal with an overgrown mouth similar to a Venus flytrap's. Due to its skinny complexity, this cryptid appears to move at high speeds and hunts down its prey with its long limbs that are equipped with thick nails, sharp enough to tear any target into shreds. The cryptid, although not good with hearing due to its lack of ears, is equipped with 4 protruding compound eyes, granting it a wide field of view of its surroundings to help hunt down its next victim.]]
+SlashCo.LangTable["Abomignat_docDescAdd"] = [[This Slasher will sometimes crawl on the ground to traverse long distances at high speed. At high [ANGER], it will lunge at its victims, dealing heavy damage.]]
+
+SlashCo.LangTable["Amogus_docDesc"] = [[This cryptid appears to rotate between searching for victims as well as hiding in plain sight in an attempt to deceive them by disguising himself as a human, or even a Fuel Can. Teams should be particularly careful about Fuel Cans or team members which look “sus”. Once the cryptid starts hunting a player; the subject will begin shouting, “AMONG US!”.]]
+SlashCo.LangTable["Amogus_docDescAdd"] = [[This cryptid has a pair of massively muscular legs with huge glutes which support a relatively small mid-section with a visor in the front.]]
+
+SlashCo.LangTable["Bababooey_docDesc"] = [[A non-organic entity composed of very thick, tar-like particulate smoke which condenses itself into the shape of a muscular male humanoid, with a massive chin and huge smiling mouth. This Slasher seems to not be very aggressive, choosing to be more playful with its victims. It seems to take enjoyment from scaring humans and catching them off their guard.]]
+SlashCo.LangTable["Bababooey_docDescAdd"] = [[When Bababooey has enough [ANGER], he will start turning invisible, indicated with a loud sound. When invisible, he will scare survivors who he reaches. While invisible, will also leave behind harmless clones to scare survivors.]]
+
+SlashCo.LangTable["Borgmire_docDesc"] = [[A huge humanoid mechanical contraption, possessing large, solid steel hands, glowing red goggle eyes and an open chest cavity with a beating heart. This Slasher has quite poor eyesight, but a considerably good stamina.]]
+SlashCo.LangTable["Borgmire_docDescAdd"] = [[This Slasher gains [ANGER] quickly. During pursuit, Borgmire will lose [ANGER]. At high [ANGER], Borgmire will gain the ability to sprint very quickly.]]
+
+SlashCo.LangTable["Bren_docDesc"] = [[This umbra’s body is that of an elderly human male. The Umbra also has a characteristic red glow to their body and appears to levitate.]]
+SlashCo.LangTable["Bren_docDescAdd"] = [[A terrifying Umbra which can phase through solid objects. Extremely aggressive.	After being angered, this Umbra will proceed to start phasing through doors, walls, and other similar objects to reach its prey.]]
+
+SlashCo.LangTable["Covenant_docDesc"] = [[How about I take my motherfucking goddamn Covenant, chase you down in the middle of the motherfucking snow you're running. You see a bunch of us in Black cloaks running towards you. You see me in a gold cloak, big tall muscular evil ass motherfucker running at you. First I start off like this cuz I don't need my full speed to catch you. Then I see you start to speed up then I start speeding. Then I just go and I just sick my whole Covenant and they're just chasing you running at you like wolves in black..]]
+SlashCo.LangTable["Covenant_docDescAdd"] = [[Don't let Rocks put that stick up your ass.]]
+
+SlashCo.LangTable["Criminal_docDesc"] = [[Criminal has been noticed to stalk its prey before planning its attack. As an intimidation tactic, Criminal will split into 6 copies which will surround whoever he is trying to attack. After killing its target, Criminal and its copies will disappear for a short-time being. Upon being enraged, Criminal will now immediately attack anything it sees without any planning. Criminal in its rage form will now hide within his copies, not being able to be detected.]]
+SlashCo.LangTable["Criminal_docDescAdd"] = [[This umbra’s body is that of an elderly human male in a full suit, sporting a large smile at all times. Upon being enraged, Criminal becomes purple and his face turns mangled with a large grin being shown at all times.]]
+
+SlashCo.LangTable["Dolphinman_docDesc"] = [[A humanoid cryptid creature, having the body of a man with biological features of a dolphin. Its skin secretes a sticky mucous, giving it a glistening and moist texture. The creature has very poor eyesight, and mostly relies on its hearing and echolocation to ascertain its surroundings. When hunting, it sings a continuous loud wail to intimidate its target.]]
+SlashCo.LangTable["Dolphinman_docDescAdd"] = [[This Slasher is extremely sensitive to sound and has extremely poor eyesight. If agitated with a loud sound, Dolphinman will begin wailing loudly and start HUNTING. When HUNTING, Dolphinman has very good eyesight. Sensitivity to loud sounds increases with [ANGER].]]
+
+SlashCo.LangTable["FreeSmiley_docDesc"] = [[A cryptid entity that represents the appearance of a yellow tall guy with a big smile, it is said that he roams endlessly laughing near residential areas.]]
+SlashCo.LangTable["FreeSmiley_docDescAdd"] = [[We have reports of him being followed by two floating creatures that will try to harm anyone that cross they line of sight]]
+
+SlashCo.LangTable["Hatman_docDesc"] = [[A consistent hallucination reported to be seen by those who have ingested excessive doses of Diphenhydramine. Most who have experienced this entity claim to be somehow monetarily indebted to it. Other common hallucinations include visions of various large insects as well as silhouettes of people. The Hat Man will continuously head towards your current location. Staring at The Hat Man will stop him, and after a short moment will get him to temporarily disappear.]]
+--SlashCo.LangTable["HatMan_docDescAdd"] =
+
+SlashCo.LangTable["Leuonard_docDesc"] = [[This demon creature shapes into the form of an action figure, holding an championship belt on his shoulder and a pair of cool glasses. He's also very attached to a dog plushie.]]
+SlashCo.LangTable["Leuonard_docDescAdd"] = [[Reports says he's very aggressive and will try to attack everyone that take his dog plushie away. Awaiting more scout reports.]]
+
+SlashCo.LangTable["Male07_docDesc"] = [[A terrifying Umbra which seems to appear in and out of existence anywhere he pleases. He can turn into a mangled form of himself to attack his victims, but he is most dangerous in his unchanged form, when he will kill anyone in sight. This Umbra usually lives in coordination with other citizen subjects.]]
+SlashCo.LangTable["Male07_docDescAdd"] = [[This umbra most often looks no different from an average human male. He has been seen in a terrifyingly mangled form, with an elongated head and arms with two sharp claws.]]
+
+SlashCo.LangTable["Manspider_docDesc"] = [[A dangerous cryptid which does not seek human victims directly. It will initially roam around, avoiding any human it encounters. It will eventually find a nesting spot. Any human who approaches within a radius of the spot will then become its prey. At that point this cryptid will keep actively hunting for the specific victim until they have died. After that it will return to its roaming state and repeat the cycle. It has been known to carry fuel cans to its nesting spot to lure in victims.]]
+SlashCo.LangTable["Manspider_docDescAdd"] = [[This slasher’s body is a grotesque human body with extra pairs of arms and legs, a huge abdomen, and a spider’s head grown into the face.]]
+
+SlashCo.LangTable["Princess_docDesc"] = [[A canine creature strongly resembling an excessively large Pitbull, with brightly glowing green eyes. This Demon has seen to exhibit a particularly great urge to brutally attack and maul humans, especially toddlers and small children.]]
+SlashCo.LangTable["Princess_docDescAdd"] = [[This Slasher RAPIDLY gains [ANGER]. Princess can be given Babies to maul, which will lower his anger and pacify him for a short while. Upon attacking, Princess will begin mauling, and the victim must [STRUGGLE] to escape the grasp. [ANGER] increases the difficulty of the [STRUGGLE].]]
+
+SlashCo.LangTable["Sid_docDesc"] = [[A non-organic entity which takes the form of a crudely-made mascot costume of the character Cookie Monster. The Slasher is armed with a large caliber handgun which appears to operate without the need to reload. The rounds it fires were measured to be chambered in .50 BMG. This Slasher is extremely aggressive and psychotic. Its only concern seems to be the killing of as many humans as possible as quickly as it can.]]
+SlashCo.LangTable["Sid_docDescAdd"] = [[This Slasher gains [ANGER] quickly. At low [ANGER], Sid will seek out Cookies to eat. Eating a cookie will slightly reduce [ANGER] and pacify Sid for around a minute. At high [ANGER], Sid will equip his gun. After this, he will not eat cookies anymore.]]
+
+SlashCo.LangTable["Speedrunner_docDesc"] = [[A large, skeletal, humanoid, green-skinned cryptid, wearing a white smiley face mask, believed to be related to taking the shortest time possible to beat a block-based survival video game. This Slasher appears to require a kind of 'warm-up' before being able to utilize his full speed.]]
+SlashCo.LangTable["Speedrunner_docDescAdd"] = [[This Slasher gains [ANGER] VERY RAPIDLY. Speedrunner can only gain [ANGER] passively. This Slasher's movement speed is initially very slow, but is heavily affected by [ANGER].]]
+
+SlashCo.LangTable["Thirsty_docDesc"] = [[A humanoid entity, appearing to wear an all-black bodysuit and a cracked, plain white mask. This Slasher moves around very quietly, and seems to not be very aggressive, but it is suspected to be easily irritable if provoked. This Demon has an incredibly high affinity for Milk, which could be used as an advantage to keep it distracted.]]
+SlashCo.LangTable["Thirsty_docDescAdd"] = [[This Slasher gains [ANGER] quickly, especially if aggravated. At low to medium [ANGER], Thirsty is PASSIVE. Thirsty will seek out Milk Jugs to drink.]]
+
+SlashCo.LangTable["Trollge_docDesc"] = [[A thin, skeletal figure with a large, contorted smiling head. The entity's movements appear frail and slow. It has been show that this Slasher has great difficulty visually discerning objects which are not in motion. The Slasher also has incredibly good hearing, and seems to be easy to irritate.]]
+SlashCo.LangTable["Trollge_docDescAdd"] = [[At high [ANGER], Trollge will become more sensitive to sounds, and is more likely to sprint towards them.]]
+
+SlashCo.LangTable["Tyler_docDesc"] = [[A transcendent non-corporeal entity which assumes the form of musical artist Tyler The Creator. In its passive state the entity seems to enjoy dancing as if on stage, and using its unexplainable power to create objects out of thin air. The entity can also manifest in an alternate form; "Tyler: The Destroyer." FUEL will become considerably more scarce with this Slasher present, Tyler The Creator will have to be found within a limited time: otherwise he will become Tyler: The Destroyer for a short duration. He can be found by listening out for his music, the volume of which decreases with [ANGER]. Tyler: The Destroyer can DESTROY various ITEMS, and doing so will shorten his duration.]]
+--SlashCo.LangTable["Tyler_docDescAdd"] =
+
+SlashCo.LangTable["Watcher_docDesc"] = [[An umbra entity, taking the form of an extremely tall old man wearing an olive overcoat, round glasses and a hat. The entity awkwardly stumbles when moving, and has mostly been reported to observe victims patiently while hidden in the dark. This Slasher has been reported to prefer to stay in groups, and has shown to be a brutal killer when acting alone.]]
+SlashCo.LangTable["Watcher_docDescAdd"] = [[This Slasher cannot passively gain [ANGER]. The Watcher will VERY RAPIDLY gain [ANGER] when observing a victim.]]
+
 -- Perks
+
+SlashCo.LangTable["perk_nameui"] = "NAME: \""
+SlashCo.LangTable["perk_priceui"] = "PRICE: "
+SlashCo.LangTable["perk_teamui"] = "TEAM: "
+SlashCo.LangTable["perk_descui"] = "[Description]"
 
 SlashCo.LangTable["perk_buy"] = "Buy Perk"
 SlashCo.LangTable["perk_enable"] = "Enable Perk"

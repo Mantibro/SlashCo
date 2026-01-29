@@ -154,19 +154,19 @@ end
 
 local selection = {
 	["Selection"] = function(w, h)
-		if DrawTextWithHitbox("[SLASHERS]", "TVCDBig", w / 2, (h / 2) - (h / 4), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+		if DrawTextWithHitbox(SlashCo.Language("documentSlashers"), "TVCDBig", w / 2, (h / 2) - (h / 4), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 			GameData.DocumentPointer = 0
 		end
 
-		if DrawTextWithHitbox("[LOCATIONS]", "TVCDBig", w / 2, (h / 2) - (h / 12), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+		if DrawTextWithHitbox(SlashCo.Language("documentLocations"), "TVCDBig", w / 2, (h / 2) - (h / 12), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 			GameData.DocumentPointer = 1
 		end
 
-		if DrawTextWithHitbox("[ARCHIVE]", "TVCDBig", w / 2, (h / 2) + (h / 12), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+		if DrawTextWithHitbox(SlashCo.Language("documentArchive"), "TVCDBig", w / 2, (h / 2) + (h / 12), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 			GameData.DocumentPointer = 2
 		end
 
-		if DrawTextWithHitbox("[PERKS]", "TVCDBig", w / 2, (h / 2) + (h / 4), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
+		if DrawTextWithHitbox(SlashCo.Language("documentPerks"), "TVCDBig", w / 2, (h / 2) + (h / 4), color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER) then
 			GameData.DocumentPointer = 3
 		end
 
@@ -265,7 +265,7 @@ local selection = {
 		if slasher or (selectedDocument.DangerLevel and selectedDocument.Class) then
 			draw.SimpleText(string.upper(SlashCo.DangerLevel[slasher and slasher.DangerLevel or selectedDocument.DangerLevel] .. " " .. SlashCo.SlasherClass[slasher and slasher.Class or selectedDocument.Class]), "TVCDMedium", h / 1.45, w / 1.17, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		else
-			draw.SimpleText("ENCOUNTER SLASHER TO UNLOCK ENTRY", "TVCDSmall", h / 1.45, w / 1.17, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText(SlashCo.Language("documentEncounter"), "TVCDSmall", h / 1.45, w / 1.17, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 
 		if IsPressing(MOUSE_LEFT) and (slasher or selectedDocument.ID) then
@@ -381,17 +381,17 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 
 	if not Aliases or not Class or not DangerLevel or not ID then continue end -- No slasher and no data? Then something is invalid
 
-	local descriptionRows = SplitTextIntoRows(document.Description, "TVCD", screenSize / 1.01)
-	local additionalDescriptionRows = SplitTextIntoRows(document.AdditionalDescription, "TVCD", screenSize / 1.01)
+	local descriptionRows = SplitTextIntoRows(SlashCo.Language(document.Description), "TVCD", screenSize / 1.01)
+	local additionalDescriptionRows = SplitTextIntoRows(SlashCo.Language(document.AdditionalDescription), "TVCD", screenSize / 1.01)
 
 	local icon = Material("slashco/ui/icons/slasher/s_" .. ID)
 	selection["Slasher-" .. (document.Slasher or document.Name)] = function(w, h)
 		local row = 1
 		local rowSize = w / 32
-		draw.SimpleText("ENTRY: \"" .. Name .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("documentEntry") .. Name .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
-		draw.SimpleText("ALIASES:", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("documentAliases"), "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		for _, name in ipairs(Aliases) do
 			row = row + 1
@@ -399,13 +399,13 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 		end
 
 		row = row + 1
-		draw.SimpleText("CLASS:", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("documentClass"), "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
 		draw.SimpleText("[" .. Class .. "]", "TVCD", h / 3.1, rowSize * row, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		row = row + 1
-		draw.SimpleText("DANGER LVL:", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("documentDanger"), "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
 		draw.SimpleText("[" .. DangerLevel .. "]", "TVCD", h / 3.1, rowSize * row, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -414,7 +414,7 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 			row = 13
 		end
 
-		draw.SimpleText("[VIEW ATTACHED FILE]", "TVCD", h / 100, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("documentAttFile"), "TVCD", h / 100, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		local rating = SlashCo.GetDocumentRating(document.Name)
 		local star = 0
@@ -449,7 +449,7 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 				row = row + 1
 			end
 		else
-			draw.SimpleText("[SURVIVE SLASHER FOR MORE INFO]", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+			draw.SimpleText(SlashCo.Language("documentSurvive"), "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 		end
 
 		surface.SetDrawColor(255, 255, 255, 255)
@@ -475,13 +475,13 @@ for _, perk in ipairs(SlashCo.GetPerks()) do
 	selection["Perk-" .. perk.ID] = function(w, h)
 		local row = 1
 		local rowSize = w / 28
-		draw.SimpleText("NAME: \"" .. SlashCo.Language(perk.Name) .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("perk_nameui") .. SlashCo.Language(perk.Name) .. "\"", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
-		draw.SimpleText("PRICE: " .. perk.Price .. "P", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("perk_priceui") .. perk.Price .. "P", "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
-		draw.SimpleText("TEAM: " .. team.GetName(perk.Team), "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("perk_teamui") .. team.GetName(perk.Team), "TVCD", h / 75, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(icon)
@@ -504,7 +504,7 @@ for _, perk in ipairs(SlashCo.GetPerks()) do
 		wasHit = DrawTextWithHitbox("[" .. text .. "]", "TVCDMedium", (h / 30) + (width / 2), rowSize * row, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		row = row + 5
-		draw.SimpleText("[Description]", "TVCD", h / 100, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("perk_descui"), "TVCD", h / 100, rowSize * row, color_white, 0, TEXT_ALIGN_CENTER)
 
 		row = row + 1
 		for _, rowText in ipairs(descriptionRows) do
@@ -581,8 +581,8 @@ hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bD
 		surface.SetDrawColor(0, 0, 0, 255)
 		surface.DrawRect(0, 0, w, h)
 
-		draw.SimpleText("[Left Click] = Enter Page", "TVCD", w, (h / 2), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT)
-		draw.SimpleText("[Right Click] = Exit Page", "TVCD", w, (h / 2) + (h / 20), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT)
+		draw.SimpleText(SlashCo.Language("documentUI_one"), "TVCD", w, (h / 2), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT)
+		draw.SimpleText(SlashCo.Language("documentUI_two"), "TVCD", w, (h / 2) + (h / 20), color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT)
 
 		-- Debug to check screen Mins/Maxs values
 		-- debugoverlay.BoxAngles( screenPos, screenMins, screenMaxs, screenAngle, 0.02, hitPos != nil and Color(0,255,0) or Color( 255,0, 0, 10) )

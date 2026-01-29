@@ -44,70 +44,49 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if not slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
+	if not slasher:GetNWBool("InSlasherChaseMode") then return end
+	if not IsValid(target) or not target:IsPlayer() then return end
+	if target:Team() ~= TEAM_SURVIVOR then return end
+	if slasher:GetPos():Distance(target:GetPos()) > 137 then return end
+	if slasher.ShockCooldown > 0.01 then return end
 
-	if not IsValid(target) or not target:IsPlayer() then
-		return
-	end
-	
-	if target:Team() ~= TEAM_SURVIVOR then
-		return
-	end
-	
-	if slasher:GetPos():Distance(target:GetPos()) >= 137 then
-		return
-	end
+	slasher:SetNWBool("RockPunching", false)
+	timer.Remove("RockPunchDecay")
+	slasher.ShockCooldown = 2
 
-	if slasher.ShockCooldown < 0.01 then
-		slasher:SetNWBool("RockPunching", false)
-		timer.Remove("RockPunchDecay")
-		slasher.ShockCooldown = 2
+	timer.Simple(0.3, function()
+		if not IsValid(slasher) then return end
 
-		timer.Simple(0.3, function()
-			if not IsValid(slasher) then
-				return
+		if SERVER then
+			local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(137, 0, 0)),
+				Vector(-30, -30, -60), Vector(30, 30, 60), 25, DMG_SLASH, 5, false)
+
+			if target1:IsPlayer() then
+				if target1:Team() ~= TEAM_SURVIVOR then return end
+
+				target1:EmitSound("ambient/energy/spark"..tostring(math.random(1,6))..".wav", 100, 100, 0.25)
+				local vPoint = slasher:GetBonePosition(slasher:LookupBone("Hand.R"))
+				local tr = slasher:GetEyeTrace()
+				local lightning = EffectData()
+
+				lightning:SetOrigin(tr.HitPos)
+				lightning:SetStart(vPoint)
+				lightning:SetEntity(target1)
+				util.Effect("rocks_lightning", lightning)
 			end
+		end
+	end)
 
-			if SERVER then
-				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(137, 0, 0)),
-						Vector(-30, -30, -60), Vector(30, 30, 60), 25, DMG_SLASH, 5, false)
+	timer.Simple(0.1, function()
+		if not IsValid(slasher) then return end
 
-				if target1:IsPlayer() then
-					if target1:Team() ~= TEAM_SURVIVOR then
-						return
-					end
-					
-					target1:EmitSound("ambient/energy/spark"..tostring(math.random(1,6))..".wav", 100, 100, 0.25)
-					local vec, ang = slasher:GetBonePosition(slasher:LookupBone("Hand.R"))
-					local vPoint = vec
-					local lightning = EffectData()
-					lightning:SetOrigin(vPoint + target1:GetPos() + Vector(0, 0, 0))
-					lightning:SetStart(Vector(0, 0, 0))
-					lightning:SetAttachment(0)
-					util.Effect("rocks_lightning", lightning)
-				end
-			end
+		slasher:SetNWBool("RockPunching", true)
+		timer.Create("RockPunchDecay", 0.6, 1, function()
+			if not IsValid(slasher) then return end
+
+			slasher:SetNWBool("RockPunching", false)
 		end)
-
-		timer.Simple(0.1, function()
-			if not IsValid(slasher) then
-				return
-			end
-
-			slasher:SetNWBool("RockPunching", true)
-
-			timer.Create("RockPunchDecay", 0.6, 1, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				slasher:SetNWBool("RockPunching", false)
-			end)
-
-		end)
-	end
+	end)
 end
 
 function SLASHER.Animator(ply)
@@ -156,9 +135,9 @@ function SLASHER.InitHud(_, hud)
 	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
 	
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	hook.Add("SlashCo:DrawHUD", "SlashCoZanySurvey", function()
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCoZanySurvey")
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
 		end
 
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
