@@ -68,6 +68,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	local MaleCD = slasher.MaleCooldown or 0 --Cooldown
 	local SlashCD = slasher.SlashCooldown or 0 --Slash Cooldown
 
+	local prowl_final = SLASHER.ProwlSpeed
+	local chase_final = SLASHER.ChaseSpeed
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
 
@@ -145,8 +147,8 @@ function SLASHER.OnTickBehaviour(slasher)
 					slasher:Freeze(false)
 
 					if slasher:GetNWBool("InSlasherChaseMode") then
-						slasher:SetRunSpeed(285)
-						slasher:SetWalkSpeed(285)
+						slasher:SetRunSpeed(chase_final)
+						slasher:SetWalkSpeed(chase_final)
 					end
 				end)
 
