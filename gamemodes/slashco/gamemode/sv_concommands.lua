@@ -375,6 +375,62 @@ end, function(cmd, args)
 	return tbl1
 end, "Give yourself an item", FCVAR_CHEAT)
 
+concommand.Add("slashco_give_points", function(ply, _, args)
+	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+		doPrint(ply, "Only admins can use debug commands!")
+		return
+	end
+
+	local target = ply
+	if args[1] then
+		target = nil
+
+		if tonumber(args[1]) then
+			target = Player(tonumber(args[1]))
+
+			if not IsValid(target) then
+				target = player.GetBySteamID64(args[1])
+			end
+		end
+
+		if not IsValid(target) then
+			target = player.GetBySteamID(args[1])
+		end
+
+		if not IsValid(target) then
+			local targetSelect, tooMany
+			for _, v in ipairs(player.GetAll()) do
+				if string.find(v:Nick(), args[1]) then
+					if targetSelect then
+						tooMany = true
+						break
+					end
+					targetSelect = v
+				end
+			end
+			if tooMany then
+				doPrint(ply, "There's more than one player your arguments apply to.")
+				return
+			end
+			if targetSelect then
+				target = targetSelect
+			end
+		end
+
+		if not IsValid(target) then
+			doPrint(ply, "Not a valid target.")
+			return
+		end
+	end
+
+	local steamid = target:SteamID64()
+	local name = target:Nick()
+	local number = "number" and args[2] or 0
+
+	SlashCoDatabase.UpdateStats(steamid, "Points", number)
+	doPrint(ply, "Player " .. name .. " received " .. number.. " points")
+end, "Give a player more points", FCVAR_CHEAT + FCVAR_PROTECTED)
+
 concommand.Add("slashco_debug_printents", function(ply, _, args)
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
 		doPrint(ply, "Only admins can use debug commands!")
