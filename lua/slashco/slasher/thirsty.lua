@@ -44,8 +44,6 @@ function SLASHER.OnSpawn(slasher)
 	slasher.MilkCount = 0
 	slasher.Pacification = 0
 	slasher.Thirsty = 0
-	--slasher.ThirstyProwlSpeed = 0
-	--slasher.ThirstyChaseSpeed = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -54,8 +52,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	local Milks = slasher.MilkCount or 0 --Milk drank
 	local Pacification = slasher.Pacification or 0 --Pacification
 	local Thirst = slasher.Thirsty or 0 --Thirst
-	--local ThirstyPS = slasher.ThirstyProwlSpeed or 0 -- Prowl Speed
-	--local ThirstyCS = slasher.ThirstyChaseSpeed or 0 -- Chase Speed
 
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
@@ -99,7 +95,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 	
-	if Milks > 3 then
+	if Milks > 5 then
 		slasher:SetNWBool("FullMilks", true)
 	end
 	
@@ -214,6 +210,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 		slasher:Freeze(false)
 		slasher:SetNWBool("ThirstyDrinking", false)
+		slasher:SetNWBool("InSlasherChaseMode", false) -- just to make sure..
 		slasher:SetNWBool("DemonPacified", true)
 
 		if slasher.MilkCount < (6 + SatO) then
