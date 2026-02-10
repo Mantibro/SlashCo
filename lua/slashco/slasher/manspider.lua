@@ -483,7 +483,16 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	slasher.LeapCooldown = 15
 
 	slasher:Freeze(true)
-	slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
+	local idx = math.random(1, 4)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/manspider/manspider_scream" .. idx .. ".mp3",
+		identifier = "ManspiderScream" .. idx,
+		minDistance = 700 * SlashCo.MapSize,
+		maxDistance = 1240 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	timer.Simple(1, function()
 		if not IsValid(slasher) then
@@ -530,7 +539,7 @@ function SLASHER.Footstep(ply)
 			identifier = "ManspiderFootstep",
 			group = "SlasherFootstep",
 			minDistance = 250,
-			maxDistance = 500,
+			maxDistance = 550,
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
