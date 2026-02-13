@@ -30,6 +30,7 @@ SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 SLASHER.CannotBeSpectated = true
+SLASHER.AngerPassiveGain = 0.001 -- Anger thats gained per second when hes getting surrounded by survivors.
 SLASHER.NestedRange = 1000 -- When nested, this range is used to check for any nearby survivors.
 SLASHER.AdditionalAngerMult = 0 -- Used to multiply FrameTime which is then added additionally to the Anger.
 SLASHER.JumpStrengthForward = 800 -- forward Velocity used when jumping
@@ -63,14 +64,13 @@ function SLASHER.OnSpawn(slasher)
 	slasher.TargetPlayer = 0
 	slasher.LeapCooldown = 0
 	slasher.TimeNested = 0
-	slasher.Aggression = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local Target = slasher.TargetPlayer or 0 --Target SteamID
 	local LeapCD = slasher.LeapCooldown or 0 --Leap Cooldown
 	local TimeNested = slasher.TimeNested or 0 --Time spend nested
-	local Aggression = slasher.Aggression or 0 --Aggression
+	local anger = SlashCo.GetSlasherAnger(slasher) -- Anger Amount
 
 	if LeapCD > 0 then
 		slasher.LeapCooldown = LeapCD - FrameTime()
@@ -142,7 +142,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 		end
 
-		slasher.Aggression = 0
+		slasher.Anger = 0
 	else
 		--Not nested
 		slasher.TimeNested = 0
@@ -161,7 +161,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				local d = s:GetPos():Distance(slasher:GetPos())
 
-				if d >= 250 then
+				if d >= 350 then
 					continue
 				end
 
@@ -175,15 +175,16 @@ function SLASHER.OnTickBehaviour(slasher)
 					continue
 				end
 
-				slasher.Aggression = Aggression + (FrameTime() * ((250 - d) / 2000)) + (SLASHER.AdditionalAngerMult * FrameTime())
+				slasher.Anger = SLASHER.AngerPassiveGain + (FrameTime() * ((1750 - d) / 2000)) + (SLASHER.AdditionalAngerMult * FrameTime())
+				SlashCo.AddSlasherAnger(slasher, slasher.Anger)
 
-				if Aggression >= 100 then
+				if anger >= 100 then
 					slasher.TargetPlayer = s:SteamID64()
 					slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
 				end
 			end
 		else
-			slasher.Aggression = 0
+			slasher.Anger = 0
 		end
 	end
 
@@ -201,6 +202,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
+	slasher:SetNWInt("ManspiderAnger", anger)
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
@@ -210,7 +212,9 @@ function SLASHER.OnHitByTeslaCoil(slasher)
 end
 
 function SLASHER.OnKillPlayer(slasher, target)
+	local anger = SlashCo.GetSlasherAnger(slasher)
 	slasher.TargetPlayer = "" -- We killed our prey, so reset it or else he might persist in case he had multiple lives
+	SlashCo.AddSlasherAnger(slasher, -anger)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
@@ -585,6 +589,10 @@ function SLASHER.InitHud(_, hud)
 	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/s_punch"))
 	hud:TieControlVisible("F", "ManspiderNested", true, false, false)
 	hud:TieControl("F", "CanLeap", false, true)
+
+	function hud.TitleCard.Label:PaintOver()
+		draw.SimpleText("AGGRESSION: " .. math.Round(GameData.LocalPlayer:GetNWInt("ManspiderAnger"), 1), "TVCD", 4, 18, red)
+	end
 
 	hud.prevTarget = -1
 	hud.prevNested = -1
