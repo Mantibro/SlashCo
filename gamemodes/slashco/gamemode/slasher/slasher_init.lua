@@ -101,6 +101,36 @@ function SlashCo.GetRandomSlasher(dangerlevel, slasherClass)
 	return acceptableSlashers[math.random(1, #acceptableSlashers)]
 end
 
+-- RaphaelIT7: No AddSlasherAnger for client!
+
+function SlashCo.GetSlasherAnger(slasher)
+	return slasher:GetNW2Float("SlasherAnger", 0)
+end
+
+function SlashCo.GetGlobalSlasherAnger()
+	local slashers = team.GetPlayers(TEAM_SLASHER)
+	local count = #slashers
+	local totalAnger = 0
+
+	for _, slasher in ipairs(slashers) do
+		totalAnger = totalAnger + SlashCo.GetSlasherAnger(slasher)
+	end
+
+	return totalAnger / count
+end
+
+function SlashCo.GetHighestSlasherAnger()
+	local highestAnger = 0
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		local anger = SlashCo.GetSlasherAnger(slasher)
+		if anger > highestAnger then
+			highestAnger = anger
+		end
+	end
+
+	return highestAnger
+end
+
 --Slasher Animation Controller
 hook.Add("CalcMainActivity", "SlashCo:SlasherAnimator", function(ply, vel)
 	if ply:Team() ~= TEAM_SLASHER then return end

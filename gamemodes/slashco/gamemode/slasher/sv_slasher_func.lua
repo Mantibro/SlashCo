@@ -475,36 +475,9 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 	end)
 end
 
+-- RaphaelIT7: This is intentionally server only to avoid desync!
 function SlashCo.AddSlasherAnger(slasher, anger)
 	slasher:SetNW2Float("SlasherAnger", math.Clamp(SlashCo.GetSlasherAnger(slasher) + anger, 0, 100))
-end
-
-function SlashCo.GetSlasherAnger(slasher)
-	return slasher:GetNW2Float("SlasherAnger", 0)
-end
-
-function SlashCo.GetGlobalSlasherAnger()
-	local slashers = team.GetPlayers(TEAM_SLASHER)
-	local count = #slashers
-	local totalAnger = 0
-
-	for _, slasher in ipairs(slashers) do
-		totalAnger = totalAnger + SlashCo.GetSlasherAnger(slasher)
-	end
-
-	return totalAnger / count
-end
-
-function SlashCo.GetHighestSlasherAnger()
-	local highestAnger = 0
-	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		local anger = SlashCo.GetSlasherAnger(slasher)
-		if anger > highestAnger then
-			highestAnger = anger
-		end
-	end
-
-	return highestAnger
 end
 
 --[[

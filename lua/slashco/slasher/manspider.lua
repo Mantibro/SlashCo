@@ -70,7 +70,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	local Target = slasher.TargetPlayer or 0 --Target SteamID
 	local LeapCD = slasher.LeapCooldown or 0 --Leap Cooldown
 	local TimeNested = slasher.TimeNested or 0 --Time spend nested
-	local anger = SlashCo.GetSlasherAnger(slasher) -- Anger Amount
 
 	if LeapCD > 0 then
 		slasher.LeapCooldown = LeapCD - FrameTime()
@@ -178,7 +177,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher.Anger = SLASHER.AngerPassiveGain + (FrameTime() * ((1750 - d) / 2000)) + (SLASHER.AdditionalAngerMult * FrameTime())
 				SlashCo.AddSlasherAnger(slasher, slasher.Anger)
 
-				if anger >= 100 then
+				if SlashCo.GetSlasherAnger(slasher) >= 100 then
 					slasher.TargetPlayer = s:SteamID64()
 					slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
 				end
@@ -202,7 +201,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	slasher:SetNWInt("ManspiderAnger", anger)
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
@@ -591,7 +589,7 @@ function SLASHER.InitHud(_, hud)
 	hud:TieControl("F", "CanLeap", false, true)
 
 	function hud.TitleCard.Label:PaintOver()
-		draw.SimpleText("AGGRESSION: " .. math.Round(GameData.LocalPlayer:GetNWInt("ManspiderAnger"), 1), "TVCD", 4, 18, red)
+		draw.SimpleText("AGGRESSION: " .. math.Round(SlashCo.GetSlasherAnger(GameData.LocalPlayer), 1), "TVCD", 4, 18, red)
 	end
 
 	hud.prevTarget = -1
