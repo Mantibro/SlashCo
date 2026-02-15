@@ -342,24 +342,27 @@ local function lobbyRoundSetup()
 	if SlashCo.LobbyData.AssignedSurvivors[1] and SlashCo.LobbyData.AssignedSlashers[1] then
 		--print(player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[1].steamid):GetName() .. player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid):GetName())
 
-		for i = 1, #SlashCo.LobbyData.AssignedSurvivors do
+		for _, data in ipairs(SlashCo.LobbyData.AssignedSurvivors) do
 			--The Survivors become survivors
 
-			local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[i].steamid)
-			ply:SetTeam(TEAM_SURVIVOR)
-			ply:Spawn()
-			ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
+			local ply = player.GetBySteamID64(data.steamid)
+			if IsValid(ply) then
+				ply:SetTeam(TEAM_SURVIVOR)
+				ply:Spawn()
+				ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
 
-			print("[SlashCo] Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
+				print("[SlashCo] Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
+			end
 		end
 
-		for i = 1, #SlashCo.LobbyData.AssignedSlashers do
+		for _, data in ipairs(SlashCo.LobbyData.AssignedSlashers) do
 			--The Slasher becomes a spectator in the lobby.
 
-			local ply = player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[i].steamid)
-
-			ply:SetTeam(TEAM_SPECTATOR)
-			ply:Spawn()
+			local ply = player.GetBySteamID64(data.steamid)
+			if IsValid(ply) then
+				ply:SetTeam(TEAM_SPECTATOR)
+				ply:Spawn()
+			end
 		end
 	end
 
