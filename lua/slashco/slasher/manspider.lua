@@ -61,13 +61,13 @@ function SLASHER.OnSpawn(slasher)
 	slasher.Jump = slasher:GetJumpPower()
 	slasher:SetNWBool("ManspiderClimbing", false)
 
-	slasher.TargetPlayer = 0
+	slasher.TargetPlayer = NULL
 	slasher.LeapCooldown = 0
 	slasher.TimeNested = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local Target = slasher.TargetPlayer or 0 --Target SteamID
+	local Target = slasher.TargetPlayer or NULL --Target Player
 	local LeapCD = slasher.LeapCooldown or 0 --Leap Cooldown
 	local TimeNested = slasher.TimeNested or 0 --Time spend nested
 
@@ -78,17 +78,14 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("CanLeap", true)
 	end
 
-	if not isstring(Target) or Target == 0 then
-		slasher.TargetPlayer = ""
-	end
-
-	if Target == "" then
+	if not IsValid(Target) then
+		slasher.TargetPlayer = NULL
 		slasher:SetNWBool("CanChase", false)
 		slasher:SetNWBool("CanKill", false)
 
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		if #survivors == 1 then
-			slasher.TargetPlayer = survivors[1]:SteamID64()
+			slasher.TargetPlayer = survivors[1]
 
 			slasher:SetNWBool("CanChase", true)
 			slasher:SetNWBool("CanKill", true)
@@ -97,9 +94,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("CanChase", true)
 		slasher:SetNWBool("CanKill", true)
 
-		local s = player.GetBySteamID64(Target)
-		if not IsValid(s) or s:Team() ~= TEAM_SURVIVOR then
-			slasher.TargetPlayer = ""
+		if not IsValid(Target) or Target:Team() ~= TEAM_SURVIVOR then
+			slasher.TargetPlayer = NULL
 		end
 	end
 
@@ -113,27 +109,27 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
 
-		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not s:CanBeSeen() then
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not survivor:CanBeSeen() then
 				continue
 			end
 
-			if s:GetPos():Distance(slasher:GetPos()) >= (SLASHER.NestedRange + (TimeNested * 3)) then
+			if survivor:GetPos():Distance(slasher:GetPos()) >= (SLASHER.NestedRange + (TimeNested * 3)) then
 				continue
 			end
 
 			local tr = util.TraceLine({
 				start = slasher:EyePos(),
-				endpos = s:WorldSpaceCenter(),
+				endpos = survivor:WorldSpaceCenter(),
 				filter = slasher
 			})
 
-			if tr.Entity ~= s then
+			if tr.Entity ~= survivor then
 				continue
 			end
 
 			slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
-			slasher.TargetPlayer = s:SteamID64()
+			slasher.TargetPlayer = survivor
 			slasher:SetNWBool("ManspiderNested", false)
 
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
@@ -152,13 +148,13 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
 
-		if Target == "" then
-			for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-				if not s:CanBeSeen() then
+		if not IsValid(Target) then
+			for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+				if not survivor:CanBeSeen() then
 					continue
 				end
 
-				local d = s:GetPos():Distance(slasher:GetPos())
+				local d = survivor:GetPos():Distance(slasher:GetPos())
 
 				if d >= 350 then
 					continue
@@ -166,11 +162,11 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				local tr = util.TraceLine({
 					start = slasher:EyePos(),
-					endpos = s:WorldSpaceCenter(),
+					endpos = survivor:WorldSpaceCenter(),
 					filter = slasher
 				})
 
-				if tr.Entity ~= s then
+				if tr.Entity ~= survivor then
 					continue
 				end
 
@@ -178,7 +174,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				SlashCo.AddSlasherAnger(slasher, slasher.Anger)
 
 				if SlashCo.GetSlasherAnger(slasher) >= 100 then
-					slasher.TargetPlayer = s:SteamID64()
+					slasher.TargetPlayer = survivor
 					slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
 				end
 			end
@@ -187,8 +183,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if slasher:GetNWString("ManspiderTarget") ~= Target then
-		slasher:SetNWString("ManspiderTarget", Target)
+	if slasher:GetNWEntity("ManspiderTarget") ~= Target then
+		slasher:SetNWEntity("ManspiderTarget", Target)
 	end
 
 	if TimeNested > 50 then
@@ -206,12 +202,12 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
-	slasher.TargetPlayer = "" -- Reset prey when we got hit by a tesla coil.
+	slasher.TargetPlayer = NULL -- Reset prey when we got hit by a tesla coil.
 end
 
 function SLASHER.OnKillPlayer(slasher, target)
 	local anger = SlashCo.GetSlasherAnger(slasher)
-	slasher.TargetPlayer = "" -- We killed our prey, so reset it or else he might persist in case he had multiple lives
+	slasher.TargetPlayer = NULL -- We killed our prey, so reset it or else he might persist in case he had multiple lives
 	SlashCo.AddSlasherAnger(slasher, -anger)
 end
 
@@ -220,7 +216,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	if target:SteamID64() ~= slasher.TargetPlayer then
+	if target ~= slasher.TargetPlayer then
 		slasher:ChatPrint("You can only kill your Prey.")
 		return
 	else
@@ -249,7 +245,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		return
 	end
 
-	if target:SteamID64() ~= slasher.TargetPlayer then
+	if target ~= slasher.TargetPlayer then
 		return
 	end
 
@@ -257,7 +253,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.TargetPlayer ~= "" then
+	if IsValid(slasher.TargetPlayer) then
 		return
 	end
 	
@@ -592,41 +588,10 @@ function SLASHER.InitHud(_, hud)
 		draw.SimpleText("AGGRESSION: " .. math.Round(SlashCo.GetSlasherAnger(GameData.LocalPlayer), 1), "TVCD", 4, 18, red)
 	end
 
-	hud.prevTarget = -1
 	hud.prevNested = -1
 	hud.prevLeave = -1
 	hud.prevHide = -1
 	function hud.AlsoThink()
-		local target = GameData.LocalPlayer:GetNWString("ManspiderTarget")
-		if target ~= hud.prevTarget then
-			if target == "" then
-				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			else
-				local targetEnt
-				for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-					if ply:SteamID64() == target then
-						targetEnt = ply
-						break
-					end
-				end
-
-				hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-					if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not IsValid(targetEnt) then
-						hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-						return
-					end
-
-					targetPaint(targetEnt)
-
-					local distColor = math.Clamp(GameData.LocalPlayer:GetPos():Distance(targetEnt:GetPos()), 0, 2048) / 16
-					draw.SimpleText("Your prey: " .. targetEnt:Name(), "ItemFontTip",
-							ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
-							TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				end)
-			end
-			hud.prevTarget = target
-		end
-
 		local nested = GameData.LocalPlayer:GetNWBool("ManspiderNested")
 		if nested ~= hud.prevNested then
 			hud:ShakeControl("R")
@@ -664,6 +629,22 @@ function SLASHER.InitHud(_, hud)
 			hud.prevLeave = canLeave
 		end
 	end
+
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+		local target = GameData.LocalPlayer:GetNWEntity("ManspiderTarget")
+		if not IsValid(target) then return end -- RaphaelIT7: The hook is not removed since the player/target could be outside the PVS/not yet networked
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+			return
+		end
+
+		targetPaint(target)
+
+		local distColor = math.Clamp(GameData.LocalPlayer:GetPos():Distance(target:GetPos()), 0, 2048) / 16
+		draw.SimpleText("Your prey: " .. target:Name(), "ItemFontTip",
+				ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+	end)
 end
 
 if CLIENT then
