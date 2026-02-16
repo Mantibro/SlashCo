@@ -166,12 +166,12 @@ local function drawItemDisplay(item, notUsable, moveUp, shift)
 
 	local offset = 0
 	if SlashCoItems[item].OnUse then
-		draw.SimpleText(SlashCo.Language("item_use", "R"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - y,
+		draw.SimpleText(SlashCo.Language("item_use", SlashCo.GetKeyButtonName("USE_ITEM")), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - y,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		offset = 27
 	end
 	if not GameData.LocalPlayer:ItemFunction2("PreDrop", item) then
-		draw.SimpleText(SlashCo.Language("item_drop", "Q"), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset - y,
+		draw.SimpleText(SlashCo.Language("item_drop", SlashCo.GetKeyButtonName("DROP_ITEM")), "TVCD", ScrW() * 0.975 - shift - 8, ScrH() * 0.95 - 30 - offset - y,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
 

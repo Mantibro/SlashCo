@@ -62,14 +62,21 @@ local function survivorButtons(ply, button)
 	end
 end
 
---Door Ramming
-hook.Add("KeyPress", "SurvivorFunctions", function(ply, button)
+hook.Add("PlayerButtonDown", "SlashCo:SurvivorFunctions", function(ply, button)
 	local team = ply:Team()
 	if team ~= TEAM_SURVIVOR and team ~= TEAM_LOBBY then
 		return
 	end
 
 	survivorButtons(ply, button)
+end)
+
+--Door Ramming
+hook.Add("KeyPress", "SlashCo:SurvivorFunctions", function(ply, button)
+	local team = ply:Team()
+	if team ~= TEAM_SURVIVOR and team ~= TEAM_LOBBY then
+		return
+	end
 
 	--Covenant Tackle
 	if ply:GetNWBool("SurvivorTackled") then

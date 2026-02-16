@@ -264,6 +264,8 @@ end
 
 ---Spawn documents for the round
 function SlashCo.SpawnDocuments()
+	if not GameData.RequiredDocumentCount or GameData.RequiredDocumentCount <= 0 then return end
+
 	local totalDocuments = GameData.RequiredDocumentCount
 	totalDocuments = totalDocuments + SlashCo.MapSize
 
