@@ -130,7 +130,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 			local succ, err = pcall(SlashCo.OnSlasherSpawned, slasher) -- if succ == false then we had an error in spawning. We also need pcall to be sure.
 			if not slasher.SuccessfulSpawn and not succ then
 				slasher:SetTeam(TEAM_SPECTATOR)
-				print("[SlashCo] Player \"" .. slasher:Name() .. "\" was set to spectator because we were unable to properly spawn them! (Error: \"" .. err .. "\"")
+				print("[SlashCo] Player \"" .. slasher:Name() .. "\" was set to spectator because we were unable to properly spawn them! (Error: \"" .. err .. "\" Slasher:\"" .. slasher:GetNWString("Slasher", "") .. "\"")
 				continue -- Skip the loop.
 			end
 		end

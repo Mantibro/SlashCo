@@ -99,7 +99,7 @@ function SlashCo.LoadCurRoundData()
 				SlashCo.SelectSlasher(slasherData.SlasherID, slasherData.SteamID)
 				table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = slasherData.SteamID, slasherID = slasherData.SlasherID })
 			else
-				table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = slasherData.SteamID })
+				SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[slasherData.SteamID] = true -- RaphaelIT7: easier lookup
 			end
 		end
 

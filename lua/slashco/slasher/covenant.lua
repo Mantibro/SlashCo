@@ -50,7 +50,7 @@ function SLASHER.SummonCovenantMembers(target)
 		SlashCo.BroadcastCurrentRoundData(false)
 		
 		-- Add player to table in case we need it
-		table.insert(SLASHER.PlayersToBecomePartOfCovenant, {steamid = clk:SteamID64()})
+		SLASHER.PlayersToBecomePartOfCovenant[clk:SteamID64()] = true
 	end
 end
 

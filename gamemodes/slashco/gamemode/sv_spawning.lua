@@ -422,7 +422,6 @@ function SlashCo.SetupPlayers()
 	print("[SlashCo] Teams database loaded...")
 
 	local becameCovenant = 0
-	local spawn_queue = 0
 	local survivors = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_survivordata;"), "SteamID") or singlePlayerTable()
 	local slashers = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata;"), "SteamID") or {}
 	for _, ply in ipairs(player.GetAll()) do
@@ -455,19 +454,16 @@ function SlashCo.SetupPlayers()
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
 		if slashers[steamid] then
-			for _, v in ipairs(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant) do
-				if v.steamid == steamid then
-					print(ply:Name() .. " will become part of the Covenant.")
-					ply:SetTeam(TEAM_SPECTATOR)
-					ply:Spawn()
-					spawn_queue = spawn_queue + 1
-				end
+			if SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[steamid] then
+				print(ply:Name() .. " will become part of the Covenant.")
+				ply:SetTeam(TEAM_SPECTATOR)
+				ply:Spawn()
+				continue
 			end
 
 			print(ply:Name() .. " now Slasher (Memorized)")
 			ply:SetTeam(TEAM_SPECTATOR)
 			ply:Spawn()
-			spawn_queue = spawn_queue + 1
 
 			table.insert(SlashCo.CurRound.SlashersToBeSpawned, ply)
 			continue
@@ -484,10 +480,9 @@ function SlashCo.SetupPlayers()
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()
 		print(ply:Name() .. " now Spectator")
-		spawn_queue = spawn_queue + 1
 
 		if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
-			table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = steamid })
+			SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[steamid] = true
 			becameCovenant = becameCovenant + 1
 		end
 	end
