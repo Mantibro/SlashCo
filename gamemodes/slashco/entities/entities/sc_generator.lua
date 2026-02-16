@@ -232,6 +232,10 @@ function ENT:CheckProgress(dontFailStart)
 		})
 
 		timer.Simple(6.4, function()
+			SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.PROGRESS, 1)
+			SlashCo.SendObjectives()
+
+			if not IsValid(self) then return end
 			SlashCo.AudioSystem.PlaySound({ -- Let everyone hear that a generator was started
 				soundPath = "slashco/generator_loop.mp3",
 				identifier = "GeneratorLoop",

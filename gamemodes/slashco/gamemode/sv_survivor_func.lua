@@ -7,22 +7,22 @@ local function survivorButtons(ply, button)
 		end
 	end
 
-	if button == KEY_R then
+	if SlashCo.IsKeyPressed("USE_ITEM", ply, button) then
 		SlashCo.UseItem(ply)
 		return
 	end --Using their Item
 
-	if button == KEY_Q then
+	if SlashCo.IsKeyPressed("DROP_ITEM", ply, button) then
 		SlashCo.DropItem(ply)
 		return
 	end --Dropping their Item
 
-	if button == MOUSE_MIDDLE then
+	if SlashCo.IsKeyPressed("PING", ply, button) then
 		ply:SurvivorPing()
 		return
 	end
 
-	if button == KEY_1 then
+	if SlashCo.IsKeyPressed("TAUNT_MN", ply, button) then
 		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
 			return
 		end
@@ -35,7 +35,7 @@ local function survivorButtons(ply, button)
 		return
 	end
 
-	if button == KEY_2 then
+	if SlashCo.IsKeyPressed("TAUNT_HTG", ply, button) then
 		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
 			return
 		end
@@ -48,7 +48,7 @@ local function survivorButtons(ply, button)
 		return
 	end
 
-	if button == KEY_3 then
+	if SlashCo.IsKeyPressed("TAUNT_CG", ply, button) then
 		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
 			return
 		end
@@ -63,7 +63,7 @@ local function survivorButtons(ply, button)
 end
 
 --Door Ramming
-hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, button)
+hook.Add("KeyPress", "SurvivorFunctions", function(ply, button)
 	local team = ply:Team()
 	if team ~= TEAM_SURVIVOR and team ~= TEAM_LOBBY then
 		return
@@ -73,7 +73,7 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, button)
 
 	--Covenant Tackle
 	if ply:GetNWBool("SurvivorTackled") then
-		if button == KEY_D or button == KEY_A and ply.LastTackleStruggleKey ~= button then
+		if button == IN_MOVERIGHT or button == IN_MOVELEFT and ply.LastTackleStruggleKey ~= button then
 			ply.LastTackleStruggleKey = button
 			ply.TackleStruggle = (ply.TackleStruggle or 0) + 1
 		end
@@ -83,7 +83,7 @@ hook.Add("PlayerButtonDown", "SurvivorFunctions", function(ply, button)
 
 	local lookent = ply:GetEyeTrace().Entity
 
-	if button ~= MOUSE_FIRST or ply:GetVelocity():Length() <= 250 then
+	if button ~= IN_ATTACK or ply:GetVelocity():Length() <= 250 then
 		return
 	end
 

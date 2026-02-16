@@ -318,6 +318,7 @@ SlashCo.LangTable["toggle_light"] = "[%s] TOGGLE LIGHT"
 SlashCo.LangTable["demon_pacified"] = "You have been pacified by consuming an item."
 SlashCo.LangTable["beacon_call"] = "The Survivors are attempting to call emergency escape."
 SlashCo.LangTable["beacon_destroy"] = "DESTROY THE BEACON."
+SlashCo.LangTable["slasher_lobbyselection"] = "You will play as %s"
 SlashCo.LangTable["slasher_anticipation"] = "You will soon spawn as %s"
 SlashCo.LangTable["slasher_unavailable"] = "unavailable"
 SlashCo.LangTable["kill survivor"] = "kill survivor"
@@ -600,20 +601,21 @@ SlashCo.LangTable["cant_fuel"] = "[ALREADY FULL]"
 SlashCo.LangTable["cant_power"] = "[ALREADY HAS A BATTERY]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "POWER %s GENERATORS"
+SlashCo.LangTable["objective_generators"] = "POWER %s/%s GENERATORS"
 SlashCo.LangTable["objective_generator"] = "POWER 1 GENERATOR"
 SlashCo.LangTable["objective_heliwait"] = "WAIT FOR THE HELICOPTER"
 SlashCo.LangTable["objective_helicopter"] = "GET IN THE HELICOPTER"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) CLEAN UP %s PIECES OF GARBAGE" --item spawns
-SlashCo.LangTable["objective_trash"] = "(OPTIONAL) CLEAN UP 1 PIECE OF GARBAGE"
-SlashCo.LangTable["objective_mops"] = "(OPTIONAL) MOP %s SPILLS" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(OPTIONAL) MOP 1 SPILL"
-SlashCo.LangTable["objective_traps"] = "(OPTIONAL) RESET %s MOUSETRAPS" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(OPTIONAL) RESET 1 MOUSETRAP"
-SlashCo.LangTable["objective_pages"] = "(OPTIONAL) COLLECT %s DOCUMENTS" --gascan spawns
-SlashCo.LangTable["objective_page"] = "(OPTIONAL) COLLECT 1 DOCUMENT"
+SlashCo.LangTable["optional"] = "OPTIONAL"
+SlashCo.LangTable["objective_trashs"] = "CLEAN UP %s/%s PIECES OF GARBAGE" --item spawns
+SlashCo.LangTable["objective_trash"] = "CLEAN UP 1 PIECE OF GARBAGE"
+SlashCo.LangTable["objective_mops"] = "MOP %s/%s SPILLS" --gen spawns
+SlashCo.LangTable["objective_mop"] = "MOP 1 SPILL"
+SlashCo.LangTable["objective_traps"] = "RESET %s/%s MOUSETRAPS" --battery spawns
+SlashCo.LangTable["objective_trap"] = "RESET 1 MOUSETRAP"
+SlashCo.LangTable["objective_pages"] = "COLLECT %s/%s DOCUMENTS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "COLLECT 1 DOCUMENT"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "- POINTS EARNED -"
@@ -731,3 +733,20 @@ SlashCo.LangTable["perk_disable"] = "Disable Perk"
 
 SlashCo.LangTable["faster_fueling"] = "Faster Fueling"
 SlashCo.LangTable["faster_fueling_desc"] = "Increases the fueling speed by 25% at the cost of 10% walking speed while holding fuel"
+
+-- Keyboard UI
+
+SlashCo.LangTable["keyboard_currentkey"] = "Current Key: %s"
+SlashCo.LangTable["keyboard_keyname"] = "Key Name: %s"
+SlashCo.LangTable["keyboard_changekey"] = "Change Key"
+SlashCo.LangTable["keyboard_pressnewkey"] = "Press the new Keyboard button"
+SlashCo.LangTable["keyboard_confirmkey"] = "Press the key again to confirm new key: %s"
+
+SlashCo.LangTable["keyboard_bind_drop_item"] = "Drop Item"
+SlashCo.LangTable["keyboard_bind_use_item"] = "Use Item"
+SlashCo.LangTable["keyboard_bind_ping"] = "Ping"
+SlashCo.LangTable["keyboard_bind_taunt"] = "Taunt (%s)"
+SlashCo.LangTable["keyboard_bind_voices"] = "Open Voice Selection"
+SlashCo.LangTable["keyboard_bind_keybinds"] = "Open Keybinds"
+SlashCo.LangTable["keyboard_bind_main_ability"] = "Use Main Ability"
+SlashCo.LangTable["keyboard_bind_special_ability"] = "Use Special Ability"

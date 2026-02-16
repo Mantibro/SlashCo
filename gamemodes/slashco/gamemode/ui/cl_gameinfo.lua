@@ -1,14 +1,14 @@
 hook.Add("SlashCo:DrawHUD", "GameInfo_Info", function()
 	if GameData.LocalPlayer:Team() ~= TEAM_LOBBY then return end
 
-	draw.SimpleText(SlashCo.Language("GameInfo", "F6"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("GameInfo", SlashCo.GetKeyButtonName("GAME_INFO")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95), color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 end)
 
 hook.Add("PlayerButtonDown", "GameInfo", function(ply, key) 
 	if ply ~= GameData.LocalPlayer then return end
 	if GameData.LocalPlayer:Team() ~= TEAM_LOBBY and GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR then return end
 
-	if key == KEY_F6 then 
+	if SlashCo.IsKeyPressed("GAME_INFO", ply, key) then 
 		DrawTheGameInfoBox()
 	end
 end)

@@ -539,20 +539,21 @@ SlashCo.LangTable["cant_fuel"] = "[JÁ ESTÁ CHEIO]"
 SlashCo.LangTable["cant_power"] = "[JÁ TEM UMA BATERIA]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "LIGUE %s GERADORES"
+SlashCo.LangTable["objective_generators"] = "LIGUE %s/%s GERADORES"
 SlashCo.LangTable["objective_generator"] = "LIGUE 1 GERADOR"
 SlashCo.LangTable["objective_heliwait"] = "ESPEREM PELO HELICÓPTERO"
 SlashCo.LangTable["objective_helicopter"] = "EMTREM NO HELICÓPTERO"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(OPCIONAL) LIMPE %s PEÇAS DE LIXO" --item spawns
-SlashCo.LangTable["objective_trash"] = "(OPCIONAL) LIMPE 1 PEÇA DE LIXO"
-SlashCo.LangTable["objective_mops"] = "(OPCIONAL) LIMPE %s DERRAMAMENTOS" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(OPCIONAL) LIMPE 1 DERRAMAMENTO"
-SlashCo.LangTable["objective_traps"] = "OPCIONAL) REATIVE %s ARMADILHAS" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(OPCIONAL) REATIVE 1 ARMADILHA"
-SlashCo.LangTable["objective_pages"] = "(OPCIONAL) COLETE %s DOCUMENTOS" --gascan spawns
-SlashCo.LangTable["objective_page"] = "(OPCIONAL) COLETE 1 DOCUMENTO"
+SlashCo.LangTable["optional"] = "OPCIONAL"
+SlashCo.LangTable["objective_trashs"] = "LIMPE %s/%s PEÇAS DE LIXO" --item spawns
+SlashCo.LangTable["objective_trash"] = "LIMPE 1 PEÇA DE LIXO"
+SlashCo.LangTable["objective_mops"] = "LIMPE %s/%s DERRAMAMENTOS" --gen spawns
+SlashCo.LangTable["objective_mop"] = "LIMPE 1 DERRAMAMENTO"
+SlashCo.LangTable["objective_traps"] = "REATIVE %s/%s ARMADILHAS" --battery spawns
+SlashCo.LangTable["objective_trap"] = "REATIVE 1 ARMADILHA"
+SlashCo.LangTable["objective_pages"] = "COLETE %s/%s DOCUMENTOS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "COLETE 1 DOCUMENTO"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "- Pontos GANHOS -"

@@ -160,7 +160,7 @@ function SlashCo.StartGameIntro()
 	end
 
 	SlashCo.SendValue(nil, "RoundEnd", 6, {
-		SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME,
+		SCInfo.Maps[SlashCo.LobbyData.SelectedMap] and SCInfo.Maps[SlashCo.LobbyData.SelectedMap].NAME or SlashCo.LobbyData.SelectedMap,
 		SlashCo.LobbyData.SelectedSlasherInfo.NAME,
 		SlashCo.LobbyData.SelectedSlasherInfo.CLASS,
 		SlashCo.LobbyData.SelectedSlasherInfo.DANGER,

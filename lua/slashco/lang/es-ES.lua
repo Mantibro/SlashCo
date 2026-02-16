@@ -593,20 +593,21 @@ SlashCo.LangTable["cant_fuel"] = "[YA ESTA LLENO]"
 SlashCo.LangTable["cant_power"] = "[YA TIENE UNA BATERIA]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "ENCIENDE %s GENERADORES"
+SlashCo.LangTable["objective_generators"] = "ENCIENDE %s/%s GENERADORES"
 SlashCo.LangTable["objective_generator"] = "ENCIENDE 1 GENERADOR"
 SlashCo.LangTable["objective_heliwait"] = "ESPERA AL HELICOPTERO"
 SlashCo.LangTable["objective_helicopter"] = "SUBE AL HELICOPTERO"
 
---optional objectives [currently not used]
-SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) CLEAN UP %s PIECES OF GARBAGE" --item spawns
-SlashCo.LangTable["objective_trash"] = "(OPTIONAL) CLEAN UP 1 PIECE OF GARBAGE"
-SlashCo.LangTable["objective_mops"] = "(OPTIONAL) MOP %s SPILLS" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(OPTIONAL) MOP 1 SPILL"
-SlashCo.LangTable["objective_traps"] = "(OPTIONAL) RESET %s MOUSETRAPS" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(OPTIONAL) RESET 1 MOUSETRAP"
-SlashCo.LangTable["objective_pages"] = "(OPTIONAL) COLLECT %s DOCUMENTS" --gascan spawns
-SlashCo.LangTable["objective_page"] = "(OPTIONAL) COLLECT 1 DOCUMENT"
+--optional objectives
+SlashCo.LangTable["optional"] = "OPTIONAL"
+SlashCo.LangTable["objective_trashs"] = "CLEAN UP %s/%s PIECES OF GARBAGE" --item spawns
+SlashCo.LangTable["objective_trash"] = "CLEAN UP 1 PIECE OF GARBAGE"
+SlashCo.LangTable["objective_mops"] = "MOP %s/%s SPILLS" --gen spawns
+SlashCo.LangTable["objective_mop"] = "MOP 1 SPILL"
+SlashCo.LangTable["objective_traps"] = "RESET %s/%s MOUSETRAPS" --battery spawns
+SlashCo.LangTable["objective_trap"] = "RESET 1 MOUSETRAP"
+SlashCo.LangTable["objective_pages"] = "COLLECT %s/%s DOCUMENTS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "COLLECT 1 DOCUMENT"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "- PUNTOS GANADOS -"

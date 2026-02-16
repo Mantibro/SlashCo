@@ -74,6 +74,7 @@ include("ui/cl_spectator_hud.lua")
 include("ui/cl_playermodel_picker.lua")
 include("ui/cl_gameinfo.lua")
 include("ui/cl_pings.lua")
+include("ui/cl_keyboard_ui.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
@@ -85,6 +86,7 @@ include("ui/cl_documents.lua") -- Depends on sh_perks.lua
 include("sh_canbeseen.lua")
 include("sh_player.lua")
 include("sh_fog.lua")
+include("sh_keyboard.lua")
 
 include("ui/cl_projector.lua")
 include("ui/cl_voiceselect.lua")
@@ -161,8 +163,12 @@ hook.Add("PlayerButtonDown", "SlashCo:OpenPlayermodelSelector", function(ply, ke
 		return
 	end
 
-	if key == KEY_G then
+	if SlashCo.IsKeyPressed("PLAYERMODEL", ply, key) then
 		SlashCo.OpenPlayermodelSelector()
+	end
+
+	if SlashCo.IsKeyPressed("OPEN_KEYBINDS", ply, key) then
+		SlashCo.OpenKeyboardUI()
 	end
 end)
 

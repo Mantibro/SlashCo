@@ -342,7 +342,7 @@ local function lobbyRoundSetup()
 	if SlashCo.LobbyData.AssignedSurvivors[1] and SlashCo.LobbyData.AssignedSlashers[1] then
 		--print(player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[1].steamid):GetName() .. player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid):GetName())
 
-		for _, data in ipairs(SlashCo.LobbyData.AssignedSurvivors) do
+		for idx, data in ipairs(SlashCo.LobbyData.AssignedSurvivors) do
 			--The Survivors become survivors
 
 			local ply = player.GetBySteamID64(data.steamid)
@@ -351,7 +351,7 @@ local function lobbyRoundSetup()
 				ply:Spawn()
 				ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
 
-				print("[SlashCo] Survivor " .. i .. " selection successful, the Survivor is: " .. ply:GetName())
+				print("[SlashCo] Survivor " .. idx .. " selection successful, the Survivor is: " .. ply:GetName())
 			end
 		end
 

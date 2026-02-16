@@ -531,20 +531,21 @@ SlashCo.LangTable["cant_fuel"] = "[УЖЕ ЗАПОЛНЕННО]"
 SlashCo.LangTable["cant_power"] = "[УЖЕ ЕСТЬ БАТАРЕЯ]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "ВКЛЮЧИТЕ %s ГЕНЕРАТОРА"
+SlashCo.LangTable["objective_generators"] = "ВКЛЮЧИТЕ %s/%s ГЕНЕРАТОРА"
 SlashCo.LangTable["objective_generator"] = "ВКЛЮЧИТЕ 1 ГЕНЕРАТОР"
 SlashCo.LangTable["objective_heliwait"] = "ДОЖДИТЕСЬ ВЕРТОЛЁТА"
 SlashCo.LangTable["objective_helicopter"] = "ДОБЕРИТЕСЬ ДО ВЕРТОЛЁТА"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(ДОПОЛНИТЕЛЬНО) УБЕРИТЕ %s КУСКА МУСОРА" --item spawns
-SlashCo.LangTable["objective_trash"] = "(ДОПОЛНИТЕЛЬНО) УБЕРИТЕ 1 КУСОК МУСОРА"
-SlashCo.LangTable["objective_mops"] = "(ДОПОЛНИТЕЛЬНО) ПРОТРИТЕ %s КЛЯКС" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(ДОПОЛНИТЕЛЬНО) ПРОТРИТЕ 1 КЛЯКСУ"
-SlashCo.LangTable["objective_traps"] = "(ДОПОЛНИТЕЛЬНО) ЗАВЕДИТЕ %s МЫШЕЛОВОК" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(ДОПОЛНИТЕЛЬНО) ЗАВЕДИТЕ 1 МЫШЕЛОВКУ"
-SlashCo.LangTable["objective_pages"] = "(ДОПОЛНИТЕЛЬНО) СОБЕРИТЕ %s ДОКУМЕНТОВ" --gascan spawns
-SlashCo.LangTable["objective_page"] = "(ДОПОЛНИТЕЛЬНО) СОБЕРИТЕ 1 ДОКУМЕНТ"
+SlashCo.LangTable["optional"] = "ДОПОЛНИТЕЛЬНО"
+SlashCo.LangTable["objective_trashs"] = "УБЕРИТЕ %s/%s КУСКА МУСОРА" --item spawns
+SlashCo.LangTable["objective_trash"] = "УБЕРИТЕ 1 КУСОК МУСОРА"
+SlashCo.LangTable["objective_mops"] = "ПРОТРИТЕ %s/%s КЛЯКС" --gen spawns
+SlashCo.LangTable["objective_mop"] = "ПРОТРИТЕ 1 КЛЯКСУ"
+SlashCo.LangTable["objective_traps"] = "ЗАВЕДИТЕ %s/%s МЫШЕЛОВОК" --battery spawns
+SlashCo.LangTable["objective_trap"] = "ЗАВЕДИТЕ 1 МЫШЕЛОВКУ"
+SlashCo.LangTable["objective_pages"] = "СОБЕРИТЕ %s/%s ДОКУМЕНТОВ" --gascan spawns
+SlashCo.LangTable["objective_page"] = "СОБЕРИТЕ 1 ДОКУМЕНТ"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "- НАБРАНО ОЧКОВ -"

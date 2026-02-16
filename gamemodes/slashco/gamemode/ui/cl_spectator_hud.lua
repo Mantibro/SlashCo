@@ -55,18 +55,18 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 			spin = 1
 		end
 
-		local blip = "☞ [R] ☜"
+		local blip = "☞ [" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "] ☜"
 		if GameData.IsNewPlayer then
-			blip = SlashCo.Language("newplayer_spawnnotice", "R") --"Press [R] to Spawn"
+			blip = SlashCo.Language("newplayer_spawnnotice", SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR")) --"Press [R] to Spawn"
 		else
 			if team.NumPlayers(TEAM_LOBBY) > (GameData.MaxPlayers - 1) then
-				blip = "☓ [R] ☓"
+				blip = "☓ [" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "] ☓"
 			else
 				flash = flash + RealFrameTime()
 				if flash > 1 then flash = 0 end
 
 				if flash > 0.5 then
-					blip = "☛[R]☚"
+					blip = "☛[" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "]☚"
 				end
 			end
 		end
@@ -97,7 +97,7 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 			slashershow_tick = 255
 		end
 
-		draw.SimpleText("You will play as: " .. pickedSlasher, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.6, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		draw.SimpleText(SlashCo.Language("slasher_lobbyselection", pickedSlasher), "LobbyFont2", ScrW() * 0.5, ScrH() * 0.6, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
 	if GameData.IsLobby then return end
@@ -131,19 +131,19 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 
 	if not show_slasher_anticipation then
 		if SlashCo.CanSpectatorsPing() then
-			draw.SimpleText(SlashCo.Language("surv_ping", "MMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 230, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			draw.SimpleText(SlashCo.Language("surv_ping", SlashCo.GetKeyButtonName("PING")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 230, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 		
 		draw.SimpleText("[" .. SlashCo.Language("spectating") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.05, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
 	draw.SimpleText(SlashCo.Language("hide_info", "Q"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 290, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("toggle_halo", "ALT"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("toggle_halo_gas", "E"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("toggle_halo", string.upper(input.LookupBinding("+walk"))), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("toggle_halo_gas", string.upper(input.LookupBinding("+use"))), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("player_follow", "LMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("player_cycle", "RMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("switch_view", "SPACE"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("toggle_light", "R"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("switch_view", SlashCo.GetKeyButtonName("SPECTATE_PLAYER")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("toggle_light", string.upper(input.LookupBinding("+reload"))), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 end)
 
 if CLIENT then

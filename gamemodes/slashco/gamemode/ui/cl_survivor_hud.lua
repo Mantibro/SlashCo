@@ -62,10 +62,10 @@ hook.Add("DrawOverlay", "SlashCoVHS", function()
 	end
 end)
 
-local objectives = {}
+GameData.Objectives = GameData.Objectives or {}
 
-net.Receive("SlashCoUpdateObjectives", function()
-	objectives = {}
+net.Receive("SlashCo:UpdateObjectives", function()
+	GameData.Objectives = {}
 	local count = net.ReadUInt(8)
 	for i = 1, count do
 		local name = net.ReadString()
@@ -78,32 +78,39 @@ net.Receive("SlashCoUpdateObjectives", function()
 		obj.status = net.ReadUInt(4)
 
 		if SlashCo.Objectives[name].hasCount then
-			obj.count = net.ReadUInt(16)
+			obj.totalCount = net.ReadUInt(8)
+			obj.doneCount = net.ReadUInt(8)
 		end
 
-		table.insert(objectives, obj)
+		table.insert(GameData.Objectives, obj)
 	end
 end)
 
 local function drawObjectives()
-	if table.IsEmpty(objectives) then
+	if table.IsEmpty(GameData.Objectives) then
 		return
 	end
 
 	local shift = 0
-	for k, v in ipairs(objectives) do
-		local count = 1
-		if SlashCo.Objectives[v.name].hasCount then
-			count = v.count or count
+	for k, v in ipairs(GameData.Objectives) do
+		local totalCount = 1
+		local objectiveInfo = SlashCo.Objectives[v.name]
+		if objectiveInfo.hasCount then
+			totalCount = v.totalCount or totalCount
 		end
 
-		local langText = SlashCo.Language("objective_" .. v.name .. (count > 1 and "s" or ""), count)
+		local langText = SlashCo.Language("objective_" .. v.name .. (totalCount > 1 and "s" or ""), v.doneCount, totalCount)
+
+		if objectiveInfo.optional then
+			langText = "(" .. SlashCo.Language("optional") .. ") " .. langText
+		end
 
 		local complete = " "
 		local r, g, b = 255, 255, 255
 		if v.status == SlashCo.ObjStatus.FAILED then
 			r, g, b = 255, 64, 64
 		elseif v.status == SlashCo.ObjStatus.COMPLETE then
+			r, g, b = 64, 255, 64
 			complete = "X"
 		end
 
@@ -218,7 +225,7 @@ local function gasFuelMeter(hitPos)
 	local gas
 	if IsFueling then
 		gas = (TimeUntilFueled - CurTime()) / TimeToFuel
-		if not input.IsButtonDown(KEY_E) then
+		if not input.IsButtonDown(input.GetKeyCode(input.LookupBinding("+walk"))) then
 			IsFueling = false
 		elseif CurTime() >= TimeUntilFueled then
 			IsFueling = false
@@ -449,7 +456,8 @@ hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)
 	if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SURVIVOR then
 		return
 	end
-	if button == KEY_G then
+
+	if SlashCo.IsKeyPressed("VOICE_SELECT", ply, button) then
 		vgui.Create("sc_voiceselect")
 	end
 end)
@@ -558,7 +566,7 @@ net.Receive("SlashCo:AskToBecomeSlasher", function()
 				end
 
 				textColor.a = (fadeOut and textAlpha > 0) and alpha or textAlpha
-				draw.SimpleText(SlashCo.Language("vocal_yes") .. " - [F1]", "TVCD", ScrW() * 0.5, ScrH() * 0.34, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+				draw.SimpleText(SlashCo.Language("vocal_yes") .. " - [" .. SlashCo.GetKeyButton("READY_SURVIVOR") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.34, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 
 			if fadeOut or difference > 2 then
@@ -568,18 +576,18 @@ net.Receive("SlashCo:AskToBecomeSlasher", function()
 				end
 
 				textColor.a =  (fadeOut and textAlpha > 0) and alpha or textAlpha
-				draw.SimpleText(SlashCo.Language("vocal_no") .. " - [F2]", "TVCD", ScrW() * 0.5, ScrH() * 0.38, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+				draw.SimpleText(SlashCo.Language("vocal_no") .. " - [" .. SlashCo.GetKeyButton("READY_SLASHER") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.38, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 
 			if not fadeOut and chooseTime <= 0 then
-				if input.IsButtonDown(KEY_F1) then
+				if input.IsButtonDown(SlashCo.GetKeyButton("READY_SURVIVOR")) then
 					chooseTime = CurTime() + fadeTime
 					chooseYes = true
 					SlashCo.AudioSystem.PlayPrecachedChannel("AskToBecomeSlasher")
 					net.Start("SlashCo:AskToBecomeSlasher")
 						net.WriteBool(true)
 					net.SendToServer()
-				elseif input.IsButtonDown(KEY_F2) then
+				elseif input.IsButtonDown(SlashCo.GetKeyButton("READY_SLASHER")) then
 					chooseTime = CurTime() + fadeTime
 					chooseYes = false
 					SlashCo.AudioSystem.PlayPrecachedChannel("AskToBecomeSlasher")

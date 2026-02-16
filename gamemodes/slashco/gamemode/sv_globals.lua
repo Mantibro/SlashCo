@@ -170,6 +170,24 @@ function SlashCo.CreateGasCan(pos, ang)
 	return Ent
 end
 
+-- Spawn a document
+function SlashCo.CreateDocument(pos, ang)
+	local Ent = ents.Create("sc_document")
+
+	if not IsValid(Ent) then
+		MsgC(Color(255, 64, 64),
+				"[SlashCo] Something went wrong when trying to create a gas can at (" .. tostring(pos) .. "), entity was NULL.\n")
+		return nil
+	end
+
+	Ent:SetPos(pos)
+	Ent:SetAngles(ang)
+	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+
+	return Ent
+end
+
 --Spawn an Item( or any entity, including slasher entities )
 function SlashCo.CreateItem(class, pos, ang)
 	local Ent = ents.Create(class)

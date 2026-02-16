@@ -1154,6 +1154,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channelData.volume = 0
 		else
 			channel:SetVolume(soundData.volume)
+			channelData.volume = soundData.volume
 		end
 
 		channel:EnableLooping(soundData.looping)
@@ -1227,7 +1228,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			hook.Run("SlashCo:AudioSystem:PlaySound:" .. soundData.group, soundData, channel)
 		end
 
-		if soundData.deleteWhenDone then
+		if soundData.deleteWhenDone and not soundData.looping then
 			timer.Simple(timeLeft + 0.1, function()
 				if not IsValid(channel) then return end
 				SlashCo.AudioSystem.DestroyChannel(channel, 0)

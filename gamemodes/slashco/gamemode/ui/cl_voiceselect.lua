@@ -111,12 +111,12 @@ function PANEL:Think()
 end
 
 function PANEL:OnKeyCodeReleased(keyCode)
-	if keyCode == KEY_G then
+	if SlashCo.IsKeyPressed("VOICE_SELECT", nil, keyCode) then
 		self:Remove()
 
 		if self.CursorSelect then
 			net.Start("SlashCo:SurvivorVoicePrompt")
-			net.WriteString(self.CursorSelect)
+				net.WriteString(self.CursorSelect)
 			net.SendToServer()
 		end
 	end

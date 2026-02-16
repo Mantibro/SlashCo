@@ -86,11 +86,11 @@ hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
 	--LobbyFont1
 	if localTeam == TEAM_LOBBY then
 		if GameData.StateOfLobby == nil or GameData.StateOfLobby < 1 then
-			draw.SimpleText("[R] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
 					color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 
-		draw.SimpleText("[G] " .. SlashCo.Language("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80,
+		draw.SimpleText("[" .. SlashCo.GetKeyButtonName("PLAYERMODEL") .. "] " .. SlashCo.Language("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
 
@@ -102,10 +102,13 @@ hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
 		if isClientinLobby then
 			surface.SetDrawColor(255, 255, 255, 255)
 
-			draw.SimpleText("[F1] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Survivor"))), "TVCD",
-					scrW * 0.975, (scrH * 0.95) - 130, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-			draw.SimpleText("[F2] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Slasher"))), "TVCD",
-					scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("READY_SURVIVOR") .. "] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Survivor"))), "TVCD",
+					scrW * 0.975, (scrH * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("READY_SLASHER") .. "] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Slasher"))), "TVCD",
+					scrW * 0.975, (scrH * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("OPEN_KEYBINDS") .. "] " .. SlashCo.Language("keyboard_bind_keybinds"), "TVCD",
+					scrW * 0.975, (scrH * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
 			if GameData.TimeLeft and GameData.TimeLeft > 0 and GameData.TimeLeft < 61 then
 				draw.SimpleText(tostring(GameData.TimeLeft), "LobbyFont2", scrW * 0.5, scrH * 0.65, color_white,

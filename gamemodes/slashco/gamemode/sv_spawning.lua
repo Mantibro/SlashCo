@@ -262,6 +262,22 @@ function SlashCo.SpawnGasCans()
 	end)
 end
 
+---Spawn documents for the round
+function SlashCo.SpawnDocuments()
+	local totalDocuments = GameData.RequiredDocumentCount
+	totalDocuments = totalDocuments + SlashCo.MapSize
+
+	local documentsToSpawn = SlashCo.SelectSpawns(ents.FindByClass("info_sc_document"), totalDocuments, nil, nil, true)
+	if table.IsEmpty(documentsToSpawn) then
+		GameData.FailedToSpawnDocuments = true
+		print("[SlashCo] Missing document spawn entities")
+		--SlashCo.Abort("Missing document spawn entities")
+		return
+	end
+
+	SlashCo.Spawn(documentsToSpawn)
+end
+
 local function itemCondForced(ent)
 	return SlashCo.DefaultConditionsForced(ent) and (not ent.Item or not SlashCoItems[ent.Item])
 end
@@ -653,18 +669,23 @@ end
 hook.Add("InitPostEntity", "LegacySetupSpawns", SlashCo.LegacySetup)
 
 function SlashCo.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	if SlashCo.GetGeneratorsNeeded() != SlashCo.GensNeeded or SlashCo.GetGeneratorsToSpawn() != SlashCo.Generators then
-		return -- Map has forced the generator count. GG
+	-- Check if the Map has forced the generator count.
+	if SlashCo.GetGeneratorsNeeded() == SlashCo.GensNeeded and SlashCo.GetGeneratorsToSpawn() == SlashCo.Generators then
+		-- It did not- let's modify it
+		local totalGens = SlashCo.GensNeeded
+		if additionalSurvivors > 0 then
+			totalGens = totalGens + math.floor(additionalSurvivors / GameData.BaseMaxSurvivors) -- For every 6 additional survivors, there will be one more gen.
+		end
+
+		print("Spawning a total of " .. totalGens .. " generators (additional survivors: " .. additionalSurvivors .. ")")
+		SlashCo.SetGeneratorsNeeded(totalGens)
+		SlashCo.SetGeneratorsToSpawn(totalGens)
 	end
 
-	local totalGens = SlashCo.GensNeeded
-	if additionalSurvivors > 0 then
-		totalGens = totalGens + math.floor(additionalSurvivors / GameData.BaseMaxSurvivors) -- For every 6 additional survivors, there will be one more gen.
+	if totalSurvivors > 4 then
+		-- For every two additional survivors you must find 1 more document (max 4 for now)
+		GameData.RequiredDocumentCount = math.Clamp((totalSurvivors - 4) / 2, 1, 4)
 	end
-
-	print("Spawning a total of " .. totalGens .. " generators (additional survivors: " .. additionalSurvivors .. ")")
-	SlashCo.SetGeneratorsNeeded(totalGens)
-	SlashCo.SetGeneratorsToSpawn(totalGens)
 end
 
 ---main body of round starting function
@@ -718,6 +739,7 @@ local function startRound(noSetup)
 	end
 
 	SlashCo.SpawnGasCans()
+	SlashCo.SpawnDocuments()
 	SlashCo.SpawnItems()
 
 	SlashCo.SetHelicopterPositions()
@@ -770,6 +792,10 @@ local function startRound(noSetup)
 	end
 
 	SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.INCOMPLETE, SlashCo.GetGeneratorsNeeded())
+	if GameData.RequiredDocumentCount and GameData.RequiredDocumentCount > 0 and not GameData.FailedToSpawnDocuments then
+		SlashCo.UpdateObjective("page", SlashCo.ObjStatus.INCOMPLETE, GameData.RequiredDocumentCount)
+	end
+
 	SlashCo.SendObjectives()
 end
 

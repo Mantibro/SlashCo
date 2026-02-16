@@ -543,19 +543,20 @@ SlashCo.LangTable["cant_fuel"] = "[SCHON VOLL]"
 SlashCo.LangTable["cant_power"] = "[BESITZT SCHON EINE BATTERIE]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "VERSORGE %s GENERATOREN MIT STROM"
+SlashCo.LangTable["objective_generators"] = "VERSORGE %s/%s GENERATOREN MIT STROM"
 SlashCo.LangTable["objective_generator"] = "VERSORGE 1 GENERATOR MIT STROM"
 SlashCo.LangTable["objective_heliwait"] = "WARTE AUF DEN HUBSCHRAUBER"
 SlashCo.LangTable["objective_helicopter"] = "STEIG IN DEN HUBSCHRAUBER"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) RÄUME %s MÜLLTEILE AUF" --item spawns
+SlashCo.LangTable["optional"] = "OPTIONAL"
+SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) RÄUME %s/%s MÜLLTEILE AUF" --item spawns
 SlashCo.LangTable["objective_trash"] = "(OPTIONAL) RÄUME 1 MÜLLTEIL AUF"
-SlashCo.LangTable["objective_mops"] = "(OPTIONAL) WISCHE %s VERSCHÜTTUNGEN AUF" --gen spawns
+SlashCo.LangTable["objective_mops"] = "(OPTIONAL) WISCHE %s/%s VERSCHÜTTUNGEN AUF" --gen spawns
 SlashCo.LangTable["objective_mop"] = "(OPTIONAL) WISCH 1 VERSCHÜTTUNG AUF"
-SlashCo.LangTable["objective_traps"] = "(OPTIONAL) SETZE %s MAUSEFALLEN ZURÜCK" --battery spawns
+SlashCo.LangTable["objective_traps"] = "(OPTIONAL) SETZE %s/%s MAUSEFALLEN ZURÜCK" --battery spawns
 SlashCo.LangTable["objective_trap"] = "(OPTIONAL) SETZE 1 MAUSEFALLE ZURÜCK"
-SlashCo.LangTable["objective_pages"] = "(OPTIONAL) SAMMELE %s DOKUMENTE" --gascan spawns
+SlashCo.LangTable["objective_pages"] = "(OPTIONAL) SAMMELE %s/%s DOKUMENTE" --gascan spawns
 SlashCo.LangTable["objective_page"] = "(OPTIONAL) SAMMEL 1 DOKUMENT"
 
 --points summary

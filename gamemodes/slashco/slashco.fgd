@@ -101,6 +101,7 @@
 ///////////////////////
 
 @PointClass base(Angles, SCItem) studio("models/props_junk/metalgascan.mdl") = info_sc_gascan : "SC: A potential spawn point for a gas can." []
+@PointClass base(Angles, SCItem) studio("models/slashco/items/slashcofile.mdl") = info_sc_document : "SC: A potential spawn point for a document." []
 @PointClass base(Angles, SCItem) studio("models/props_junk/gascan001a.mdl") = info_sc_gascanexposed : "SC: A potential spawn point for a gas can for the Exposure offering." []
 @PointClass base(Angles, SCSpawn) studio("models/slashco/other/helicopter/helicopter.mdl") = info_sc_helicopter : "SC: A target location for the escape helicopter to land at. The escape helicopter will choose any of the set positions on the map." []
 

@@ -399,6 +399,8 @@ if CLIENT then
 		GameData.LocalEntIndex = GameData.LocalPlayer:EntIndex()
 		GameData.LocalSteamID = GameData.LocalPlayer:SteamID()
 		GameData.LocalSteamID64 = GameData.LocalPlayer:SteamID64()
+
+		SlashCo.LoadKeyboardBinds()
 	end
 else
 	local maxplayers = CreateConVar("slashco_maxplayers", tostring(GameData.BaseMaxPlayers), FCVAR_ARCHIVE, "The number of maximum players, by default 7. 6 survivors - 1 slasher", 1, 255)
@@ -659,13 +661,13 @@ SlashCo.Objectives = {
 		optional = true
 	},
 	page = {
-		hasCount = true,
-		optional = true
+		hasCount = true
 	},
 }
 
 SlashCo.ObjStatus = {
 	INCOMPLETE = 0,
-	COMPLETE = 1,
-	FAILED = 2
+	PROGRESS = 1,
+	COMPLETE = 2,
+	FAILED = 3
 }

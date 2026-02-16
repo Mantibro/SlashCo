@@ -22,6 +22,7 @@ AddCSLuaFile("ui/slasher_stock/cl_slasher_meter.lua")
 AddCSLuaFile("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 AddCSLuaFile("ui/cl_projector.lua")
 AddCSLuaFile("ui/cl_documents.lua")
+AddCSLuaFile("ui/cl_keyboard_ui.lua")
 AddCSLuaFile("cl_limitedzone.lua")
 AddCSLuaFile("sh_bhop.lua")
 AddCSLuaFile("ui/cl_pings.lua")
@@ -32,6 +33,7 @@ AddCSLuaFile("sh_canbeseen.lua")
 AddCSLuaFile("sh_content.lua")
 AddCSLuaFile("sh_player.lua")
 AddCSLuaFile("sh_fog.lua")
+AddCSLuaFile("sh_keyboard.lua")
 
 include("sh_content.lua")
 include("sh_shared.lua")
@@ -66,6 +68,7 @@ include("sh_player.lua")
 include("sh_fog.lua")
 include("sv_holylib.lua")
 include("sv_maptools.lua")
+include("sh_keyboard.lua")
 
 --Initialize global variable to hold functions.
 SlashCo = SlashCo or {}
@@ -128,7 +131,7 @@ end
 local function lobbyButtons(ply, button)
 	local plyTeam = ply:Team()
 	if SlashCo.LobbyData.LOBBYSTATE == 0 and plyTeam == TEAM_LOBBY  then
-		if button == KEY_F1 then
+		if SlashCo.IsKeyPressed("READY_SURVIVOR", ply, button) then
 			if SlashCo.GetLobbyPlayerReadyState(ply) ~= 1 then
 				SlashCo.SetLobbyPlayerReadyState(ply, 1)
 				SlashCo.LobbyBroadcastInfo()
@@ -142,7 +145,7 @@ local function lobbyButtons(ply, button)
 			Sndd:ChangePitch(100, 0)
 		end
 
-		if button == KEY_F2 then
+		if SlashCo.IsKeyPressed("READY_SLASHER", ply, button) then
 			if SlashCo.GetLobbyPlayerReadyState(ply) ~= 2 then
 				--Check if the player has made an offering or agreed to one
 				--[[if isPlyOfferer(ply) then
@@ -170,7 +173,7 @@ local function lobbyButtons(ply, button)
 			end
 		end
 
-		if button == KEY_F4 and SlashCo.LobbyData.VotedOffering > 0 and not SlashCo.IsLobbyPlyOfferer(ply) then
+		if SlashCo.IsKeyPressed("OFFERING_VOTE", ply, button) and SlashCo.LobbyData.VotedOffering > 0 and not SlashCo.IsLobbyPlyOfferer(ply) then
 			SlashCo.OfferingVote(ply, true)
 			SlashCo.EndOfferingVote(ply)
 		end
@@ -178,7 +181,7 @@ local function lobbyButtons(ply, button)
 
 	--Switching Teams
 	-- NOTE: We check both KEY_COMMA and KEY_R since previously the key was set to be COMMA but was changed to be R.
-	if (button == KEY_COMMA or button == KEY_R) and SlashCo.LobbyData.LOBBYSTATE == 0 then
+	if SlashCo.IsKeyPressed("TOGGLE_SPECTATOR", ply, button) and SlashCo.LobbyData.LOBBYSTATE == 0 then
 		if plyTeam == TEAM_SPECTATOR then
 			if (#team.GetPlayers(TEAM_LOBBY) < GameData.MaxPlayers) then
 				ply:SetTeam(TEAM_LOBBY)
@@ -271,7 +274,7 @@ local function spectatorButtons(ply, button)
 		return
 	end
 
-	if button == KEY_SPACE and IsValid(ply:GetObserverTarget()) then
+	if SlashCo.IsKeyPressed("SPECTATE_PLAYER", ply, button) and IsValid(ply:GetObserverTarget()) then
 		--Spectator presses Space, cycles camera modes.
 		if ply:GetObserverMode() == OBS_MODE_CHASE then
 			ply:SetObserverMode(OBS_MODE_IN_EYE)
@@ -294,12 +297,12 @@ local function slasherButtons(ply, button)
 		return
 	end --Activate Chase Mode
 
-	if button == KEY_R then
+	if SlashCo.IsKeyPressed("MAIN_ABILITY", ply, button) then
 		ply:SlasherFunction("OnMainAbilityFire", lagTrace(ply))
 		return
 	end --Main Ability
 
-	if button == KEY_F then
+	if SlashCo.IsKeyPressed("SPECIAL_ABILITY", ply, button) then
 		ply:SlasherFunction("OnSpecialAbilityFire", lagTrace(ply))
 		return
 	end --Special
