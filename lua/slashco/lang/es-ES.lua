@@ -318,6 +318,7 @@ SlashCo.LangTable["toggle_light"] = "[%s] ACTIVAR LUZ"
 SlashCo.LangTable["demon_pacified"] = "Has consumido Equipo que te ha hecho pasivo."
 SlashCo.LangTable["beacon_call"] = "Los sobrevivientes están intentando abortar la misión."
 SlashCo.LangTable["beacon_destroy"] = "ELIMINA LA BALIZA."
+SlashCo.LangTable["slasher_lobbyselection"] = "Jugaras como %s"
 SlashCo.LangTable["slasher_anticipation"] = "Apareceras como %s"
 SlashCo.LangTable["slasher_unavailable"] = "no disponible"
 SlashCo.LangTable["kill survivor"] = "matar sobreviviente"
@@ -599,15 +600,15 @@ SlashCo.LangTable["objective_heliwait"] = "ESPERA AL HELICOPTERO"
 SlashCo.LangTable["objective_helicopter"] = "SUBE AL HELICOPTERO"
 
 --optional objectives
-SlashCo.LangTable["optional"] = "OPTIONAL"
-SlashCo.LangTable["objective_trashs"] = "CLEAN UP %s/%s PIECES OF GARBAGE" --item spawns
-SlashCo.LangTable["objective_trash"] = "CLEAN UP 1 PIECE OF GARBAGE"
-SlashCo.LangTable["objective_mops"] = "MOP %s/%s SPILLS" --gen spawns
-SlashCo.LangTable["objective_mop"] = "MOP 1 SPILL"
-SlashCo.LangTable["objective_traps"] = "RESET %s/%s MOUSETRAPS" --battery spawns
-SlashCo.LangTable["objective_trap"] = "RESET 1 MOUSETRAP"
-SlashCo.LangTable["objective_pages"] = "COLLECT %s/%s DOCUMENTS" --gascan spawns
-SlashCo.LangTable["objective_page"] = "COLLECT 1 DOCUMENT"
+SlashCo.LangTable["optional"] = "OPCIONAL"
+SlashCo.LangTable["objective_trashs"] = "RECOGE %s/%s TROZOS DE BASURA" --item spawns
+SlashCo.LangTable["objective_trash"] = "RECOGE 1 TROZO DE BASURA"
+SlashCo.LangTable["objective_mops"] = "LIMPIA %s/%s CHARCOS" --gen spawns
+SlashCo.LangTable["objective_mop"] = "LIMPIA 1 CHARCO"
+SlashCo.LangTable["objective_traps"] = "REINICIA %s/%s TRAMPAS DE RATON" --battery spawns
+SlashCo.LangTable["objective_trap"] = "REINICIA 1 TRAMPA DE RATON"
+SlashCo.LangTable["objective_pages"] = "RECUPERA %s/%s DOCUMENTOS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "RECUPERA 1 DOCUMENTO"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "- PUNTOS GANADOS -"
@@ -636,3 +637,49 @@ SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] HACER TU TRABAJO"
 SlashCo.LangTable["points_quickescape"] = "[%s] ESCAPE RAPIDO"
 SlashCo.LangTable["points_slowescape"] = "[%s] ESCAPE LENTO"
+
+-- Documents
+
+SlashCo.LangTable["documentUI_one"] = "[Click Izquierdo] = Entrar"
+SlashCo.LangTable["documentUI_two"] = "[Click Derecho] = Volver"
+SlashCo.LangTable["documentLocations"] = "UBICACIONES"
+SlashCo.LangTable["documentArchive"] = "ARCHIVOS"
+SlashCo.LangTable["documentPerks"] = "MEJORAS"
+SlashCo.LangTable["documentEncounter"] = "AVISTA AL SLASHER PARA DESBLOQUEAR"
+SlashCo.LangTable["documentEntry"] = "NOMBRE: \""
+SlashCo.LangTable["documentAliases"] = "ALIAS:"
+SlashCo.LangTable["documentClass"] = "CLASE:"
+SlashCo.LangTable["documentDanger"] = "PELIGRO:"
+SlashCo.LangTable["documentAttFile"] = "[VER ARCHIVO ADJUNTO]"
+SlashCo.LangTable["documentSurvive"] = "[SOBREVIVE PARA MAS INFORMACION]"
+
+-- Perks
+
+SlashCo.LangTable["perk_nameui"] = "NOMBRE: \""
+SlashCo.LangTable["perk_priceui"] = "PRECIO: "
+SlashCo.LangTable["perk_teamui"] = "EQUIPO: "
+SlashCo.LangTable["perk_descui"] = "[Descripcion]"
+
+SlashCo.LangTable["perk_buy"] = "Comprar Perk"
+SlashCo.LangTable["perk_enable"] = "Activar Perk"
+SlashCo.LangTable["perk_disable"] = "Desactivar Perk"
+
+SlashCo.LangTable["faster_fueling"] = "Carga Rapida"
+SlashCo.LangTable["faster_fueling_desc"] = "Aumenta la velocidad a la que cargas combustible un 25%, a costa de restar un 10% tu velocidad mientras llevas una gasolina en mano"
+
+-- Keyboard UI
+
+SlashCo.LangTable["keyboard_currentkey"] = "Tecla Actual: %s"
+SlashCo.LangTable["keyboard_keyname"] = "Nombre de la Tecla: %s"
+SlashCo.LangTable["keyboard_changekey"] = "Cambiar Tecla"
+SlashCo.LangTable["keyboard_pressnewkey"] = "Presiona una nueva tecla"
+SlashCo.LangTable["keyboard_confirmkey"] = "Presiona nuevamente para confirmar la nueva tecla: %s"
+
+SlashCo.LangTable["keyboard_bind_drop_item"] = "Soltar Objeto"
+SlashCo.LangTable["keyboard_bind_use_item"] = "Usar Objeto"
+SlashCo.LangTable["keyboard_bind_ping"] = "Marcar"
+SlashCo.LangTable["keyboard_bind_taunt"] = "Burla (%s)"
+SlashCo.LangTable["keyboard_bind_voices"] = "Abrir Selector de Voz"
+SlashCo.LangTable["keyboard_bind_keybinds"] = "Abrir Asignacion de Controles"
+SlashCo.LangTable["keyboard_bind_main_ability"] = "Usar Habilidad Principal"
+SlashCo.LangTable["keyboard_bind_special_ability"] = "Usar Habilidad Especial"
