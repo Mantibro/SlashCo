@@ -225,7 +225,7 @@ local function gasFuelMeter(hitPos)
 	local gas
 	if IsFueling then
 		gas = (TimeUntilFueled - CurTime()) / TimeToFuel
-		if not input.IsButtonDown(input.GetKeyCode(input.LookupBinding("+walk"))) then
+		if not input.IsButtonDown(input.GetKeyCode(input.LookupBinding("+walk") or "ALT")) then
 			IsFueling = false
 		elseif CurTime() >= TimeUntilFueled then
 			IsFueling = false
