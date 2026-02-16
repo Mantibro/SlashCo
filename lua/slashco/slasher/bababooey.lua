@@ -61,6 +61,7 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.DoSound(slasher)
+	if not IsValid(slasher) then return end
 	if slasher:GetNWBool("BababooeyInvisibility") then
 		slasher:EmitSound("slashco/slasher/bababooey/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))
 	end
@@ -136,6 +137,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:EmitSound("slashco/slasher/bababooey/baba_hide.mp3")
 
 		timer.Simple(1, function()
+			if not IsValid(slasher) then return end
 			--Delay for entering invisibility
 
 			slasher:SetVisible(false)
@@ -165,6 +167,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 				slasher:EmitSound("slashco/slasher/bababooey/baba_scare.mp3", 100)
 				slasher:Freeze(true)
 				timer.Simple(2.5, function()
+					if not IsValid(slasher) then return end
 					slasher:Freeze(false)
 				end)
 
