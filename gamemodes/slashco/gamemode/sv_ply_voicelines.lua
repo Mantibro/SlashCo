@@ -235,6 +235,7 @@ function SlashCo.LobbyBanter()
 	local totalLength = SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2 + SlashCo.LobbyConvos[convo].Length3 + predelay
 
 	local function playVocal(conv, id, plyid)
+		if not IsValid(survivors[plyid]) then return end
 		survivors[plyid]:EmitSound("slashco/survivor/voice/maleconv_" .. conv .. "_" .. id .. ".mp3")
 	end
 
