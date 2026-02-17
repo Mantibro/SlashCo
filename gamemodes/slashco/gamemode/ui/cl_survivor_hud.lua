@@ -435,6 +435,11 @@ hook.Add("SlashCo:DrawHUD", "SurvivorHUD", function()
 		return
 	end
 
+	if team == TEAM_SPECTATOR then
+		drawObjectives()
+		return
+	end
+
 	if team ~= TEAM_SURVIVOR then
 		return
 	end

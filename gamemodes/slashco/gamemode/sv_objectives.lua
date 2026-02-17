@@ -16,7 +16,16 @@ function SlashCo.SendObjectives()
 		end
 	end
 
-	net.Send(team.GetPlayers(TEAM_SURVIVOR))
+	local plys = {}
+	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		table.insert(plys, ply)
+	end
+
+	for _, ply in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
+		table.insert(plys, ply)
+	end
+
+	net.Send(plys)
 end
 
 ---add or update an objective
