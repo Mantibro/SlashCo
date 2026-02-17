@@ -5,7 +5,7 @@ hook.Add("InitPostEntity", "SlashCo:LobbyBackgroundMusic", function()
 	if not GameData.IsLobby then return end
 
 	SlashCo.AudioSystem.EnableBackgroundMusic()
-	SlashCo.AudioSystem.SetBackgroundMusic("slashco/music/slashco_lobby.wav")
+	SlashCo.AudioSystem.SetBackgroundMusic("slashco/music/slashco_lobby.wav", 0.4)
 end)
 
 local function lobbySaveCurData()
