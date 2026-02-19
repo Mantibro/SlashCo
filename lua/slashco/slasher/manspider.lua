@@ -187,7 +187,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWEntity("ManspiderTarget", Target)
 	end
 
-	if TimeNested > 50 then
+	if TimeNested > 30 then
 		if slasher:GetNWBool("ManspiderCanLeaveNest") ~= true then
 			slasher:SetNWBool("ManspiderCanLeaveNest", true)
 		end
@@ -253,32 +253,17 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if IsValid(slasher.TargetPlayer) then
-		return
-	end
-	
-	if not slasher:IsOnGround() then
-		return
-	end
-
 	if not slasher:GetNWBool("ManspiderNested") then
-		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
-			return
-		end
+		if IsValid(slasher.TargetPlayer) then return end
+		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then return end
+		if not slasher:IsOnGround() and not slasher:GetNWBool("ManspiderClimbing") then return end
 
 		slasher:SetNWBool("ManspiderNested", true)
+		return
+	end
 
-		slasher:SetRunSpeed(1)
-		slasher:SetWalkSpeed(1)
-		slasher:SetSlowWalkSpeed(1)
-	else
-		if slasher.TimeNested > 30 or not slasher:IsOnGround() then
-			slasher:SetNWBool("ManspiderNested", false)
-
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		end
+	if slasher.TimeNested > 30 then
+		slasher:SetNWBool("ManspiderNested", false)
 	end
 end
 
@@ -353,7 +338,7 @@ end
 local vectorAddNormal = Vector(0, 0, 0)
 local vectorAddHigh = Vector(0, 0, 64)
 function SLASHER.Move(ply, mv)
-	if ply:GetNWBool("ManspiderClimbing") then
+	if ply:GetNWBool("ManspiderClimbing") or ply:GetNWBool("ManspiderNested") then
 		ply:SetRunSpeed(1)
 		ply:SetWalkSpeed(1)
 		ply:SetSlowWalkSpeed(1)
