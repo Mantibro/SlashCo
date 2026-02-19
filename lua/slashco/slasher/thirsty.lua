@@ -140,7 +140,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end
 
 	slasher:SetNWBool("ThirstyDrinking", true)
-	slasher:SetNWBool("InSlasherChaseMode", false)
+	SlashCo.StopChase(slasher)
 	slasher:StopSound(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseMusic)
 	slasher:SetRunSpeed(slasher.ThirstyProwlSpeed)
 	slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
@@ -210,7 +210,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 		slasher:Freeze(false)
 		slasher:SetNWBool("ThirstyDrinking", false)
-		slasher:SetNWBool("InSlasherChaseMode", false) -- just to make sure..
 		slasher:SetNWBool("DemonPacified", true)
 
 		if slasher.MilkCount < (6 + SatO) then
