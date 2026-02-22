@@ -646,7 +646,6 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
-			unreliable = true,
 		})
 	end
 

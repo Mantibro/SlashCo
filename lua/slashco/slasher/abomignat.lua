@@ -253,7 +253,6 @@ function SLASHER.OnPrimaryFire(slasher)
 			entity = slasher,
 			volume = 1,
 			fadeIn = 0,
-			unreliable = true,
 		})
 
 		slasher:Freeze(true)
@@ -355,7 +354,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		entity = slasher,
 		volume = 1,
 		fadeIn = 0,
-		unreliable = true,
 	})
 	slasher:SlasherHudFunc("ShakeControl", "F")
 
@@ -457,7 +455,6 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
-			unreliable = true,
 		})
 	end
 

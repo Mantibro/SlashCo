@@ -37,8 +37,8 @@ local NetworkSettings = { -- This table MUST be the same on the client
 		ReadFunc = nil,
 		ProcessFunc = nil,
 	},
-	_BITS = 3, -- max 7
-	_COUNT_BITS = 16, -- max 64k updates per transmit
+	_ID_BITS = 3, -- max 7
+	_COUNT_BITS = 9, -- max 511 updates per transmit
 
 	-- Sends out an upate every time containing all updates from the last acknowledged tick
 	-- if false it sends the message as reliable once and is done
@@ -50,11 +50,13 @@ local NetworkSettings = { -- This table MUST be the same on the client
 local function AddToTransmit(ply, type, data)
 	local transmitData = SlashCo.AudioSystem.TransmitData[ply]
 	if not transmitData then
-		transmitData = {}
+		transmitData = {
+			pending = {}
+		}
 		SlashCo.AudioSystem.TransmitData[ply] = transmitData
 	end
 
-	table.insert(transmitData, {
+	table.insert(transmitData.pending, {
 		type = type,
 		data = data,
 		tick = engine.TickCount()
@@ -342,30 +344,37 @@ hook.Add("SetupPlayerVisibility", "SlashCo:AudioSystem", function(ply)
 	local transmitData = SlashCo.AudioSystem.TransmitData[ply]
 	if not transmitData then return end
 
-	local count = #transmitData
+	local count = #transmitData.pending
 	if count == 0 then return end
+
+	local maxEntries = math.pow(2, 10) - 1
+	if count > maxEntries then
+		count = maxEntries
+	end
 
 	net.Start("slashCo_AudioSystem_Update", NetworkSettings._UNRELIABLE)
 		net.WriteUInt(engine.TickCount(), 32)
 		net.WriteUInt(count, NetworkSettings._COUNT_BITS)
-		for idx, transmitEntry in ipairs(transmitData) do
+		for idx, transmitEntry in ipairs(transmitData.pending) do
+			if idx > maxEntries then break end
+
 			net.WriteUInt(transmitEntry.tick, 32)
-			net.WriteUInt(transmitEntry.type.ID, NetworkSettings._BITS)
+			net.WriteUInt(transmitEntry.type.ID, NetworkSettings._ID_BITS)
 			local func = transmitEntry.type.ProcessFunc
 			if func then
 				func(transmitEntry.data)
 			else
 				net.Abort()
 				ErrorNoHaltWithStack("Tried to network an update with no function!")
-				table.remove(transmitData, idx) -- Get rid of the invalid entry
+				table.remove(transmitData.pending, idx) -- Get rid of the invalid entry
 				return
-			end
-
-			if not NetworkSettings._UNRELIABLE then
-				table.remove(transmitData, idx)
 			end
 		end
 	net.Send(ply)
+
+	if not NetworkSettings._UNRELIABLE then
+		transmitData.pending = {}
+	end
 end)
 
 util.AddNetworkString("slashCo_AudioSystem_StopSound")
@@ -448,15 +457,19 @@ net.Receive("slashCo_AudioSystem_Acknowledge", function(_, ply)
 		transmitData._LAST_ACK = tickCount -- In case it somehow screwed up???
 	end
 
-	for idx, transmitEntry in ipairs(transmitData) do
+	for idx, transmitEntry in ipairs(transmitData.pending) do
 		if transmitEntry.tick <= transmitData._LAST_ACK then
-			table.remove(transmitData, idx)
+			table.remove(transmitData.pending, idx)
 		end
 	end
 end)
 
 hook.Add("EntityRemoved", "AudioSystem:EntityRemoved", function(ent)
 	AddToTransmits(nil, NetworkSettings.EntityRemoved, ent:EntIndex())
+
+	if ent:IsPlayer() then
+		SlashCo.AudioSystem.TransmitData[ent] = nil
+	end
 end)
 
 function NetworkSettings.EntityRemoved.ProcessFunc(entIndex)

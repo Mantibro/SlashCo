@@ -156,7 +156,6 @@ function PLAYER:PlayDamageSound(additionalRange)
 		entity = self,
 		volume = 0.8,
 		fadeIn = 0,
-		unreliable = true,
 	})
 end
 

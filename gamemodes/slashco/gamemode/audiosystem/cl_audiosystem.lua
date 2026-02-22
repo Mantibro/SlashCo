@@ -1468,8 +1468,8 @@ local NetworkSettings = { -- This table MUST be the same on the client
 		ReadFunc = nil,
 		ProcessFunc = nil,
 	},
-	_BITS = 3, -- max 7
-	_COUNT_BITS = 16, -- max 64k updates per transmit
+	_ID_BITS = 3, -- max 7
+	_COUNT_BITS = 9, -- max 511 updates per transmit
 
 	-- Sends out an upate every time containing all updates from the last acknowledged tick
 	-- if false it sends the message as reliable once and is done
@@ -1489,7 +1489,7 @@ net.Receive("slashCo_AudioSystem_Update", function()
 	local count = net.ReadUInt(NetworkSettings._COUNT_BITS)
 	for k=1, count do
 		local tick = net.ReadUInt(32)
-		local type = net.ReadUInt(NetworkSettings._BITS)
+		local type = net.ReadUInt(NetworkSettings._ID_BITS)
 		local typeData = NetworkSettings[type]
 
 		if not typeData or not typeData.ReadFunc or not typeData.ProcessFunc then

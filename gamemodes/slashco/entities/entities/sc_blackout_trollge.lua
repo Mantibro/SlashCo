@@ -153,7 +153,6 @@ function ENT:Think()
 			entity = self,
 			volume = 1,
 			fadeIn = 0,
-			unreliable = true,
 		})
 
 		self.LastStepSound = CurTime()

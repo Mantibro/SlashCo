@@ -23,7 +23,6 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 		entity = self,
 		volume = 0.9,
 		fadeIn = 0,
-		unreliable = true,
 	})
 
 	if math.random(1, 3) == 1 or dmg:GetDamage() > 100 then
@@ -37,7 +36,6 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 			entity = self,
 			volume = 0.9,
 			fadeIn = 0,
-			unreliable = true,
 		})
 	end
 
