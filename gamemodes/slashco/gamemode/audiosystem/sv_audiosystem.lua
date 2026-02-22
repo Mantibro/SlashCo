@@ -164,6 +164,7 @@ local function SendToPlayersWithDelta(playerList, soundData, deltaList)
 end
 
 local function SendToPlayersWithNoDelta(playerList, soundData, manualSend)
+	net.WriteBool(false)
 	WriteSoundField(soundData.soundPath, net.WriteString)
 	WriteSoundField(soundData.fallbackSoundPath, net.WriteString)
 	WriteSoundField(soundData.entity, WriteEntIndex)
