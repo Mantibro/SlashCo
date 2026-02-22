@@ -71,8 +71,12 @@ local function AddToTransmits(sendToEntity, type, data)
 			sendToEntity = team.GetPlayers(sendToEntity)
 		end
 
-		for _, ply in ipairs(sendToEntity) do
-			AddToTransmit(ply, type, data)
+		if istable(sendToEntity) then
+			for _, ply in ipairs(sendToEntity) do
+				AddToTransmit(ply, type, data)
+			end
+		elseif IsEntity(sendToEntity) and IsValid(sendToEntity) and sendToEntity:IsPlayer() then
+			AddToTransmit(sendToEntity, type, data)
 		end
 	end
 end
