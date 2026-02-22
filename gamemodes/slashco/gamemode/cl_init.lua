@@ -523,10 +523,10 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 
 	if bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then return end
 
-	do
-		local ent = table.Random(ents.FindByClass("sc_offertable"))
-		local angle = ent:LocalToWorldAngles(Angle(0, 90, 90))
-		local pos = ent:LocalToWorld(Vector(5, 0, 110))
+	local offerTable = table.Random(ents.FindByClass("sc_offertable"))
+	if IsValid(offerTable) then
+		local angle = offerTable:LocalToWorldAngles(Angle(0, 90, 90))
+		local pos = offerTable:LocalToWorld(Vector(5, 0, 110))
 
 		cam.Start3D2D(pos, angle, 0.15)
 		-- Get the size of the text we are about to draw
