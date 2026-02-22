@@ -8,6 +8,7 @@ SlashCo.AudioSystem.UpdateFrequency = 0.05 -- How often timers execute to update
 SlashCo.AudioSystem.ServerGroupVolumes = SlashCo.AudioSystem.ServerGroupVolumes or {} -- Group volume mulipliers added on top of channel volumes controlled by the server
 SlashCo.AudioSystem.ClientGroupVolumes = SlashCo.AudioSystem.ClientGroupVolumes or {} -- Group volume mulipliers added on top of channel volumes controlled by the client
 SlashCo.AudioSystem.ModifiedChannelGroups = SlashCo.AudioSystem.ModifiedChannelGroups or {}
+SlashCo.AudioSystem.LastAcknowledgedTick = SlashCo.AudioSystem.LastAcknowledgedTick or 0
 
 -- These intentionally are nuked on autorefresh
 local ErrorList = {} -- A table containing all the files we failed to open, if the file is in this list and we fail loading again, then we won't throw another error.
@@ -1440,9 +1441,87 @@ net.Receive("slashCo_AudioSystem_MissingDelta", function()
 	PlayServerReceivedSound(soundData)
 end)
 
-net.Receive("slashCo_AudioSystem_PlaySound", function()
-	local isDelta = net.ReadBool()
-	local soundData = ReadSoundData()
+
+local NetworkSettings = { -- This table MUST be the same on the client
+	PlaySound = {
+		ID = 1,
+		ReadFunc = nil, -- only used clientside
+		ProcessFunc = nil, -- on the server this is used to SEND data- on the client it's used to process data read by ReadFunc
+	},
+	StopSound = {
+		ID = 2,
+		ReadFunc = nil,
+		ProcessFunc = nil,
+	},
+	EntityRemoved = {
+		ID = 3,
+		ReadFunc = nil,
+		ProcessFunc = nil,
+	},
+	SetGroupVolume = {
+		ID = 4,
+		ReadFunc = nil,
+		ProcessFunc = nil,
+	},
+	FadeSound = {
+		ID = 5,
+		ReadFunc = nil,
+		ProcessFunc = nil,
+	},
+	_BITS = 3, -- max 7
+	_COUNT_BITS = 16, -- max 64k updates per transmit
+
+	-- Sends out an upate every time containing all updates from the last acknowledged tick
+	-- if false it sends the message as reliable once and is done
+	-- This makes a noticable difference in higher ping conditions & packet loss
+	-- as it can network sounds way faster staying in sync with entity updates.
+	_UNRELIABLE = true,
+}
+for key, data in pairs(NetworkSettings) do -- Add NetworkSettings[ID] entries for easy lookup
+	if istable(data) and data.ID then
+		NetworkSettings[data.ID] = data
+		data.Name = key
+	end
+end
+
+net.Receive("slashCo_AudioSystem_Update", function()
+	local sendTick = net.ReadUInt(32)
+	local count = net.ReadUInt(NetworkSettings._COUNT_BITS)
+	for k=1, count do
+		local tick = net.ReadUInt(32)
+		local type = net.ReadUInt(NetworkSettings._BITS)
+		local typeData = NetworkSettings[type]
+
+		if not typeData or not typeData.ReadFunc or not typeData.ProcessFunc then
+			ErrorNoHaltWithStack("Invalid type? (" .. type .. ", " .. ((typeData and typeData.Name) or "Unknown") .. ")")
+			return
+		end
+
+		local readData = typeData.ReadFunc()
+
+		-- If we receive an old tick or duplicate we skip since we already processed it.
+		if tick <= SlashCo.AudioSystem.LastAcknowledgedTick then continue end
+
+		typeData.ProcessFunc(readData)
+	end
+
+	SlashCo.AudioSystem.LastAcknowledgedTick = sendTick
+
+	net.Start("slashCo_AudioSystem_Acknowledge", NetworkSettings._UNRELIABLE)
+		net.WriteUInt(sendTick, 32)
+	net.SendToServer()
+end)
+
+function NetworkSettings.PlaySound.ReadFunc()
+	return {
+		isDelta = net.ReadBool(),
+		soundData = ReadSoundData(),
+	}
+end
+
+function NetworkSettings.PlaySound.ProcessFunc(data)
+	local isDelta = data.isDelta
+	local soundData = data.soundData
 	local identifier = soundData.identifier or soundData.soundPath
 	if isDelta then
 		local baseTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
@@ -1471,40 +1550,54 @@ net.Receive("slashCo_AudioSystem_PlaySound", function()
 
 	-- PrintTable(soundData)
 	PlayServerReceivedSound(soundData)
-end)
+end
 
-net.Receive("slashCo_AudioSystem_StopSound", function()
-	local identifier = ReadSoundField(net.ReadString)
-	local fadeOut = net.ReadFloat()
-	local entIndex = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS)
+function NetworkSettings.StopSound.ReadFunc()
+	return {
+		identifier = ReadSoundField(net.ReadString),
+		fadeOut = net.ReadFloat(),
+		entIndex = ReadSoundField(net.ReadUInt, MAX_EDICT_BITS),
+	}
+end
 
-	SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
-end)
+function NetworkSettings.StopSound.ProcessFunc(data)
+	SlashCo.AudioSystem.StopSound(data.identifier, data.fadeOut, data.entIndex)
+end
 
-net.Receive("slashCo_AudioSystem_FadeSound", function() -- ToDo: Fix this function
-	local identifier = net.ReadString()
-	local fadeTime = net.ReadFloat()
-	local targetVolume = net.ReadFloat()
+function NetworkSettings.FadeSound.ReadFunc()
+	return {
+		identifier = net.ReadString(),
+		fadeTime = net.ReadFloat(),
+		targetVolume = net.ReadFloat(),
+	}
+end
 
-	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier)
+function NetworkSettings.FadeSound.ProcessFunc(data)
+	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(data.identifier)
 	if not channel then return end
 
-	SlashCo.AudioSystem.FadeToVolume(channel, fadeTime, targetVolume)
-end)
+	SlashCo.AudioSystem.FadeToVolume(channel, data.fadeTime, data.targetVolume)
+end
 
-net.Receive("slashCo_AudioSystem_EntityRemoved", function()
-	local entIndex = net.ReadUInt(MAX_EDICT_BITS)
+function NetworkSettings.EntityRemoved.ReadFunc()
+	return net.ReadUInt(MAX_EDICT_BITS)
+end
 
+function NetworkSettings.EntityRemoved.ProcessFunc(entIndex)
 	SlashCo.AudioSystem.StopSound(nil, 1, entIndex)
-end)
+end
 
-net.Receive("slashCo_AudioSystem_SetGroupVolume", function()
-	local groupName = net.ReadString()
-	local groupVolume = net.ReadFloat()
-	local lerpTime = net.ReadFloat() -- ToDo
+function NetworkSettings.SetGroupVolume.ReadFunc()
+	return {
+		groupName = net.ReadString(),
+		groupVolume = net.ReadFloat(),
+		lerpTime = net.ReadFloat(), -- ToDo
+	}
+end
 
-	SlashCo.AudioSystem.ServerGroupVolumes[groupName] = groupVolume
-end)
+function NetworkSettings.SetGroupVolume.ProcessFunc(data)
+	SlashCo.AudioSystem.ServerGroupVolumes[data.groupName] = data.groupVolume
+end
 
 function SlashCo.AudioSystem.SetGroupVolume(groupName, groupVolume, lerpTime)
 	SlashCo.AudioSystem.ClientGroupVolumes[groupName] = groupVolume
