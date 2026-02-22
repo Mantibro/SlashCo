@@ -570,7 +570,7 @@ concommand.Add("slashco_debug_lobbybot", function(ply)
 		timer.Simple(0, function()
 			if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
 
-			hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_COMMA)
+			hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_R)
 		end)
 	end)
 end)
