@@ -21,6 +21,10 @@ function SlashCo.RegisterSlasher(table, name)
 				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
 			end
 		end
+
+		if SC_CURRENT_SLASHER_FILE then
+			SlashCo.PrecacheSlasherAddon(SC_CURRENT_SLASHER_FILE)
+		end
 	end
 end
 
@@ -28,15 +32,18 @@ function SlashCo.GetSlasherTable(name)
 	return SlashCoSlashers[name]
 end
 
-SC_LOADEDSLASHERS = nil
-
-local slasher_files = file.Find("slashco/slasher/*.lua", "LUA")
-for _, v in ipairs(slasher_files) do
-	AddCSLuaFile("slashco/slasher/" .. v)
-	include("slashco/slasher/" .. v)
+function SlashCo.LoadSlashers()
+	SC_LOADEDSLASHERS = nil
+	local slasher_files = file.Find("slashco/slasher/*.lua", "LUA")
+	for _, v in ipairs(slasher_files) do
+		AddCSLuaFile("slashco/slasher/" .. v)
+		SC_CURRENT_SLASHER_FILE = "slashco/slasher/" .. v
+		include("slashco/slasher/" .. v)
+		SC_CURRENT_SLASHER_FILE = nil
+	end
+	SC_LOADEDSLASHERS = true
 end
-
-SC_LOADEDSLASHERS = true
+SlashCo.LoadSlashers()
 
 ---remainder of init code
 
@@ -263,9 +270,17 @@ if CLIENT then
 	end)
 end
 
----load patch files; these are specifically intended to modify existing addon code
-local slasher_patches = file.Find("slashco/patch/slasher/*.lua", "LUA")
-for _, v in ipairs(slasher_patches) do
-	AddCSLuaFile("slashco/patch/slasher/" .. v)
-	include("slashco/patch/slasher/" .. v)
+function SlashCo.LoadSlasherPatches()
+	---load patch files; these are specifically intended to modify existing addon code
+	local slasher_patches = file.Find("slashco/patch/slasher/*.lua", "LUA")
+	for _, v in ipairs(slasher_patches) do
+		AddCSLuaFile("slashco/patch/slasher/" .. v)
+		include("slashco/patch/slasher/" .. v)
+	end
 end
+SlashCo.LoadSlasherPatches()
+
+hook.Add("GameContentChanged", "SlashCo:RefreshSlashers", function()
+	SlashCo.LoadSlashers()
+	SlashCo.LoadSlasherPatches()
+end)

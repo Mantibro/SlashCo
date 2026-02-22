@@ -161,11 +161,13 @@ else
 	end
 end
 
-SC_LOADEDPERKS = nil
-
-for _, v in ipairs(file.Find("slashco/perks/*.lua", "LUA")) do
-	AddCSLuaFile("slashco/perks/" .. v)
-	include("slashco/perks/" .. v)
+function SlashCo.LoadPerks()
+	SC_LOADEDPERKS = nil
+	for _, v in ipairs(file.Find("slashco/perks/*.lua", "LUA")) do
+		AddCSLuaFile("slashco/perks/" .. v)
+		include("slashco/perks/" .. v)
+	end
+	SC_LOADEDPERKS = true
 end
-
-SC_LOADEDPERKS = true
+hook.Add("GameContentChanged", "SlashCo:RefreshPerks", SlashCo.LoadPerks)
+SlashCo.LoadPerks()

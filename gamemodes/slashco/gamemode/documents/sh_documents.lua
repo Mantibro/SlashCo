@@ -26,11 +26,13 @@ function SlashCo.GetDocumentTable(name)
 	return SlashCoDocuments[name]
 end
 
-SC_LOADEDDOCUMENTS = nil
-
-for _, v in ipairs(file.Find("slashco/documents/*.lua", "LUA")) do
-	AddCSLuaFile("slashco/documents/" .. v)
-	include("slashco/documents/" .. v)
+function SlashCo.LoadDocuments()
+	SC_LOADEDDOCUMENTS = nil
+	for _, v in ipairs(file.Find("slashco/documents/*.lua", "LUA")) do
+		AddCSLuaFile("slashco/documents/" .. v)
+		include("slashco/documents/" .. v)
+	end
+	SC_LOADEDDOCUMENTS = true
 end
-
-SC_LOADEDDOCUMENTS = true
+hook.Add("GameContentChanged", "SlashCo:RefreshDocuments", SlashCo.LoadDocuments)
+SlashCo.LoadDocuments()

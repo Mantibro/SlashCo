@@ -45,21 +45,23 @@ function SlashCo.GetEffectTable(name)
 	return SlashCoEffects[name]
 end
 
-SC_LOADEDITEMS = nil
+function SlashCo.LoadItems()
+	SC_LOADEDITEMS = nil
+	local effect_files = file.Find("slashco/effect/*.lua", "LUA")
+	for _, v in ipairs(effect_files) do
+		AddCSLuaFile("slashco/effect/" .. v)
+		include("slashco/effect/" .. v)
+	end
 
-local effect_files = file.Find("slashco/effect/*.lua", "LUA")
-for _, v in ipairs(effect_files) do
-	AddCSLuaFile("slashco/effect/" .. v)
-	include("slashco/effect/" .. v)
+	local item_files = file.Find("slashco/item/*.lua", "LUA")
+	for _, v in ipairs(item_files) do
+		AddCSLuaFile("slashco/item/" .. v)
+		include("slashco/item/" .. v)
+	end
+	SC_LOADEDITEMS = true
 end
-
-local item_files = file.Find("slashco/item/*.lua", "LUA")
-for _, v in ipairs(item_files) do
-	AddCSLuaFile("slashco/item/" .. v)
-	include("slashco/item/" .. v)
-end
-
-SC_LOADEDITEMS = true
+hook.Add("GameContentChanged", "SlashCo:RefreshItems", SlashCo.LoadItems)
+SlashCo.LoadItems()
 
 ---remainder of init code
 
@@ -337,16 +339,24 @@ function PLAYER:ItemFunctionInternal(value, slot, ...)
 		return SlashCoItems[item][value](self, ...)
 	end
 end
----load patch files; these are specifically intended to modify existing addon code
 
-local effect_patches = file.Find("slashco/patch/effect/*.lua", "LUA")
-for _, v in ipairs(effect_patches) do
-	AddCSLuaFile("slashco/patch/effect/" .. v)
-	include("slashco/patch/effect/" .. v)
-end
+function SlashCo.LoadItemPatches()
+	---load patch files; these are specifically intended to modify existing addon code
+	local effect_patches = file.Find("slashco/patch/effect/*.lua", "LUA")
+	for _, v in ipairs(effect_patches) do
+		AddCSLuaFile("slashco/patch/effect/" .. v)
+		include("slashco/patch/effect/" .. v)
+	end
 
-local item_patches = file.Find("slashco/patch/item/*.lua", "LUA")
-for _, v in ipairs(item_patches) do
-	AddCSLuaFile("slashco/patch/item/" .. v)
-	include("slashco/patch/item/" .. v)
+	local item_patches = file.Find("slashco/patch/item/*.lua", "LUA")
+	for _, v in ipairs(item_patches) do
+		AddCSLuaFile("slashco/patch/item/" .. v)
+		include("slashco/patch/item/" .. v)
+	end
 end
+SlashCo.LoadItemPatches()
+
+hook.Add("GameContentChanged", "SlashCo:RefreshItems", function()
+	SlashCo.LoadItems()
+	SlashCo.LoadItemPatches()
+end)

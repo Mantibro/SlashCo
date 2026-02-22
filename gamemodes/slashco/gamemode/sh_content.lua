@@ -1,6 +1,8 @@
 SlashCo = SlashCo or {}
 SlashCo.Content = SlashCo.Content or {}
 SlashCo.Content.AddedMapToWorkshop = SlashCo.Content.AddedMapToWorkshop or false
+SlashCo.Content.AddedGamemodeToWorkshop = SlashCo.Content.AddedGamemodeToWorkshop or false
+SlashCo.Content.AddedSlashersToWorkshop = SlashCo.Content.AddedSlashersToWorkshop or {}
 
 --[[
 	These precache tables store every single precached thing.
@@ -19,14 +21,9 @@ local function DebugPrint(msg)
 	end
 end
 
-function SlashCo.FindWorkshopID(mapName)
-	if not string.EndsWith(mapName, ".bsp") then
-		mapName = mapName .. ".bsp"
-	end
-
-	local mapPath = "maps/" .. mapName
+function SlashCo.FindWorkshopID(fileName)
 	for _, addon in ipairs(engine.GetAddons()) do
-		if file.Exists(mapPath, addon.title) then
+		if file.Exists(fileName, addon.title) then
 			return addon.wsid, addon.title
 		end
 	end
@@ -34,26 +31,48 @@ function SlashCo.FindWorkshopID(mapName)
 	return nil, nil
 end
 
-if SERVER and not SlashCo.Content.AddedMapToWorkshop then
-	local wsid, title = SlashCo.FindWorkshopID(game.GetMap())
-	if wsid then
-		print("[Content] Current map is from Addon " .. title)
-		resource.AddWorkshop(wsid) -- Adds the current map to the server download.
-		SlashCo.Content.AddedMapToWorkshop = true
+function SlashCo.FindMapWorkshopID(mapName)
+	if not string.EndsWith(mapName, ".bsp") then
+		mapName = mapName .. ".bsp"
 	end
 
-	resource.AddWorkshop("3453013573") -- Add the gamemode itself, just to be sure that it was added since somehow people still miss content.
+	return SlashCo.FindWorkshopID("maps/" .. mapName)
+end
+
+function SlashCo.FindSlasherWorkshopID(slasherFile)
+	if not string.EndsWith(slasherFile, ".lua") then
+		slasherFile = slasherFile .. ".lua"
+	end
+
+	return SlashCo.FindWorkshopID("lua/" .. slasherFile)
+end
+
+if SERVER then
+	if not SlashCo.Content.AddedMapToWorkshop then
+		local wsid, title = SlashCo.FindMapWorkshopID(game.GetMap())
+		if wsid then
+			print("[Content] Current map is from Addon \"" .. title .. "\"")
+			resource.AddWorkshop(wsid) -- Adds the current map to the server download.
+			SlashCo.Content.AddedMapToWorkshop = true
+		end
+	end
+
+	if not SlashCo.Content.AddedGamemodeToWorkshop then
+		-- Add the gamemode itself, just to be sure that it was added since somehow people still miss content.
+		resource.AddWorkshop("3453013573")
+		SlashCo.Content.AddedGamemodeToWorkshop = true
+	end
 end
 
 if CLIENT then
-	net.Receive("slashco_PrecacheMap", function() -- Goal is to reduce loading time by starting the map download in the lobby already.
+	net.Receive("slashco_PrecacheAddon", function() -- Goal is to reduce loading time by starting the map download in the lobby already.
 		local wsid = net.ReadString()
 		local title = net.ReadString()
 
-		DebugPrint("[Content] Received precache signal")
+		DebugPrint("[Content] Received precache signal for addon")
 		steamworks.FileInfo(wsid, function(result)
 			if result.installed and not result.disabled then  -- The map is already installed :3
-				DebugPrint("[Content] The next map is already installed\n")
+				DebugPrint("[Content] The addon is already installed (\"" .. title .. "\", \"".. wsid .. "\")\n")
 				return
 			end
 
@@ -67,7 +86,7 @@ if CLIENT then
 		end)
 	end)
 else
-	util.AddNetworkString("slashco_PrecacheMap")
+	util.AddNetworkString("slashco_PrecacheAddon")
 	function SlashCo.PrecacheNextMap()
 		local mapName = SlashCo.LobbyData.SelectedMap
 		local wsid, title = SlashCo.FindWorkshopID(mapName)
@@ -78,10 +97,26 @@ else
 			DebugPrint("[Content] Sent out precache signal for map \"" .. mapName .. "\" (\"" .. title .. "\" - " .. wsid .. ")")
 		end
 
-		net.Start("slashco_PrecacheMap")
+		net.Start("slashco_PrecacheAddon")
 			net.WriteString(wsid)
 			net.WriteString(title)
 		net.Broadcast()
+	end
+
+	function SlashCo.PrecacheSlasherAddon(slasherFile)
+		if SlashCo.Content.AddedSlashersToWorkshop[slasherFile] then return end
+
+		local wsid, title = SlashCo.FindSlasherWorkshopID(slasherFile)
+		if wsid then
+			print("[Content] Slasher found from Addon \"" .. title .. "\"")
+			resource.AddWorkshop(wsid) -- Adds the current map to the server download.
+			SlashCo.Content.AddedSlashersToWorkshop[slasherFile] = true
+
+			net.Start("slashco_PrecacheAddon")
+				net.WriteString(wsid)
+				net.WriteString(title)
+			net.Broadcast()
+		end
 	end
 end
 
