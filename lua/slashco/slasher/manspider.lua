@@ -50,6 +50,23 @@ local function PlayScream(slasher)
 	})
 end
 
+local function PlayIdle(slasher)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/manspider/manspider_idle.mp3",
+		identifier = "ManspiderIdle",
+		minDistance = 200 * SlashCo.MapSize,
+		maxDistance = 800 * SlashCo.MapSize,
+		looping = true,
+		entity = slasher,
+		volume = 0.5,
+		fadeIn = 0,
+	})
+end
+
+local function StopIdle(slasher)
+	SlashCo.AudioSystem.StopSound("ManspiderIdle", 0.1, slasher)
+end
+
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
@@ -118,7 +135,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeNested = TimeNested + FrameTime()
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
-			SlashCo.AudioSystem.StopSound("ManspiderIdle", 0.1, slasher)
+			StopIdle(slasher)
 			slasher:SetJumpPower(0)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
@@ -157,17 +174,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeNested = 0
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/manspider/manspider_idle.mp3",
-				identifier = "ManspiderIdle",
-				minDistance = 200 * SlashCo.MapSize,
-				maxDistance = 800 * SlashCo.MapSize,
-				looping = true,
-				entity = slasher,
-				volume = 0.5,
-				fadeIn = 0,
-			})
-
+			PlayIdle(slasher)
 			slasher:SetJumpPower(slasher.Jump)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
