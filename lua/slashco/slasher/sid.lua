@@ -61,6 +61,38 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ChaseSpeed = 275 + (7.5 * additionalSurvivors)
 end
 
+local function PlayShots(slasher)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_shot.mp3",
+		identifier = "SidShot",
+		minDistance = 700 * SlashCo.MapSize,
+		maxDistance = 1240 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 0.8,
+		fadeIn = 0,
+	})
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_shot_legacy.mp3",
+		identifier = "SidShotLegacy",
+		minDistance = 700 * SlashCo.MapSize,
+		maxDistance = 1240 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 0.7,
+		fadeIn = 0,
+	})
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_shot_farthest.mp3",
+		identifier = "SidShotFarthest",
+		minDistance = 1250 * SlashCo.MapSize,
+		maxDistance = 2250 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher.EatedCookies = 0
 	slasher.Pacification = 0
@@ -198,12 +230,29 @@ local function EatCookie(slasher, target)
 
 	slasher:SetNWBool("SidEating", true)
 	slasher.Pacification = 99
-	slasher:EmitSound("slashco/slasher/sid/sid_cookie" .. math.random(1, 2) .. ".mp3")
+	local idx = math.random(1, 2)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_cookie" .. idx .. ".mp3",
+		identifier = "SidCookie" .. idx,
+		minDistance = 200,
+		maxDistance = 700,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	target:SetNWBool("BeingEaten", true)
 
 	timer.Simple(1.3, function()
-		slasher:EmitSound("slashco/slasher/sid/sid_eating.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_eating.mp3",
+			identifier = "SidEating",
+			minDistance = 200,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end)
 
 	slasher:Freeze(true)
@@ -241,10 +290,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end
 
 			slasher:SetNWFloat("SidGunShoot", CurTime())
-
-			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot_farthest.mp3", 150)
-			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot.mp3", 85)
-			slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot_legacy.mp3", 70)
+			PlayShots(slasher)
 
 			slasher:FireBullets(
 					{
@@ -331,7 +377,15 @@ function SLASHER.OnPrimaryFire(slasher, target)
 						return
 					end
 
-					target:EmitSound("ambient/voices/citizen_beaten4.wav")
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "ambient/voices/citizen_beaten4.wav",
+						identifier = "SurvivorSidStruggle1",
+						minDistance = 600,
+						maxDistance = 800,
+						entity = target,
+						volume = 1,
+						fadeIn = 0,
+					})
 				end)
 
 				timer.Simple(3, function()
@@ -339,7 +393,15 @@ function SLASHER.OnPrimaryFire(slasher, target)
 						return
 					end
 
-					target:EmitSound("ambient/voices/citizen_beaten3.wav")
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "ambient/voices/citizen_beaten3.wav",
+						identifier = "SurvivorSidStruggle2",
+						minDistance = 600,
+						maxDistance = 800,
+						entity = target,
+						volume = 1,
+						fadeIn = 0,
+					})
 				end)
 
 				timer.Simple(3.95, function()
@@ -357,10 +419,34 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 					target:SetNWBool("SurvivorBeingJumpscared", false)
 
-					slasher:PlayGlobalSound("slashco/slasher/sid/sid_shot_farthest.mp3", 150)
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/sid/sid_shot_farthest.mp3",
+						identifier = "SidShotFarthest",
+						minDistance = 1250 * SlashCo.MapSize,
+						maxDistance = 2250 * SlashCo.MapSize,
+						entity = slasher,
+						volume = 1,
+						fadeIn = 0,
+					})
 
-					slasher:EmitSound("slashco/slasher/sid/sid_shot.mp3", 95)
-					slasher:EmitSound("slashco/slasher/sid/sid_shot_2.mp3", 85)
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/sid/sid_shot.mp3",
+						identifier = "SidShot",
+						minDistance = 700 * SlashCo.MapSize,
+						maxDistance = 1240 * SlashCo.MapSize,
+						entity = slasher,
+						volume = 0.9,
+						fadeIn = 0,
+					})
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/sid/sid_shot2.mp3",
+						identifier = "SidShot2",
+						minDistance = 700 * SlashCo.MapSize,
+						maxDistance = 1240 * SlashCo.MapSize,
+						entity = slasher,
+						volume = 0.8,
+						fadeIn = 0,
+					})
 
 					local vec, ang = slasher:GetBonePosition(slasher:LookupBone("HandL"))
 					local vPoint = vec
@@ -423,7 +509,16 @@ function SLASHER.OnSecondaryFire(slasher)
 		slasher:SetSlowWalkSpeed(1)
 		slasher:SetWalkSpeed(1)
 		slasher:SetRunSpeed(1)
-		slasher:EmitSound("slashco/slasher/sid/sid_draw.mp3", 75, 110)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_draw.mp3",
+			identifier = "SidDraw",
+			minDistance = 400,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(1, function()
 			if not IsValid(slasher) then
@@ -432,7 +527,15 @@ function SLASHER.OnSecondaryFire(slasher)
 
 			slasher:SetNWBool("SidGunAiming", false)
 			slasher:SetNWBool("SidGunAimed", true)
-			slasher:EmitSound("slashco/slasher/sid/sid_clipout.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_clipout.mp3",
+				identifier = "SidClipout",
+				minDistance = 400,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 			slasher.GunSpread = 2
 		end)
 	elseif slasher:GetNWBool("SidGunAimed") and slasher.GunCooldown < 0.01 then
@@ -461,10 +564,27 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 		slasher:SetNWBool("SidEatingSurvCookie", true)
 		slasher:Freeze(true)
-		slasher:EmitSound("slashco/slasher/sid/sid_cookie" .. math.random(1, 2) .. ".mp3")
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_cookie" .. idx .. ".mp3",
+			identifier = "SidCookie" .. idx,
+			minDistance = 200,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 		
 		timer.Simple(3.55, function()
-			slasher:EmitSound("slashco/slasher/sid/sid_eating.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_eating.mp3",
+				identifier = "SidEating",
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 			cookie:Remove()
 		end)
 		
@@ -513,11 +633,29 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			--Show the gun model
 
 			slasher:SetBodygroup(1, 1)
-			slasher:EmitSound("slashco/slasher/sid/sid_draw.mp3")
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_draw.mp3",
+				identifier = "SidDraw",
+				minDistance = 400,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end)
 		timer.Simple(2.25, function()
 			--sound
-			slasher:EmitSound("slashco/slasher/sid/sid_slideback.mp3", 75, 75)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_slideback.mp3",
+				identifier = "SidSlideback",
+				minDistance = 400,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 0.8,
+				fadeIn = 0,
+			})
+
 			slasher:SlasherHudFunc("SetCrosshairProngs", 4)
 		end)
 
@@ -819,7 +957,15 @@ function SLASHER.SidRage(ply)
 				v:SetNWBool("SidFuck", false)
 			end
 
-			slasher:PlayGlobalSound("slashco/slasher/sid/sid_sad_1.mp3", 85)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_sad_1.mp3",
+				identifier = "SidSad",
+				minDistance = 750,
+				maxDistance = 1250,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end)
 	end
 end

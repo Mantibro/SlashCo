@@ -33,7 +33,17 @@ SLASHER.DiffRating = "★★★☆☆"
 SLASHER.DisableHelicopterMusic = false
 
 function SLASHER.OnSpawn(slasher)
-	slasher:PlayGlobalSound("slashco/slasher/covenant/covenant_ritual" .. math.random(1, 6) .. ".mp3", 100)
+	local idx = math.random(1, 6)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/covenant/covenant_ritual" .. idx .. ".mp3",
+		identifier = "CovenantRitual" .. idx,
+		minDistance = 1200 * SlashCo.MapSize,
+		maxDistance = 2400 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	slasher:SetNWBool("CanChase", true)
 	slasher.RockSummoned = false
 end
@@ -176,7 +186,16 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				slasher:Freeze(false)
 			end)
 
-			slasher:EmitSound("slashco/slasher/covenant/covenant_summoning.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/covenant/covenant_summoning.mp3",
+				identifier = "CovenantSummoning",
+				minDistance = 400 * SlashCo.MapSize,
+				maxDistance = 800 * SlashCo.MapSize,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+
 			slasher:SetNWBool("CovenantSummoning", true)
 			slasher:Freeze(true)
 		end)

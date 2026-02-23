@@ -242,11 +242,28 @@ function SLASHER.OnMainAbilityFire(slasher)
 	slasher.SurveyLength = SLASHER.SurveyLength
 	slasher.SurveyCooldown = SLASHER.SurveyCooldown
 
-	slasher:PlayGlobalSound("slashco/slasher/watcher/watcher_locate.mp3", 100)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/watcher/watcher_locate.mp3",
+		identifier = "WatcherLocate",
+		minDistance = 1000,
+		maxDistance = 2000,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		p:SetNWBool("WatcherSurveyed", true)
-		p:EmitSound("slashco/slasher/watcher/watcher_see.mp3")
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/watcher/watcher_see.mp3",
+			identifier = "WatcherSee",
+			entity = p,
+			volume = 1,
+			fadeIn = 0,
+			fadeOutStart = SLASHER.SurveyDisplayLength,
+			fadeOut = 0.5,
+		})
 	end
 
 	timer.Simple(SLASHER.SurveyDisplayLength, function()

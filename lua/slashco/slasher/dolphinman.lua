@@ -96,7 +96,17 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetRunSpeed(1)
 		slasher:SetWalkSpeed(1)
 		slasher:SetSlowWalkSpeed(1)
-		slasher:EmitSound("slashco/slasher/dolfin/dolfin_breath.wav", 40)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/dolfin/dolfin_breath.wav",
+			identifier = "DolfinBreath",
+			minDistance = 400 * SlashCo.MapSize,
+			maxDistance = 800 * SlashCo.MapSize,
+			looping = true,
+			entity = slasher,
+			volume = 0.5,
+			fadeIn = 0,
+		})
 
 		--get hunt yes.....
 		if HuntPower < 100 then
@@ -107,15 +117,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if SlashCo.CurRound.EscapeHelicopterSummoned then
 			slasher:SetNWBool("DolphinFound", true)
-			
-			slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-			timer.Simple(0.1, function()
-				if not IsValid(slasher) then
-					return
-				end
-				slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-			end)
 
+			SlashCo.AudioSystem.StopSound("DolfinBreath", 0.1, slasher)
 			PlayCallSound(slasher)
 
 			timer.Simple(10, function()
@@ -147,15 +150,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			slasher:SetNWBool("DolphinFound", true)
-			
-			slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-			timer.Simple(0.1, function()
-				if not IsValid(slasher) then
-					return
-				end
-				slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-			end)
 
+			SlashCo.AudioSystem.StopSound("DolfinBreath", 0.1, slasher)
 			PlayCallSound(slasher)
 
 			timer.Simple(10, function()
@@ -200,14 +196,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetNWBool("DolphinHunting", false)
 				SlashCo.AudioSystem.StopSound("DolfinCall", 0.5, slasher)
 				SlashCo.AudioSystem.StopSound("DolfinCallFar", 0.5, slasher)
-				
-				slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-				for i = 1, 8 do
-					--WHY THE FUCK DO I HAVE TO DO THIS HOLY SHIT
-					timer.Simple(i / 10, function()
-						slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-					end)
-				end
 			end
 		end
 	end
@@ -280,15 +268,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") and slasher.HuntPower >= 5 then
 		slasher:SetNWBool("DolphinInHiding", false)
-		
-		slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-		timer.Simple(0.1, function()
-			if not IsValid(slasher) then
-				return
-			end
-			
-			slasher:StopSound("slashco/slasher/dolfin/dolfin_breath.wav")
-		end)
+		SlashCo.AudioSystem.StopSound("DolfinBreath", 0.1, slasher)
 
 		slasher.HuntPower = slasher.HuntPower - math.floor(slasher.HuntPower / 1.5)
 	end

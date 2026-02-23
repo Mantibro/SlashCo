@@ -288,7 +288,16 @@ end
 
 function SLASHER.SmileyIdle(slasher)
 	if not slasher:GetNWBool("InSlasherChaseMode") then
-		slasher:EmitSound("slashco/slasher/freesmiley/freesmiley_idle" .. math.random(1, 7) .. ".mp3")
+		local idx = math.random(1, 7)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/freesmiley/freesmiley_idle" .. idx .. ".mp3",
+			identifier = "FreeSmileyLaugh" .. idx,
+			minDistance = 200,
+			maxDistance = 1200,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
 	timer.Simple(math.random(3, 5), function()

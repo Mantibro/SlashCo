@@ -270,7 +270,15 @@ function SLASHER.OnTickBehaviour(slasher)
 		if isCreating and slasher.TylerBlink ~= 1.8 then
 			slasher.TylerBlink = 1.8
 
-			slasher:EmitSound("slashco/slasher/tyler/tyler_create.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/tyler/tyler_create.mp3",
+				identifier = "TylerCreate",
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 
 			timer.Simple(3, function()
 				if not IsValid(slasher) then

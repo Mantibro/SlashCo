@@ -36,6 +36,20 @@ SLASHER.AdditionalAngerMult = 0 -- Used to multiply FrameTime which is then adde
 SLASHER.JumpStrengthForward = 800 -- forward Velocity used when jumping
 SLASHER.JumpStrengthUp = 200 -- up Velocity used when jumping
 
+local function PlayScream(slasher)
+	local idx = math.random(1, 4)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/manspider/manspider_scream" .. idx .. ".mp3",
+		identifier = "ManspiderScream",
+		minDistance = 500 * SlashCo.MapSize,
+		maxDistance = 1000 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+end
+
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
@@ -104,7 +118,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeNested = TimeNested + FrameTime()
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
-			slasher:StopSound("slashco/slasher/manspider/manspider_idle.mp3")
+			SlashCo.AudioSystem.StopSound("ManspiderIdle", 0.1, slasher)
 			slasher:SetJumpPower(0)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
@@ -128,7 +142,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				continue
 			end
 
-			slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
+			PlayScream(slasher)
 			slasher.TargetPlayer = survivor
 			slasher:SetNWBool("ManspiderNested", false)
 
@@ -143,7 +157,17 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeNested = 0
 
 		if slasher.NestSound ~= slasher:GetNWBool("ManspiderNested") then
-			slasher:PlayGlobalSound("slashco/slasher/manspider/manspider_idle.mp3", 50, nil, true)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/manspider/manspider_idle.mp3",
+				identifier = "ManspiderIdle",
+				minDistance = 200 * SlashCo.MapSize,
+				maxDistance = 800 * SlashCo.MapSize,
+				looping = true,
+				entity = slasher,
+				volume = 0.5,
+				fadeIn = 0,
+			})
+
 			slasher:SetJumpPower(slasher.Jump)
 			slasher.NestSound = slasher:GetNWBool("ManspiderNested")
 		end
@@ -175,7 +199,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				if SlashCo.GetSlasherAnger(slasher) >= 100 then
 					slasher.TargetPlayer = survivor
-					slasher:EmitSound("slashco/slasher/manspider/manspider_scream" .. math.random(1, 4) .. ".mp3")
+					PlayScream(slasher)
 				end
 			end
 		else
@@ -436,7 +460,15 @@ function SLASHER.Move(ply, mv)
 	edata:SetEntity(victim)
 	util.Effect("BloodImpact", edata)
 
-	victim:EmitSound("physics/body/body_medium_break3.wav")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "physics/body/body_medium_break3.wav",
+		identifier = "ManspiderSmash",
+		minDistance = 400,
+		maxDistance = 800,
+		entity = victim,
+		volume = 1,
+		fadeIn = 0,
+	})
 	ply:SetNWString("ManspiderClimbEntity", "")
 end
 

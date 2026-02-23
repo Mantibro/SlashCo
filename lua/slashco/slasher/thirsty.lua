@@ -168,7 +168,15 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 			return
 		end
 
-		slasher:EmitSound("slashco/slasher/thirsty/thirsty_drink.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/thirsty/thirsty_drink.mp3",
+			identifier = "ThirstyDrink",
+			minDistance = 200,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end)
 
 	timer.Simple(4.5, function()

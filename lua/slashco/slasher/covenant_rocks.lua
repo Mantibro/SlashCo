@@ -64,7 +64,17 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			if target1:IsPlayer() then
 				if target1:Team() ~= TEAM_SURVIVOR then return end
 
-				target1:EmitSound("ambient/energy/spark"..tostring(math.random(1,6))..".wav", 100, 100, 0.25)
+				local idx = tostring(math.random(1, 6))
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "ambient/energy/spark" .. idx .. ".wav",
+					identifier = "CovenantRocksHit",
+					minDistance = 400,
+					maxDistance = 800,
+					entity = target1,
+					volume = 1,
+					fadeIn = 0,
+				})
+
 				local vPoint = slasher:GetBonePosition(slasher:LookupBone("Hand.R"))
 				local tr = slasher:GetEyeTrace()
 				local lightning = EffectData()

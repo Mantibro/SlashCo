@@ -56,11 +56,82 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ChaseDuration = 12.0 + (1 * additionalSurvivors)
 end
 
+local function PlayHeartbeat(slasher)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/borgmire/borgmire_heartbeat.mp3",
+		identifier = "BorgmireHeart",
+		minDistance = 200,
+		maxDistance = 500,
+		looping = true,
+		entity = slasher,
+		volume = 0.5,
+		fadeIn = 0,
+	})
+end
+
+local function PlayBreath(slasher)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/borgmire/borgmire_breath_base.mp3",
+		identifier = "BorgmireBreathBase",
+		minDistance = 200 * SlashCo.MapSize,
+		maxDistance = 500 * SlashCo.MapSize,
+		looping = true,
+		entity = slasher,
+		volume = 0.6,
+		fadeIn = 0,
+	})
+end
+
+local function StopBreath(slasher)
+	SlashCo.AudioSystem.StopSound("BorgmireBreathBase", 0.5, slasher)
+end
+
+local function PlayChaseSounds(slasher)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/borgmire/borgmire_breath_chase.mp3",
+		identifier = "BorgmireBreathChase",
+		minDistance = 800,
+		maxDistance = 1200,
+		looping = true,
+		entity = slasher,
+		volume = 0.7,
+		fadeIn = 0,
+	})
+	
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/borgmire/borgmire_anger.mp3",
+		identifier = "BorgmireAnger",
+		minDistance = 700 * SlashCo.MapSize,
+		maxDistance = 1240 * SlashCo.MapSize,
+		looping = true,
+		entity = slasher,
+		volume = 0.8,
+		fadeIn = 0,
+	})
+	
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/borgmire/borgmire_anger_far.mp3",
+		identifier = "BorgmireAngerFar",
+		minDistance = 1250 * SlashCo.MapSize,
+		maxDistance = 2250 * SlashCo.MapSize,
+		looping = true,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+end
+
+local function StopChaseSounds(slasher)
+	SlashCo.AudioSystem.StopSound("BorgmireBreathChase", 0.5, slasher)
+	SlashCo.AudioSystem.StopSound("BorgmireAnger", 0.5, slasher)
+	SlashCo.AudioSystem.StopSound("BorgmireAngerFar", 0.5, slasher)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 85))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 85))
-	slasher:PlayGlobalSound("slashco/slasher/borgmire/borgmire_heartbeat.mp3", 50, nil, true)
 	slasher:SetNWBool("CanChase", true)
+	PlayHeartbeat(slasher)
 
 	slasher.TimeChasing = 0
 	slasher.PunchCooldown = 0
@@ -110,12 +181,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.ChaseSound = nil
 
 		if slasher.IdleSound == nil then
-			slasher:PlayGlobalSound("slashco/slasher/borgmire/borgmire_breath_base.mp3", 60, nil, true)
-
-			slasher:StopSound("slashco/slasher/borgmire/borgmire_breath_chase.mp3")
-			timer.Simple(0.1, function()
-				slasher:StopSound("slashco/slasher/borgmire/borgmire_breath_chase.mp3")
-			end)
+			PlayBreath(slasher)
+			StopChaseSounds(slasher)
 
 			slasher.IdleSound = true
 		end
@@ -133,14 +200,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		if slasher.ChaseSound == nil then
-			slasher:PlayGlobalSound("slashco/slasher/borgmire/borgmire_breath_chase.mp3", 70, nil, true)
-			slasher:PlayGlobalSound("slashco/slasher/borgmire/borgmire_anger.mp3", 75)
-			slasher:PlayGlobalSound("slashco/slasher/borgmire/borgmire_anger_far.mp3", 110)
-
-			slasher:StopSound("slashco/slasher/borgmire/borgmire_breath_base.mp3")
-			timer.Simple(0.1, function()
-				slasher:StopSound("slashco/slasher/borgmire/borgmire_breath_base.mp3")
-			end)
+			PlayChaseSounds(slasher)
+			StopBreath(slasher)
 
 			slasher.ChaseSound = true
 		end
@@ -179,7 +240,17 @@ function SLASHER.OnPrimaryFire(slasher)
 				return
 			end
 
-			slasher:EmitSound("slashco/slasher/borgmire/borgmire_swing" .. math.random(1, 2) .. ".mp3")
+			local idx = math.random(1, 2)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/borgmire/borgmire_swing" .. idx .. ".mp3",
+				identifier = "BorgmireSwing" .. idx,
+				minDistance = 600,
+				maxDistance = 800,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+
 			slasher.PunchSlowdown = 2
 
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
@@ -203,7 +274,16 @@ function SLASHER.OnPrimaryFire(slasher)
 				bloodfx:SetOrigin(vPoint)
 				util.Effect("BloodImpact", bloodfx)
 
-				target:EmitSound("slashco/slasher/borgmire/borgmire_hit" .. math.random(1, 2) .. ".mp3")
+				local idx = math.random(1, 2)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/borgmire/borgmire_hit" .. idx .. ".mp3",
+					identifier = "SurvivorHitBorg" .. idx,
+					minDistance = 600,
+					maxDistance = 800,
+					entity = target,
+					volume = 1,
+					fadeIn = 0,
+				})
 				SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 			end
 		end)
@@ -247,7 +327,16 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher.KickCooldown = 15
 		
 		timer.Simple(2.0, function()
-			slasher:EmitSound("slashco/slasher/borgmire/borgmire_swing" .. math.random(1, 2) .. ".mp3")
+			local idx = math.random(1, 2)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/borgmire/borgmire_swing" .. idx .. ".mp3",
+				identifier = "BorgmireSwing" .. idx,
+				minDistance = 600,
+				maxDistance = 800,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 			
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
 				Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.KickDamage, DMG_SLASH, 5, false)
@@ -270,7 +359,16 @@ function SLASHER.OnMainAbilityFire(slasher)
 				bloodfx:SetOrigin(vPoint)
 				util.Effect("BloodImpact", bloodfx)
 
-				target:EmitSound("slashco/slasher/borgmire/borgmire_hit" .. math.random(1, 2) .. ".mp3")
+				local idx = math.random(1, 2)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/borgmire/borgmire_hit" .. idx .. ".mp3",
+					identifier = "SurvivorHitBorg" .. idx,
+					minDistance = 600,
+					maxDistance = 800,
+					entity = target,
+					volume = 1,
+					fadeIn = 0,
+				})
 				target:SetVelocity((slasher:GetForward() * 600) + Vector(0, 0, 400))
 
 				SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
@@ -320,7 +418,15 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if slasher.ThrowCooldown < 0.01 then
 		slasher:SetNWBool("BorgmireThrow", true)
 		slasher.ChaseActivationCooldown = 99
-		slasher:EmitSound("slashco/slasher/borgmire/borgmire_throw.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/borgmire/borgmire_throw.mp3",
+			identifier = "BorgmireThrow",
+			minDistance = 400,
+			maxDistance = 900,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 		
 		target:Freeze(true)
 		target:SetPos(slasher:GetPos() + Vector(0, 0, 100))

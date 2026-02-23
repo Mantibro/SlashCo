@@ -88,7 +88,17 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if DisguiseT > 30 then
 			Speech = 0
-			slasher:EmitSound("slashco/slasher/amogus/amogus_speech" .. math.random(1, 7) .. ".mp3")
+
+			local idx = math.random(1, 7)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/amogus/amogus_speech" .. idx .. ".mp3",
+				identifier = "AmogusSpeech" .. idx,
+				minDistance = 400,
+				maxDistance = 600,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end
 	else
 		Speech = 0
@@ -130,7 +140,15 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	target:SetNWBool("SurvivorBeingJumpscared", true)
 	target:Freeze(true)
 
-	slasher:EmitSound("slashco/slasher/amogus/amogus_stealthkill.mp3", 60)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/amogus/amogus_stealthkill.mp3",
+		identifier = "AmogusStealthKill",
+		minDistance = 200,
+		maxDistance = 500,
+		entity = slasher,
+		volume = 0.7,
+		fadeIn = 0,
+	})
 	slasher:Freeze(true)
 	slasher.KillDelayTick = SLASHER.KillDelay
 
@@ -162,7 +180,16 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetNWBool("AmogusDisguising", true)
 		slasher:Freeze(true)
 
-		slasher:EmitSound("slashco/slasher/amogus/amogus_transform" .. math.random(1, 2) .. ".mp3")
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/amogus/amogus_transform" .. idx .. ".mp3",
+			identifier = "AmogusTransform" .. idx,
+			minDistance = 200,
+			maxDistance = 600,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 		slasher.DisguiseCooldown = 4
 
 		timer.Simple(2, function()
@@ -175,7 +202,15 @@ function SLASHER.OnMainAbilityFire(slasher)
 			slasher:SlasherHudFunc("SetAvatar", "survivor")
 			slasher:SlasherHudFunc("SetTitle", "Amogus_survivor_disguised_title")
 
-			slasher:EmitSound("slashco/slasher/amogus/amogus_sus.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/amogus/amogus_sus.mp3",
+				identifier = "AmogusSus",
+				minDistance = 300,
+				maxDistance = 500,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 
 			local survivors = team.GetPlayers(TEAM_SURVIVOR)
 			local modelname = "models/slashco/survivor/male_01.mdl"
@@ -192,8 +227,17 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetNWBool("AmogusSurvivorDisguise", false)
 		slasher:SetNWBool("AmogusFuelDisguise", false)
 		slasher:SetNWBool("AmogusDisguised", false)
-		slasher:EmitSound("slashco/slasher/amogus/amogus_reveal.mp3")
 		slasher:SetNWBool("DynamicFlashlight", false)
+		
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/amogus/amogus_reveal.mp3",
+			identifier = "AmogusReveal",
+			minDistance = 600,
+			maxDistance = 800,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		slasher:SlasherHudFunc("SetAvatar", "default")
 		slasher:SlasherHudFunc("SetTitle", "Amogus")
@@ -222,7 +266,17 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	if not slasher:GetNWBool("AmogusDisguising") and slasher.DisguiseCooldown < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
 		slasher:SetNWBool("AmogusDisguising", true)
 		slasher:Freeze(true)
-		slasher:EmitSound("slashco/slasher/amogus/amogus_transform" .. math.random(1, 2) .. ".mp3")
+
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/amogus/amogus_transform" .. idx .. ".mp3",
+			identifier = "AmogusTransform" .. idx,
+			minDistance = 200,
+			maxDistance = 600,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		slasher.DisguiseCooldown = 4
 
@@ -235,7 +289,15 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher:SlasherHudFunc("SetAvatar", "fuel")
 			slasher:SlasherHudFunc("SetTitle", "Amogus_gas_disguised_title")
 
-			slasher:EmitSound("slashco/slasher/amogus/amogus_sus.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/amogus/amogus_sus.mp3",
+				identifier = "AmogusSus",
+				minDistance = 300,
+				maxDistance = 500,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 
 			slasher:SetVisible(false)
 

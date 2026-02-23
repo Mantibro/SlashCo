@@ -28,6 +28,28 @@ SLASHER.DiffRating = "★★★☆☆"
 SLASHER.PrimaryDamage = 50 -- How much damage he does with his primary attack.
 SLASHER.GameProgressMult = 1 -- Used to multiply the GameProgress when deciding if he should become a monster. Raising it will allow him to enter the monster form earlier.
 
+local function PlayTransform(slasher)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "vo/npc/male01/no02.wav",
+		identifier = "Male07Transform1",
+		minDistance = 400,
+		maxDistance = 1200,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+	
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "NPC_Manhack.Slice",
+		identifier = "Male07Transform2",
+		minDistance = 400,
+		maxDistance = 1200,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+end
+
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
@@ -138,9 +160,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				bloodfx:SetOrigin(vPoint)
 				util.Effect("BloodImpact", bloodfx)
 
-				slasher:EmitSound("vo/npc/male01/no02.wav")
-
-				slasher:EmitSound("NPC_Manhack.Slice")
+				PlayTransform(slasher)
 
 				timer.Simple(3, function()
 					slasher:SetNWBool("Male07Transforming", false)
@@ -183,7 +203,15 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		slasher.SlashCooldown = 2
 
 		timer.Simple(0.5, function()
-			slasher:EmitSound("slashco/slasher/trollge/trollge_swing.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/trollge/trollge_swing.mp3",
+				identifier = "Male07Swing",
+				minDistance = 600,
+				maxDistance = 800,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 
 			if SERVER then
 				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
@@ -203,7 +231,15 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					bloodfx:SetOrigin(vPoint)
 					util.Effect("BloodImpact", bloodfx)
 
-					target1:EmitSound("slashco/slasher/trollge/trollge_hit.mp3")
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
+						identifier = "SurvivorHitMale07",
+						minDistance = 600,
+						maxDistance = 800,
+						entity = target1,
+						volume = 1,
+						fadeIn = 0,
+					})
 				end
 
 				SlashCo.BustDoor(slasher, target, 30000)
@@ -230,7 +266,15 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end
 
 	if IsValid(target) and target:GetClass() == "sc_maleclone" and slasher:GetPos():Distance(target:GetPos()) < 150 then
-		slasher:EmitSound("slashco/slasher/male07/male07_possess.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/male07/male07_possess.mp3",
+			identifier = "Male07Possess",
+			minDistance = 400,
+			maxDistance = 1000,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		slasher:SetPos(target:GetPos())
 		slasher:SetEyeAngles(target:EyeAngles())
@@ -262,8 +306,18 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		SlashCo.CreateItem("sc_maleclone", slasher:GetPos(), slasher:GetAngles())
 
 		slasher.MaleState = MALE07_GHOST
-		slasher:EmitSound("slashco/slasher/male07/male07_unpossess" .. math.random(1, 2) .. ".mp3")
 		slasher.MaleCooldown = 3
+
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/male07/male07_unpossess" .. idx .. ".mp3",
+			identifier = "Male07Unpossess" .. idx,
+			minDistance = 400,
+			maxDistance = 1000,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		slasher:SetWalkSpeed(300)
 		slasher:SetRunSpeed(300)

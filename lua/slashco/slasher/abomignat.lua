@@ -204,7 +204,15 @@ function SLASHER.HandleDOT(slasher, target)
 
 	if timer.Exists("AbomignatHit_" .. target:UserID()) then
 		target:TakeDamage(99999, slasher, slasher)
-		target:EmitSound("physics/flesh/flesh_bloody_break.wav")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "physics/flesh/flesh_bloody_break.wav",
+			identifier = "SurvivorHitDOT",
+			minDistance = 600,
+			maxDistance = 800,
+			entity = target,
+			volume = 1,
+			fadeIn = 0,
+		})
 		return
 	end
 
@@ -220,7 +228,16 @@ function SLASHER.HandleDOT(slasher, target)
 		bloodfx:SetOrigin(vPoint)
 		util.Effect("BloodImpact", bloodfx)
 
-		target:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "physics/flesh/flesh_squishy_impact_hard" .. idx .. ".wav",
+			identifier = "SurvivorHitAbo" .. idx,
+			minDistance = 600,
+			maxDistance = 800,
+			entity = target,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end)
 
 	target.AbomignatProcs = target.AbomignatProcs + 3
@@ -284,7 +301,15 @@ function SLASHER.OnPrimaryFire(slasher)
 			bloodfx:SetOrigin(vPoint)
 			util.Effect("BloodImpact", bloodfx)
 
-			target:EmitSound("slashco/slasher/trollge/trollge_hit.mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
+				identifier = "SurvivorHitTroll",
+				minDistance = 600,
+				maxDistance = 800,
+				entity = target,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end
 	end
 

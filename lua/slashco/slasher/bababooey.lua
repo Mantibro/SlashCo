@@ -63,7 +63,17 @@ end
 function SLASHER.DoSound(slasher)
 	if not IsValid(slasher) then return end
 	if slasher:GetNWBool("BababooeyInvisibility") then
-		slasher:EmitSound("slashco/slasher/bababooey/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))
+		local idx = math.random(2, 4)
+		local idx2 = math.random(0.1, 0.5)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/baba_laugh" .. idx .. ".mp3",
+			identifier = "BababooeyLaugh" .. idx,
+			minDistance = 200,
+			maxDistance = 1200,
+			entity = slasher,
+			volume = 0.3 + idx2,
+			fadeIn = 0,
+		})
 	end
 
 	timer.Simple(math.random(6, 10), function()
@@ -134,7 +144,15 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
 
 		slasher.TriggerCooldown = 4
-		slasher:EmitSound("slashco/slasher/bababooey/baba_hide.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/baba_hide.mp3",
+			identifier = "BababooeyHide",
+			minDistance = 600,
+			maxDistance = 1200,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(1, function()
 			if not IsValid(slasher) then return end
@@ -142,13 +160,29 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 			slasher:SetVisible(false)
 
-			slasher:PlayGlobalSound("slashco/slasher/bababooey/bababooey_loud.mp3", 130)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/bababooey/bababooey_loud.mp3",
+				identifier = "BababooeyLoud",
+				minDistance = 1200,
+				maxDistance = 2000,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 
 			slasher:SetRunSpeed(200)
 			slasher:SetWalkSpeed(200)
 		end)
 	else
-		slasher:EmitSound("slashco/slasher/bababooey/baba_reveal.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/baba_reveal.mp3",
+			identifier = "BababooeyReveal",
+			minDistance = 800,
+			maxDistance = 1600,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		slasher:SlasherHudFunc("SetAvatar", "default")
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
@@ -164,7 +198,15 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 				slasher:SetNWBool("BababooeySpooking", true)
 				slasher.KillCooldown = 2
 				slasher.SpookCooldown = 2
-				slasher:EmitSound("slashco/slasher/bababooey/baba_scare.mp3", 100)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/bababooey/baba_scare.mp3",
+					identifier = "BababooeyScare",
+					minDistance = 200,
+					maxDistance = 800,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
 				slasher:Freeze(true)
 				timer.Simple(2.5, function()
 					if not IsValid(slasher) then return end

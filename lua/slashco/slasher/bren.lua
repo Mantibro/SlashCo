@@ -141,7 +141,15 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 		slasher:Freeze(true)
 		target:Freeze(true)
-		target:EmitSound("ambient/voices/citizen_beaten4.wav")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "ambient/voices/citizen_beaten4.wav",
+			identifier = "SurvivorHitBren",
+			minDistance = 600,
+			maxDistance = 800,
+			entity = target,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		slasher.MainCooldown = 5
 		slasher:SetNWBool("CanChase", false)
@@ -252,7 +260,15 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 
 		slasher:SetNWBool("BrenSnapAnim", false)
 		slasher:Freeze(false)
-		slasher:EmitSound("slashco/slasher/bren/bren_snap.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bren/bren_snap.mp3",
+			identifier = "BrenSnap",
+			minDistance = 600 * SlashCo.MapSize,
+			maxDistance = 1200 * SlashCo.MapSize,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		SlashCo.AddFog({
 			name = "BrenSnap",
