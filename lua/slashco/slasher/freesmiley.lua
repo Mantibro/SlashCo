@@ -134,12 +134,40 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("FreeSmileySummoning")
+	return ply:GetNWBool("FreeSmileySummoning") or ply:GetNWBool("FreeSmileyPocketSand") or ply:GetNWBool("FreeSmileyTeslaCoil")
+end
+
+function SLASHER.OnHitByPocketSand(slasher, ply)
+	SlashCo.StopChase(slasher)
+
+	slasher:SetNWBool("FreeSmileyPocketSand", true)
+	slasher:Freeze(true)
+	timer.Simple(9, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("FreeSmileyPocketSand", false)
+		slasher:Freeze(false)
+	end)
+end
+
+function SLASHER.OnHitByTeslaCoil(slasher)
+	SlashCo.StopChase(slasher)
+
+	slasher:SetNWBool("FreeSmileyTeslaCoil", true)
+	slasher:Freeze(true)
+	timer.Simple(16, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("FreeSmileyTeslaCoil", false)
+		slasher:Freeze(false)
+	end)
 end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local smiley_summon = ply:GetNWBool("FreeSmileySummoning")
+	local smiley_sand_stun = ply:GetNWBool("FreeSmileyPocketSand")
+	local smiley_tesla_stun = ply:GetNWBool("FreeSmileyTeslaCoil")
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -155,6 +183,26 @@ function SLASHER.Animator(ply)
 
 	if smiley_summon then
 		ply.CalcSeqOverride = ply:LookupSequence("summon")
+		if ply.anim_antispam == nil or ply.anim_antispam == false then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	else
+		ply.anim_antispam = false
+	end
+	
+	if smiley_sand_stun then
+		ply.CalcSeqOverride = ply:LookupSequence("stun")
+		if ply.anim_antispam == nil or ply.anim_antispam == false then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	else
+		ply.anim_antispam = false
+	end
+	
+	if smiley_tesla_stun then
+		ply.CalcSeqOverride = ply:LookupSequence("death")
 		if ply.anim_antispam == nil or ply.anim_antispam == false then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
