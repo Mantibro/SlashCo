@@ -8,6 +8,7 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 [+] A dark fog that dynamically adjusts to the environment lighting.<br>
 -> In the background this is an entire fog system that was implemented.<br>
 [+] Added slasher documents<br>
+[+] Added player perks<br>
 [+] Implemented quick escape reward (10 credits)<br>
 [+] Different game intro sounds are played based off the slasher difficulty.<br>
 [+] Playing the dangerLevel sound when spawning into a round<br>
@@ -31,7 +32,7 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 [#] Removed player limit.<br>
 -> In the main menu you now got the option `Max Players` which by default is `7` but can be increased.<br>
 -> Servers can set the `slashco_maxplayers` convar<br>
--> If the helicopter is full, additional players will be somewhat bugged, but it should work fine.)<br>
+-> If the helicopter is full, additional players will be somewhat bugged, but it should work fine.<br>
 [#] Synchronized for all survivors the helicopter voicelines<br>
 
 ### Document Objective
@@ -67,6 +68,11 @@ Using the `slashco_openkeyboardbinds` command OR using the `F8` key by default, 
 In the Lobby you can now find the document terminal with information about Slashers
 
 <img width="1086" height="708" alt="image" src="https://github.com/user-attachments/assets/633c0fa9-6a60-4ebe-bdb0-c2795a50792d" />
+
+### Perk System
+You can find perks in the same terminal as documents and equip them depending on your current level. (WIP)
+
+<img width="1086" height="708" alt="image" src="https://i.imgur.com/VEHLo8L.png" />
 
 ## Slasher Changes
 [#] Moved all slasher sounds into `slashco/slasher/'slashername'`<br>
