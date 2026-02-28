@@ -15,7 +15,7 @@ SlashCo.Content.PrecacheSlashers = SlashCo.Content.PrecacheSlashers or {}
 SlashCo.Content.DebugPrint = SlashCo.Content.DebugPrint or false -- For debugging
 
 local GamemodeInfo = util.KeyValuesToTable(file.Read((GAMEMODE or GM).Folder .. "/" .. (GAMEMODE or GM).FolderName .. ".txt", "GAME") or "")
-SlashCo.Content.WorkshopID = GamemodeInfo.workshopid or "3453013573" -- Fallback ID! Currently the Beta Addon!
+SlashCo.Content.WorkshopID = GamemodeInfo.workshopid or "2844428843" -- Fallback ID! Currently the Main Addon!
 
 -- NOTE: Errors aren't put behind DebugPrint as something clearly went wrong.
 local function DebugPrint(msg)

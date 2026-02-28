@@ -1,11 +1,11 @@
 "slashco"
 {
 	"base"		"base"
-	"title"		"SlashCo (Beta)"
+	"title"		"SlashCo"
 	"maps"		"^sc_"
 	"category"	"pvp"
 	"menusystem"	"1"
-	"workshopid"	"3453013573"
+	"workshopid"	"2844428843"
 
 	"settings"
 	{

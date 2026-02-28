@@ -1,37 +1,76 @@
 ## Notes
-All newly added sounds will be from the SlashCo VR version.<br>
+Some newly added sounds will be from the SlashCo VR version.<br>
 
 > [!WARNING]
 > When we release these changes, revert `gamemodes/slashco/slashco.txt` -> `workshopid` back to the main addon -> `2844428843`
 
-## gameplay changes
+## GamePlay changes
 [+] A dark fog that dynamically adjusts to the environment lighting.<br>
-[+] Added a new item "Tesla Coil"<br>
-(It stuns all slashers on the entire map for 20 seconds)<br>
+-> In the background this is an entire fog system that was implemented.<br>
 [+] Added a clientside sound that is played when a Slasher sees a survivor the first time.<br>
-[+] Added basic slasher documents<br>
-(This is still WIP and is unfinished)<br>
-[+] Added a status light to the generators showing if their running or not<br>
-[+] Added a fuel display to the generators allowing one to see how much fuel is missing<br>
+[+] Added slasher documents<br>
 [+] Implemented quick escape reward (10 credits)<br>
 [+] Different game intro sounds are played based off the slasher difficulty.<br>
 [+] Playing the dangerLevel sound when spawning into a round<br>
 [+] Implemented quick escape and slow escape.<br>
 (If you escape before the round went on for 10 minutes it counts as a quick escape, if you escape after 20 minutes its a slow escape)<br>
-[+] Added ambient sounds which volume and sound track are based off the Slasher's anger.<br>
-[+] After `15` minutes(the warning time) of playing, the player receives a warning sound indicating that they got 5 minutes left before they would have a slow escape<br>
-[+] When the warning time is reached, fuel cans will start making noises making it more easy to find them<br>
 [+] Added `slashco_unstuck` console command that can be used to unstuck yourself if you somehow get stuck due to any kind of bug<br>
 [+] Added `slashco_banslasher`, `slashco_unbanslasher` allowing hosts to ban one or multiple slashers. The ban **remains indefinetly** until removed manually!<br>
+[+] Added a fuel display to the generators allowing one to see how much fuel is missing<br>
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c467fc49-9bfe-4372-8559-ff618ced4eac" />
+
+[+] Show how many remaining generators are left in the objective<br>
+<img width="285" height="43" alt="image" src="https://github.com/user-attachments/assets/0d54494d-c482-4038-9ec0-56a9e85725d0" />
+
+[+] Added a status light to the generators showing if their running or not<br>
+<img width="1040" height="617" alt="image" src="https://github.com/user-attachments/assets/3bc456d5-aaae-46ae-a7b7-bd27c704c641" />
+
 [#] You can now hold the USE key when fuling a generator instead of having to let go of it and press it again<br>
 [#] Disable broken door collisions after it stopped moving<br>
 (if you accidentally walked on it previously, your movement would become jittery as the prediction would fail).<br>
-[#] Allow one to drop the used deathward<br>
 [#] Removed player limit.<br>
+-> In the main menu you now got the option `Max Players` which by default is `7` but can be increased.<br>
+-> Servers can set the `slashco_maxplayers` convar<br>
+[#] Synchronized for all survivors the helicopter voicelines<br>
+
+### Document Objective
+A new objective to find documents was added, BUT it still needs to be implemented on many maps.<br>
+When there are more than 4 survivors, you'll have to find 1 document for every 2 additional survivors.<br>
+
+### Overtime
+When a round goes longer than 15 minutes, players will hear a warning sound<br>
+Batteries, fuel cans, and documents will begin to randomly play a sound to help survivors find the remaining ones.<br>
+When a round goes for 20 minutes or more, it's considered a slow escape, and there will be a penalty.<br>
+
+### Keyboard UI
+Using the `slashco_openkeyboardbinds` command OR using the `F8` key by default, you can open the Keyboard UI to rebind keys if some are conflicting<br>
+
+<img width="971" height="550" alt="image" src="https://github.com/user-attachments/assets/430f0a3b-271d-4ba1-aaf6-51e8bfe9cf8b" />
+
+## Server changes
+[+] Added `slashco_proximity_chat`, `slashco_proximity_voice` and `slashco_proximity_range` to control the voice & text chat.<br>
+[#] Made console messages not throw an error<br>
+-> For example using `say Hello` would have resulted in an error<br>
+
+## Lobby changes
+[+] Extended the Lobby a bit and improved performance slightly<br>
 [#] New lobby map file (more players spawns)<br>
 [#] Make the chat global in the lobby<br>
 
+### Nightmare Offering
+[+] Changed the lobby lighting & background music just to fit the impending nightmare
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/575d8912-f217-4394-aec1-d61d409b3a34" />
+
+### Document System
+In the Lobby you can now find the document terminal with information about Slashers
+
+<img width="1086" height="708" alt="image" src="https://github.com/user-attachments/assets/633c0fa9-6a60-4ebe-bdb0-c2795a50792d" />
+
 ## Slasher Changes
+Almost all slashers are in some form dynamically balanced based of the survivor count!<br>
+Most slashers have been switched to use the new anger system<br>
+Based on the slasher's anger the background music will change, indicating for the survivors how mad the slashers are / how dangerous they have become already<br>
 
 ### Tyler
 [+] Added a camera shake to his effect, intensity is based off his distance<br>
@@ -40,6 +79,7 @@ All newly added sounds will be from the SlashCo VR version.<br>
 (when the round time reaches the defined slow time of 20min, this chase is disabled by default)<br>
 [+] If a player is holding a fuel can, Tyler will destroy the fuel can first instead of killing the player<br>
 [+] Added Tyler theme which is played as background music after the first chase.<br>
+-> The volume of the background music indicates how close he is to becoming the destroyer once it's almost completely gone, he'll switch.
 [+] Added three new songs from SlashCo VR to play when hes tyler the creator.<br>
 [#] Made his HUD effect local and based off his distance to the player<br>
 [#] Move all sounds into `slashco/slasher/igor`<br>
@@ -134,6 +174,12 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [#] Fixed him leaving a NPC causing the NPC to T-Pose for one frame.<br>
 [#] Fixed some engine squence warnings related to the slasher's model being set to a plate.<br>
 
+### Bren
+[+] Added new Slasher Bren.<br>
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/27ffbd1a-735c-4210-9cad-6bd47e3998c1" />
+
+
 ## Item changes
 
 ### Baby
@@ -159,6 +205,22 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [+] Added Hat man that spawns when you eat it.<br>
 [+] Added all the Shadow voices from SlashCo VR<br>
 
+### Tesla Coil
+[+] Added the tesla coil<br>
+-> Stuns all slashers on the map for 7 seconds<br>
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/35c91132-177e-4948-889f-bc58634a003d" />
+
+### BeerKeg
+[+] Added the beerkeg<br>
+-> It deafens all slashers nearby for 25+ seconds<br>
+-> Survivors take 50 damage if hit<br>
+-> Prepare your ears for the tinnitus<br>
+
+### Costco Pizza
+[+] Added Costco Frozen Pizza<br>
+-> Fully blocks any incoming damage (except insta kill) but has a 1/3 chance of breaking<br>
+
 ## Offering changes
 
 ### Duality
@@ -172,7 +234,7 @@ All newly added sounds will be from the SlashCo VR version.<br>
 (going through doors/players as male07 is now far smoother).<br>
 [+] Spectators have an animation and watch the helicopter take off in the lobby.<br>
 (going through doors/players as male07 is now far smoother).<br>
-[+] Implemented a new audiosystem for lobby and future ambient sounds<br>
+[+] Implemented a new audiosystem for almost every sound in the gamemode<br>
 [+] Support live language changes<br>
 [+] Added sound/vision fade in when spawning into a round<br>
 [#] Implemented a failsafe in case the slashers or survivors disconnect<br>
@@ -203,7 +265,6 @@ All newly added sounds will be from the SlashCo VR version.<br>
 [#] Fixed `gmod_hands` sometimes spawning and causing errors<br>
 [#] Fixed a bug with particle emitters used for footsteps and decoy causing issues when they don't clean up quick enouth & optimized the code of it to only use a single emitter now.<br>
 [#] Fixed a error caused by the console using the `say` command.<br>
-[-] Removed hardcoded 7-player limit.<br>
 (If the helicopter is full, additional players will be somewhat bugged, but it should work fine.)<br>
 
 ## Lua API Changes
@@ -215,7 +276,17 @@ This documentation wasn't finished yet<br>
 [+] Added `SlashCo.States`, `SlashCo.DifficultyLevel`, `SlashCo.SlasherClass`, `SlashCo.DangerLevel` enums<br>
 [+] Added `SlashCo.GetRoundTime`, `SlashCo.IsQuickEscape`, `SlashCo.IsSlowEscape`, `SlashCo.GetRoundStartTime` functions<br>
 [+] Added `SlashCo.GetDangerColor`, `SlashCo.GetDangerSound`, `SlashCo.GetNameColor`, `SlashCo.GetClassColor`, `SlashCo.CopyColor` functions<br>
+[+] Added `SlashCo.AddDangerLevel` and `SlashCo.AddSlasherClass` funcitons<br>
+[+] Added `SlashCo:OnObjectiveComplete(objectiveName)` lua hook<br>
 [#] Changed `SlashCo.OfferingData` keys.<br>
 \-> Renamed `SO` to `Singularity`<br>
 \-> Renamed `DO` to `Duality`<br>
 \-> Renamed `SatO` to `Satiation`<br>
+[#] Changed all net messages from formats like `mantislashcoSurvivorPings` to `SlashCo:SurvivorPings` as an example<br>
+
+## Mapping changes (slashco.fdg changes)
+[+] Added `info_sc_document`, `func_sc_lobby_elevator_ready_zone`, `info_sc_lobby_documentscreen`, `info_sc_lobby_briefingscreen`, `sc_itemstash`, `sc_offertable`, `sc_cagelight`, `sc_effect_sparks`, `info_sc_blackout_trollge_path`(WIP) map entities<br>
+[+] Added `IsLobby` & `Normal Lights Name` key fields to `info_sc_settings`<br>
+[#] Made `info_sc_helicopter`, `info_sc_helicopter_intro`, `info_sc_helicopter_start` show the actual helicopter model<br>
+
+[-] Removed `hl2mp.fgd` include<br>
