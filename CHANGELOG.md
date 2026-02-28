@@ -177,6 +177,13 @@ In the Lobby you can now find the document terminal with information about Slash
 [#] Fixed him leaving a NPC causing the NPC to T-Pose for one frame.<br>
 [#] Fixed some engine squence warnings related to the slasher's model being set to a plate.<br>
 
+### Speedrunner
+[+] Added a new ability: Mining.<br>
+-> An ore will spawn in a random position.<br>
+-> Speedrunner can start mining this ore to gain 5 - 20 speed after 5 seconds.<br>
+-> After that, all the gas cans of the map will get randomly teleported.<br>
+-> Survivors can also mine this ore to prevent the above, but the mining duration for them is 10 seconds.<br>
+
 ### Bren
 [+] Added new Slasher Bren.<br>
 
