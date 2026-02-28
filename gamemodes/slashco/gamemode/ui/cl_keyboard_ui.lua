@@ -91,5 +91,5 @@ function SlashCo.OpenKeyboardUI()
 end
 
 concommand.Add("slashco_openkeyboardbinds", function()
-	OpenKeyboardUI()
+	SlashCo.OpenKeyboardUI()
 end)
