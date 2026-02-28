@@ -15,7 +15,7 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 [+] Implemented quick escape and slow escape.<br>
 -> If you escape before the round went on for 10 minutes it counts as a quick escape, if you escape after 20 minutes its a slow escape<br>
 [+] Added `slashco_unstuck` console command that can be used to unstuck yourself if you somehow get stuck due to any kind of bug<br>
-[+] Added `slashco_give_points` console command to increase a player current points amount.
+[+] Added `slashco_give_points` console command to increase a player current points amount.<br>
 [+] Added `slashco_banslasher`, `slashco_unbanslasher` allowing hosts to ban one or multiple slashers. The ban **remains indefinetly** until removed manually!<br>
 [+] Added a fuel display to the generators allowing one to see how much fuel is missing<br>
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c467fc49-9bfe-4372-8559-ff618ced4eac" />
@@ -117,10 +117,10 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Fixed chase animation not being used.<br>
 
 ### Borgmire
-[+] Added a new ability: Kick.
+[+] Added a new ability: Kick.<br>
 -> Upon use, Borgmire will get a speed boost for a few seconds before performing a kick.<br>
 -> Survivors in the range would get damage and high knockback.<br>
-[#] 'Throw' ability now requires 50% anger amount to be usable.
+[#] 'Throw' ability now requires 50% anger amount to be usable.<br>
 [#] Decreased Chase cooldown (8s - 5s).<br>
 [#] Now he can freely move and aim when holding a survivor.<br>
 
@@ -141,8 +141,8 @@ You can find perks in the same terminal as documents and equip them depending on
 ### Manspider
 [#] Increased Prowl speed (150 - 250) and Chase speed (290 - 315).<br>
 [#] Added a new ability: Climbing.<br>
--> Allows Manspider to climb into walls, jump between them and even make a nest there.
--> Landing on top of a survivor after jumping from a wall will deal them damage.
+-> Allows Manspider to climb into walls, jump between them and even make a nest there.<br>
+-> Landing on top of a survivor after jumping from a wall will deal them damage.<br>
 
 ### Sid
 [#] Decreased KillDelay (7s - 5s)<br>
@@ -175,7 +175,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Reduced Chase speed (297 - 275).<br>
 [#] Increased "Cloaks" Prowl speed (100 - 150).<br>
 [#] Fixed "Cloaks" ability, Tackle now stuns survivors for 7s, Cloak will remain freezed for 3.5s after using it.<br>
--> Survivors can escape sooner by spamming left and right movement keys.
+-> Survivors can escape sooner by spamming left and right movement keys.<br>
 [#] "Cloaks" can mark survivors when tackled.<br>
 [#] Changed Danger level to Devastating.<br>
 
@@ -227,7 +227,7 @@ You can find perks in the same terminal as documents and equip them depending on
 
 ### Deathward
 [+] Added a proper death/revive animation.<br>
-(Additionally everyone can now hear you respawn. You better run.)<br>
+-> Additionally everyone can now hear you respawn. You better run.<br>
 [#] Raised price from `50` to `80` credits.<br>
 [#] Allow one to drop the used deathward.<br>
 
