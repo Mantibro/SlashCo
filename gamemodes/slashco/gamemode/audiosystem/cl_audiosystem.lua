@@ -774,7 +774,7 @@ function SlashCo.AudioSystem.PlayBackgroundMusic(fileName)
 		channel:EnableLooping(true)
 		channel:SetTime(SlashCo.AudioSystem.GetBackgroundMusicTime())
 		channel:SetPlaybackRate(SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate())
-		SlashCo.AudioSystem.FadeToVolume(channel, 3, SlashCo.AudioSystem.GetBackgroundMusicVolume())
+		SlashCo.AudioSystem.FadeToVolume(channel, 3, SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled())
 	end)
 end
 
@@ -808,6 +808,18 @@ local function OnBackgroundMusicPlaybackRateChange(ent, name, old, new)
 	end
 end
 
+-- Similar to GetBackgroundMusicVolume BUT in the lobby it's bound to snd_musicvolume -> The GMod Settings Music volume slider
+local snd_musicvolume = GetConVar("snd_musicvolume")
+function SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled(fallBack)
+	local volume = SlashCo.AudioSystem.GetBackgroundMusicVolume(fallBack)
+
+	if GameData.IsLobby then
+		volume = volume * snd_musicvolume:GetFloat()
+	end
+
+	return volume
+end
+
 function SlashCo.AudioSystem.Init()
 	local world = game.GetWorld()
 
@@ -826,7 +838,7 @@ function SlashCo.AudioSystem.Init()
 	OnBackgroundMusicStateChange(world, "SlashCo:ShouldPlayBackgroundMusic", nil, SlashCo.AudioSystem.ShouldPlayBackgroundMusic())
 
 	world:SetNW2VarProxy("SlashCo:BackgroundMusicVolume", OnBackgroundMusicVolumeChange)
-	OnBackgroundMusicVolumeChange(world, "SlashCo:BackgroundMusicVolume", nil, SlashCo.AudioSystem.GetBackgroundMusicVolume())
+	OnBackgroundMusicVolumeChange(world, "SlashCo:BackgroundMusicVolume", nil, SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled())
 
 	world:SetNW2VarProxy("SlashCo:BackgroundMusicPlaybackRate", OnBackgroundMusicPlaybackRateChange)
 	OnBackgroundMusicPlaybackRateChange(world, "SlashCo:BackgroundMusicPlaybackRate", nil, SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate())
@@ -912,6 +924,14 @@ local function UpdateChannelPositionAndVolume(channel, channelData, localPlyPos)
 		channel:SetPos(channelData.pos)
 	end
 end
+
+cvars.AddChangeCallback("snd_musicvolume", function(_, _, newValue)
+	if not IsValid(SlashCo.AudioSystem.BackgroundChannel) then return end
+
+	local channel = SlashCo.AudioSystem.BackgroundChannel
+	local channelData = SlashCo.AudioSystem.Channels[channel]
+	channel:SetVolume(CalculateChannelVolume(channel, SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled()))
+end)
 
 local function UpdateChannelPositionsAndVolumes()
 	local localPlyPos = GetLocalPlayerPosition()
@@ -1095,10 +1115,12 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		entIndex = soundData.entity
 	elseif IsValid(soundData.entity) then
 		entIndex = soundData.entity:EntIndex() -- ToDo: Should we also support clientside entities? Probably.
+	else
+		soundData.disableUniqueToEntity = true
 	end
 
 	if not soundData.disableUniqueToEntity then
-		soundData.identifier = soundData.identifier .. entIndex
+		soundData.identifier = soundData.identifier .. "_ENT_" .. entIndex
 	end
 
 	SlashCo.AudioSystem.StopSound(soundData.identifier, 0.5)
@@ -1318,13 +1340,13 @@ function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
 	end
 
 	-- We use or and do identifier .. entIndex since if a sound didn't use disableUniqueToEntity, it will append the EntIndex to our identifier
-	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier] or SlashCo.AudioSystem.CreatingChannels[identifier .. (entIndex or "")]
+	local creationSounData = SlashCo.AudioSystem.CreatingChannels[identifier] or SlashCo.AudioSystem.CreatingChannels[identifier .. "_ENT_" .. (entIndex or "")]
 	if creationSounData then -- The channel wasn't created yet, so we cannot stop it. Instead we'll set a flag.
 		creationSounData.DESTROYCHANNEL = true
 		return
 	end
 
-	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier) or SlashCo.AudioSystem.GetChannelByIdentifier(identifier .. (entIndex or ""))
+	local channel = SlashCo.AudioSystem.GetChannelByIdentifier(identifier) or SlashCo.AudioSystem.GetChannelByIdentifier(identifier .. "_ENT_" .. (entIndex or ""))
 	if not channel then return end
 
 	SlashCo.AudioSystem.DestroyChannel(channel, fadeOut)

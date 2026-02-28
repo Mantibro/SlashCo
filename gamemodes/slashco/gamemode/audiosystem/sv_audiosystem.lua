@@ -123,7 +123,7 @@ local function WriteDeltaPulseEffect(table, deltaTable)
 	WriteDeltaSoundField(table.frequency, (deltaTable and deltaTable.frequency or nil), net.ReadUInt, 16)
 end
 
-local function SendToPlayersWithDelta(playerList, soundData, deltaList)
+local function SendToPlayersWithDelta(soundData, deltaList)
 	local identifier = soundData.identifier or soundData.soundPath
 	net.WriteBool(true)
 	if soundData.soundPath == identifier then -- We cannot apply delta to the soundPath if it's the delta identifier!
@@ -169,7 +169,7 @@ local function SendToPlayersWithDelta(playerList, soundData, deltaList)
 	-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 end
 
-local function SendToPlayersWithNoDelta(playerList, soundData, manualSend)
+local function SendToPlayersWithNoDelta(soundData, manualSend)
 	net.WriteBool(false)
 	WriteSoundField(soundData.soundPath, net.WriteString)
 	WriteSoundField(soundData.fallbackSoundPath, net.WriteString)
@@ -237,6 +237,15 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 		error("PlaySound: Missing soundPath field!")
 	end
 
+	if not soundData.entity then -- Falls back onto the world as a global sound!
+		soundData.entity = 0
+		soundData.disableUniqueToEntity = true
+
+		if not soundData.position then
+			soundData.forceStereo = true
+		end
+	end
+
 	-- Fallback code to ensure that if an entity wasn't networked to a client yet,
 	-- the sound would still have the right volume calculated when used with any of the fields that require a position to calculate the volume with.
 	if not soundData.position and (soundData.minDistance or soundData.maxDistance or soundData.startDistance or soundData.startEndDistance) and soundData.entity and (isnumber(soundData.entity) or IsValid(soundData.entity)) then
@@ -267,64 +276,15 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 	AddToTransmits(soundData.sendToEntity, NetworkSettings.PlaySound, data)
 end
 
-function NetworkSettings.PlaySound.ProcessFunc(data)
+function NetworkSettings.PlaySound.ProcessFunc(data, ply)
 	local identifier = data.identifier
 	local soundData = data.soundData
 	local deltaTable = data.deltaTable -- if we had no data when PlaySound was called we do not want to check here for delta.
-	if deltaTable then
-		local deltaPlayers = {}
-		local revDeltaPlayers = {}
-		local targetPlayers = {}
-		if IsEntity(soundData.sendToEntity) then
-			local deltaList = SlashCo.AudioSystem.PlayerDeltaSoundCache[soundData.sendToEntity]
-			if deltaList and deltaList[identifier] then
-				table.insert(deltaList, soundData.sendToEntity)
-
-				table.insert(deltaPlayers, soundData.sendToEntity)
-				revDeltaPlayers[soundData.sendToEntity] = true
-			end
-		else
-			if istable(soundData.sendToEntity) then
-				for k, ply in ipairs(soundData.sendToEntity) do
-					targetPlayers[ply] = true
-					targetPlayers[k] = ply
-				end
-			else
-				for k, ply in player.Iterator() do
-					targetPlayers[ply] = true
-					targetPlayers[k] = ply
-				end
-			end
-
-			for ply, deltaList in pairs(SlashCo.AudioSystem.PlayerDeltaSoundCache) do
-				if not IsValid(ply) then
-					SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = nil -- Yes, this is how we'll clean it.
-					continue
-				end
-
-				if targetPlayers[ply] and deltaList[identifier] then
-					-- print("Added for delta update " .. ply:Name())
-					table.insert(deltaPlayers, ply)
-					revDeltaPlayers[ply] = true
-				end
-			end
-		end
-
-		SendToPlayersWithDelta(deltaPlayers, soundData, deltaTable)
-
-		local noDeltaPlayers = {}
-		for _, ply in ipairs(targetPlayers) do
-			if revDeltaPlayers[ply] then continue end
-
-			table.insert(noDeltaPlayers, ply)
-		end
-
-		if #noDeltaPlayers > 0 then
-			-- print("We had no delta for " .. #noDeltaPlayers)
-			SendToPlayersWithNoDelta(noDeltaPlayers, soundData)
-		end
+	local plyDeltaTable = SlashCo.AudioSystem.PlayerDeltaSoundCache[ply]
+	if deltaTable and plyDeltaTable and plyDeltaTable[identifier] then
+		SendToPlayersWithDelta(soundData, deltaTable)
 	else
-		SendToPlayersWithNoDelta(soundData.sendToEntity, soundData)
+		SendToPlayersWithNoDelta(soundData)
 		deltaTable = {}
 		-- print("We had no delta :sob:")
 
@@ -347,7 +307,7 @@ hook.Add("SetupPlayerVisibility", "SlashCo:AudioSystem", function(ply)
 	local count = #transmitData.pending
 	if count == 0 then return end
 
-	local maxEntries = math.pow(2, 10) - 1
+	local maxEntries = math.pow(2, NetworkSettings._COUNT_BITS) - 1
 	if count > maxEntries then
 		count = maxEntries
 	end
@@ -362,7 +322,7 @@ hook.Add("SetupPlayerVisibility", "SlashCo:AudioSystem", function(ply)
 			net.WriteUInt(transmitEntry.type.ID, NetworkSettings._ID_BITS)
 			local func = transmitEntry.type.ProcessFunc
 			if func then
-				func(transmitEntry.data)
+				func(transmitEntry.data, ply)
 			else
 				net.Abort()
 				ErrorNoHaltWithStack("Tried to network an update with no function!")
@@ -381,6 +341,14 @@ util.AddNetworkString("slashCo_AudioSystem_StopSound")
 function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entity, sendToEntity)
 	fadeOut = fadeOut or 0
 
+	if not isnumber(fadeOut) then
+		error("fadeOut is not a number!")
+	end
+
+	if entity ~= nil and not IsEntity(entity) then
+		error("entity is not an Entity!")
+	end
+
 	local data = {
 		identifier = identifier,
 		fadeOut = fadeOut,
@@ -397,6 +365,16 @@ function NetworkSettings.StopSound.ProcessFunc(data)
 end
 
 function SlashCo.AudioSystem.FadeSound(identifier, fadeTime, targetVolume) -- ToDo: Fix this function. Update: naah
+	fadeTime = fadeTime or 0
+
+	if not isnumber(fadeTime) then
+		error("fadeTime is not a number!")
+	end
+
+	if not isnumber(targetVolume) then
+		error("targetVolume is not a number!")
+	end
+
 	local data = {
 		identifier = identifier,
 		fadeTime = fadeTime,
@@ -469,6 +447,7 @@ hook.Add("EntityRemoved", "AudioSystem:EntityRemoved", function(ent)
 
 	if ent:IsPlayer() then
 		SlashCo.AudioSystem.TransmitData[ent] = nil
+		SlashCo.AudioSystem.PlayerDeltaSoundCache[ent] = nil
 	end
 end)
 

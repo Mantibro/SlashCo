@@ -14,6 +14,9 @@ SlashCo.Content.PrecacheItems = SlashCo.Content.PrecacheItems or {}
 SlashCo.Content.PrecacheSlashers = SlashCo.Content.PrecacheSlashers or {}
 SlashCo.Content.DebugPrint = SlashCo.Content.DebugPrint or false -- For debugging
 
+local GamemodeInfo = util.KeyValuesToTable(file.Read((GAMEMODE or GM).Folder .. "/" .. (GAMEMODE or GM).FolderName .. ".txt", "GAME") or "")
+SlashCo.Content.WorkshopID = GamemodeInfo.workshopid or "3453013573" -- Fallback ID! Currently the Beta Addon!
+
 -- NOTE: Errors aren't put behind DebugPrint as something clearly went wrong.
 local function DebugPrint(msg)
 	if SlashCo.Content.DebugPrint then
@@ -51,7 +54,10 @@ if SERVER then
 	if not SlashCo.Content.AddedMapToWorkshop then
 		local wsid, title = SlashCo.FindMapWorkshopID(game.GetMap())
 		if wsid then
-			print("[Content] Current map is from Addon \"" .. title .. "\"")
+			if wsid ~= SlashCo.Content.WorkshopID then
+				print("[Content] Current map is from Addon \"" .. title .. "\"")
+			end
+
 			resource.AddWorkshop(wsid) -- Adds the current map to the server download.
 			SlashCo.Content.AddedMapToWorkshop = true
 		end
@@ -59,7 +65,7 @@ if SERVER then
 
 	if not SlashCo.Content.AddedGamemodeToWorkshop then
 		-- Add the gamemode itself, just to be sure that it was added since somehow people still miss content.
-		resource.AddWorkshop("3453013573")
+		resource.AddWorkshop(SlashCo.Content.WorkshopID)
 		SlashCo.Content.AddedGamemodeToWorkshop = true
 	end
 end
@@ -107,7 +113,7 @@ else
 		if SlashCo.Content.AddedSlashersToWorkshop[slasherFile] then return end
 
 		local wsid, title = SlashCo.FindSlasherWorkshopID(slasherFile)
-		if wsid then
+		if wsid and wsid ~= SlashCo.Content.WorkshopID then
 			print("[Content] Slasher found from Addon \"" .. title .. "\"")
 			resource.AddWorkshop(wsid) -- Adds the current map to the server download.
 			SlashCo.Content.AddedSlashersToWorkshop[slasherFile] = true
