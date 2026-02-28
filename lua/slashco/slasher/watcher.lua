@@ -47,6 +47,10 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.SurveyLength = 10 + (SO * 10) + (1 * additionalSurvivors)
 	SLASHER.SurveyCooldown = 100 + (SO * 35) + (2.5 * additionalSurvivors)
 	SLASHER.SurveyDisplayLength = 5 + (SO * 5)
+
+	if additionalSurvivors > 0 then
+		SLASHER.ProwlSpeed = 185 + (3 * additionalSurvivors)
+	end
 end
 
 function SLASHER.OnSpawn(slasher)

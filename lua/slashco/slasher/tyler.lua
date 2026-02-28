@@ -50,8 +50,8 @@ SLASHER.ItemPriceDivisionMultiplier = 2 -- We use this multiplier when convertin
 SLASHER.TimeRemovedWhenFound = 10 -- Number of seconds removed if tyler was found.
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	SLASHER.ProwlSpeed = 300 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 580 + (7.5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 300 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 580 + (0.5 * additionalSurvivors)
 	SLASHER.TimeAsSpecter = 30 + additionalSurvivors
 	SLASHER.ItemPriceDivisionMultiplier = 2 + math.Clamp(additionalSurvivors / 10, 0, 3)
 	SLASHER.TimeAddedForPlayerKill = 180 - (10 * additionalSurvivors)

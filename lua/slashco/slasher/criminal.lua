@@ -44,8 +44,8 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.AdditionalClones = math.max((3 * SO) + math.floor(additionalSurvivors / 4), 0)
 	SLASHER.AdditionalSpecialClones = math.max((2 * SO) + math.floor(additionalSurvivors / 5), 0)
 
-	SLASHER.ProwlSpeed = 200 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 310 + (5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 200 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 310 + (0.5 * additionalSurvivors)
 end
 
 function SLASHER.OnSpawn(slasher)

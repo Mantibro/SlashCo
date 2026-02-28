@@ -41,6 +41,11 @@ function SLASHER.OnSpawn(slasher)
 		fadeIn = 0,
 	})
 	slasher:SetNWBool("CanKill", true)
+	
+	timer.Simple(1, function()
+		if not IsValid(slasher) then return end
+		SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
+	end)
 
 	slasher.Speedrun = 100
 	slasher.Speedrunning = 1
@@ -88,19 +93,13 @@ function SLASHER.RandomTPCans()
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.Speedrun < slasher.Speedrunned or slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
-		return
-	end
+	if slasher.Speedrun < slasher.Speedrunned or slasher:GetNWBool("SpeedrunnerSacrificeTwo") then return end
+	if slasher.SpeedRunnering then return end
 
-	if slasher.SpeedRunnering then
-		return
-	end
 	slasher.SpeedRunnering = true
 
 	timer.Simple(0.1, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		SlashCo.AudioSystem.StopSound("Speedrun1", 0.5, slasher)
 		SlashCo.AudioSystem.StopSound("Speedrun2", 0.5, slasher)
@@ -109,15 +108,29 @@ function SLASHER.OnMainAbilityFire(slasher)
 	slasher:Freeze(true)
 
 	if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
-		slasher:EmitSound("slashco/slasher/speedrunner/speedrunner_rng1.mp3", 85, 100)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/speedrunner/speedrunner_rng1.mp3",
+			identifier = "SpeedrunRNG1",
+			minDistance = 400,
+			maxDistance = 900,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 	else
-		slasher:EmitSound("slashco/slasher/speedrunner/speedrunner_rng2.mp3", 85, 100)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/speedrunner/speedrunner_rng2.mp3",
+			identifier = "SpeedrunRNG2",
+			minDistance = 400,
+			maxDistance = 900,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
 	timer.Simple(2, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		slasher.Speedrun = 100
 		slasher.SpeedRunnering = nil
@@ -164,6 +177,69 @@ function SLASHER.OnMainAbilityFire(slasher)
 	end)
 end
 
+function SLASHER.OnSpecialAbilityFire(slasher, target)
+	if not IsValid(target) or target:GetClass() ~= "sc_ore" then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 200 or slasher:GetNWBool("SpeedrunnerMining") then return end
+	if slasher:GetNWBool("SpeedrunnerSacrificeTwo") then return end
+
+	slasher:Freeze(true)
+	slasher:SetNWBool("SpeedrunnerMining", true)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/speedrunner/speedrunner_mining.mp3",
+		identifier = "SpeedrunMining",
+		minDistance = 400,
+		maxDistance = 1200,
+		entity = slasher,
+		volume = 2,
+		fadeIn = 0,
+	})
+
+	local pos = slasher:LocalToWorld(Vector(5, 0, 3))
+	local ang = slasher:LocalToWorldAngles(Angle(80, -70, 0))
+
+	local pickaxe = ents.Create("prop_physics")
+
+	pickaxe:SetMoveType(MOVETYPE_NONE)
+	pickaxe:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+	pickaxe:SetModel("models/slashco/slashers/dream/pickaxe.mdl")
+	pickaxe:SetSkin(4)
+	pickaxe:SetPos(pos)
+	pickaxe:SetAngles(ang)
+	pickaxe:FollowBone(slasher, slasher:LookupBone("HandR"))
+
+	timer.Simple(5, function()
+		if not IsValid(slasher) then return end
+
+		slasher:Freeze(false)
+		slasher:SetNWBool("SpeedrunnerMining", false)
+		SlashCo.AudioSystem.StopSound("SpeedrunMining", 0.1, slasher)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/speedrunner/speedrunner_mined.mp3",
+			identifier = "SpeedrunMined",
+			minDistance = 400,
+			maxDistance = 1200,
+			entity = slasher,
+			volume = 2,
+			fadeIn = 0,
+		})
+
+		local rand = math.random(5, 20)
+		slasher.Speedrun = slasher.Speedrun + rand
+		SLASHER.RandomTPCans()
+
+		SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
+
+		if IsValid(target) then
+			target:Remove()
+		end
+		if not IsValid(pickaxe) then return end
+
+		pickaxe:Remove()
+	end)
+end
+
 function SLASHER.Animator(ply, veloc)
 	local move_vel = ply:WorldToLocal(veloc + ply:GetPos())
 	local anim_vel = veloc:Length()
@@ -203,10 +279,24 @@ function SLASHER.InitHud(_, hud)
 	hud:SetTitle("Speedrunner")
 
 	hud:AddControl("R", "rng sacrifice", "chase")
+	hud:AddControl("F", "mine ore", Material("slashco/ui/icons/slasher/s_minethecraft"))
 	hud:ChaseAndKill(true)
 
 	hud:AddMeter("speed", 235, "", nil, true)
 	hud:TieMeterInt("speed", "SpeedrunnerSpeed")
+	
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+			return
+		end
+		
+		if GameData.LocalPlayer:GetNWBool("SpeedrunnerMining") then
+			draw.SimpleText("MINING ORE . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+					Color(255, 0, 0, 255),
+					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		end
+	end)
 
 	hud.prevSac1 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeOne")
 	hud.prevSac2 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeTwo")
@@ -218,6 +308,7 @@ function SLASHER.InitHud(_, hud)
 			if sac2 then
 				hud:SetMeterMax("speed", 500)
 				hud:SetControlVisible("R", false)
+				hud:SetControlVisible("F", false)
 			elseif sac1 then
 				hud:SetMeterMax("speed", 325)
 			else
@@ -243,6 +334,10 @@ function SLASHER.InitHud(_, hud)
 	end
 end
 
+function SLASHER.PreDrawHalos()
+	SlashCo.DrawHalo(ents.FindByClass("sc_ore"), "red")
+end
+
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Speedrunner") == true then
@@ -262,6 +357,12 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
 			GameData.LocalPlayer.spd_f = nil
+		end
+
+		if GameData.LocalPlayer:GetNWBool("SurvivorMining") then
+			draw.SimpleText("MINING . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+					Color(255, 0, 0, 255),
+					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		end
 	end)
 

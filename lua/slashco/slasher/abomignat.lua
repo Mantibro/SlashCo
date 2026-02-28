@@ -39,9 +39,9 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	-- For every 5 additional or missing survivors we increase/decrease by 1 second.
 	SLASHER.CooldownReduction = math.max((SO * 4) + (0.2 * additionalSurvivors), 0) -- math.max so we don't go below 0
 
-	SLASHER.ProwlSpeed = 200 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 325 + (7.5 * additionalSurvivors)
-	SLASHER.KillDistance = 150 + (5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 200 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 325 + (0.5 * additionalSurvivors)
+	SLASHER.KillDistance = 150 + (2 * additionalSurvivors)
 	SLASHER.ChaseDuration = 7.0 + (1 * additionalSurvivors)
 end
 

@@ -35,8 +35,8 @@ SLASHER.AngerChaseGain = 0
 SLASHER.HighAngerBackgroundMusic = "slashco/slasher/trollge/trollge_stage6.ogg"
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	SLASHER.ProwlSpeed = 150 + (2.5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 295 + (5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 295 + (0.5 * additionalSurvivors)
 end
 
 local function PlayBreathing(slasher)
@@ -218,7 +218,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			})
 
 			slasher:SetRunSpeed(450)
-			slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 			final_eyesight = 10
 
 			for _, ply in ipairs(player.GetAll()) do
@@ -328,7 +328,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				})
 
 				slasher:SetRunSpeed(450)
-				slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+				slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 				final_eyesight = 10
 				slasher:SetNWBool("CanKill", true)
 

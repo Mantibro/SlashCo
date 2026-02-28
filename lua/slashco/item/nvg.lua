@@ -3,11 +3,9 @@ local ITEM = {}
 ITEM.Model = "models/slashco/items/nvg.mdl"
 ITEM.Name = "NightVisionGoggles"
 ITEM.EntClass = "sc_nvg"
-ITEM.Icon = "slashco/ui/icons/items/item_7"
 ITEM.Price = 40
 ITEM.Description = "NightVisionGoggles_desc"
 ITEM.CamPos = Vector(50,0,0)
-ITEM.ChangesSpeed = false
 ITEM.IsSpawnable = true
 
 local nvgSoundFile = {
@@ -27,25 +25,24 @@ function GenDynLight(entIndex)
 end
 
 function ITEM.OnPickUp(ply)
-	if GameData.IsLobby then
-		return
-	end
+	if GameData.IsLobby then return end
+
 	ply:SetNWBool("NightVision", true)
 	ply:ScreenFade(1, color_white, 0.5, 0.2)
-	ply:EmitSound(nvgSoundFile[1], 75, 100, 1)
 	ply.Eyesight = 8
 	ply:SetNWFloat("Ply_Eyesight", ply.Eyesight)
 	ply:EmitSound(nvgSoundFile[2], 75, 100, 1)
 end
+
 function ITEM.ItemDropped(ply, droppeditem)
 	ply:SetNWBool("NightVision", false)
 	ply:ScreenFade(1, color_black, 0.5, 0.2)
 	ply:EmitSound(nvgSoundFile[1], 75, 100, 1)
 end
+
 function ITEM.OnDie(ply)
 	ply:SetNWBool("NightVision", false)
 	ply:ScreenFade(1, color_black, 0.5, 0.2)
-	ply:EmitSound(nvgSoundFile[1], 75, 100, 1)
 end
 
 ITEM.ViewModel = {
@@ -88,7 +85,6 @@ ITEM.WorldModel = {
 hook.Add("RenderScreenspaceEffects", "NightVision", function()
 	local ply = GameData.LocalPlayer
 	if GameData.LocalPlayer:GetNWBool("NightVision") then
-	
 		local tr = ply:GetEyeTraceNoCursor()
 		local dlight = GenDynLight(ply:EntIndex())
 

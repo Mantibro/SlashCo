@@ -26,6 +26,15 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 275 + (0.5 * additionalSurvivors)
+
+	if additionalSurvivors > 0 then
+		SLASHER.ChaseDuration = 9.0 + (2 * additionalSurvivors)
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("CanChase", true)
 

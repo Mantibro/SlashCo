@@ -7,14 +7,14 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 ## GamePlay changes
 [+] A dark fog that dynamically adjusts to the environment lighting.<br>
 -> In the background this is an entire fog system that was implemented.<br>
-[+] Added a clientside sound that is played when a Slasher sees a survivor the first time.<br>
 [+] Added slasher documents<br>
 [+] Implemented quick escape reward (10 credits)<br>
 [+] Different game intro sounds are played based off the slasher difficulty.<br>
 [+] Playing the dangerLevel sound when spawning into a round<br>
 [+] Implemented quick escape and slow escape.<br>
-(If you escape before the round went on for 10 minutes it counts as a quick escape, if you escape after 20 minutes its a slow escape)<br>
+-> If you escape before the round went on for 10 minutes it counts as a quick escape, if you escape after 20 minutes its a slow escape<br>
 [+] Added `slashco_unstuck` console command that can be used to unstuck yourself if you somehow get stuck due to any kind of bug<br>
+[+] Added `slashco_give_points` console command to increase a player current points amount.
 [+] Added `slashco_banslasher`, `slashco_unbanslasher` allowing hosts to ban one or multiple slashers. The ban **remains indefinetly** until removed manually!<br>
 [+] Added a fuel display to the generators allowing one to see how much fuel is missing<br>
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c467fc49-9bfe-4372-8559-ff618ced4eac" />
@@ -31,6 +31,7 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 [#] Removed player limit.<br>
 -> In the main menu you now got the option `Max Players` which by default is `7` but can be increased.<br>
 -> Servers can set the `slashco_maxplayers` convar<br>
+-> If the helicopter is full, additional players will be somewhat bugged, but it should work fine.)<br>
 [#] Synchronized for all survivors the helicopter voicelines<br>
 
 ### Document Objective
@@ -68,21 +69,21 @@ In the Lobby you can now find the document terminal with information about Slash
 <img width="1086" height="708" alt="image" src="https://github.com/user-attachments/assets/633c0fa9-6a60-4ebe-bdb0-c2795a50792d" />
 
 ## Slasher Changes
-Almost all slashers are in some form dynamically balanced based of the survivor count!<br>
-Most slashers have been switched to use the new anger system<br>
-Based on the slasher's anger the background music will change, indicating for the survivors how mad the slashers are / how dangerous they have become already<br>
+[#] Moved all slasher sounds into `slashco/slasher/'slashername'`<br>
+[#] Almost all slashers are in some form dynamically balanced based of the survivor count!<br>
+[#] Most slashers have been switched to use the new anger system<br>
+-> Based on the slasher's anger the background music will change, indicating for the survivors how mad the slashers are / how dangerous they have become already<br>
 
 ### Tyler
 [+] Added a camera shake to his effect, intensity is based off his distance<br>
 [+] Added new sound for when he's below 50 anger<br>
 [+] Implement endless chase if the time is up<br>
-(when the round time reaches the defined slow time of 20min, this chase is disabled by default)<br>
+-> When the round time reaches the defined slow time of 20min, this chase is disabled by default<br>
 [+] If a player is holding a fuel can, Tyler will destroy the fuel can first instead of killing the player<br>
 [+] Added Tyler theme which is played as background music after the first chase.<br>
--> The volume of the background music indicates how close he is to becoming the destroyer once it's almost completely gone, he'll switch.
+-> The volume of the background music indicates how close he is to becoming the destroyer once it's almost completely gone, he'll switch.<br>
 [+] Added three new songs from SlashCo VR to play when hes tyler the creator.<br>
 [#] Made his HUD effect local and based off his distance to the player<br>
-[#] Move all sounds into `slashco/slasher/igor`<br>
 [#] Switched all code over to use the new audiosystem and the new anger system<br>
 [#] When the escape helicopter is called, activates endless chase.<br>
 [#] Improved tyler hide time duration.<br>
@@ -92,7 +93,6 @@ Based on the slasher's anger the background music will change, indicating for th
 ### The Watcher
 [+] Added footstep sounds from SlashCo VR<br>
 [+] Added background music from SlashCo VR<br>
-[#] Move all sounds into `slashco/slasher/watcher`<br>
 [#] Reduced Prowl speed (200 - 185).<br>
 
 ### Princess
@@ -110,12 +110,12 @@ Based on the slasher's anger the background music will change, indicating for th
 [#] Moved Gascan disguise position to the ground level.<br>
 [#] Fixed chase animation not being used.<br>
 
-### Bababooey
-[#] Increased Chase speed (298 - 305).<br>
-
 ### Borgmire
-[#] Increased Chase speed (325 - 335).<br>
-[#] Decreased Chase cooldown (8s - 3s).<br>
+[+] Added a new ability: Kick.
+-> Upon use, Borgmire will get a speed boost for a few seconds before performing a kick.<br>
+-> Survivors in the range would get damage and high knockback.<br>
+[#] 'Throw' ability now requires 50% anger amount to be usable.
+[#] Decreased Chase cooldown (8s - 5s).<br>
 [#] Now he can freely move and aim when holding a survivor.<br>
 
 ### Dolphinman
@@ -124,10 +124,9 @@ Based on the slasher's anger the background music will change, indicating for th
 [#] Increased KillDelay (0.25s - 0.50s).<br>
 [#] Decreased hunt power gain on kill when hunting (25% - 15%).<br>
 [#] Decreased hunt power loss on standing (50% - 25%).<br>
+[#] Gains 20% hunt power when killing without hunting.<br>
+[#] Starts gaining hunt power when the escape helicopter is called.<br>
 [#] Eyesight decreased. (3 - 2)<br>
-[#] Gains 25% hunt power when killing without hunting.<br>
-[#] KillDellay is increased to 5s when no hunting.<br>
-[#] Start gaining hunt power when the escape helicopter spawns.<br>
 
 ### Freesmiley
 [#] Balkan Boost users are marked until the effect run out.<br>
@@ -135,6 +134,9 @@ Based on the slasher's anger the background music will change, indicating for th
 
 ### Manspider
 [#] Increased Prowl speed (150 - 250) and Chase speed (290 - 315).<br>
+[#] Added a new ability: Climbing.<br>
+-> Allows Manspider to climb into walls, jump between them and even make a nest there.
+-> Landing on top of a survivor after jumping from a wall will deal them damage.
 
 ### Sid
 [#] Decreased KillDelay (7s - 5s)<br>
@@ -143,7 +145,7 @@ Based on the slasher's anger the background music will change, indicating for th
 [#] Increased base Prowl speed (100 - 120) and base Chase speed (260 - 280).<br>
 [#] Decreased Pacified duration (same duration of Sid).<br>
 [#] Increased max milkies (4 - 6).<br>
-[#] After 4 milkies, Thirst meter will not increase anymore and will give you a permanent visibility buff.<br>
+[#] Upon reaching 6 milkies, Thirst meter will not increase anymore and will give Thirsty a permanent visibility buff.<br>
 
 ### Trollge
 [+] Added footstep sounds from SlashCo VR<br>
@@ -152,21 +154,22 @@ Based on the slasher's anger the background music will change, indicating for th
 [#] Can see the halos of Balkan Boost holders.<br>
 [#] On contact with a Balkan Boost, instantly change to stage 3.<br>
 [#] Switched all sounds to use the new audiosystem.<br>
-[#] Move all sounds into `slashco/slasher/trollge`<br>
 [#] Optimized his code slightly<br>
 
 ### Covenant
-[+] Added footstep sounds to covenant and his members.<br>
+[+] Added Covenant as a playable slasher during the selection screen.<br>
+[+] Added footstep sounds to Covenant and his members.<br>
 [#] Translated abilities into other languages<br>
-[#] Now spawns correctly all covenant members.<br>
-[#] Now all covenant members correctly enter chase mode when Covenant does.<br>
+[#] Now spawns correctly all Covenant members.<br>
+[#] Now all Covenant members correctly enter chase mode when Covenant does.<br>
 [#] First kill summons "LTG Rocks", rest of victims will be summoned as "Cloaks".<br>
 [#] Properly added a minimum distance to be able to kill a player.<br>
 [#] "LTG Rocks" can now hit with the Saturn Stick (only on Chase).<br>
 [#] Reduced Chase duration (160s - 60s).<br>
 [#] Reduced Chase speed (297 - 275).<br>
 [#] Increased "Cloaks" Prowl speed (100 - 150).<br>
-[#] Fixed "Cloaks" ability, Tackle now stuns survivors for 1.2s, Cloak will remain freezed for 4.5s after using it.<br>
+[#] Fixed "Cloaks" ability, Tackle now stuns survivors for 7s, Cloak will remain freezed for 3.5s after using it.<br>
+-> Survivors can escape sooner by spamming left and right movement keys.
 [#] "Cloaks" can mark survivors when tackled.<br>
 [#] Changed Danger level to Devastating.<br>
 
@@ -181,35 +184,16 @@ Based on the slasher's anger the background music will change, indicating for th
 
 
 ## Item changes
+[#] Allow stacking of effect/duration on most items.<br>
+-> Doesn't work with Balkan Boost<br>
 
 ### Baby
 [#] A random slasher is now teleported instead of always the second one.<br>
 
 ### Balkan Boost
 [+] Added the Balkan Boost<br>
-
-### Nightvision goggles
-[+] Added the Nightvision goggles<br>
-
-### Deathward
-[+] Added a proper death/revive animation.<br>
-(Additionally everyone can now hear you respawn. You better run.)<br>
-[#] Raised price from `50` to `80` credits.<br>
-[#] Allow one to drop the used deathward.<br>
-
-### PocketSand
-[+] Created a effect for when its used.<br>
-(The effect's range matches the range of where slashers would be blinded)<br>
-
-### Benadryl
-[+] Added Hat man that spawns when you eat it.<br>
-[+] Added all the Shadow voices from SlashCo VR<br>
-
-### Tesla Coil
-[+] Added the tesla coil<br>
--> Stuns all slashers on the map for 7 seconds<br>
-
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/35c91132-177e-4948-889f-bc58634a003d" />
+-> After 30 seconds of waiting, the survivor receive a massive speed boost.<br>
+-> When the effect runs out, the survivor is permanently slowed down.<br>
 
 ### BeerKeg
 [+] Added the beerkeg<br>
@@ -217,34 +201,79 @@ Based on the slasher's anger the background music will change, indicating for th
 -> Survivors take 50 damage if hit<br>
 -> Prepare your ears for the tinnitus<br>
 
+### Benadryl
+[+] Added Hat man that spawns when you eat it.<br>
+[+] Added all the Shadow voices from SlashCo VR<br>
+
+### Brick
+[#] Now it can be used to apply knockback to slashers and break doors.<br>
+
 ### Costco Pizza
 [+] Added Costco Frozen Pizza<br>
 -> Fully blocks any incoming damage (except insta kill) but has a 1/3 chance of breaking<br>
 
+### Deathward
+[+] Added a proper death/revive animation.<br>
+(Additionally everyone can now hear you respawn. You better run.)<br>
+[#] Raised price from `50` to `80` credits.<br>
+[#] Allow one to drop the used deathward.<br>
+
+### Jello Cup
+[+] Added Jello Cup<br>
+-> Heals 1/3 of your max health (can go above up to 1.5x of max health)<br>
+-> Reduces any damage by 10x for a random time between 20 - 50 seconds<br>
+
+### Jonkler Cart
+[+] Added Evil Jonkler Cart<br>
+-> Alert the slasher with a loud sound.<br>
+-> Increases the anger amount of slashers standing around it.<br>
+
+### Newports
+[+] Added the Newport Menthols<br>
+-> Reduce the amount of fog by 3x for a random time between 140 - 200 seconds.<br>
+
+### Nightvision goggles
+[+] Added the Nightvision goggles<br>
+-> Takes your item slot in exchange of an enhanced vision in the dark, can be throw away anytime.<br>
+
+### PocketSand
+[+] Created a effect for when its used.<br>
+-> The effect's range matches the range of where slashers would be blinded<br>
+
+### Porchlight
+[+] Added the Porch Light<br>
+-> Creates a light so bright that can randomly stun any player that makes contact with it.<br>
+
+### Tesla Coil
+[+] Added the tesla coil<br>
+-> Stuns all slashers on the map for 7 seconds<br>
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/35c91132-177e-4948-889f-bc58634a003d" />
+
 ## Offering changes
 
 ### Duality
-[#] It now requires 2 generators to escape.<br>
+[#] Now requires 2 generators to escape.<br>
 
 ## Other changes
 [+] Precached a lot of things to reduce in game laggs.<br>
 [+] Precached the next map<br>
-(The download of the next map starts in the lobby as soon as it is selected to reduce loading times later on).<br>
+-> The download of the next map starts in the lobby as soon as it is selected to reduce loading times later on.<br>
 [+] Added missing clientside prediction for Impervious<br>
-(going through doors/players as male07 is now far smoother).<br>
+-> Going through doors/players as male07 is now far smoother.<br>
 [+] Spectators have an animation and watch the helicopter take off in the lobby.<br>
-(going through doors/players as male07 is now far smoother).<br>
 [+] Implemented a new audiosystem for almost every sound in the gamemode<br>
 [+] Support live language changes<br>
 [+] Added sound/vision fade in when spawning into a round<br>
 [#] Implemented a failsafe in case the slashers or survivors disconnect<br>
-(the game ends if no survivors or slashers exist after 90 seconds)<br>
+-> The game ends if no survivors or slashers exist after 90 seconds<br>
+-> If there's enough survivors in-game but not the required slashers, a selection screen would show up to choose a new slasher.
 [#] Solved a spectator prediction issue, making movement/noclipping jittery<br>
-(It was a gmod bug)<br>
+-> It was a gmod bug<br>
 [#] Stopped player from suiciding when the helicopter is taking off in the lobby.<br>
 [#] The picked slasher in the lobby can freely spectate instead of being locked in the spectator camera.<br>
-[#] solved an error caused by entities being created too early.<br>
-[#] cleaned up the entire code.<br>
+[#] Solved an error caused by entities being created too early.<br>
+[#] Cleaned up the entire code.<br>
 [#] Fixed auto refresh errors/bugs that made development more painful.<br>
 [#] Fixed lobby-ready status clipping into player count<br>
 [#] Fixed spectators being able to leave noclip<br>
@@ -256,16 +285,15 @@ Based on the slasher's anger the background music will change, indicating for th
 [#] Fixed player model selector being always broken(fixes #33)<br>
 [#] Fixed round end panels stacking and never removing the old panel<br>
 [#] Fixed helicopter collisions being left behind<br>
-(It's physics object didn't follow the helicopter causing a invisible box with collisions to exist)<br>
+-> It's physics object didn't follow the helicopter causing a invisible box with collisions to exist<br>
 [#] Syncronized Helicopter voice lines for all players<br>
-[#] Fixed a possible error with princess<br>
+[#] Fixed a possible error with Princess<br>
 [#] Live update points and wins when their changed<br>
 [#] Show the ready state of other players in the lobby (if they picked slasher or survivor)<br>
 [#] Show the spectator ui to the slasher when their waiting to be spawned.<br>
 [#] Fixed `gmod_hands` sometimes spawning and causing errors<br>
 [#] Fixed a bug with particle emitters used for footsteps and decoy causing issues when they don't clean up quick enouth & optimized the code of it to only use a single emitter now.<br>
 [#] Fixed a error caused by the console using the `say` command.<br>
-(If the helicopter is full, additional players will be somewhat bugged, but it should work fine.)<br>
 
 ## Lua API Changes
 This documentation wasn't finished yet<br>

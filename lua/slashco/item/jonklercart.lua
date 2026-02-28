@@ -6,7 +6,7 @@ ITEM.EntClass = "sc_jonklercart"
 ITEM.Price = 50
 ITEM.Description = "JonklerCart_desc"
 ITEM.CamPos = Vector(150, 0, 0)
-ITEM.ReplacesWorldProps = true
+ITEM.IsSpawnable = true
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end

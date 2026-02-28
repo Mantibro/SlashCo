@@ -6,7 +6,7 @@ ITEM.EntClass = "sc_porchlight"
 ITEM.Price = 150
 ITEM.Description = "PorchLight_desc"
 ITEM.CamPos = Vector(150, 0, 0)
-ITEM.ReplacesWorldProps = true
+
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end

@@ -79,8 +79,8 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 		SLASHER.JumpStrengthUp = SLASHER.JumpStrengthUp + (5 * additionalSurvivors)
 	end
 
-	SLASHER.ProwlSpeed = 250 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 315 + (7.5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 250 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 315 + (0.5 * additionalSurvivors)
 	if additionalSurvivors > 0 then -- Only increase the chase duration if we have more than the default survivors.
 		SLASHER.ChaseDuration = 9.0 + (1 * additionalSurvivors)
 	end

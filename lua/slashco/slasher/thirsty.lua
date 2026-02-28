@@ -32,8 +32,8 @@ SLASHER.DiffRating = "★★★☆☆"
 SLASHER.ItemToSpawn = "MilkJug"
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	SLASHER.ProwlSpeed = 120 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 290 + (7.5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 120 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 290 + (0.5 * additionalSurvivors)
 end
 
 function SLASHER.OnSpawn(slasher)

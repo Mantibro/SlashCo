@@ -57,8 +57,8 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.GunEyeSight = SLASHER.Eyesight + 5 + (SO * 2)
 	SLASHER.GunPerception = SLASHER.Perception + 1 + (SO * 3)
 
-	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 275 + (7.5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 275 + (0.5 * additionalSurvivors)
 end
 
 local function PlayShots(slasher)

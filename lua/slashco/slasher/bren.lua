@@ -37,9 +37,9 @@ SLASHER.HighAngerBackgroundMusic = "slashco/slasher/bren/bren_ambience.ogg"
 SLASHER.FogIncreaseLength = 12
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	SLASHER.ProwlSpeed = 200 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 290 + (1.5 * additionalSurvivors)
-	SLASHER.KillDistance = 135 + (5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 200 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 290 + (0.5 * additionalSurvivors)
+	SLASHER.KillDistance = 135 + (1 * additionalSurvivors)
 	
 	if additionalSurvivors > 0 then
 		SLASHER.ChaseDuration = 10.0 + (2 * additionalSurvivors)

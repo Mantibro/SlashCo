@@ -46,8 +46,8 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 		SLASHER.AppearCooldownReduction = (SO * 6) + (0.05 * additionalSurvivors)
 	end
 
-	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 298 + (1.5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 298 + (0.5 * additionalSurvivors)
 	SLASHER.KillDistance = 135 + (5 * additionalSurvivors)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 end

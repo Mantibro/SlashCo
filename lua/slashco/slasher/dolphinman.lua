@@ -40,8 +40,8 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.HuntPowerDiv = math.max(1 + SO + (0.1 * additionalSurvivors), 0.5)
 	SLASHER.HuntPowerGainDiv = math.max(2 - (0.5 * SO) - (0.02 * additionalSurvivors), 0.5)
 
-	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 315 + (5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 315 + (0.5 * additionalSurvivors)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 end
 

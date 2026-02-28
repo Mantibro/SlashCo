@@ -3,10 +3,10 @@ local ITEM = {}
 ITEM.Model = "models/slashco/jellocup.mdl"
 ITEM.Name = "JelloCup"
 ITEM.EntClass = "sc_jellocup"
-ITEM.Price = 150
+ITEM.Price = 80
 ITEM.Description = "JelloCup_desc"
 ITEM.CamPos = Vector(150, 0, 0)
-ITEM.ReplacesWorldProps = true
+ITEM.IsSpawnable = true
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end

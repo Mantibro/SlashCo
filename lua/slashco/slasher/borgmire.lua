@@ -51,8 +51,8 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.PunchSlowdownDiv = math.Clamp((SO / 2) - (0.05 * additionalSurvivors), 0.5, 2)
 	SLASHER.ChaseSpeedReduction = (SO * 7) + (0.5 * additionalSurvivors)
 
-	SLASHER.ProwlSpeed = 150 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 325 + (7.5 * additionalSurvivors)
+	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+	SLASHER.ChaseSpeed = 325 + (0.5 * additionalSurvivors)
 	SLASHER.ChaseDuration = 12.0 + (1 * additionalSurvivors)
 end
 
