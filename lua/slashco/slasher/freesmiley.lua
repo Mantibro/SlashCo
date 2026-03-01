@@ -35,9 +35,12 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	SLASHER.SummonCooldown = 50 - (25 * SO)
-	SLASHER.ProwlSpeed = 100 + (5 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 275 + (0.5 * additionalSurvivors)
-	SLASHER.KillDistance = 150 + (1 * additionalSurvivors)
+
+	if additionalSurvivors > 0 then
+		SLASHER.ProwlSpeed = 100 + (5 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 275 + (0.5 * additionalSurvivors)
+		SLASHER.KillDistance = 150 + (1 * additionalSurvivors)
+	end
 end
 
 function SLASHER.OnSpawn(slasher)

@@ -38,18 +38,18 @@ SLASHER.MaxClones = 1 -- How many clones he can have.
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
+	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 	SLASHER.MaxClones = 1 + SO
+
 	if additionalSurvivors > 0 then -- If we got more than the default players.
 		SLASHER.MaxClones = SLASHER.MaxClones + math.floor(additionalSurvivors / 4) -- For every 4 additional survivors we allow one more clone.
 
 		SLASHER.CooldownReduction = (SO * 0.04) + (0.01 * additionalSurvivors)
 		SLASHER.AppearCooldownReduction = (SO * 6) + (0.05 * additionalSurvivors)
+		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 298 + (0.5 * additionalSurvivors)
+		SLASHER.KillDistance = 135 + (5 * additionalSurvivors)
 	end
-
-	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 298 + (0.5 * additionalSurvivors)
-	SLASHER.KillDistance = 135 + (5 * additionalSurvivors)
-	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 end
 
 function SLASHER.OnSpawn(slasher)

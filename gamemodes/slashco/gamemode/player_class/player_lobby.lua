@@ -19,18 +19,6 @@ function PLAYER:Loadout()
 	self.Player:RemoveAllAmmo()
 end
 
-SlashCo.SurvivorModels = file.Find("models/slashco/survivor/male_*.mdl", "GAME")
-for idx, fileName in ipairs(SlashCo.SurvivorModels) do
-	SlashCo.SurvivorModels[idx] = "models/slashco/survivor/" .. fileName
-	SlashCo.SurvivorModels[SlashCo.SurvivorModels[idx]] = idx
-end
-
-hook.Add("SlashCo:Precache", "PrecacheSurvivorModels", function()
-	for _, modelName in ipairs(SlashCo.SurvivorModels) do
-		SlashCo.PrecacheModel(modelName)
-	end
-end)
-
 function PLAYER:SetModel()
 	local modelname
 	local cl_modelname = self.Player:GetInfo("slashco_cl_playermodel")

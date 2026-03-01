@@ -50,10 +50,12 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ThrowStrengthUp = 800 + (SO * 150) + (10 * additionalSurvivors)
 	SLASHER.PunchSlowdownDiv = math.Clamp((SO / 2) - (0.05 * additionalSurvivors), 0.5, 2)
 	SLASHER.ChaseSpeedReduction = (SO * 7) + (0.5 * additionalSurvivors)
-
-	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 325 + (0.5 * additionalSurvivors)
 	SLASHER.ChaseDuration = 12.0 + (1 * additionalSurvivors)
+
+	if additionalSurvivors > 0 then
+		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 325 + (0.5 * additionalSurvivors)
+	end
 end
 
 local function PlayHeartbeat(slasher)

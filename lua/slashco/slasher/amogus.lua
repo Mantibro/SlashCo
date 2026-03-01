@@ -32,9 +32,13 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 296 + (0.5 * additionalSurvivors)
-	SLASHER.KillDistance = 130 + (1 * additionalSurvivors)
+	SLASHER.ChaseDuration = 15.0 + (1 * additionalSurvivors)
+
+	if additionalSurvivors > 0 then
+		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 296 + (0.5 * additionalSurvivors)
+		SLASHER.KillDistance = 130 + (1 * additionalSurvivors)
+	end
 end
 
 function SLASHER.OnSpawn(slasher)

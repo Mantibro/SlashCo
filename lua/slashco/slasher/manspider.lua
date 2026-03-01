@@ -70,19 +70,17 @@ end
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
+	SLASHER.ChaseDuration = 9.0 + (1 * additionalSurvivors)
 	SLASHER.NestedRange = 1000 + (SO * 750) + (50 * additionalSurvivors)
 	SLASHER.AdditionalAngerMult = SO + (0.05 * additionalSurvivors)
 
 	SLASHER.JumpStrengthForward = 800 + (SO * 500) + (30 * additionalSurvivors)
 	SLASHER.JumpStrengthUp = 200 + (SO * 100)
+
 	if additionalSurvivors > 0 then
 		SLASHER.JumpStrengthUp = SLASHER.JumpStrengthUp + (5 * additionalSurvivors)
-	end
-
-	SLASHER.ProwlSpeed = 250 + (3 * additionalSurvivors)
-	SLASHER.ChaseSpeed = 315 + (0.5 * additionalSurvivors)
-	if additionalSurvivors > 0 then -- Only increase the chase duration if we have more than the default survivors.
-		SLASHER.ChaseDuration = 9.0 + (1 * additionalSurvivors)
+		SLASHER.ProwlSpeed = 250 + (3 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 315 + (0.5 * additionalSurvivors)
 	end
 end
 
