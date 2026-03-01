@@ -83,7 +83,7 @@ if SERVER then
 			for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 				slasher:SetNW2Float("TeslaStunned", curTime + stunTime)
 				slasher:SetNW2Float("LastTeslaStun", curTime)
-				slasher:ScreenFade(SCREENFADE.OUT, Color(0, 0, 0), 0.5, stunTime)
+				slasher:ScreenFade(SCREENFADE.OUT, color_black, 0.5, stunTime)
 				slasher:SlasherFunction("OnHitByTeslaCoil")
 			end
 			SlashCo.DisableGlobalFog()

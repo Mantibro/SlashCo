@@ -71,7 +71,7 @@ function SlashCo.EnableAlarmLights(noEffect)
 
 	if not noEffect then
 		for _, ply in player.Iterator() do
-			ply:ScreenFade(SCREENFADE.IN, Color(0, 0, 0), 3, 1)
+			ply:ScreenFade(SCREENFADE.IN, color_black, 3, 1)
 		end
 
 		SlashCo.AudioSystem.PlaySound({
