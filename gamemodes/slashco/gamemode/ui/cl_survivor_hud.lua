@@ -571,7 +571,7 @@ net.Receive("SlashCo:AskToBecomeSlasher", function()
 				end
 
 				textColor.a = (fadeOut and textAlpha > 0) and alpha or textAlpha
-				draw.SimpleText(SlashCo.Language("vocal_yes") .. " - [" .. SlashCo.GetKeyButton("READY_SURVIVOR") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.34, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+				draw.SimpleText(SlashCo.Language("vocal_yes") .. " - [" .. SlashCo.GetKeyButtonName("READY_SURVIVOR") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.34, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 
 			if fadeOut or difference > 2 then
@@ -581,7 +581,7 @@ net.Receive("SlashCo:AskToBecomeSlasher", function()
 				end
 
 				textColor.a =  (fadeOut and textAlpha > 0) and alpha or textAlpha
-				draw.SimpleText(SlashCo.Language("vocal_no") .. " - [" .. SlashCo.GetKeyButton("READY_SLASHER") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.38, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+				draw.SimpleText(SlashCo.Language("vocal_no") .. " - [" .. SlashCo.GetKeyButtonName("READY_SLASHER") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.38, textColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 
 			if not fadeOut and chooseTime <= 0 then
