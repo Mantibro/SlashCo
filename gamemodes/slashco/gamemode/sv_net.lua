@@ -244,13 +244,17 @@ function SlashCo.RoundOverScreen(state)
 	SlashCo.SendValue(nil, "RoundEnd", state, goodSurvivorTable, rescued)
 end
 
-function SlashCo.BroadcastGlobalData()
+function SlashCo.BroadcastGlobalData(ply)
 	net.Start("SlashCo:SendGlobalInfoTable")
 		net.WriteTable(SCInfo)
-	net.Broadcast()
+	if ply then
+		net.Send(ply)
+	else
+		net.Broadcast()
+	end
 end
 
-function SlashCo.BroadcastMasterDatabaseForClient(ply)
+function SlashCo.LoadPlayerFromDatabase(ply)
 	if not IsValid(ply) then return end
 
 	local data = sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(ply:SteamID64()) .. ";")

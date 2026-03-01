@@ -233,12 +233,6 @@ end
 --				***Assign the values for the incoming Round***
 local function lobbyRoundSetup()
 	SlashCo.BroadcastGlobalData()
-
-	for _, play in player.Iterator() do
-		--local pid = play:SteamID64()
-		SlashCo.BroadcastMasterDatabaseForClient(play)
-	end
-
 	SlashCo.LobbyData.SelectedDifficulty = math.random(0, #SlashCo.DifficultyLevel) --Randomizing the Difficulty
 
 	local diff = math.min(GetConVar("slashco_force_difficulty"):GetInt(), #SlashCo.DifficultyLevel)
@@ -531,10 +525,6 @@ local function pickItem(ply, item)
 	ply:Give("sc_survivorhands")
 	SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -SlashCoItems[item].Price)
 	lobbyChooseItem(ply:SteamID64(), item)
-
-	timer.Simple(0.5, function()
-		SlashCo.BroadcastMasterDatabaseForClient(ply)
-	end)
 
 	if not SlashCo.LobbyData.VendorCooldown then
 		SlashCo.LobbyData.VendorCooldown = CurTime()

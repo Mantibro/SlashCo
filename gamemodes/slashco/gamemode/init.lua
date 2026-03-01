@@ -508,9 +508,10 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 	hook.Run("LobbyInfoText")
 
 	SlashCoDatabase.OnPlayerJoined(ply:SteamID64())
+	SlashCo.LoadPlayerFromDatabase(ply)
 
 	SlashCo.AwaitExpectedPlayers()
-	SlashCo.BroadcastGlobalData()
+	SlashCo.BroadcastGlobalData(ply)
 	
 	if SlashCo.CurRound then
 		SlashCo.CurRound.DisconnectedPlayers[ply:SteamID64()] = nil -- cleanup :^
@@ -518,11 +519,8 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 
 	timer.Simple(2, function()
 		SlashCo.BroadcastCurrentRoundData(false)
-		SlashCo.BroadcastGlobalData()
 
 		if not IsValid(ply) then return end
-		SlashCo.BroadcastMasterDatabaseForClient(ply)
-
 		if GameData.IsLobby or not SlashCo.RoundStarted or SlashCo.GetRoundTime() > SlashCo.MaximumLateJoinTime then return end
 		local steamID = ply:SteamID64()
 		for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
@@ -548,7 +546,7 @@ hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, old, ne
 		return
 	end
 
-	SlashCo.BroadcastMasterDatabaseForClient(ply)
+	SlashCo.LoadPlayerFromDatabase(ply)
 
 	if new == TEAM_SURVIVOR then
 		ply.Lives = 1
