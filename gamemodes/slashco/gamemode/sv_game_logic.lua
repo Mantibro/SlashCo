@@ -214,6 +214,7 @@ local function DoSlasherSelection(slashers, usingPotentialSlashers)
 
 		SlashCo.AwaitPlayerToSelectSlasher = function(ply, slasherID) -- if id is nil, then they took too long!
 			SlashCo.AwaitPlayerToSelectSlasher = nil
+			SlashCo.AllowedPlayerSlasherSelection[selectedPly] = nil -- He lost his privilege
 			if SlashCo.CurRound.AntiLoopSpawn then return end
 
 			local slasherID = slasherID or SlashCo.GetRandomSlasher(SlashCo.CurRound.SlasherDanger, SlashCo.CurRound.SlasherClass)
