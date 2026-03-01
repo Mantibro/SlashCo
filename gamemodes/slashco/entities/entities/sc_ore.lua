@@ -39,15 +39,33 @@ if SERVER then
 
 			activator:SetNWBool("SurvivorMining", true)
 	        activator:Freeze(true)
-			activator:EmitSound("slashco/slasher/speedrunner/speedrunner_mining.mp3", 200)
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/speedrunner/speedrunner_mining.mp3",
+				identifier = "SurvivorMining",
+				minDistance = 400,
+				maxDistance = 800,
+				entity = activator,
+				volume = 2,
+				fadeIn = 0,
+			})
 
 			timer.Simple(10, function()
 				if not IsValid(activator) then return end
 
 				activator:SetNWBool("SurvivorMining", false)
 				activator:Freeze(false)
-				activator:EmitSound("slashco/slasher/speedrunner/speedrunner_mined.mp3", 200)
 				activator:AddEffect("Speed", 10)
+
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/speedrunner/speedrunner_mined.mp3",
+					identifier = "SurvivorMined",
+					minDistance = 400,
+					maxDistance = 800,
+					entity = activator,
+					volume = 2,
+					fadeIn = 0,
+				})
 
 				if not IsValid(self) then return end
 
