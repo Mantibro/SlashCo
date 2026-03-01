@@ -92,30 +92,30 @@ local function PlayChaseSounds(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/borgmire/borgmire_breath_chase.mp3",
 		identifier = "BorgmireBreathChase",
-		minDistance = 800,
-		maxDistance = 1200,
+		minDistance = 400 * SlashCo.MapSize,
+		maxDistance = 700 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 0.7,
 		fadeIn = 0,
 	})
-	
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/borgmire/borgmire_anger.mp3",
 		identifier = "BorgmireAnger",
-		minDistance = 700 * SlashCo.MapSize,
-		maxDistance = 1240 * SlashCo.MapSize,
+		minDistance = 400 * SlashCo.MapSize,
+		maxDistance = 700 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 0.8,
 		fadeIn = 0,
 	})
-	
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/borgmire/borgmire_anger_far.mp3",
 		identifier = "BorgmireAngerFar",
-		minDistance = 1250 * SlashCo.MapSize,
-		maxDistance = 2250 * SlashCo.MapSize,
+		minDistance = 710 * SlashCo.MapSize,
+		maxDistance = 1000 * SlashCo.MapSize,
 		looping = true,
 		entity = slasher,
 		volume = 1,
