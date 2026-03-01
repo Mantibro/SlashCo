@@ -512,6 +512,7 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 
 	SlashCo.AwaitExpectedPlayers()
 	SlashCo.BroadcastGlobalData(ply)
+	SlashCo.NetworkPings(ply)
 	
 	if SlashCo.CurRound then
 		SlashCo.CurRound.DisconnectedPlayers[ply:SteamID64()] = nil -- cleanup :^
@@ -736,6 +737,20 @@ function SlashCo.SetLightStyle(lightStyle, lightPattern)
 	net.Start("SlashCo:UpdateLightMap")
 	net.Broadcast()
 end
+
+util.AddNetworkString("SlashCo:EntityRemoved")
+hook.Add("EntityRemoved", "SlashCo:EntityRemoved", function(ent)
+	net.Start("SlashCo:EntityRemoved")
+		net.WriteUInt(ent:EntIndex(), MAX_EDICT_BITS)
+	net.Broadcast()
+end)
+
+--[[util.AddNetworkString("SlashCo:EntityCreated")
+hook.Add("OnEntityCreated", "SlashCo:EntityCreated", function(ent)
+	net.Start("SlashCo:EntityCreated")
+		net.WriteUInt(ent:EntIndex(), MAX_EDICT_BITS)
+	net.Broadcast()
+end)]]
 
 SC_SERVER_LOADED = true
 

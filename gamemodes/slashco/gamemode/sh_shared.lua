@@ -216,6 +216,24 @@ function SlashCo.MapTools.IsEnabled()
 	return slashco_enablemaptools and slashco_enablemaptools:GetBool()
 end
 
+-- Helper networking functions
+function SlashCo.WriteOptional(value, writeFunc, ...)
+	local isNil = value == nil
+	net.WriteBool(isNil)
+	if not isNil then
+		writeFunc(value, ...)
+	end
+end
+
+function SlashCo.ReadOptional(readFunc, ...)
+	local isNil = net.ReadBool(isNil)
+	if not isNil then
+		return readFunc(...)
+	end
+
+	return nil
+end
+
 --[[
 	DangerLevel's
 	Use the SlashCo.AddDangerLevel and NEVER manually add stuff to SlashCo.DangerLevel

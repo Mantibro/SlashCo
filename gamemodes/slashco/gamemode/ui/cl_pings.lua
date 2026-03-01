@@ -2,13 +2,12 @@ local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
 local blue = Color(64, 64, 255)
 local transp = Color(255, 255, 255, 180)
-
 local pingType = {
-	ITEM = function(v)
-		return v.Name or "Item"
+	ITEM = function(pingInfo)
+		return pingInfo.Name or "Item"
 	end,
-	SURVIVOR = function(v)
-		return v.SurvivorName, blue
+	SURVIVOR = function(pingInfo)
+		return pingInfo.Name, blue
 	end,
 	SLASHER = function()
 		return nil, red
@@ -21,16 +20,24 @@ local pingType = {
 	end
 }
 
-GameData.GlobalPings = GameData.GlobalPings or {}
-local function removePing(key)
-	GameData.GlobalPings[key] = nil
-end
+GameData.ActivePings = GameData.ActivePings or {}
+hook.Add("SlashCo:ServerEntityRemoved", "SlashCo:Pings", function(entIndex) -- Cleanup :3
+	for idx, pingInfo in ipairs(GameData.ActivePings) do
+		if (pingInfo.Entity and pingInfo.Entity == entIndex) or (pingInfo.Player and pingInfo.Player == entIndex) then
+			table.remove(GameData.ActivePings, idx)
+			continue
+		end
+	end
+end)
 
-local function findPos(search)
-	if IsEntity(search) then
-		return search:WorldSpaceCenter()
-	elseif isvector(search) then
-		return search
+local function findPos(pingInfo)
+	if pingInfo.Entity then
+		local ent = Entity(pingInfo.Entity)
+		if IsValid(ent) then
+			return ent:WorldSpaceCenter()
+		end
+	elseif pingInfo.Position then
+		return pingInfo.Position
 	end
 
 	return vector_origin
@@ -41,69 +48,97 @@ local function antiDupePings(ping)
 		return
 	end
 
-	for k, v in pairs(GameData.GlobalPings) do
-		if v.Player == ping.Player then
-			removePing(k)
+	for idx, pingInfo in ipairs(GameData.ActivePings) do
+		if not pingInfo.Permanent and pingInfo.Player == ping.Player then
+			table.remove(GameData.ActivePings, idx)
+			break
+		end
+
+		if pingInfo.Entity and pingInfo.Entity == ping.Entity then
+			table.remove(GameData.ActivePings, idx)
 			break
 		end
 	end
 end
 
 net.Receive("SlashCo:SurvivorPings", function()
-	local ping = net.ReadTable()
-
-	antiDupePings(ping)
-
-	if ping.Type == "GENERATOR" then
-		GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
-	elseif ping.Type ~= "LOOK HERE" and ping.Type ~= "LOOK AT THIS" and ping.Type ~= "GHOST" then
-		GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
+	local fullUpdate = net.ReadBool()
+	if fullUpdate then
+		GameData.ActivePings = {}
 	end
 
-	ping.ID = math.random(2 ^ 31 - 1)
-	GameData.GlobalPings[ping.ID] = ping
+	local count = net.ReadUInt(7)
+	for k=1, count do
+		local pingInfo = {
+			ID = net.ReadUInt(16),
+			ExpiryTime = SlashCo.ReadOptional(net.ReadFloat),
+			Team = net.ReadUInt(10),
+			Type = net.ReadString(),
+			Name = SlashCo.ReadOptional(net.ReadString),
+			Player = SlashCo.ReadOptional(net.ReadUInt, MAX_EDICT_BITS),
+			Entity = SlashCo.ReadOptional(net.ReadUInt, MAX_EDICT_BITS),
+			Position = SlashCo.ReadOptional(net.ReadVector),
+		}
 
-	if ping.ExpiryTime and ping.ExpiryTime > 0 then
-		timer.Simple(ping.ExpiryTime, function()
-			removePing(ping.ID)
-		end)
+		if not pingInfo.ExpiryTime then
+			pingInfo.Permanent = true
+		end
+
+		antiDupePings(pingInfo)
+		if not fullUpdate then
+			if pingInfo.Type == "GENERATOR" then
+				GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
+			elseif pingInfo.Type ~= "LOOK HERE" and pingInfo.Type ~= "LOOK AT THIS" and pingInfo.Type ~= "GHOST" then
+				GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
+			end
+		end
+
+		table.insert(GameData.ActivePings, pingInfo)
 	end
 end)
 
 --ping display
-hook.Add("SlashCo:DrawHUD", "PingDisplay", function()
+-- RaphaelIT7: Why don't we remove pings? Because we can NEVER be certain here, an entity may be outside the PVS,may not have been networked yet and so on
+--             and since a round doesn't go that long, we can accept it filling up a bit.
+hook.Add("SlashCo:DrawHUD", "SlashCo:PingDisplay", function()
 	if not IsValid(GameData.LocalPlayer) then return end -- RaphaelIT7: iirc on 64x DrawHUD can be called BEFORE LocalPlayer is valid.
-	if GameData.LocalPlayer:Team() == TEAM_SLASHER then
-		GameData.GlobalPings = {}
-		return
-	end
 
-	for k, v in pairs(GameData.GlobalPings) do
-		if v.Entity == nil then
-			removePing(k)
+	local curTime = CurTime()
+	local team = GameData.LocalPlayer:Team()
+	for idx, pingInfo in ipairs(GameData.ActivePings) do
+		if team ~= TEAM_SPECTATOR and pingInfo.Team ~= team then
 			continue
 		end
 
-		if type(v.Entity) ~= "Vector" and not IsValid(v.Entity) then
-			removePing(k)
+		if not pingInfo.Entity and not pingInfo.Position then
+			table.remove(GameData.ActivePings, idx)
 			continue
 		end
 
-		if v.Type ~= "GHOST" and not IsValid(v.Player) then
-			removePing(k)
+		if not pingInfo.Permanent and pingInfo.ExpiryTime and curTime > pingInfo.ExpiryTime then
+			table.remove(GameData.ActivePings, idx)
+			continue
+		end
+
+		if pingInfo.Entity and not IsValid(Entity(pingInfo.Entity)) then
+			continue
+		end
+
+		local ply = pingInfo.Player and Entity(pingInfo.Player) or NULL
+		if pingInfo.Type ~= "GHOST" and not IsValid(ply) then
 			continue
 		end
 
 		local showText, textColor, pos
-		if pingType[v.Type] then
-			showText, textColor, pos = pingType[v.Type](v)
+		if pingType[pingInfo.Type] then
+			showText, textColor, pos = pingType[pingInfo.Type](pingInfo)
 		end
-		showText = showText or v.Type or "INVALID"
+		showText = showText or pingInfo.Type or "INVALID"
 		textColor = textColor or color_white
-		pos = pos or (findPos(v.Entity)):ToScreen()
+		pos = pos or findPos(pingInfo):ToScreen()
 
-		if IsValid(v.Player) then
-			draw.SimpleText(v.Player:GetName(), "TVCD_small", pos.x, pos.y - 25, transp,
+		if IsValid(ply) then
+			draw.SimpleText(ply:GetName(), "TVCD_small", pos.x, pos.y - 25, transp,
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		end
 

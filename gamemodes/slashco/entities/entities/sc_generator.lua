@@ -11,7 +11,7 @@ ENT.Contact = ""
 ENT.Purpose = "Combustion engine powered generator unit."
 ENT.Instructions = ""
 ENT.PingType = "GENERATOR"
-ENT.PingExpiryTime = -1
+ENT.PingExpiryTime = -1 -- Permanently pinged
 
 hook.Add("SlashCo:Precache", "PrecacheGenerator", function()
 	SlashCo.PrecacheSound("slashco/generator_fill.mp3")

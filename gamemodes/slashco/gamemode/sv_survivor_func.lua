@@ -113,6 +113,75 @@ end)
 local PLAYER = FindMetaTable("Player")
 local slamDoor, typeCheck, sayPrompt
 
+GameData.ActivePings = GameData.ActivePings or {}
+GameData.NextPingID = GameData.NextPingID or 0
+local function clearDeadPings(newPing) -- newPing if there is one to avoid duplicates
+	local curTime = CurTime()
+	local count = #GameData.ActivePings
+	local mustClear = count > 100
+	for idx, pingInfo in ipairs(GameData.ActivePings) do
+		if newPing then
+			if not pingInfo.Permanent and pingInfo.Player == newPing.Player then
+				table.remove(GameData.ActivePings, idx)
+				continue
+			end
+
+			if pingInfo.Entity and pingInfo.Entity == newPing.Entity then
+				table.remove(GameData.ActivePings, idx)
+				continue
+			end
+		end
+
+		if pingInfo.Entity and not IsValid(pingInfo.Entity) then
+			table.remove(GameData.ActivePings, idx)
+			continue
+		end
+
+		if pingInfo.Player and not IsValid(pingInfo.Player) then
+			if pingInfo.Permanent then
+				pingInfo.Player = nil -- They shall remain
+			else
+				table.remove(GameData.ActivePings, idx)
+			end
+			continue
+		end
+		if pingInfo.Permanent then continue end
+
+		-- We remove every ping that is above 100 (oldest first) to avoid network overflows
+		if mustClear and idx < (count - 100) then
+			table.remove(GameData.ActivePings, idx)
+			continue
+		end
+
+		if pingInfo.ExpiryTime and curTime > pingInfo.ExpiryTime then
+			table.remove(GameData.ActivePings, idx)
+			continue
+		end
+	end
+end
+
+-- We ONLY want to call this when a player joins into an active round!
+function SlashCo.NetworkPings(ply)
+	clearDeadPings()
+	local maxCount = math.Clamp(#GameData.ActivePings, 0, 127)
+	net.Start("SlashCo:SurvivorPings")
+		net.WriteBool(true) -- this is a full update of all active pings
+		net.WriteUInt(maxCount, 7)
+		for idx, pingInfo in ipairs(GameData.ActivePings) do
+			if idx > maxCount then break end
+
+			net.WriteUInt(pingInfo.ID, 16)
+			SlashCo.WriteOptional(pingInfo.ExpiryTime, net.WriteFloat)
+			net.WriteUInt(pingInfo.Team, 10)
+			net.WriteString(pingInfo.Type)
+			SlashCo.WriteOptional(pingInfo.Name, net.WriteString)
+			SlashCo.WriteOptional(pingInfo.Player, net.WriteEntity)
+			SlashCo.WriteOptional(pingInfo.Entity, net.WriteEntity)
+			SlashCo.WriteOptional(pingInfo.Position, net.WriteVector)
+		end
+	net.Send(ply)
+end
+
 function PLAYER:SurvivorPing()
 	if self.LastPinged and CurTime() - self.LastPinged < 3 then
 		return
@@ -123,69 +192,84 @@ function PLAYER:SurvivorPing()
 	local trace = self:GetEyeTrace()
 	self:LagCompensation(false)
 
-	local look
-	local ping_info = {
-		ExpiryTime = 0
+	GameData.NextPingID = GameData.NextPingID + 1
+	local pingInfo = {
+		ID = GameData.NextPingID,
+		ExpiryTime = 0, -- Time in seconds!
+		Team = self:Team(), -- Idea: Allow slasher's to ping too
 	}
 
-	ping_info.Player = self
+	pingInfo.Player = self
 
 	if self:Team() == TEAM_SPECTATOR then
-		ping_info.Type = "GHOST"
-		look = trace.HitPos
-		ping_info.ExpiryTime = 5
-		ping_info.Player = nil
+		pingInfo.Type = "GHOST"
+		pingInfo.Position = trace.HitPos
+		pingInfo.ExpiryTime = 5
+		pingInfo.Player = nil
 	elseif self:GetNWBool("SurvivorBenadrylFull") then
-		ping_info.Type = "SLASHER"
-		look = trace.HitPos
-		ping_info.ExpiryTime = 5
+		pingInfo.Type = "SLASHER"
+		pingInfo.Position = trace.HitPos
+		pingInfo.ExpiryTime = 5
 	elseif not IsValid(trace.Entity) then
-		look = trace.HitPos
-		ping_info.Type = "LOOK HERE"
-		ping_info.ExpiryTime = 10
+		pingInfo.Position = trace.HitPos
+		pingInfo.Type = "LOOK HERE"
+		pingInfo.ExpiryTime = 10
 	else
-		look = trace.Entity
-
+		local look = trace.Entity
 		if look.PingType then
-			ping_info.Type = look.PingType
+			pingInfo.Entity = look
+			pingInfo.Type = look.PingType
+			if look.PingExpiryTime then
+				pingInfo.ExpiryTime = look.PingExpiryTime
+			end
+
+			if look.OnPing then
+				-- RaphaelIT7: ToDo (Idea) - we can give a reward to the first survivor who found a generator
+				look:OnPing(self)
+			end
 		elseif look:GetModel() == "models/ldi/basketball.mdl" then
-			ping_info.Type = "BASKETBALL"
-			ping_info.ExpiryTime = 15
+			pingInfo.Type = "BASKETBALL"
+			pingInfo.ExpiryTime = 15
 		elseif look:IsPlayer() then
 			if look:Team() == TEAM_SURVIVOR then
-				ping_info.Type = "SURVIVOR"
-				ping_info.SurvivorName = string.upper(look:Nick())
-				look = trace.HitPos
-				ping_info.ExpiryTime = 5
+				pingInfo.Type = "SURVIVOR"
+				pingInfo.SurvivorName = string.upper(look:Nick())
+				pingInfo.Position = trace.HitPos
+				pingInfo.ExpiryTime = 5
 			elseif look:Team() == TEAM_SLASHER then
 				if not look:GetNWBool("AmogusSurvivorDisguise") then
-					ping_info.Type = "SLASHER"
-					look = trace.HitPos
-					ping_info.ExpiryTime = 5
+					pingInfo.Type = "SLASHER"
+					pingInfo.Position = trace.HitPos
+					pingInfo.ExpiryTime = 5
 				else
-					ping_info.Type = "SURVIVOR"
-					ping_info.SurvivorName = string.upper(table.Random(team.GetPlayers(TEAM_SURVIVOR)):Nick())
-					look = trace.HitPos
-					ping_info.ExpiryTime = 5
+					pingInfo.Type = "SURVIVOR"
+					pingInfo.SurvivorName = string.upper(table.Random(team.GetPlayers(TEAM_SURVIVOR)):Nick())
+					pingInfo.Position = trace.HitPos
+					pingInfo.ExpiryTime = 5
 				end
 			end
 		else
-			ping_info.Type = "LOOK AT THIS"
-			ping_info.ExpiryTime = 10
+			pingInfo.Type = "LOOK AT THIS"
+			pingInfo.ExpiryTime = 10
 		end
 	end
 
-	if ping_info.Type == "DEAD BODY" then
-		local deadguy = player.GetBySteamID64(look.SurvivorSteamID)
+	if pingInfo.ExpiryTime and pingInfo.ExpiryTime == -1 then
+		pingInfo.ExpiryTime = nil
+		pingInfo.Permanent = true -- Permanent pings always remain!
+	end
+
+	if pingInfo.Type == "DEAD BODY" and pingInfo.Entity then
+		local deadguy = player.GetBySteamID64(pingInfo.Entity.SurvivorSteamID)
 		if IsValid(deadguy) then
 			deadguy:SetNWBool("ConfirmedDead", true)
 		end
 	end
 
-	if typeCheck[ping_info.Type] then
-		sayPrompt(self, typeCheck[ping_info.Type])
-	elseif ping_info.Type == "ITEM" and type(look) == "Entity" then
-		local class = look:GetClass()
+	if typeCheck[pingInfo.Type] then
+		sayPrompt(self, typeCheck[pingInfo.Type])
+	elseif pingInfo.Type == "ITEM" and pingInfo.Entity then
+		local class = pingInfo.Entity:GetClass()
 		for _, v in pairs(SlashCoItems) do
 			local input = v.EntClass
 			if not input then
@@ -194,15 +278,35 @@ function PLAYER:SurvivorPing()
 
 			if v.EntClass == class then
 				sayPrompt(self, string.sub(input, 4))
-				ping_info.Name = v.Name
+				pingInfo.Name = v.Name
 				break
 			end
 		end
 	end
 
-	ping_info.Entity = look
+	if pingInfo.ExpiryTime then
+		if pingInfo.ExpiryTime ~= 0 then
+			pingInfo.ExpiryTime = CurTime() + pingInfo.ExpiryTime
+		else
+			pingInfo.ExpiryTime = nil
+		end
+	end
+
+	clearDeadPings(pingInfo)
+	table.insert(GameData.ActivePings, pingInfo)
+
 	net.Start("SlashCo:SurvivorPings")
-		net.WriteTable(ping_info)
+		net.WriteBool(false) -- not a full update
+		net.WriteUInt(1, 7) -- count of pings
+		net.WriteUInt(pingInfo.ID, 16)
+		SlashCo.WriteOptional(pingInfo.ExpiryTime, net.WriteFloat)
+		net.WriteUInt(pingInfo.Team, 10)
+		net.WriteString(pingInfo.Type)
+		SlashCo.WriteOptional(pingInfo.Name, net.WriteString)
+		SlashCo.WriteOptional(pingInfo.Player, net.WriteEntity)
+		SlashCo.WriteOptional(pingInfo.Entity, net.WriteEntity)
+		SlashCo.WriteOptional(pingInfo.Position, net.WriteVector)
+
 		local players = team.GetPlayers(TEAM_SURVIVOR)
 		table.Add(players, team.GetPlayers(TEAM_SPECTATOR))
 	net.Send(players)

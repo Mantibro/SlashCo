@@ -785,6 +785,24 @@ net.Receive("SlashCo:UpdateLightMap", function()
 	render.RedownloadAllLightmaps(GameData.IsLobby, GameData.IsLobby)
 end)
 
+--GameData.EntityExists = GameData.EntityExists or {}
+net.Receive("SlashCo:EntityRemoved", function()
+	local entIndex = net.ReadUInt(MAX_EDICT_BITS)
+	--GameData.EntityExists[entIndex] = false
+
+	hook.Run("SlashCo:ServerEntityRemoved", entIndex)
+end)
+
+-- For now, we only need to know when an Entity is removed, not when they're created.
+--[[net.Receive("SlashCo:EntityCreated", function()
+	local entIndex = net.ReadUInt(MAX_EDICT_BITS)
+	GameData.EntityExists[entIndex] = true
+end)]]
+
+function SlashCo.EntityExists(entIndex)
+	return GameData.EntityExists[entIndex] == true
+end
+
 SC_CLIENT_LOADED = true
 
 ---load patch files; these are specifically intended to modify existing addon code
