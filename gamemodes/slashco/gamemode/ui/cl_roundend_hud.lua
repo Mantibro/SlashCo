@@ -247,7 +247,7 @@ local function nextLine(panel, lines)
 	local isMultiLabel = istable(lineData)
 	line:SetText(isMultiLabel and lineData[1] or lineData)
 	if isMultiLabel then
-		line:SetTextColor(Color(0, 0, 0, 0))
+		line:SetTextColor(color_transparent)
 		line.Paint = function(self, w, h)
 			surface.SetTextColor(color_white)
 			surface.SetFont("OutroFont")

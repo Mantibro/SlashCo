@@ -398,14 +398,11 @@ hook.Add("InitPostEntity", "SlashCo:InitPostEntity", function()
 end)
 
 local function Think()
-	local plys = player.GetAll()
 	if engine.TickCount() % math.floor(5 / engine.TickInterval()) == 0 then
-		for _, p in ipairs(plys) do
-			if p:Team() == TEAM_SURVIVOR then
-				local health = p:Health()
-				if health > 100 then
-					p:SetHealth(health - 1)
-				end
+		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			local health = p:Health()
+			if health > 100 then
+				p:SetHealth(health - 1)
 			end
 		end
 	end

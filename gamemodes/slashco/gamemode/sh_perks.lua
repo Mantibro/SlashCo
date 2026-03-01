@@ -2,7 +2,7 @@ SlashCo.Perks = SlashCo.Perks or {}
 
 function SlashCo.RegisterPerk(table, perkID)
 	if SC_LOADEDPERKS then
-		error("Tried to register an perk illegally", 2)
+		error("Tried to register a perk illegally", 2)
 		return
 	end
 

@@ -13,7 +13,7 @@ end
 
 ---abort the game if there is a technical issue
 function SlashCo.Abort(reason)
-	for _, v in ipairs(player.GetAll()) do
+	for _, v in player.Iterator() do
 		v:ChatPrint("Aborting round: " .. reason)
 	end
 	ErrorNoHaltWithStack("Aborting round: " .. reason)
@@ -426,7 +426,7 @@ function SlashCo.SetupPlayers()
 	local becameCovenant = 0
 	local survivors = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_survivordata;"), "SteamID") or singlePlayerTable()
 	local slashers = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata;"), "SteamID") or {}
-	for _, ply in ipairs(player.GetAll()) do
+	for _, ply in player.Iterator() do
 		local steamid = ply:SteamID64()
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
@@ -813,7 +813,7 @@ function SlashCo.StartRound(noSetup)
 	end
 
 	SlashCo.DisableSoundScapes()
-	for _, ply in ipairs(player.GetAll()) do
+	for _, ply in player.Iterator() do
 		ply:ScreenFade(SCREENFADE.OUT, color_black, 0.5, 2)
 		ply:ConCommand("soundfade 100 1 0.5 0.5")
 	end

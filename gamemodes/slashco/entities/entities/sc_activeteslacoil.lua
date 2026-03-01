@@ -95,19 +95,22 @@ if SERVER then
 		end
 	end
 else
+	local tempVec = Vector(0, 0, 0)
 	function ENT:Initialize()
 		local mins, maxs = self:GetModelBounds()
-		self:SetRenderBounds(mins, maxs + Vector(0, 0, 2000))
+		tempVec:SetUnpacked(0, 0, 2000)
+		maxs:Add(tempVec)
+		self:SetRenderBounds(mins, maxs)
 	end
 
 	local segments = 15
 	local segmentsSize = 8
 	local segmentOffsets = 100
+	local renderColor = Color(255, 255, 255)
 	local lightningMaterial = Material("sprites/lgtning")
-	local fullWhiteCol = Color(255, 255, 255, 255)
 	function ENT:Draw()
 		local state = self:GetChargeState()
-		local noLighting = state > 1 and state < 5 and not self:GetNW2Bool("NoLight")
+		local noLighting = state > 1 and state < 5 and not self:GetNoLight()
 		if noLighting then
 			render.SuppressEngineLighting(true)
 		end
@@ -121,15 +124,19 @@ else
 		if state == 4 then
 			local pos = self:GetPos()
 			local mins, maxs = self:GetModelBounds()
-			local centerPos = pos + maxs + Vector(mins[1], mins[2])
-			render.SetColorMaterial()
+			local centerPos = pos
+			centerPos:Add(maxs)
+			tempVec:SetUnpacked(mins[1], mins[2], 0)
+			centerPos:Add(tempVec)
 
-			local mins, maxs = self:GetModelBounds()
-			local centerPos = pos + maxs + Vector(mins[1], mins[2])
+			render.SetColorMaterial()
 			render.StartBeam(segments)
-				render.AddBeam(centerPos, 2, 0, fullWhiteCol)
+				render.AddBeam(centerPos, 2, 0, color_white)
 				for k=1, segments - 1 do
-					render.AddBeam(centerPos + Vector(0, 0, segmentOffsets * k), segmentsSize * k, 0, Color(255, 255, 255, (segments * 2) - (k * 2) - 2))
+					renderColor.a = (segments * 2) - (k * 2) - 2
+					tempVec:SetUnpacked(0, 0, segmentOffsets * k)
+					tempVec:Add(centerPos)
+					render.AddBeam(tempVec, segmentsSize * k, 0, renderColor)
 				end
 			render.EndBeam()
 
@@ -140,12 +147,14 @@ else
 			local lightningRnd = segmentsSize
 			for k=1, 10 do
 				render.StartBeam(lightningSegments + 1)
-					render.AddBeam(centerPos, segmentsSize, uv, fullWhiteCol)
+					render.AddBeam(centerPos, segmentsSize, uv, color_white)
 					local prevEnd = centerPos
 					for k=1, lightningSegments do 
-						prevEnd = LerpVector(0.5, prevEnd, centerPos + Vector(math.Rand(-lightningRnd * k, lightningRnd * k), math.Rand(-lightningRnd * k, lightningRnd * k), 0))
+						tempVec:SetUnpacked(math.Rand(-lightningRnd * k, lightningRnd * k), math.Rand(-lightningRnd * k, lightningRnd * k), 0)
+						tempVec:Add(centerPos)
+						prevEnd = LerpVector(0.5, prevEnd, tempVec)
 						prevEnd[3] = centerPos[3] + (segmentOffsets * k)
-						render.AddBeam(prevEnd, segmentsSize, uv * k, fullWhiteCol)
+						render.AddBeam(prevEnd, segmentsSize, uv * k, color_white)
 					end
 				render.EndBeam()
 			end
@@ -162,12 +171,15 @@ else
 		framerate = 2,
 		material = "sprites/lgtning.vmt"
 	}
+	local beamRingTipCol = Color(255, 255, 150, 8)
+	local beamRingCol = Color(255, 255, 150, 16)
+	local beamRingTipOffset = Vector(0, 0, 2)
 	function ENT:Think()
 		local state = self:GetChargeState()
-		if state >= 1 and not self:GetNW2Bool("NoLight") then
-			local intensity = CurTime() - self:GetNW2Float("BrightnessTime")
+		if state >= 1 and not self:GetNoLight() then
+			local intensity = CurTime() - self:GetBrightnessTime()
 			if state > 5 then
-				intensity = self:GetNW2Float("BrightnessTime") - CurTime()
+				intensity = self:GetBrightnessTime() - CurTime()
 			end
 
 			if state == 4 then
@@ -178,8 +190,13 @@ else
 				local mins, maxs = self:GetModelBounds()
 				self.NextEffect = CurTime() + 0.05
 
-				local basePos = self:GetPos() + Vector(0, 0, mins[3])
-				effects.BeamRingPoint(basePos + Vector(0, 0, 2), 0.75, 32, 128, 8, 0, Color(255, 255, 150, 8), beamTbl)
+				local basePos = self:GetPos()
+				tempVec:SetUnpacked(0, 0, mins[3])
+				basePos:Add(tempVec)
+
+				tempVec:Set(beamRingTipOffset)
+				tempVec:Add(basePos)
+				effects.BeamRingPoint(tempVec, 0.75, 32, 128, 8, 0, beamRingTipCol, beamTbl)
 
 				for k=1, 8 do
 					if k > intensity then
@@ -188,36 +205,52 @@ else
 
 					local rev = 8 - k
 					local adding = 3
-					effects.BeamRingPoint(basePos + Vector(0, 0, 4.2 * k), 0.5, (adding * rev), 32 + (adding * rev), 2, 0, Color(255, 255, 150, 16), beamTbl)
+					tempVec:SetUnpacked(0, 0, 4.2 * k)
+					tempVec:Add(basePos)
+					effects.BeamRingPoint(tempVec, 0.5, (adding * rev), 32 + (adding * rev), 2, 0, beamRingCol, beamTbl)
 				end
 
-				local centerPos = self:GetPos() + maxs + Vector(mins[1], mins[2])
+				local centerPos = self:GetPos()
+				tempVec:SetUnpacked(mins[1], mins[2], 0)
+				centerPos:Add(maxs)
+				centerPos:Add(tempVec)
+
 				--if intensity > 8 then
 				if state == 1 then
 					local effectdata = EffectData()
 					effectdata:SetOrigin(centerPos)
 					effectdata:SetScale(5)
-					effectdata:SetNormal(Vector(0, 0, intensity / 10))
+					tempVec:SetUnpacked(0, 0, intensity / 10)
+					effectdata:SetNormal(tempVec)
 					util.Effect("ManhackSparks", effectdata)
 				end
 
 				if state == 4 then
 					local splits = 5
 					for k=1, segments * splits do
-						effects.BeamRingPoint(centerPos + Vector(0, 0, (segmentOffsets / splits) * k), 1, segmentsSize * k / splits, segmentsSize + (segmentsSize * k / splits * 2), 2, 0, outerBeamCol, beamTbl)
+						tempVec:SetUnpacked(0, 0, (segmentOffsets / splits) * k)
+						tempVec:Add(centerPos)
+						effects.BeamRingPoint(tempVec, 1, segmentsSize * k / splits, segmentsSize + (segmentsSize * k / splits * 2), 2, 0, outerBeamCol, beamTbl)
 					end
 
 					splits = 2
 					for k=1, segments * splits do
-						effects.BeamRingPoint(centerPos + Vector(0, 0, (segmentOffsets / splits) * k), 1, segmentsSize * k / splits / 4, segmentsSize + (segmentsSize * k / splits * 2 / 4), 2, 0, innerBeamCol, beamTbl)
+						tempVec:SetUnpacked(0, 0, (segmentOffsets / splits) * k)
+						tempVec:Add(centerPos)
+						effects.BeamRingPoint(tempVec, 1, segmentsSize * k / splits / 4, segmentsSize + (segmentsSize * k / splits * 2 / 4), 2, 0, innerBeamCol, beamTbl)
 					end
 
 					local mins, maxs = self:GetModelBounds()
-					local centerPos = self:GetPos() + maxs + Vector(mins[1], mins[2])
+					local centerPos = self:GetPos()
+					centerPos:Add(maxs)
+					tempVec:SetUnpacked(mins[1], mins[2], 0)
+					centerPos:Add(tempVec)
+
 					local effectdata = EffectData()
 					effectdata:SetOrigin(centerPos)
 					effectdata:SetScale(1)
-					effectdata:SetNormal(Vector(0, 0, intensity / 10))
+					tempVec:SetUnpacked(0, 0, intensity / 10)
+					effectdata:SetNormal(tempVec)
 					util.Effect("ElectricSpark", effectdata)
 				end
 			end
@@ -256,14 +289,19 @@ else
 
 		local pos = ply:GetPos()
 		local mins, maxs = ply:GetModelBounds()
-		local centerPos = ply:GetPos() + Vector(0, 0, mins[3])
-		render.SetColorMaterial()
+		local centerPos = ply:GetPos()
+		tempVec:SetUnpacked(0, 0, mins[3])
+		centerPos:Add(tempVec)
 
+		render.SetColorMaterial()
 		render.StartBeam(segments)
 			render.AddBeam(centerPos, segmentsSize * (segments - 1), 0, fullWhiteCol)
 			local segs = segments - 1
 			for k=1, segs do
-				render.AddBeam(centerPos + Vector(0, 0, segmentOffsets * k), segmentsSize * (segs - k), 0, Color(255, 255, 255, (segments * 2) - (k * 2) - 2))
+				renderColor.a = (segments * 2) - (k * 2) - 2
+				tempVec:SetUnpacked(0, 0, segmentOffsets * k)
+				tempVec:Add(centerPos)
+				render.AddBeam(tempVec, segmentsSize * (segs - k), 0, renderColor)
 			end
 		render.EndBeam()
 
@@ -276,8 +314,10 @@ else
 			render.StartBeam(lightningSegments + 1)
 				render.AddBeam(centerPos, segmentsSize, uv, fullWhiteCol)
 				local prevEnd = centerPos
-				for k=1, lightningSegments do 
-					prevEnd = LerpVector(0.5, prevEnd, centerPos + Vector(math.Rand(-lightningRnd * k, lightningRnd * k), math.Rand(-lightningRnd * k, lightningRnd * k), 0))
+				for k=1, lightningSegments do
+					tempVec:SetUnpacked(math.Rand(-lightningRnd * k, lightningRnd * k), math.Rand(-lightningRnd * k, lightningRnd * k), 0)
+					tempVec:Add(centerPos)
+					prevEnd = LerpVector(0.5, prevEnd, tempVec)
 					prevEnd[3] = centerPos[3] + (segmentOffsets * k)
 					render.AddBeam(prevEnd, segmentsSize, uv * k, fullWhiteCol)
 				end
@@ -288,12 +328,14 @@ else
 		local segmentsSize = segmentsSize * 7.5
 		local splits = 3
 		for k=1, segments * splits do
-			effects.BeamRingPoint(centerPos + Vector(0, 0, (segmentOffsets / splits) * k), 1, segmentsSize, segmentsSize * 2, 2, 0, outerBeamCol, beamTbl)
+			tempVec:SetUnpacked(0, 0, (segmentOffsets / splits) * k)
+			tempVec:Add(centerPos)
+			effects.BeamRingPoint(tempVec, 1, segmentsSize, segmentsSize * 2, 2, 0, outerBeamCol, beamTbl)
 		end
 	end
 
 	hook.Add("PreDrawViewModels", "TeslaCoilStun", function()
-		for _, ply in ipairs(player.GetAll()) do
+		for _, ply in player.Iterator() do
 			DrawPlayerStun(ply)
 		end
 	end)

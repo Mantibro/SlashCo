@@ -307,7 +307,7 @@ if SERVER then
 		end
 
 		if not validSlots[slot] then
-			error("Tried to use a invalid item slot! (Got: " .. tostring(slot) .. ", Expected one of: " .. table.concat(validSlots, ", ") .. ")")
+			error("Tried to use an invalid item slot! (Got: " .. tostring(slot) .. ", Expected one of: " .. table.concat(validSlots, ", ") .. ")")
 			return
 		end
 

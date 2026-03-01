@@ -259,7 +259,7 @@ local function DoSlasherSelection(slashers, usingPotentialSlashers)
 end
 _DoSlasherSelection = DoSlasherSelection
 
-function AskPlayersToBecomeSlasher()
+local function AskPlayersToBecomeSlasher()
 	if SlashCo.CurRound.AntiLoopSpawn then return end
 
 	SlashCo.AudioSystem.EnableBackgroundMusic()
@@ -294,14 +294,13 @@ function SlashCo.ForceNewSlasherSelection()
 	end
 
 	local expected_count = 0
-	local plys = player.GetAll()
 	for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
 		if data.disconnected then
 			expected_count = expected_count + 1
 			continue
 		end
 
-		for _, ply in ipairs(plys) do
+		for _, ply in player.Iterator() do
 			if data.steamid == ply:SteamID64() then
 				expected_count = expected_count + 1
 				print("[SlashCo] Expected " .. expected_count .. " players in!" .. "(" .. ply:Name() .. ")")
@@ -312,7 +311,7 @@ function SlashCo.ForceNewSlasherSelection()
 
 	local foundSlasher = false
 	local slashers = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}, "SteamID") or {}
-	for _, ply in ipairs(plys) do
+	for _, ply in player.Iterator() do
 		if slashers[ply:SteamID64()] then
 			foundSlasher = true
 			break

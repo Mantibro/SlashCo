@@ -579,7 +579,7 @@ SlashCo.LangTable["Bren_desc"] = [[A terrifying Umbra which can phase through so
 
 -Bren can phase through doors and walls when he's angry.
 -He can increase the fog with a simple snap.
--This slasher has a very bad eyesight.]]
+-This slasher has very bad eyesight.]]
 SlashCo.LangTable["Bren_tip"] = "-Watch yourself."
 SlashCo.LangTable["snap"] = "snap"
 

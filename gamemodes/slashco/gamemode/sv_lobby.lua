@@ -234,7 +234,7 @@ end
 local function lobbyRoundSetup()
 	SlashCo.BroadcastGlobalData()
 
-	for _, play in ipairs(player.GetAll()) do
+	for _, play in player.Iterator() do
 		--local pid = play:SteamID64()
 		SlashCo.BroadcastMasterDatabaseForClient(play)
 	end
@@ -305,7 +305,7 @@ local function lobbyRoundSetup()
 	--[[if team.NumPlayers(TEAM_SPECTATOR) < 1 and SlashCo.LobbyData.Offering == SCInfo.Offering.Duality then
 		SlashCo.LobbyData.Offering = 0
 
-		for _, play in ipairs(player.GetAll()) do
+		for _, play in player.Iterator() do
 			play:ChatPrint("[SlashCo] No Spectators, Duality Offering was cleared.")
 		end
 	end]]
@@ -580,7 +580,7 @@ local function pickMap(ply, map)
 		return
 	end
 
-	for _, play in ipairs(player.GetAll()) do
+	for _, play in player.Iterator() do
 		play:ChatText({"map_guaranteed_to", ply:Nick(), SlashCo.MapForceCost, SCInfo.Maps[map].NAME})
 	end
 
@@ -760,8 +760,8 @@ function SlashCo.OfferingVoteSuccess(id)
 
 	timer.Remove("OfferingVoteTimer")
 
-	for _, play in ipairs(player.GetAll()) do
-		SlashCo.EndOfferingVote(play)
+	for _, ply in player.Iterator() do
+		SlashCo.EndOfferingVote(ply)
 	end
 
 	if SCInfo.Offering[id] then

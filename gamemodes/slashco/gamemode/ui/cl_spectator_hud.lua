@@ -74,16 +74,16 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 		spinSkull(spin)
 
 		draw.SimpleText(SlashCo.Language("Welcome", string.upper(GameData.LocalPlayer:Nick())), "TVCD", ScrW() / 2, ScrH() / 3.5,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText("SLASHCO", "LobbyFont2", ScrW() / 2, ScrH() / 4,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText(blip, "TVCD", ScrW() / 2, ScrH() / 2,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText("[" .. team.NumPlayers(TEAM_LOBBY) .. " / " .. GameData.MaxPlayers .. "]", "TVCD", ScrW() / 2, ScrH() / 2.5,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText("[" .. srvwin_count .. " " .. SlashCo.Language("SurvivorWins") .. "]  [" .. slswin_count .. " " .. SlashCo.Language("SlasherWins") .. "]",
 				"TVCD", ScrW() * 0.5, ScrH() * 0.75, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)

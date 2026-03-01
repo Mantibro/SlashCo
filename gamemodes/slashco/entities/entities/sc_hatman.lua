@@ -113,8 +113,8 @@ hook.Add("PostPlayerDeath", "SlashCo:RemoveHatMans", function(ply)
 	end
 end)
 
-local RecursiveFindFuthestArea2
-local function RecursiveFindFuthestArea(area, targetPos, depth, maxDepth, lastMaxDistance)
+local RecursiveFindFurthestArea2
+local function RecursiveFindFurthestArea(area, targetPos, depth, maxDepth, lastMaxDistance)
 	lastMaxDistance = lastMaxDistance or 0
 	depth = depth or 0
 
@@ -132,7 +132,7 @@ local function RecursiveFindFuthestArea(area, targetPos, depth, maxDepth, lastMa
 			maxDistant = dist
 		end
 
-		local childResult, childDistant = RecursiveFindFuthestArea2(area, targetPos, depth + 1, maxDepth, maxDistant)
+		local childResult, childDistant = RecursiveFindFurthestArea2(area, targetPos, depth + 1, maxDepth, maxDistant)
 		if childResult then
 			resultArea = childResult
 			maxDistant = childDistant
@@ -145,7 +145,7 @@ local function RecursiveFindFuthestArea(area, targetPos, depth, maxDepth, lastMa
 
 	return resultArea, maxDistant
 end
-RecursiveFindFuthestArea2 = RecursiveFindFuthestArea
+RecursiveFindFurthestArea2 = RecursiveFindFurthestArea
 
 local function RequiresTeleport(path, targetPos, lastPos)
 	local segments = path:GetAllSegments()
@@ -162,7 +162,7 @@ end
 
 function ENT:FindRandomSpot()
 	local targetPos = self:GetTarget():GetPos()
-	local area = RecursiveFindFuthestArea(navmesh.GetNearestNavArea(targetPos), targetPos, 0, math.random(2, 5))
+	local area = RecursiveFindFurthestArea(navmesh.GetNearestNavArea(targetPos), targetPos, 0, math.random(2, 5))
 	if not area then return end
 
 	if targetPos:Distance(area:GetCenter()) < 500 then

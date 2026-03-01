@@ -99,10 +99,11 @@ function ENT:CreateExplosion()
 	-- Time to apply knockback >:3
 	local plys = {}
 	local coilPos = self:GetCoilOffset()
-	for _, ply in ipairs(player.GetAll()) do
+	for _, ply in player.Iterator() do
 		local plyPos = ply:GetPos()
 		if plyPos:Distance(coilPos) < 350 then
-			ply:SetVelocity((plyPos - coilPos):GetNormalized() * 750)
+			plyPos:Sub(coilPos)
+			ply:SetVelocity(plyPos:GetNormalized() * 750)
 		end
 	end
 end
@@ -261,6 +262,7 @@ else
 		end
 	end
 
+	local cache_col = Color(255, 255, 255)
 	hook.Add("PreDrawOpaqueRenderables", "PorchLight", function()
 		render.OverrideDepthEnable(true, true)
 		for porchLight, _ in pairs(porchLights) do
@@ -275,11 +277,13 @@ else
 			local lightTime = porchLight:GetLightStartTime()
 			local time = CurTime() - lightTime
 
+			local coilOffset = porchLight:GetCoilOffset()
 			render.SetMaterial(Material("vgui/white"))
 			for k=30, 1, -1 do
 				local size = math.max(math.pow(time, 1.05) - math.pow(k, 1.7), 1)
 				local sphereSize = math.Clamp(size / 5, 10, 20)
-				render.DrawSphere(porchLight:GetCoilOffset(), size, sphereSize, sphereSize, Color(255, 255, 255, (time / 20 * k / 2)))
+				cache_col.a = time / 20 * k / 2
+				render.DrawSphere(coilOffset, size, sphereSize, sphereSize, cache_col)
 			end
 		end
 		render.OverrideDepthEnable(false, false)

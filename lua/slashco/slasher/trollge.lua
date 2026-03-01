@@ -155,7 +155,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		StopBreathing(slasher)
 		PlayTransition(slasher)
 
-		for _, ply in ipairs(player.GetAll()) do
+		for _, ply in player.Iterator() do
 			ply:SetNWBool("DisplayTrollgeTransition", true)
 		end
 
@@ -180,7 +180,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetWalkSpeed(150)
 			slasher:SetNWBool("CanKill", true)
 
-			for _, ply in ipairs(player.GetAll()) do
+			for _, ply in player.Iterator() do
 				ply:SetNWBool("DisplayTrollgeTransition", false)
 			end
 		end)
@@ -192,7 +192,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
 		PlayTransition(slasher)
 
-		for _, ply in ipairs(player.GetAll()) do
+		for _, ply in player.Iterator() do
 			ply:SetNWBool("DisplayTrollgeTransition", true)
 		end
 
@@ -221,7 +221,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 			final_eyesight = 10
 
-			for _, ply in ipairs(player.GetAll()) do
+			for _, ply in player.Iterator() do
 				ply:SetNWBool("DisplayTrollgeTransition", false)
 			end
 		end)
@@ -301,7 +301,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			StopBreathing(slasher)
 	 		PlayTransition(slasher)
 
-			for _, ply in ipairs(player.GetAll()) do
+			for _, ply in player.Iterator() do
 				ply:SetNWBool("DisplayTrollgeTransition", true)
 			end
 
@@ -332,7 +332,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				final_eyesight = 10
 				slasher:SetNWBool("CanKill", true)
 
-				for _, ply in ipairs(player.GetAll()) do
+				for _, ply in player.Iterator() do
 					ply:SetNWBool("DisplayTrollgeTransition", false)
 				end
 			end)

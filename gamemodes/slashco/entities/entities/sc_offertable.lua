@@ -39,7 +39,7 @@ if SERVER then
 	function ENT:Think()
 		if SlashCo.LobbyData.Offering > 0 then
 			self.Offer:SetModel("models/slashco/other/offerings/o_" .. SlashCo.LobbyData.Offering .. ".mdl")
-			self.Offer:SetColor(Color(255, 255, 255, 255))
+			self.Offer:SetColor(color_white)
 		else
 			self.Offer:SetModel("")
 			self.Offer:SetColor(color_transparent)

@@ -7,6 +7,9 @@ ENT.ClassName = "sc_battery"
 
 if CLIENT then return end
 
+local mins = Vector(0, 0, 0)
+local maxs = Vector(0, 0, 0)
+local size = Vector(200, 200, 200)
 function ENT:Think()
 	local curTime = CurTime()
 	self:NextThink(curTime + 0.5)
@@ -15,9 +18,16 @@ function ENT:Think()
 		return true
 	end
 
+	local pos = self:GetPos()
+	mins:Set(pos)
+	mins:Sub(size)
+
+	maxs:Set(pos)
+	maxs:Add(size)
+
 	local nearbyBatteries = 0 -- If multiple fuel cans are nearby, we play sounds more likely to play a sound. Why? Because when Tyler for example decides to make a funny pile, we want everyone to know where it is.
 	local class = self:GetClass()
-	for _, ent in ipairs(ents.FindInSphere(self:GetPos(), 200)) do
+	for _, ent in ipairs(ents.FindInBox(mins, maxs)) do
 		if ent:GetClass() == class then
 			nearbyBatteries = nearbyBatteries + 1
 		end

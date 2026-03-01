@@ -162,8 +162,6 @@ net.Receive("SlashCo:InitialFog", function()
 
 		GameData.FogData[name] = fogInfo
 	end
-
-	PrintTable(GameData.FogData)
 end)
 
 if CLIENT then return end

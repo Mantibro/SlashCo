@@ -467,7 +467,7 @@ TEAM_LOBBY = 3
 function GM:CreateTeams()
 	if not GAMEMODE.TeamBased then return end
 
-	team.SetUp(TEAM_SURVIVOR, "Survivor", Color(255, 255, 255), false)
+	team.SetUp(TEAM_SURVIVOR, "Survivor", color_white, false)
 	team.SetUp(TEAM_SLASHER, "Slasher", Color(255, 0, 0), false)
 	team.SetUp(TEAM_LOBBY, "Lobby", Color(230, 255, 230), false)
 	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235), false)
@@ -599,13 +599,13 @@ function SlashCo.LoadMapConfigs(initialCheck)
 	if SERVER and not SlashCo.MapTools.IsEnabled(true) then
 		if not SlashCo.IsPlayable then
 			timer.Simple(math.max(30 - CurTime(), 0), function() -- If the game has already been running for a while don't use a 30sec timer
-				for _, play in ipairs(player.GetAll()) do
+				for _, play in player.Iterator() do
 					play:ChatPrint("[SlashCo] WARNING! There are no maps mounted!\nThe gamemode is not playable!\nDownload the Maps at the Gamemode's workshop page under the \"Required Items\" section.\nNOTE: After downloading a map you don't have to restart the game")
 				end
 			end)
 		elseif SlashCo.IsPlayable and not wasPlayable and not initialCheck then
 			timer.Simple(math.max(30 - CurTime(), 0), function() -- If the game has already been running for a while don't use a 30sec timer
-				for _, play in ipairs(player.GetAll()) do
+				for _, play in player.Iterator() do
 					play:ChatPrint("[SlashCo] Loaded configs for freshly mounted maps\nThe gamemode is now playable")
 				end
 			end)

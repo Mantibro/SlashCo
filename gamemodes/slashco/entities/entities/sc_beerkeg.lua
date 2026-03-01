@@ -22,7 +22,6 @@ end
 function ENT:SetBeerKegVelocity(velocity)
 	local phys = self:GetPhysicsObject()
 	if IsValid(phys) then
-		velocity[3] = velocity[3]
 		phys:SetVelocity(velocity)
 		self.DisableGravity = CurTime() + 1
 	end

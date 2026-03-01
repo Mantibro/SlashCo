@@ -12,7 +12,7 @@ function ITEM.DisplayColor()
 end
 function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fog.
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/newports_eat.ogg", -- It's so cold that we consider it to be concrete at this point :hehe:
+		soundPath = "slashco/newports_eat.ogg",
 		identifier = "NewportsEat",
 		minDistance = 300,
 		maxDistance = 500,

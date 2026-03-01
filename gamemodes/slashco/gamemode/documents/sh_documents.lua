@@ -5,7 +5,7 @@ SlashCoDocumentTypes = SlashCoDocumentTypes or {} -- a table containing all docu
 
 function SlashCo.RegisterDocument(table)
 	if SC_LOADEDDOCUMENTS then
-		error("Tried to register an document illegally", 2)
+		error("Tried to register a document illegally", 2)
 		return
 	end
 

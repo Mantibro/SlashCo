@@ -339,12 +339,12 @@ function SLASHER.ThirstyRage(ply)
 		slasher.MilkCount = 6
 		slasher:SetNWBool("ThirstyBigMlik", true)
 
-		for _, ply1 in ipairs(player.GetAll()) do
+		for _, ply1 in player.Iterator() do
 			ply1:SetNWBool("ThirstyFuck", true)
 		end
 
 		timer.Simple(3, function()
-			for _, ply1 in ipairs(player.GetAll()) do
+			for _, ply1 in player.Iterator() do
 				ply1:SetNWBool("ThirstyFuck", false)
 			end
 		end)

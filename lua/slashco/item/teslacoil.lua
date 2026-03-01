@@ -48,8 +48,6 @@ ITEM.WorldModel = {
 }
 
 function ITEM.OnUse(ply)
-	--If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
-
 	local ent = SlashCo.CreateItem("sc_activeteslacoil", ply:WorldSpaceCenter(), Angle(0, 0, 0))
 	ent:DropToFloor()
 end

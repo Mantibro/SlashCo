@@ -120,12 +120,12 @@ hook.Add("SlashCo:DrawHUD", "PingDisplay", function()
 		local fl_pos = v:WorldSpaceCenter():ToScreen()
 
 		draw.SimpleText(v:GetNWString("FlareDropperName"), "TVCD_small", fl_pos.x, fl_pos.y - 25,
-				Color(255, 255, 255, 180),
+				transp,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, textColor, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
 		draw.SimpleText(tostring(math.floor(GameData.LocalPlayer:GetPos():Distance(v:GetPos()) * 0.0254)) .. " m",
-				"TVCD_small", fl_pos.x, fl_pos.y + 25, Color(255, 255, 255, 180),
+				"TVCD_small", fl_pos.x, fl_pos.y + 25, transp,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 end)

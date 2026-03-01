@@ -12,6 +12,8 @@ function EFFECT:Think()
 	return not (CurTime() > self.DieTime)
 end
 
+local rng_vec = Vector()
+local color = Color(143, 167, 240, 255)
 function EFFECT:Render()
 	self.fDelta = math.Max(self.fDelta - 0.5, 0)
 	self.BeamSize = math.Max(self.BeamSize - 0.05, 0)
@@ -29,27 +31,34 @@ function EFFECT:Render()
 	// start the beam with 14 points
 	render.StartBeam(14)
 
+	local curTime = CurTime()
+
 	// add start
 	render.AddBeam(
 		start_pos,				// Start position
 		self.BeamSize,					// Width
-		CurTime(),				// Texture coordinate
-		Color(143, 167, 240, 255)		// Color
+		curTime,				// Texture coordinate
+		color		// Color
 	)
 	
 	for i = 1, 12 do
 		// get point
-		local point = (start_pos + dir * (i * increment)) + VectorRand() * math.random(1, 8)
+		local point = start_pos + dir
+		point:Mul(i * increment)
+
+		rng_vec:Random(-1, 1)
+		point:Add(rng_vec)
+		point:Mul(math.random(1, 8))
 
 		// texture coords
-		local tcoord = CurTime() + (1 / 12) * i
+		local tcoord = curTime + (1 / 12) * i
 
 		// add point
 		render.AddBeam(
 			point,
 			self.BeamSize,
 			tcoord,
-			Color(143, 167, 240, 255)
+			color
 		)
 	end
 
@@ -57,8 +66,8 @@ function EFFECT:Render()
 	render.AddBeam(
 		end_pos,
 		self.BeamSize,
-		CurTime() + 1,
-		Color(143, 167, 240, 255)
+		curTime + 1,
+		color
 	)
 
 	// finish up the beam

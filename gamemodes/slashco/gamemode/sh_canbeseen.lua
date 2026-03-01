@@ -40,6 +40,7 @@ function PLAYER:CanSeeFlashlights()
 	return self:GetNWBool("SlashCoSeeFlashlights", true)
 end
 
+-- Returns whether the player is visible (NOT accounting for item or slasher effects! Use CanBeSeen if you need to account for those)
 function PLAYER:IsVisible()
 	return self:GetNWBool("SlashCoVisible", true)
 end

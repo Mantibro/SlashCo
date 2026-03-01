@@ -42,7 +42,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 
 		if not IsValid(target) then
 			local targetSelect, tooMany
-			for _, v in ipairs(player.GetAll()) do
+			for _, v in player.Iterator() do
 				if string.find(v:Nick(), args[1]) then
 					if targetSelect then
 						tooMany = true
@@ -136,7 +136,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 
 		if not IsValid(target) then
 			local targetSelect, tooMany
-			for _, v in ipairs(player.GetAll()) do
+			for _, v in player.Iterator() do
 				if string.find(v:Nick(), args[2]) then
 					if targetSelect then
 						tooMany = true
@@ -399,7 +399,7 @@ concommand.Add("slashco_give_points", function(ply, _, args)
 
 		if not IsValid(target) then
 			local targetSelect, tooMany
-			for _, v in ipairs(player.GetAll()) do
+			for _, v in player.Iterator() do
 				if string.find(v:Nick(), args[1]) then
 					if targetSelect then
 						tooMany = true
@@ -546,7 +546,7 @@ concommand.Add("slashco_unstuck", function(ply, _, args)
 end)
 
 timer.Create("SlashCo:CheckStuck", 5, 0, function()
-	for _, ply in ipairs(player.GetAll()) do
+	for _, ply in player.Iterator() do
 		if not ply:IsStuck() then continue end
 		if ply.IsImpervious and not ply:IsStuck(true) then continue end
 		if SlashCo.State != SlashCo.States.IN_GAME then continue end

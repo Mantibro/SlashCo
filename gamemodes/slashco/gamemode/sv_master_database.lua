@@ -32,7 +32,7 @@ function SlashCoDatabase.EstablishDatabase()
 		return
 	end --Create the database table for basic statistics
 
-	for _, ply in ipairs( player.GetAll() ) do
+	for _, ply in player.Iterator() do
 		ply:ChatPrint("[SlashCo] The Master Database does not exist. Creating it now.")
 	end
 

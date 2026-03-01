@@ -18,7 +18,7 @@ function ENT:Initialize()
 	if SERVER then
 		local item = SlashCoItems[self.OverrideItem or self.PrintName]
 		if not item then
-			print("[SlashCo] Failed to spawn item \"" .. (self.OverrideItem or self.PrintName) .. "\"!")
+			ErrorNoHaltWithStack("[SlashCo] Failed to spawn item \"" .. (self.OverrideItem or self.PrintName) .. "\"!")
 		else
 			self:SetModel(item.Model)
 		end
