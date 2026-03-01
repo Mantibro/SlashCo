@@ -137,7 +137,7 @@ function ENT:RunBehaviour()
 		else
 			self:SetSequence(self:LookupSequence("attack"))
 			self.loco:FaceTowards(self.AttackedPlayer:GetPos())	-- Face our enemy
-			coroutine.wait(math.Rand(12))
+			coroutine.wait(math.Rand(4, 12))
 		end
 		-- At this point in the code the bot has stopped chasing the player or finished walking to a random spot
 		-- Using this next function we are going to wait 2 seconds until we go ahead and repeat it 
