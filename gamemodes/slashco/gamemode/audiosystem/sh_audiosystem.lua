@@ -130,6 +130,21 @@ function SlashCo.AudioSystem.TimeToTick(time, baseTick)
 	return baseTick - tickTime
 end
 
+-- Looks up a sound by name registered using sound.Add and select one of its sound files randomly
+function SlashCo.AudioSystem.GetSoundFileFromSource(name)
+	local info = sound.GetProperties(name)
+	if not info then return end
+	if not info.sound then return end
+
+	if isstring(info.sound) then
+		return info.sound
+	end
+
+	if istable(info.sound) then
+		return info.sound[math.random(1, #info.sound)]
+	end
+end
+
 -- Server & client files are loaded at last
 if SERVER then
 	include("sv_audiosystem.lua")

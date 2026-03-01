@@ -40,7 +40,7 @@ local function PlayTransform(slasher)
 	})
 	
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "NPC_Manhack.Slice",
+		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("NPC_Manhack.Slice"),
 		identifier = "Male07Transform2",
 		minDistance = 400,
 		maxDistance = 1200,
