@@ -7,16 +7,17 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 ## GamePlay changes
 [+] A dark fog that dynamically adjusts to the environment lighting.<br>
 -> In the background this is an entire fog system that was implemented.<br>
-[+] Added slasher documents<br>
-[+] Added player perks<br>
-[+] Implemented quick escape reward (10 credits)<br>
+[+] Added player perks (WIP)<br>
 [+] Different game intro sounds are played based off the slasher difficulty.<br>
 [+] Playing the dangerLevel sound when spawning into a round<br>
-[+] Implemented quick escape and slow escape.<br>
+[+] Implemented quick escape and slow escape. (+10 or -10 credits)<br>
 -> If you escape before the round went on for 10 minutes it counts as a quick escape, if you escape after 20 minutes its a slow escape<br>
 [+] Added `slashco_unstuck` console command that can be used to unstuck yourself if you somehow get stuck due to any kind of bug<br>
 [+] Added `slashco_give_points` console command to increase a player current points amount.<br>
 [+] Added `slashco_banslasher`, `slashco_unbanslasher` allowing hosts to ban one or multiple slashers. The ban **remains indefinetly** until removed manually!<br>
+[+] Added Late Join support allowing people to join as survivors in the first 3 minutes of a round.<br>
+[+] Added support for stacking effects<br>
+-> Previously, one item's effect would have overwritten the currently active effect<br>
 [+] Added a fuel display to the generators allowing one to see how much fuel is missing<br>
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c467fc49-9bfe-4372-8559-ff618ced4eac" />
 
@@ -34,6 +35,9 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 -> Servers can set the `slashco_maxplayers` convar<br>
 -> If the helicopter is full, additional players will be somewhat bugged, but it should work fine.<br>
 [#] Synchronized for all survivors the helicopter voicelines<br>
+[#] Precached almost every used sound and model to avoid in-game stutters.<br>
+-> The stutters sometimes were caused by GMod having to first load the sound before it could play it- now it loads everything when joining, avoiding that from happening in-game.<br>
+[#] Play a sound when an item can't be used<br>
 
 ### Document Objective
 A new objective to find documents was added, BUT it still needs to be implemented on many maps.<br>
@@ -53,24 +57,29 @@ Using the `slashco_openkeyboardbinds` command OR using the `F8` key by default, 
 [+] Added `slashco_proximity_chat`, `slashco_proximity_voice` and `slashco_proximity_range` to control the voice & text chat.<br>
 [#] Made console messages not throw an error<br>
 -> For example using `say Hello` would have resulted in an error<br>
+[#] Made a lot of entities use `EFL_KEEP_ON_RECREATE_ENTITIES` to avoid deletion when `game.CleanUpMap()` was used<br>
 
 ## Lobby changes
 [+] Extended the Lobby a bit and improved performance slightly<br>
+[+] Show the level & EP in the lobby HUD below the points<br>
 [#] New lobby map file (more players spawns)<br>
 [#] Make the chat global in the lobby<br>
+[#] Disabled collisions between lobby players, avoiding issues when playing with 6+ survivors who all try to queeze into the elevator.<br>
+[#] Made item picker show items in an ordered list by name instead of being random<br>
+[#] Flip Slasher & Survivor in Lobby HUD to fit the order<br>
 
 ### Nightmare Offering
-[+] Changed the lobby lighting & background music just to fit the impending nightmare
+[+] Changed the lobby lighting & background music just to fit the impending nightmare<br>
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/575d8912-f217-4394-aec1-d61d409b3a34" />
 
 ### Document System
-In the Lobby you can now find the document terminal with information about Slashers
+In the Lobby you can now find the document terminal with information about Slashers<br>
 
 <img width="1086" height="708" alt="image" src="https://github.com/user-attachments/assets/633c0fa9-6a60-4ebe-bdb0-c2795a50792d" />
 
 ### Perk System
-You can find perks in the same terminal as documents and equip them depending on your current level. (WIP)
+You can find perks in the same terminal as documents and equip them depending on your current level. (WIP)<br>
 
 <img width="1086" height="708" alt="image" src="https://i.imgur.com/VEHLo8L.png" />
 
@@ -79,6 +88,12 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Almost all slashers are in some form dynamically balanced based of the survivor count!<br>
 [#] Most slashers have been switched to use the new anger system<br>
 -> Based on the slasher's anger the background music will change, indicating for the survivors how mad the slashers are / how dangerous they have become already<br>
+[#] Fixed Slasher's step notification mass creating & deleting particle emitters<br>
+-> Only a single one is used now & simply reused each time.<br>
+-> This could have caused a lot of errors when they didn't clean up quick enouth<br>
+[#] Breaking a door open will now check if there is another door nearby (for double doors) and break that one too<br>
+[#] Implemented some failsafe logic to somewhat handle the case that a slasher cannot be spawned if a Lua error occurred.<br>
+[#] The generator's color in the stock UI changes if a generator is running or not.<br>
 
 ### Tyler
 [+] Added a camera shake to his effect, intensity is based off his distance<br>
@@ -220,6 +235,7 @@ You can find perks in the same terminal as documents and equip them depending on
 
 ### Brick
 [#] Now it can be used to apply knockback to slashers and break doors.<br>
+-> It has a 1/5 chance of breaking when colliding with something.
 
 ### Costco Pizza
 [+] Added Costco Frozen Pizza<br>
@@ -255,7 +271,7 @@ You can find perks in the same terminal as documents and equip them depending on
 
 ### Porchlight
 [+] Added the Porch Light<br>
--> Creates a light so bright that can randomly stun any player that makes contact with it.<br>
+-> Creates a light so bright that can randomly stun any slasher that makes contact with it.<br>
 
 ### Tesla Coil
 [+] Added the tesla coil<br>
@@ -305,8 +321,10 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Show the ready state of other players in the lobby (if they picked slasher or survivor)<br>
 [#] Show the spectator ui to the slasher when their waiting to be spawned.<br>
 [#] Fixed `gmod_hands` sometimes spawning and causing errors<br>
-[#] Fixed a bug with particle emitters used for footsteps and decoy causing issues when they don't clean up quick enouth & optimized the code of it to only use a single emitter now.<br>
-[#] Fixed a error caused by the console using the `say` command.<br>
+[#] Fixed a possible error with an entity having an invalid `PrintName` causing an error when the item is attempted to be dropped<br>
+[#] Made all HUDs render differently / in PostHUD to properly show even when the main menu is open.<br>
+[#] Made `PLAYER:SetItem` validate the input<br>
+[-] Removed all hardcoded `sc_lobby` parts to now allow any map marked as a lobby to be used as one.<br>
 
 ## Lua API Changes
 This documentation wasn't finished yet<br>
