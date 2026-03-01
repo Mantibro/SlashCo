@@ -1,5 +1,3 @@
-local global_pings = {}
-
 local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
 local blue = Color(64, 64, 255)
@@ -23,8 +21,9 @@ local pingType = {
 	end
 }
 
+GameData.GlobalPings = GameData.GlobalPings or {}
 local function removePing(key)
-	global_pings[key] = nil
+	GameData.GlobalPings[key] = nil
 end
 
 local function findPos(search)
@@ -42,7 +41,7 @@ local function antiDupePings(ping)
 		return
 	end
 
-	for k, v in pairs(global_pings) do
+	for k, v in pairs(GameData.GlobalPings) do
 		if v.Player == ping.Player then
 			removePing(k)
 			break
@@ -62,7 +61,7 @@ net.Receive("SlashCo:SurvivorPings", function()
 	end
 
 	ping.ID = math.random(2 ^ 31 - 1)
-	global_pings[ping.ID] = ping
+	GameData.GlobalPings[ping.ID] = ping
 
 	if ping.ExpiryTime and ping.ExpiryTime > 0 then
 		timer.Simple(ping.ExpiryTime, function()
@@ -75,11 +74,11 @@ end)
 hook.Add("SlashCo:DrawHUD", "PingDisplay", function()
 	if not IsValid(GameData.LocalPlayer) then return end -- RaphaelIT7: iirc on 64x DrawHUD can be called BEFORE LocalPlayer is valid.
 	if GameData.LocalPlayer:Team() == TEAM_SLASHER then
-		global_pings = {}
+		GameData.GlobalPings = {}
 		return
 	end
 
-	for k, v in pairs(global_pings) do
+	for k, v in pairs(GameData.GlobalPings) do
 		if v.Entity == nil then
 			removePing(k)
 			continue
