@@ -85,9 +85,19 @@ local proximity_chat = CreateConVar("slashco_proximity_chat", "1", FCVAR_ARCHIVE
 local proximity_voice = CreateConVar("slashco_proximity_voice", "1", FCVAR_ARCHIVE, "Enables proximity voicechat")
 local proximity_range = CreateConVar("slashco_proximity_range", "1000", FCVAR_ARCHIVE, "Sets the proximity range")
 
-hook.Add("PlayerCanHearPlayersVoice", "Maximum Range", function(listener, talker)
-	if not proximity_voice:GetBool() then
-		return true
+local function CanPlayersHearEachOther(listener, talker, isVoice)
+	if isVoice then
+		if not proximity_voice:GetBool() then
+			return true
+		end
+	else
+		if not proximity_chat:GetBool() or GameData.IsLobby then
+			return true
+		end
+
+		if not IsValid(talker) then
+			return true -- The console spoke. Let everyone know :3
+		end
 	end
 
 	local talkerTeam = talker:Team()
@@ -103,47 +113,20 @@ hook.Add("PlayerCanHearPlayersVoice", "Maximum Range", function(listener, talker
 	if listener:GetPos():DistToSqr(talker:GetPos()) > (range * range) then
 		return false
 	end
+
+	return true
+end
+
+hook.Add("PlayerCanHearPlayersVoice", "SlashCo:VoiceChat", function(listener, talker)
+	return CanPlayersHearEachOther(listener, talker, true)
 end)
 
 hook.Add("GetFallDamage", "RealisticDamage", function(_, speed)
 	return speed / 16
 end)
 
-hook.Add("PlayerCanSeePlayersChat", "TeamChat", function(_, _, listener, speaker)
-	if not proximity_chat:GetBool() or GameData.IsLobby then
-		return true
-	end
-
-	if not IsValid(speaker) then
-		return true -- The console spoke. Let everyone know :3
-	end
-
-	local listenerTeam = listener:Team()
-	if listenerTeam == TEAM_SPECTATOR then
-		return true
-	end
-
-	local speakerTeam = speaker:Team()
-	if speakerTeam == TEAM_SLASHER then
-		return false
-	end
-
-	if listenerTeam == TEAM_SLASHER then
-		return false
-	end
-
-	if speakerTeam == TEAM_SPECTATOR and listenerTeam ~= TEAM_SPECTATOR then
-		return false
-	end
-
-	local range = proximity_range:GetInt()
-	if listener:GetPos():DistToSqr(speaker:GetPos()) > (range * range) then
-		return false
-	end
-
-	if speakerTeam == TEAM_SURVIVOR then
-		return true
-	end
+hook.Add("PlayerCanSeePlayersChat", "SlashCo:TeamChat", function(_, _, listener, talker)
+	return CanPlayersHearEachOther(listener, talker, false)
 end)
 
 hook.Add("ShowTeam", "DoNotAllowTeamSwitch", function()
