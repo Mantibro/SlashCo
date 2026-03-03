@@ -7,11 +7,22 @@ ITEM.Price = 5
 ITEM.Description = "Brick_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ReplacesWorldProps = true
+
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
+
 function ITEM.OnUse(ply)
-	ply:EmitSound("Weapon_Crowbar.Miss")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Miss"),
+		identifier = "BrickThrow",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	ply:ViewPunch(Angle(-10, 0, 0))
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	droppeditem:SetBrickVelocity(ply:GetAimVector() * 1500)
@@ -34,6 +45,7 @@ function ITEM.OnUse(ply)
 		droppeditem:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 	end)
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

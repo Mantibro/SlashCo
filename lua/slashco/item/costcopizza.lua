@@ -7,12 +7,11 @@ ITEM.Price = 50
 ITEM.Description = "CostcoPizza_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
-function ITEM.DisplayColor()
-	return 128, 48, 0, 255
-end
+
 function ITEM.OnUse() -- You don't use it. You just hold it.
 	return true
 end
+
 function ITEM.OnOwnerTakeDamage(owner, dmg)
 	local rng = math.random(1, 4)
 	SlashCo.AudioSystem.PlaySound({
@@ -45,6 +44,7 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 		return true
 	end
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, 0),

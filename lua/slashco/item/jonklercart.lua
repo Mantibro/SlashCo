@@ -7,13 +7,12 @@ ITEM.Price = 50
 ITEM.Description = "JonklerCart_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
-function ITEM.DisplayColor()
-	return 128, 48, 0, 255
-end
+
 function ITEM.OnUse(ply)
 	local ent = SlashCo.CreateItem(ITEM.EntClass, ply:WorldSpaceCenter(), Angle(0, 0, 0))
 	ent:EnableJonkler()
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

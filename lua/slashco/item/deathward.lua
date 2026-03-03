@@ -7,10 +7,12 @@ ITEM.Icon = "slashco/ui/icons/items/item_2"
 ITEM.Price = 80
 ITEM.Description = "Deathward_desc"
 ITEM.CamPos = Vector(40, 0, 15)
+ITEM.IsSpawnable = true
+
 function ITEM.MaxAllowed()
 	return 2
 end
-ITEM.IsSpawnable = true
+
 function ITEM.OnDie(ply)
 	SlashCo.ChangeSurvivorItem(ply, "item", "DeathWard (Used)", true)
 	local pos = ply:WorldSpaceCenter()
@@ -60,9 +62,11 @@ function ITEM.OnDie(ply)
 
 	return true
 end
+
 function ITEM.OnSwitchFrom(ply)
 	timer.Remove("deathWardDamage_" .. ply:UserID())
 end
+
 function ITEM.OnPickUp(ply)
 	if GameData.IsLobby then
 		return
@@ -82,8 +86,9 @@ function ITEM.OnPickUp(ply)
 		ply:SetHealth(hp + 1)
 	end)
 end
+
 ITEM.ViewModel = {
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(45, -70, -120),
 	size = Vector(0.5, 0.5, 0.5),
@@ -94,7 +99,7 @@ ITEM.ViewModel = {
 	bodygroup = { [0] = 0 }
 }
 ITEM.WorldModelHolstered = {
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Pelvis",
 	pos = Vector(5, 2, 5),
 	angle = Angle(110, -80, 0),
@@ -107,7 +112,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "slam",
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(4, 1, -2),
 	angle = Angle(10, -20, 200),

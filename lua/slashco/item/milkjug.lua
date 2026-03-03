@@ -8,15 +8,26 @@ ITEM.Price = 10
 ITEM.Description = "MilkJug_desc"
 ITEM.CamPos = Vector(60,0,10)
 ITEM.IsSpawnable = true
+
 function ITEM.OnUse(ply)
 	--While the item is stored, a survivor can press R to consume it. It will set their sprint speed to 400 for 15 seconds.
 
-	ply:EmitSound("slashco/survivor/drink_milk.mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/drink_milk.mp3",
+		identifier = "MilkUse",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	SlashCoSlashers.Thirsty.ThirstyRage(ply)
 	ply:AddEffect("Speed", 15)
 end
+
 ITEM.ViewModel = {
-	model = "models/props_junk/garbage_milkcarton001a.mdl",
+	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(45, -70, -120),
 	size = Vector(0.5, 0.5, 0.5),
@@ -27,7 +38,7 @@ ITEM.ViewModel = {
 	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-	model = "models/props_junk/garbage_milkcarton001a.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Pelvis",
 	pos = Vector(10, 2, 5),
 	angle = Angle(110, -80, 0),
@@ -40,7 +51,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "slam",
-	model = "models/props_junk/garbage_milkcarton001a.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(1, 4.5, 1),
 	angle = Angle(180, -20, -25),

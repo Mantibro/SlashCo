@@ -8,11 +8,6 @@ ITEM.Description = "NightVisionGoggles_desc"
 ITEM.CamPos = Vector(50,0,0)
 ITEM.IsSpawnable = true
 
-local nvgSoundFile = {
-	[1] = "slashco/nvg_off.mp3",
-	[2] = "slashco/nvg_on.mp3"
-}
-
 function GenDynLight(entIndex)
 	local dlight = DynamicLight(MAX_EDICT + entIndex)
 	if dlight then
@@ -31,13 +26,31 @@ function ITEM.OnPickUp(ply)
 	ply:ScreenFade(1, color_white, 0.5, 0.2)
 	ply.Eyesight = 8
 	ply:SetNWFloat("Ply_Eyesight", ply.Eyesight)
-	ply:EmitSound(nvgSoundFile[2], 75, 100, 1)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/nvg_on.mp3",
+		identifier = "NightVisionOn",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 0.8,
+		fadeIn = 0,
+	})
 end
 
 function ITEM.ItemDropped(ply, droppeditem)
 	ply:SetNWBool("NightVision", false)
 	ply:ScreenFade(1, color_black, 0.5, 0.2)
-	ply:EmitSound(nvgSoundFile[1], 75, 100, 1)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/nvg_off.mp3",
+		identifier = "NightVisionOff",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 0.8,
+		fadeIn = 0,
+	})
 end
 
 function ITEM.OnDie(ply)
@@ -46,7 +59,7 @@ function ITEM.OnDie(ply)
 end
 
 ITEM.ViewModel = {
-	model = "models/slashco/items/nvg.mdl",
+	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(45, -70, -120),
 	size = Vector(0, 0, 0),
@@ -57,7 +70,7 @@ ITEM.ViewModel = {
 	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-	model = "models/slashco/items/nvg.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Head1",
 	pos = Vector(5, 6, 0),
 	angle = Angle(0, 100, 90),
@@ -70,7 +83,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "normal",
-	model = "models/slashco/items/nvg.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Head1",
 	pos = Vector(5, 6, 0),
 	angle = Angle(0, 100, 90),

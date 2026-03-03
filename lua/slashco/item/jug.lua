@@ -12,13 +12,25 @@ ITEM.IsSpawnable = true
 function ITEM.ItemDropped(ply, droppeditem)
 	if ply.JugTele then
 		timer.Remove("JugTele_" .. ply:UserID())
-		droppeditem:EmitSound("slashco/jug_curse.mp3", 75, 50)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/jug_curse.mp3",
+			identifier = "JugCurse",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = droppeditem,
+			volume = 0.7,
+			fadeIn = 0,
+		})
+
 		ply.JugTele = false
 	end
 end
+
 function ITEM.OnSwitchFrom(ply)
 	ply:RemoveSpeedEffect("jug")
 end
+
 function ITEM.PrePickUp(ply)
 	if not ply:GetNWBool("CurseOfTheJug") then
 		return
@@ -29,10 +41,19 @@ function ITEM.PrePickUp(ply)
 	end
 	ply.JugDropTimer = CurTime()
 
-	ply:EmitSound("slashco/jug_reject.mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/jug_reject.mp3",
+		identifier = "JugReject",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	return true
 end
+
 function ITEM.OnPickUp(ply)
 	if ply:GetNWBool("CurseOfTheJug") then
 		timer.Simple(0, function()
@@ -104,10 +125,27 @@ if SERVER then
 			ply:RandomTeleport()
 			ply:AddSpeedEffect("jugCurse", 290, 1)
 			ply:SetNWBool("CurseOfTheJug", true)
-			ply:EmitSound("slashco/jug_curse.mp3", 75, 70)
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/jug_curse.mp3",
+				identifier = "JugCurse",
+				minDistance = 200,
+				maxDistance = 400,
+				entity = ply,
+				volume = 0.7,
+				fadeIn = 0,
+			})
 		end)
 
-		ply:EmitSound("slashco/jug_curse.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/jug_curse.mp3",
+			identifier = "JugCurse",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 0.7,
+			fadeIn = 0,
+		})
 	end
 
 	concommand.Add("slashco_debug_jugtele", function(ply)
@@ -174,7 +212,15 @@ hook.Add("SlashCo:DrawHUD", "JugVisions", function()
 			Overlay:SetFloat("$alpha", 1 - ((GameData.LocalPlayer.JugFrame - 61) / 60))
 
 			if math.floor(GameData.LocalPlayer.JugFrame) == 61 then
-				GameData.LocalPlayer:EmitSound("slashco/jug_curse.mp3")
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/jug_curse.mp3",
+					identifier = "JugCurse",
+					minDistance = 200,
+					maxDistance = 400,
+					entity = GameData.LocalPlayer,
+					volume = 0.7,
+					fadeIn = 0,
+				})
 			end
 
 		end

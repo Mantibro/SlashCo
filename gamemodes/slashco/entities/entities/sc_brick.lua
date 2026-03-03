@@ -28,7 +28,17 @@ end
 
 function ENT:Break()
 	if math.random(1, 5) == 1 then
-		self:EmitSound("physics/concrete/boulder_impact_hard" .. math.random(1, 4) .. ".wav")
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "physics/concrete/boulder_impact_hard" .. idx .. ".wav"),
+			identifier = "BrickImpact" .. idx,
+			minDistance = 400,
+			maxDistance = 800,
+			entity = self,
+			volume = 1,
+			fadeIn = 0,
+		})
+
 		self:Remove()
 	end
 end
@@ -70,6 +80,16 @@ function ENT:PhysicsCollide(data)
 		data.HitObject:ApplyForceCenter(velocity * 50)
 	end
 
-	self:EmitSound("physics/concrete/concrete_break" .. math.random(2, 3) .. ".wav")
+	local idx = math.random(2, 3)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "physics/concrete/concrete_break" .. idx .. ".wav"),
+		identifier = "BrickBreak" .. idx,
+		minDistance = 400,
+		maxDistance = 800,
+		entity = self,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	self.DidCollide = true
 end

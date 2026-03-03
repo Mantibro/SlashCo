@@ -41,7 +41,17 @@ hook.Add("SlashCo:OnAngerTick", "JonklerCart", function(slasher)
 end)
 
 function ENT:DestroyJonkler()
-	self:EmitSound("physics/concrete/concrete_break" .. math.random(2, 3) .. ".wav")
+	local idx = math.random(2, 3)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "physics/concrete/concrete_break" .. idx .. ".wav"),
+		identifier = "JonklerBreak" .. idx,
+		minDistance = 400,
+		maxDistance = 800,
+		entity = self,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	SlashCo.AudioSystem.StopSound("JonklerCart", 5, self)
 end
 

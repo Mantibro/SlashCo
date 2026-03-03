@@ -8,6 +8,7 @@ ITEM.Price = 10
 ITEM.Description = "StepDecoy_desc"
 ITEM.CamPos = Vector(50, 0, 20)
 ITEM.IsSpawnable = true
+
 function ITEM.OnUse(ply)
 	--Active Step Decoy
 
@@ -17,15 +18,17 @@ function ITEM.OnUse(ply)
 	decoy:SetStepDecoyActive(true)
 	SlashCo.CurRound.Items[decoy:EntIndex()] = true
 end
+
 function ITEM.OnDrop(ply)
 	return 30, nil, true
 end
+
 function ITEM.ItemDropped(_, itemEnt)
 	itemEnt:DropToFloor()
 end
 
 ITEM.ViewModel = {
-	model = "models/props_junk/Shoe001a.mdl",
+	model = ITEM.Model,
 	pos = Vector(65, 0, -5),
 	angle = Angle(120, -120, -80),
 	size = Vector(0.5, 0.5, 0.5),
@@ -36,7 +39,7 @@ ITEM.ViewModel = {
 	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-	model = "models/props_junk/Shoe001a.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Foot",
 	pos = Vector(2.5, 3, -0.2),
 	angle = Angle(0, -33, 90),
@@ -49,7 +52,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "slam",
-	model = "models/props_junk/Shoe001a.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(4, 6, -1),
 	angle = Angle(180, 90, 0),

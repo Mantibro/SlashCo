@@ -9,16 +9,28 @@ ITEM.Description = "Flare_desc"
 ITEM.ReplacesWorldProps = true
 ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = true
+
 function ITEM.OnUse(ply)
 	local flare = SlashCo.CreateItem("sc_flare", ply:LocalToWorld( Vector(0, 0, 30) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
 	flare:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 400)
 	flare:SetNWBool("FlareActive", true)
 	flare:SetNWString("FlareDropperName", ply:Nick())
-	flare:EmitSound("weapons/flaregun/burn.wav")
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "weapons/flaregun/burn.wav",
+		identifier = "FlareActive",
+		minDistance = 200,
+		maxDistance = 800,
+		entity = flare,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	SlashCo.CurRound.Items[flare:EntIndex()] = true
 end
+
 ITEM.ViewModel = {
-	model = "models/slashco/items/flare.mdl",
+	model = ITEM.Model,
 	pos = Vector(64, 2, -5),
 	angle = Angle(120, -120, -80),
 	size = Vector(0.5, 0.5, 0.5),
@@ -29,7 +41,7 @@ ITEM.ViewModel = {
 	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-	model = "models/slashco/items/flare.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Pelvis",
 	pos = Vector(5, 2, 5),
 	angle = Angle(100, -80, 0),
@@ -42,7 +54,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "slam",
-	model = "models/slashco/items/flare.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(3.2, 2, -1),
 	angle = Angle(200, 85, 0),

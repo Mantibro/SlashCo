@@ -6,9 +6,11 @@ ITEM.EntClass = "sc_benadryl"
 ITEM.Price = 30
 ITEM.Description = "Benadryl_desc"
 ITEM.CamPos = Vector(50, 0, 0)
+
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
+
 function ITEM.OnUse(ply)
 	ply:AddRoundPoints("benadryl")
 	SlashCo.AudioSystem.PlaySound({
@@ -34,6 +36,7 @@ function ITEM.OnUse(ply)
 		GameData.TestHatMan:Spawn()
 	end
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

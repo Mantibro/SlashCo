@@ -45,7 +45,16 @@ if SERVER then
 		local startTime = self:GetChargeBeginning()
 		local state = self:GetChargeState()
 		if state == 0 then
-			self:PlayGlobalSound("slashco/survivor/teslacoil_chargeup.mp3", 100)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/survivor/teslacoil_chargeup.mp3",
+				identifier = "TeslaCharge",
+				minDistance = 400 * SlashCo.MapSize,
+				maxDistance = 900 * SlashCo.MapSize,
+				entity = self,
+				volume = 1,
+				fadeIn = 0,
+			})
+
 			self:SetChargeState(1)
 		end
 
@@ -74,7 +83,15 @@ if SERVER then
 			self:SetBrightnessTime(curTime + 3)
 			SlashCo.EnableGlobalFog()
 			for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-				ply:PlayGlobalSound("slashco/survivor/teslacoil_stun.mp3", 100, 5)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/survivor/teslacoil_stun.mp3",
+					identifier = "TeslaStun",
+					minDistance = 400 * SlashCo.MapSize,
+					maxDistance = 600 * SlashCo.MapSize,
+					entity = ply,
+					volume = 1,
+					fadeIn = 0,
+				})
 			end
 		end
 

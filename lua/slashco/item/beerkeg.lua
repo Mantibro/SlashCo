@@ -7,17 +7,25 @@ ITEM.Price = 30
 ITEM.Description = "BeerKeg_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
-function ITEM.DisplayColor()
-	return 128, 48, 0, 255
-end
+
 function ITEM.OnUse(ply)
-	ply:EmitSound("Weapon_Crowbar.Miss")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Miss"),
+		identifier = "BeerKegThrow",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	ply:ViewPunch(Angle(-10, 0, 0))
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	droppeditem:SetBeerKegVelocity(ply:GetAimVector() * 150)
 	SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
 	droppeditem:SetOwner(ply)
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

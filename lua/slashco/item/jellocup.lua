@@ -7,16 +7,25 @@ ITEM.Price = 80
 ITEM.Description = "JelloCup_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
-function ITEM.DisplayColor()
-	return 128, 48, 0, 255
-end
+
 function ITEM.OnUse(ply)
 	-- RaphaelIT7: Yes, it's intentional that it can go over the max health! It's limited to 1.5x of the max health
 	local maxHealth = ply:GetMaxHealth()
 	ply:SetHealth(math.min(ply:Health() + maxHealth / 3, maxHealth * 1.5))
+	
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/eat_mayo.mp3",
+		identifier = "JelloUse",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	ply:AddEffect("Resistance", math.random(20, 50))
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

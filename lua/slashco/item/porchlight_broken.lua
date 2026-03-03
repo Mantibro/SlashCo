@@ -6,11 +6,8 @@ ITEM.EntClass = "sc_brokenporchlight"
 ITEM.Description = "BrokenPorchLight_desc"
 ITEM.ToolTip = "BrokenPorchLight_desc"
 ITEM.CamPos = Vector(150, 0, 0)
-ITEM.ReplacesWorldProps = true
 ITEM.IsSpawnable = false
-function ITEM.DisplayColor()
-	return 128, 48, 0, 255
-end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

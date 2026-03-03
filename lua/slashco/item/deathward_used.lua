@@ -7,12 +7,15 @@ ITEM.Icon = "slashco/ui/icons/items/item_2_99"
 ITEM.Description = "You broke it!"
 ITEM.CamPos = Vector(40,0,15)
 ITEM.IsSpawnable = false
+
 function ITEM.DisplayColor()
 	return 128, 0, 0, 255
 end
+
 function ITEM.OnSwitchFrom(ply)
 	timer.Remove("deathWardDamage_" .. ply:UserID())
 end
+
 function ITEM.OnPickUp(ply)
 	if GameData.IsLobby then
 		return
@@ -32,8 +35,9 @@ function ITEM.OnPickUp(ply)
 		ply:SetHealth(hp + 1)
 	end)
 end
+
 ITEM.ViewModel = {
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(45, -70, -120),
 	size = Vector(0.5, 0.5, 0.5),
@@ -44,7 +48,7 @@ ITEM.ViewModel = {
 	bodygroup = {[0] = 1}
 }
 ITEM.WorldModelHolstered = {
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(3, 0, 0),
 	angle = Angle(10, -20, -90),
@@ -57,7 +61,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "normal",
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(3, 0, 0),
 	angle = Angle(10, -20, -90),

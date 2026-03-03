@@ -7,13 +7,16 @@ ITEM.Icon = "slashco/ui/icons/items/item_20"
 ITEM.Price = 100
 ITEM.Description = "BalkanBoost_desc"
 ITEM.CamPos = Vector(50, 0, 0)
-function ITEM.MaxAllowed()
-	return 4
-end
 ITEM.IsSpawnable = false
+
 function ITEM.DisplayColor()
 	return 232, 23, 55, 255
 end
+
+function ITEM.MaxAllowed()
+	return 4
+end
+
 function ITEM.OnUse(ply)
 	-- RaphaelIT7: Disallow balkan stacking
 	if ply:GetNWBool("SurvivorBalkan") then
@@ -52,6 +55,7 @@ function ITEM.OnUse(ply)
 		end
 	end)
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

@@ -8,12 +8,24 @@ ITEM.Price = 20
 ITEM.Description = "Soda_desc"
 ITEM.CamPos = Vector(30,0,0)
 ITEM.IsSpawnable = true
+
 function ITEM.OnUse(ply)
-	ply:EmitSound("slashco/survivor/soda_drink" .. math.random(1,2) .. ".mp3")
+	local idx = math.random(1, 2)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/soda_drink" .. idx .. ".mp3",
+		identifier = "SodaUse" .. idx,
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	ply:AddEffect("Invisibility", 30)
 end
+
 ITEM.ViewModel = {
-	model = "models/props_junk/PopCan01a.mdl",
+	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(45, -70, -120),
 	size = Vector(0.5, 0.5, 0.5),
@@ -24,7 +36,7 @@ ITEM.ViewModel = {
 	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-	model = "models/props_junk/PopCan01a.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Pelvis",
 	pos = Vector(5, 2, 5),
 	angle = Angle(110, -80, 0),
@@ -37,7 +49,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "slam",
-	model = "models/props_junk/PopCan01a.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(3, 2.5, -1),
 	angle = Angle(180, 0, 0),

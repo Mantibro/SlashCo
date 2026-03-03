@@ -18,7 +18,17 @@ local function ArmBeacon(ent)
 	if ent:GetBeaconBroken() then return end
 
 	timer.Remove(ent:EntIndex() .. "_BeaconBlipSound")
-	ent:PlayGlobalSound("slashco/survivor/distress_siren.mp3", 100)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/distress_siren.mp3",
+		identifier = "BeaconSiren",
+		minDistance = 1000 * SlashCo.MapSize,
+		maxDistance = 2000 * SlashCo.MapSize,
+		entity = ent,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	ent:SetArmingBeacon(false)
 	SlashCo.BeaconArming = nil
 	SlashCo.SummonEscapeHelicopter(true)
@@ -58,7 +68,15 @@ if SERVER then
 				ArmBeacon(self)
 			end)
 			timer.Create(self:EntIndex() .. "_BeaconBlipSound",3 , 0, function()
-				self:PlayGlobalSound("slashco/beacon_connect.mp3", 100)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/beacon_connect.mp3",
+					identifier = "BeaconConnect",
+					minDistance = 800 * SlashCo.MapSize,
+					maxDistance = 1200 * SlashCo.MapSize,
+					entity = self,
+					volume = 1,
+					fadeIn = 0,
+				})
 			end)
 			self.TimersStarted = true
 		end
@@ -73,7 +91,16 @@ if SERVER then
 
 		for k, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if v:GetPos():Distance(self:GetPos()) < 50 then
-				self:EmitSound("slashco/beacon_break.mp3", 85)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/beacon_break.mp3",
+					identifier = "BeaconBreak",
+					minDistance = 400,
+					maxDistance = 900,
+					entity = self,
+					volume = 1,
+					fadeIn = 0,
+				})
+
 				timer.Remove(self:EntIndex() .. "_BeaconArming")
 				timer.Remove(self:EntIndex() .. "_BeaconBlipSound")
 				self:SetModel("models/props_c17/light_cagelight02_off.mdl")

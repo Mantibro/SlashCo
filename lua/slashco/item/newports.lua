@@ -7,16 +7,14 @@ ITEM.Price = 40
 ITEM.Description = "Newports_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
-function ITEM.DisplayColor()
-	return 128, 48, 0, 255
-end
+
 function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fog.
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/newports_eat.ogg",
 		identifier = "NewportsEat",
-		minDistance = 300,
-		maxDistance = 500,
-		entity = self,
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
 		volume = 0.8,
 		fadeIn = 0,
 	})
@@ -35,6 +33,7 @@ function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fo
 		SlashCo.RemoveFog("Newports", ply)
 	end)
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

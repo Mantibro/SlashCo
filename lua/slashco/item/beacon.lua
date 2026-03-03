@@ -7,10 +7,12 @@ ITEM.Icon = "slashco/ui/icons/items/item_9"
 ITEM.Price = 15
 ITEM.Description = "Beacon_desc"
 ITEM.CamPos = Vector(50, 0, 35)
+ITEM.IsSpawnable = false
+
 function ITEM.MaxAllowed()
 	return 1
 end
-ITEM.IsSpawnable = false
+
 function ITEM.OnUse(ply)
 	--If the holder of the item is the last one alive and at least one generator has been activated, the rescue helicopter will come prematurely.
 
@@ -70,12 +72,22 @@ function ITEM.OnUse(ply)
 		SlashCo.SummonEscapeHelicopter(true)
 		local ent = SlashCo.CreateItem("sc_activebeacon", ply:WorldSpaceCenter(), Angle(0, 0, 0))
 		ent:DropToFloor()
-		ent:PlayGlobalSound("slashco/survivor/distress_siren.mp3", 100)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/survivor/distress_siren.mp3",
+			identifier = "BeaconSiren",
+			minDistance = 1000 * SlashCo.MapSize,
+			maxDistance = 2000 * SlashCo.MapSize,
+			entity = ent,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 end
+
 ITEM.ViewModel = {
 	type = "Model",
-	model = "models/props_c17/light_cagelight01_on.mdl",
+	model = ITEM.Model,
 	rel = "",
 	pos = Vector(66, 0, -7),
 	angle = Angle(45, -70, -120),
@@ -87,7 +99,7 @@ ITEM.ViewModel = {
 	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-	model = "models/props_c17/light_cagelight01_on.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Spine2",
 	pos = Vector(4, 1, 4),
 	angle = Angle(0, -90, 0),
@@ -100,7 +112,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "passive",
-	model = "models/props_c17/light_cagelight01_on.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(9, 1, 4),
 	angle = Angle(-30, 180, 0),
