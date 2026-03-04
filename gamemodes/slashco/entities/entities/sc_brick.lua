@@ -30,7 +30,7 @@ function ENT:Break()
 	if math.random(1, 5) == 1 then
 		local idx = math.random(1, 4)
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "physics/concrete/boulder_impact_hard" .. idx .. ".wav"),
+			soundPath = "physics/concrete/boulder_impact_hard" .. idx .. ".wav",
 			identifier = "BrickImpact" .. idx,
 			minDistance = 400,
 			maxDistance = 800,
@@ -82,7 +82,7 @@ function ENT:PhysicsCollide(data)
 
 	local idx = math.random(2, 3)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "physics/concrete/concrete_break" .. idx .. ".wav"),
+		soundPath = "physics/concrete/concrete_break" .. idx .. ".wav",
 		identifier = "BrickBreak" .. idx,
 		minDistance = 400,
 		maxDistance = 800,

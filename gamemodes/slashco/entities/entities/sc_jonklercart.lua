@@ -43,7 +43,7 @@ end)
 function ENT:DestroyJonkler()
 	local idx = math.random(2, 3)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "physics/concrete/concrete_break" .. idx .. ".wav"),
+		soundPath = "physics/concrete/concrete_break" .. idx .. ".wav",
 		identifier = "JonklerBreak" .. idx,
 		minDistance = 400,
 		maxDistance = 800,
