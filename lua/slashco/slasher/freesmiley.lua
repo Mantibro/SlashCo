@@ -175,6 +175,10 @@ function SLASHER.Animator(ply)
 	local smiley_sand_stun = ply:GetNWBool("FreeSmileyPocketSand")
 	local smiley_tesla_stun = ply:GetNWBool("FreeSmileyTeslaCoil")
 
+	if not smiley_summon and not smiley_sand_stun and not smiley_tesla_stun then
+		ply.anim_antispam = false
+	end
+
 	if ply:IsOnGround() then
 		if not chase then
 			ply.CalcIdeal = ACT_HL2MP_WALK
@@ -193,28 +197,22 @@ function SLASHER.Animator(ply)
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
-	else
-		ply.anim_antispam = false
 	end
-	
+
 	if smiley_sand_stun then
 		ply.CalcSeqOverride = ply:LookupSequence("stun")
 		if ply.anim_antispam == nil or ply.anim_antispam == false then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
-	else
-		ply.anim_antispam = false
 	end
-	
+
 	if smiley_tesla_stun then
 		ply.CalcSeqOverride = ply:LookupSequence("death")
 		if ply.anim_antispam == nil or ply.anim_antispam == false then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
-	else
-		ply.anim_antispam = false
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
