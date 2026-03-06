@@ -29,7 +29,7 @@ function ITEM.OnBuy(_)
 end
 
 function ITEM.OnPickUp(ply)
-	ply:AddSpeedEffect("gas", 200, 10)
+	ply:AddSpeedEffect("gas", 150, 10)
 end
 
 function ITEM.EquipSound()
