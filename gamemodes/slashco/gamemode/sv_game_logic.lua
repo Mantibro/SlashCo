@@ -332,7 +332,7 @@ function SlashCo.SetupExpectedPlayersFailsafe()
 	SlashCo.AudioSystem.EnableBackgroundMusic()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/ambienttrack/mf_mid.ogg", 1)
 
-	timer.Create("SlashCo:ExpectedPlayersFailsafe", 90, 1, SlashCo.ForceNewSlasherSelection)
+	timer.Create("SlashCo:ExpectedPlayersFailsafe", 300, 1, SlashCo.ForceNewSlasherSelection)
 
 	gameevent.Listen("player_disconnect")
 	hook.Add("player_disconnect", "SlashCo:OnPlayerDisconnect", function(data)
@@ -557,7 +557,7 @@ local function CheckLobbyFailSafe()
 	end
 
 	local timePassed = SlashCo.GetRoundTime()
-	if timePassed > 300 and not SlashCo.FailSafeActivate then
+	if timePassed > 360 and not SlashCo.FailSafeActivate then
 		local slashers = team.GetPlayers(TEAM_SLASHER)
 		if #slashers == 0 then
 			print("[SlashCo] Lobby failsafe was triggered! (No Slashers)")

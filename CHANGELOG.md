@@ -150,6 +150,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Eyesight decreased. (3 - 2)<br>
 
 ### Freesmiley
+[+] Added new float and stun animations.<br>
 [#] Balkan Boost users are marked until the effect run out.<br>
 [#] Increased Chase duration (5s - 9s).<br>
 
@@ -160,6 +161,8 @@ You can find perks in the same terminal as documents and equip them depending on
 -> Landing on top of a survivor after jumping from a wall will deal them damage.<br>
 
 ### Sid
+[+] Added the ability to grab a cookie from a survivor's hand.<br>
+[+] Added a new animation for the cookie ability.<br>
 [#] Decreased KillDelay (7s - 5s)<br>
 
 ### Thirsty
@@ -247,6 +250,9 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Raised price from `50` to `80` credits.<br>
 [#] Allow one to drop the used deathward.<br>
 
+### GasCan
+[#] Reduced survivor's speed when holding a gascan to 150.<br>
+
 ### Jello Cup
 [+] Added Jello Cup<br>
 -> Heals 1/3 of your max health (can go above up to 1.5x of max health)<br>
@@ -295,7 +301,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [+] Support live language changes<br>
 [+] Added sound/vision fade in when spawning into a round<br>
 [#] Implemented a failsafe in case the slashers or survivors disconnect<br>
--> The game ends if no survivors or slashers exist after 90 seconds<br>
+-> The game ends if no survivors or slashers exist after 5 minutes<br>
 -> If there's enough survivors in-game but not the required slashers, a selection screen would show up to choose a new slasher.
 [#] Solved a spectator prediction issue, making movement/noclipping jittery<br>
 -> It was a gmod bug<br>
