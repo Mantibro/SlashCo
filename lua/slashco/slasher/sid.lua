@@ -277,6 +277,60 @@ local function EatCookie(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
+	if not slasher:GetNWBool("SidGun") and (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
+		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
+		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
+
+		local cookie = ents.Create("prop_physics")
+
+		cookie:SetMoveType(MOVETYPE_NONE)
+		cookie:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		cookie:SetModel(SlashCoItems.Cookie.Model)
+		cookie:SetPos(pos)
+		cookie:SetAngles(ang)
+		cookie:FollowBone(slasher, slasher:LookupBone("HandR"))
+
+		slasher:SetNWBool("SidEatingSurvCookie", true)
+		slasher:Freeze(true)
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_cookie" .. idx .. ".mp3",
+			identifier = "SidCookie" .. idx,
+			minDistance = 200,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+
+		timer.Simple(3.55, function()
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_eating.mp3",
+				identifier = "SidEating",
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+			cookie:Remove()
+		end)
+
+		timer.Simple(10, function()
+			if not IsValid(slasher) and not IsValid(target) then
+				return
+			end
+
+			slasher:SetNWBool("SidEatingSurvCookie", false)
+			slasher:SetNWBool("DemonPacified", true)
+			slasher:Freeze(false)
+			slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
+			slasher.Pacification = math.random(15, 25)
+		end)
+
+		return
+	end
+
 	if not slasher:GetNWBool("SidGun") then
 		SlashCo.Jumpscare(slasher, target)
 		return
@@ -551,60 +605,6 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	if (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
-		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
-		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
-
-		local cookie = ents.Create("prop_physics")
-
-		cookie:SetMoveType(MOVETYPE_NONE)
-		cookie:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-		cookie:SetModel(SlashCoItems.Cookie.Model)
-		cookie:SetPos(pos)
-		cookie:SetAngles(ang)
-		cookie:FollowBone(slasher, slasher:LookupBone("HandR"))
-
-		slasher:SetNWBool("SidEatingSurvCookie", true)
-		slasher:Freeze(true)
-		local idx = math.random(1, 2)
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/sid/sid_cookie" .. idx .. ".mp3",
-			identifier = "SidCookie" .. idx,
-			minDistance = 200,
-			maxDistance = 700,
-			entity = slasher,
-			volume = 1,
-			fadeIn = 0,
-		})
-		
-		timer.Simple(3.55, function()
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/sid/sid_eating.mp3",
-				identifier = "SidEating",
-				minDistance = 200,
-				maxDistance = 700,
-				entity = slasher,
-				volume = 1,
-				fadeIn = 0,
-			})
-			cookie:Remove()
-		end)
-		
-		timer.Simple(10, function()
-			if not IsValid(slasher) and not IsValid(target) then
-				return
-			end
-
-			slasher:SetNWBool("SidEatingSurvCookie", false)
-			slasher:SetNWBool("DemonPacified", true)
-			slasher:Freeze(false)
-			slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
-			slasher.Pacification = math.random(15, 25)
-		end)
-
-		return
-	end
-
 	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then
 		return
 	end
