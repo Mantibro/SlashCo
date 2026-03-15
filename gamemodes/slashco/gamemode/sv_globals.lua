@@ -395,6 +395,7 @@ function SlashCo.SummonEscapeHelicopter(distress)
 		end
 
 		if not disableHelicopterMusic then
+			GameData.HelicopterMusic = true
 			SlashCo.AudioSystem.EnableBackgroundMusic()
 			SlashCo.AudioSystem.SetBackgroundMusic("slashco/music/slashco_helicopter.wav", 1)
 		end

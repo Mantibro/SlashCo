@@ -126,7 +126,7 @@ function SlashCoDatabase.OnPlayerJoined(steamid)
 	elseif hasEntry then
 		--Check if the player has changed their name
 		if database[entryIndex].PlayerName ~= ply:GetName() then
-			sql.Query("UPDATE slashco_master_database SET PlayerName = " .. ply:GetName() .. " WHERE PlayerID = '" .. steamid .. "';")
+			sql.Query("UPDATE slashco_master_database SET PlayerName = " .. sql.SQLStr(ply:GetName()) .. " WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")
 		end
 	end
 end

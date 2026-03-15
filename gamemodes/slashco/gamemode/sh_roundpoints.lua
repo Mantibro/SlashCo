@@ -17,7 +17,8 @@ local pointAmounts = {
 	quickescape = 10, --
 	slowescape = -10, --
 	benadryl = 15, --
-	working = 5 --
+	working = 5, --
+	generator = 3, -- Survivor found / pinged the generator
 }
 
 GameData.RoundPoints = GameData.RoundPoints or {}

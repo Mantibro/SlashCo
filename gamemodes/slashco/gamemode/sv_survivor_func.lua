@@ -115,47 +115,60 @@ local slamDoor, typeCheck, sayPrompt
 
 GameData.ActivePings = GameData.ActivePings or {}
 GameData.NextPingID = GameData.NextPingID or 0
+local function shouldRemovePing(curTime, mustClear, idx, pingInfo, newPing)
+	if newPing then
+		-- IMPORTANT: This part MUST stay synchronized with the cl_pings.lua -> shouldRemovePing function! else the client may remove a ping when they shouldn't!
+
+		if not pingInfo.Permanent and pingInfo.Player == newPing.Player then
+			return true
+		end
+
+		-- We allow the same entity to be pinged multiple times if it's by different teams!
+		if pingInfo.Entity and pingInfo.Entity == newPing.Entity and pingInfo.Team == newPing.Team then
+			return true
+		end
+	end
+
+	if pingInfo.Entity and not IsValid(pingInfo.Entity) then
+		return true
+	end
+
+	if pingInfo.Player and not IsValid(pingInfo.Player) then
+		if pingInfo.Permanent then
+			pingInfo.Player = nil -- They shall remain
+			return false
+		else
+			return true
+		end
+	end
+
+	if pingInfo.Permanent then return false end
+
+	-- We remove every ping that is above 100 (oldest first) to avoid network overflows
+	if mustClear and idx < (count - 100) then
+		return true
+	end
+
+	if pingInfo.ExpiryTime and curTime > pingInfo.ExpiryTime then
+		return true
+	end
+
+	return false
+end
+
 local function clearDeadPings(newPing) -- newPing if there is one to avoid duplicates
 	local curTime = CurTime()
 	local count = #GameData.ActivePings
 	local mustClear = count > 100
-	for idx, pingInfo in ipairs(GameData.ActivePings) do
-		if newPing then
-			if not pingInfo.Permanent and pingInfo.Player == newPing.Player then
-				table.remove(GameData.ActivePings, idx)
-				continue
-			end
+	local idx = 0
+	while idx <= #GameData.ActivePings do
+		idx = idx + 1
+		local pingInfo = GameData.ActivePings[idx]
+		if not pingInfo then break end
 
-			if pingInfo.Entity and pingInfo.Entity == newPing.Entity then
-				table.remove(GameData.ActivePings, idx)
-				continue
-			end
-		end
-
-		if pingInfo.Entity and not IsValid(pingInfo.Entity) then
+		if shouldRemovePing(curTime, mustClear, idx, pingInfo, newPing) then
 			table.remove(GameData.ActivePings, idx)
-			continue
-		end
-
-		if pingInfo.Player and not IsValid(pingInfo.Player) then
-			if pingInfo.Permanent then
-				pingInfo.Player = nil -- They shall remain
-			else
-				table.remove(GameData.ActivePings, idx)
-			end
-			continue
-		end
-		if pingInfo.Permanent then continue end
-
-		-- We remove every ping that is above 100 (oldest first) to avoid network overflows
-		if mustClear and idx < (count - 100) then
-			table.remove(GameData.ActivePings, idx)
-			continue
-		end
-
-		if pingInfo.ExpiryTime and curTime > pingInfo.ExpiryTime then
-			table.remove(GameData.ActivePings, idx)
-			continue
+			idx = idx - 1 -- table.remove shifted all entries! so we must check the same index again!
 		end
 	end
 end
@@ -201,7 +214,7 @@ function PLAYER:SurvivorPing()
 
 	pingInfo.Player = self
 
-	if self:Team() == TEAM_SPECTATOR then
+	if pingInfo.Team == TEAM_SPECTATOR then
 		pingInfo.Type = "GHOST"
 		pingInfo.Position = trace.HitPos
 		pingInfo.ExpiryTime = 5
@@ -266,20 +279,22 @@ function PLAYER:SurvivorPing()
 		end
 	end
 
-	if typeCheck[pingInfo.Type] then
-		sayPrompt(self, typeCheck[pingInfo.Type])
-	elseif pingInfo.Type == "ITEM" and pingInfo.Entity then
-		local class = pingInfo.Entity:GetClass()
-		for _, v in pairs(SlashCoItems) do
-			local input = v.EntClass
-			if not input then
-				continue
-			end
+	if pingInfo.Team == TEAM_SURVIVOR then
+		if typeCheck[pingInfo.Type] then
+			sayPrompt(self, typeCheck[pingInfo.Type])
+		elseif pingInfo.Type == "ITEM" and pingInfo.Entity then
+			local class = pingInfo.Entity:GetClass()
+			for _, v in pairs(SlashCoItems) do
+				local input = v.EntClass
+				if not input then
+					continue
+				end
 
-			if v.EntClass == class then
-				sayPrompt(self, string.sub(input, 4))
-				pingInfo.Name = v.Name
-				break
+				if v.EntClass == class then
+					sayPrompt(self, string.sub(input, 4))
+					pingInfo.Name = v.Name
+					break
+				end
 			end
 		end
 	end
@@ -307,7 +322,7 @@ function PLAYER:SurvivorPing()
 		SlashCo.WriteOptional(pingInfo.Entity, net.WriteEntity)
 		SlashCo.WriteOptional(pingInfo.Position, net.WriteVector)
 
-		local players = team.GetPlayers(TEAM_SURVIVOR)
+		local players = team.GetPlayers(pingInfo.Team == TEAM_SPECTATOR and TEAM_SURVIVOR or pingInfo.Team)
 		table.Add(players, team.GetPlayers(TEAM_SPECTATOR))
 	net.Send(players)
 end

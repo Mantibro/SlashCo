@@ -525,6 +525,7 @@ timer.Create("SlashCo:SlasherAnger", 1, 0, function()
 	end
 
 	if hasCustomBackgroundMusic then return end
+	if GameData.HelicopterMusic then return end
 
 	local highestAnger = SlashCo.GetHighestSlasherAnger()
 	if (not backgroundMusic or backgroundMusic == "") and SlashCo.AudioSystem.ShouldPlayBackgroundMusic() then

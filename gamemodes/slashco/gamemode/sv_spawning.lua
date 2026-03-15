@@ -564,6 +564,11 @@ local function convertLegacyConfig(name, skip)
 	if istable(config.Generators) then
 		if isnumber(config.Generators.Count) then
 			SlashCo.SetGeneratorsToSpawn(config.Generators.Count)
+
+			if (SlashCo.Generators > config.Generators.Count and (istable(config.Generators.Spawnpoints) and #config.Generators.Spawnpoints >= SlashCo.Generators)) then
+				print("[SlashCo] Ignored legacy config generator count to enforce default of " .. tostring(SlashCo.Generators))
+				SlashCo.SetGeneratorsToSpawn(SlashCo.Generators)
+			end
 		end
 
 		if isnumber(config.Generators.Needed) then
@@ -669,14 +674,14 @@ function SlashCo.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	-- Check if the Map has forced the generator count.
 	if SlashCo.GetGeneratorsNeeded() == SlashCo.GensNeeded and SlashCo.GetGeneratorsToSpawn() == SlashCo.Generators then
 		-- It did not- let's modify it
-		local totalGens = SlashCo.GensNeeded
+		local additionalGens = 0
 		if additionalSurvivors > 0 then
-			totalGens = totalGens + math.floor(additionalSurvivors / GameData.BaseMaxSurvivors) -- For every 6 additional survivors, there will be one more gen.
+			additionalGens = math.floor(additionalSurvivors / GameData.BaseMaxSurvivors) -- For every 6 additional survivors, there will be one more gen.
 		end
 
-		print("Spawning a total of " .. totalGens .. " generators (additional survivors: " .. additionalSurvivors .. ")")
-		SlashCo.SetGeneratorsNeeded(totalGens)
-		SlashCo.SetGeneratorsToSpawn(totalGens)
+		print("Spawning " .. additionalGens .. " additional generators (additional survivors: " .. additionalSurvivors .. ")")
+		SlashCo.SetGeneratorsNeeded(SlashCo.GensNeeded + additionalGens)
+		SlashCo.SetGeneratorsToSpawn(SlashCo.Generators + additionalGens)
 	end
 
 	if totalSurvivors > 4 then

@@ -643,6 +643,7 @@ SlashCo.LangTable["points_quickescape"] = "[%s] QUICK ESCAPE"
 SlashCo.LangTable["points_slowescape"] = "[%s] SLOW ESCAPE"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] DOING YOUR JOB"
+SlashCo.LangTable["points_generator"] = "[%s] FOUND GENERATORS"
 
 -- Documents
 

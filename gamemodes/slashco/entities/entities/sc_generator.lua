@@ -31,6 +31,13 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "CansRemaining")
 end
 
+function ENT:OnPing(ply)
+	if self.WasDiscovered then return end
+
+	self.WasDiscovered = true
+	ply:AddRoundPoints("generator") -- give them a reward for finding it as the first person
+end
+
 if CLIENT then
 	local lightAng = Angle(0, 0, 180)
 	local screenAng = Angle(0, 180, 90)

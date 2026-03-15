@@ -306,6 +306,11 @@ local function slasherButtons(ply, button)
 		ply:SlasherFunction("OnSpecialAbilityFire", lagTrace(ply))
 		return
 	end --Special
+	
+	if SlashCo.IsKeyPressed("PING", ply, button) then
+		ply:SurvivorPing()
+		return
+	end
 end
 
 function SlashCo.GetSpectatableSet()
@@ -369,19 +374,6 @@ hook.Add("OnPlayerChangedTeam", "SlashCo:OnPlayerChangedTeam", function(ply, old
 
 	--Ready Message
 	SlashCo.BroadcastGlobalData()
-end)
-
---[[
-	ToDo
-
-	We use PlayerChangedTeam here because OnPlayerChangedTeam is deprecated.
-	BUT the issue with PlayerChangedTeam is that we might be calling Player:SetTeam when we call ply:Spawn so we could enter a infinite loop.
-	Additionally as mentioned, PlayerChangedTeam is called when Player:SetTeam is used, and the logic might not like that.
-]]
-hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, oldTeam, newTeam)
-	if newTeam == TEAM_SURVIVOR then
-		ply.WasSurvivor = true -- At some point this player was a survivor.
-	end
 end)
 
 hook.Add("InitPostEntity", "SlashCo:InitPostEntity", function()
@@ -542,27 +534,28 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 	end)
 end)
 
-hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, old, new)
+hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, oldTeam, newTeam)
 	if CLIENT then
 		return
 	end
 
 	SlashCo.LoadPlayerFromDatabase(ply)
 
-	if new == TEAM_SURVIVOR then
+	if newTeam == TEAM_SURVIVOR then
 		ply.Lives = 1
+		ply.WasSurvivor = true -- At some point this player was a survivor.
 	end
 
-	if new == TEAM_LOBBY and team.NumPlayers(TEAM_LOBBY) > 5 then
+	if newTeam == TEAM_LOBBY and team.NumPlayers(TEAM_LOBBY) > 5 then
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()
 	end
 
-	if old == TEAM_LOBBY then
+	if oldTeam == TEAM_LOBBY then
 		SlashCo.SetLobbyPlayerReadyState(ply, 0)
 	end
 
-	if old == TEAM_SURVIVOR then
+	if oldTeam == TEAM_SURVIVOR then
 		ply:SetNW2Bool("DynamicFlashlight", false)
 	end
 
