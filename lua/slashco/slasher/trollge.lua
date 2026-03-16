@@ -445,7 +445,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	if slasher.ClawCooldown < 0.01 and not slasher:GetNWBool("TrollgeTransition") then
+	if slasher.ClawCooldown < 0.01 and not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeDashFinish") then
 		slasher:SetNWBool("TrollgeSlashing", false)
 		timer.Remove("TrollgeSlashDecay")
 
