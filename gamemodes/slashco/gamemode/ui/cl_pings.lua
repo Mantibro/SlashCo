@@ -124,7 +124,7 @@ hook.Add("SlashCo:DrawHUD", "SlashCo:PingDisplay", function()
 		local pingInfo = GameData.ActivePings[idx]
 		if not pingInfo then break end
 
-		if (pingInfo.Team ~= TEAM_SPECTATOR and plyTeam == TEAM_SURVIVOR) and (plyTeam ~= TEAM_SPECTATOR and pingInfo.Team ~= plyTeam) then
+		if (pingInfo.Team ~= TEAM_SPECTATOR and plyTeam ~= TEAM_SURVIVOR) and (plyTeam ~= TEAM_SPECTATOR and pingInfo.Team ~= plyTeam) then
 			continue
 		end
 
