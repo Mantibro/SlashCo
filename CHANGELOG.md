@@ -18,6 +18,8 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 [+] Added Late Join support allowing people to join as survivors in the first 3 minutes of a round.<br>
 [+] Added support for stacking effects<br>
 -> Previously, one item's effect would have overwritten the currently active effect<br>
+[+] Maps will always spawn 3 generators now. The amount needed to complete the objective increase every 6 survivors.<br>
+[+] Added point reward for being the first person to find / ping a generator<br>
 [+] Added a fuel display to the generators allowing one to see how much fuel is missing<br>
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/c467fc49-9bfe-4372-8559-ff618ced4eac" />
 
@@ -84,6 +86,7 @@ You can find perks in the same terminal as documents and equip them depending on
 <img width="1086" height="708" alt="image" src="https://i.imgur.com/VEHLo8L.png" />
 
 ## Slasher Changes
+[+] Gave slashers the ability to ping like survivors<br>
 [#] Moved all slasher sounds into `slashco/slasher/'slashername'`<br>
 [#] Almost all slashers are in some form dynamically balanced based of the survivor count!<br>
 [#] Most slashers have been switched to use the new anger system<br>
@@ -179,6 +182,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] On contact with a Balkan Boost, instantly change to stage 3.<br>
 [#] Switched all sounds to use the new audiosystem.<br>
 [#] Optimized his code slightly<br>
+[#] Blocked his claw attack while being freezed after using the dash.<br>
 
 ### Covenant
 [+] Added Covenant as a playable slasher during the selection screen.<br>
