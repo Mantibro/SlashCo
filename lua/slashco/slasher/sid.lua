@@ -278,6 +278,8 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if not slasher:GetNWBool("SidGun") and (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
+		if slasher:GetNWBool("SidEatingSurvCookie") then return end
+
 		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
 		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
 
@@ -332,6 +334,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	end
 
 	if not slasher:GetNWBool("SidGun") then
+		if slasher:GetNWBool("SidEatingSurvCookie") then return end
+
 		SlashCo.Jumpscare(slasher, target)
 		return
 	end
