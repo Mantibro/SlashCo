@@ -22,6 +22,7 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	local pacified = GameData.LocalPlayer:GetNWBool("DemonPacified")
 	local blinded = GameData.LocalPlayer:GetNWBool("SlasherBlinded")
 
+	surface.SetDrawColor(255, 255, 255, 255)
 	if blinded then
 		local black = Material("models/slashco/slashers/trollge/body")
 		surface.SetMaterial(black)
@@ -36,8 +37,7 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	--Activating the Beacon
 	for _, v in ipairs(ents.FindByClass("sc_activebeacon")) do
 		if v:GetArmingBeacon() then
-			local pos = (v:GetPos()):ToScreen()
-
+			local pos = v:GetPos():ToScreen()
 			if pos.visible then
 				surface.SetMaterial(BeaconIcon)
 				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)

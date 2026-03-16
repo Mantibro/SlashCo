@@ -393,18 +393,19 @@ function SLASHER.InitHud(_, hud)
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		end
 
+		surface.SetDrawColor(255, 255, 255, 255)
+		surface.SetMaterial(surveyNoticeIcon)
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if not survivor:GetNWBool("SurvivorWatcherSurveyed") then
-				return
+				continue
 			end
 
 			if not survivor:CanBeSeen() then
 				continue
 			end
 
-			local pos = (survivor:GetPos() + Vector(0, 0, 60)):ToScreen()
+			local pos = survivor:EyePos():ToScreen()
 			if pos.visible then
-				surface.SetMaterial(surveyNoticeIcon)
 				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 			end
 		end

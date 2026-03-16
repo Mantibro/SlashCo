@@ -155,12 +155,11 @@ else
 				self.Light2:Remove()
 				self.Light2 = nil
 			end
+
+			return
 		end
 
-		if self:GetArmingBeacon() then return end
-
 		rotate = rotate + (FrameTime() * 300)
-
 		if self.Light then
 			local position = self:GetPos() + Vector(0,0,20)
 

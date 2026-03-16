@@ -186,12 +186,43 @@ function PLAYER:ClearEffects()
 	end
 end
 
+-- Collects all things that have this value for a combined result. This sucks... ToDo: Finish/Rework this!
+local itemSlots = {"item", "item2"}
+function PLAYER:StackedItemValue(valueName, initialValue)
+	local value = 0
+	local activePerks = SlashCo.GetActivePerks(self)
+	for _, perk in ipairs(activePerks) do
+		local perkValue = activePerks[perk][valueName]
+		if perkValue ~= nil then
+			value = value + AddItemValue(perkValue)
+		end
+	end
+
+	local effects = GetEffects(self)
+	for _, effectName in ipairs(effects) do
+		if SlashCoEffects[effectName] and SlashCoEffects[effectName][valueName] then
+			value = value + AddItemValue(SlashCoEffects[effectName][valueName])
+		end
+	end
+
+	for _, slot in ipairs(itemSlots) do
+		local item = self:GetItem(slot)
+		if SlashCoItems[item] and SlashCoItems[item][valueName] then
+			value = value + AddItemValue(SlashCoItems[item][valueName])
+		end
+	end
+
+	return value == 0 and initialValue or math.max(value, 0.1)
+end
+
 ---check the <valueName> value of a player's item in a specific slot
 --this doesn't include a team check because we assume that it's in a survivor-only context
 function PLAYER:ItemValue(valueName, fallback, isSecondary)
 	local effects = GetEffects(self)
-	if SlashCoEffects[effect] and SlashCoEffects[effect][valueName] then
-		return SlashCoEffects[effect][valueName]
+	for _, effectName in ipairs(effects) do
+		if SlashCoEffects[effectName] and SlashCoEffects[effectName][valueName] then
+			return SlashCoEffects[effectName][valueName]
+		end
 	end
 
 	local slot = isSecondary and "item2" or "item"
