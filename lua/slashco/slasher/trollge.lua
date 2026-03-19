@@ -188,7 +188,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		end)
 	end
 
-	if not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage2") and SlashCo.CurRound.GameProgress > (10 - (Blood / 2)) and stage == 1 then
+	if not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage2") and SlashCo.CurRound.GameProgress > (10 - (Blood / 2)) and stage == 1 
+		or not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage2") and slasher.TrollgeBlood == 8 and SlashCo.CurRound.DistressBeaconUsed then
+
 		slasher:SetNWBool("TrollgeTransition", true)
 		slasher:Freeze(true)
 		SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)

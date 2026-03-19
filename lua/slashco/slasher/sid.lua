@@ -202,6 +202,23 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	--]]
 
+	if Cookies >= 3 and SlashCo.CurRound.DistressBeaconUsed then
+		if not slasher.CanUseGun then
+			slasher:SetNWBool("SidCanUseGun", true)
+			slasher.CanUseGun = true
+		end
+
+		if not slasher:GetNWBool("SidGunRage") then
+			slasher:SetNWBool("SidGunRage", true)
+
+			if slasher:GetNWBool("SidGunEquipped") then
+				if not slasher:GetNWBool("SidGunAimed") and not slasher:GetNWBool("SidGunAiming") then
+					slasher:SetRunSpeed(SLASHER.ChaseSpeed)
+				end
+			end
+		end
+	end
+
 	slasher:SetEyeSight(final_eyesight)
 	slasher:SetPerception(final_perception)
 end
@@ -282,7 +299,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
 		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
-
 		local cookie = ents.Create("prop_physics")
 
 		cookie:SetMoveType(MOVETYPE_NONE)
@@ -294,6 +310,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 		slasher:SetNWBool("SidEatingSurvCookie", true)
 		slasher:Freeze(true)
+		SlashCo.StopChase(slasher)
+
 		local idx = math.random(1, 2)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/sid/sid_cookie" .. idx .. ".mp3",
@@ -618,6 +636,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end
 
 	EatCookie(slasher, target)
+	SlashCo.StopChase(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
