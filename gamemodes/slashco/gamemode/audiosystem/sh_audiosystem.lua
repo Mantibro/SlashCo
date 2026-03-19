@@ -136,12 +136,17 @@ function SlashCo.AudioSystem.GetSoundFileFromSource(name)
 	if not info then return end
 	if not info.sound then return end
 
+	local soundFile = nil
 	if isstring(info.sound) then
-		return info.sound
+		soundFile = info.sound
 	end
 
 	if istable(info.sound) then
-		return info.sound[math.random(1, #info.sound)]
+		soundFile = info.sound[math.random(1, #info.sound)]
+	end
+	
+	if soundFile then
+		return (soundFile:StartsWith("(") or soundFile:StartsWith(")")) and soundFile:sub(2) or soundFile
 	end
 end
 
