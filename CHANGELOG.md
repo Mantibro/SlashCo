@@ -125,6 +125,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] When Princess eats/kills a player or baby, they will be stunned for 4.5 seconds.<br>
 
 ### Abomignat
+[+] Added 3 seconds of cooldown to his abilities after leaving crawling state.<br>
 [#] Increased Prowl speed (150 - 200) and Chase speed (293 - 325).<br>
 [#] Increased Chase duration (5s - 7s).<br>
 [#] Increased Lunge damage (50 - 100).<br>
@@ -143,13 +144,12 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Now he can freely move and aim when holding a survivor.<br>
 
 ### Dolphinman
-[+] Added a breathing sound when hiding.<br>
 [+] Added proper footstep sounds<br>
+[+] Gains 20% hunt power when killing without hunting.<br>
+[+] Starts gaining hunt power when the escape helicopter is called.<br>
 [#] Increased KillDelay (0.25s - 0.50s).<br>
 [#] Decreased hunt power gain on kill when hunting (25% - 15%).<br>
 [#] Decreased hunt power loss on standing (50% - 25%).<br>
-[#] Gains 20% hunt power when killing without hunting.<br>
-[#] Starts gaining hunt power when the escape helicopter is called.<br>
 [#] Eyesight decreased. (3 - 2)<br>
 
 ### Freesmiley
@@ -166,6 +166,7 @@ You can find perks in the same terminal as documents and equip them depending on
 ### Sid
 [+] Added the ability to grab a cookie from a survivor's hand.<br>
 [+] Added a new animation for the cookie ability.<br>
+[+] Sid will activate his rage if the beacon is used and he eated at least 3 cookies.<br>
 [#] Decreased KillDelay (7s - 5s)<br>
 
 ### Thirsty
@@ -178,6 +179,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [+] Added footstep sounds from SlashCo VR<br>
 [+] Added background music from SlashCo VR<br>
 [+] Added two sounds for when he's blinded by pocket sand<br>
+[+] Trollge will switch to stage 3 if the beacon is used and he collected max blood.<br>
 [#] Can see the halos of Balkan Boost holders.<br>
 [#] On contact with a Balkan Boost, instantly change to stage 3.<br>
 [#] Switched all sounds to use the new audiosystem.<br>
