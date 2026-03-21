@@ -143,6 +143,9 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Decreased Chase cooldown (8s - 5s).<br>
 [#] Now he can freely move and aim when holding a survivor.<br>
 
+### Criminal
+[+] Added background music.<br>
+
 ### Dolphinman
 [+] Added proper footstep sounds<br>
 [+] Gains 20% hunt power when killing without hunting.<br>

@@ -29,6 +29,7 @@ SLASHER.ProTip = "Criminal_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
+SLASHER.CustomBackgroundMusic = true
 -- Balancement Vars
 SLASHER.ChaseSpeedDecreaseInRageDiv = 4
 SLASHER.ChaseSpeedDecreaseDiv = 5
@@ -68,7 +69,6 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local ClonTimer = slasher.ClonDuration or 0 --Cloning Duration
-
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
 
@@ -112,6 +112,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_eyesight = 6
 	end
 
+	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress >= 7 then
+		SlashCo.AudioSystem.EnableBackgroundMusic()
+		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/criminal/criminal_ambience.ogg", 1)
+	end
+
 	slasher:SetEyeSight(final_eyesight)
 	slasher:SetPerception(final_perception)
 end
@@ -121,11 +126,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
+	if slasher.ChaseActivationCooldown > 0 then return end
 
-	if slasher.ChaseActivationCooldown > 0 then
-		return
-	end
 	slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
 
 	if slasher:GetNWBool("CriminalCloning") then
@@ -159,15 +161,9 @@ function SLASHER.OnMainAbilityFire()
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if not slasher:GetNWBool("CriminalCloning") then
-		return
-	end
-	if slasher:GetNWBool("CriminalRage") then
-		return
-	end
-	if SlashCo.CurRound.GameProgress < 7 then
-		return
-	end
+	if not slasher:GetNWBool("CriminalCloning") then return end
+	if slasher:GetNWBool("CriminalRage") then return end
+	if SlashCo.CurRound.GameProgress < 7 then return end
 
 	for i = 1, math.random(2 + SLASHER.AdditionalSpecialClones, 4 + SLASHER.AdditionalSpecialClones) do
 		local clone = ents.Create("sc_crimclone")
