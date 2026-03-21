@@ -68,7 +68,6 @@ function SLASHER.OnSpawn(slasher)
 	PlayBreathing(slasher)
 
 	slasher.AbomignatKills = 0
-
 	slasher.SlashCooldown = 0
 	slasher.FowardCharge = 0
 	slasher.LungeAntiSpam = 0
@@ -219,9 +218,7 @@ function SLASHER.HandleDOT(slasher, target)
 	end
 
 	timer.Create("AbomignatHit_" .. target:UserID(), 0.75, target.AbomignatProcs, function()
-		if not IsValid(target) or target:Team() == TEAM_SPECTATOR then
-			return
-		end
+		if not IsValid(target) or target:Team() == TEAM_SPECTATOR then return end
 
 		target:TakeDamage(3, slasher, slasher)
 
@@ -246,15 +243,9 @@ function SLASHER.HandleDOT(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
-	if slasher:GetNWBool("AbomignatCrawling") then
-		return
-	end
-	if slasher:GetNWBool("AbomignatSlashing") then
-		return
-	end
-	if slasher.SlashCooldown > 0 then
-		return
-	end
+	if slasher:GetNWBool("AbomignatCrawling") then return end
+	if slasher:GetNWBool("AbomignatSlashing") then return end
+	if slasher.SlashCooldown > 0 then return end
 
 	slasher:SetNWBool("AbomignatSlashing", true)
 	slasher.SlashCooldown = math.max(3 - SLASHER.CooldownReduction, 0)
@@ -292,9 +283,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		end)
 
 		if target:IsPlayer() then
-			if target:Team() ~= TEAM_SURVIVOR then
-				return
-			end
+			if target:Team() ~= TEAM_SURVIVOR then return end
 
 			SLASHER.HandleDOT(slasher, target)
 
@@ -326,6 +315,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("AbomignatCrawling") then
 		slasher:SetNWBool("AbomignatCrawling", false)
 		slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
+		slasher.SlashCooldown = 3
 
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", true)
@@ -333,21 +323,11 @@ function SLASHER.OnMainAbilityFire(slasher)
 		return
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
-	if slasher:GetNWBool("AbomignatSlashing") then
-		return
-	end
-	if slasher:GetNWBool("AbomignatLunging") then
-		return
-	end
-	if slasher:GetNWBool("AbomignatLungeFinish") then
-		return
-	end
-	if slasher.ChaseActivationCooldown > 0 then
-		return
-	end
+	if slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher:GetNWBool("AbomignatSlashing") then return end
+	if slasher:GetNWBool("AbomignatLunging") then return end
+	if slasher:GetNWBool("AbomignatLungeFinish") then return end
+	if slasher.ChaseActivationCooldown > 0 then return end
 
 	if not slasher:GetNWBool("AbomignatCrawling") then
 		slasher:SetNWBool("AbomignatCrawling", true)
@@ -359,17 +339,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if slasher:GetNWBool("AbomignatCrawling") then
-		return
-	end
+	if slasher:GetNWBool("AbomignatCrawling") then return end
+	if slasher.SlashCooldown > 0 then return end
 
-	if slasher.SlashCooldown > 0 then
-		return
-	end
 	slasher.SlashCooldown = 10 - SLASHER.CooldownReduction
 	slasher.FowardCharge = 8 + SLASHER.CooldownReduction
 	slasher.LungeAntiSpam = 0
-
 	slasher:Freeze(true)
 
 	slasher:SetNWBool("AbomignatLunging", true)
@@ -385,6 +360,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	slasher:SlasherHudFunc("ShakeControl", "F")
 
 	timer.Simple(1.75, function()
+		if not IsValid(slasher) then return end
+
 		if slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
