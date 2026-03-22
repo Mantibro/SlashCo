@@ -517,7 +517,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 						fadeIn = 0,
 					})
 					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/sid/sid_shot2.mp3",
+						soundPath = "slashco/slasher/sid/sid_shot_2.mp3",
 						identifier = "SidShot2",
 						minDistance = 700 * SlashCo.MapSize,
 						maxDistance = 1240 * SlashCo.MapSize,
