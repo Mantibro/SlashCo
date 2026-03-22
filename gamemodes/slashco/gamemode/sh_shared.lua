@@ -419,6 +419,8 @@ if CLIENT then
 		GameData.LocalSteamID64 = GameData.LocalPlayer:SteamID64()
 
 		SlashCo.LoadKeyboardBinds()
+
+		RunConsoleCommand("r_flushlod") -- RaphaelIT7: GMod has a lot of those checksum errors in our maps, always breaking something after every map change, so we flush just to avoid issues with models not rendering.
 	end
 else
 	local maxplayers = CreateConVar("slashco_maxplayers", tostring(GameData.BaseMaxPlayers), FCVAR_ARCHIVE, "The number of maximum players, by default 7. 6 survivors - 1 slasher", 1, 255)

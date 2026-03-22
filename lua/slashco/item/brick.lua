@@ -14,7 +14,7 @@ end
 
 function ITEM.OnUse(ply)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Miss"),
+		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Single"),
 		identifier = "BrickThrow",
 		minDistance = 400,
 		maxDistance = 600,

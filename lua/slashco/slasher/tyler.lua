@@ -97,7 +97,7 @@ function TylerSwitchForm(slasher, newForm)
 		SLASHER.HideTime(slasher)
 		if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and slasher.WasDestroyerOnce then -- If its already playing, we don't need to start it again.
 			SlashCo.AudioSystem.EnableBackgroundMusic()
-			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.Clamp(100 - anger, 0, 100) / 100) -- Make the background music getting more silent the more anger he has.
+			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.max(math.Clamp(100 - anger, 0, 100) / 100), 0.1) -- Make the background music getting more silent the more anger he has.
 		end
 
 		slasher:SetNW2Bool("Slasher:NoFootsteps", false)
@@ -125,7 +125,7 @@ function SLASHER.Precache()
 end
 
 function SLASHER.HideTime(slasher)
-	slasher.TylerTime = math.max((30 + SlashCo.MapSize * 20) - ((SlashCo.GetSlasherAnger(slasher) / 1.5) / SlashCo.MapSize) - team.NumPlayers(TEAM_SURVIVOR), SLASHER.MinTylerTime)
+	slasher.TylerTime = (100 + SLASHER.MinTylerTime + ((team.NumPlayers(TEAM_SURVIVOR) + SlashCo.MapSize) * 5)) - SlashCo.GetSlasherAnger(slasher)
 	-- print("Tyler transformation time: " .. slasher.TylerTime)
 end
 
@@ -237,7 +237,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		-- We let the background music fade out, this way players know, Tyler is somewhere as the creator, and the players know if he's close to entering destroyer.
-		SlashCo.AudioSystem.SetBackgroundMusicVolume(math.Round((math.Clamp(100 - anger, 0, 100) / 100) * math.Clamp(1 - (TimeAsTylerForm / slasher.TylerTime), 0, 1), 3))
+		SlashCo.AudioSystem.SetBackgroundMusicVolume(math.Round(math.max(math.Clamp(100 - anger, 0, 100) / 100, 0.1) * math.Clamp(1 - (TimeAsTylerForm / slasher.TylerTime), 0, 1), 3))
 
 		--Time ran out
 		if not isCreating and (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
@@ -426,7 +426,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanSeePlayers(true)
 		final_perception = 2.0
 
-		if TimeAsTylerForm > math.max((((3 + SlashCo.MapSize) / 4) * anger), SLASHER.MinChase) and not endlessChase then
+		if TimeAsTylerForm > math.max((((2 + SlashCo.MapSize) / 1.5) * anger * (0.5 + (team.NumPlayers(TEAM_SURVIVOR) / 10))), SLASHER.MinChase) and not endlessChase then
 			TylerSwitchForm(slasher, TYLER_SPECTER)
 		end
 	end

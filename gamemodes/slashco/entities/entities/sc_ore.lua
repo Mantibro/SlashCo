@@ -34,15 +34,35 @@ end
 
 if SERVER then
 	function ENT:Use(activator)
-		if activator:Team() == TEAM_SURVIVOR then
-			if activator:GetNWBool("SurvivorMining") then return end
+		if activator:Team() ~= TEAM_SURVIVOR then return end
+		if activator:GetNWBool("SurvivorMining") then return end
+		if IsValid(self.MiningPlayer) and self.MiningPlayer == TEAM_SURVIVOR then return end
 
-			activator:SetNWBool("SurvivorMining", true)
-	        activator:Freeze(true)
+		activator:SetNWBool("SurvivorMining", true)
+	    activator:Freeze(true)
+	    activator.MiningOre = self
+	    self.MiningPlayer = activator
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/speedrunner/speedrunner_mining.mp3",
+			identifier = "SurvivorMining",
+			minDistance = 400,
+			maxDistance = 800,
+			entity = activator,
+			volume = 2,
+			fadeIn = 0,
+		})
+
+		timer.Create("Mining-" .. activator:UserID(), 10, 1, function()
+			if not IsValid(activator) then return end
+
+			activator:SetNWBool("SurvivorMining", false)
+			activator:Freeze(false)
+			activator:AddEffect("Speed", 10)
 
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/speedrunner/speedrunner_mining.mp3",
-				identifier = "SurvivorMining",
+				soundPath = "slashco/slasher/speedrunner/speedrunner_mined.mp3",
+				identifier = "SurvivorMined",
 				minDistance = 400,
 				maxDistance = 800,
 				entity = activator,
@@ -50,33 +70,29 @@ if SERVER then
 				fadeIn = 0,
 			})
 
-			timer.Simple(10, function()
-				if not IsValid(activator) then return end
+			if not IsValid(self) then return end
 
-				activator:SetNWBool("SurvivorMining", false)
-				activator:Freeze(false)
-				activator:AddEffect("Speed", 10)
+			SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
+			self:Remove()
+		end)
+	end
 
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/speedrunner/speedrunner_mined.mp3",
-					identifier = "SurvivorMined",
-					minDistance = 400,
-					maxDistance = 800,
-					entity = activator,
-					volume = 2,
-					fadeIn = 0,
-				})
+	local function CancelMining(ply)
+		if not activator:GetNWBool("SurvivorMining") then return end
 
-				if not IsValid(self) then return end
+		timer.Remove("Mining-" .. activator:UserID())
+		activator:Freeze(false)
+		activator:SetNWBool("SurvivorMining", false)
 
-				SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
-				self:Remove()
-			end)
+		if IsValid(activator.MiningOre) then
+			activator.MiningOre.MiningPlayer = nil
+			activator.MiningOre = nil
 		end
 	end
-end
 
-if CLIENT then
+	hook.Add("PlayerDeath", "SlashCo:CancelMining", CancelMining)
+	hook.Add("PlayerSilentDeath", "SlashCo:CancelMining", CancelMining)
+else
 	function ENT:Draw()
 	    local curTime = CurTime()
 	    local tr = self:GetPos()
@@ -94,6 +110,4 @@ if CLIENT then
 
 		self:DrawModel()
 	end
-
-	return
 end

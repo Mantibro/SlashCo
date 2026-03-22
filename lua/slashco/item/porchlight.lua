@@ -9,7 +9,7 @@ ITEM.CamPos = Vector(150, 0, 0)
 
 function ITEM.OnUse(ply)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Miss"),
+		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Single"),
 		identifier = "PorchLightUse",
 		minDistance = 400,
 		maxDistance = 600,

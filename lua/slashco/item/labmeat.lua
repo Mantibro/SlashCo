@@ -37,7 +37,7 @@ function ITEM.OnUse(ply)
 
 	local idx = math.random(1, 2)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/amogus_transform" .. idx .. ".mp3",
+		soundPath = "slashco/slasher/amogus/amogus_transform" .. idx .. ".mp3",
 		identifier = "LabMeatUse2" .. idx,
 		minDistance = 400,
 		maxDistance = 600,

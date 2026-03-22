@@ -40,22 +40,19 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.TackleFail(slasher)
-	if IsValid(slasher) then
-		if slasher.TackledPlayer == nil then
-			slasher:SetNWBool("CloakTackleFail", true)
-			slasher:Freeze(true)
+	if not IsValid(slasher) then return end
+	if slasher.TackledPlayer ~= nil then return end
+			
+	slasher:SetNWBool("CloakTackleFail", true)
+	slasher:Freeze(true)
 
-			timer.Simple(2.5, function()
-				if not IsValid(slasher) then
-					return
-				end
+	timer.Simple(2.5, function()
+		if not IsValid(slasher) then return end
 
-				slasher:SetNWBool("CloakTackle", false)
-				slasher:SetNWBool("CloakTackleFail", false)
-				slasher:Freeze(false)
-			end)
-		end
-	end
+		slasher:SetNWBool("CloakTackle", false)
+		slasher:SetNWBool("CloakTackleFail", false)
+		slasher:Freeze(false)
+	end)
 end
 
 local SURVIVOR_STUN_TIME = 7.0
@@ -80,6 +77,8 @@ function SLASHER.OnTickBehaviour(slasher, target)
 			slasher:SetPos(slasher.TackledPlayer:GetPos() + Vector(0, 0, 80))
 			slasher.TackledPlayer = nil
 			timer.Simple(2.0, function()
+				if not IsValid(slasher) then return end
+
 				slasher:Freeze(false)
 			end)
 		end
@@ -101,34 +100,35 @@ function SLASHER.OnTickBehaviour(slasher, target)
 					ply:SetNWBool("MarkedByCloaks", true)
 					ply.SlashCo_PushDir = (ply:GetPos() - slasher:GetPos()):GetNormalized()
 					timer.Simple(SURVIVOR_STUN_TIME, function()
-						if IsValid(ply) then
-							ply:SetNWBool("SurvivorTackled", false)
-							ply:Freeze(false)
-							if IsValid(slasher) and slasher.TackledPlayer == ply then
-								slasher.TackledPlayer = nil
-							end
-							if ply.SlashCo_PushDir then
-								local pushStrength = 400
-								ply:SetVelocity(ply.SlashCo_PushDir * pushStrength + Vector(0,0,120))
-								ply.SlashCo_PushDir = nil
-							end
+						if not IsValid(ply) then return end
+						
+						ply:SetNWBool("SurvivorTackled", false)
+						ply:Freeze(false)
+						if IsValid(slasher) and slasher.TackledPlayer == ply then
+							slasher.TackledPlayer = nil
+						end
+						
+						if ply.SlashCo_PushDir then
+							local pushStrength = 400
+							ply:SetVelocity(ply.SlashCo_PushDir * pushStrength + Vector(0,0,120))
+							ply.SlashCo_PushDir = nil
 						end
 					end)
 					
 					timer.Simple(10.0, function()
-						if IsValid(ply) then
-							ply:SetNWBool("MarkedByCloaks", false)
-						end
+						if not IsValid(ply) then return end
+						
+						ply:SetNWBool("MarkedByCloaks", false)
 					end)
 
 					-- Stun slasher
 					slasher:Freeze(true)
 					slasher:SetImpervious(true)
 					timer.Simple(SLASHER_STUN_TIME, function()
-						if IsValid(slasher) then
-							slasher:Freeze(false)
-							slasher:SetImpervious(false)
-						end
+						if not IsValid(slasher) then return end
+						
+						slasher:Freeze(false)
+						slasher:SetImpervious(false)
 					end)
 
 					break
@@ -169,7 +169,10 @@ function SLASHER.OnPrimaryFire(slasher)
 		slasher:Freeze(true)
 
 		timer.Simple(0.8, function()
+			if not IsValid(slasher) then return end
+
 			slasher:SetNWBool("CloakTackling", false)
+			slasher:Freeze(false) -- RaphaelIT7: Somehow in one round a player managed to get permanently frozen?
 			--SLASHER.TackleFail(slasher)
 		end)
 	end

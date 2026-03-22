@@ -122,7 +122,7 @@ hook.Add("PlayerCanHearPlayersVoice", "SlashCo:VoiceChat", function(listener, ta
 end)
 
 hook.Add("GetFallDamage", "RealisticDamage", function(_, speed)
-	return speed / 16
+	return speed / 24
 end)
 
 hook.Add("PlayerCanSeePlayersChat", "SlashCo:TeamChat", function(_, _, listener, talker)
