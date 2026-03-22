@@ -77,7 +77,7 @@ if SERVER then
 		end)
 	end
 
-	local function CancelMining(ply)
+	local function CancelMining(activator)
 		if not activator:GetNWBool("SurvivorMining") then return end
 
 		timer.Remove("Mining-" .. activator:UserID())
