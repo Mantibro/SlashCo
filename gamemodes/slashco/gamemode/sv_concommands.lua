@@ -635,8 +635,9 @@ end
 local function SlasherIDToSlasher(slasherID)
 	local slasher = SlashCoSlashers[slasherID]
 	if not slasher then
+		slasherID = string.lower(tostring(slasherID))
 		for slasherName, slasherTbl in pairs(SlashCoSlashers) do
-			if slasherTbl.Name == slasherID or tostring(slasherTbl.ID) == slasherID then
+			if string.lower(slasherTbl.Name) == slasherID or tostring(slasherTbl.ID) == slasherID then
 				slasher = slasherTbl
 				break
 			end
