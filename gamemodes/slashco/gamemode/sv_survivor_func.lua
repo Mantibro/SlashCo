@@ -244,22 +244,22 @@ function PLAYER:SurvivorPing()
 			pingInfo.Type = "BASKETBALL"
 			pingInfo.ExpiryTime = 15
 		elseif look:IsPlayer() then
+			pingInfo.Position = trace.HitPos
+			pingInfo.ExpiryTime = 5
 			if look:Team() == TEAM_SURVIVOR then
 				pingInfo.Type = "SURVIVOR"
 				pingInfo.SurvivorName = string.upper(look:Nick())
-				pingInfo.Position = trace.HitPos
-				pingInfo.ExpiryTime = 5
 			elseif look:Team() == TEAM_SLASHER then
 				if not look:GetNWBool("AmogusSurvivorDisguise") then
 					pingInfo.Type = "SLASHER"
-					pingInfo.Position = trace.HitPos
-					pingInfo.ExpiryTime = 5
 				else
 					pingInfo.Type = "SURVIVOR"
 					pingInfo.SurvivorName = string.upper(table.Random(team.GetPlayers(TEAM_SURVIVOR)):Nick())
-					pingInfo.Position = trace.HitPos
-					pingInfo.ExpiryTime = 5
 				end
+			else
+				pingInfo.Type = "PLAYER"
+				pingInfo.Position = trace.HitPos
+				pingInfo.SurvivorName = string.upper(look:Nick())
 			end
 		else
 			pingInfo.Type = "LOOK AT THIS"
