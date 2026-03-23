@@ -255,6 +255,9 @@ if SERVER then
 		elseif SatPlayers[6] == activator then
 			pos = self:LocalToWorld(Vector(24.5, -24.25, 44.5))
 			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
+		elseif #SatPlayers > 6 then -- wacky solution
+			pos = self:LocalToWorld(Vector(24.5, -24.25, 44.5))
+			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
 		end
 
 		vehicle:SetPos(pos)
