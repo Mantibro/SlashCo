@@ -240,9 +240,43 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	end)
 end
 
+function SLASHER.OnHitByPocketSand(slasher, ply)
+	if slasher:GetNWBool("SpeedrunnerSacrificeTwo") then return end
+
+	slasher:SetNWBool("SpeedrunnerStunSand", true)
+	slasher:Freeze(true)
+	timer.Simple(9, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("SpeedrunnerStunSand", false)
+		slasher:Freeze(false)
+	end)
+end
+
+function SLASHER.OnHitByTeslaCoil(slasher)
+	if slasher:GetNWBool("SpeedrunnerSacrificeTwo") then return end
+
+	slasher:SetNWBool("SpeedrunnerStunTesla", true)
+	slasher:Freeze(true)
+	timer.Simple(16, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("SpeedrunnerStunTesla", false)
+		slasher:Freeze(false)
+	end)
+end
+
 function SLASHER.Animator(ply, veloc)
 	local move_vel = ply:WorldToLocal(veloc + ply:GetPos())
 	local anim_vel = veloc:Length()
+
+	local mining = ply:GetNWBool("SpeedrunnerMining")
+	local stun_sand = ply:GetNWBool("SpeedrunnerStunSand")
+	local stun_tesla = ply:GetNWBool("SpeedrunnerStunTesla")
+
+	if not mining and not stun_sand and not stun_tesla then
+		ply.anim_antispam = false
+	end
 
 	if ply:IsOnGround() then
 		if anim_vel > 1 then
@@ -265,6 +299,30 @@ function SLASHER.Animator(ply, veloc)
 
 	if ply:GetNWBool("SpeedrunnerSacrificeTwo") then
 		ply.CalcSeqOverride = ply:LookupSequence("ascended")
+	end
+
+	if mining then
+		ply.CalcSeqOverride = ply:LookupSequence("mining")
+		if ply.anim_antispam == nil or ply.anim_antispam == false then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	end
+
+	if stun_sand then
+		ply.CalcSeqOverride = ply:LookupSequence("stun_1")
+		if ply.anim_antispam == nil or ply.anim_antispam == false then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	end
+
+	if stun_tesla then
+		ply.CalcSeqOverride = ply:LookupSequence("stun_2")
+		if ply.anim_antispam == nil or ply.anim_antispam == false then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
