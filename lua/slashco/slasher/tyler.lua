@@ -349,6 +349,21 @@ function SLASHER.OnTickBehaviour(slasher)
 		else
 			SlashCo.AudioSystem.StopSound("TylerAlarm", 0.5, slasher)
 
+			if endlessChase then
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/tyler/tyler_whatsgood.ogg",
+					fallbackSoundPath = "slashco/slasher/tyler/tyler_destroyer_theme.mp3",
+					boundConVar = "slashco_tyler_endless_chase_music",
+					identifier = "TylerTheme",
+					minDistance = 15000,
+					maxDistance = 20000,
+					looping = true,
+					entity = slasher,
+					volume = 0.6,
+					fadeIn = 1,
+				})
+			end
+
 			if anger < 50 then -- switch up songs if his anger is below 50.
 				SlashCo.AudioSystem.PlaySound({
 					soundPath = "slashco/slasher/tyler/tyler_destroyer_low.ogg",
@@ -361,20 +376,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					fadeIn = 1,
 				})
 			else
-				if endlessChase then
-					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/tyler/tyler_whatsgood.ogg",
-						fallbackSoundPath = "slashco/slasher/tyler/tyler_destroyer_theme.mp3",
-						boundConVar = "slashco_tyler_endless_chase_music",
-						identifier = "TylerTheme",
-						minDistance = 15000,
-						maxDistance = 20000,
-						looping = true,
-						entity = slasher,
-						volume = 0.6,
-						fadeIn = 1,
-					})
-				else
+				if not endlessChase then
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "slashco/slasher/tyler/tyler_destroyer_theme.mp3",
 						identifier = "TylerTheme",
