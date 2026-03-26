@@ -241,9 +241,7 @@ function SLASHER.OnKillPlayer(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if not IsValid(target) or not target:IsPlayer() then
-		return
-	end
+	if not IsValid(target) or not target:IsPlayer() then return end
 
 	if target ~= slasher.TargetPlayer then
 		slasher:ChatPrint("You can only kill your Prey.")
@@ -258,9 +256,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.CanBeSeen(ply)
-	if SERVER then
-		return
-	end
+	if SERVER then return end
 
 	if ply:IsVisible() and not ply:GetNWBool("ManspiderNested") then
 		return true
@@ -270,13 +266,8 @@ end
 function SLASHER.OnSecondaryFire(slasher)
 	local target = slasher:GetEyeTrace().Entity
 
-	if not target:IsPlayer() then
-		return
-	end
-
-	if target ~= slasher.TargetPlayer then
-		return
-	end
+	if not target:IsPlayer() then return end
+	if target ~= slasher.TargetPlayer then return end
 
 	SlashCo.StartChaseMode(slasher)
 end
@@ -423,9 +414,7 @@ function SLASHER.Move(ply, mv)
 				ply:SetNWBool("ManspiderLeaping", false)
 				mv:SetOrigin(vectoradd + tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28)
 			else
-				if ply:GetNWString("ManspiderClimbEntity", "wall") == "ceiling" then
-					return
-				end
+				if ply:GetNWString("ManspiderClimbEntity", "wall") == "ceiling" then return end
 
 				ply:SetNWString("ManspiderClimbEntity", "ceiling")
 				ply:SetNWBool("ManspiderLeaping", false)
@@ -488,17 +477,9 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		return
 	end
 
-	if slasher.LeapCooldown > 0 then
-		return
-	end
-
-	if not slasher:IsOnGround() then
-		return
-	end
-
-	if slasher:GetNWBool("ManspiderNested") then
-		return
-	end
+	if slasher.LeapCooldown > 0 then return end
+	if not slasher:IsOnGround() then return end
+	if slasher:GetNWBool("ManspiderNested") then return end
 
 	slasher.LeapCooldown = 15
 
@@ -515,13 +496,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	})
 
 	timer.Simple(1, function()
-		if not IsValid(slasher) then
-			return
-		end
-		
-		if slasher:GetNWBool("ManspiderNested") then
-			return
-		end
+		if not IsValid(slasher) then return end
+		if slasher:GetNWBool("ManspiderNested") then return end
 
 		slasher:SetNWBool("ManspiderLeaping", true)
 		slasher:SetVelocity((slasher:EyeAngles():Forward() * SLASHER.JumpStrengthForward) + Vector(0, 0, SLASHER.JumpStrengthUp))
@@ -571,9 +547,7 @@ end
 
 local mat = Material("lights/white")
 local function targetPaint(ply)
-	if not IsValid(ply) or not ply:CanBeSeen() then
-		return
-	end
+	if not IsValid(ply) or not ply:CanBeSeen() then return end
 
 	cam.Start3D()
 	render.MaterialOverride(mat)

@@ -485,6 +485,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
 	end)
 end
 SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 5) end -- +5 additioal anger just because it deafened us.
+SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end
 
 local controlTable = {
 	default = Material("slashco/ui/icons/slasher/s_slash"),

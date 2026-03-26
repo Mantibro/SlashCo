@@ -281,9 +281,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			})
 
 			timer.Simple(3, function()
-				if not IsValid(slasher) then
-					return
-				end
+				if not IsValid(slasher) then return end
 
 				-- NOTE: We use WorldSpaceCenter so that the gas cans spawn a bit in the air, this stops them from somehow bugging and falling through the floor.
 				local startPos = slasher:WorldSpaceCenter()
@@ -305,9 +303,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end)
 
 			timer.Simple(4, function()
-				if not IsValid(slasher) then
-					return
-				end
+				if not IsValid(slasher) then return end
 
 				slasher:SetNWBool("TylerCreating", false)
 				TylerSwitchForm(slasher, TYLER_SPECTER)
@@ -459,9 +455,7 @@ end
 
 local function DestroyItem(slasher, target)
 	SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
-	if not IsValid(target) then
-		return
-	end
+	if not IsValid(target) then return end
 
 	local item = SlashCo.GetItemByEntity(target:GetClass())
 	if item and slasher.TylerState == TYLER_DESTROYER then
@@ -478,9 +472,7 @@ local function DestroyItem(slasher, target)
 		corpse = target
 	end
 
-	if not IsValid(corpse) then
-		return
-	end
+	if not IsValid(corpse) then return end
 
 	local dissolver = ents.Create("env_entity_dissolver")
 	timer.Simple(2, function()
@@ -512,30 +504,14 @@ local function StopTyperChase(slasher, switchForm)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher.TylerState ~= TYLER_DESTROYER then
-		return
-	end
-
-	if slasher:GetNWBool("CanKill") == false then
-		return
-	end
-
-	if slasher.KillDelayTick > 0 then
-		return
-	end
-
-	if not IsValid(target) then
-		return
-	end
+	if slasher.TylerState ~= TYLER_DESTROYER then return end
+	if slasher:GetNWBool("CanKill") == false then return end
+	if slasher.KillDelayTick > 0 then return end
+	if not IsValid(target) then return end
 
 	local class = target:GetClass()
-	if (not target:IsPlayer() and target.PingType ~= "ITEM") or class == "sc_beacon" or class == "sc_battery" then
-		return
-	end
-
-	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then
-		return
-	end
+	if (not target:IsPlayer() and target.PingType ~= "ITEM") or class == "sc_beacon" or class == "sc_battery" then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SLASHER.KillSound,
@@ -602,13 +578,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.TylerState ~= 0 then
-		return
-	end
-
-	if slasher:WaterLevel() > 1 then
-		return
-	end
+	if slasher.TylerState ~= 0 then return end
+	if slasher:WaterLevel() > 1 then return end
 
 	TylerSwitchForm(slasher, TYLER_CREATOR)
 	slasher:SetVisible(true)
@@ -650,9 +621,7 @@ function SLASHER.Footstep()
 end
 
 function SLASHER.CanBeSeen(ply)
-	if SERVER then
-		return
-	end
+	if SERVER then return end
 
 	if ply:IsVisible() and ply:GetNWInt("TylerState") ~= 1 then
 		return true
@@ -783,9 +752,7 @@ if CLIENT then
 			GameData.LocalPlayer.tyl_f = nil
 		end
 
-		if GameData.LocalPlayer:Team() == TEAM_SLASHER then
-			return
-		end
+		if GameData.LocalPlayer:Team() == TEAM_SLASHER then return end
 
 		if drawIcon and GameData.LocalPlayer:Team() == TEAM_SURVIVOR then
 			iconTL = SlashCo.Dampen(7, iconTL, iconT)

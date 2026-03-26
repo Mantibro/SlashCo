@@ -76,12 +76,8 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("FreeSmileySummoning") then
-		return
-	end
-	if slasher.SummonCooldown > 0 then
-		return
-	end
+	if slasher:GetNWBool("FreeSmileySummoning") then return end
+	if slasher.SummonCooldown > 0 then return end
 
 	if slasher.SummonChoose == 0 then
 		slasher.SummonChoose = 1
@@ -94,13 +90,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then
-		return
-	end
-
-	if slasher.SummonCooldown > 0 then
-		return
-	end
+	if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then return end
+	if slasher.SummonCooldown > 0 then return end
 
 	local zanies = ents.FindByClass("sc_zanysmiley")
 	if slasher.SummonChoose == 0 and #zanies >= 2 then
@@ -155,6 +146,8 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		slasher:Freeze(false)
 	end)
 end
+SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
+SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
 
 function SLASHER.OnHitByTeslaCoil(slasher)
 	SlashCo.StopChase(slasher)

@@ -98,11 +98,11 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
 		end
 	end
-	
+
 	if Milks > 5 then
 		slasher:SetNWBool("FullMilks", true)
 	end
-	
+
 	if slasher:GetNWBool("FullMilks") and not slasher:GetNWBool("DemonPacified") then
 		slasher.Thirsty = 0
 		eyesight_final = 4
@@ -132,16 +132,10 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
 	local SatO = SlashCo.CurRound.OfferingData.Satiation
 
-	if not IsValid(target) or target:GetClass() ~= "sc_milkjug" then
-		return
-	end
-
-	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("ThirstyDrinking") then
-		return
-	end
+	if not IsValid(target) or target:GetClass() ~= "sc_milkjug" then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("ThirstyDrinking") then return end
 
 	slasher:SetNWBool("ThirstyDrinking", true)
 	SlashCo.StopChase(slasher)
@@ -168,9 +162,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	chugjug:FollowBone(slasher, slasher:LookupBone("HandR"))
 
 	timer.Simple(1, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/thirsty/thirsty_drink.mp3",
@@ -184,9 +176,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end)
 
 	timer.Simple(4.5, function()
-		if not IsValid(chugjug) then
-			return
-		end
+		if not IsValid(chugjug) then return end
 
 		chugjug:Remove()
 
@@ -207,18 +197,14 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		phys:ApplyForceCenter(slasher:GetAimVector() * 450)
 
 		timer.Simple(4.5, function()
-			if not IsValid(emptyjug) then
-				return
-			end
+			if not IsValid(emptyjug) then return end
 
 			emptyjug:Remove()
 		end)
 	end)
 
 	timer.Simple(8, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		slasher:Freeze(false)
 		slasher:SetNWBool("ThirstyDrinking", false)
@@ -239,8 +225,9 @@ end
 function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local pac = ply:GetNWBool("DemonPacified")
+	local drink = ply:GetNWBool("ThirstyDrinking")
 
-	if not ply:GetNWBool("ThirstyDrinking") then
+	if not drink then
 		ply.anim_antispam = false
 	end
 
@@ -266,7 +253,7 @@ function SLASHER.Animator(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("float")
 	end
 
-	if ply:GetNWBool("ThirstyDrinking") then
+	if drink then
 		ply.CalcSeqOverride = ply:LookupSequence("drink")
 
 		if ply.anim_antispam == nil or ply.anim_antispam == false then
@@ -332,13 +319,8 @@ function SLASHER.ThirstyRage(ply)
 	local pos = ply:GetPos()
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if SlashCoSlashers[slasher:GetNWString("Slasher")].SlasherID ~= 5 then
-			return
-		end
-
-		if slasher:GetPos():Distance(pos) > 1600 then
-			return
-		end
+		if SlashCoSlashers[slasher:GetNWString("Slasher")].SlasherID ~= 5 then return end
+		if slasher:GetPos():Distance(pos) > 1600 then return end
 
 		slasher.MilkCount = 6
 		slasher:SetNWBool("ThirstyBigMlik", true)

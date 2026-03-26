@@ -41,7 +41,7 @@ function SLASHER.OnSpawn(slasher)
 		fadeIn = 0,
 	})
 	slasher:SetNWBool("CanKill", true)
-	
+
 	timer.Simple(1, function()
 		if not IsValid(slasher) then return end
 		SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))

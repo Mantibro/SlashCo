@@ -98,7 +98,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetWalkSpeed(SLASHER.ProwlSpeed - (Watched * 120))
 		slasher:SetRunSpeed(SLASHER.ProwlSpeed - (Watched * 120))
 	end
-	
+
 	if slasher:GetNWBool("WatcherRage") then
 		slasher:SetSlowWalkSpeed(300)
 		slasher:SetWalkSpeed(300)
@@ -227,21 +227,14 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("WatcherRage") then
-		return
-	end
+	if slasher:GetNWBool("WatcherRage") then return end
+
 	SlashCo.StartChaseMode(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
-	if (slasher.SurveyCooldown or 0) > 0 then
-		return
-	end
-	if slasher:GetNWBool("WatcherRage") then
-		return
-	end
+	if (slasher.SurveyCooldown or 0) > 0 then return end
+	if slasher:GetNWBool("WatcherRage") then return end
 
 	slasher.SurveyLength = SLASHER.SurveyLength
 	slasher.SurveyCooldown = SLASHER.SurveyCooldown
@@ -278,19 +271,13 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-
-	if SlashCo.CurRound.GameProgress < (10 - (slasher.StalkTime / 25)) then
-		return
-	end
-	if slasher:GetNWBool("WatcherRage") then
-		return
-	end
-	if team.NumPlayers(TEAM_SURVIVOR) < 2 then
-		return
-	end
+	if SlashCo.CurRound.GameProgress < (10 - (slasher.StalkTime / 25)) then return end
+	if slasher:GetNWBool("WatcherRage") then return end
+	if team.NumPlayers(TEAM_SURVIVOR) < 2 then return end
 
 	slasher:SetNWBool("WatcherRage", true)
 	SlashCo.AudioSystem.DisableBackgroundMusic()
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/watcher/watcher_rage.ogg",
 		identifier = "WatcherRage",

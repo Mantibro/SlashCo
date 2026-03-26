@@ -72,7 +72,7 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	PlayBreathing(slasher)
-	
+
 	slasher.TrollgeStage = 0
 	slasher.ClawCooldown = 0
 	slasher.TrollgeBlood = 0
@@ -201,9 +201,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		timer.Simple(7, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			--transit
 			SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
@@ -260,9 +258,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if target:IsValid() and target:IsPlayer() then
 				stopDash(slasher)
 
-				if target:Team() ~= TEAM_SURVIVOR then
-					return
-				end
+				if target:Team() ~= TEAM_SURVIVOR then return end
 
 				local vPoint = target:GetPos() + Vector(0, 0, 50)
 				local bloodfx = EffectData()
@@ -310,9 +306,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			timer.Simple(7, function()
-				if not IsValid(slasher) then
-					return
-				end
+				if not IsValid(slasher) then return end
 
 				--transit
 				StopBreathing(slasher)
@@ -452,9 +446,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		timer.Remove("TrollgeSlashDecay")
 
 		timer.Simple(0.3, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/trollge/trollge_swing.mp3",
@@ -471,9 +463,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 						Vector(-30, -30, -60), Vector(30, 30, 60), 10, DMG_SLASH, 5, false)
 
 				if target1:IsPlayer() then
-					if target1:Team() ~= TEAM_SURVIVOR then
-						return
-					end
+					if target1:Team() ~= TEAM_SURVIVOR then return end
 
 					local vPoint = target1:GetPos() + Vector(0, 0, 50)
 					local bloodfx = EffectData()
@@ -500,17 +490,11 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		end)
 
 		timer.Simple(0.1, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("TrollgeSlashing", true)
 
 			timer.Create("TrollgeSlashDecay", 0.6, 1, function()
-				if not IsValid(slasher) then
-					return
-				end
-
 				slasher:SetNWBool("TrollgeSlashing", false)
 			end)
 
@@ -600,6 +584,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage) -- additionalRa
 	end)
 end
 SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end -- When hit by a BeerKeg we in total add +15 anger.
+SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end
 
 function SLASHER.CanSeeFlashlights(ply)
 	return false

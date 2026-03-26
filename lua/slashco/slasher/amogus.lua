@@ -113,33 +113,17 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("AmogusFuelDisguise") then
-		return
-	end
-	
+	if slasher:GetNWBool("AmogusFuelDisguise") then return end
+
 	if not slasher:GetNWBool("AmogusSurvivorDisguise") then
 		SlashCo.Jumpscare(slasher, target)
 	end
 
-	if not IsValid(target) or not target:IsPlayer() then
-		return
-	end
-
-	if target:Team() ~= TEAM_SURVIVOR then
-		return
-	end
-
-	if slasher.KillDelayTick > 0 then
-		return
-	end
-
-	if slasher:GetVelocity():Length() > 1 then
-		return
-	end
-
-	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlashers.Amogus.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then
-		return
-	end
+	if not IsValid(target) or not target:IsPlayer() then return end
+	if target:Team() ~= TEAM_SURVIVOR then return end
+	if slasher.KillDelayTick > 0 then return end
+	if slasher:GetVelocity():Length() > 1 then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlashers.Amogus.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
 	target:SetNWBool("SurvivorBeingJumpscared", true)
 	target:Freeze(true)

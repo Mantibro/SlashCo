@@ -66,7 +66,7 @@ function SLASHER.SummonCovenantMembers(target)
 		clk:Spawn()
 		SlashCo.OnSlasherSpawned(clk)
 		SlashCo.BroadcastCurrentRoundData(false)
-		
+
 		-- Add player to table in case we need it
 		SLASHER.PlayersToBecomePartOfCovenant[clk:SteamID64()] = true
 	end
@@ -97,7 +97,7 @@ function SLASHER.OnTickBehaviour(slasher, cloak)
 			end
 		end
 	end
-	
+
 	if slasher.RockSummoned then
 		SLASHER.ProwlSpeed = 175
 		SLASHER.ChaseSpeed = 275
@@ -108,17 +108,9 @@ function SLASHER.OnTickBehaviour(slasher, cloak)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if not IsValid(target) or not target:IsPlayer() then
-		return
-	end
-
-	if target:Team() ~= TEAM_SURVIVOR then
-		return
-	end
-	
-	if slasher:GetPos():Distance(target:GetPos()) >= 137 then
-		return
-	end
+	if not IsValid(target) or not target:IsPlayer() then return end
+	if target:Team() ~= TEAM_SURVIVOR then return end
+	if slasher:GetPos():Distance(target:GetPos()) > SLASHER.KillDistance then return end
 
 	if not slasher:GetNWBool("CovenantSummoning") then
 		target:Kill()
@@ -147,7 +139,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 						target:SetNWBool("RocksBeingSummoned", false)
 					end)
 				end)
-				
+
 				slasher.PlayerToBecomeRocks = target
 				target:SetNWBool("RocksBeingSummoned", true)
 				slasher.RockSummoned = true
@@ -252,10 +244,10 @@ end
 function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_18"))
 	hud:SetTitle("Covenant")
-	
+
 	hud:AddControl("LMB", "covenant_member", Material("slashco/ui/icons/slasher/s_covenantcloak"))
 	hud:AddControl("RMB", "chase", Material("slashco/ui/icons/slasher/s_chase"))
-	
+
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then

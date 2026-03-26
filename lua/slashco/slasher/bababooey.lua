@@ -62,6 +62,7 @@ end
 
 function SLASHER.DoSound(slasher)
 	if not IsValid(slasher) then return end
+
 	if slasher:GetNWBool("BababooeyInvisibility") then
 		local idx = math.random(2, 4)
 		local idx2 = math.random(0.1, 0.5)
@@ -125,14 +126,8 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	local cooldown = slasher.TriggerCooldown
-
-	if cooldown > 0 then
-		return
-	end
-	if slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
+	if slasher.TriggerCooldown > 0 then return end
+	if slasher:GetNWBool("InSlasherChaseMode") then return end
 
 	slasher:SetNWBool("BababooeyInvisibility", not slasher:GetNWBool("BababooeyInvisibility"))
 
@@ -236,9 +231,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if #ents.FindByClass("sc_babaclone") >= SLASHER.MaxClones then
-		return
-	end
+	if #ents.FindByClass("sc_babaclone") >= SLASHER.MaxClones then return end
 
 	local ent = SlashCo.CreateItem("sc_babaclone", slasher:GetPos(), slasher:GetAngles())
 	if IsValid(ent) then

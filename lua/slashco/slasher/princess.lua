@@ -207,9 +207,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 
 				timer.Simple(3.75, function()
-					if not IsValid(slasher) then
-						return
-					end
+					if not IsValid(slasher) then return end
 
 					local vPoint = mauled_child:GetPos()
 					local bloodfx = EffectData()
@@ -236,9 +234,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				---yeah
 
 				timer.Simple(4.5, function()
-					if not IsValid(slasher) then
-						return
-					end
+					if not IsValid(slasher) then return end
 
 					slasher:Freeze(false)
 					slasher:SetNWBool("PrincessMaulingChild", false)
@@ -319,9 +315,7 @@ function SLASHER.Maul(slasher, target)
 	util.Effect("BloodImpact", bloodfx)
 
 	local eatBabyFromPlayer = IsPlayerHoldingBaby(target, true) -- true if were eating a baby that a player was holding.
-	if slasher.Aggression <= 99 and not eatBabyFromPlayer then
-		return
-	end
+	if slasher.Aggression <= 99 and not eatBabyFromPlayer then return end
 
 	SlashCo.StopChase(slasher)
 	slasher:SetNWBool("PrincessMaulingBase", false)
@@ -330,17 +324,13 @@ function SLASHER.Maul(slasher, target)
 
 	if not eatBabyFromPlayer then
 		timer.Simple(0, function() -- ToDo: Why do we even need a timer? Verify.
-			if not IsValid(slasher) or not IsValid(target) then
-				return
-			end
+			if not IsValid(slasher) or not IsValid(target) then return end
 
 			slasher:SetNWBool("PrincessMaulingSurvivor", true)
 			target:TakeDamage(99999, slasher, slasher)
 
 			timer.Simple(FrameTime() * 3, function()
-				if not IsValid(slasher) then
-					return
-				end
+				if not IsValid(slasher) then return end
 
 				slasher.victimragdoll = target and (target.DeadBody or NULL)
 			end)
@@ -373,9 +363,7 @@ function SLASHER.Maul(slasher, target)
 
 	for i = 1, math.random(9, 10) do
 		timer.Simple((i / 8) * (0.7 + (math.random() * 0.3)), function()
-			if not IsValid(slasher.victimragdoll) then
-				return
-			end
+			if not IsValid(slasher.victimragdoll) then return end
 
 			local vPoint1 = slasher.victimragdoll:GetPos()
 			local bloodfx1 = EffectData()
@@ -407,9 +395,7 @@ function SLASHER.Maul(slasher, target)
 	end
 
 	timer.Simple(2, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 		
 		slasher:Freeze(false)
 
@@ -426,9 +412,7 @@ function SLASHER.Maul(slasher, target)
 		end
 		slasher:SetNWBool("PrincessMaulingChild", false) -- Just to be sure
 
-		if not IsValid(slasher.victimragdoll) then
-			return
-		end
+		if not IsValid(slasher.victimragdoll) then return end
 
 		slasher.victimragdoll:Remove()
 
@@ -464,22 +448,12 @@ function SLASHER.Maul(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
-	if slasher:GetNWBool("PrincessMaulingChild") then
-		return
-	end
-	if slasher:GetNWBool("PrincessSniffing") then
-		return
-	end
-	if slasher:GetNWBool("DemonPacified") then
-		return
-	end
-	if slasher:GetNWBool("PrincessMaulingBase") then
-		return
-	end
+	if slasher:GetNWBool("PrincessMaulingChild") then return end
+	if slasher:GetNWBool("PrincessSniffing") then return end
+	if slasher:GetNWBool("DemonPacified") then return end
+	if slasher:GetNWBool("PrincessMaulingBase") then return end
+	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then return end
 
-	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then
-		return
-	end
 	slasher.MaulTime = CurTime()
 
 	slasher:SetNWBool("PrincessMaulingBase", true)
@@ -498,9 +472,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	end
 
 	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
@@ -533,9 +505,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	end)
 
 	timer.Simple(0.7, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		if not slasher:GetNWBool("PrincessMaulingSurvivor") then
 			slasher:SetNWBool("PrincessMaulingBase", false)
@@ -548,21 +518,11 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("PrincessMaulingChild") then
-		return
-	end
-	if slasher:GetNWBool("PrincessMaulingSurvivor") then
-		return
-	end
-	if slasher:GetNWBool("PrincessMaulingBase") then
-		return
-	end
-	if slasher:GetNWBool("PrincessSniffing") then
-		return
-	end
-	if slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
+	if slasher:GetNWBool("PrincessMaulingChild") then return end
+	if slasher:GetNWBool("PrincessMaulingSurvivor") then return end
+	if slasher:GetNWBool("PrincessMaulingBase") then return end
+	if slasher:GetNWBool("PrincessSniffing") then return end
+	if slasher:GetNWBool("InSlasherChaseMode") then return end
 
 	slasher:SetNWBool("PrincessSniffing", true)
 	slasher:Freeze(true)
@@ -577,9 +537,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	})
 
 	timer.Simple(4, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		slasher:SetNWBool("PrincessSniffing", false)
 		slasher:Freeze(false)
@@ -700,9 +658,8 @@ function SLASHER.InitHud(_, hud)
 	function hud:Sniff()
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		local sniffables = table.Add(survivors, ents.FindByClass("sc_baby"))
-		if table.Count(sniffables) <= 0 then
-			return
-		end
+
+		if table.Count(sniffables) <= 0 then return end
 
 		self.SniffPos = table.Random(sniffables):WorldSpaceCenter()
 

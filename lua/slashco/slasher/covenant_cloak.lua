@@ -149,13 +149,8 @@ function SLASHER.OnTickBehaviour(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
-	if IsValid(slasher.TackledPlayer) then
-		return
-	end
-
-	if slasher:IsFrozen() then
-		return 
-	end
+	if IsValid(slasher.TackledPlayer) then return end
+	if slasher:IsFrozen() then return end
 
 	if not slasher:GetNWBool("CloakTackle") then
 		slasher:SetNWBool("CloakTackle", true)

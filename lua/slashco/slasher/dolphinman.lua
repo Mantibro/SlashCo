@@ -203,18 +203,24 @@ function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetPerception(SLASHER.Perception * 1.4 ^ (slasher.DolphinKills or 0) + (hunt_boost * 3))
 end
 
-function SLASHER.OnHitByTeslaCoil(slasher)
+function SLASHER.OnHitByPocketSand(slasher, ply)
 	-- i'm crying
 	slasher:SetNWBool("DolphinFound", false)
 	slasher:SetNWBool("DolphinInHiding", false)
 	slasher:SetNWBool("DolphinHunting", false)
+	slasher:Freeze(true)
 
-	timer.Simple(16, function()
+	timer.Simple(9, function()
+		if not IsValid(slasher) then return end
+
+		slasher:Freeze(false)
 		if not slasher:GetNWBool("CanKill") then
 			slasher:SetNWBool("CanKill", true)
 		end
 	end)
 end
+SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
+SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
 
 function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("DolphinInHiding")

@@ -223,13 +223,8 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
-	if slasher:GetNWBool("BorgmireThrow") then
-		return
-	end
-	
-	if slasher.BorgKicking then
-		return
-	end
+	if slasher:GetNWBool("BorgmireThrow") then return end
+	if slasher.BorgKicking then return end
 
 	if slasher.PunchCooldown < 0.01 then
 		slasher:SetNWBool("BorgmirePunch", false)
@@ -238,9 +233,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		slasher.PunchCooldown = 2
 
 		timer.Simple(0.3, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			local idx = math.random(1, 2)
 			SlashCo.AudioSystem.PlaySound({
@@ -258,9 +251,7 @@ function SLASHER.OnPrimaryFire(slasher)
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
 					Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.PunchDamage, DMG_SLASH, 5, false)
 
-			if not target:IsValid() then
-				return
-			end
+			if not target:IsValid() then return end
 
 			SlashCo.BustDoor(slasher, target, 60000)
 
@@ -291,16 +282,12 @@ function SLASHER.OnPrimaryFire(slasher)
 		end)
 
 		timer.Simple(0.05, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("BorgmirePunch", true)
 
 			timer.Create("BorgmirePunchDecay", 1.5, 1, function()
-				if not IsValid(slasher) then
-					return
-				end
+				if not IsValid(slasher) then return end
 
 				slasher:SetNWBool("BorgmirePunch", false)
 				slasher.BorgPunching = false
@@ -314,20 +301,15 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("BorgmireThrow") then
-		return
-	end
-
-	if slasher.BorgPunching then
-		return
-	end
+	if slasher:GetNWBool("BorgmireThrow") then return end
+	if slasher.BorgPunching then return end
 
 	if slasher.KickCooldown < 0.01 then
 		slasher:SetNWBool("BorgmireKick", false)
 		slasher.BorgKicking = true
 		timer.Remove("BorgmireKickDecay")
 		slasher.KickCooldown = 15
-		
+
 		timer.Simple(2.0, function()
 			local idx = math.random(1, 2)
 			SlashCo.AudioSystem.PlaySound({
@@ -339,16 +321,14 @@ function SLASHER.OnMainAbilityFire(slasher)
 				volume = 1,
 				fadeIn = 0,
 			})
-			
+
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
 				Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.KickDamage, DMG_SLASH, 5, false)
 
-			if not target:IsValid() then
-				return
-			end
-			
+			if not target:IsValid() then return end
+
 			SlashCo.BustDoor(slasher, target, 60000)
-			
+
 			if (target:IsPlayer() and target:Team() == TEAM_SURVIVOR) or target:GetClass() == "prop_ragdoll" then
 				local o = Vector(0, 0, 0)
 
@@ -378,10 +358,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 		end)
 		
 		timer.Simple(0.1, function()
-			if not IsValid(slasher) then
-				return
-			end
-			
+			if not IsValid(slasher) then return end
+
 			slasher:SetNWBool("BorgmireKick", true)
 
 			timer.Create("BorgmireKickDecay", 2.1, 1, function()
@@ -393,29 +371,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
-	if not slasher:GetNWBool("CanThrow") then
-		return
-	end
-
-	if slasher.BorgPunching then
-		return
-	end
-	
-	if slasher.BorgKicking then
-		return
-	end
-
-	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then
-		return
-	end
-
-	if target:Team() ~= TEAM_SURVIVOR then
-		return
-	end
-
-	if slasher:GetPos():Distance(target:GetPos()) >= 140 or target:GetNWBool("SurvivorBeingJumpscared") then
-		return
-	end
+	if not slasher:GetNWBool("CanThrow") then return end
+	if slasher.BorgPunching then return end
+	if slasher.BorgKicking then return end
+	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then return end
+	if target:Team() ~= TEAM_SURVIVOR then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 140 or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
 	if slasher.ThrowCooldown < 0.01 then
 		slasher:SetNWBool("BorgmireThrow", true)
@@ -429,24 +390,20 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 			volume = 1,
 			fadeIn = 0,
 		})
-		
+
 		target:Freeze(true)
 		target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
 
 		for i = 1, 13 do
 			timer.Simple(0.1 + (i / 10), function()
-				if not IsValid(target) or not IsValid(slasher) then
-					return
-				end
+				if not IsValid(target) or not IsValid(slasher) then return end
 
 				target:SetPos(slasher:GetPos() + Vector(0, 0, 100))
 			end)
 		end
 
 		timer.Simple(1.5, function()
-			if not IsValid(target) or not IsValid(slasher) then
-				return
-			end
+			if not IsValid(target) or not IsValid(slasher) then return end
 
 			target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
 			target:SetVelocity((slasher:GetForward() * SLASHER.ThrowStrengthForward) + Vector(0, 0, SLASHER.ThrowStrengthUp))
@@ -461,9 +418,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		end)
 
 		timer.Simple(2, function()
-			if not IsValid(target) or not IsValid(slasher) then
-				return
-			end
+			if not IsValid(target) or not IsValid(slasher) then return end
 
 			slasher:SetNWBool("BorgmireThrow", false)
 			slasher.ChaseActivationCooldown = 2
@@ -483,19 +438,8 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		slasher:Freeze(false)
 	end)
 end
-
-function SLASHER.OnHitByTeslaCoil(slasher)
-	SlashCo.StopChase(slasher)
-
-	slasher:SetNWBool("BorgmireStunned", true)
-	slasher:Freeze(true)
-	timer.Simple(16, function()
-		if not IsValid(slasher) then return end
-
-		slasher:SetNWBool("BorgmireStunned", false)
-		slasher:Freeze(false)
-	end)
-end
+SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
+SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
@@ -509,16 +453,12 @@ function SLASHER.Animator(ply)
 	end
 
 	if ply:IsOnGround() then
-		if borg_stun then
-			ply.CalcSeqOverride = ply:LookupSequence("sit")
+		if not chase then
+			ply.CalcIdeal = ACT_HL2MP_WALK
+			ply.CalcSeqOverride = ply:LookupSequence("walk_all")
 		else
-			if not chase then
-				ply.CalcIdeal = ACT_HL2MP_WALK
-				ply.CalcSeqOverride = ply:LookupSequence("walk_all")
-			else
-				ply.CalcIdeal = ACT_HL2MP_RUN
-				ply.CalcSeqOverride = ply:LookupSequence("run_all")
-			end
+			ply.CalcIdeal = ACT_HL2MP_RUN
+			ply.CalcSeqOverride = ply:LookupSequence("run_all")
 		end
 	else
 		ply.CalcSeqOverride = ply:LookupSequence("jump")
@@ -541,7 +481,7 @@ function SLASHER.Animator(ply)
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("attack_throw"), 0, true)
 		ply.anim_antispam = true
 	end
-	
+
 	if borg_kick and (ply.anim_antispam == nil or ply.anim_antispam == false) then
 		local rand2 = math.random(1, 2)
 		local KickAnim = ""
@@ -553,6 +493,10 @@ function SLASHER.Animator(ply)
 
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence(KickAnim), 0, true)
 		ply.anim_antispam = true
+	end
+
+	if borg_stun then
+		ply.CalcSeqOverride = ply:LookupSequence("sit")
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride

@@ -38,7 +38,7 @@ local function PlayTransform(slasher)
 		volume = 1,
 		fadeIn = 0,
 	})
-	
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("NPC_Manhack.Slice"),
 		identifier = "Male07Transform2",
@@ -193,9 +193,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	if slasher.MaleState == MALE07_GHOST then
-		return
-	end
+	if slasher.MaleState == MALE07_GHOST then return end
 
 	if slasher.SlashCooldown < 0.01 then
 		slasher:SetNWBool("Male07Slashing", false)
@@ -217,14 +215,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
 						Vector(-30, -40, -60), Vector(30, 40, 60), SLASHER.PrimaryDamage, DMG_SLASH, 2, false)
 
-				if not target1:IsValid() then
-					return
-				end
+				if not target1:IsValid() then return end
 
 				if target1:IsPlayer() then
-					if target1:Team() ~= TEAM_SURVIVOR then
-						return
-					end
+					if target1:Team() ~= TEAM_SURVIVOR then return end
 
 					local vPoint = target1:GetPos() + Vector(0, 0, 50)
 					local bloodfx = EffectData()
@@ -261,9 +255,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	if slasher.MaleCooldown > 0 or slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
+	if slasher.MaleCooldown > 0 or slasher:GetNWBool("InSlasherChaseMode") then return end
 
 	if IsValid(target) and target:GetClass() == "sc_maleclone" and slasher:GetPos():Distance(target:GetPos()) < 150 then
 		SlashCo.AudioSystem.PlaySound({
@@ -436,9 +428,7 @@ function SLASHER.InitHud(_, hud)
 			end
 		end
 
-		if curState == hud.prevState then
-			return
-		end
+		if curState == hud.prevState then return end
 
 		local avatar = "default"
 		if curState == 0 then

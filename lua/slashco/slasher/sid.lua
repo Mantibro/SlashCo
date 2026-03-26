@@ -277,9 +277,7 @@ local function EatCookie(slasher, target)
 	slasher:Freeze(true)
 
 	timer.Simple(10, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		slasher:Freeze(false)
 		slasher:SetNWBool("SidEating", false)
@@ -337,9 +335,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		end)
 
 		timer.Simple(10, function()
-			if not IsValid(slasher) and not IsValid(target) then
-				return
-			end
+			if not IsValid(slasher) and not IsValid(target) then return end
 
 			slasher:SetNWBool("SidEatingSurvCookie", false)
 			slasher:SetNWBool("DemonPacified", true)
@@ -363,9 +359,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	if slasher:GetNWBool("SidGunAimed") and spread < 2.4 then
 		timer.Simple(0.05, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWFloat("SidGunShoot", CurTime())
 			PlayShots(slasher)
@@ -402,13 +396,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		--Executing a Survivor
 
 		if IsValid(target) and target:IsPlayer() then
-			if target:Team() ~= TEAM_SURVIVOR then
-				return
-			end
-
-			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then
-				return
-			end
+			if target:Team() ~= TEAM_SURVIVOR then return end
+			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
 			local pick_ang = SlashCo.RadialTester(slasher, 600, target)
 
@@ -417,15 +406,12 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			slasher:Freeze(true)
 
 			timer.Simple(0.1, function()
-				if not IsValid(slasher) or not IsValid(target) then
-					return
-				end
+				if not IsValid(slasher) or not IsValid(target) then return end
 
 				target:SetPos(slasher:GetPos())
-
 				target:Freeze(true)
-
 				target:SetNWBool("SurvivorBeingJumpscared", true)
+
 				slasher:SetNWBool("CanChase", false)
 
 				local idx = math.random(1,4)
@@ -451,9 +437,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				slasher.KillDelayTick = SlashCoSlashers[slasher:GetNWString("Slasher")].KillDelay
 
 				timer.Simple(1, function()
-					if not IsValid(target) then
-						return
-					end
+					if not IsValid(target) then return end
 
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "ambient/voices/citizen_beaten4.wav",
@@ -467,9 +451,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				end)
 
 				timer.Simple(3, function()
-					if not IsValid(target) then
-						return
-					end
+					if not IsValid(target) then return end
 
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "ambient/voices/citizen_beaten3.wav",
@@ -483,17 +465,13 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				end)
 
 				timer.Simple(3.95, function()
-					if not IsValid(target) then
-						return
-					end
+					if not IsValid(target) then return end
 
 					target:SetEyeAngles(Angle(0, 180 + pick_ang, 0))
 				end)
 
 				timer.Simple(4.1, function()
-					if not IsValid(slasher) or not IsValid(target) then
-						return
-					end
+					if not IsValid(slasher) or not IsValid(target) then return end
 
 					target:SetNWBool("SurvivorBeingJumpscared", false)
 
@@ -547,9 +525,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					target:SetVelocity(slasher:GetForward() * 300)
 					target:SetNotSolid(false)
 					timer.Simple(0.05, function()
-						if not IsValid(target) then
-							return
-						end
+						if not IsValid(target) then return end
 
 						if IsValid(slasher) then
 							target:TakeDamage(99999, slasher, slasher)
@@ -560,9 +536,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				end)
 
 				timer.Simple(8, function()
-					if not IsValid(slasher) or not IsValid(target) then
-						return
-					end
+					if not IsValid(slasher) or not IsValid(target) then return end
 
 					slasher:Freeze(false)
 					slasher:SetNWBool("SidExecuting", false)
@@ -599,9 +573,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		})
 
 		timer.Simple(1, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("SidGunAiming", false)
 			slasher:SetNWBool("SidGunAimed", true)
@@ -627,22 +599,16 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then
-		return
-	end
-
-	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("SidEating") or slasher:GetNWBool("SidEatingSurvCookie") or slasher:GetNWBool("SidGun") then
-		return
-	end
+	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("SidEating")
+		or slasher:GetNWBool("SidEatingSurvCookie") or slasher:GetNWBool("SidGun") then return end
 
 	EatCookie(slasher, target)
 	SlashCo.StopChase(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if not slasher.CanUseGun then
-		return
-	end
+	if not slasher.CanUseGun then return end
 
 	if not slasher:GetNWBool("SidGun") and slasher.GunCooldown < 0.01 and slasher.EatedCookies > 0 then
 		--Equip the gun
@@ -858,9 +824,8 @@ function SLASHER.InitHud(_, hud)
 	hud:TieCrosshairEntity("sc_cookie", 150, "R", { "SidGun", "SidEating", IsOr = true })
 
 	timer.Simple(0, function()
-		if GameData.LocalPlayer:GetNWBool("SidCanUseGun") then
-			return
-		end
+		if GameData.LocalPlayer:GetNWBool("SidCanUseGun") then return end
+
 		hud:SetControlVisible("F", false)
 	end)
 
@@ -1030,9 +995,7 @@ if CLIENT then
 	end)
 
 	hook.Add("CalcView", "SidExecution", function(ply, pos, angles, fov)
-		if ply:Team() ~= TEAM_SURVIVOR then
-			return
-		end
+		if ply:Team() ~= TEAM_SURVIVOR then return end
 
 		if ply:GetNWBool("SurvivorSidExecution") then
 			pos = ply:LocalToWorld(Vector(120, 120, 60))

@@ -132,9 +132,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	
 	local dist = SLASHER.KillDistance
-	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then
-		return
-	end
+	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
 	timer.Simple(0.1, function()
 		if not IsValid(slasher) or not IsValid(target) then return end
@@ -362,30 +360,30 @@ function SLASHER.InitHud(_, hud)
 	hud:ChaseAndKill()
 	hud:AddControl("R", "noclip", Material("slashco/ui/icons/slasher/s_bren_noclip"))
 	hud:AddControl("F", "snap", Material("slashco/ui/icons/slasher/s_bren_snap"))
-	
+
 	hud:TieControl("R", "CanNoclip")
 	hud:TieControlVisible("R", "CanNoclip")
-	
+
 	hud:AddMeter("anger", 100, "", nil, true)
 	hud:TieMeterInt("anger", "BrenAnger")
-	
+
 	function hud.AlsoThink()
 		local BrenMainCooldown = GameData.LocalPlayer:GetNWInt("MainCooldown")
 		local BrenNoclipCooldown = GameData.LocalPlayer:GetNWInt("NoclipCooldown")
 		local BrenSnapCooldown = GameData.LocalPlayer:GetNWInt("SnapCooldown")
-		
+
 		if BrenMainCooldown > 0 then
 			hud:SetControlEnabled("LMB", false)
 		else
 			hud:SetControlEnabled("LMB", true)
 		end
-		
+
 		if BrenNoclipCooldown > 0 then
 			hud:SetControlEnabled("R", false)
 		else
 			hud:SetControlEnabled("R", true)
 		end
-		
+
 		if BrenSnapCooldown > 0 then
 			hud:SetControlEnabled("F", false)
 		else
