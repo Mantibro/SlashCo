@@ -241,6 +241,7 @@ function SLASHER.OnKillPlayer(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
+	if slasher.KillDelayTick > 0 then return end
 	if not IsValid(target) or not target:IsPlayer() then return end
 
 	if target ~= slasher.TargetPlayer then
@@ -473,6 +474,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher:SetMoveType(MOVETYPE_WALK)
 		slasher:SetVelocity((slasher:EyeAngles():Forward() * 400) + Vector(0, 0, 200))
 		slasher:SetNWBool("ManspiderLeaping", true)
+		slasher.KillDelayTick = SLASHER.KillDelay
 
 		return
 	end
