@@ -112,7 +112,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_eyesight = 6
 	end
 
-	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress >= 7 then
+	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress > 6 then
 		SlashCo.AudioSystem.EnableBackgroundMusic()
 		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/criminal/criminal_ambience.ogg", 1)
 	end
