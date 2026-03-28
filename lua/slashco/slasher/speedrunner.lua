@@ -206,7 +206,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	pickaxe:SetSkin(4)
 	pickaxe:SetPos(pos)
 	pickaxe:SetAngles(ang)
-	pickaxe:FollowBone(slasher, slasher:LookupBone("HandR"))
+	pickaxe:FollowBone(slasher, slasher:LookupBone("HandL"))
 
 	timer.Simple(5, function()
 		if not IsValid(slasher) then return end
