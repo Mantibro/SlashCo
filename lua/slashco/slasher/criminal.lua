@@ -29,7 +29,8 @@ SLASHER.ProTip = "Criminal_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
-SLASHER.CustomBackgroundMusic = true
+SLASHER.HighAngerBackgroundMusic = "slashco/slasher/criminal/criminal_ambience.ogg"
+SLASHER.AngerIncrease = 100
 -- Balancement Vars
 SLASHER.ChaseSpeedDecreaseInRageDiv = 4
 SLASHER.ChaseSpeedDecreaseDiv = 5
@@ -71,6 +72,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local ClonTimer = slasher.ClonDuration or 0 --Cloning Duration
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
+	local anger = SlashCo.GetSlasherAnger(slasher)
 
 	if slasher:GetVelocity():Length() > 5 then
 		slasher:SetNWBool("CanKill", false)
@@ -112,9 +114,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_eyesight = 6
 	end
 
-	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress > 6 then
-		SlashCo.AudioSystem.EnableBackgroundMusic()
-		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/criminal/criminal_ambience.ogg", 1)
+	if SlashCo.CurRound.GameProgress > 6 and anger < 100 then -- let's do it this way then 7-7
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 	end
 
 	slasher:SetEyeSight(final_eyesight)
