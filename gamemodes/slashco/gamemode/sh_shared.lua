@@ -26,7 +26,7 @@ SlashCo.OverTime = SlashCo.SlowEscapeTime - 300 -- Time in seconds when the surv
 SlashCo.AllowLateJoin = true -- If enabled, players that joined after the lobby was created BUT before the round was started will get spawned as survivors.
 SlashCo.MaximumLateJoinTime = 180 -- Time in seconds in which players will still be spawned as survivors if they just took ages to load, though they won't be spawned a survivors if they weren't expected to join!
 SlashCo.PlayerPingDelay = 30 -- Default time in seconds to wait before a player can ping again. Can be changed by servers using the convar slashco_pingdelay
-SlashCo.MapForceCost = 100 -- Default cost to force a map
+SlashCo.MapForceCost = 50 -- Default cost to force a map
 SlashCo.MapForceCostIncrease = 50 -- Default amount of points that the cost to force a map is increased by every time someone tires to force it
 
 SlashCo.HelicopterVoices = {

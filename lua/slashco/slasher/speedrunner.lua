@@ -225,8 +225,8 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 			fadeIn = 0,
 		})
 
-		local rand = math.random(5, 20)
-		slasher.Speedrun = slasher.Speedrun + rand
+		local rand = math.random(15, 35)
+		slasher.Speedrun = math.min(slasher.Speedrun + rand, slasher.Speedrunned)
 		SLASHER.RandomTPCans()
 
 		SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
@@ -250,8 +250,8 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		slasher:Freeze(false)
 	end)
 end
-SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
-SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Animator(ply, veloc)
 	local move_vel = ply:WorldToLocal(veloc + ply:GetPos())

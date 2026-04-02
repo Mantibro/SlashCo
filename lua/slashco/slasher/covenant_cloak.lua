@@ -55,8 +55,8 @@ function SLASHER.TackleFail(slasher)
 	end)
 end
 
-local SURVIVOR_STUN_TIME = 7.0
-local SLASHER_STUN_TIME = 3.5
+local SURVIVOR_STUN_TIME = 5.0
+local SLASHER_STUN_TIME = 6.0
 
 function SLASHER.OnTickBehaviour(slasher, target)
 	if IsValid(slasher.TackledPlayer) then

@@ -146,8 +146,8 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		slasher:Freeze(false)
 	end)
 end
-SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
-SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.OnHitByTeslaCoil(slasher)
 	SlashCo.StopChase(slasher)

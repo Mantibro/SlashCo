@@ -219,8 +219,8 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		end
 	end)
 end
-SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
-SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil) end
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("DolphinInHiding")
