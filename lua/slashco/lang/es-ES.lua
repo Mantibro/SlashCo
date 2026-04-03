@@ -684,3 +684,59 @@ SlashCo.LangTable["keyboard_bind_voices"] = "Abrir Selector de Voz"
 SlashCo.LangTable["keyboard_bind_keybinds"] = "ABRIR CONFIG. DE TECLAS"
 SlashCo.LangTable["keyboard_bind_main_ability"] = "Usar Habilidad Principal"
 SlashCo.LangTable["keyboard_bind_special_ability"] = "Usar Habilidad Especial"
+
+-- CUSTOM SLASHER SUPPORT
+-- Doing this as a temp fix to patch files corrupting the entire language system
+
+SlashCo.LangTable["Buffsoldier"] = "Buff Soldier"
+SlashCo.LangTable["Buffsoldier_desc"] = [[Un hombre ruso muy fuerte y aterrador.
+
+-Buffsoldier debe conseguir musculos para hacer mas daño.
+-Buffsoldier puede fumar para aumentar su musculatura maxima.
+-Este slasher sufre de mala vision al inicio.]]
+SlashCo.LangTable["Buffsoldier_tip"] = "-Evita ser golpeado."
+
+SlashCo.LangTable["cigar"] = "fumar"
+SlashCo.LangTable["muscles gained"] = "musculos"
+
+SlashCo.LangTable["Buffsoldier_docDesc"] = [[Un hombre fuerte y masivo proveniente de rusia. Buffsoldier es conocido por ser el asesino numero uno de rusia, y ahora es trabajo de slashco el retenerlo.]]
+SlashCo.LangTable["Buffsoldier_docDescAdd"] = [[Buffsoldier gana [MUSCULOS] siempre que golpea a un superviviente. A mayor cantidad de [MUSCULOS], mayor sera su daño.]]
+
+--The Screamer
+SlashCo.LangTable["Screamer"] = "El Screamer"
+SlashCo.LangTable["Screamer_desc"] = [[Este Slasher aparenta ser amigable, hasta que muestra su verdadera forma.
+
+-El Screamer puede transformarse y ganar gran velocidad.
+-Puede alcanzar a sus presas muy facilmente.
+-Enojarse es muy dificil para el.]]
+SlashCo.LangTable["Screamer_tip"] = "-Matalos sin piedad."
+SlashCo.LangTable["kill"] = "matar"
+
+--TOPO.MP4
+SlashCo.LangTable["Topomp4"] = "Topo.mp4"
+SlashCo.LangTable["Topomp4_desc"] = [[Tambien estoy, en la region perdida, ay cielo santo... y sin poder.. volar..
+
+-Topo.mp4 puede lanzar un poderoso grito.
+-No puede atacar sin estar en persecucion.
+-Este slasher tiene mala percepcion.]]
+SlashCo.LangTable["Topomp4_tip"] = "-Buenas Noches."
+SlashCo.LangTable["scream"] = "gritar"
+SlashCo.LangTable["bite"] = "morder"
+SlashCo.LangTable["attack"] = "atacar"
+
+-- HOTDOGMAN
+SlashCo.LangTable["Hotdogman"] = "Hombre-hotdog"
+SlashCo.LangTable["Hotdogman_desc"] = [[Me gustan los hotdogs.
+
+-Hombre-hotdog solo puede embestir durante su chase.
+-Necesita encontrar hotdogs.
+-Este slasher corre lento]]
+SlashCo.LangTable["Hotdogman_tip"] = "-Vomita mucho."
+
+SlashCo.LangTable["find hotdog"] = "busca hotdog"
+SlashCo.LangTable["eat hotdog"] = "comer hotdog"
+SlashCo.LangTable["vomit"] = "vomitar"
+SlashCo.LangTable["nausea"] = "nauseas"
+
+SlashCo.LangTable["Hotdogman_docDesc"] = [[This demon has the appearance of an adult fat man that stands out for having a hot dog by head.]]
+SlashCo.LangTable["Hotdogman_docDescAdd"] = [[This slasher can run slow but deal high damage easily. Hotdogs grant him more power.]]
