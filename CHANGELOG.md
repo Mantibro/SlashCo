@@ -314,7 +314,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [+] Added sound/vision fade in when spawning into a round<br>
 [#] Implemented a failsafe in case the slashers or survivors disconnect<br>
 -> The game ends if no survivors or slashers exist after 5 minutes<br>
--> If there's enough survivors in-game but not the required slashers, a selection screen would show up to choose a new slasher.
+-> If there's enough survivors in-game but not the required slashers, a selection screen would show up to choose a new slasher.<br>
 [#] Solved a spectator prediction issue, making movement/noclipping jittery<br>
 -> It was a gmod bug<br>
 [#] Stopped player from suiciding when the helicopter is taking off in the lobby.<br>
