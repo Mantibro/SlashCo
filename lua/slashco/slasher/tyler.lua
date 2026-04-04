@@ -360,7 +360,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				})
 			end
 
-			if anger < 50 then -- switch up songs if his anger is below 50.
+			if not endlessChase and anger < 50 then -- switch up songs if his anger is below 50.
 				SlashCo.AudioSystem.PlaySound({
 					soundPath = "slashco/slasher/tyler/tyler_destroyer_low.ogg",
 					identifier = "TylerTheme",
