@@ -40,6 +40,7 @@ Some newly added sounds will be from the SlashCo VR version.<br>
 [#] Precached almost every used sound and model to avoid in-game stutters.<br>
 -> The stutters sometimes were caused by GMod having to first load the sound before it could play it- now it loads everything when joining, avoiding that from happening in-game.<br>
 [#] Play a sound when an item can't be used<br>
+[#] Slightly reduced fall damage<br>
 
 ### Document Objective
 A new objective to find documents was added, BUT it still needs to be implemented on many maps.<br>
@@ -113,6 +114,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Improved tyler hide time duration.<br>
 [#] He will **always** spawn after `10` seconds into the round<br>
 [#] The Helicopter will **always** arrive after `30` seconds when escaping<br>
+[#] Reduced the amount of GasCans that spawn during his round.<br>
 
 ### The Watcher
 [+] Added footstep sounds from SlashCo VR<br>
@@ -201,7 +203,7 @@ You can find perks in the same terminal as documents and equip them depending on
 [#] Reduced Chase duration (160s - 60s).<br>
 [#] Reduced Chase speed (297 - 275).<br>
 [#] Increased "Cloaks" Prowl speed (100 - 150).<br>
-[#] Fixed "Cloaks" ability, Tackle now stuns survivors for 7s, Cloak will remain freezed for 3.5s after using it.<br>
+[#] Fixed "Cloaks" ability, Tackle now stuns survivors for 5s, Cloak will remain freezed for 6s after using it.<br>
 -> Survivors can escape sooner by spamming left and right movement keys.<br>
 [#] "Cloaks" can mark survivors when tackled.<br>
 [#] Changed Danger level to Devastating.<br>
@@ -213,9 +215,10 @@ You can find perks in the same terminal as documents and equip them depending on
 ### Speedrunner
 [+] Added a new ability: Mining.<br>
 -> An ore will spawn in a random position.<br>
--> Speedrunner can start mining this ore to gain 5 - 20 speed after 5 seconds.<br>
+-> Speedrunner can start mining this ore to gain 15 - 35 speed after 5 seconds.<br>
 -> After that, all the gas cans of the map will get randomly teleported.<br>
 -> Survivors can also mine this ore to prevent the above, but the mining duration for them is 10 seconds.<br>
+[+] Added new stun and mining animations.<br>
 
 ### Bren
 [+] Added new Slasher Bren.<br>
