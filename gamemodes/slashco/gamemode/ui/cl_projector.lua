@@ -107,6 +107,14 @@ function PANEL:RenderTop(ent)
 	end
 	--]]
 
+	local r, g, b = 255, 255, 255
+	if self.ForceRenderColor then
+		r = self.ForceRenderColor.r / 255
+		g = self.ForceRenderColor.g / 255
+		b = self.ForceRenderColor.b / 255
+	end
+
+	render.SetColorModulation(r, g, b)
 	if not ent:GetNoDraw() then
 		if IsValid(ent.ProjectedModel) and not ent.RenderOverride then
 			ent.ProjectedModel:DrawModel()
@@ -175,7 +183,7 @@ function PANEL:Paint(w, h)
 		pos = self.Entity:WorldSpaceCenter() + self.CamPos
 	end
 
-	local eyeAng = LocalPlayer():LocalEyeAngles() --EyeAngles()
+	local eyeAng = GameData.LocalPlayer:LocalEyeAngles() --EyeAngles()
 	local vec = Vector(self.Distance * self.Entity:GetModelScale(), 0, 0)
 	vec:Rotate(eyeAng)
 	local x, y = self:LocalToScreen(0, 0)
@@ -193,7 +201,7 @@ function PANEL:Paint(w, h)
 			render.SetModelLighting(i, col.r / 255, col.g / 255, col.b / 255)
 		end
 	end
-
+	
 	self:RenderTop(self.Entity)
 	if self.ExtraEntities then
 		for _, v in pairs(self.ExtraEntities) do
@@ -212,6 +220,6 @@ local frame = vgui.Create("DFrame")
 frame:SetSize(500, 500)
 
 local project = frame:Add("slashco_projector")
-project:SetEntity(LocalPlayer())
+project:SetEntity(GameData.LocalPlayer)
 project:Dock(FILL)
 --]]

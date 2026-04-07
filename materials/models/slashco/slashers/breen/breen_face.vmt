@@ -1,0 +1,7 @@
+"VertexLitGeneric"
+{
+	// Original shader: VertexLitTexture
+	"$basetexture" "models/slashco/slashers/breen/black"
+	"$bumpmap" "models/slashco/slashers/breen/breen_head_normal"
+	"$halflambert" 1
+}

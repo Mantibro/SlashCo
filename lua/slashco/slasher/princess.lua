@@ -1,9 +1,13 @@
 local SLASHER = {}
 
 SLASHER.Name = "Princess"
+SLASHER.Aliases = {
+	"Cupcake",
+	"Satan Death Destroyer",
+}
 SLASHER.ID = 17
-SLASHER.Class = 2
-SLASHER.DangerLevel = 1
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/princess/princess.mdl"
 SLASHER.GasCanMod = 0
@@ -18,7 +22,7 @@ SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1.5
-SLASHER.ChaseMusic = "slashco/slasher/princess_chase.wav"
+SLASHER.ChaseMusic = "slashco/slasher/princess/princess_chase.ogg"
 SLASHER.KillSound = ""
 SLASHER.Description = "Princess_desc"
 SLASHER.ProTip = "Princess_tip"
@@ -26,27 +30,71 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.ItemToSpawn = "Baby"
+SLASHER.AngerIncrease = 5
+SLASHER.AngerPassiveGain = 0.04
+SLASHER.AngerChaseGain = 0
 
-SLASHER.OnSpawn = function(slasher)
+local function PlayChase(slasher)
+	local idx = math.random(1, 15)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/princess/princess_chase" .. idx .. ".mp3",
+		identifier = "PrincessChase" .. idx,
+		minDistance = 200,
+		maxDistance = 1200,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+end
+
+local function PlayIdle(slasher)
+	local idx = math.random(1, 9)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/princess/princess_idle" .. idx .. ".mp3",
+		identifier = "PrincessIdle" .. idx,
+		minDistance = 200,
+		maxDistance = 1200,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+end
+
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	-- If we have more than the default survivors, the ChaseSpeed is increased by 7.5, if we have less than the default, we only decrease it by 2.5
+	SLASHER.ChaseSpeed = 280 + (((additionalSurvivors > 0) and 7.5 or 2.5) * additionalSurvivors)
+
+	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
+	if additionalSurvivors > 0 then -- Only increase these if we have more than the default survivors.
+		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+	end
+end
+
+function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 50))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 50))
 
-	slasher.SlasherValue2 = 50
+	slasher.AggressionThreshold = 50
+	slasher.Aggression = 0
 
 	SLASHER.DoSound(slasher)
 end
 
-SLASHER.DoSound = function(slasher)
+function SLASHER.DoSound(slasher)
+	if SlashCo.State ~= SlashCo.States.IN_GAME then return end -- RaphaelIT7: Before/After a game you should shut up! >:(
 	if not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessMaulingSurvivor") and not slasher:GetNWBool("PrincessSniffing") then
 		if slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:EmitSound("slashco/slasher/princess_chase" .. math.random(1, 15) .. ".mp3")
+			PlayChase(slasher)
 		else
-			slasher:EmitSound("slashco/slasher/princess_idle" .. math.random(1, 9) .. ".mp3")
+			PlayIdle(slasher)
 		end
 	end
 
-	timer.Simple(2, function()
-		if not IsValid(slasher) then
+	timer.Create("PrincessSound", 2, 1, function()
+		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= "Princess" then
+			timer.Remove("PrincessSound")
 			return
 		end
 
@@ -54,9 +102,9 @@ SLASHER.DoSound = function(slasher)
 	end)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local v1 = slasher.SlasherValue1 --aggression
-	local v2 = slasher.SlasherValue2 --aggression threshold
+function SLASHER.OnTickBehaviour(slasher)
+	local Aggression = slasher.Aggression or 0 --aggression
+	local AggressionTH = slasher.AggressionThreshold or 0 --aggression threshold
 
 	local eyesight = SLASHER.Eyesight
 	local perception = SLASHER.Perception
@@ -72,11 +120,11 @@ SLASHER.OnTickBehaviour = function(slasher)
 	--find children to maul
 	if slasher:GetNWBool("InSlasherChaseMode") then
 		--Get Aggro
-		if v1 < v2 then
-			slasher.SlasherValue1 = v1 + FrameTime()
+		if Aggression < AggressionTH then
+			slasher.Aggression = Aggression + FrameTime()
 		end
 
-		local speed = SLASHER.ChaseSpeed + (v1 / 8)
+		local speed = SLASHER.ChaseSpeed + (Aggression / 8)
 
 		slasher:SetRunSpeed(speed)
 		slasher:SetWalkSpeed(speed)
@@ -84,9 +132,9 @@ SLASHER.OnTickBehaviour = function(slasher)
 		local lookent = slasher:GetEyeTrace().Entity
 
 		if lookent:GetPos():Distance(slasher:GetPos()) < 100 then
-			if v1 >= 95 then
+			if Aggression >= 95 then
 				SlashCo.BustDoor(slasher, lookent, 50000)
-			elseif v1 >= 50 then
+			elseif Aggression >= 50 then
 				slasher:SlamDoor(lookent)
 			end
 
@@ -102,7 +150,15 @@ SLASHER.OnTickBehaviour = function(slasher)
 				slasher:SetNWBool("PrincessMaulingChild", true)
 				slasher:Freeze(true)
 
-				slasher:EmitSound("slashco/slasher/princess_maul.mp3")
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/princess/princess_maul.mp3",
+					identifier = "PrincessMaul",
+					minDistance = 200,
+					maxDistance = 700,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
 
 				--baby in jaw
 
@@ -113,7 +169,15 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 				local mauled_child = ents.Create("prop_physics")
 
-				slasher:EmitSound("slashco/survivor/baby_use.mp3")
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/survivor/baby_use.mp3",
+					identifier = "PrincessBabyMaul1",
+					minDistance = 200,
+					maxDistance = 700,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
 
 				mauled_child:SetMoveType(MOVETYPE_NONE)
 				mauled_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
@@ -129,34 +193,48 @@ SLASHER.OnTickBehaviour = function(slasher)
 						bloodfx:SetOrigin(vPoint)
 						util.Effect("BloodImpact", bloodfx)
 
-						slasher:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(2, 4) .. ".wav")
+						local idx = math.random(2, 4)
+						SlashCo.AudioSystem.PlaySound({
+							soundPath = "physics/flesh/flesh_squishy_impact_hard" .. idx .. ".wav",
+							identifier = "PrincessBabyMaul2" .. idx,
+							minDistance = 200,
+							maxDistance = 700,
+							entity = slasher,
+							volume = 1,
+							fadeIn = 0,
+						})
 					end)
 				end
 
 				timer.Simple(3.75, function()
-					if not IsValid(slasher) then
-						return
-					end
+					if not IsValid(slasher) then return end
 
 					local vPoint = mauled_child:GetPos()
 					local bloodfx = EffectData()
 					bloodfx:SetOrigin(vPoint)
 					util.Effect("BloodImpact", bloodfx)
 
-					slasher:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+					local idx = math.random(2, 4)
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "physics/body/body_medium_break" .. idx .. ".wav",
+						identifier = "PrincessBabyMaul3" .. idx,
+						minDistance = 200,
+						maxDistance = 700,
+						entity = slasher,
+						volume = 1,
+						fadeIn = 0,
+					})
 
 					mauled_child:Remove()
 
-					slasher.SlasherValue2 = slasher.SlasherValue2 + math.random(15, 20)
-					slasher.SlasherValue1 = v1 - math.random(25, v1 + 26)
+					slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
+					slasher.Aggression = Aggression - math.random(25, Aggression + 26)
 				end)
 
 				---yeah
 
 				timer.Simple(4.5, function()
-					if not IsValid(slasher) then
-						return
-					end
+					if not IsValid(slasher) then return end
 
 					slasher:Freeze(false)
 					slasher:SetNWBool("PrincessMaulingChild", false)
@@ -170,20 +248,20 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 	end
 
-	if v2 > 100 then
-		slasher.SlasherValue2 = 100
+	if AggressionTH > 100 then
+		slasher.AggressionThreshold = 100
 	end
 
-	if v1 < 0 then
-		slasher.SlasherValue1 = 0
+	if Aggression < 0 then
+		slasher.Aggression = 0
 	end
 
-	if slasher:GetNWInt("PrincessAggression") ~= math.floor(slasher.SlasherValue1) then
-		slasher:SetNWInt("PrincessAggression", math.floor(slasher.SlasherValue1))
+	if slasher:GetNWInt("PrincessAggression") ~= math.floor(slasher.Aggression) then
+		slasher:SetNWInt("PrincessAggression", math.floor(slasher.Aggression))
 	end
 
-	if slasher:GetNWInt("PrincessAggressionThres") ~= math.floor(slasher.SlasherValue2) then
-		slasher:SetNWInt("PrincessAggressionThres", math.floor(slasher.SlasherValue2))
+	if slasher:GetNWInt("PrincessAggressionThres") ~= math.floor(slasher.AggressionThreshold) then
+		slasher:SetNWInt("PrincessAggressionThres", math.floor(slasher.AggressionThreshold))
 	end
 
 	if IsValid(slasher.victimragdoll) and IsValid(slasher.ref_child) then
@@ -195,85 +273,147 @@ SLASHER.OnTickBehaviour = function(slasher)
 		end
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", eyesight)
-	slasher:SetNWInt("Slasher_Perception", perception)
+	slasher:SetEyeSight(eyesight)
+	slasher:SetPerception(perception)
 end
 
-SLASHER.Maul = function(slasher, target)
+local function IsPlayerHoldingBaby(target, removeBaby)
+	if target:ItemValue("EntClass", false, true) == "sc_baby" then -- eat the baby >:3
+		if removeBaby then
+			SlashCo.RemoveItem(target, true)
+		end
+
+		return true
+	end
+
+	if target:ItemValue("EntClass", false, false) == "sc_baby" then -- eat the baby >:3
+		if removeBaby then
+			SlashCo.RemoveItem(target, false)
+		end
+
+		return true
+	end
+
+	return false
+end
+
+function SLASHER.Maul(slasher, target)
 	timer.Remove("princessMaul_" .. slasher:UserID())
-	slasher:EmitSound("slashco/slasher/princess_bite.mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/princess/princess_bite.mp3",
+		identifier = "PrincessBite",
+		minDistance = 200,
+		maxDistance = 700,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	local vPoint = target:GetPos()
 	local bloodfx = EffectData()
 	bloodfx:SetOrigin(vPoint)
 	util.Effect("BloodImpact", bloodfx)
 
-	if slasher.SlasherValue1 <= 99 then
-		return
-	end
+	local eatBabyFromPlayer = IsPlayerHoldingBaby(target, true) -- true if were eating a baby that a player was holding.
+	if slasher.Aggression <= 99 and not eatBabyFromPlayer then return end
 
 	SlashCo.StopChase(slasher)
 	slasher:SetNWBool("PrincessMaulingBase", false)
 
-	timer.Simple(FrameTime() * 3, function()
-		if not IsValid(slasher) or not IsValid(target) then
-			return
-		end
+	slasher:Freeze(true)
 
-		slasher:SetNWBool("PrincessMaulingSurvivor", true)
-		target:TakeDamage(99999, slasher, slasher)
+	if not eatBabyFromPlayer then
+		timer.Simple(0, function() -- ToDo: Why do we even need a timer? Verify.
+			if not IsValid(slasher) or not IsValid(target) then return end
 
-		timer.Simple(FrameTime() * 3, function()
-			if not IsValid(slasher) then
-				return
-			end
+			slasher:SetNWBool("PrincessMaulingSurvivor", true)
+			target:TakeDamage(99999, slasher, slasher)
 
-			slasher.victimragdoll = target and (target.DeadBody or NULL)
+			timer.Simple(FrameTime() * 3, function()
+				if not IsValid(slasher) then return end
+
+				slasher.victimragdoll = target and (target.DeadBody or NULL)
+			end)
 		end)
-	end)
+	end
 
-	slasher:EmitSound("slashco/slasher/princess_maul.mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/princess/princess_maul.mp3",
+		identifier = "PrincessMaul",
+		minDistance = 200,
+		maxDistance = 700,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	local pos = slasher:LocalToWorld(Vector(0, 10, -5))
 	local ang = slasher:LocalToWorldAngles(Angle(90, 0, 0))
 
-	slasher.ref_child = ents.Create("prop_physics")
-	slasher.ref_child:SetMoveType(MOVETYPE_NONE)
-	slasher.ref_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-	slasher.ref_child:SetModel(SlashCoItems.Baby.Model)
-	slasher.ref_child:SetPos(pos)
-	slasher.ref_child:SetAngles(ang)
-	slasher.ref_child:FollowBone(slasher, slasher:LookupBone("head"))
+	if eatBabyFromPlayer or not IsValid(target) then
+		slasher.ref_child = ents.Create("prop_physics")
+		slasher.ref_child:SetMoveType(MOVETYPE_NONE)
+		slasher.ref_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		slasher.ref_child:SetModel(SlashCoItems.Baby.Model)
+		slasher.ref_child:SetPos(pos)
+		slasher.ref_child:SetAngles(ang)
+		slasher.ref_child:FollowBone(slasher, slasher:LookupBone("head"))
+		slasher:SetNWBool("PrincessMaulingChild", true)
+	end
 
 	for i = 1, math.random(9, 10) do
 		timer.Simple((i / 8) * (0.7 + (math.random() * 0.3)), function()
-			if not IsValid(slasher.victimragdoll) then
-				return
-			end
+			if not IsValid(slasher.victimragdoll) then return end
 
 			local vPoint1 = slasher.victimragdoll:GetPos()
 			local bloodfx1 = EffectData()
 			bloodfx:SetOrigin(vPoint1)
 			util.Effect("BloodImpact", bloodfx1)
 
-			slasher.victimragdoll:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(2, 4) .. ".wav")
-			slasher.victimragdoll:EmitSound("slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".wav")
+			local idx = math.random(2, 4)
+			local idx2 = math.random(1, 5)
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/body_medium_impact_hard" .. idx .. ".wav",
+				identifier = "PrincessRagdollMaul1" .. idx,
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher.victimragdoll,
+				volume = 1,
+				fadeIn = 0,
+			})
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/body_medium_impact_hard" .. idx2 .. ".mp3",
+				identifier = "PrincessRagdollMaul2" .. idx2,
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher.victimragdoll,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end)
 	end
 
 	timer.Simple(2, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
+		
+		slasher:Freeze(false)
 
 		slasher:SetNWBool("PrincessMaulingSurvivor", false)
 		slasher:SetNWBool("PrincessMaulingBase", false)
+		
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 
-		if not IsValid(slasher.victimragdoll) then
-			return
+		if IsValid(slasher.ref_child) then
+			slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
+			slasher.Aggression = slasher.Aggression - math.random(25, slasher.Aggression + 26)
+
+			slasher.ref_child:Remove()
 		end
+		slasher:SetNWBool("PrincessMaulingChild", false) -- Just to be sure
 
-		slasher.ref_child:Remove()
+		if not IsValid(slasher.victimragdoll) then return end
+
 		slasher.victimragdoll:Remove()
 
 		local pickedclean = ents.Create("prop_ragdoll")
@@ -283,7 +423,16 @@ SLASHER.Maul = function(slasher, target)
 		pickedclean:Spawn()
 		pickedclean:SetSkin(2)
 
-		pickedclean:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+		local idx = math.random(2, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "physics/body/body_medium_break" .. idx .. ".wav",
+			identifier = "PrincessSkeletonMaul" .. idx,
+			minDistance = 200,
+			maxDistance = 700,
+			entity = pickedclean,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		local physCount = pickedclean:GetPhysicsObjectCount()
 
@@ -298,40 +447,57 @@ SLASHER.Maul = function(slasher, target)
 	end)
 end
 
-SLASHER.OnPrimaryFire = function(slasher)
-	if slasher:GetNWBool("PrincessMaulingChild") then
-		return
-	end
-	if slasher:GetNWBool("PrincessSniffing") then
-		return
-	end
-	if slasher:GetNWBool("DemonPacified") then
-		return
-	end
-	if slasher:GetNWBool("PrincessMaulingBase") then
-		return
-	end
+function SLASHER.OnPrimaryFire(slasher)
+	if slasher:GetNWBool("PrincessMaulingChild") then return end
+	if slasher:GetNWBool("PrincessSniffing") then return end
+	if slasher:GetNWBool("DemonPacified") then return end
+	if slasher:GetNWBool("PrincessMaulingBase") then return end
+	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then return end
 
-	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then
-		return
-	end
 	slasher.MaulTime = CurTime()
 
 	slasher:SetNWBool("PrincessMaulingBase", true)
-	slasher:EmitSound("slashco/slasher/princess_attack.mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/princess/princess_attack.mp3",
+		identifier = "PrincessAttack",
+		minDistance = 200,
+		maxDistance = 700,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	if slasher:IsOnGround() then
 		slasher:SetVelocity(slasher:GetForward() * 800)
 	end
 
 	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
-		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-				Vector(-40, -40, -60), Vector(40, 40, 60),
-				math.random(15, 30) + math.random(0, math.floor(slasher.SlasherValue1 / 4)), DMG_SLASH, 5, false)
+		local tr = util.TraceHull({
+			start = slasher:EyePos(),
+			endpos = slasher:LocalToWorld(Vector(45, 0, 30)),
+			maxs = Vector(40, 40, 60),
+			mins = Vector(-40, -40, -60),
+			filter = slasher,
+			ignoreworld = true,
+		})
+		local target = tr.Entity
+		local damage = math.random(20, 35) + math.random(0, math.floor(slasher.Aggression / 4))
+		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
+		--		Vector(-40, -40, -60), Vector(40, 40, 60),
+		--		damage, DMG_SLASH, 5, false)
+
+		if target:IsValid() and (not target:IsPlayer() or (target:Team() == TEAM_SURVIVOR and not IsPlayerHoldingBaby(target, false))) then
+			local dmg = DamageInfo()
+			dmg:SetDamageType(DMG_SLASH)
+			dmg:SetAttacker(slasher)
+			dmg:SetInflictor(slasher)
+			dmg:SetDamage(damage)
+			dmg:SetDamageForce(Vector(1, 1, 1)) -- required or else warnings are spammed
+			dmg:SetDamagePosition(tr.HitPos) -- required or else warnings are spammed
+			target:TakeDamageInfo(dmg)
+		end
 
 		if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
 			SLASHER.Maul(slasher, target)
@@ -339,9 +505,7 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end)
 
 	timer.Simple(0.7, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		if not slasher:GetNWBool("PrincessMaulingSurvivor") then
 			slasher:SetNWBool("PrincessMaulingBase", false)
@@ -349,35 +513,31 @@ SLASHER.OnPrimaryFire = function(slasher)
 	end)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher)
-	if slasher:GetNWBool("PrincessMaulingChild") then
-		return
-	end
-	if slasher:GetNWBool("PrincessMaulingSurvivor") then
-		return
-	end
-	if slasher:GetNWBool("PrincessMaulingBase") then
-		return
-	end
-	if slasher:GetNWBool("PrincessSniffing") then
-		return
-	end
-	if slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
+function SLASHER.OnMainAbilityFire(slasher)
+	if slasher:GetNWBool("PrincessMaulingChild") then return end
+	if slasher:GetNWBool("PrincessMaulingSurvivor") then return end
+	if slasher:GetNWBool("PrincessMaulingBase") then return end
+	if slasher:GetNWBool("PrincessSniffing") then return end
+	if slasher:GetNWBool("InSlasherChaseMode") then return end
 
 	slasher:SetNWBool("PrincessSniffing", true)
 	slasher:Freeze(true)
-	slasher:EmitSound("slashco/slasher/princess_sniff.mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/princess/princess_sniff.mp3",
+		identifier = "PrincessSniff",
+		minDistance = 200,
+		maxDistance = 700,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	timer.Simple(4, function()
-		if not IsValid(slasher) then
-			return
-		end
+		if not IsValid(slasher) then return end
 
 		slasher:SetNWBool("PrincessSniffing", false)
 		slasher:Freeze(false)
@@ -386,10 +546,14 @@ SLASHER.OnMainAbilityFire = function(slasher)
 	end)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
+function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Thirdperson(ply)
+	return ply:GetNWBool("PrincessMaulingChild") or ply:GetNWBool("PrincessMaulingSurvivor") or ply:GetNWBool("PrincessSniffing")
+end
+
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local maul_child = ply:GetNWBool("PrincessMaulingChild")
 	local maul_normal = ply:GetNWBool("PrincessMaulingBase")
@@ -443,20 +607,34 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/princess_step" .. math.random(1, 3) .. ".mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
+			identifier = "PrincessFootstep1",
+			group = "SlasherFootstep",
+			minDistance = 300,
+			maxDistance = 700,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(0.15, function()
-			ply:EmitSound("slashco/slasher/princess_step" .. math.random(1, 3) .. ".mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
+				identifier = "PrincessFootstep2",
+				group = "SlasherFootstep",
+				minDistance = 300,
+				maxDistance = 700,
+				entity = ply,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end)
-
-		return true
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 local maulTable = {
@@ -464,7 +642,7 @@ local maulTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_17"))
 	hud:SetTitle("Princess")
 
@@ -480,17 +658,16 @@ SLASHER.InitHud = function(_, hud)
 	function hud:Sniff()
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		local sniffables = table.Add(survivors, ents.FindByClass("sc_baby"))
-		if table.Count(sniffables) <= 0 then
-			return
-		end
+
+		if table.Count(sniffables) <= 0 then return end
 
 		self.SniffPos = table.Random(sniffables):WorldSpaceCenter()
 
-		local inaccuracy = math.max(self.SniffPos:Distance(LocalPlayer():GetPos()) / 12, 50)
+		local inaccuracy = math.max(self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) / 12, 50)
 		self.SniffRandom = VectorRand(-inaccuracy, inaccuracy)
-		hook.Add("HUDPaint", "SlashCoSniff", function()
-			if LocalPlayer():Team() ~= TEAM_SLASHER or self.SniffPos:Distance(LocalPlayer():GetPos()) < 150 then
-				hook.Remove("HUDPaint", "SlashCoSniff")
+		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not self.SniffPos or self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) < 150 then
+				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
 				return
 			end
 
@@ -505,7 +682,7 @@ SLASHER.InitHud = function(_, hud)
 
 	hud.prevThresh = -1
 	function hud.AlsoThink()
-		local thresh = LocalPlayer():GetNWInt("PrincessAggressionThres")
+		local thresh = GameData.LocalPlayer:GetNWInt("PrincessAggressionThres")
 		if thresh ~= hud.prevThresh then
 			hud:SetMeterMax("aggro", thresh)
 			hud.prevThresh = thresh
@@ -513,7 +690,7 @@ SLASHER.InitHud = function(_, hud)
 	end
 end
 
-SLASHER.PreDrawHalos = function()
+function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_baby"), nil, 2, false)
 
 	local plyWithItem = {}

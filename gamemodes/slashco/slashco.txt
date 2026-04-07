@@ -29,5 +29,25 @@
 			"singleplayer"	"1"
 			"replicate"		"1"
 		}
+
+		3
+		{
+			"name"			"slashco_maxplayers"
+			"text"			"Max Players"
+			"help"			"Maximum number of Players that can play, any additional players are forced into spectator."
+			"type"			"Numeric"
+			"default"		"7"
+			"singleplayer"	"1"
+		}
+
+		4
+		{
+			"name"			"slashco_enablemaptools"
+			"text"			"Max Players"
+			"help"			"(Developer Only) Used together with Hammer to make map editing easier"
+			"type"			"CheckBox"
+			"default"		"0"
+			"singleplayer"	"1"
+		}
 	}
 }

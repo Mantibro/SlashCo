@@ -12,7 +12,9 @@ function SlashCo.RegisterItem(table, name)
 		return
 	end
 
+	name = name or table.Name
 	SlashCoItems[name] = table
+	SlashCo.PrecacheItem(name)
 end
 
 function SlashCo.RegisterEffect(table, name)
@@ -21,7 +23,18 @@ function SlashCo.RegisterEffect(table, name)
 		return
 	end
 
+	name = name or table.Name
 	SlashCoEffects[name] = table
+end
+
+function SlashCo.GetItemByEntity(class)
+	for name, tbl in pairs(SlashCoItems) do
+		if tbl.EntClass and tbl.EntClass == class then
+			return name
+		end
+	end
+
+	return nil
 end
 
 function SlashCo.GetItemTable(name)
@@ -32,21 +45,23 @@ function SlashCo.GetEffectTable(name)
 	return SlashCoEffects[name]
 end
 
-SC_LOADEDITEMS = nil
+function SlashCo.LoadItems()
+	SC_LOADEDITEMS = nil
+	local effect_files = file.Find("slashco/effect/*.lua", "LUA")
+	for _, v in ipairs(effect_files) do
+		AddCSLuaFile("slashco/effect/" .. v)
+		include("slashco/effect/" .. v)
+	end
 
-local effect_files = file.Find("slashco/effect/*.lua", "LUA")
-for _, v in ipairs(effect_files) do
-	AddCSLuaFile("slashco/effect/" .. v)
-	include("slashco/effect/" .. v)
+	local item_files = file.Find("slashco/item/*.lua", "LUA")
+	for _, v in ipairs(item_files) do
+		AddCSLuaFile("slashco/item/" .. v)
+		include("slashco/item/" .. v)
+	end
+	SC_LOADEDITEMS = true
 end
-
-local item_files = file.Find("slashco/item/*.lua", "LUA")
-for _, v in ipairs(item_files) do
-	AddCSLuaFile("slashco/item/" .. v)
-	include("slashco/item/" .. v)
-end
-
-SC_LOADEDITEMS = true
+hook.Add("GameContentChanged", "SlashCo:RefreshItems", SlashCo.LoadItems)
+SlashCo.LoadItems()
 
 ---remainder of init code
 
@@ -59,50 +74,155 @@ end
 
 local PLAYER = FindMetaTable("Player")
 
----gives a player an effect
-function PLAYER:AddEffect(value, duration)
-	if not self:EffectFunction("OnRemoved") then
-		self:EffectFunction("OnExpired")
+local function RemoveEmptyEntires(perkTable)
+	for id, entry in ipairs(perkTable) do
+		if entry == "" or entry == "," then
+			table.remove(perkTable, id)
+		end
 	end
-	self:SetItem("itemEffect", value)
-	self:EffectFunction("OnApplied")
-	timer.Create("itemEffectExpire_" .. self:UserID(), duration, 1, function()
+end
+
+local function HasEffect(ply, effectName)
+	return string.find(ply:GetActiveEffects(), effectName) ~= nil
+end
+
+local function GetEffects(ply)
+	return string.Split(ply:GetActiveEffects(), ",")
+end
+
+local function AddEffect(ply, effectName)
+	if HasEffect(ply, effectName) then return end
+
+	local effects = GetEffects(ply)
+	table.insert(effects, effectName)
+	RemoveEmptyEntires(effects)
+
+	ply:SetActiveEffects(table.concat(effects, ","))
+end
+
+local function RemoveEffect(ply, effectName)
+	if not HasEffect(ply, effectName) then return end
+
+	local effects = GetEffects(ply)
+	for id, effName in ipairs(effects) do
+		if effName == effectName then
+			table.remove(effects, id)
+			break
+		end
+	end
+	RemoveEmptyEntires(effects)
+
+	ply:SetActiveEffects(table.concat(effects, ","))
+end
+
+---gives a player an effect
+function PLAYER:AddEffect(effectName, duration)
+	if not self:EffectFunction(effectName, "OnRemoved") then
+		self:EffectFunction(effectName, "OnExpired")
+	end
+	AddEffect(self, effectName)
+	self:EffectFunction(effectName, "OnApplied")
+	GameData.EffectCounter = (GameData.EffectCounter or 0) + 1
+	local effectID = GameData.EffectCounter
+	self.ActiveEffects = self.ActiveEffects or {}
+	self.ActiveEffects[effectID] = effectName
+	timer.Create("itemEffectExpire_" .. GameData.EffectCounter, duration, 1, function()
 		if not IsValid(self) then
 			return
 		end
+
+		self.ActiveEffects[effectID] = nil
+
+		for _, effName in pairs(self.ActiveEffects) do
+			-- There is another effect stacked on top of this- so skip.
+			if effName == effectName then return end
+		end
+
 		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
-		self:EffectFunction("OnExpired")
-		self:SetItem("itemEffect", "none")
+		self:EffectFunction(effectName, "OnExpired")
+		RemoveEffect(self, effectName)
 	end)
 end
 
 ---calls the <funcName> function of a player's effect with passed args
-function PLAYER:EffectFunction(funcName, ...)
-	local effect = self:GetItem("itemEffect")
-	if SlashCoEffects[effect] and SlashCoEffects[effect][funcName] then
-		return SlashCoEffects[effect][funcName](self, ...)
+function PLAYER:EffectFunction(effectName, funcName, ...)
+	if not HasEffect(self, effectName) then return end
+
+	if SlashCoEffects[effectName] and SlashCoEffects[effectName][funcName] then
+		return SlashCoEffects[effectName][funcName](self, ...)
 	end
 end
 
----removes a player's effect
-function PLAYER:ClearEffect()
-	if not self:EffectFunction("OnRemoved") then
-		self:EffectFunction("OnExpired")
-	end
-	if self:GetItem("itemEffect") ~= "none" then
-		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+---removes a player's effect (removes all instances of it in case it's stacked)
+function PLAYER:ClearEffect(effectName)
+	if not HasEffect(self, effectName) then return end
+	if not self:EffectFunction(effectName, "OnRemoved") then
+		self:EffectFunction(effectName, "OnExpired")
 	end
 
-	self:SetItem("itemEffect", "none")
-	timer.Remove("itemEffectExpire_" .. self:UserID())
+	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+
+	RemoveEffect(self, effectName)
+	for effectID, effName in pairs(self.ActiveEffects or {}) do
+		if effName == effectName then
+			timer.Remove("itemEffectExpire_" .. effectID)
+		end
+	end
+end
+
+function PLAYER:ClearEffects()
+	local effects = GetEffects(self)
+	for _, effectName in ipairs(effects) do
+		if not self:EffectFunction(effectName, "OnRemoved") then
+			self:EffectFunction(effectName, "OnExpired")
+		end
+
+		RemoveEffect(self, effectName)
+	end
+
+	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+	for effectID, _ in pairs(self.ActiveEffects or {}) do
+		timer.Remove("itemEffectExpire_" .. effectID)
+	end
+end
+
+-- Collects all things that have this value for a combined result. This sucks... ToDo: Finish/Rework this!
+local itemSlots = {"item", "item2"}
+function PLAYER:StackedItemValue(valueName, initialValue)
+	local value = 0
+	local activePerks = SlashCo.GetActivePerks(self)
+	for _, perk in ipairs(activePerks) do
+		local perkValue = activePerks[perk][valueName]
+		if perkValue ~= nil then
+			value = value + AddItemValue(perkValue)
+		end
+	end
+
+	local effects = GetEffects(self)
+	for _, effectName in ipairs(effects) do
+		if SlashCoEffects[effectName] and SlashCoEffects[effectName][valueName] then
+			value = value + AddItemValue(SlashCoEffects[effectName][valueName])
+		end
+	end
+
+	for _, slot in ipairs(itemSlots) do
+		local item = self:GetItem(slot)
+		if SlashCoItems[item] and SlashCoItems[item][valueName] then
+			value = value + AddItemValue(SlashCoItems[item][valueName])
+		end
+	end
+
+	return value == 0 and initialValue or math.max(value, 0.1)
 end
 
 ---check the <valueName> value of a player's item in a specific slot
 --this doesn't include a team check because we assume that it's in a survivor-only context
 function PLAYER:ItemValue(valueName, fallback, isSecondary)
-	local effect = self:GetItem("itemEffect")
-	if SlashCoEffects[effect] and SlashCoEffects[effect][valueName] then
-		return SlashCoEffects[effect][valueName]
+	local effects = GetEffects(self)
+	for _, effectName in ipairs(effects) do
+		if SlashCoEffects[effectName] and SlashCoEffects[effectName][valueName] then
+			return SlashCoEffects[effectName][valueName]
+		end
 	end
 
 	local slot = isSecondary and "item2" or "item"
@@ -118,9 +238,11 @@ end
 function PLAYER:ItemValue2(value, fallback, noEffect)
 	local item
 	if not noEffect then
-		item = self:GetItem("itemEffect")
-		if SlashCoItems[item] and SlashCoItems[item][value] then
-			return SlashCoItems[item][value]
+		item = GetEffects(self)
+		for _, effectName in ipairs(item) do
+			if SlashCoEffects[effectName] and SlashCoEffects[effectName][value] then
+				return SlashCoEffects[effectName][value]
+			end
 		end
 	end
 
@@ -194,76 +316,53 @@ function PLAYER:ItemFunction2OrElse(funcName, item, fallback, ...)
 	return unpack(fallback)
 end
 
-if SERVER then
-	function PLAYER:GetItem(slot)
-		return self:GetNWString(slot, "none")
-	end
+function PLAYER:GetItem(slot)
+	return self:GetNW2String(slot, "none")
+end
 
+if SERVER then
 	-- slot can be omitted if desired
+	local validSlots = {
+		item2 = true,
+		"item2", -- added for table.concat to work as it needs a sequential table.
+		item = true,
+		"item",
+	}
 	function PLAYER:SetItem(slot, item)
 		if not slot then
 			if SlashCoItems[item] then
 				slot = SlashCoItems[item].IsSecondary and "item2" or "item"
-			elseif SlashCoEffects[item] then
-				slot = "itemEffect"
 			else
 				return
 			end
 		end
 
-		self:SetNWString(slot, item)
-		SlashCo.SendValue(self, "preItem", item) -- networking on nwvars can be slow, this acts as a backup
-	end
-else
-	SlashCo.PreItem = SlashCo.PreItem or "none"
-
-	hook.Add("scValue_preItem", "SlashCoPreItem", function(item, slot)
-		if not slot then
-			SlashCo.PreItem = item or "none"
+		if not validSlots[slot] then
+			error("Tried to use an invalid item slot! (Got: " .. tostring(slot) .. ", Expected one of: " .. table.concat(validSlots, ", ") .. ")")
 			return
 		end
 
-		if not SlashCoItems[SlashCo.PreItem] then
+		if item ~= "none" and not SlashCoItems[item] and not SlashCoEffects[item] then
+			error("Tried to set an invalid item! (Item: " .. (tostring(item) or "") .. ")")
 			return
 		end
 
-		local isSecondary = slot == "item2"
-		local itemSecondary = SlashCoItems[SlashCo.PreItem].IsSecondary or false
-		if itemSecondary == isSecondary then
-			SlashCo.PreItem = "none"
-		end
-	end)
-
-	function PLAYER:GetItem(slot)
-		local item = self:GetNWString(slot, "none")
-
-		if self ~= LocalPlayer() or SlashCo.PreItem == "none" or slot == "itemEffect" then
-			return item
-		end
-
-		if not SlashCoItems[SlashCo.PreItem] then
-			return item
-		end
-
-		local isSecondary = slot == "item2"
-		local itemSecondary = SlashCoItems[SlashCo.PreItem].IsSecondary or false
-		if itemSecondary == isSecondary then
-			if item == "none" and SlashCoItems[SlashCo.PreItem] then
-				return SlashCo.PreItem
-			end
-
-			SlashCo.PreItem = "none"
-		end
-
-		return item
+		self:SetNW2String(slot, item)
 	end
 end
 
 ---internal: checks effect function first before checking the specified slot
 function PLAYER:ItemFunctionInternal(value, slot, ...)
-	local effect = self:GetItem("itemEffect")
-	if SlashCoEffects[effect] and SlashCoEffects[effect][value] then
-		return SlashCoEffects[effect][value](self, ...)
+	local effects = GetEffects(self)
+	for _, effectName in ipairs(effects) do
+		if SlashCoEffects[effectName] and SlashCoEffects[effectName][value] then
+			local ret = SlashCoEffects[effectName][value](self, ...)
+			-- RaphaelIT7: If an effect returns nothing we will continue the next active effects.
+			-- This allows multiple effects to for example render Screenscpace at once.
+			if ret ~= nil then
+				return ret
+			end
+		end
 	end
 
 	local item = self:GetItem(slot)
@@ -271,16 +370,24 @@ function PLAYER:ItemFunctionInternal(value, slot, ...)
 		return SlashCoItems[item][value](self, ...)
 	end
 end
----load patch files; these are specifically intended to modify existing addon code
 
-local effect_patches = file.Find("slashco/patch/effect/*.lua", "LUA")
-for _, v in ipairs(effect_patches) do
-	AddCSLuaFile("slashco/patch/effect/" .. v)
-	include("slashco/patch/effect/" .. v)
-end
+function SlashCo.LoadItemPatches()
+	---load patch files; these are specifically intended to modify existing addon code
+	local effect_patches = file.Find("slashco/patch/effect/*.lua", "LUA")
+	for _, v in ipairs(effect_patches) do
+		AddCSLuaFile("slashco/patch/effect/" .. v)
+		include("slashco/patch/effect/" .. v)
+	end
 
-local item_patches = file.Find("slashco/patch/item/*.lua", "LUA")
-for _, v in ipairs(item_patches) do
-	AddCSLuaFile("slashco/patch/item/" .. v)
-	include("slashco/patch/item/" .. v)
+	local item_patches = file.Find("slashco/patch/item/*.lua", "LUA")
+	for _, v in ipairs(item_patches) do
+		AddCSLuaFile("slashco/patch/item/" .. v)
+		include("slashco/patch/item/" .. v)
+	end
 end
+SlashCo.LoadItemPatches()
+
+hook.Add("GameContentChanged", "SlashCo:RefreshItems", function()
+	SlashCo.LoadItems()
+	SlashCo.LoadItemPatches()
+end)

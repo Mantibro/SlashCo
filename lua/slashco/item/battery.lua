@@ -8,11 +8,14 @@ ITEM.Description = "Battery_desc"
 ITEM.CamPos = Vector(80,0,0)
 ITEM.IsSpawnable = false
 ITEM.IsBattery = true
-ITEM.OnDrop = function(ply)
+ITEM.Unbreakable = true
+
+function ITEM.OnDrop(ply)
 	return 55
 end
+
 ITEM.ViewModel = {
-	model = "models/items/car_battery01.mdl",
+	model = ITEM.Model,
 	pos = Vector(63, 0, 0),
 	angle = Angle(0, 90, 90),
 	size = Vector(0.5, 0.5, 0.5),
@@ -24,7 +27,7 @@ ITEM.ViewModel = {
 }
 ITEM.WorldModel = {
 	holdtype = "duel",
-	model = "models/items/car_battery01.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(-2.5, 11, -3),
 	angle = Angle(0, -10, 180),

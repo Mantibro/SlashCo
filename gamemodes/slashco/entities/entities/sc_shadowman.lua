@@ -40,54 +40,81 @@ function ENT:Initialize()
 	end)
 
 	self.Speed = 0.5 + math.random() * 1.5
-	self.Sound = math.random(1, 2)
 
-	if LocalPlayer().BenadrylIntensity then
-		self:EmitSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3", 60 + math.random(1, 80), 100,
-				(math.random() * 2) * LocalPlayer().BenadrylIntensity)
+	GameData.ShadowManIndex = (GameData.ShadowManIndex or 0) + 1
+	self.ShadowIndex = GameData.ShadowManIndex
+
+	if GameData.LocalPlayer.BenadrylIntensity then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/benadryl/shadowman/Shadow_Voice_" .. math.random(1, 113) .. ".ogg",
+			identifier = "ShadowMan" .. GameData.ShadowManIndex,
+			minDistance = 100,
+			maxDistance = 500,
+			entity = self,
+			volume = 0.25,
+			fadeIn = 0,
+			deleteWhenDone = true,
+		})
 	end
 end
 
+function ENT:OnRemove()
+	local entIndex = self.ShadowIndex
+	timer.Simple(10, function()
+		SlashCo.AudioSystem.StopSound("ShadowMan" .. entIndex, 1, entIndex)
+	end)
+end
+
+local minBox = Vector(-6000, -6000, -6000)
+local maxBox = Vector(6000, 6000, 6000)
+local ang = Angle(0, 0, 0)
+local traceStartOffset = Vector(0, 0, 80)
 function ENT:Think()
-	if not LocalPlayer().BenadrylIntensity then
+	if not GameData.LocalPlayer.BenadrylIntensity then
 		return
 	end
 
-	if not self.Speed or not self.Sound then
+	if not self.Speed then
 		self:Remove()
 		return
 	end
 
 	--remove shadowboys that are way too far away
-	if not self:GetPos():WithinAABox(Vector(-6000, -6000, -6000), Vector(6000, 6000, 6000)) then
+	local pos = self:GetPos()
+	if not pos:WithinAABox(minBox, maxBox) then
 		self:Remove()
 		return
 	end
 
-	self:SetColor(Color(0, 0, 0, math.abs(LocalPlayer().BenadrylIntensity) * 255))
+	self:SetColor(Color(0, 0, 0, math.abs(GameData.LocalPlayer.BenadrylIntensity) * 255))
 
 	if not IsValid(self.TargetThing) then
-		self.TargetThing = ents.FindByClass("sc_gascan")[math.random(1, #ents.FindByClass("sc_gascan"))]
+		local gasCans = ents.FindByClass("sc_gascan")
+		self.TargetThing = gasCans[math.random(1, #gasCans)]
 	else
 		if not self.Speed then
 			self.Speed = 1
 		end
 
-		local dir = (self.TargetThing:GetPos() - self:GetPos()):GetNormalized() * self.Speed
-		self:SetPos(self:GetPos() + dir)
-		self:SetAngles(Angle(0, (self:GetPos() + dir):Angle()[2] + 90, 0))
-
+		local dir = (self.TargetThing:GetPos() - pos):GetNormalized() * self.Speed
+		pos:Add(dir)
+		self:SetPos(pos)
+		ang[2] = pos:Angle()[2] + 90
+		self:SetAngles(ang)
+	
+		local up = self:GetUp()
+		up:Mul(-200)
 		local ground = util.TraceLine({
-			start = self:LocalToWorld(Vector(0, 0, 80)),
-			endpos = self:LocalToWorld(Vector(0, 0, 0)) + self:GetUp() * -200
+			start = self:LocalToWorld(traceStartOffset),
+			endpos = self:LocalToWorld(vector_origin):Add(up)
 		})
 
 		if ground.Fraction > 0 then
 			self:SetPos(ground.HitPos)
+			pos = ground.HitPos
 		end
 
-		if self:GetPos():Distance(self.TargetThing:GetPos()) < 25 then
-			self:StopSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3")
+		if pos:Distance(self.TargetThing:GetPos()) < 25 then
 			self:Remove()
 		end
 	end
@@ -101,8 +128,7 @@ function ENT:Think()
 		self.Cycle = CurTime()
 	end
 
-	if not LocalPlayer():GetNWBool("SurvivorBenadryl") then
-		self:StopSound("slashco/benadryl_shadow" .. self.Sound .. ".mp3")
+	if GameData.LocalPlayer:GetNW2Float("InitialBenadrylTime", 0) == 0 then
 		self:Remove()
 	end
 end

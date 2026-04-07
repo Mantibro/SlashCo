@@ -11,13 +11,105 @@ ENT.Contact = ""
 ENT.Purpose = "Combustion engine powered generator unit."
 ENT.Instructions = ""
 ENT.PingType = "GENERATOR"
+ENT.PingExpiryTime = -1 -- Permanently pinged
+
+hook.Add("SlashCo:Precache", "PrecacheGenerator", function()
+	SlashCo.PrecacheSound("slashco/generator_fill.mp3")
+	SlashCo.PrecacheSound("slashco/generator_start.mp3")
+	SlashCo.PrecacheSound("slashco/generator_loop.mp3")
+	SlashCo.PrecacheSound("slashco/generator_failstart.mp3")
+	SlashCo.PrecacheSound("ambient/machines/zap1.mp3")
+	SlashCo.PrecacheSound("slashco/battery_insert.mp3")
+	SlashCo.PrecacheModel("models/props_c17/light_cagelight01_on.mdl")
+end)
 
 local DefaultTimeToFuel = 13
 local TimeToFuel = DefaultTimeToFuel
 
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "Running")
+	self:NetworkVar("Int", 0, "CansRemaining")
+end
+
+function ENT:OnPing(ply)
+	if self.WasDiscovered then return end
+
+	self.WasDiscovered = true
+	ply:AddRoundPoints("generator") -- give them a reward for finding it as the first person
+end
+
 if CLIENT then
+	local lightAng = Angle(0, 0, 180)
+	local screenAng = Angle(0, 180, 90)
+	local screenPos = Vector(-37, 18.8, 45.75)
 	function ENT:Draw()
+		if GameData.GeneratorLight and not GameData.GeneratorLight:IsValid() then
+			GameData.GeneratorLight = nil
+		end
+		GameData.GeneratorLight = GameData.GeneratorLight or ClientsideModel("models/props_c17/light_cagelight01_on.mdl", RENDERGROUP_OTHER)
+
+		local cacheData = self.cacheData
+		if not cacheData then
+			local lightPos = self:GetPos()
+			local mins, maxs = self:GetModelBounds()
+			lightPos[3] = lightPos[3] + (maxs[3] / 1.55)
+			
+			local ang = self:GetAngles()
+			ang:Add(lightAng)
+
+			cacheData = {
+				pos = lightPos,
+				ang = ang,
+				entindex = self:EntIndex(),
+				screenPos = self:LocalToWorld(screenPos),
+				screenAng = self:LocalToWorldAngles(screenAng),
+			}
+			self.cacheData = cacheData
+		end
+
+		local running = self:GetRunning()
+		GameData.GeneratorLight:SetPos(cacheData.pos)
+		GameData.GeneratorLight:SetColor4Part(not running and 255 or 0, running and 255 or 0, 0, 255)
+		GameData.GeneratorLight:SetAngles(cacheData.ang)
+		GameData.GeneratorLight:DrawModel()
+
+		local curTime = CurTime()
+		local dlight = DynamicLight(cacheData.entindex)
+		if dlight then
+			dlight.pos = cacheData.pos
+			dlight.r = not running and 255 or 0
+			dlight.g = running and 255 or 0
+			dlight.b = 0
+			dlight.brightness = 5
+			dlight.Decay = 1000
+			--dlight.nomodel = true -- We don't need that.
+			dlight.Size = math.abs(running and 1 or math.sin(curTime)) * 200
+			dlight.DieTime = curTime + (running and 60 or 0.1)
+		end
+
 		self:DrawModel()
+
+		-- Small fuel UI showing how full a generator is
+		local gasPerGen = SlashCo.GetGasCansPerGenerator()
+		local remaining = self:GetCansRemaining()
+		if remaining < 0 then
+			remaining = 0
+		end
+
+		cam.Start3D2D(cacheData.screenPos, cacheData.screenAng, 0.05)
+			surface.SetDrawColor(0, 0, 0, 255)
+			surface.DrawRect(0, 0, 100, 190)
+
+			surface.SetDrawColor(255, 255, 255, 255)
+			surface.DrawOutlinedRect(5, 5, 90, 180, 2)
+
+			local spaceSize = 15
+			local xOffset = (180 - spaceSize) / gasPerGen
+			local segmentSize = math.max(xOffset / 1.5, xOffset - 5)
+			for k=0, ((gasPerGen - 1) - remaining) do
+				surface.DrawRect(15, 180 - xOffset - (xOffset * k), 70, segmentSize)
+			end
+		cam.End3D2D()
 	end
 
 	return
@@ -31,16 +123,20 @@ function ENT:Initialize()
 	self:GetPhysicsObject():EnableMotion(false)
 	self:SetUseType(SIMPLE_USE)
 	self.Progress = 0
+
+	self.CansRemaining = SlashCo.GetGasCansPerGenerator()
+	self:SetCansRemaining(self.CansRemaining)
 end
 
 function ENT:ChangeCanProgress(amount)
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	self.CansRemaining = math.Clamp((self.CansRemaining or gasPerGen) - amount, 0, gasPerGen)
+	self:SetCansRemaining(self.CansRemaining)
 	self.Progress = math.Clamp((gasPerGen - self.CansRemaining) * (4 / gasPerGen), 0, 4) + (self.HasBattery and 1 or 0)
 
 	if self.CansRemaining == 0 then
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			v:RemovePointsKey("slasher_perfect")
+			v:RemoveRoundPointsKey("slasher_perfect")
 		end
 
 		SlashCo.NotPerfect = true
@@ -50,17 +146,17 @@ function ENT:ChangeCanProgress(amount)
 end
 
 function ENT:SendData(ply)
-	net.Start("mantislashcoGasPourProgress")
-	net.WriteUInt(TimeToFuel, 8)
-	net.WriteEntity(self.FuelingCan)
-	net.WriteBool(self.IsFueling)
-	net.WriteFloat(self.TimeUntilFueled)
+	net.Start("SlashCo:GasPourProgress")
+		net.WriteUInt(TimeToFuel, 8)
+		net.WriteUInt(self.FuelingCan:EntIndex(), MAX_EDICT_BITS) -- NOTE: We require this since we might send this net message before the Entity was networked, so we need to accout for that.
+		net.WriteBool(self.IsFueling)
+		net.WriteFloat(self.TimeUntilFueled)
 	net.Send(ply)
 end
 
 function ENT:Touch(otherEnt)
 	local class = otherEnt:GetClass()
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	if not self.MakingItem and not self.FuelingCan and class == "sc_gascan"
 			and (self.CansRemaining or gasPerGen) > 0 then
 
@@ -95,7 +191,8 @@ function ENT:MakeBattery(model)
 	battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
 	battery:SetParent(self)
 	battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-	battery:EmitSound("slashco/battery_insert.wav", 125, 100, 1)
+	battery:EmitSound("slashco/battery_insert.mp3", 125, 100, 1)
+	battery:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	SlashCo.SpawnSlasher()
 end
@@ -116,12 +213,13 @@ function ENT:MakeGasCan(model)
 	gasCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035)))
 	gasCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25)))
 	gasCan:SetParent(self)
+	gasCan:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	SlashCo.SpawnSlasher()
 end
 
 function ENT:CheckProgress(dontFailStart)
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	if (self.CansRemaining or gasPerGen) <= 0 and self.HasBattery and not self.IsRunning then
 		if IsValid(self.SpawnedAt) then
 			self.SpawnedAt:TriggerOutput("OnComplete", self.CurrentPourer)
@@ -129,13 +227,46 @@ function ENT:CheckProgress(dontFailStart)
 
 		self.IsRunning = true
 		self.Progress = 5
-		self:EmitSound("slashco/generator_start.wav", 85, 100, 1)
+		self:SetRunning(true)
+		SlashCo.AudioSystem.PlaySound({ -- Let everyone hear that a generator was started
+			soundPath = "slashco/generator_start.mp3",
+			identifier = "GeneratorStart",
+			group = "Generator",
+			minDistance = 1500,
+			maxDistance = 10000,
+			entity = self,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(6.4, function()
-			self:PlayGlobalSound("slashco/generator_loop.wav", 85, nil, true)
+			SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.PROGRESS, 1)
+			SlashCo.SendObjectives()
+
+			if not IsValid(self) then return end
+			SlashCo.AudioSystem.PlaySound({ -- Let everyone hear that a generator was started
+				soundPath = "slashco/generator_loop.mp3",
+				identifier = "GeneratorLoop",
+				group = "Generator",
+				minDistance = 250,
+				maxDistance = 750,
+				entity = self,
+				volume = 1,
+				fadeIn = 0,
+				looping = true,
+			})
 		end)
 	elseif not dontFailStart and self.HasBattery and (self.CansRemaining or gasPerGen) > 0 then
-		self:EmitSound("slashco/generator_failstart.wav", 85, 100, 1)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/generator_failstart.mp3",
+			identifier = "GeneratorFailedStart",
+			group = "Generator",
+			minDistance = 500,
+			maxDistance = 1500,
+			entity = self,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 end
 
@@ -152,7 +283,7 @@ function ENT:Use(activator)
 
 		--shift TimeToFuel and TimeUntilFueled
 		local unShift = DefaultTimeToFuel / TimeToFuel
-		TimeToFuel = DefaultTimeToFuel / activator:ItemValue("FuelSpeed", 1)
+		TimeToFuel = DefaultTimeToFuel / activator:ItemValue("FuelSpeed", 1) / activator:PerkValue("FuelSpeed", 1)
 		if self.FuelProgress then
 			self.FuelProgress = self.FuelProgress * unShift * (TimeToFuel / DefaultTimeToFuel)
 		end
@@ -161,10 +292,10 @@ function ENT:Use(activator)
 		self.CurrentPourer = activator
 		self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
 		self:SendData(activator)
-		self:EmitSound("slashco/generator_fill.wav")
+		self:EmitSound("slashco/generator_fill.mp3")
 	elseif not self.MakingItem then
 		self:SlasherHint()
-		local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+		local gasPerGen = SlashCo.GetGasCansPerGenerator()
 		if activator:ItemValue("IsFuel", false, true) then
 			if self.FuelingCan or (self.CansRemaining or gasPerGen) <= 0 then
 				SlashCo.SendValue(activator, "cantFuel")
@@ -175,6 +306,9 @@ function ENT:Use(activator)
 			self.ItemModel = activator:ItemValue("Model", false, true)
 			timer.Simple(0.25, function()
 				self:MakeGasCan(self.ItemModel)
+				if IsValid(activator) then
+					self:Use(activator, activator) -- Hopefully allow them to instantly pour into the generator instead of having to release and press USE again.
+				end
 			end)
 
 			activator:SecondaryItemFunction("OnFuel", self)
@@ -207,7 +341,7 @@ end
 
 function ENT:SlasherObserve()
 	local observed
-	local gasPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
+	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if v:GetEyeTrace().Entity == self and (not v.GenCooldown or CurTime() - v.GenCooldown > 3) then
 			timer.Remove(self:GetCreationID() .. "_slasherHint_" .. v:UserID())
@@ -231,7 +365,7 @@ function ENT:Think()
 	end
 
 	if not IsValid(self.CurrentPourer) or not IsValid(self.FuelingCan) then
-		self:StopSound("slashco/generator_fill.wav")
+		self:StopSound("slashco/generator_fill.mp3")
 		self.IsFueling = false
 		return
 	end
@@ -243,18 +377,19 @@ function ENT:Think()
 		self:SendData(self.CurrentPourer)
 		self.TimeUntilFueled = nil
 		self.CurrentPourer = nil
-		self:StopSound("slashco/generator_fill.wav")
+		self:StopSound("slashco/generator_fill.mp3")
 		return
 	end
+
 	local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
 	self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25 + fuelprog * 40)))
 	self.FuelingCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035 + fuelprog * 10)))
 
 	if CurTime() >= self.TimeUntilFueled then
-		if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
-			self.CurrentPourer:AddPoints("working", 5 + (#team.GetPlayers(TEAM_SLASHER) * 15))
+		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
+			self.CurrentPourer:AddRoundPoints("working", 5 + (team.NumPlayers(TEAM_SLASHER) * 15))
 		else
-			self.CurrentPourer:AddPoints("working")
+			self.CurrentPourer:AddRoundPoints("working")
 		end
 
 		if IsValid(self.SpawnedAt) then
@@ -267,7 +402,7 @@ function ENT:Think()
 		self:SendData(self.CurrentPourer)
 		self.TimeUntilFueled = nil
 		self.CurrentPourer = nil
-		self:StopSound("slashco/generator_fill.wav")
+		self:StopSound("slashco/generator_fill.mp3")
 		self:ChangeCanProgress(1)
 
 		--//discard gas can//--

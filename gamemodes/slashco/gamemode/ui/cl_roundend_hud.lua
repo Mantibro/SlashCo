@@ -1,7 +1,7 @@
 local function showPointSummary(cur)
 	local stuff = {}
 
-	local pKeys = LocalPlayer():GetPointsKeys()
+	local pKeys = GameData.LocalPlayer:GetRoundPointsKeys()
 	if table.IsEmpty(pKeys) then
 		table.insert(stuff, "point_nil")
 	else
@@ -23,9 +23,9 @@ local function showPointSummary(cur)
 		if v == "point_summary" or v == "point_nil" then
 			langText = SlashCo.Language(v)
 		elseif v == "point_total" then
-			langText = SlashCo.Language(v, LocalPlayer():GetTotalPoints())
+			langText = SlashCo.Language(v, GameData.LocalPlayer:GetTotalRoundPoints())
 		else
-			local amount, num = LocalPlayer():GetPoints(v)
+			local amount, num = GameData.LocalPlayer:GetRoundPoints(v)
 			if amount > 0 then
 				amount = "+" .. amount
 			end
@@ -147,42 +147,15 @@ local function teamSummary(lines, survivors, rescued)
 	end
 end
 
-local dangerTable = {
-	[0] = "Unknown",
-	"Moderate",
-	"Considerable",
-	"Devastating"
-}
-local classTable = {
-	[0] = "Unknown",
-	"Cryptid",
-	"Demon",
-	"Umbra"
-}
-local difficultyTable = {
-	[0] = "Easy",
-	"Novice",
-	"Intermediate",
-	"Hard"
-}
-local stateTable = {
-	[0] = "wonAllSurvivors",
-	"wonSomeSurvivors",
-	"wonNoSurvivors",
-	"lost",
-	"wonBeacon",
-	"cursed",
-	"intro"
-}
 local stringTable = {
-	wonAllSurvivors = function()
+	[SlashCo.RoundState.WON_ALL_ALIVE] = function()
 		surface.PlaySound("slashco/music/slashco_win_full.mp3")
 		return {
 			SlashCo.Language("AssignmentSuccess"),
 			SlashCo.Language("AllRescued"),
 		}
 	end,
-	wonSomeSurvivors = function(survivors, rescued)
+	[SlashCo.RoundState.WON_SOME_DEAD] = function(survivors, rescued)
 		surface.PlaySound("slashco/music/slashco_win_2.mp3")
 		local lines = {
 			SlashCo.Language("AssignmentSuccess"),
@@ -192,21 +165,21 @@ local stringTable = {
 
 		return lines
 	end,
-	wonNoSurvivors = function()
+	[SlashCo.RoundState.WON_ALL_DEAD] = function()
 		surface.PlaySound("slashco/music/slashco_lost_active.mp3")
 		return {
 			SlashCo.Language("AssignmentSuccess"),
 			SlashCo.Language("NoneRescued"),
 		}
 	end,
-	lost = function()
+	[SlashCo.RoundState.LOST] = function()
 		surface.PlaySound("slashco/music/slashco_lost.mp3")
 		return {
 			SlashCo.Language("AssignmentFail"),
 			SlashCo.Language("NoneRescued"),
 		}
 	end,
-	wonBeacon = function(survivors, rescued)
+	[SlashCo.RoundState.WON_DISTRESS] = function(survivors, rescued)
 		surface.PlaySound("slashco/music/slashco_win_db.mp3")
 		local lines = {
 			SlashCo.Language("AssignmentAborted"),
@@ -215,7 +188,7 @@ local stringTable = {
 
 		return lines
 	end,
-	cursed = function()
+	[SlashCo.RoundState.CURSED] = function()
 		surface.PlaySound("slashco/music/slashco_lost.mp3")
 		local lines = {}
 		for i = 0, 19 do
@@ -228,19 +201,22 @@ local stringTable = {
 
 		return lines
 	end,
-	intro = function(info)
-		stop_lobbymusic = true --incredibly lame
-		surface.PlaySound("slashco/music/slashco_intro.mp3")
+	[SlashCo.RoundState.INTRO] = function(info)
+		surface.PlaySound(SlashCo.GetDangerSound(info[4]))
 		local lines = {
 			SlashCo.Language("cur_assignment", info[1]),
 			SlashCo.Language("slasher_assess"),
-			SlashCo.Language("Name", info[2]),
-			SlashCo.Language("Class", classTable[info[3]]),
-			SlashCo.Language("DangerLevel", dangerTable[info[4]]),
-			SlashCo.Language("Difficulty", difficultyTable[info[5]]),
+			{ SlashCo.Language("Name", info[2]), SlashCo.GetNameColor(info[2]) },
+			{ SlashCo.Language("Class", SlashCo.SlasherClass[info[3]]), SlashCo.GetClassColor(info[3]) },
+			{ SlashCo.Language("DangerLevel", SlashCo.DangerLevel[info[4]]), SlashCo.GetDangerColor(info[4]) },
+			SlashCo.Language("Difficulty", SlashCo.DifficultyLevel[info[5]]),
 		}
 		if info[6] ~= "Regular" then
 			table.insert(lines, SlashCo.Language("Offering_name", info[6]))
+		end
+
+		if GameData.IsNewPlayer then
+			cookie.Set("slashco_totalplaycount", tostring(cookie.GetNumber("slashco_totalplaycount", 0) + 1)) -- They played their first round, we don't need to flag them to be new at this point.
 		end
 
 		return lines
@@ -266,7 +242,30 @@ local function nextLine(panel, lines)
 	line:SetFont("OutroFont")
 	line:SetContentAlignment(8)
 	line:SetTall(40)
-	line:SetText(lines[#lines])
+
+	local lineData = lines[#lines]
+	local isMultiLabel = istable(lineData)
+	line:SetText(isMultiLabel and lineData[1] or lineData)
+	if isMultiLabel then
+		line:SetTextColor(color_transparent)
+		line.Paint = function(self, w, h)
+			surface.SetTextColor(color_white)
+			surface.SetFont("OutroFont")
+
+			local x, y = surface.GetTextSize(lineData[1])
+			local pos1 = ScrW() / 2 - (x / 2)
+			surface.SetTextPos(pos1, 0)
+
+			local split = string.Split(lineData[1], ":")
+			split[1] = split[1] .. ":"
+			surface.DrawText(split[1])
+
+			local x2, y2 = surface.GetTextSize(split[1])
+			surface.SetTextColor(lineData[2])
+			surface.SetTextPos(pos1 + x2, 0)
+			surface.DrawText(split[2])
+		end
+	end
 
 	timer.Simple(0, function()
 		local w = line:GetTextSize()
@@ -286,10 +285,13 @@ local function nextLine(panel, lines)
 end
 
 hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescued)
-	local stateString = stateTable[state]
-	local lines = stringTable[stateString](survivors, rescued)
+	local lines = stringTable[state](survivors, rescued)
 	if table.IsEmpty(lines) then
 		return
+	end
+
+	if IsValid(SlashCo.RoundEndPanel) then
+		SlashCo.RoundEndPanel:Remove()
 	end
 
 	local cur = CurTime()
@@ -298,12 +300,13 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	local panel = vgui.Create("Panel")
 	panel:Dock(FILL)
 	fadeIn(panel)
+	SlashCo.RoundEndPanel = panel
 
 	function panel.Paint()
 		surface.SetDrawColor(0, 0, 0)
 		panel:DrawFilledRect()
 
-		if stateTable[state] ~= "intro" and CurTime() - cur > 2 then
+		if state ~= SlashCo.RoundState.INTRO and CurTime() - cur > 2 then
 			showPointSummary(cur)
 		end
 	end
@@ -338,15 +341,4 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 
 		nextLine(panel, linesPlay)
 	end)
-end)
-
-local helimusic_antispam
-local heli_music
-net.Receive("mantislashcoHelicopterMusic", function()
-	if not helimusic_antispam then
-		heli_music = CreateSound(LocalPlayer(), "slashco/music/slashco_helicopter.wav")
-		heli_music:Play()
-		helimusic_antispam = true
-		g_AmbientStop = true
-	end
 end)

@@ -9,17 +9,29 @@ ITEM.CamPos = Vector(50, 0, 0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = true
 
-ITEM.ItemDropped = function(ply, droppeditem)
+function ITEM.ItemDropped(ply, droppeditem)
 	if ply.JugTele then
 		timer.Remove("JugTele_" .. ply:UserID())
-		droppeditem:EmitSound("slashco/jug_curse.mp3", 75, 50)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/jug_curse.mp3",
+			identifier = "JugCurse",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = droppeditem,
+			volume = 0.7,
+			fadeIn = 0,
+		})
+
 		ply.JugTele = false
 	end
 end
-ITEM.OnSwitchFrom = function(ply)
+
+function ITEM.OnSwitchFrom(ply)
 	ply:RemoveSpeedEffect("jug")
 end
-ITEM.PrePickUp = function(ply)
+
+function ITEM.PrePickUp(ply)
 	if not ply:GetNWBool("CurseOfTheJug") then
 		return
 	end
@@ -29,11 +41,20 @@ ITEM.PrePickUp = function(ply)
 	end
 	ply.JugDropTimer = CurTime()
 
-	ply:EmitSound("slashco/jug_reject.mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/jug_reject.mp3",
+		identifier = "JugReject",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
 
 	return true
 end
-ITEM.OnPickUp = function(ply)
+
+function ITEM.OnPickUp(ply)
 	if ply:GetNWBool("CurseOfTheJug") then
 		timer.Simple(0, function()
 			SlashCo.DropItem(ply)
@@ -104,10 +125,27 @@ if SERVER then
 			ply:RandomTeleport()
 			ply:AddSpeedEffect("jugCurse", 290, 1)
 			ply:SetNWBool("CurseOfTheJug", true)
-			ply:EmitSound("slashco/jug_curse.mp3", 75, 70)
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/jug_curse.mp3",
+				identifier = "JugCurse",
+				minDistance = 200,
+				maxDistance = 400,
+				entity = ply,
+				volume = 0.7,
+				fadeIn = 0,
+			})
 		end)
 
-		ply:EmitSound("slashco/jug_curse.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/jug_curse.mp3",
+			identifier = "JugCurse",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 0.7,
+			fadeIn = 0,
+		})
 	end
 
 	concommand.Add("slashco_debug_jugtele", function(ply)
@@ -162,30 +200,38 @@ if SERVER then
 	return
 end
 
-hook.Add("HUDPaint", "JugVisions", function()
-	if LocalPlayer():GetNWBool("JugCurseActivate") then
+hook.Add("SlashCo:DrawHUD", "JugVisions", function()
+	if GameData.LocalPlayer:GetNWBool("JugCurseActivate") then
 		local Overlay = Material("slashco/ui/overlays/jug_freeze")
 
-		if LocalPlayer().JugFrame < 61 then
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().JugFrame))
+		if GameData.LocalPlayer.JugFrame < 61 then
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.JugFrame))
 			Overlay:SetFloat("$alpha", 1)
 		else
 			Overlay:SetInt("$frame", 60)
-			Overlay:SetFloat("$alpha", 1 - ((LocalPlayer().JugFrame - 61) / 60))
+			Overlay:SetFloat("$alpha", 1 - ((GameData.LocalPlayer.JugFrame - 61) / 60))
 
-			if math.floor(LocalPlayer().JugFrame) == 61 then
-				LocalPlayer():EmitSound("slashco/jug_curse.mp3")
+			if math.floor(GameData.LocalPlayer.JugFrame) == 61 then
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/jug_curse.mp3",
+					identifier = "JugCurse",
+					minDistance = 200,
+					maxDistance = 400,
+					entity = GameData.LocalPlayer,
+					volume = 0.7,
+					fadeIn = 0,
+				})
 			end
 
 		end
 
-		LocalPlayer().JugFrame = LocalPlayer().JugFrame + RealFrameTime() * 30
-		if LocalPlayer().JugFrame < 120 then
+		GameData.LocalPlayer.JugFrame = GameData.LocalPlayer.JugFrame + RealFrameTime() * 30
+		if GameData.LocalPlayer.JugFrame < 120 then
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0 - (ScrW() / 6), ScrW(), ScrW())
 		end
 	else
-		LocalPlayer().JugFrame = 0
+		GameData.LocalPlayer.JugFrame = 0
 	end
 end)

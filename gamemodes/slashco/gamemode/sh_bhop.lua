@@ -23,7 +23,7 @@ else
 			return
 		end
 
-		local lply = LocalPlayer()
+		local lply = GameData.LocalPlayer
 		if not IsValid(lply) then return end
 		if not lply:Alive() then return end
 

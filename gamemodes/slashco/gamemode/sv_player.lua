@@ -5,7 +5,7 @@ function GM:PlayerSwitchWeapon()
 end
 
 function GM:PlayerInitialSpawn(ply)
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		ply:SetTeam(TEAM_SPECTATOR)
 		ply:Spawn()
 	end
@@ -38,7 +38,9 @@ function GM:PlayerSpawn(ply, transition)
 
 	-- Stop observer mode
 	ply:UnSpectate()
-	ply:SetupHands()
+	if ply:Team() == TEAM_SURVIVOR then -- So that we have less entities & also less possible errors.
+		ply:SetupHands()
+	end
 
 	player_manager.OnPlayerSpawn(ply, transition)
 	player_manager.RunClass(ply, "Spawn")
@@ -70,7 +72,7 @@ function GM:PlayerDeathThink(ply)
 end
 
 function GM:CanPlayerSuicide(player)
-	if player:Team() == TEAM_SPECTATOR or player:Team() == TEAM_SLASHER then
+	if player:Team() == TEAM_SPECTATOR or player:Team() == TEAM_SLASHER or SlashCo.IsLobbyStarting() then
 		return false
 	end
 
@@ -79,40 +81,52 @@ end
 
 --Proximity voice chat
 
-hook.Add("PlayerCanHearPlayersVoice", "Maximum Range", function(listener, talker)
-	if talker:Team() == TEAM_SPECTATOR or talker:Team() == TEAM_SLASHER then
+local proximity_chat = CreateConVar("slashco_proximity_chat", "1", FCVAR_ARCHIVE, "Enables proximity chat")
+local proximity_voice = CreateConVar("slashco_proximity_voice", "1", FCVAR_ARCHIVE, "Enables proximity voicechat")
+local proximity_range = CreateConVar("slashco_proximity_range", "1000", FCVAR_ARCHIVE, "Sets the proximity range")
+
+local function CanPlayersHearEachOther(listener, talker, isVoice)
+	if isVoice then
+		if not proximity_voice:GetBool() then
+			return true
+		end
+	else
+		if not proximity_chat:GetBool() or GameData.IsLobby then
+			return true
+		end
+
+		if not IsValid(talker) then
+			return true -- The console spoke. Let everyone know :3
+		end
+	end
+
+	local talkerTeam = talker:Team()
+	local listenerTeam = listener:Team()
+	if listenerTeam == talkerTeam and (talkerTeam == TEAM_SLASHER or talkerTeam == TEAM_SPECTATOR) then
+		return true
+	end
+	if talkerTeam == TEAM_SPECTATOR or talkerTeam == TEAM_SLASHER then
 		return false
 	end
-	if listener:GetPos():DistToSqr(talker:GetPos()) > 1000000 then
+
+	local range = proximity_range:GetInt()
+	if listener:GetPos():DistToSqr(talker:GetPos()) > (range * range) then
 		return false
 	end
+
+	return true
+end
+
+hook.Add("PlayerCanHearPlayersVoice", "SlashCo:VoiceChat", function(listener, talker)
+	return CanPlayersHearEachOther(listener, talker, true)
 end)
 
 hook.Add("GetFallDamage", "RealisticDamage", function(_, speed)
-	return speed / 16
+	return speed / 24
 end)
 
-hook.Add("PlayerCanSeePlayersChat", "TeamChat", function(_, _, listener, speaker)
-	if listener:Team() == TEAM_SPECTATOR then
-		return true
-	end
-	if speaker:Team() == TEAM_SLASHER then
-		return false
-	end
-	if listener:Team() == TEAM_SLASHER then
-		return false
-	end
-	if speaker:Team() == TEAM_SPECTATOR and listener:Team() ~= TEAM_SPECTATOR then
-		return false
-	end
-
-	if listener:GetPos():DistToSqr(speaker:GetPos()) > 1000000 then
-		return false
-	else
-		if speaker:Team() == TEAM_SURVIVOR then
-			return true
-		end
-	end
+hook.Add("PlayerCanSeePlayersChat", "SlashCo:TeamChat", function(_, _, listener, talker)
+	return CanPlayersHearEachOther(listener, talker, false)
 end)
 
 hook.Add("ShowTeam", "DoNotAllowTeamSwitch", function()
@@ -122,57 +136,5 @@ end)
 hook.Add("PlayerUse", "STOP", function(ply, _)
 	if ply:Team() == TEAM_SPECTATOR then
 		return false
-	else
-		return
 	end
-end)
-
-local PLAYER = FindMetaTable("Player")
-
-function PLAYER:SetImpervious(state)
-	if state then
-		if self.IsImpervious then
-			return
-		end
-
-		self:SetCustomCollisionCheck(true)
-		self.IsImpervious = true
-
-		local userid = self:UserID()
-		hook.Add("ShouldCollide", "SlashCoImpervious_" .. userid, function(ent1, ent2)
-			if not IsValid(self) then
-				hook.Remove("ShouldCollide", "SlashCoImpervious_" .. userid)
-				return
-			end
-
-			local object
-			if ent1 == self then
-				object = ent2
-			end
-			if ent2 == self then
-				object = ent1
-			end
-
-			if not IsValid(object) then
-				return
-			end
-			if object:IsPlayer() or object:GetClass() == "prop_door_rotating" then
-				--i would put a check for if doors were locked here but the locked state of doors could change
-				--see the warning in https://wiki.facepunch.com/gmod/GM:ShouldCollide to see why this matters
-				return false
-			end
-		end)
-	else
-		if not self.IsImpervious then
-			return
-		end
-
-		self:SetCustomCollisionCheck(false)
-		self.IsImpervious = nil
-		hook.Remove("ShouldCollide", "SlashCoImpervious_" .. self:UserID())
-	end
-end
-
-hook.Add("PlayerDeath", "slashCoRemoveImpervious", function(victim)
-	victim:SetImpervious(false)
 end)

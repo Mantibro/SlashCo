@@ -32,6 +32,14 @@ function PANEL:Init()
 		surface.SetMaterial(self.Icon)
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.DrawTexturedRectRotated(w / 2 + self.dX, h / 2 + self.dY, 80, 80, icon.Rotate)
+
+		--[[ ToDo: Finish this, the idea is to display the cooldown of every ability. See https://github.com/RaphaelIT7/SlashCo/issues/72
+
+		if self.Enabled then
+			draw.NoTexture()
+			surface.SetDrawColor(0, 0, 0, 210)
+			surface.DrawTexturedRectRotated(w / 2 + self.dX, h / 2 + self.dY, 80, 20, icon.Rotate)
+		end]]
 	end
 
 	local label = vgui.Create("DLabel", self)
@@ -164,12 +172,12 @@ function PANEL:TieFunc(netvar, func, doShake, fallback)
 		fallback = true
 	end
 
-	timer.Simple(0, function()
+	timer.Simple(0, function() -- Ewwww, why do we have this >:(
 		if not IsValid(self) then
 			return
 		end
 
-		local state = LocalPlayer():GetNWBool(netvar, fallback)
+		local state = GameData.LocalPlayer:GetNWBool(netvar, fallback)
 		func(self, state)
 		table.insert(self.Ties, {
 			netvar = netvar,
@@ -225,7 +233,7 @@ function PANEL:Think()
 	end
 
 	for _, v in ipairs(self.Ties) do
-		local state = LocalPlayer():GetNWBool(v.netvar, v.fallback)
+		local state = GameData.LocalPlayer:GetNWBool(v.netvar, v.fallback)
 		if state ~= v.prevVal then
 			v.func(self, state)
 			v.prevVal = state

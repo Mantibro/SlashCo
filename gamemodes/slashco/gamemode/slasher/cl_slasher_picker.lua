@@ -1,23 +1,8 @@
-net.Receive("mantiSlashCoPickingSlasher", function()
-	readtable = net.ReadTable()
-
-	SlasherIcon = "slashco/ui/icons/slasher/s_0"
-	SelectedSlasher = "None"
-
-	DrawTheSlasherSelectorBox()
+net.Receive("SlashCo:PickingSlasher", function()
+	DrawTheSlasherSelectorBox(net.ReadTable())
 end)
 
-function SelectThisSlasher(slasherName)
-	if IsValid(SlasherSelectFrame) then
-		SlasherSelectFrame:Remove()
-		SlasherSelectFrame = nil
-	end
-
-	SelectedSlasher = slasherName
-
-	DrawTheSlasherSelectorBox()
-end
-
+GameData.SelectedSlasher = GameData.SelectedSlasher or "None"
 function HideSelection()
 	if IsValid(SlasherSelectFrame) then
 		SlasherSelectFrame:Remove()
@@ -25,53 +10,50 @@ function HideSelection()
 	end
 end
 
-function SlasherChosen(My_Pick)
-	net.Start("mantiSlashCoSelectSlasher")
-	net.WriteTable({pick = My_Pick})
+function SlasherChosen(pickedSlasher)
+	net.Start("SlashCo:SelectSlasher")
+		net.WriteString(pickedSlasher)
 	net.SendToServer()
 
-	print("Slasher chosen with the Name of " .. My_Pick)
+	-- print("[SlashCo] Slasher chosen \"" .. pickedSlasher .. "\"")
 end
 
+function DrawTheSlasherSelectorBox(pickSlasherTbl)
+	SlashCo.FlashWindows() -- RaphaelIT7: Let's notify the player that they can pick
 
-function DrawTheSlasherSelectorBox()
-	if LocalPlayer():SteamID64() ~= readtable.slashersteamid then return end
-
-	local SlasherPickingID = 0
-	local SlasherPickingCLASS = 0
-	local SlasherPickingDANGER = 0
-
-	if readtable ~= nil then
-		SlasherPickingID = readtable.slashID
-		SlasherPickingCLASS = readtable.slashClass
-		SlasherPickingDANGER = readtable.slashDanger
+	local SlasherPickingCLASS = SlashCo.SlasherClass.Unknown
+	local SlasherPickingDANGER = SlashCo.DangerLevel.Unknown
+	local bannedSlashers = {}
+	if pickSlasherTbl then
+		SlasherPickingCLASS = pickSlasherTbl.slasherClass or SlashCo.SlasherClass.Unknown
+		SlasherPickingDANGER = pickSlasherTbl.slasherDanger or SlashCo.DangerLevel.Unknown
+		bannedSlashers = pickSlasherTbl.bannedSlashers or {}
 	end
 
-	if not SelectedSlasher then
-		SelectedSlasher = "None"
+	GameData.SelectedSlasher = "None"
+	if IsValid(SlasherSelectFrame) then
+		SlasherSelectFrame:Remove()
 	end
-
-	if IsValid(SlasherSelectFrame) then print("not valid!") return end
-
-	if  SlasherPickingID ~= 0 then SlasherChosen(SlasherPickingID) return end
 
 	-- Slasher selectionBox
 	SlasherSelectFrame = vgui.Create("DFrame")
 	SlasherSelectFrame:SetTitle("")
+	--SlasherSelectFrame:ParentToHUD() -- RaphaelIT7: We don't parent to HUD since we want this rendered even if the mainmenu is open
 
 	local x = ScrW() / 50
 	local y = ScrH() / 25
 	local icon_size = ScrW() / 15
 	local row = 0
 	local count = 1
-
-	for k, v in SortedPairs(SlashCoSlashers) do
+	local updateSelection -- We set this variable further down
+	for slasherName, v in SortedPairs(SlashCoSlashers) do
 		if not v.IsSelectable then continue end
 
 		local Slash = vgui.Create("DButton", SlasherSelectFrame)
 		function Slash.DoClick()
-			SelectThisSlasher(k)
-			LocalPlayer():EmitSound("slashco/slasher_preview.mp3")
+			GameData.SelectedSlasher = slasherName
+			updateSelection()
+			GameData.LocalPlayer:EmitSound("slashco/slasher_preview.mp3")
 		end
 		Slash:SetPos(30 + x, 30 + y)
 		Slash:SetSize(icon_size, icon_size)
@@ -89,18 +71,24 @@ function DrawTheSlasherSelectorBox()
 			is_available = false
 		end
 
-		if SelectedSlasher == k  then
+		if bannedSlashers[v.Name] then
+			Slash:SetDisabled(true)
+			is_available = false
+		end
+
+		if GameData.SelectedSlasher == slasherName then
 			Slash:SetDisabled(true)
 			Slash:SetSize(icon_size * 1.12, icon_size * 1.12)
 			Slash:SetPos((30 + x) - icon_size * 0.06, (30 + y) - icon_size * 0.06)
 		end
 
-		Slash.Paint = function(self, w, h)
+		function Slash.Paint(self, w, h)
 			if is_available then
-				surface.SetMaterial(Material("slashco/ui/icons/slasher/s_" .. SlashCoSlashers[k].ID))
+				surface.SetMaterial(Material("slashco/ui/icons/slasher/s_" .. SlashCoSlashers[slasherName].ID))
 			else
 				surface.SetMaterial(Material("slashco/ui/icons/slasher/kill_disabled"))
 			end
+
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.DrawTexturedRect(0, 0, w, h)
 		end
@@ -116,24 +104,17 @@ function DrawTheSlasherSelectorBox()
 	end
 
 	local confirmselect = vgui.Create("DButton", SlasherSelectFrame)
-	function confirmselect.DoClick() SlasherChosen(SelectedSlasher) HideSelection() LocalPlayer():EmitSound("slashco/slasher_select.mp3") end
+	function confirmselect.DoClick()
+		SlasherChosen(GameData.SelectedSlasher)
+		HideSelection()
+		GameData.LocalPlayer:EmitSound("slashco/slasher_select.mp3")
+	end
 	confirmselect:SetPos(ScrW() / 2, ScrH() / 1.1)
 	confirmselect:SetSize(ScrW() / 4, 40)
 	confirmselect:SetText(SlashCo.Language("ItemConfirm"))
 	confirmselect:SetFont("MenuFont2")
-	confirmselect.Paint = function(self, w, h)
+	function confirmselect.Paint(self, w, h)
 		draw.RoundedBox(0, 0, 0, w, h, Color(255, 0, 0, 255))
-	end
-
-	if SelectedSlasher == "None"  then
-		confirmselect:SetDisabled(true)
-	else
-		local mat = vgui.Create("Material", SlasherSelectFrame)
-		mat:SetPos(ScrW() - (ScrW() / 2.5), 0)
-		mat:SetSize(ScrW() / 2.5, ScrH() / 1.5)
-		mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_" .. SlashCoSlashers[SelectedSlasher].ID)
-		--mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1")
-		mat.AutoSize = false
 	end
 
 	SlasherSelectFrame:SetSize(ScrW(), ScrH())
@@ -142,7 +123,7 @@ function DrawTheSlasherSelectorBox()
 	SlasherSelectFrame:SetKeyboardInputEnabled(false)
 	SlasherSelectFrame:SetDraggable(false)
 	SlasherSelectFrame:ShowCloseButton(false)
-	SlasherSelectFrame.Paint = function(self, w, h)
+	function SlasherSelectFrame.Paint(self, w, h)
 		draw.RoundedBox(0, 0, 0, w, h, color_black)
 	end
 
@@ -162,40 +143,6 @@ function DrawTheSlasherSelectorBox()
 	ISDesc:SetPos(ScrW() / 2, ScrH() / 1.4)
 	ISDesc:SetSize(ScrW() / 2, 100)
 
-	if SelectedSlasher ~= "None" then
-		ILabel:SetText(SlashCo.Language(SelectedSlasher))
-		ISDesc:SetText(SlashCo.Language(SelectedSlasher .. "_desc") .. "\n\n" .. SlashCo.Language("slasher_speedrate") .. ": " .. SlashCoSlashers[SelectedSlasher].SpeedRating .. "\n" .. SlashCo.Language("slasher_eyerate") .. ": " .. SlashCoSlashers[SelectedSlasher].EyeRating .. "\n" .. SlashCo.Language("slasher_diffrate") .. ": " .. SlashCoSlashers[SelectedSlasher].DiffRating)
-		ISClass:SetText(SlashCo.Language(TranslateSlasherClass(SlashCoSlashers[SelectedSlasher].Class)))
-		ISDanger:SetText(SlashCo.Language(TranslateDangerLevel(SlashCoSlashers[SelectedSlasher].DangerLevel)))
-
-		if SlashCoSlashers[SelectedSlasher].DangerLevel == 1 then
-			ISDanger:SetTextColor(Color(255, 200, 0))
-		end
-
-		if SlashCoSlashers[SelectedSlasher].DangerLevel == 2 then
-			ISDanger:SetTextColor(Color(255, 120, 120))
-		end
-
-		if SlashCoSlashers[SelectedSlasher].DangerLevel == 3 then
-			ISDanger:SetTextColor(Color(255, 0, 0))
-		end
-
-		local Descriptor = vgui.Create("DLabel", SlasherSelectFrame)
-		Descriptor:SetPos(ScrW() / 2, ScrH() / 1.75)
-		Descriptor:SetSize(1024, 600)
-		Descriptor:SetText(SlashCo.Language("Class", "") .. [[:
-
-
-
-		]] .. SlashCo.Language("DangerLevel","") .. [[:]])
-		Descriptor:SetFont("MenuFont1")
-		Descriptor:SetAutoStretchVertical(true)
-	else
-		ILabel:SetText("")
-		ISDesc:SetText("")
-		ISClass:SetText("")
-		ISDanger:SetText("")
-	end
 	ILabel:SetAutoStretchVertical(true)
 	ISClass:SetAutoStretchVertical(true)
 	ISDanger:SetAutoStretchVertical(true)
@@ -206,47 +153,57 @@ function DrawTheSlasherSelectorBox()
 	ISDanger:SetFont("MenuFont4")
 	ISDesc:SetFont("MenuFont1")
 
-end
+	local Descriptor = vgui.Create("DLabel", SlasherSelectFrame)
+	Descriptor:SetPos(ScrW() / 2, ScrH() / 1.75)
+	Descriptor:SetSize(1024, 600)
+	Descriptor:SetText("")
+	Descriptor:SetFont("MenuFont1")
+	Descriptor:SetAutoStretchVertical(true)
 
-local Fun = {
-	CurInput = 1,
-	Sequence = {
-		88,
-		88,
-		90,
-		90,
-		89,
-		91,
-		89,
-		91,
-		12,
-		11,
-		64
-	}
-}
+	local mat = vgui.Create("Material", SlasherSelectFrame)
+	mat:SetPos(ScrW() - (ScrW() / 2.5), 0)
+	mat:SetSize(ScrW() / 2.5, ScrH() / 1.5)
+	mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1")
+	mat.AutoSize = false
+	mat:SetZPos(-1) -- Else it would cut off our labels. This took like an hour to figure out :sob:
+	mat:SetVisible(false)
 
+	function updateSelection()
+		if GameData.SelectedSlasher == "None" then
+			confirmselect:SetDisabled(true)
 
-hook.Add("PlayerButtonDown", "TheCoder", function(ply, key)
-	if ply ~= LocalPlayer() then return end
-	if not IsFirstTimePredicted() then return end
-
-	if IsValid(SlasherSelectFrame) then
-		if key == Fun.Sequence[Fun.CurInput] then
-			Fun.CurInput = Fun.CurInput + 1
-			ply:EmitSound("slashco/blip.wav")
-			if Fun.CurInput > 11 then
-				ply:ChatPrint("You unleashed the Beast.")
-				ply:EmitSound("slashco/slasher/leuonard_yell1.mp3")
-				SlashCoSlashers.Leuonard.IsSelectable = true
-				if (IsValid(SlasherSelectFrame)) then
-					SlasherSelectFrame:Remove()
-					SlasherSelectFrame = nil
-				end
-				SelectedSlasher = "Leuonard"
-				DrawTheSlasherSelectorBox()
-			end
+			ILabel:SetText("")
+			ISDesc:SetText("")
+			ISClass:SetText("")
+			ISDanger:SetText("")
 		else
-			Fun.CurInput = 1
+			confirmselect:SetDisabled(false)
+			mat:SetVisible(true)
+			mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_" .. SlashCoSlashers[GameData.SelectedSlasher].ID)
+
+			ILabel:SetText(SlashCo.Language(GameData.SelectedSlasher))
+			ISDesc:SetText(SlashCo.Language(GameData.SelectedSlasher .. "_desc") .. "\n\n" .. SlashCo.Language("slasher_speedrate") .. ": " .. SlashCoSlashers[GameData.SelectedSlasher].SpeedRating .. "\n" .. SlashCo.Language("slasher_eyerate") .. ": " .. SlashCoSlashers[GameData.SelectedSlasher].EyeRating .. "\n" .. SlashCo.Language("slasher_diffrate") .. ": " .. SlashCoSlashers[GameData.SelectedSlasher].DiffRating)
+			ISClass:SetText(SlashCo.Language(TranslateSlasherClass(SlashCoSlashers[GameData.SelectedSlasher].Class)))
+			ISDanger:SetText(SlashCo.Language(TranslateDangerLevel(SlashCoSlashers[GameData.SelectedSlasher].DangerLevel)))
+
+			if SlashCoSlashers[GameData.SelectedSlasher].DangerLevel == 1 then
+				ISDanger:SetTextColor(Color(255, 200, 0))
+			end
+
+			if SlashCoSlashers[GameData.SelectedSlasher].DangerLevel == 2 then
+				ISDanger:SetTextColor(Color(255, 120, 120))
+			end
+
+			if SlashCoSlashers[GameData.SelectedSlasher].DangerLevel == 3 then
+				ISDanger:SetTextColor(Color(255, 0, 0))
+			end
+
+			Descriptor:SetText(SlashCo.Language("Class", "") .. [[
+
+
+
+			]] .. SlashCo.Language("DangerLevel",""))
 		end
 	end
-end)
+	updateSelection()
+end

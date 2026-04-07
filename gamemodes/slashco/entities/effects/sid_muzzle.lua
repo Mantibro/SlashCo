@@ -2,7 +2,7 @@ function EFFECT:Init(data)
 	local vOffset = data:GetOrigin()
 	--local Dir = data:GetStart()
 
-	local Dir = Entity(1):EyeAngles():Forward()
+	local Dir = data:GetEntity():EyeAngles():Forward()
 
 	local NumParticles = 32
 
@@ -66,19 +66,19 @@ function EFFECT:Init(data)
 
 			particleflash:SetAngleVelocity(Angle(math.Rand(-25, 25), math.Rand(-25, 25), math.Rand(-25, 25)))
 		end
-
-		if i == 1 then
-			local dlight = DynamicLight(24984)
-			if dlight then
-				dlight.pos = vOffset
-				dlight.r = 255
-				dlight.g = 100
-				dlight.b = 100
-				dlight.brightness = 3
-				dlight.Decay = 1000
-				dlight.Size = 150
-				dlight.DieTime = CurTime() + 0.12
-			end
+	end
+	
+	if GameData.CURRENT_SID then
+		local dlight = DynamicLight(MAX_EDICT + GameData.CURRENT_SID:EntIndex())
+		if dlight then
+			dlight.pos = vOffset
+			dlight.r = 255
+			dlight.g = 100
+			dlight.b = 100
+			dlight.brightness = 3
+			dlight.Decay = 1000
+			dlight.Size = 150
+			dlight.DieTime = CurTime() + 0.12
 		end
 	end
 

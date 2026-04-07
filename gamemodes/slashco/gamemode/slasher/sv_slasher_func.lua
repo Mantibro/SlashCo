@@ -1,33 +1,68 @@
 local SlashCo = SlashCo
 
-SlashCo.SelectSlasher = function(slasher_name, plyid)
-	print(slasher_name)
-	SlashCo.CurRound.Slashers[plyid] = {}
-	SlashCo.CurRound.Slashers[plyid].SlasherID = slasher_name
-	SlashCo.CurRound.Slashers[plyid].GasCanMod = SlashCoSlashers[slasher_name].GasCanMod
+function SlashCo.SelectSlasher(slasherID, steamID64)
+	SlashCo.CurRound.Slashers[steamID64] = {}
+	SlashCo.CurRound.Slashers[steamID64].SlasherID = slasherID
+	SlashCo.CurRound.Slashers[steamID64].GasCanMod = SlashCoSlashers[slasherID].GasCanMod
+	SlashCo.PrecacheSlasher(slasherID)
 end
 
-SlashCo.ApplySlasherToPlayer = function(ply)
-	if SlashCo.CurRound.Slashers[ply:SteamID64()] ~= nil then
+function SlashCo.ApplySlasherToPlayer(ply)
+	if SlashCo.CurRound.Slashers[ply:SteamID64()] then
 		--Set the correct Slasher
-		print("Assigning the correct Slasher to the player.")
+		print("[SlashCo] Assigning the correct Slasher to the player.")
 		ply:SetNWString("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
 	end
 end
 
-SlashCo.PrepareSlasherForSpawning = function()
+-- Used for debugging.
+function SlashCo.SpawnPlayerAsSlasher(ply, slasherName)
+	local foundSlasherName = nil
+	for name, slasherTbl in pairs(SlashCoSlashers) do -- In case we screw up upper/lower case
+		if name:lower() == slasherName:lower() then
+			foundSlasherName = name
+			break
+		end
+
+		if slasherTbl.Name:lower() == slasherName:lower() then
+			foundSlasherName = slasherTbl.Name
+			break
+		end
+	end
+
+	if not foundSlasherName then
+		ErrorNoHaltWithStack("[SlashCo] Tried to set player " .. ply:Name() .. " as an invalid slasher \"" .. slasherName .. "\"")
+		return
+	end
+
+	if SlashCo.CurRound.GameProgress == -1 then -- We didn't spawn them yet, so just mark them as having the slasher selected.
+		SlashCo.SelectSlasher(foundSlasherName, ply:SteamID64())
+		return
+	end
+
+	SlashCo.AudioSystem.StopSound(nil, 1, ply) -- Stop any sounds that were playing from the player in case we switched from one slasher to another.
+	ply:SetNWString("Slasher", foundSlasherName)
+	ply:SetTeam(TEAM_SLASHER)
+	ply:Spawn()
+	SlashCo.OnSlasherSpawned(ply)
+end
+
+function SlashCo.PrepareSlasherForSpawning()
 	--[[
-
-	If the Difficulty is Hard, the Slasher immediately spawns with them. On other difficulties the Slasher has a spawn delay.
-	(1,2 - 30 seconds), (0 - 60 seconds)
-	(The Delay is cancelled once the Survivors have performed any kind of action on a Generator).
-	The Slasher will spawn at a spawn powint furthest away from the Survivors.
-
+		If the Difficulty is Hard, the Slasher immediately spawns with them. On other difficulties the Slasher has a spawn delay.
+		(1,2 - 30 seconds), (0 - 60 seconds)
+		(The Delay is cancelled once the Survivors have performed any kind of action on a Generator).
+		The Slasher will spawn at a spawn powint furthest away from the Survivors.
 	]]
 
 	if SERVER then
-		local delay = 1
-		delay = 1 + (4 - SlashCo.CurRound.Difficulty) * 20
+		local delay = (4 - SlashCo.CurRound.Difficulty) * 20
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			local slasherSpawnDelay = slasher:SlasherValue("SpawnDelay", -1)
+			if slasherSpawnDelay ~= -1 and delay > slasherSpawnDelay then
+				delay = slasherSpawnDelay
+			end
+		end
 
 		print("[SlashCo] Slasher set to spawn in " .. delay .. " seconds.")
 
@@ -37,42 +72,71 @@ SlashCo.PrepareSlasherForSpawning = function()
 	end
 end
 
-SlashCo.OnSlasherSpawned = function(ply)
-	ply:SetRunSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
-	ply:SetWalkSpeed(SlashCoSlashers[ply:GetNWString("Slasher")].ProwlSpeed)
+function SlashCo.OnSlasherSpawned(ply)
+	-- We setup variables as the first thing to hopefully prevent any issues when in OnSpawn or such it errors.
+	ply:SetCanSeePlayers(true) -- Enabled by default
 
 	ply.ChaseActivationCooldown = 0
 	ply.KillDelayTick = 0
 	ply.CurrentChaseTick = 0
+	
+	-- ToDo: Move away from these values, they make the code painful to read and it serves no use to have them like this.
 	ply.SlasherValue1 = 0
 	ply.SlasherValue2 = 0
 	ply.SlasherValue3 = 0
 	ply.SlasherValue4 = 0
 	ply.SlasherValue5 = 0
 
+	local slasherTbl = SlashCoSlashers[ply:GetNWString("Slasher")]
+	if slasherTbl.OnBalanceForPlayers then
+		slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+		--[[
+			Example:
+
+			totalSurvivors = How many survivors existed when they got spawned in using the helicopter
+			additionalSurvivors = How many survivors above or below the base max survivor count exist. If 2 total survivors exist them this would be -4 since 2 - 6(the base max survivors) = -4
+				
+			function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+				SLASHER.ProwlSpeed = 140 + (5 * totalSurvivors)
+			end
+		]]
+	end
+
+	ply:SetRunSpeed(slasherTbl.ProwlSpeed)
+	ply:SetWalkSpeed(slasherTbl.ProwlSpeed)
+	ply:SetNW2Float("SlasherAnger", 0)
+
 	ply:SlasherFunction("OnSpawn")
 
-	if not SlashCo.NotPerfect and GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded) > 1 then
-		ply:SetPoints("slasher_perfect")
+	if not SlashCo.NotPerfect and SlashCo.GetGeneratorsNeeded() > 1 then
+		ply:SetRoundPoints("slasher_perfect")
 	end
+	ply.SuccessfulSpawn = true
 end
 
 
 --On-Tick Behaviour
 hook.Add("Tick", "HandleSlasherAbilities", function()
 	local gens = ents.FindByClass("sc_generator")
-	if #gens < 1 then
-		return
-	end
+	if #gens == 0 then return end
 
-	local SO = SlashCo.CurRound.OfferingData.SO
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	--Calculate the Game Progress Value
 	--The Game Progress Value - Amount of fuel poured into the Generator + amount of batteries inserted (0 - 10)
 
-	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		local slasher = v
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		if not slasher.SuccessfulSpawn then
+			local succ, err = pcall(SlashCo.OnSlasherSpawned, slasher) -- if succ == false then we had an error in spawning. We also need pcall to be sure.
+			if not slasher.SuccessfulSpawn and not succ then
+				slasher:SetTeam(TEAM_SPECTATOR)
+				print("[SlashCo] Player \"" .. slasher:Name() .. "\" was set to spectator because we were unable to properly spawn them! (Error: \"" .. err .. "\" Slasher:\"" .. slasher:GetNWString("Slasher", "") .. "\"")
+				continue -- Skip the loop.
+			end
+		end
+
 		local dist = slasher:SlasherValue("ChaseRange", 600) + (SO * 250)
+		local inv = -0.2
 
 		--Handle The Chase Functions \/ \/ \/
 		--SlashCoSlashers[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
@@ -84,14 +148,17 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 			slasher.ChaseActivationCooldown = slasher.ChaseActivationCooldown - FrameTime()
 		end
 
+		for _, ply in ipairs(slasher:FindPlayersInView(slasher:SlasherValue("Eyesight") * 100, slasher:SlasherValue("ChaseRadius", 0.91) + inv)) do
+			ply:SetWasSeenBySlasher(true) -- They were seen.
+		end
+
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			slasher.CurrentChaseTick = slasher.CurrentChaseTick + FrameTime()
 
 			--local inv = (1 - SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseRadius) / 2
-			local inv = -0.2
 
-			local find = ents.FindInCone(slasher:GetPos(), slasher:GetEyeTrace().Normal, dist * 2,
-					slasher:SlasherValue("ChaseRadius", 0.91) + inv)
+			local eyeTrace = slasher:GetEyeTrace()
+			local find = ents.FindInCone(slasher:GetPos(), eyeTrace.Normal, dist * 2, slasher:SlasherValue("ChaseRadius", 0.91) + inv)
 			local find_p = NULL
 
 			for p = 1, #find do
@@ -101,26 +168,17 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 				end
 			end
 
-			if slasher:GetEyeTrace().Entity:IsPlayer() and slasher:GetEyeTrace().Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(slasher:GetEyeTrace().Entity:GetPos()) < dist * 2 then
+			if eyeTrace.Entity:IsPlayer() and eyeTrace.Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(eyeTrace.Entity:GetPos()) < dist * 2 then
 				slasher.CurrentChaseTick = 0
-				find_p = slasher:GetEyeTrace().Entity
+				find_p = eyeTrace.Entity
 			end
 
-			if IsValid(find_p) and not find_p:GetNWBool("SurvivorChased") then
-				find_p:SetNWBool("SurvivorChased", true)
+			if IsValid(find_p) and not IsValid(find_p:GetNWEntity("SurvivorChased")) then
+				find_p:SetNWEntity("SurvivorChased", slasher)
 			end
 
 			if slasher.CurrentChaseTick > slasher:SlasherValue("ChaseDuration", 10) then
 				SlashCo.StopChase(slasher)
-			end
-
-			if not slasher:GetNWBool("InSlasherChaseMode") then
-				for p = 1, team.NumPlayers(TEAM_SURVIVOR) do
-					local ply = team.GetPlayers(TEAM_SURVIVOR)[p]
-					if ply:GetNWBool("SurvivorChased") then
-						ply:SetNWBool("SurvivorChased", false)
-					end
-				end
 			end
 		end
 
@@ -133,23 +191,26 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 		end
 
 		slasher:SlasherFunction("OnTickBehaviour")
+	
+		SlashCo.AddFog({
+			name = "SlasherFog",
+			multiplier = 0.5 + (slasher:GetEyeSight() / 5),
+			priority = 0,
+			fogType = SlashCo.FogType.PLAYER,
+			entity = slasher,
+		})
 	end
 
-	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then
-		return
-	end
+	if engine.TickCount() % math.floor(5 / engine.TickInterval()) ~= 0 then return end
+	if SlashCo.CurRound.GameProgress <= -1 then return end
 
-	if SlashCo.CurRound.GameProgress <= -1 then
-		return
-	end
-
-	local needed = GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded)
 	local genProgs = {}
 	for k, v in ipairs(gens) do
 		genProgs[k] = v.Progress
 	end
 
 	local progress = 0
+	local needed = SlashCo.GetGeneratorsNeeded()
 	for i = 1, needed do
 		local maxProg, progVal = 0
 		for k, v in ipairs(genProgs) do
@@ -171,7 +232,7 @@ hook.Add("Tick", "HandleSlasherAbilities", function()
 	SlashCo.CurRound.GameProgress = math.ceil(progress)
 end)
 
-SlashCo.Jumpscare = function(slasher, target)
+function SlashCo.Jumpscare(slasher, target)
 	if not slasher:GetNWBool("CanKill") then
 		return
 	end
@@ -190,6 +251,10 @@ SlashCo.Jumpscare = function(slasher, target)
 
 	if slasher:GetPos():Distance(target:GetPos()) > slasher:SlasherValue("KillDistance",
 			135) and not target:GetNWBool("SurvivorBeingJumpscared") then
+		return
+	end
+	
+	if slasher:SlasherFunction("CanJumpscare", target) then
 		return
 	end
 
@@ -220,17 +285,19 @@ SlashCo.Jumpscare = function(slasher, target)
 			slasher:Freeze(false)
 			slasher.CurrentChaseTick = 0
 			slasher:SetNWBool("CanChase", true)
+			slasher:SlasherFunction("OnKillPlayer", target)
 		end
 	end)
 
 	return true
 end
 
-SlashCo.StopChase = function(slasher)
+function SlashCo.StopChase(slasher)
 	slasher:SetNWBool("InSlasherChaseMode", false)
+	slasher:SetNWFloat("SlasherChaseBegin", 0)
 	slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
-	slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
+	SlashCo.AudioSystem.StopSound("ChaseMusic", 5, slasher)
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 
 	timer.Remove("SlashCoEndChase_" .. slasher:UserID())
@@ -239,18 +306,18 @@ SlashCo.StopChase = function(slasher)
 		if not IsValid(slasher) then
 			return
 		end
-		slasher:StopSound(slasher:SlasherValue("ChaseMusic"))
+		SlashCo.AudioSystem.StopSound("ChaseMusic", 5, slasher)
 	end)
 
-	for _, pl in ipairs(player.GetAll()) do
-		if pl:GetNWBool("SurvivorChased") then
-			pl:SetNWBool("SurvivorChased", false)
+	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if ply:GetNWEntity("SurvivorChased") == slasher then
+			ply:SetNWEntity("SurvivorChased", NULL)
 		end
 	end
 end
 
-SlashCo.StartChaseMode = function(slasher)
-	if slasher.ChaseActivationCooldown > 0 then
+function SlashCo.StartChaseMode(slasher)
+	if (slasher.ChaseActivationCooldown or 0) > 0 then
 		return
 	end
 
@@ -317,62 +384,173 @@ SlashCo.StartChaseMode = function(slasher)
 	end)
 
 	slasher:SetNWBool("InSlasherChaseMode", true)
+	slasher:SetNWFloat("SlasherChaseBegin", CurTime())
 	slasher.CurrentChaseTick = 0
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 	slasher:SetRunSpeed(slasher:SlasherValue("ChaseSpeed"))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ChaseSpeed"))
-	slasher:PlayGlobalSound(slasher:SlasherValue("ChaseMusic"), 95, nil, true)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = slasher:SlasherValue("ChaseMusic"),
+		identifier = "ChaseMusic",
+		minDistance = 1000 * SlashCo.MapSize,
+		maxDistance = 3000 * SlashCo.MapSize,
+		looping = true,
+		entity = slasher,
+		volume = 0.7,
+		fadeIn = 1,
+	})
 end
 
-SlashCo.BustDoor = function(slasher, target, force)
+function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 	if not IsValid(target) then
+		if callback then
+			callback(false)
+		end
 		return
 	end
 
-	if target:GetClass() ~= "prop_door_rotating" then
+	local doors = {}
+	local name = target:GetName()
+	for _, ent in ipairs(ents.FindInSphere(target:WorldSpaceCenter(), 100)) do
+		if ent:GetName() == name and ent:GetClass() == "prop_door_rotating" then
+			table.insert(doors, ent)
+		end
+	end
+
+	if #doors == 0 then
+		if callback then
+			callback(false)
+		end
 		return
 	end
 
-	if SERVER then
-		target:Fire("Open")
+	for _, door in ipairs(doors) do
+		door:Fire("Open")
 	end
 
 	timer.Simple(0.05, function()
-		local tr = util.TraceLine({
-			start = slasher:EyePos(),
-			endpos = slasher:EyePos() + slasher:GetForward() * 10000,
-			filter = slasher
-		})
-
-		if not target:IsValid() then
+		if not IsValid(slasher) then
+			if callback then
+				callback(false)
+			end
 			return
 		end
 
-		local prop = ents.Create("prop_physics")
-		local model = target:GetModel()
-		prop:SetModel(model)
-		prop:SetMoveType(MOVETYPE_NONE)
-		--prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
-		prop:SetPos(target:GetPos() + slasher:GetForward() * 6 + Vector(0, 0, 1))
-		prop:SetAngles(target:GetAngles())
-		prop:Spawn()
-		prop:Activate()
-		prop:SetSkin(target:GetSkin())
-		local phys = prop:GetPhysicsObject()
-		if phys:IsValid() then
-			phys:Wake()
-		end
-		phys:ApplyForceCenter(slasher:GetForward() * force)
+		for _, door in ipairs(doors) do
+			if not IsValid(door) then continue end
 
-		local surf = util.GetSurfaceData(tr.SurfaceProps)
-		if surf then
-			if surf.name == "wood" then
-				target:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
-			elseif surf.name == "metal" then
-				target:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+			local prop = ents.Create("sc_broken_door")
+			local model = door:GetModel()
+			prop:SetModel(model)
+			prop:SetMoveType(MOVETYPE_NONE)
+			--prop:SetCollisionGroup( COLLISION_GROUP_PASSABLE_DOOR )
+			prop:SetPos(door:GetPos() + slasher:GetForward() * 6 + Vector(0, 0, 1))
+			prop:SetAngles(door:GetAngles())
+			prop:Spawn()
+			prop:Activate()
+			prop:PhysicsInit(SOLID_VPHYSICS)
+			prop:SetSkin(door:GetSkin())
+			local phys = prop:GetPhysicsObject()
+			if phys:IsValid() then
+				phys:Wake()
+				phys:ApplyForceCenter(isvector(force) and force or (slasher:GetForward() * force))
 			end
+
+			local doorPhys = door:GetPhysicsObject()
+			local surf = IsValid(doorPhys) and doorPhys:GetMaterial() or nil
+			if surf then
+				if surf.name == "wood" then
+					door:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
+				elseif surf.name == "metal" then
+					door:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+				end
+			end
+
+			door:Remove()
 		end
 
-		target:Remove()
+		if callback then
+			callback(true)
+		end
 	end)
 end
+
+-- RaphaelIT7: This is intentionally server only to avoid desync!
+function SlashCo.AddSlasherAnger(slasher, anger)
+	slasher:SetNW2Float("SlasherAnger", math.Clamp(SlashCo.GetSlasherAnger(slasher) + anger, 0, 100))
+end
+
+--[[
+	We could remove this one since all of the sounds are .ogg but we can just keep it because why not.
+	There are also ambient_high sounds but we use thoes instead for when a player gets chased.
+]]
+local lowAmbientTracks = {
+	"slashco/ambienttrack/ambient_low1.ogg",
+	"slashco/ambienttrack/ambient_low2.ogg",
+	"slashco/ambienttrack/ambient_low3.ogg",
+	"slashco/ambienttrack/ambient_low4.ogg",
+	"slashco/ambienttrack/ambient_low5.ogg",
+}
+local midAmbientTracks = {
+	"slashco/ambienttrack/ambient_mid1.mp3",
+	"slashco/ambienttrack/ambient_mid2.mp3",
+	"slashco/ambienttrack/ambient_mid3.ogg",
+	"slashco/ambienttrack/ambient_mid4.ogg",
+	"slashco/ambienttrack/ambient_mid5.ogg",
+}
+timer.Create("SlashCo:SlasherAnger", 1, 0, function()
+	if GameData.IsLobby or SlashCo.State ~= SlashCo.States.IN_GAME then return end
+
+	local hasCustomBackgroundMusic = false
+	local backgroundMusic = nil -- change the file later.
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		local addAnger = slasher:SlasherValue("AngerPassiveGain", 0)
+		SlashCo.AddSlasherAnger(slasher, addAnger)
+
+		slasher:SlasherFunction("OnAngerTick")
+		hook.Run("SlashCo:OnAngerTick", slasher)
+
+		if slasher:SlasherValue("CustomBackgroundMusic", false) then
+			hasCustomBackgroundMusic = true -- One of the slashers has custom background music, so we shouldn't interfere with it.
+		end
+
+		local anger = SlashCo.GetSlasherAnger(slasher)
+		if anger > 75 then
+			backgroundMusic = slasher:SlasherValue("HighAngerBackgroundMusic", backgroundMusic)
+		elseif anger > 50 then
+			backgroundMusic = slasher:SlasherValue("MediumAngerBackgroundMusic", backgroundMusic)
+		elseif anger > 25 then
+			backgroundMusic = slasher:SlasherValue("LowAngerBackgroundMusic", backgroundMusic)
+		end
+	end
+
+	if hasCustomBackgroundMusic then return end
+	if GameData.HelicopterMusic then return end
+
+	local highestAnger = SlashCo.GetHighestSlasherAnger()
+	if (not backgroundMusic or backgroundMusic == "") and SlashCo.AudioSystem.ShouldPlayBackgroundMusic() then
+		GameData.AmbientID = GameData.AmbientID or math.random(1, 5)
+
+		if highestAnger < 75 then
+			backgroundMusic = lowAmbientTracks[GameData.AmbientID]
+		else
+			backgroundMusic = midAmbientTracks[GameData.AmbientID]
+		end
+
+		--SlashCo.AudioSystem.DisableBackgroundMusic()
+		--return
+	end
+
+	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() or backgroundMusic != SlashCo.AudioSystem.GetBackgroundMusic() then
+		SlashCo.AudioSystem.SetBackgroundMusic(backgroundMusic, SlashCo.GetGlobalSlasherAnger() / 100)
+		SlashCo.AudioSystem.EnableBackgroundMusic()
+	else
+		SlashCo.AudioSystem.SetBackgroundMusicVolume(SlashCo.GetGlobalSlasherAnger() / 100)
+	end
+end)
+
+hook.Add("SlashCo:PlayerDeath", "SlashCo:RunSlasherPlayerDeath", function(victim)
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		slasher:SlasherFunction("OnPlayerDeath", victim)
+	end
+end)

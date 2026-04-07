@@ -3,3 +3,5 @@ maps/sc_highschool.bsp
 maps/sc_hospital.bsp
 /.idea/
 maps/sc_redforest.bsp
+*.bak
+_workshop/**

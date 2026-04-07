@@ -12,16 +12,17 @@
 --local SlashID = 0
 
 local BeaconIcon = Material("slashco/ui/slasher_beacon")
-hook.Add("HUDPaint", "BaseSlasherHUD", function()
-	local ply = LocalPlayer()
+hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
+	local ply = GameData.LocalPlayer
 
 	if ply:Team() ~= TEAM_SLASHER then
 		return
 	end
 
-	local pacified = LocalPlayer():GetNWBool("DemonPacified")
-	local blinded = LocalPlayer():GetNWBool("SlasherBlinded")
+	local pacified = GameData.LocalPlayer:GetNWBool("DemonPacified")
+	local blinded = GameData.LocalPlayer:GetNWBool("SlasherBlinded")
 
+	surface.SetDrawColor(255, 255, 255, 255)
 	if blinded then
 		local black = Material("models/slashco/slashers/trollge/body")
 		surface.SetMaterial(black)
@@ -35,9 +36,8 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 
 	--Activating the Beacon
 	for _, v in ipairs(ents.FindByClass("sc_activebeacon")) do
-		if v:GetNWBool("ArmingBeacon") then
-			local pos = (v:GetPos()):ToScreen()
-
+		if v:GetArmingBeacon() then
+			local pos = v:GetPos():ToScreen()
 			if pos.visible then
 				surface.SetMaterial(BeaconIcon)
 				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
@@ -51,12 +51,12 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	--[[ kept for reference
-	if not SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].UserInterface then
+	if not SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].UserInterface then
 		return
 	end
 
 	local slasherpos = ply:GetPos()
-	local inchase = LocalPlayer():GetNWBool("InSlasherChaseMode")
+	local inchase = GameData.LocalPlayer:GetNWBool("InSlasherChaseMode")
 
 	local cx = ScrW() / 2
 	local cy = ScrH() / 2
@@ -64,19 +64,19 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	local mainiconposx = cx / 20
 	local mainiconposy = cy + (cy / 2)
 
-	if SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].ID ~= SlashID then
-		SlashID = SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].ID
+	if SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID ~= SlashID then
+		SlashID = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID
 		MainIcon = Material("slashco/ui/icons/slasher/s_" .. SlashID)
 	end
 
-	local GameProgress = LocalPlayer():GetNWInt("GameProgressDisplay")
+	local GameProgress = GameData.LocalPlayer:GetNWInt("GameProgressDisplay")
 
 	local willdrawkill = true
 	local willdrawchase = true
 	local willdrawmain = true
 
-	local CanKill = LocalPlayer():GetNWBool("CanKill")
-	local CanChase = LocalPlayer():GetNWBool("CanChase")
+	local CanKill = GameData.LocalPlayer:GetNWBool("CanKill")
+	local CanChase = GameData.LocalPlayer:GetNWBool("CanChase")
 
 	surface.SetDrawColor(255, 255, 255, 255)
 
@@ -127,7 +127,7 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 		--Survivor team visualization
 
 		for x = 1, team.NumPlayers(TEAM_SURVIVOR) do
-			if team.GetPlayers(TEAM_SURVIVOR)[x]:SteamID64() == SurvivorTeam[i].id then
+			if team.GetPlayers(TEAM_SURVIVOR)[x]:SteamID64() == SurvivorTeam[i].steamid then
 				--The survivor is alive (is the Survivors Team)
 				surface.SetMaterial(SurvivorIcon)
 				surface.DrawTexturedRect((cx + (cx / 1.25)) - xoffset, mainiconposy + (cy / 6), ScrW() / 12,
@@ -146,10 +146,10 @@ hook.Add("HUDPaint", "BaseSlasherHUD", function()
 	end
 
 	--Call for the HUD
-	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].UserInterface(cx,
+	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].UserInterface(cx,
 			cy, mainiconposx, mainiconposy)
 
-	local SlashName = SlashCoSlashers[LocalPlayer():GetNWString("Slasher")].Name
+	local SlashName = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].Name
 
 	draw.SimpleText(SlashName, "LobbyFont2", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 4.25),
 			Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)

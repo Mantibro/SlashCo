@@ -5,6 +5,15 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "LabMeat"
 ENT.ClassName = "sc_labmeat"
 
+hook.Add("SlashCo:Precache", "PrecacheLabMeat", function()
+	SlashCo.PrecacheModel("models/slashco/items/labmeat.mdl")
+	SlashCo.PrecacheSound("slashco/survivor/eat_mayo.mp3")
+	
+	for k=1, 3 do
+		SlashCo.PrecacheSound("npc/headcrab/idle" .. k .. ".wav")
+	end
+end)
+
 function ENT:Initialize()
 	if SERVER then
 		self.ragdoll = ents.Create("prop_ragdoll")
@@ -14,6 +23,7 @@ function ENT:Initialize()
 		self.ragdoll:SetNoDraw(false)
 		self.ragdoll:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 		self.ragdoll:Spawn()
+		self.ragdoll:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 		self:SetModel("models/slashco/items/labmeat.mdl")
 		self:SetSolid(SOLID_VPHYSICS)

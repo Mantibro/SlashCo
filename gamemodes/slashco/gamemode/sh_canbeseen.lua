@@ -13,14 +13,14 @@ function PLAYER:CanBeSeen()
 			return override
 		end
 
-		if CLIENT and LocalPlayer():Team() == TEAM_SPECTATOR and self:SlasherValue("CannotBeSpectated") then
+		if CLIENT and GameData.LocalPlayer:Team() == TEAM_SPECTATOR and self:SlasherValue("CannotBeSpectated") then
 			return false
 		end
 	elseif _team == TEAM_SPECTATOR then
 		return false
 	end
 
-	return self:GetNWBool("SlashCoVisible", true)
+	return self:IsVisible()
 end
 
 function PLAYER:CanSeeFlashlights()
@@ -38,6 +38,11 @@ function PLAYER:CanSeeFlashlights()
 	end
 
 	return self:GetNWBool("SlashCoSeeFlashlights", true)
+end
+
+-- Returns whether the player is visible (NOT accounting for item or slasher effects! Use CanBeSeen if you need to account for those)
+function PLAYER:IsVisible()
+	return self:GetNWBool("SlashCoVisible", true)
 end
 
 if CLIENT then

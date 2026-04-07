@@ -1,13 +1,17 @@
 local SLASHER = {}
 
 SLASHER.Name = "Sid"
+SLASHER.Aliases = {
+	"Sidney Monster",
+	"Cookie Monster",
+}
 SLASHER.ID = 2
-SLASHER.Class = 2
-SLASHER.DangerLevel = 2
+SLASHER.Class = SlashCo.SlasherClass.Demon
+SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/sid/sid.mdl"
 SLASHER.GasCanMod = 0
-SLASHER.KillDelay = 7
+SLASHER.KillDelay = 5
 SLASHER.ProwlSpeed = 150
 SLASHER.ChaseSpeed = 275
 SLASHER.Perception = 1.0
@@ -18,30 +22,100 @@ SLASHER.ChaseRadius = 0.96
 SLASHER.ChaseDuration = 6.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1
-SLASHER.ChaseMusic = "slashco/slasher/sid_chase.wav"
-SLASHER.KillSound = "slashco/slasher/sid_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/sid/sid_chase.ogg"
+SLASHER.KillSound = "slashco/slasher/sid/sid_kill.mp3"
 SLASHER.Description = "Sid_desc"
 SLASHER.ProTip = "Sid_tip"
 SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.ItemToSpawn = "Cookie"
+SLASHER.GunShotDecay = 1.5 -- How long he'll be in the shooting animation.
+-- Balancement Vars
+SLASHER.ChaseIncreaseAddition = 0 -- By how much the chase is increased additionally
+SLASHER.PacificationAddition = 0 -- By how much the Pacification is additionally increased each tick
+SLASHER.GunSpreadDecrease = 0 --- By how much the gun spread should be reduced each tick
+SLASHER.GunCooldownAddition = 0 -- By how much the gun cooldown is additionally reduced each tick
+SLASHER.EquipGunCooldownDecrease = 0 -- By how much the GunCooldown and Pacification are decreased when the special ability is used
+SLASHER.GunRageEyeSight = 0 -- His EyeSight when he's in gun rage
+SLASHER.GunRagePerception = 0 -- His Perception when he's in gun rage
+SLASHER.GunEyeSight = 0 -- His EyeSight when he has a gun but is NOT in rage
+SLASHER.GunPerception = 0 -- His Perception when he has a gun but is NOT in rage
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	local v1 = math.Clamp(slasher.SlasherValue1, 0, 5) --Cookies Eaten
-	slasher.SlasherValue1 = v1
-	local v2 = slasher.SlasherValue2 --Pacification
-	local v3 = slasher.SlasherValue3 --Gun use cooldown
-	local v4 = slasher.SlasherValue4 --bullet spread
-	local v5 = slasher.SlasherValue5 --chase speed increase
+	SLASHER.PacificationAddition = 0.04 * SO
+	SLASHER.GunSpreadDecrease = 0.02 + (0.08 * SO)
+	SLASHER.GunCooldownAddition = 0.04 * SO
+	SLASHER.EquipGunCooldownDecrease = 2 * SO
+	SLASHER.ChaseIncreaseAddition = 0.02 * SO
+
+	SLASHER.GunRageEyeSight = SLASHER.Eyesight + 2 + (SO * 2)
+	SLASHER.GunRagePerception = SLASHER.Perception + 1.5 + (SO * 1)
+
+	SLASHER.GunEyeSight = SLASHER.Eyesight + 5 + (SO * 2)
+	SLASHER.GunPerception = SLASHER.Perception + 1 + (SO * 3)
+
+	if additionalSurvivors > 0 then
+		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 275 + (0.5 * additionalSurvivors)
+	end
+end
+
+local function PlayShots(slasher)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_shot.mp3",
+		identifier = "SidShot",
+		minDistance = 700 * SlashCo.MapSize,
+		maxDistance = 1240 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 0.8,
+		fadeIn = 0,
+	})
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_shot_legacy.mp3",
+		identifier = "SidShotLegacy",
+		minDistance = 700 * SlashCo.MapSize,
+		maxDistance = 1240 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 0.7,
+		fadeIn = 0,
+	})
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_shot_farthest.mp3",
+		identifier = "SidShotFarthest",
+		minDistance = 1250 * SlashCo.MapSize,
+		maxDistance = 2250 * SlashCo.MapSize,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+end
+
+function SLASHER.OnSpawn(slasher)
+	slasher.EatedCookies = 0
+	slasher.Pacification = 0
+	slasher.GunCooldown = 0
+	slasher.GunSpread = 0
+	slasher.ChaseIncrease = 0
+end
+
+function SLASHER.OnTickBehaviour(slasher)
+	local Cookies = math.Clamp(slasher.EatedCookies, 0, 5) --Cookies Eaten
+	slasher.EatedCookies = Cookies
+	local Pacification = slasher.Pacification or 0
+	local GunCD = slasher.GunCooldown or 0 --Gun use cooldown
+	local GunSP = slasher.GunSpread or 0 --bullet spread
+	local ChaseIN = slasher.ChaseIncrease or 0 --chase speed increase
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
 
-	if v2 > 0 then
-		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
+	if Pacification > 0 then
+		slasher.Pacification = Pacification - (FrameTime() + SLASHER.PacificationAddition)
 		slasher:SetNWBool("CanKill", false)
 		slasher:SetNWBool("CanChase", false)
 	elseif slasher:GetNWBool("SidGun", false) then
@@ -54,19 +128,19 @@ SLASHER.OnTickBehaviour = function(slasher)
 		slasher:SetNWBool("DemonPacified", false)
 	end
 
-	if v3 > 0 then
-		slasher.SlasherValue3 = v3 - (FrameTime() + (SO * 0.04))
+	if GunCD > 0 then
+		slasher.GunCooldown = math.max(GunCD - (FrameTime() + SLASHER.GunCooldownAddition), 0)
 	end
-	if v4 > 0 then
-		slasher.SlasherValue4 = v4 - (0.02 + (SO * 0.08))
+	if GunSP > 0 then
+		slasher.GunSpread = math.max(GunSP - SLASHER.GunSpreadDecrease, 0)
 	end
 
-	if v5 < 160 and slasher:GetNWBool("InSlasherChaseMode") then
-		slasher.SlasherValue5 = v5 + (FrameTime() + (SO * 0.02)) + (v1 * FrameTime() * 0.5)
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed + (v5 / 3.5))
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed + (v5 / 3.5))
+	if ChaseIN < 160 and slasher:GetNWBool("InSlasherChaseMode") then
+		slasher.ChaseIncrease = ChaseIN + (FrameTime() + SLASHER.ChaseIncreaseAddition) + (Cookies * FrameTime() * 0.5)
+		slasher:SetRunSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
+		slasher:SetWalkSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
 	else
-		slasher.SlasherValue5 = 0
+		slasher.ChaseIncrease = 0
 	end
 
 	if not slasher:GetNWBool("DemonPacified") then
@@ -75,11 +149,11 @@ SLASHER.OnTickBehaviour = function(slasher)
 			final_perception = SLASHER.Perception
 		else
 			if not slasher:GetNWBool("SidGunRage") then
-				final_eyesight = SLASHER.Eyesight + (2 + (SO * 2))
-				final_perception = SLASHER.Perception + (1.5 + (SO * 1))
+				final_eyesight = SLASHER.GunRageEyeSight
+				final_perception = SLASHER.GunRagePerception
 			else
-				final_eyesight = SLASHER.Eyesight + (5 + (SO * 2))
-				final_perception = SLASHER.Perception + (1 + (SO * 3))
+				final_eyesight = SLASHER.GunEyeSight
+				final_perception = SLASHER.GunPerception
 			end
 		end
 	else
@@ -99,11 +173,20 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	if slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("SidGunLetterC") and slasher:GetNWBool("SidGunEquipped") then
 		slasher:SetNWBool("SidGunLetterC", true)
-		slasher:PlayGlobalSound("slashco/slasher/sid_THE_LETTER_C.wav", 95, 0.5)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_THE_LETTER_C.ogg",
+			identifier = "SidLetterC",
+			minDistance = 750,
+			maxDistance = 1400,
+			looping = true,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
-	if slasher:GetNWInt("SidGunUses") ~= v1 then
-		slasher:SetNWInt("SidGunUses", v1)
+	if slasher:GetNWInt("SidGunUses") ~= Cookies then
+		slasher:SetNWInt("SidGunUses", Cookies)
 	end
 
 	if not slasher.CanUseGun and SlashCo.CurRound.GameProgress > 5 then
@@ -113,39 +196,173 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	-- [[
 	--let sid use his gun early if he gets enough saturation
-	if not slasher.CanUseGun and v1 >= 5 then
+	if not slasher.CanUseGun and Cookies >= 5 then
 		slasher:SetNWBool("SidCanUseGun", true)
 		slasher.CanUseGun = true
 	end
 	--]]
 
-	slasher:SetNWFloat("Slasher_Eyesight", final_eyesight)
-	slasher:SetNWInt("Slasher_Perception", final_perception)
+	if Cookies >= 3 and SlashCo.CurRound.DistressBeaconUsed then
+		if not slasher.CanUseGun then
+			slasher:SetNWBool("SidCanUseGun", true)
+			slasher.CanUseGun = true
+		end
+
+		if not slasher:GetNWBool("SidGunRage") then
+			slasher:SetNWBool("SidGunRage", true)
+
+			if slasher:GetNWBool("SidGunEquipped") then
+				if not slasher:GetNWBool("SidGunAimed") and not slasher:GetNWBool("SidGunAiming") then
+					slasher:SetRunSpeed(SLASHER.ChaseSpeed)
+				end
+			end
+		end
+	end
+
+	slasher:SetEyeSight(final_eyesight)
+	slasher:SetPerception(final_perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+local function IsPlayerHoldingCookie(target, removeCookie)
+	if target:ItemValue("EntClass", false, true) == "sc_cookie" then -- eat the Cookie >:3
+		if removeCookie then
+			SlashCo.RemoveItem(target, true)
+		end
+
+		return true
+	end
+
+	if target:ItemValue("EntClass", false, false) == "sc_cookie" then -- eat the Cookie >:3
+		if removeCookie then
+			SlashCo.RemoveItem(target, false)
+		end
+
+		return true
+	end
+
+	return false
+end
+
+local function EatCookie(slasher, target)
+	target:SetPos(slasher:WorldSpaceCenter() + (slasher:GetForward() * 29)) -- Make the cookie align for the animation :3
+	target:DropToFloor()
+
+	slasher:SetNWBool("SidEating", true)
+	slasher.Pacification = 99
+	local idx = math.random(1, 2)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/sid/sid_cookie" .. idx .. ".mp3",
+		identifier = "SidCookie" .. idx,
+		minDistance = 200,
+		maxDistance = 700,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+
+	target:SetNWBool("BeingEaten", true)
+
+	timer.Simple(1.3, function()
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_eating.mp3",
+			identifier = "SidEating",
+			minDistance = 200,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+	end)
+
+	slasher:Freeze(true)
+
+	timer.Simple(10, function()
+		if not IsValid(slasher) then return end
+
+		slasher:Freeze(false)
+		slasher:SetNWBool("SidEating", false)
+		slasher:SetNWBool("DemonPacified", true)
+		slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
+		slasher.Pacification = math.random(15, 25)
+
+		if IsValid(target) then
+			target:Remove()
+		end
+	end)
+end
+
+function SLASHER.OnPrimaryFire(slasher, target)
+	if not slasher:GetNWBool("SidGun") and (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
+		if slasher:GetNWBool("SidEatingSurvCookie") then return end
+
+		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
+		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
+		local cookie = ents.Create("prop_physics")
+
+		cookie:SetMoveType(MOVETYPE_NONE)
+		cookie:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		cookie:SetModel(SlashCoItems.Cookie.Model)
+		cookie:SetPos(pos)
+		cookie:SetAngles(ang)
+		cookie:FollowBone(slasher, slasher:LookupBone("HandR"))
+
+		slasher:SetNWBool("SidEatingSurvCookie", true)
+		slasher:Freeze(true)
+		SlashCo.StopChase(slasher)
+
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_cookie" .. idx .. ".mp3",
+			identifier = "SidCookie" .. idx,
+			minDistance = 200,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+
+		timer.Simple(3.55, function()
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_eating.mp3",
+				identifier = "SidEating",
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+			cookie:Remove()
+		end)
+
+		timer.Simple(10, function()
+			if not IsValid(slasher) and not IsValid(target) then return end
+
+			slasher:SetNWBool("SidEatingSurvCookie", false)
+			slasher:SetNWBool("DemonPacified", true)
+			slasher:Freeze(false)
+			slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
+			slasher.Pacification = math.random(15, 25)
+		end)
+
+		return
+	end
+
 	if not slasher:GetNWBool("SidGun") then
+		if slasher:GetNWBool("SidEatingSurvCookie") then return end
+
 		SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
-	local spread = slasher.SlasherValue4
+	local spread = slasher.GunSpread
 	local dist = SLASHER.KillDistance
 
 	if slasher:GetNWBool("SidGunAimed") and spread < 2.4 then
-		slasher:SetNWBool("SidGunShoot", false)
-		timer.Remove("SidGunDecay")
-
 		timer.Simple(0.05, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("SidGunShoot", true)
-
-			slasher:PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150)
-			slasher:PlayGlobalSound("slashco/slasher/sid_shot.mp3", 85)
-			slasher:PlayGlobalSound("slashco/slasher/sid_shot_legacy.mp3", 70)
+			slasher:SetNWFloat("SidGunShoot", CurTime())
+			PlayShots(slasher)
 
 			slasher:FireBullets(
 					{
@@ -165,6 +382,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			muzzle:SetOrigin(vPoint + slasher:GetForward() * 8 + Vector(0, 0, 2))
 			muzzle:SetStart(Vector(255, 0, 0))
 			muzzle:SetAttachment(0)
+			muzzle:SetEntity(slasher)
 			util.Effect("sid_muzzle", muzzle)
 
 			local shell = EffectData()
@@ -172,27 +390,14 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			shell:SetAngles(ang)
 			util.Effect("ShellEject", shell)
 
-			slasher.SlasherValue4 = 3
-
-			timer.Create("SidGunDecay", 1.5, 1, function()
-				if not IsValid(slasher) then
-					return
-				end
-
-				slasher:SetNWBool("SidGunShoot", false)
-			end)
+			slasher.GunSpread = 3
 		end)
 	else
 		--Executing a Survivor
 
 		if IsValid(target) and target:IsPlayer() then
-			if target:Team() ~= TEAM_SURVIVOR then
-				return
-			end
-
-			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then
-				return
-			end
+			if target:Team() ~= TEAM_SURVIVOR then return end
+			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
 			local pick_ang = SlashCo.RadialTester(slasher, 600, target)
 
@@ -201,18 +406,25 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 			slasher:Freeze(true)
 
 			timer.Simple(0.1, function()
-				if not IsValid(slasher) or not IsValid(target) then
-					return
-				end
+				if not IsValid(slasher) or not IsValid(target) then return end
 
 				target:SetPos(slasher:GetPos())
-
 				target:Freeze(true)
-
 				target:SetNWBool("SurvivorBeingJumpscared", true)
+
 				slasher:SetNWBool("CanChase", false)
 
-				slasher:PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 85)
+				local idx = math.random(1,4)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3",
+					identifier = "SidAngry" .. idx,
+					minDistance = 750,
+					maxDistance = 1250,
+					looping = false,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
 
 				slasher:SetNWBool("SidExecuting", true)
 
@@ -225,40 +437,72 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 				slasher.KillDelayTick = SlashCoSlashers[slasher:GetNWString("Slasher")].KillDelay
 
 				timer.Simple(1, function()
-					if not IsValid(target) then
-						return
-					end
+					if not IsValid(target) then return end
 
-					target:EmitSound("ambient/voices/citizen_beaten4.wav")
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "ambient/voices/citizen_beaten4.wav",
+						identifier = "SurvivorSidStruggle1",
+						minDistance = 600,
+						maxDistance = 800,
+						entity = target,
+						volume = 1,
+						fadeIn = 0,
+					})
 				end)
 
 				timer.Simple(3, function()
-					if not IsValid(target) then
-						return
-					end
+					if not IsValid(target) then return end
 
-					target:EmitSound("ambient/voices/citizen_beaten3.wav")
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "ambient/voices/citizen_beaten3.wav",
+						identifier = "SurvivorSidStruggle2",
+						minDistance = 600,
+						maxDistance = 800,
+						entity = target,
+						volume = 1,
+						fadeIn = 0,
+					})
 				end)
 
 				timer.Simple(3.95, function()
-					if not IsValid(target) then
-						return
-					end
+					if not IsValid(target) then return end
 
 					target:SetEyeAngles(Angle(0, 180 + pick_ang, 0))
 				end)
 
 				timer.Simple(4.1, function()
-					if not IsValid(slasher) or not IsValid(target) then
-						return
-					end
+					if not IsValid(slasher) or not IsValid(target) then return end
 
 					target:SetNWBool("SurvivorBeingJumpscared", false)
 
-					slasher:PlayGlobalSound("slashco/slasher/sid_shot_farthest.mp3", 150)
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/sid/sid_shot_farthest.mp3",
+						identifier = "SidShotFarthest",
+						minDistance = 1250 * SlashCo.MapSize,
+						maxDistance = 2250 * SlashCo.MapSize,
+						entity = slasher,
+						volume = 1,
+						fadeIn = 0,
+					})
 
-					slasher:EmitSound("slashco/slasher/sid_shot.mp3", 95)
-					slasher:EmitSound("slashco/slasher/sid_shot_2.mp3", 85)
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/sid/sid_shot.mp3",
+						identifier = "SidShot",
+						minDistance = 700 * SlashCo.MapSize,
+						maxDistance = 1240 * SlashCo.MapSize,
+						entity = slasher,
+						volume = 0.9,
+						fadeIn = 0,
+					})
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "slashco/slasher/sid/sid_shot_2.mp3",
+						identifier = "SidShot2",
+						minDistance = 700 * SlashCo.MapSize,
+						maxDistance = 1240 * SlashCo.MapSize,
+						entity = slasher,
+						volume = 0.8,
+						fadeIn = 0,
+					})
 
 					local vec, ang = slasher:GetBonePosition(slasher:LookupBone("HandL"))
 					local vPoint = vec
@@ -266,6 +510,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 					muzzle:SetOrigin(vPoint + slasher:GetForward() * 8 + Vector(0, 0, 2))
 					muzzle:SetStart(Vector(255, 0, 0))
 					muzzle:SetAttachment(0)
+					muzzle:SetEntity(slasher)
 					util.Effect("sid_muzzle", muzzle)
 
 					local shell = EffectData()
@@ -280,9 +525,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 					target:SetVelocity(slasher:GetForward() * 300)
 					target:SetNotSolid(false)
 					timer.Simple(0.05, function()
-						if not IsValid(target) then
-							return
-						end
+						if not IsValid(target) then return end
 
 						if IsValid(slasher) then
 							target:TakeDamage(99999, slasher, slasher)
@@ -293,9 +536,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 				end)
 
 				timer.Simple(8, function()
-					if not IsValid(slasher) or not IsValid(target) then
-						return
-					end
+					if not IsValid(slasher) or not IsValid(target) then return end
 
 					slasher:Freeze(false)
 					slasher:SetNWBool("SidExecuting", false)
@@ -306,7 +547,7 @@ SLASHER.OnPrimaryFire = function(slasher, target)
 	end
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	if not slasher:GetNWBool("SidGunEquipped") then
 		SlashCo.StartChaseMode(slasher)
 		return
@@ -314,106 +555,98 @@ SLASHER.OnSecondaryFire = function(slasher)
 
 	local gunrage = slasher:GetNWBool("SidGunRage")
 
-	if not slasher:GetNWBool("SidGunAimed") and not slasher:GetNWBool("SidGunAiming") and slasher.SlasherValue3 < 0.01 then
+	if not slasher:GetNWBool("SidGunAimed") and not slasher:GetNWBool("SidGunAiming") and slasher.GunCooldown < 0.01 then
 		slasher:SetNWBool("SidGunAiming", true)
-		slasher.SlasherValue3 = 2
+		slasher.GunCooldown = 2
 		slasher:SetSlowWalkSpeed(1)
 		slasher:SetWalkSpeed(1)
 		slasher:SetRunSpeed(1)
-		slasher:EmitSound("slashco/slasher/sid_draw.wav", 75, 110)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_draw.mp3",
+			identifier = "SidDraw",
+			minDistance = 400,
+			maxDistance = 700,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(1, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("SidGunAiming", false)
 			slasher:SetNWBool("SidGunAimed", true)
-			slasher:EmitSound("slashco/slasher/sid_clipout.wav")
-			slasher.SlasherValue4 = 2
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_clipout.mp3",
+				identifier = "SidClipout",
+				minDistance = 400,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+			slasher.GunSpread = 2
 		end)
-	elseif slasher:GetNWBool("SidGunAimed") and slasher.SlasherValue3 < 0.01 then
-		slasher.SlasherValue3 = 2
+	elseif slasher:GetNWBool("SidGunAimed") and slasher.GunCooldown < 0.01 then
+		slasher.GunCooldown = 2
 		slasher:SetNWBool("SidGunAiming", false)
 		slasher:SetNWBool("SidGunAimed", false)
-		slasher:SetSlowWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-
-		if not gunrage then
-			slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-		else
-			slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
-		end
+		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+		slasher:SetRunSpeed(gunrage and SLASHER.ChaseSpeed or SLASHER.ProwlSpeed)
 	end
 end
 
-SLASHER.OnMainAbilityFire = function(slasher, target)
-	local SO = SlashCo.CurRound.OfferingData.SO
-	local SatO = SlashCo.CurRound.OfferingData.SatO
+function SLASHER.OnMainAbilityFire(slasher, target)
+	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("SidEating")
+		or slasher:GetNWBool("SidEatingSurvCookie") or slasher:GetNWBool("SidGun") then return end
 
-	if not IsValid(target) or target:GetClass() ~= "sc_cookie" then
-		return
-	end
-
-	if slasher:GetPos():Distance(target:GetPos()) >= 150 or slasher:GetNWBool("SidEating") or slasher:GetNWBool("SidGun") then
-		return
-	end
-
-	slasher:SetNWBool("SidEating", true)
-	slasher.SlasherValue2 = 99
-	slasher:EmitSound("slashco/slasher/sid_cookie" .. math.random(1, 2) .. ".mp3")
-
-	target:SetNWBool("BeingEaten", true)
-
-	timer.Simple(1.3, function()
-		slasher:EmitSound("slashco/slasher/sid_eating.mp3")
-	end)
-
-	slasher:Freeze(true)
-
-	timer.Simple(10, function()
-		if not IsValid(slasher) then
-			return
-		end
-
-		slasher:Freeze(false)
-		slasher:SetNWBool("SidEating", false)
-		slasher:SetNWBool("DemonPacified", true)
-		slasher.SlasherValue1 = slasher.SlasherValue1 + 1 + SatO
-		slasher.SlasherValue2 = math.random(15, 25)
-
-		if IsValid(target) then
-			target:Remove()
-		end
-	end)
+	EatCookie(slasher, target)
+	SlashCo.StopChase(slasher)
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
-	if not slasher.CanUseGun then
-		return
-	end
+function SLASHER.OnSpecialAbilityFire(slasher)
+	if not slasher.CanUseGun then return end
 
-	local SO = SlashCo.CurRound.OfferingData.SO
-
-	if not slasher:GetNWBool("SidGun") and slasher.SlasherValue3 < 0.01 and slasher.SlasherValue1 > 0 then
+	if not slasher:GetNWBool("SidGun") and slasher.GunCooldown < 0.01 and slasher.EatedCookies > 0 then
 		--Equip the gun
 		slasher:SetNWBool("SidGun", true)
 		slasher:SetNWBool("SidGunEquipping", true)
 		slasher:Freeze(true)
-		slasher.SlasherValue3 = 4 - (SO * 2)
-		slasher.SlasherValue2 = 4 - (SO * 2)
+		slasher.GunCooldown = 4 - SLASHER.EquipGunCooldownDecrease
+		slasher.Pacification = 4 - SLASHER.EquipGunCooldownDecrease
 
-		slasher.SlasherValue1 = slasher.SlasherValue1 - 1 --Deplete the uses
+		slasher.EatedCookies = slasher.EatedCookies - 1 --Deplete the uses
 
 		timer.Simple(0.5, function()
 			--Show the gun model
 
 			slasher:SetBodygroup(1, 1)
-			slasher:EmitSound("slashco/slasher/sid_draw.wav")
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_draw.mp3",
+				identifier = "SidDraw",
+				minDistance = 400,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end)
 		timer.Simple(2.25, function()
 			--sound
-			slasher:EmitSound("slashco/slasher/sid_slideback.wav", 75, 75)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_slideback.mp3",
+				identifier = "SidSlideback",
+				minDistance = 400,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 0.8,
+				fadeIn = 0,
+			})
+
 			slasher:SlasherHudFunc("SetCrosshairProngs", 4)
 		end)
 
@@ -424,39 +657,39 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 			slasher:SetNWBool("SidGunEquipped", true)
 			slasher:Freeze(false)
 
-			slasher.SlasherValue3 = 2
+			slasher.GunCooldown = 2
 
 			if slasher:GetNWBool("SidGunRage") then
-				slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseSpeed)
+				slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 			end
 		end)
-	elseif slasher:GetNWBool("SidGun") and slasher.SlasherValue3 < 0.01 and not slasher:GetNWBool("SidGunAiming") and not slasher:GetNWBool("SidGunAimed") then
+	elseif slasher:GetNWBool("SidGun") and slasher.GunCooldown < 0.01 and not slasher:GetNWBool("SidGunAiming") and not slasher:GetNWBool("SidGunAimed") then
 		slasher:SetNWBool("SidGunEquipped", false)
 		slasher:SetNWBool("SidGun", false)
 		slasher:SetBodygroup(1, 0)
 		slasher:SetNWBool("SidGunLetterC", false)
-		slasher:StopSound("slashco/slasher/sid_THE_LETTER_C.wav")
-		slasher.SlasherValue2 = math.random(5, 15)
+		SlashCo.AudioSystem.StopSound("SidLetterC", 0.5, slasher)
+		slasher.Pacification = math.random(5, 15)
 	end
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Thirdperson(ply)
+	return ply:GetNWBool("SidEating")
+end
+
+function SLASHER.Animator(ply)
 	local eating = ply:GetNWBool("SidEating")
+	local eating_surv = ply:GetNWBool("SidEatingSurvCookie")
 	local equipping_gun = ply:GetNWBool("SidGunEquipping")
 	local sid_executing = ply:GetNWBool("SidExecuting")
 
 	local gun_state = ply:GetNWBool("SidGunEquipped")
 	local aiming_gun = ply:GetNWBool("SidGunAiming")
 	local aimed_gun = ply:GetNWBool("SidGunAimed")
-	local gun_shooting = ply:GetNWBool("SidGunShoot")
+	local gun_shooting = (CurTime() - ply:GetNWFloat("SidGunShoot", 0)) < SLASHER.GunShotDecay
+	local gun_prefix = gun_state and "g_" or ""
 
-	if gun_state then
-		gun_prefix = "g_"
-	else
-		gun_prefix = ""
-	end
-
-	if not eating and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then
+	if not eating and not eating_surv and not equipping_gun and not aiming_gun and not gun_shooting and not sid_executing then
 		ply.anim_antispam = false
 	end
 
@@ -474,8 +707,16 @@ SLASHER.Animator = function(ply)
 				else
 					ply.CalcSeqOverride = ply:LookupSequence(gun_prefix .. "float")
 				end
+				
+				if eating_surv then
+					ply.CalcSeqOverride = ply:LookupSequence("eat2")
+					if ply.anim_antispam == nil or ply.anim_antispam == false then
+						ply:SetCycle(0)
+						ply.anim_antispam = true
+					end
+				end
 			else
-				ply.CalcSeqOverride = ply:LookupSequence("eat")
+				ply.CalcSeqOverride = ply:LookupSequence("eat1")
 				if ply.anim_antispam == nil or ply.anim_antispam == false then
 					ply:SetCycle(0)
 					ply.anim_antispam = true
@@ -522,15 +763,22 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
+function SLASHER.Footstep(ply)
 	if SERVER then
-		ply:EmitSound("slashco/slasher/sid_step" .. math.random(1, 2) .. ".mp3")
-		return true
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_step" .. idx .. ".mp3",
+			identifier = "SIDFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 300,
+			maxDistance = 600,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
 local gunTable = {
@@ -558,7 +806,7 @@ local cookieTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_2"))
 	hud:SetTitle("Sid")
 
@@ -576,21 +824,20 @@ SLASHER.InitHud = function(_, hud)
 	hud:TieCrosshairEntity("sc_cookie", 150, "R", { "SidGun", "SidEating", IsOr = true })
 
 	timer.Simple(0, function()
-		if LocalPlayer():GetNWBool("SidCanUseGun") then
-			return
-		end
+		if GameData.LocalPlayer:GetNWBool("SidCanUseGun") then return end
+
 		hud:SetControlVisible("F", false)
 	end)
 
 	hud:AddMeter("satiation", 5, "", nil, true)
 	hud:TieMeterInt("satiation", "SidGunUses", true)
 
-	hud.prevGun = not LocalPlayer():GetNWBool("SidGun")
-	hud.prevGunEquipped = not LocalPlayer():GetNWBool("SidGunEquipped")
+	hud.prevGun = not GameData.LocalPlayer:GetNWBool("SidGun")
+	hud.prevGunEquipped = not GameData.LocalPlayer:GetNWBool("SidGunEquipped")
 	hud.prevGunUses = -1
 	function hud.AlsoThink()
-		local gun = LocalPlayer():GetNWBool("SidGun")
-		local gunUses = LocalPlayer():GetNWInt("SidGunUses")
+		local gun = GameData.LocalPlayer:GetNWBool("SidGun")
+		local gunUses = GameData.LocalPlayer:GetNWInt("SidGunUses")
 		if gun ~= hud.prevGun then
 			if gun then
 				hud:UntieControl("LMB")
@@ -623,7 +870,7 @@ SLASHER.InitHud = function(_, hud)
 			hud.prevGun = gun
 		end
 
-		local gunEquip = LocalPlayer():GetNWBool("SidGunEquipped")
+		local gunEquip = GameData.LocalPlayer:GetNWBool("SidGunEquipped")
 		if gunEquip ~= hud.prevGunEquipped then
 			if gunEquip then
 				timer.Simple(0, function()
@@ -645,7 +892,7 @@ SLASHER.InitHud = function(_, hud)
 			hud.prevGunUses = gunUses
 		end
 
-		if not hud.gunMode and LocalPlayer():GetNWBool("SidCanUseGun") then
+		if not hud.gunMode and GameData.LocalPlayer:GetNWBool("SidCanUseGun") then
 			hud:SetControlVisible("F", true)
 			hud:SetMeterName("satiation", "gun uses")
 			hud:FlashMeter("gun uses")
@@ -658,7 +905,7 @@ SLASHER.InitHud = function(_, hud)
 	end
 end
 
-SLASHER.PreDrawHalos = function()
+function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_cookie"), nil, 2, false)
 
 	local plyWithItem = {}
@@ -671,24 +918,25 @@ SLASHER.PreDrawHalos = function()
 	SlashCo.DrawHalo(plyWithItem, nil, 2, false)
 end
 
-SLASHER.SidRage = function(ply)
+function SLASHER.SidRage(ply)
 	local pos = ply:GetPos()
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		if SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
+		if slasher:GetPos():Distance(pos) > 1800 then return end
 
-	for i = 1, #team.GetPlayers(TEAM_SLASHER) do
-		local slasherid = team.GetPlayers(TEAM_SLASHER)[i]:SteamID64()
-		local slasher = team.GetPlayers(TEAM_SLASHER)[i]
+		slasher.EatedCookies = slasher.EatedCookies + 2
 
-		if SlashCoSlashers[slasher:GetNWString("Slasher")].ID ~= 2 then
-			return
-		end
-
-		if slasher:GetPos():Distance(pos) > 1800 then
-			return
-		end
-
-		slasher.SlasherValue1 = slasher.SlasherValue1 + 2
-
-		slasher:PlayGlobalSound("slashco/slasher/sid_angry_" .. math.random(1, 4) .. ".mp3", 95)
+		local idx = math.random(1,4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/sid/sid_angry_" .. idx .. ".mp3",
+			identifier = "SidAngry" .. idx,
+			minDistance = 750,
+			maxDistance = 1250,
+			looping = false,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		for _, v in player.Iterator() do
 			v:SetNWBool("SidFuck", true)
@@ -699,32 +947,40 @@ SLASHER.SidRage = function(ply)
 				v:SetNWBool("SidFuck", false)
 			end
 
-			slasher:PlayGlobalSound("slashco/slasher/sid_sad_1.mp3", 85)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/sid/sid_sad_1.mp3",
+				identifier = "SidSad",
+				minDistance = 750,
+				maxDistance = 1250,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 		end)
 	end
 end
 
 if CLIENT then
-	hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-		if LocalPlayer():GetNWBool("SurvivorJumpscare_Sid") == true then
-			if LocalPlayer().sid_f == nil then
-				LocalPlayer().sid_f = 0
+	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
+		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Sid") == true then
+			if GameData.LocalPlayer.sid_f == nil then
+				GameData.LocalPlayer.sid_f = 0
 			end
-			if LocalPlayer().sid_f < 39 then
-				LocalPlayer().sid_f = LocalPlayer().sid_f + (FrameTime() * 30)
+			if GameData.LocalPlayer.sid_f < 39 then
+				GameData.LocalPlayer.sid_f = GameData.LocalPlayer.sid_f + (FrameTime() * 30)
 			end
 
 			local Overlay = Material("slashco/ui/overlays/jumpscare_2")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().sid_f))
+			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.sid_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(Overlay)
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		else
-			LocalPlayer().sid_f = nil
+			GameData.LocalPlayer.sid_f = nil
 		end
 
-		if LocalPlayer():GetNWBool("SidFuck") == true then
+		if GameData.LocalPlayer:GetNWBool("SidFuck") == true then
 			local Overlay = Material("slashco/ui/overlays/sid_fuck")
 
 			surface.SetDrawColor(255, 255, 255, 60)
@@ -732,16 +988,14 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
 			if c == nil then
-				surface.PlaySound("slashco/slasher/sid_rage_drone.mp3")
+				surface.PlaySound("slashco/slasher/sid/sid_rage_drone.mp3")
 				c = true
 			end
 		end
 	end)
 
 	hook.Add("CalcView", "SidExecution", function(ply, pos, angles, fov)
-		if ply:Team() ~= TEAM_SURVIVOR then
-			return
-		end
+		if ply:Team() ~= TEAM_SURVIVOR then return end
 
 		if ply:GetNWBool("SurvivorSidExecution") then
 			pos = ply:LocalToWorld(Vector(120, 120, 60))
@@ -753,4 +1007,3 @@ if CLIENT then
 end
 
 SlashCo.RegisterSlasher(SLASHER, "Sid")
-

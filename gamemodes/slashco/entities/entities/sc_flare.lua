@@ -38,7 +38,7 @@ if CLIENT then
 
 			intensity = intensity + (FrameTime() * 300)
 
-			local dlight = DynamicLight(self:EntIndex() + 999968)
+			local dlight = DynamicLight(self:EntIndex())
 			if dlight then
 				dlight.pos = self:GetPos()
 				dlight.r = 180

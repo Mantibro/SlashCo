@@ -1,12 +1,8 @@
 local SlashCo = SlashCo
 local SlashCoItems = SlashCoItems
 
-SlashCo.UseItem = function(ply)
-	if CLIENT then
-		return
-	end
-
-	if game.GetMap() == "sc_lobby" then
+function SlashCo.UseItem(ply)
+	if GameData.IsLobby then
 		return
 	end
 
@@ -26,49 +22,66 @@ SlashCo.UseItem = function(ply)
 	if SlashCoItems[item] and SlashCoItems[item].OnUse then
 		local doNotRemove = SlashCoItems[item].OnUse(ply)
 		if not doNotRemove then
-			SlashCo.ChangeSurvivorItem(ply, "none")
+			SlashCo.ChangeSurvivorItem(ply, "item", "none")
+		else
+			ply.SoundCannotUseItem = (ply.SoundCannotUseItem or 0) + 1
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/ui/item_deselect.mp3",
+				identifier = "ItemUnusable" .. ply.SoundCannotUseItem,
+				playbackRate = 0.4,
+				volume = 1,
+				fadeIn = 0,
+				sendToEntity = ply,
+			})
 		end
 	end
 end
 
-SlashCo.DropAllItems = function(ply, noEffect)
+function SlashCo.DropAllItems(ply, noEffect)
 	if not noEffect then
-		ply:ClearEffect()
+		ply:ClearEffects()
 	end
 
 	SlashCo.DropItem(ply)
 	SlashCo.DropItem(ply)
 end
 
-SlashCo.DropItem = function(ply)
-	if CLIENT then
-		return
-	end
-
-	if game.GetMap() == "sc_lobby" then
+function SlashCo.DropItem(ply, dropCallback, ignoreField)
+	if GameData.IsLobby then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
 	if ply:Team() ~= TEAM_SURVIVOR then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
 	if ply:IsFrozen() then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
 	local item = ply:GetItem("item2")
-	if item == "none" then
+	if item == "none" or (SlashCoItems[item] and SlashCoItems[item][ignoreField]) then
 		item = ply:GetItem("item")
 	end
 
 	if not SlashCoItems[item] then
-		SlashCo.SendValue(ply, "preItem")
 		return
 	end
 
 	local dontDrop = ply:ItemFunction2("PreDrop", item)
 	if dontDrop then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
@@ -77,6 +90,9 @@ SlashCo.DropItem = function(ply)
 	if SlashCoItems[item].IsSecondary then
 		local dontDrop1 = ply:ItemFunction("PreDropSecondary", item)
 		if dontDrop1 then
+			if dropCallback then
+				dropCallback(nil)
+			end
 			return
 		end
 
@@ -89,13 +105,16 @@ SlashCo.DropItem = function(ply)
 		ply:SetItem("item", "none")
 	end
 
-	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), time, 1, function()
+	timer.Create(string.format("SlashCo:ItemSwitch_%s_%s", slot, ply:UserID()), time, 1, function()
 		if not IsValid(ply) then
 			return
 		end
 
 		local height, dontDrop1, dontPush = ply:ItemFunction2("OnDrop", item)
 		if dontDrop1 then
+			if dropCallback then
+				dropCallback(nil)
+			end
 			return
 		end
 
@@ -118,15 +137,19 @@ SlashCo.DropItem = function(ply)
 		if not SlashCoItems[item].IsSecondary then
 			SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
 		end
+		
+		if dropCallback then
+			dropCallback(ply, item, droppeditem, phys)
+		end
 	end)
 
 	ply.LastDroppedItemTime = CurTime()
 end
 
-SlashCo.RemoveItem = function(ply, isSec)
+function SlashCo.RemoveItem(ply, isSec)
 	local slot = isSec and "item2" or "item"
 	local item = ply:GetItem(slot)
-	timer.Create(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID()), isSec and 0.25 or 0.18, 1, function()
+	timer.Create(string.format("SlashCo:ItemSwitch_%s_%s", slot, ply:UserID()), isSec and 0.25 or 0.18, 1, function()
 		if IsValid(ply) then
 			ply:ItemFunction2("OnSwitchFrom", item)
 		end
@@ -134,13 +157,14 @@ SlashCo.RemoveItem = function(ply, isSec)
 	ply:SetItem(slot, "none")
 end
 
-SlashCo.ChangeSurvivorItem = function(ply, id)
+function SlashCo.ChangeSurvivorItem(ply, slot, id, noSound)
+	slot = slot or "item"
 	if SlashCoItems[id] then
 		if SlashCoItems[id].OnPickUp then
 			SlashCoItems[id].OnPickUp(ply)
 		end
 
-		if SlashCoItems[id].IsSecondary then
+		if slot == "item2" or SlashCoItems[id].IsSecondary then
 			local item = ply:GetItem("item2")
 			ply:ItemFunction2("OnSwitchFrom", item)
 			ply:SetItem("item2", id)
@@ -149,18 +173,20 @@ SlashCo.ChangeSurvivorItem = function(ply, id)
 			ply:ItemFunction2("OnSwitchFrom", item)
 			ply:SetItem("item", id)
 		end
-
-		if SlashCoItems[id].EquipSound then
-			ply:EmitSound(SlashCoItems[id].EquipSound())
-		else
-			ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+		
+		if not noSound then
+			if SlashCoItems[id].EquipSound then
+				ply:EmitSound(SlashCoItems[id].EquipSound())
+			else
+				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+			end
 		end
 	elseif id == "none" then
-		ply:SetItem("item", "none")
+		ply:SetItem(slot, "none")
 	end
 end
 
-SlashCo.ItemPickUp = function(ply, itemindex, item)
+function SlashCo.ItemPickUp(ply, itemindex, item)
 	if SlashCoItems[item].IsSecondary and ply:GetItem("item2") ~= "none"
 			or not SlashCoItems[item].IsSecondary and ply:GetItem("item") ~= "none" then
 		return
@@ -171,12 +197,17 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 	end
 
 	local slot = SlashCoItems[item].IsSecondary and "item2" or "item"
-	if timer.Exists(string.format("SlashCoItemSwitch_%s_%s", slot, ply:UserID())) then
+	if timer.Exists(string.format("SlashCo:ItemSwitch_%s_%s", slot, ply:UserID())) then
 		return
 	end
 
 	local dontPickupHook = hook.Run("SlashCoItemPickUp", ply, item, itemindex)
 	if dontPickupHook then
+		return
+	end
+	
+	local itemEnt = Entity(itemindex)
+	if itemEnt.DONTPICKUP then
 		return
 	end
 
@@ -197,14 +228,12 @@ SlashCo.ItemPickUp = function(ply, itemindex, item)
 		end
 	end
 
-	local itemEnt = Entity(itemindex)
-
 	if IsValid(itemEnt.SpawnedAt) then
 		itemEnt.SpawnedAt:TriggerOutput("OnPickedUp", ply)
 		itemEnt.SpawnedAt.SpawnedEntity = nil
 	end
 
-	SlashCo.ChangeSurvivorItem(ply, item)
+	SlashCo.ChangeSurvivorItem(ply, slot, item)
 	itemEnt:Remove()
 
 	return true

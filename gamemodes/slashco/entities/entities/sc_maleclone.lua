@@ -7,6 +7,15 @@ ENT.Type = "nextbot"
 ENT.ClassName = "sc_maleclone"
 ENT.PingType = "SLASHER"
 
+hook.Add("SlashCo:Precache", "PrecacheMaleClone", function()
+	SlashCo.PrecacheModel("models/Humans/Group01/male_07.mdl")
+
+	for k=1, 2 do
+		SlashCo.PrecacheSound("physics/water/water_impact_hard" .. k .. ".wav")
+	end
+end)
+
+
 function ENT:Initialize()
 	if CLIENT then
 		self:SetIK()
@@ -14,6 +23,9 @@ function ENT:Initialize()
 
 	self:SetModel("models/Humans/Group01/male_07.mdl")
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	if SERVER then
+		self:StartActivity(ACT_IDLE) -- Don't T-Pose for a frame
+	end
 end
 
 function ENT:OnTakeDamage()
@@ -23,8 +35,8 @@ end
 function ENT:RunBehaviour()
 	while true do
 		-- Here is the loop, it will run forever
-		self:StartActivity(ACT_WALK)            -- Walk animation
-		self.loco:SetDesiredSpeed(100)        -- Walk speed
+		self:StartActivity(ACT_WALK)			-- Walk animation
+		self.loco:SetDesiredSpeed(100)		-- Walk speed
 
 		local pos = SlashCo.RandomPosLocator()
 		if g_SlashCoDebug then

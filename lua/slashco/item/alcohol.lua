@@ -7,10 +7,22 @@ ITEM.Description = "Unfortunate."
 ITEM.CamPos = Vector(30, 0, 0)
 ITEM.ReplacesWorldProps = true
 ITEM.IsSpawnable = true
-ITEM.OnUse = function(ply)
-	ply:EmitSound("slashco/survivor/soda_drink" .. math.random(1, 2) .. ".mp3")
+
+function ITEM.OnUse(ply)
+	local idx = math.random(1, 2)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/soda_drink" .. idx .. ".mp3",
+		identifier = "MoonshineUse" .. idx,
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	ply:AddEffect("Buzzed", 45)
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(62, 0, -6),

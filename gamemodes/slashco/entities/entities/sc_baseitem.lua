@@ -16,7 +16,13 @@ ENT.PingType = "ITEM"
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel(SlashCoItems[self.PrintName].Model)
+		local item = SlashCoItems[self.OverrideItem or self.PrintName]
+		if not item then
+			ErrorNoHaltWithStack("[SlashCo] Failed to spawn item \"" .. (self.OverrideItem or self.PrintName) .. "\"!")
+		else
+			self:SetModel(item.Model)
+		end
+
 		self:SetSolid(SOLID_VPHYSICS)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)

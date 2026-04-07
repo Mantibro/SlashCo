@@ -1,7 +1,7 @@
 --[[
 
-    Language: ru, (Russian), (Русский)
-    Translator: Adolf Fritz, Miirflin, Olegsik
+	Language: ru, (Russian), (Русский)
+	Translator: Adolf Fritz, Miirflin, Olegsik
 
 ]]
 
@@ -23,6 +23,9 @@ SlashCo.LangTable["SomeRescued"] = "Только некоторые Работн
 SlashCo.LangTable["NoneRescued"] = "Ни один из Работников SlashCo не был спасен."
 SlashCo.LangTable["Cursed"] = "Ваша душа была проклята."
 SlashCo.LangTable["Judgement"] = "ПРАВОСУДИЕ"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Нажмите [%s] для появления"
+SlashCo.LangTable["slasher_replacement"] = "Вы были выбраны новым слэшером"
+SlashCo.LangTable["item_refund"] = "Вам возвращено %s очков за ваши предметы"
 
 SlashCo.LangTable["InLobby"] = "В ЛОББИ"
 SlashCo.LangTable["InGame"] = "В ИГРЕ (%s)"
@@ -208,16 +211,16 @@ SlashCo.LangTable["SlasherInfo"] = [[За Убийцу, ваша задача - 
 на три разных Класса, каждый из которых имеет разный тип способностей.
 
 Криптид:
-    Способности Криптидов легко понять. Они состоят из относительно простых способностей для убийства Рабочих.
+	Способности Криптидов легко понять. Они состоят из относительно простых способностей для убийства Рабочих.
 
 Демон:
-    Способности Демонов зависят от поглощаемых предметов, которые будут появляться по всей карте
-    и иногда во время раунда. Это означает что цель Демона состоит не только в убийстве Рабочих, но так же нахождение и поглощение
-    предметов, чтобы увеличить свою силу.
+	Способности Демонов зависят от поглощаемых предметов, которые будут появляться по всей карте
+	и иногда во время раунда. Это означает что цель Демона состоит не только в убийстве Рабочих, но так же нахождение и поглощение
+	предметов, чтобы увеличить свою силу.
 
 Умбра:
-    Силы Убийц класса Умбра растут по ходу прогресса игры. 
-    Это означает, что они слабы по началу и становятся сильнее по мере выполнения Рабочими своей цели]]
+	Силы Убийц класса Умбра растут по ходу прогресса игры. 
+	Это означает, что они слабы по началу и становятся сильнее по мере выполнения Рабочими своей цели]]
 
 SlashCo.LangTable["vocal_say"] = "СКАЗАТЬ"
 SlashCo.LangTable["vocal_cancel"] = "ОТМЕНИТЬ"
@@ -528,20 +531,21 @@ SlashCo.LangTable["cant_fuel"] = "[УЖЕ ЗАПОЛНЕННО]"
 SlashCo.LangTable["cant_power"] = "[УЖЕ ЕСТЬ БАТАРЕЯ]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "ВКЛЮЧИТЕ %s ГЕНЕРАТОРА"
+SlashCo.LangTable["objective_generators"] = "ВКЛЮЧИТЕ %s/%s ГЕНЕРАТОРА"
 SlashCo.LangTable["objective_generator"] = "ВКЛЮЧИТЕ 1 ГЕНЕРАТОР"
 SlashCo.LangTable["objective_heliwait"] = "ДОЖДИТЕСЬ ВЕРТОЛЁТА"
 SlashCo.LangTable["objective_helicopter"] = "ДОБЕРИТЕСЬ ДО ВЕРТОЛЁТА"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(ДОПОЛНИТЕЛЬНО) УБЕРИТЕ %s КУСКА МУСОРА" --item spawns
-SlashCo.LangTable["objective_trash"] = "(ДОПОЛНИТЕЛЬНО) УБЕРИТЕ 1 КУСОК МУСОРА"
-SlashCo.LangTable["objective_mops"] = "(ДОПОЛНИТЕЛЬНО) ПРОТРИТЕ %s КЛЯКС" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(ДОПОЛНИТЕЛЬНО) ПРОТРИТЕ 1 КЛЯКСУ"
-SlashCo.LangTable["objective_traps"] = "(ДОПОЛНИТЕЛЬНО) ЗАВЕДИТЕ %s МЫШЕЛОВОК" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(ДОПОЛНИТЕЛЬНО) ЗАВЕДИТЕ 1 МЫШЕЛОВКУ"
-SlashCo.LangTable["objective_pages"] = "(ДОПОЛНИТЕЛЬНО) СОБЕРИТЕ %s ДОКУМЕНТОВ" --gascan spawns
-SlashCo.LangTable["objective_page"] = "(ДОПОЛНИТЕЛЬНО) СОБЕРИТЕ 1 ДОКУМЕНТ"
+SlashCo.LangTable["optional"] = "ДОПОЛНИТЕЛЬНО"
+SlashCo.LangTable["objective_trashs"] = "УБЕРИТЕ %s/%s КУСКА МУСОРА" --item spawns
+SlashCo.LangTable["objective_trash"] = "УБЕРИТЕ 1 КУСОК МУСОРА"
+SlashCo.LangTable["objective_mops"] = "ПРОТРИТЕ %s/%s КЛЯКС" --gen spawns
+SlashCo.LangTable["objective_mop"] = "ПРОТРИТЕ 1 КЛЯКСУ"
+SlashCo.LangTable["objective_traps"] = "ЗАВЕДИТЕ %s/%s МЫШЕЛОВОК" --battery spawns
+SlashCo.LangTable["objective_trap"] = "ЗАВЕДИТЕ 1 МЫШЕЛОВКУ"
+SlashCo.LangTable["objective_pages"] = "СОБЕРИТЕ %s/%s ДОКУМЕНТОВ" --gascan spawns
+SlashCo.LangTable["objective_page"] = "СОБЕРИТЕ 1 ДОКУМЕНТ"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "- НАБРАНО ОЧКОВ -"
@@ -565,6 +569,7 @@ SlashCo.LangTable["points_left_behind"] = "[%s] ОСТАВШИЙСЯ ПОЗАД�
 SlashCo.LangTable["points_survive"] = "[%s] ВЫЖИВШИЙ"
 
 SlashCo.LangTable["points_item"] = "[%s] ВОЗВРАЩЕНИЕ ПРЕДМЕТА" --misc points
-SlashCo.LangTable["points_fast"] = "[%s] БЫСТРОЕ ЗАВЕРШЕНИЕ РАБОТЫ"
+SlashCo.LangTable["points_quickescape"] = "[%s] БЫСТРЫЙ ПОБЕГ"
+SlashCo.LangTable["points_slowescape"] = "[%s] МЕДЛЕННЫЙ ПОБЕГ"
 SlashCo.LangTable["points_benadryl"] = "[%s] БЕНАДРИЛ"
 SlashCo.LangTable["points_working"] = "[%s] ХОРОШАЯ РАБОТА"

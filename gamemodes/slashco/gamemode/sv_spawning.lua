@@ -13,12 +13,15 @@ end
 
 ---abort the game if there is a technical issue
 function SlashCo.Abort(reason)
-	for _, v in ipairs(player.GetAll()) do
+	for _, v in player.Iterator() do
 		v:ChatPrint("Aborting round: " .. reason)
 	end
+	ErrorNoHaltWithStack("Aborting round: " .. reason)
+
+	if GameData.IsLobby then return end -- We aborted in lobby? GG
 
 	if not SlashCo.Aborts then
-		SlashCo.RoundOverScreen(5)
+		SlashCo.RoundOverScreen(SlashCo.RoundState.CURSED)
 		timer.Create("SlashCoAbort", 5, 1, function()
 			SlashCo.GoToLobby()
 		end)
@@ -151,8 +154,13 @@ end
 
 ---Spawn generators for the round
 function SlashCo.SpawnGenerators()
-	local gensToSpawn = SlashCo.SelectSpawns(ents.FindByClass("info_sc_generator"),
-			GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators), genCondForced, genCondNonForced, true)
+	local gensToSpawn = SlashCo.SelectSpawns(
+		ents.FindByClass("info_sc_generator"),
+		SlashCo.GetGeneratorsToSpawn(),
+		genCondForced,
+		genCondNonForced,
+		true
+	)
 
 	if table.IsEmpty(gensToSpawn) then
 		SlashCo.Abort("Missing generator spawn entities")
@@ -169,7 +177,7 @@ end
 
 ---Auto-fills some gas cans at the start of the round if there are too few players
 local function roundHeadstart()
-	if #SlashCo.CurRound.SlasherData.AllSurvivors > (SlashCo.MAXPLAYERS - 2) then
+	if #SlashCo.CurRound.SlasherData.AllSurvivors > (math.max(GameData.MaxPlayers, GameData.BaseMaxPlayers) - 2) then
 		return
 	end
 
@@ -196,9 +204,9 @@ end
 
 ---Spawn gas cans for the round
 function SlashCo.SpawnGasCans()
-	local gasCanCount = GetGlobal2Int("SlashCoGasCansToSpawn", -1)
-	local cansPerGen = GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen)
-	local gens = GetGlobal2Int("SlashCoGeneratorsToSpawn", SlashCo.Generators)
+	local gasCanCount = SlashCo.GetGasCansToSpawn()
+	local cansPerGen = SlashCo.GetGasCansPerGenerator()
+	local gens = SlashCo.GetGeneratorsToSpawn()
 
 	-- base count is for compatibility with older configs
 	local baseCount = SlashCo.BaseCans or (cansPerGen * gens)
@@ -211,8 +219,12 @@ function SlashCo.SpawnGasCans()
 		gasCanCount = baseCount + SlashCo.MapSize
 	end
 
+	local forceGasCanCount = -1
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if not IsValid(p) then continue end
 		gasCanCount = gasCanCount + p:SlasherValue("GasCanMod", 0)
+		
+		forceGasCanCount = forceGasCanCount + p:SlasherValue("ForceGasCanCount", 0)
 	end
 
 	local diffMod = 3 - SlashCo.CurRound.Difficulty
@@ -221,8 +233,12 @@ function SlashCo.SpawnGasCans()
 	local survivorMod = -SlashCo.CurRound.SurvivorData.GasCanMod
 	gasCanCount = math.max(gasCanCount + offeringMod + headStartMod + survivorMod + diffMod, SlashCo.MapSize)
 
+	if forceGasCanCount >= 0 then
+		gasCanCount = forceGasCanCount
+	end
+
 	local gasCanSpawns
-	if SlashCo.CurRound.OfferingData.CurrentOffering == 1 then
+	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Exposure then
 		gasCanCount = math.min(gasCanCount, baseCount)
 		gasCanSpawns = ents.FindByClass("info_sc_gascanexposed")
 	else
@@ -244,6 +260,24 @@ function SlashCo.SpawnGasCans()
 	SlashCo.Spawn(gasCansToSpawn, function(ent)
 		ent.Item = "GasCan"
 	end)
+end
+
+---Spawn documents for the round
+function SlashCo.SpawnDocuments()
+	if not GameData.RequiredDocumentCount or GameData.RequiredDocumentCount <= 0 then return end
+
+	local totalDocuments = GameData.RequiredDocumentCount
+	totalDocuments = totalDocuments + SlashCo.MapSize
+
+	local documentsToSpawn = SlashCo.SelectSpawns(ents.FindByClass("info_sc_document"), totalDocuments, nil, nil, true)
+	if table.IsEmpty(documentsToSpawn) then
+		GameData.FailedToSpawnDocuments = true
+		print("[SlashCo] Missing document spawn entities")
+		--SlashCo.Abort("Missing document spawn entities")
+		return
+	end
+
+	SlashCo.Spawn(documentsToSpawn)
 end
 
 local function itemCondForced(ent)
@@ -273,8 +307,9 @@ function SlashCo.SpawnItems()
 			v:Remove()
 		end
 	end
-
-	if table.IsEmpty(ents.FindByClass("info_sc_item")) then
+	
+	local itemSpawns = ents.FindByClass("info_sc_item")
+	if table.IsEmpty(itemSpawns) then
 		SlashCo.Abort("Missing item spawn entities")
 		return
 	end
@@ -282,10 +317,11 @@ function SlashCo.SpawnItems()
 	--item count for demons
 	SlashCo.CurRound.ItemCount = SlashCo.CurRound.ItemCount + SlashCo.CurRound.OfferingData.ItemMod + SlashCo.CurRound.Difficulty
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if not IsValid(p) then continue end
 		local item = p:SlasherValue("ItemToSpawn")
 
 		if item then
-			local items = SlashCo.SelectSpawns(ents.FindByClass("info_sc_item"), SlashCo.CurRound.ItemCount,
+			local items = SlashCo.SelectSpawns(itemSpawns, SlashCo.CurRound.ItemCount,
 					itemCondForced, itemCondNonForced, true)
 
 			SlashCo.Spawn(items, function(ent)
@@ -296,15 +332,15 @@ function SlashCo.SpawnItems()
 		p:SlasherFunction("OnItemSpawn", SlashCo.CurRound.ItemCount)
 	end
 
-	local beacon = SlashCo.SelectSpawns(ents.FindByClass("info_sc_item"), 1, itemCondForced, itemCondNonForced)
+	local beacon = SlashCo.SelectSpawns(itemSpawns, 1, itemCondForced, itemCondNonForced)
 	if IsValid(beacon) then
 		beacon.Item = "Beacon"
 		beacon:SpawnEnt()
 	end
 
 	--item count for everything else
-	local randomItemCount = SlashCo.MAXPLAYERS + 1 - math.floor((SlashCo.CurRound.Difficulty + 1) / 2) - #SlashCo.CurRound.SlasherData.AllSurvivors
-	local items = SlashCo.SelectSpawns(ents.FindByClass("info_sc_item"), randomItemCount,
+	local randomItemCount = GameData.MaxPlayers - math.floor((SlashCo.CurRound.Difficulty + 1) / 2) - #SlashCo.CurRound.SlasherData.AllSurvivors
+	local items = SlashCo.SelectSpawns(itemSpawns, randomItemCount,
 			nil, nil, true)
 
 	SlashCo.Spawn(items)
@@ -334,38 +370,48 @@ function SlashCo.SetHelicopterPositions()
 	SlashCo.CurRound.HelicopterSpawnPosition = spawn:GetPos() - Vector(0, 0, 70)
 end
 
-local slasherSpawned
-
 function SlashCo.SpawnSlasher()
-	if slasherSpawned then
+	if GameData.SlasherSpawned then
 		return
 	end
 
-	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
-		p:SetTeam(TEAM_SLASHER)
-		p:Spawn()
+	for _, ply in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if not IsValid(ply) then continue end
 
-		SlashCo.OnSlasherSpawned(p)
+		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
+		ply:SetTeam(TEAM_SLASHER)
+		ply:Spawn()
+
+		SlashCo.OnSlasherSpawned(ply)
 	end
 
-	slasherSpawned = true
+	GameData.SlasherSpawned = true
 end
 
 local function singlePlayerTable()
 	local tbl = {}
 
 	for _, v in player.Iterator() do
-		table.insert(tbl, { Survivors = v:SteamID64(), Item = "none" })
+		local steamID64 = v:SteamID64()
+		tbl[steamID64] = { Survivors = steamID64, Item = "none" }
 	end
 
 	return tbl
 end
 
+-- Flips a table to have the given key as the actual key instead of the normal DB 1, 2, 3 stuff.
+function SlashCo.SQLTableToLuaTable(data, keyName)
+	local resultTable = {}
+	for _, tbl in ipairs(data) do
+		resultTable[tbl[keyName]] = tbl
+	end
+
+	return resultTable
+end
+
 ---Set up players for the round
 function SlashCo.SetupPlayers()
-	if not game.SinglePlayer() and (not sql.TableExists("slashco_table_basedata") or not sql.TableExists("slashco_table_survivordata")
-			or not sql.TableExists("slashco_table_slasherdata")) then
-
+	if not game.SinglePlayer() and ((cookie.GetString("slashco_table_basedata") == nil) or not sql.TableExists("slashco_table_survivordata") or not sql.TableExists("slashco_table_slasherdata")) then
 		SlashCo.Abort("Missing SQL table data")
 		return
 	end
@@ -378,135 +424,81 @@ function SlashCo.SetupPlayers()
 	print("[SlashCo] Teams database loaded...")
 
 	local becameCovenant = 0
-	local spawn_queue = 0
-	local survivors = sql.Query("SELECT * FROM slashco_table_survivordata; ") or singlePlayerTable()
-	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata; ") or {}
-
-	timer.Simple(0.5, function()
-		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			for _, v1 in ipairs(survivors) do
-				if v1.Survivors == v:SteamID64() then
-					SlashCo.DropAllItems(v) -- if somehow a player grabs an item beforehand
-					SlashCo.ChangeSurvivorItem(v, v1.Item)
-					SlashCo.SendValue(v, "preItem", v1.Item)
-					break
-				end
-			end
-		end
-	end)
-
-	for play = 1, #player.GetAll() do
-		--Assign the teams for the current round
-
-		local playercur = player.GetAll()[play]
-		local id = playercur:SteamID64()
-
-		print("name: " .. playercur:Name())
+	local survivors = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_survivordata;"), "SteamID") or singlePlayerTable()
+	local slashers = SlashCo.SQLTableToLuaTable(sql.Query("SELECT * FROM slashco_table_slasherdata;"), "SteamID") or {}
+	for _, ply in player.Iterator() do
+		local steamid = ply:SteamID64()
 
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
-
-		if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
-			for i = 1, #slashers do
-				--Slasher becomes the sole survivor
-				if id == slashers[i].Slashers then
-					print(playercur:Name() .. " now Survivor for Nightmare.")
-					playercur:SetTeam(TEAM_SURVIVOR)
-					playercur:Spawn()
-				end
+		if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
+			if slashers[steamid] then
+				print(ply:Name() .. " now Survivor for Nightmare.")
+				ply:SetTeam(TEAM_SURVIVOR)
+				ply:Spawn()
+				continue
 			end
 
-			for i = 1, #survivors do
-				if id == survivors[i].Survivors then
-					playercur:SetTeam(TEAM_SPECTATOR)
-					playercur:Spawn()
-					print(playercur:Name() .. " now Slasher for Nightmare")
-					table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
+			if survivors[steamid] then
+				ply:SetTeam(TEAM_SPECTATOR)
+				ply:Spawn()
 
-					break
-				else
-
-					if slashers[1] ~= nil and id == slashers[1].Slashers then
-						goto CONT_NGHT
-					end
-
-					for k = 1, #survivors do
-						if id == survivors[k].Survivors then
-							goto CONT_NGHT
-						end
-					end
-
-					playercur:SetTeam(TEAM_SPECTATOR)
-					playercur:Spawn()
-					print(playercur:Name() .. " now Spectator (Nightmare)")
-				end
-				:: CONT_NGHT ::
+				print(ply:Name() .. " now Slasher for Nightmare")
+				table.insert(SlashCo.CurRound.SlashersToBeSpawned, ply)
+				continue
 			end
 
-			if play >= #player.GetAll() then
-				goto NIGHTMARE_SKIPALL
-			else
-				goto NIGHTMARE_SKIPPART
-			end
+			ply:SetTeam(TEAM_SPECTATOR)
+			ply:Spawn()
+			print(ply:Name() .. " now Spectator (Nightmare)")
+
+			continue
 		end
-
 		--Nightmare offering >>>>>>>>>>>>>>>>>>>>>
 
-		for i = 1, #survivors do
-			if id == survivors[i].Survivors then
-				playercur:SetTeam(TEAM_SURVIVOR)
-				playercur:Spawn()
-				print(playercur:Name() .. " now Survivor")
-
-				break
-			else
-				if slashers[1] ~= nil and id == slashers[1].Slashers then
-					continue
-				end
-				if slashers[2] ~= nil and id == slashers[2].Slashers then
-					continue
-				end
-
-				for k = 1, #survivors do
-					if id == survivors[k].Survivors then
-						continue
-					end
-				end
-
-				playercur:SetTeam(TEAM_SPECTATOR)
-				playercur:Spawn()
-				print(playercur:Name() .. " now Spectator")
-				spawn_queue = spawn_queue + 1
-
-				if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
-					table.insert(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant, { steamid = id })
-					becameCovenant = becameCovenant + 1
-				end
+		if slashers[steamid] then
+			if SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[steamid] then
+				print(ply:Name() .. " will become part of the Covenant.")
+				ply:SetTeam(TEAM_SPECTATOR)
+				ply:Spawn()
+				continue
 			end
+
+			print(ply:Name() .. " now Slasher (Memorized)")
+			ply:SetTeam(TEAM_SPECTATOR)
+			ply:Spawn()
+
+			table.insert(SlashCo.CurRound.SlashersToBeSpawned, ply)
+			continue
 		end
 
-		for i = 1, #slashers do
-			if id == slashers[i].Slashers then
-				for _, v in ipairs(SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant) do
-					if v.steamid == id then
-						print(playercur:Name() .. " will become part of the Covenant.")
-						playercur:SetTeam(TEAM_SPECTATOR)
-						playercur:Spawn()
-						spawn_queue = spawn_queue + 1
-						goto covenant_member
-					end
-				end
-				print(playercur:Name() .. " now Slasher (Memorized)")
-				playercur:SetTeam(TEAM_SPECTATOR)
-				playercur:Spawn()
-				spawn_queue = spawn_queue + 1
-
-				table.insert(SlashCo.CurRound.SlashersToBeSpawned, playercur)
-				:: covenant_member ::
-			end
+		if survivors[steamid] or SlashCo.AllowLateJoin then
+			ply:SetTeam(TEAM_SURVIVOR)
+			ply:Spawn()
+			print(ply:Name() .. " now Survivor")
+			continue
 		end
-		:: NIGHTMARE_SKIPPART ::
+
+		-- They weren't processed yet, so their a spectator.
+		ply:SetTeam(TEAM_SPECTATOR)
+		ply:Spawn()
+		print(ply:Name() .. " now Spectator")
+
+		if SlashCo.PresentCovenant == nil and becameCovenant < 3 then
+			SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[steamid] = true
+			becameCovenant = becameCovenant + 1
+		end
 	end
-	:: NIGHTMARE_SKIPALL ::
+
+	-- Hand out all items, as all survivors should be spawned by now.
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		local survivorEntry = survivors[survivor:SteamID64()]
+		if survivorEntry then
+			SlashCo.DropAllItems(survivor) -- if somehow a player grabs an item beforehand
+			SlashCo.ChangeSurvivorItem(survivor, "item", survivorEntry.Item, true)
+			SlashCo.ChangeSurvivorItem(survivor, "item2", survivorEntry.Item2, true)
+		end
+	end
+	GameData.SurvivorData = survivors -- Save the data so that when players join late we can still give them their items.
 end
 
 local function makeEnt(class, config)
@@ -516,6 +508,7 @@ local function makeEnt(class, config)
 
 	local ent = ents.Create(class)
 	ent:SetPos(Vector(unpack(config.pos)))
+	ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	if isnumber(config.ang) then
 		ent:SetAngles(Angle(0, config.ang, 0))
@@ -570,11 +563,16 @@ local function convertLegacyConfig(name, skip)
 	local gens = {}
 	if istable(config.Generators) then
 		if isnumber(config.Generators.Count) then
-			SetGlobal2Int("SlashCoGeneratorsToSpawn", config.Generators.Count)
+			SlashCo.SetGeneratorsToSpawn(config.Generators.Count)
+
+			if (SlashCo.Generators > config.Generators.Count and (istable(config.Generators.Spawnpoints) and #config.Generators.Spawnpoints >= SlashCo.Generators)) then
+				print("[SlashCo] Ignored legacy config generator count to enforce default of " .. tostring(SlashCo.Generators))
+				SlashCo.SetGeneratorsToSpawn(SlashCo.Generators)
+			end
 		end
 
 		if isnumber(config.Generators.Needed) then
-			SetGlobal2Int("SlashCoGeneratorsNeeded", config.Generators.Needed)
+			SlashCo.SetGeneratorsNeeded(config.Generators.Needed)
 		end
 
 		if istable(config.Generators.Spawnpoints) then
@@ -606,13 +604,13 @@ local function convertLegacyConfig(name, skip)
 	end
 	if istable(config.GasCans) then
 		if config.GasCans.CountIsDirect and isnumber(config.GasCans.Count) then
-			SetGlobal2Int("SlashCoGasCansToSpawn", config.GasCans.Count)
+			SlashCo.SetGasCansToSpawn(config.GasCans.Count)
 		else
 			SlashCo.BaseCans = config.GasCans.Count
 		end
 
 		if isnumber(config.GasCans.NeededPerGenerator) then
-			SetGlobal2Int("SlashCoGasCansPerGenerator", config.GasCans.NeededPerGenerator)
+			SlashCo.GasCansPerGenerator(config.GasCans.NeededPerGenerator)
 		end
 
 		if istable(config.GasCans.Spawnpoints) then
@@ -657,7 +655,7 @@ end
 
 ---Add spawning entities from the legacy config if it exists
 function SlashCo.LegacySetup()
-	local configs, configDirs = file.Find(string.format("slashco/configs/maps/%s.lua", game.GetMap()), "LUA")
+	local configs, configDirs = file.Find(string.format("slashco/configs/maps/%s.lua", GameData.Map), "LUA")
 	local skip = IsValid(SlashCo.SettingsEntity())
 	for _, v in ipairs(configs) do
 		convertLegacyConfig(v, skip)
@@ -672,54 +670,105 @@ end
 
 hook.Add("InitPostEntity", "LegacySetupSpawns", SlashCo.LegacySetup)
 
+function SlashCo.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	-- Check if the Map has forced the generator count.
+	if SlashCo.GetGeneratorsNeeded() == SlashCo.GensNeeded and SlashCo.GetGeneratorsToSpawn() == SlashCo.Generators then
+		-- It did not- let's modify it
+		local additionalGens = 0
+		if additionalSurvivors > 0 then
+			additionalGens = math.floor(additionalSurvivors / GameData.BaseMaxSurvivors) -- For every 6 additional survivors, there will be one more gen.
+		end
+
+		print("Spawning " .. additionalGens .. " additional generators (additional survivors: " .. additionalSurvivors .. ")")
+		SlashCo.SetGeneratorsNeeded(SlashCo.GensNeeded + additionalGens)
+		SlashCo.SetGeneratorsToSpawn(SlashCo.Generators + additionalGens)
+	end
+
+	if totalSurvivors > 4 then
+		-- For every two additional survivors you must find 1 more document (max 4 for now)
+		GameData.RequiredDocumentCount = math.Clamp((totalSurvivors - 4) / 2, 1, 4)
+	end
+end
+
 ---main body of round starting function
 local function startRound(noSetup)
 	SlashCo.RoundStarted = true
-	GAMEMODE.State = GAMEMODE.States.IN_GAME
+	SlashCo.State = SlashCo.States.IN_GAME
 	SlashCo.CurRound.GameProgress = 0
 
-	SetGlobalFloat("SCStartTime", CurTime())
+	if g_SlashCoDebug then
+		BroadcastLua([[if IsValid(SlashCo.RoundEndPanel) then SlashCo.RoundEndPanel:Remove() end]]) -- Remove the round ending panel if it exists.
+	end
+
+	SlashCo.SetRoundStartTime(CurTime())
 	timer.Simple(SlashCo.GhostPingDelay, function()
-		SetGlobalBool("SpectatorsCanPing", true)
+		SlashCo.AllowSpectatorsToPing(true)
 		for _, v in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
 			v:ChatText("spectators_can_ping")
 		end
 	end)
 
-	if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
+	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Satiation then
 		SlashCo.CurRound.OfferingData.ItemMod = -2
+		SlashCo.CurRound.OfferingData.Satiation = 1
 	end
-	if SlashCo.CurRound.OfferingData.CurrentOffering == 2 then
-		SlashCo.CurRound.OfferingData.SatO = 1
-		SetGlobalInt("SatO", 1)
+
+	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Duality then
+		SlashCo.CurRound.OfferingData.Duality = true
 	end
-	if SlashCo.CurRound.OfferingData.CurrentOffering == 4 then
-		SlashCo.CurRound.OfferingData.DO = true
-	end
-	if SlashCo.CurRound.OfferingData.CurrentOffering == 5 then
-		SlashCo.CurRound.OfferingData.SO = 1
+	
+	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Singularity then
+		SlashCo.CurRound.OfferingData.Singularity = 1
 	end
 
 	if not noSetup then
 		SlashCo.SetupPlayers()
 	end
 
+	local survivors = team.GetPlayers(TEAM_SURVIVOR)
+	for _, ply in ipairs(survivors) do
+		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
+		ply:SetHealth(ply:GetMaxHealth())
+	end
+	GameData.RoundStartSurvivorCount = #survivors
+
+	SlashCo.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+
 	SlashCo.SpawnGenerators()
 
-	if SlashCo.CurRound.OfferingData.CurrentOffering ~= 6 then
+	if SlashCo.CurRound.OfferingData.CurrentOffering ~= SCInfo.Offering.Nightmare then
 		roundHeadstart()
 	end
 
 	SlashCo.SpawnGasCans()
+	SlashCo.SpawnDocuments()
 	SlashCo.SpawnItems()
 
 	SlashCo.SetHelicopterPositions()
 	SlashCo.UpdateHelicopterSeek(SlashCo.CurRound.HelicopterIntroPosition)
-	SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterIntroPosition, SlashCo.CurRound.HelicopterIntroAngle)
+	SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterTargetPosition, SlashCo.CurRound.HelicopterIntroAngle)
 	SlashCo.BroadcastCurrentRoundData(true)
+
+	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}
+	local dangerLevel = SlashCo.DangerLevel.Unknown
+	for _, slasher in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
+		if not IsValid(slasher) then continue end
+		local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
+		if slasherTbl and ((slasherTbl.DangerLevel or 0) > dangerLevel) then
+			dangerLevel = slasherTbl.DangerLevel
+		end
+	end
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = SlashCo.GetDangerSound(dangerLevel),
+		volume = 3,
+		fadeIn = 0,
+		deleteWhenDone = true,
+	})
 
 	timer.Simple(8, function()
 		SlashCo.HelicopterTakeOffIntro()
+		SlashCo.EnableSoundScapes()
 
 		if not g_SlashCoDebug then
 			SlashCo.ClearDatabase()
@@ -727,11 +776,11 @@ local function startRound(noSetup)
 	end)
 
 	timer.Simple(math.random(2, 4), function()
-		SlashCo.HelicopterRadioVoice(1)
+		SlashCo.HelicopterRadioVoice(SlashCo.HelicopterVoices.INTRO)
 		SlashCo.CurRound.roundOverToggle = true
 	end)
 
-	if SlashCo.CurRound.OfferingData.CurrentOffering == 6 then
+	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare then
 		timer.Simple(240, function()
 			if not SlashCo.SummonEscapeHelicopter() then
 				SlashCo.CurRound.DistressBeaconUsed = false
@@ -743,15 +792,18 @@ local function startRound(noSetup)
 	if settingsEnt then
 		settingsEnt:TriggerOutput("OnRoundStarted", settingsEnt, settingsEnt, #SlashCo.CurRound.ExpectedPlayers)
 	end
-	table.Empty(SlashCo.CurRound.ExpectedPlayers)
 
-	SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.INCOMPLETE, GetGlobal2Int("SlashCoGeneratorsNeeded", SlashCo.GensNeeded))
+	SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.INCOMPLETE, SlashCo.GetGeneratorsNeeded())
+	if GameData.RequiredDocumentCount and GameData.RequiredDocumentCount > 0 and not GameData.FailedToSpawnDocuments then
+		SlashCo.UpdateObjective("page", SlashCo.ObjStatus.INCOMPLETE, GameData.RequiredDocumentCount)
+	end
+
 	SlashCo.SendObjectives()
 end
 
 ---start a round
 function SlashCo.StartRound(noSetup)
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		return
 	end
 
@@ -765,31 +817,73 @@ function SlashCo.StartRound(noSetup)
 		settingsEnt:TriggerOutput("OnPreRoundStarted", settingsEnt, settingsEnt, #SlashCo.CurRound.ExpectedPlayers)
 	end
 
-	timer.Simple(0.5, function()
+	SlashCo.DisableSoundScapes()
+	for _, ply in player.Iterator() do
+		ply:ScreenFade(SCREENFADE.OUT, color_black, 0.5, 2)
+		ply:ConCommand("soundfade 100 1 0.5 0.5")
+	end
+
+	timer.Simple(1, function()
 		startRound(noSetup)
 	end)
 end
 
-hook.Add("PlayerSelectSpawn", "RandomSpawn", function(ply, transition)
+-- RaphaelIT7: Previously done in sc_spawnbase, but for better compatibility with info_player_start we do it here.
+local function UpdateSpawnEntity(ply, spawnEnt)
+	spawnEnt.SpawnedEntity = ply
+	spawnEnt.LastSpawnedEntity = CurTime()
+	ply.SpawnedAt = spawnEnt
+end
+
+-- RaphaelIT7: Finds a free spawn, if there is none, it'll just spawn them in each other.
+local function FindFreeSpawn(ply, entities)
+	local oldestSpawn = {}
+	for _, spawnEnt in ipairs(entities) do
+		if hook.Run("IsSpawnpointSuitable", ply, spawnEnt, false) then
+			return spawnEnt
+		end
+
+		oldestSpawn[CurTime() - (spawnEnt.LastSpawnedEntity or 0)] = spawnEnt
+	end
+
+	-- Just take the oldest one.
+	for _, spawnEnt in SortedPairs(oldestSpawn, true) do
+		return spawnEnt
+	end
+end
+
+function SlashCo.FindSpawn(ply)
+	local spawnEnts
+	local plyTeam = ply:Team()
+	if plyTeam == TEAM_SURVIVOR or plyTeam == TEAM_SPECTATOR then
+		spawnEnts = ents.FindByClass("info_sc_player_employee")
+		table.Add(spawnEnts, ents.FindByClass("info_sc_player_survivor"))
+	elseif plyTeam == TEAM_SLASHER then
+		spawnEnts = ents.FindByClass("info_sc_player_slasher")
+	elseif GameData.IsLobby then
+		GameData.PlayerSpawns = ents.FindByClass("info_player_start")
+		spawnEnts = GameData.PlayerSpawns
+	end
+
+	if spawnEnts and not table.IsEmpty(spawnEnts) then
+		local spawnEnt = FindFreeSpawn(ply, spawnEnts)
+		if not IsValid(spawnEnt) then
+			return
+		end
+
+		spawnEnt.SpawnedEntity = ply
+		if spawnEnt.SpawnEnt then -- info_player_start doesn't have this.
+			spawnEnt:SpawnEnt()
+		end
+
+		return spawnEnt
+	end
+end
+
+function GM:PlayerSelectSpawn(ply, transiton)
 	if transition then
 		return
 	end
 
-	local elements
-	if ply:Team() == TEAM_SURVIVOR then
-		elements = ents.FindByClass("info_sc_player_employee")
-		table.Add(elements, ents.FindByClass("info_sc_player_survivor"))
-	elseif ply:Team() == TEAM_SLASHER then
-		elements = ents.FindByClass("info_sc_player_slasher")
-	end
-
-	if elements and not table.IsEmpty(elements) then
-		local ent = SlashCo.SelectSpawns(elements)
-		if not IsValid(ent) then
-			return
-		end
-		ent.SpawnedEntity = ply
-		ent:SpawnEnt()
-		return ent
-	end
-end)
+	return SlashCo.FindSpawn(ply)
+end

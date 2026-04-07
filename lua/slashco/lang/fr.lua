@@ -1,7 +1,7 @@
 --[[
 
-    Language: fr, (French), (Français)
-    Translator: Manti
+	Language: fr, (French), (Français)
+	Translator: Manti
 
 ]]
 
@@ -23,6 +23,9 @@ SlashCo.LangTable["SomeRescued"] = "Only some of the dispatched SlashCo Workers 
 SlashCo.LangTable["NoneRescued"] = "The dispatched SlashCo Workers could not be rescued."
 SlashCo.LangTable["Cursed"] = "Your soul is now forfeit."
 SlashCo.LangTable["Judgement"] = "JUDGEMENT"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Appuyez sur [%s] pour apparaître"
+SlashCo.LangTable["slasher_replacement"] = "Vous avez été choisi comme le nouveau slasher"
+SlashCo.LangTable["item_refund"] = "Vous avez été remboursé de %s points pour vos objets"
 
 SlashCo.LangTable["HP"] = "HP"
 SlashCo.LangTable["FUEL"] = "FUEL"
@@ -539,20 +542,21 @@ SlashCo.LangTable["cant_fuel"] = "[DÉJÀ REMPLI]"
 SlashCo.LangTable["cant_power"] = "[IL Y A DÉJÀ UNE BATTERIE]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "ALIMENTER %s GENERATEURS"
+SlashCo.LangTable["objective_generators"] = "ALIMENTER %s/%s GENERATEURS"
 SlashCo.LangTable["objective_generator"] = "ALIMENTER 1 GENERATEUR"
 SlashCo.LangTable["objective_heliwait"] = "ATTENDEZ L'HELICOPTÈRE"
 SlashCo.LangTable["objective_helicopter"] = "RENTRER DANS L'HELICOPTÈRE"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(FALCUTATIF) LAVER %s DES POUBELLES" --item spawns
-SlashCo.LangTable["objective_trash"] = "(FALCUTATIF) LAVER 1 POUBELLE"
-SlashCo.LangTable["objective_mops"] = "(FALCUTATIF) NETTOYER %s TÂCHES" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(FALCUTATIF) NETTOYER 1 TÂCHE"
-SlashCo.LangTable["objective_traps"] = "(FALCUTATIF) REMETTRE %s SOURICIÈRES EN PLACE" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(FALCUTATIF) REMETTRE 1 SOURICIÈRE EN PLACE"
-SlashCo.LangTable["objective_pages"] = "(FALCUTATIF) COLLECTER %s DOCUMENTS" --gascan spawns
-SlashCo.LangTable["objective_page"] = "(FALCUTATIF) COLLECTER 1 DOCUMENT"
+SlashCo.LangTable["optional"] = "FALCUTATIF"
+SlashCo.LangTable["objective_trashs"] = "LAVER %s/%s DES POUBELLES" --item spawns
+SlashCo.LangTable["objective_trash"] = "LAVER 1 POUBELLE"
+SlashCo.LangTable["objective_mops"] = "NETTOYER %s/%s TÂCHES" --gen spawns
+SlashCo.LangTable["objective_mop"] = "NETTOYER 1 TÂCHE"
+SlashCo.LangTable["objective_traps"] = "REMETTRE %s/%s SOURICIÈRES EN PLACE" --battery spawns
+SlashCo.LangTable["objective_trap"] = "REMETTRE 1 SOURICIÈRE EN PLACE"
+SlashCo.LangTable["objective_pages"] = "COLLECTER %s/%s DOCUMENTS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "COLLECTER 1 DOCUMENT"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "-POINTS GAGNÉS -"
@@ -576,6 +580,7 @@ SlashCo.LangTable["points_left_behind"] = "[%s] ABANDONÉ"
 SlashCo.LangTable["points_survive"] = "[%s] SURVÉCU"
 
 SlashCo.LangTable["points_item"] = "[%s] OBJET ACHETER-RETOUR" --misc points
-SlashCo.LangTable["points_fast"] = "[%s] SUCCÉS RAPIDE"
+SlashCo.LangTable["points_quickescape"] = "[%s] ÉVASION RAPIDE"
+SlashCo.LangTable["points_slowescape"] = "[%s] ÉVASION LENT"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] FAIRE TON TRAVAIL"

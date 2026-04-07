@@ -5,17 +5,33 @@ SlashCo = SlashCo or {}
 SlashCo.LangTable = {}
 include("slashco/lang/en.lua")
 SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
+SlashCo.CurrentLang = SlashCo.CurrentLang or "en"
 
-local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
-for _, v in ipairs(lang_files) do
-	if string.lower(language.GetPhrase("slashco.language")) == string.lower(string.Replace(v, ".lua", "")) then
-		include("slashco/lang/" .. v)
-		if file.Exists("slashco/patch/lang/" .. v, "LUA") then
-			include("slashco/patch/lang/" .. v)
+function SlashCo.LoadLanguage()
+	local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
+	for _, v in ipairs(lang_files) do
+		local lang = string.lower(language.GetPhrase("slashco.language"))
+		if lang == string.lower(string.Replace(v, ".lua", "")) then
+			include("slashco/lang/" .. v)
+
+			if file.Exists("slashco/patch/lang/" .. v, "LUA") then
+				include("slashco/patch/lang/" .. v)
+			end
+
+			if SlashCo.CurrentLang != lang then
+				SlashCo.CurrentLang = lang
+				hook.Run("SlashCo:LanguageChanged") -- In case any system needs a hook, why doesn't gmod have a hook already :(
+			end
+
+			break
 		end
-		break
 	end
 end
+SlashCo.LoadLanguage()
+
+cvars.AddChangeCallback("gmod_language", function()
+	SlashCo.LoadLanguage()
+end, "SlashCo:LanguageChanged")
 
 function SlashCo.Language(key, ...)
 	local vars = {}
@@ -28,32 +44,23 @@ function SlashCo.Language(key, ...)
 	end
 
 	if SlashCo.LangTable[key] then
-		return string.format(SlashCo.LangTable[key], unpack(vars))
+		return #vars > 0 and string.format(SlashCo.LangTable[key], unpack(vars)) or SlashCo.LangTable[key]
 	elseif SlashCo.LangTableFallback[key] then
-		return string.format(SlashCo.LangTableFallback[key], unpack(vars))
+		return #vars > 0 and string.format(SlashCo.LangTableFallback[key], unpack(vars)) or SlashCo.LangTableFallback[key]
 	else
 		return string.format(Localize("slashco." .. string.gsub(key, " ", "_"), key), unpack(vars))
 	end
 end
 
-net.Receive("mantislashcoGiveMasterDatabase", function(_, _)
-	local t = net.ReadTable()
-	data_load = t
-
-	if data_load then
-		CL_srvwin_count = data_load[1].SurvivorRoundsWon
-		CL_slswin_count = data_load[1].SlasherRoundsWon
-		CL_points = data_load[1].Points
-	end
-end)
-
 include("sh_shared.lua")
+include("sh_content.lua")
 include("ui/cl_scoreboard.lua")
 include("cl_headbob.lua")
 include("ui/cl_fonts.lua")
 
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
+include("documents/cl_documents.lua")
 
 include("ui/cl_lobbyhud.lua")
 include("ui/cl_survivor_hud.lua")
@@ -67,12 +74,19 @@ include("ui/cl_spectator_hud.lua")
 include("ui/cl_playermodel_picker.lua")
 include("ui/cl_gameinfo.lua")
 include("ui/cl_pings.lua")
+include("ui/cl_keyboard_ui.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
 include("sh_chattext.lua")
 include("sh_bhop.lua")
 include("sh_roundpoints.lua")
+include("sh_experience.lua")
+include("sh_perks.lua")
+include("ui/cl_documents.lua") -- Depends on sh_perks.lua
 include("sh_canbeseen.lua")
+include("sh_player.lua")
+include("sh_fog.lua")
+include("sh_keyboard.lua")
 
 include("ui/cl_projector.lua")
 include("ui/cl_voiceselect.lua")
@@ -81,7 +95,6 @@ include("ui/slasher_stock/cl_slasher_meter.lua")
 include("ui/slasher_stock/cl_slasher_stock.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("cl_limitedzone.lua")
-include("cl_thirdperson.lua")
 
 CreateClientConVar("slashco_cl_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
 CreateClientConVar("slashco_cl_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
@@ -114,7 +127,7 @@ end
 local fx_t = 0
 
 hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
-	if LocalPlayer():Team() ~= TEAM_SURVIVOR then
+	if GameData.LocalPlayer:Team() ~= TEAM_SURVIVOR then
 		return
 	end
 
@@ -122,12 +135,12 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 		return
 	end
 
-	LocalPlayer():ItemFunction("Screenspace")
+	GameData.LocalPlayer:ItemFunction("Screenspace")
 	DrawBokehDOF(0.35, 1, 12)
 	DrawSharpen(5, 0.15)
 	DrawBloom(0.85, 2, 9, 9, 1, 1, 1, 1, 1)
 
-	local hp = LocalPlayer():Health()
+	local hp = GameData.LocalPlayer:Health()
 	if hp < 30 then
 		fx_t = fx_t + RealFrameTime() * 0.25
 		DrawBokehDOF(12, 0.4, 4 - math.sin(fx_t) * (3 - (hp / 10)))
@@ -145,21 +158,26 @@ hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
 	end
 end)
 
-hook.Add("KeyPress", "PlayerSelect", function(ply, key)
-	if ply ~= LocalPlayer() or ply:Team() ~= TEAM_LOBBY then
+hook.Add("PlayerButtonDown", "SlashCo:OpenPlayermodelSelector", function(ply, key)
+	if ply ~= GameData.LocalPlayer or ply:Team() ~= TEAM_LOBBY then
 		return
 	end
 
-	if key == 8192 then
-		DrawThePlayermodelSelectorBox()
+	if SlashCo.IsKeyPressed("PLAYERMODEL", ply, key) then
+		SlashCo.OpenPlayermodelSelector()
+	end
+
+	if SlashCo.IsKeyPressed("OPEN_KEYBINDS", ply, key) then
+		SlashCo.OpenKeyboardUI()
 	end
 end)
 
-net.Receive("octoSlashCoTestConfigHalos", function()
-	hook.Add("PreDrawHalos", "octoSlashCoTestConfigPreDrawHalos", function()
+net.Receive("SlashCo:TestConfigHalos", function()
+	hook.Add("PreDrawHalos", "SlashCo:TestConfigPreDrawHalos", function()
 		halo.Add(ents.FindByClass("prop_physics"), Color(255, 0, 0), 2, 2, 8, true, true)
 		halo.Add(ents.FindByClass("sc_*"), Color(0, 255, 255), 2, 2, 4, true, true)
 	end)
+
 	SlashCoTestConfig = true
 end)
 
@@ -170,6 +188,7 @@ local colors = {
 	red = Color(255, 0, 0),
 	blue = Color(0, 0, 255),
 	yellow = Color(255, 255, 0),
+	green = Color(0, 255, 0),
 	gray = Color(200, 200, 200)
 }
 
@@ -192,7 +211,7 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	end
 
 	for k, v in pairs(_ents) do
-		if IsValid(v) and v:IsPlayer() and not v:CanBeSeen() then
+		if IsValid(v) and (v:IsPlayer() and not v:CanBeSeen() or v:IsDormant()) then
 			table.remove(_ents, k)
 		end
 	end
@@ -200,26 +219,29 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	halo.Add(_ents, haloColor, math.abs(math.sin(CurTime())) * 2, math.abs(math.sin(CurTime())) * 2, passes or 1, nil, noZ)
 end
 
-hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
+hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 	g_SlashCoDrawingHalos = true
 
-	if LocalPlayer():Team() == TEAM_SLASHER then
+	local ply = GameData.LocalPlayer
+	local _team = ply:Team()
+	if _team == TEAM_SLASHER then
 		SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
 		SlashCo.DrawHalo(ents.FindByClass("sc_babaclone"))
 		SlashCo.DrawHalo(ents.FindByClass("sc_maleclone"))
-		LocalPlayer():SlasherFunction("PreDrawHalos")
+		ply:SlasherFunction("PreDrawHalos")
 
 		g_SlashCoDrawingHalos = false
 		return
 	end
 
-	if LocalPlayer():Team() == TEAM_SPECTATOR then
+	if _team == TEAM_SPECTATOR then
 		if showHalos then
 			SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER), "red")
 			if showGasCanHalos then
 				SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "gray")
+				SlashCo.DrawHalo(ents.FindByClass("sc_battery"), "green")
 			end
 		end
 
@@ -227,8 +249,8 @@ hook.Add("PreDrawHalos", "octoSlashCoClientPreDrawHalos", function()
 		return
 	end
 
-	if LocalPlayer():Team() == TEAM_SURVIVOR then
-		LocalPlayer():ItemFunction("PreDrawHalos")
+	if _team == TEAM_SURVIVOR then
+		ply:ItemFunction("PreDrawHalos")
 
 		g_SlashCoDrawingHalos = false
 		return
@@ -265,7 +287,8 @@ hook.Add("EntityRemoved", "DynamicFlashlight.PVS_Cache", function(entity)
 end)
 
 hook.Add("Think", "DynamicFlashlight.Rendering", function()
-	if not LocalPlayer():CanSeeFlashlights() then
+	local ply = GameData.LocalPlayer
+	if not ply:CanSeeFlashlights() then
 		for _, target in ipairs(cache) do
 			if target.DynamicFlashlight then
 				target.DynamicFlashlight:Remove()
@@ -277,7 +300,7 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 	end
 
 	for _, target in ipairs(cache) do
-		if target:GetNWBool("DynamicFlashlight") and (target:CanBeSeen() or target == LocalPlayer()) then
+		if target:GetNW2Bool("DynamicFlashlight") and (target:CanBeSeen() or target == ply) then
 			if target.DynamicFlashlight then
 				local position = target:GetPos()
 				local newposition = Vector(position[1], position[2], position[3] + 40) + target:GetForward() * 20
@@ -300,9 +323,10 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 	end
 end)
 
-net.Receive("mantislashcoGiveSlasherData", function()
+net.Receive("SlashCo:GiveSlasherData", function()
 	local SlasherTable = net.ReadTable()
-	if not LocalPlayer():IsValid() then
+	local ply = GameData.LocalPlayer
+	if not IsValid(ply) then
 		return
 	end
 
@@ -311,7 +335,7 @@ net.Receive("mantislashcoGiveSlasherData", function()
 	SlasherTeam = SlasherTable.AllSlashers
 	GameReady = SlasherTable.GameReadyToBegin
 
-	if LocalPlayer():Team() == TEAM_SLASHER then
+	if ply:Team() == TEAM_SLASHER then
 		hook.Run("BaseSlasherHUD")
 	end
 end)
@@ -383,10 +407,10 @@ local function addSound(soundPath, entID)
 	SlashCo.GlobalSounds[entID .. soundPath] = { snd = snd, permanent = permanent, entID = entID }
 end
 
-net.Receive("mantislashcoGlobalSound", function()
+net.Receive("SlashCo:GlobalSound", function()
 	local isRemove = net.ReadBool()
 	local soundPath = net.ReadString()
-	local entID = net.ReadUInt(13)
+	local entID = net.ReadUInt(MAX_EDICT_BITS)
 
 	if isRemove then
 		removeSound(soundPath, entID)
@@ -401,12 +425,12 @@ local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
 local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
 local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
 
-hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
-	if game.GetMap() == "sc_lobby" then
+hook.Add("SlashCo:DrawHUD", "AwaitingPlayersHUD", function()
+	if GameData.IsLobby then
 		return
 	end
 
-	if LocalPlayer():Team() ~= TEAM_SPECTATOR then
+	if GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR then
 		return
 	end
 
@@ -419,11 +443,11 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 	local xoffset = (#SurvivorTeam + #SlasherTeam) * -50 - 25
 	--local xoffset = -250
 
-	for i = 1, #SurvivorTeam do
+	for _, survivorData in ipairs(SurvivorTeam) do
 		--Survivor team visualization before game start
 
-		for x = 1, #team.GetPlayers(TEAM_SPECTATOR) do
-			if team.GetPlayers(TEAM_SPECTATOR)[x]:SteamID64() == SurvivorTeam[i].id then
+		for _, spectators in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
+			if spectators:SteamID64() == survivorData.steamid then
 				surface.SetMaterial(SurvivorIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
@@ -431,9 +455,8 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 			end
 		end
 
-		if LocalPlayer():SteamID64() == SurvivorTeam[i].id then
-			draw.SimpleText(SCInfo.Survivor, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.7,
-					Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		if GameData.LocalSteamID64 == survivorData.steamid then
+			draw.SimpleText(SCInfo.Survivor, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.7, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		end
 
 		surface.SetMaterial(SurvivorDeadIcon)
@@ -447,8 +470,8 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 	for i = 1, #SlasherTeam do
 		--Slashers visualization before game start
 
-		for x = 1, #team.GetPlayers(TEAM_SPECTATOR) do
-			if team.GetPlayers(TEAM_SPECTATOR)[x]:SteamID64() == SlasherTeam[i].s_id then
+		for _, spectators in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
+			if spectators:SteamID64() == SlasherTeam[i].steamid then
 				surface.SetMaterial(KillIcon)
 				surface.DrawTexturedRect(ScrW() / 2 + xoffset + 50, ScrH() / 2 + ScrH() / 18, ScrW() / 20, ScrW() / 20)
 
@@ -471,36 +494,47 @@ hook.Add("HUDPaint", "AwaitingPlayersHUD", function()
 		draw.SimpleText(SlashCo.Language("player_await"), "ItemFont", ScrW() / 2, ScrH() / 2, color_white,
 				TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
-
 	end
 end)
 
-net.Receive("mantislashcoSendGlobalInfoTable", function()
+net.Receive("SlashCo:SendGlobalInfoTable", function()
 	SCInfo = net.ReadTable()
 end)
 
-net.Receive("mantislashcoBriefing", function()
+net.Receive("SlashCo:Briefing", function()
 	BriefingTable = net.ReadTable()
 end)
 
+local function GetBriefingScreenPos()
+	local pos = GetGlobal2Vector("SlashCo:BriefingUIPos", vector_origin)
+	if pos:IsZero() then
+		return nil, nil
+	end
+
+	local ang = GetGlobal2Angle("SlashCo:BriefingUIAng", angle_zero)
+	return pos, ang
+end
+
 local b_tick = -500
 hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
-	if game.GetMap() ~= "sc_lobby" then
+	if not GameData.IsLobby then
 		return
 	end
 
-	do
-		local ent = table.Random(ents.FindByClass("sc_offertable"))
-		local angle = ent:LocalToWorldAngles(Angle(0, 90, 90))
-		local pos = ent:LocalToWorld(Vector(5, 0, 110))
+	if bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then return end
+
+	local offerTable = table.Random(ents.FindByClass("sc_offertable"))
+	if IsValid(offerTable) then
+		local angle = offerTable:LocalToWorldAngles(Angle(0, 90, 90))
+		local pos = offerTable:LocalToWorld(Vector(5, 0, 110))
 
 		cam.Start3D2D(pos, angle, 0.15)
 		-- Get the size of the text we are about to draw
 
 		local text = SlashCo.Language("offering_idle")
 
-		if offering_name ~= nil then
-			text = SlashCo.Language("Offering_name", offering_name)
+		if GameData.OfferingName then
+			text = SlashCo.Language("Offering_name", GameData.OfferingName)
 		end
 
 		surface.SetFont("LobbyFont1")
@@ -517,85 +551,58 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 	end
 
 	do
-		local angle = Angle(0, -90, 90)
-		local pos = Vector(-133, 400, 80)
+		local pos, angle = GetBriefingScreenPos()
 
-		if BriefingTable == nil then
+		if BriefingTable == nil or not pos then
 			return
 		end
 
 		b_tick = b_tick + 0.5
 
-		local s_id = BriefingTable.ID
-		local s_cls = BriefingTable.CLS
-		local s_dng = BriefingTable.DNG
-		local s_n = BriefingTable.NAME
+		local slasherID = BriefingTable.ID
+		local slasherClass = BriefingTable.CLASS
+		local slasherDanger = BriefingTable.DANGER
+		local slasherName = BriefingTable.NAME
 		local pro_tip = BriefingTable.TIP
 
 		cam.Start3D2D(pos, angle, 0.09)
 
 		local monitorsize = 1300
 		local txtcolor = color_white
-		local s_cls_t = SlashCo.Language(TranslateSlasherClass(s_cls))
-		local s_dng_t = SlashCo.Language(TranslateDangerLevel(s_dng))
+		local slasherClassTranslated = SlashCo.Language(TranslateSlasherClass(slasherClass))
+		local slasherDangerTranslated = SlashCo.Language(TranslateDangerLevel(slasherDanger))
 
 		surface.SetDrawColor(0, 0, 0, 255)
 		surface.DrawRect(-monitorsize / 2, -monitorsize / 2, monitorsize, monitorsize)
 
 		surface.SetDrawColor(0, 0, 0, 255)
-		draw.SimpleText(SlashCo.Language("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2,
-				color_white)
+		draw.SimpleText(SlashCo.Language("briefing"), "BriefingFont", 25 - monitorsize / 2, 25 - monitorsize / 2, color_white)
+		draw.SimpleText(SlashCo.Language("Name", ""), "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2, color_white)
 
-		draw.SimpleText(SlashCo.Language("Name", ""), "BriefingFont", 25 - monitorsize / 2, 250 - monitorsize / 2,
-				color_white)
-		if s_n == "Unknown" then
-			txtcolor = Color(200, 0, 0, b_tick - 0)
-		else
-			txtcolor = Color(255, 255, 255, b_tick - 0)
-		end
+		txtcolor = SlashCo.CopyColor(SlashCo.GetNameColor(slasherName))
+		txtcolor[4] = b_tick - 0
 
-		draw.SimpleText(SlashCo.Language(s_n), "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor,
-				TEXT_ALIGN_CENTER,
-				TEXT_ALIGN_TOP)
+		draw.SimpleText(SlashCo.Language(slasherName), "BriefingFont", 900 - monitorsize / 2, 250 - monitorsize / 2, txtcolor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		draw.SimpleText(SlashCo.Language("Class", ""), "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2, color_white)
 
-		draw.SimpleText(SlashCo.Language("Class", ""), "BriefingFont", 25 - monitorsize / 2, 350 - monitorsize / 2,
-				color_white)
-		if s_cls == 0 then
-			txtcolor = Color(200, 0, 0, b_tick - 255)
-		else
-			txtcolor = Color(255, 255, 255, b_tick - 255)
-		end
+		txtcolor = SlashCo.CopyColor(SlashCo.GetClassColor(slasherClass))
+		txtcolor[4] = b_tick - 255
 
-		draw.SimpleText(s_cls_t, "BriefingFont", 900 - monitorsize / 2, 350 - monitorsize / 2, txtcolor,
-				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		draw.SimpleText(slasherClassTranslated, "BriefingFont", 900 - monitorsize / 2, 350 - monitorsize / 2, txtcolor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		draw.SimpleText(SlashCo.Language("DangerLevel", ""), "BriefingFont", 25 - monitorsize / 2, 450 - monitorsize / 2, color_white)
 
-		draw.SimpleText(SlashCo.Language("DangerLevel", ""), "BriefingFont", 25 - monitorsize / 2,
-				450 - monitorsize / 2, color_white)
+		txtcolor = SlashCo.CopyColor(SlashCo.GetDangerColor(slasherDanger))
+		txtcolor[4] = b_tick - 255
 
-		if s_dng == 1 then
-			txtcolor = Color(255, 255, 0, b_tick - 255 * 2)
-		elseif s_dng == 2 then
-			txtcolor = Color(255, 155, 155, b_tick - 255 * 2)
-		elseif s_dng == 3 then
-			txtcolor = Color(255, 0, 0, b_tick - 255 * 2)
-		else
-			txtcolor = Color(200, 0, 0, b_tick - 255 * 2)
-		end
-
-		draw.SimpleText(s_dng_t, "BriefingFont", 900 - monitorsize / 2, 450 - monitorsize / 2, txtcolor,
-				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-
-		draw.SimpleText(SlashCo.Language("Notes") .. ":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2,
-				color_white)
+		draw.SimpleText(slasherDangerTranslated, "BriefingFont", 900 - monitorsize / 2, 450 - monitorsize / 2, txtcolor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		draw.SimpleText(SlashCo.Language("Notes") .. ":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2, color_white)
 
 		local icondrawid = 0
-
 		if b_tick > 200 then
-			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2,
-					color_white)
+			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
 
-			if s_id ~= nil and s_id ~= 0 then
-				icondrawid = s_id
+			if slasherID and slasherID ~= 0 then
+				icondrawid = SlashCoSlashers[slasherID].ID
 			end
 		else
 			draw.SimpleText("...", "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
@@ -611,26 +618,27 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 	end
 end)
 
-net.Receive("mantislashcoHelicopterVoice", function()
+net.Receive("SlashCo:HelicopterVoice", function()
 	local t = net.ReadUInt(4)
+	local id = net.ReadUInt(4)
 
-	if t == 1 then
-		LocalPlayer():EmitSound("slashco/helipilot/helipilot_intro" .. math.random(1, 8) .. ".mp3", 100)
+	if t == SlashCo.HelicopterVoices.INTRO then
+		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_intro" .. id .. ".mp3", 100)
 		return
 	end
 
-	if t == 2 then
-		LocalPlayer():EmitSound("slashco/helipilot/helipilot_approach" .. math.random(1, 5) .. ".mp3", 100)
+	if t == SlashCo.HelicopterVoices.APPROACH then
+		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_approach" .. id .. ".mp3", 100)
 		return
 	end
 
-	if t == 3 then
-		LocalPlayer():EmitSound("slashco/helipilot/helipilot_land" .. math.random(1, 5) .. ".mp3", 100)
+	if t == SlashCo.HelicopterVoices.LAND then
+		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_land" .. id .. ".mp3", 100)
 		return
 	end
 
-	if t == 4 then
-		LocalPlayer():EmitSound("slashco/helipilot/helipilot_beacon" .. math.random(1, 5) .. ".mp3", 100)
+	if t == SlashCo.HelicopterVoices.BEACON then
+		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_beacon" .. id .. ".mp3", 100)
 		return
 	end
 end)
@@ -639,18 +647,18 @@ local AmbientMusic
 local AmbientLength
 local AmbientVol = 0.8
 
-net.Receive("mantislashcoMapAmbientPlay", function()
+net.Receive("SlashCo:MapAmbientPlay", function()
 	timer.Simple(math.random(1, 8), function()
 		SlashCoMapAmbience()
 	end)
 end)
 
 function SlashCoMapAmbience()
-	if LocalPlayer():Team() == TEAM_SLASHER then
+	if GameData.LocalPlayer:Team() == TEAM_SLASHER then
 		return
 	end
 
-	local snd = "sound/slashco/maps/" .. game.GetMap() .. ".mp3"
+	local snd = "sound/slashco/maps/" .. GameData.Map .. ".mp3"
 	if not file.Exists(snd, "GAME") then
 		return
 	end
@@ -680,7 +688,7 @@ hook.Add("Think", "amb_vol", function()
 		AmbientMusic:SetVolume(AmbientVol)
 	end
 
-	if LocalPlayer():GetNWBool("SurvivorChased") then
+	if IsValid(GameData.LocalPlayer:GetNWEntity("SurvivorChased")) then
 		if AmbientVol > 0 then
 			AmbientVol = AmbientVol - RealFrameTime()
 		end
@@ -705,11 +713,94 @@ function SlashCo.ReadSound(fileName)
 		_sound = g_SCLoadedSounds[fileName][1]
 		filter = g_SCLoadedSounds[fileName][2]
 	end
+
 	if _sound then
 		_sound:Stop()
 		_sound:Play()
 	end
+
 	return _sound
+end
+
+-- RaphaelIT7: We use PostDrawHUD instead of DrawOverlay to avoid rendering OVER the main menu.
+hook.Add("PostDrawHUD", "SlashCo:DrawHUD", function()
+	if not GameData.LocalPlayer then return end -- DrawHUD is only called when the localplayer is valid!
+
+	cam.Start2D() -- Wiki says we need this :/
+		hook.Run("SlashCo:DrawHUD")
+	cam.End2D()
+end)
+
+-- RaphaelIT7: We use this to notify a user when something happened ingame, like if they have to select a slasher, the round starts or something else.
+function SlashCo.FlashWindows()
+	system.FlashWindow()
+end
+
+net.Receive("SlashCo:FlashWindows", function()
+	SlashCo.FlashWindows()
+end)
+
+hook.Add("CalcView", "SlashCo:ThirdPerson", function(ply, pos, angles, fov, znear, zfar)
+	local _team = ply:Team()
+	if _team == TEAM_SURVIVOR then
+		if not ply:ItemFunction("Thirdperson") then
+			return
+		end
+	elseif _team == TEAM_SLASHER then
+		if not ply:SlasherFunction("Thirdperson") then
+			return
+		end
+	else
+		return
+	end
+
+	local view = {
+		fov = fov,
+		znear = znear,
+		zfar = zfar,
+		drawviewer = true
+	}
+
+	angles.p = angles.p + 15
+
+	local traceData = {}
+	traceData.start = pos
+	traceData.endpos = traceData.start + angles:Forward() * -120
+	traceData.filter = ply
+
+	local trace = util.TraceLine(traceData)
+
+	pos = trace.HitPos
+	if trace.Fraction < 1.0 then
+		pos = pos + trace.HitNormal * 5
+	end
+
+	view.origin = pos
+	view.angles = angles
+
+	return view
+end)
+
+net.Receive("SlashCo:UpdateLightMap", function()
+	render.RedownloadAllLightmaps(GameData.IsLobby, GameData.IsLobby)
+end)
+
+--GameData.EntityExists = GameData.EntityExists or {}
+net.Receive("SlashCo:EntityRemoved", function()
+	local entIndex = net.ReadUInt(MAX_EDICT_BITS)
+	--GameData.EntityExists[entIndex] = false
+
+	hook.Run("SlashCo:ServerEntityRemoved", entIndex)
+end)
+
+-- For now, we only need to know when an Entity is removed, not when they're created.
+--[[net.Receive("SlashCo:EntityCreated", function()
+	local entIndex = net.ReadUInt(MAX_EDICT_BITS)
+	GameData.EntityExists[entIndex] = true
+end)]]
+
+function SlashCo.EntityExists(entIndex)
+	return GameData.EntityExists[entIndex] == true
 end
 
 SC_CLIENT_LOADED = true

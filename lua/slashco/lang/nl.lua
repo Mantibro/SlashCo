@@ -1,7 +1,7 @@
 --[[
 
-    Language: nl, (Dutch), (Nederlands)
-    Translator: Willem Oomkens, GGKirbyz2000, Kazzinkel, kram_2/Droom, Timon Jeruzalem
+	Language: nl, (Dutch), (Nederlands)
+	Translator: Willem Oomkens, GGKirbyz2000, Kazzinkel, kram_2/Droom, Timon Jeruzalem
 
 ]]
 
@@ -23,6 +23,9 @@ SlashCo.LangTable["SomeRescued"] = "Alleen sommige van het SlashCo-personeel kon
 SlashCo.LangTable["NoneRescued"] = "Het uitgezonden SlashCo-personeel kon niet gered worden."
 SlashCo.LangTable["Cursed"] = "Je ziel is nu opgeofferd."
 SlashCo.LangTable["Judgement"] = "OORDEEL"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Druk op [%s] om te spawnen"
+SlashCo.LangTable["slasher_replacement"] = "Je bent gekozen als de nieuwe slasher"
+SlashCo.LangTable["item_refund"] = "Je hebt %s punten teruggekregen voor je items"
 
 SlashCo.LangTable["InLobby"] = "In Lobby"
 SlashCo.LangTable["InGame"] = "In Game (%s)"

@@ -7,10 +7,12 @@ ITEM.Price = 35
 ITEM.Description = "LabMeat_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
-ITEM.OnDrop = function()
+
+function ITEM.OnDrop()
 	return nil, nil, true
 end
-ITEM.ItemDropped = function(ply, ent)
+
+function ITEM.ItemDropped(ply, ent)
 	local physCount = ent.ragdoll:GetPhysicsObjectCount()
 	for i = 0, (physCount - 1) do
 		local PhysBone = ent.ragdoll:GetPhysicsObjectNum(i)
@@ -21,14 +23,36 @@ ITEM.ItemDropped = function(ply, ent)
 		end
 	end
 end
-ITEM.OnUse = function(ply)
-	ply:EmitSound("slashco/survivor/benadryl_eat.mp3")
-	ply:EmitSound("slashco/slasher/amogus_transform" .. math.random(1, 2) .. ".mp3")
+
+function ITEM.OnUse(ply)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/benadryl_eat.mp3",
+		identifier = "LabMeatUse",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
+	local idx = math.random(1, 2)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/amogus/amogus_transform" .. idx .. ".mp3",
+		identifier = "LabMeatUse2" .. idx,
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
 	ply:AddEffect("Awareness", 120)
 end
-ITEM.OnSetModel = function(model)
+
+function ITEM.OnSetModel(model)
 	model:SetSequence(0)
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),

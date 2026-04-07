@@ -3,7 +3,6 @@ local SlashCo = SlashCo or {}
 local ConvoCount = 30
 
 SlashCo.LobbyConvos = {
-
 	{
 		Length1 = 4,
 		Length2 = 4,
@@ -222,7 +221,7 @@ SlashCo.LobbyConvos = {
 
 }
 
-SlashCo.LobbyBanter = function()
+function SlashCo.LobbyBanter()
 	local survivors = team.GetPlayers(TEAM_SURVIVOR)
 
 	if #survivors < 2 then
@@ -236,6 +235,7 @@ SlashCo.LobbyBanter = function()
 	local totalLength = SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2 + SlashCo.LobbyConvos[convo].Length3 + predelay
 
 	local function playVocal(conv, id, plyid)
+		if not IsValid(survivors[plyid]) then return end
 		survivors[plyid]:EmitSound("slashco/survivor/voice/maleconv_" .. conv .. "_" .. id .. ".mp3")
 	end
 
@@ -271,8 +271,8 @@ SlashCo.LobbyBanter = function()
 	return totalLength
 end
 
-net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
-	if game.GetMap() == "sc_lobby" and SlashCo.LobbyData.LOBBYSTATE == 2 then
+net.Receive("SlashCo:SurvivorVoicePrompt", function(_, ply)
+	if GameData.IsLobby and SlashCo.LobbyData.LOBBYSTATE == 2 then
 		return
 	end
 
@@ -285,7 +285,7 @@ net.Receive("mantislashcoSurvivorVoicePrompt", function(_, ply)
 	ply:EmitSound("slashco/survivor/voice/prompt_" .. prompt .. math.random(1, 5) .. ".mp3")
 end)
 
-SlashCo.EscapeVoicePrompt = function()
+function SlashCo.EscapeVoicePrompt()
 	if team.NumPlayers(TEAM_SURVIVOR) < 1 then
 		return
 	end

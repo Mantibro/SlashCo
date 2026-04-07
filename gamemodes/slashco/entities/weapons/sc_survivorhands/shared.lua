@@ -1,8 +1,8 @@
-SWEP.PrintName      = "survivorHands"
+SWEP.PrintName	  = "survivorHands"
 SWEP.DrawAmmo		= false
 SWEP.DrawCrosshair	= false
-SWEP.Author         = "textstack"
-SWEP.Purpose        = "Main 'weapon' for survivors in SlashCo"
+SWEP.Author		 = "textstack"
+SWEP.Purpose		= "Main 'weapon' for survivors in SlashCo"
 
 SWEP.HoldType = "normal"
 SWEP.ViewModelFOV = 69 --nice
@@ -15,27 +15,27 @@ SWEP.ViewModelBoneMods = {}
 SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1
 SWEP.Primary.Automatic		= false
-SWEP.Primary.Ammo		    = "none"
+SWEP.Primary.Ammo			= "none"
 
-SWEP.Secondary.ClipSize	    = -1
+SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
 SWEP.Secondary.Automatic	= false
-SWEP.Secondary.Ammo		    = "none"
+SWEP.Secondary.Ammo			= "none"
 
 SWEP.BobScale = 0
 
 function SWEP:CanPrimaryAttack()
-    return true
+	return true
 end
 
 function SWEP:CanSecondaryAttack()
-    return true
+	return true
 end
 
 function SWEP:PrimaryAttack()
-    return
+	return
 end
 
 function SWEP:SecondaryAttack()
-    return
+	return
 end

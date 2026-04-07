@@ -1,160 +1,177 @@
-if game.GetMap() ~= "sc_lobby" then
-	hook.Add("HUDDrawTargetID", "SlashCoLobbyNames", function()
-		return false
-	end)
-
-	return
-end
-
-local longest_name, plynum, lobby_music
-
 local grey = Color(128, 128, 128)
 local red = Color(255, 64, 64)
 local green = Color(64, 255, 64)
 
-local TimeLeft, StateOfLobby, LobbyInfoTable
-
-net.Receive("mantislashcoLobbyTimerTime", function()
-	TimeLeft = net.ReadUInt(6)
+net.Receive("SlashCo:LobbyTimerTime", function()
+	GameData.TimeLeft = net.ReadUInt(6)
 end)
 
-net.Receive("mantislashcoGiveLobbyStatus", function()
-	StateOfLobby = net.ReadUInt(3)
+net.Receive("SlashCo:GiveLobbyStatus", function()
+	GameData.StateOfLobby = net.ReadUInt(3)
 end)
 
-net.Receive("mantislashcoGiveLobbyInfo", function()
-	LobbyInfoTable = net.ReadTable()
+local longest_name, plynum, clientReadiness, Lobby_Players
+local isClientinLobby = false
+local function UpdateLobbyState()
+	Lobby_Players = {}
+	for ply, readyState in pairs(GameData.LobbyInfoTable) do
+		if not IsValid(ply) then
+			continue
+		end
+
+		if not Lobby_Players[ply] then
+			table.insert(Lobby_Players, { ID = ply:SteamID64(), Name = ply:GetName(), Ready = readyState })
+			Lobby_Players[ply] = true
+		end
+
+		if ply == GameData.LocalPlayer then
+			clientReadiness = readyState
+			isClientinLobby = true
+		end
+	end
+
+	for _, lobbyPly in ipairs(Lobby_Players) do
+		local length = string.len(lobbyPly.Name)
+		if length > 20 then
+			length = 20
+			lobbyPly.Name = lobbyPly.Name:sub(0, 20)
+			lobbyPly.Name = lobbyPly.Name .. "..."
+		end
+		
+		if (length * 15) > (longest_name or 0) then
+			longest_name = length * 14
+		end
+	end
+
+	longest_name = longest_name or 0
+	plynum = #Lobby_Players
+end
+
+net.Receive("SlashCo:GiveLobbyInfo", function(len)
+	GameData.LobbyInfoTable = {} -- We only use GameData.LobbyInfoTable in this file.
+
+	local entities = len / (MAX_EDICT_BITS + 2) -- +2 because of the uint we write
+	for k=1, entities do
+		GameData.LobbyInfoTable[net.ReadEntity()] = net.ReadUInt(2)
+	end
+
+	UpdateLobbyState()
 end)
 
 hook.Add("HUDDrawTargetID", "SlashCoLobbyNames", function()
-	return StateOfLobby and StateOfLobby < 1
+	if not GameData.IsLobby then return false end
+
+	return GameData.StateOfLobby and GameData.StateOfLobby < 1
 end)
 
 local ReadyCheck = Material("slashco/ui/lobby_ready")
 local UnReadyCheck = Material("slashco/ui/lobby_unready")
 
-hook.Add("HUDPaint", "LobbyInfoText", function()
-	if stop_lobbymusic ~= true and (lobbymusic_antispam == nil or lobbymusic_antispam ~= true) then
-		lobby_music = CreateSound(LocalPlayer(), "slashco/music/slashco_lobby.wav")
-		lobby_music:Play()
-		lobby_music:ChangeVolume(0.5)
-		lobbymusic_antispam = true
-	end
+hook.Add("SlashCo:DrawHUD", "LobbyInfoText", function()
+	if not GameData.IsLobby then return end
 
-	if IsValid(lobby_music) and stop_lobbymusic then
-		lobby_music:Stop()
-	end
+	local localPly = GameData.LocalPlayer
 
 	local scrW, scrH = ScrW(), ScrH()
-	local point_count = CL_points or 0
+	local localTeam = localPly:Team()
+	if localTeam == TEAM_SPECTATOR then return end
 
-	draw.SimpleText("[" .. point_count .. " " .. SlashCo.Language("PointCount") .. "]",
-				"TVCD", ScrW() * 0.025, ScrH() * 0.05, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+	local _, pointsSize = draw.SimpleText("[" .. localPly:GetPoints() .. " " .. SlashCo.Language("PointCount") .. "]",
+		"TVCD", ScrW() * 0.025, ScrH() * 0.05, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+
+	local lvl, ep, nextLevelEP = SlashCo.ExperienceToLevel(localPly:GetExperience())
+	draw.SimpleText("[" .. lvl .. " LVL - " .. ep .. "/" .. nextLevelEP .. "EP]",
+		"TVCD", ScrW() * 0.025, (ScrH() * 0.05) + pointsSize + 5, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 	--LobbyFont1
-	if LocalPlayer():Team() == TEAM_LOBBY then
-		if StateOfLobby == nil or StateOfLobby < 1 then
-			draw.SimpleText("[,] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
+	if localTeam == TEAM_LOBBY then
+		if GameData.StateOfLobby == nil or GameData.StateOfLobby < 1 then
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "] " .. SlashCo.Language("ToggleSpectate"), "TVCD", scrW * 0.975, (scrH * 0.95) - 50,
 					color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 		end
 
-		draw.SimpleText("[R] " .. SlashCo.Language("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80,
+		draw.SimpleText("[" .. SlashCo.GetKeyButtonName("PLAYERMODEL") .. "] " .. SlashCo.Language("SelectPlayermodel"), "TVCD", scrW * 0.975, (scrH * 0.95) - 80,
 				color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	end
 
-	if StateOfLobby and StateOfLobby < 1 then
-		local Lobby_Players = {}
-		local isClientinLobby = false
-
-		local clientReadiness
-		for _, v in ipairs(LobbyInfoTable) do
-			local ply = player.GetBySteamID64(v.steamid)
-
-			if not IsValid(ply) then
-				return
-			end
-
-			if not table.HasValue(Lobby_Players, { ID = v.steamid }) then
-				table.insert(Lobby_Players, { ID = v.steamid, Name = ply:GetName(), Ready = v.readyState })
-			end
-
-			if v.steamid == LocalPlayer():SteamID64() then
-				clientReadiness = v.readyState
-				isClientinLobby = true
-			end
+	if GameData.StateOfLobby and GameData.StateOfLobby < 1 then
+		if not clientReadiness or not Lobby_Players then
+			UpdateLobbyState()
 		end
-
-		longest_name = longest_name or 0
-		if not plynum or plynum ~= #Lobby_Players then
-			longest_name = 0
-			plynum = #Lobby_Players
-		end
-
-		CL_LobbyPlayers = plynum
 
 		if isClientinLobby then
 			surface.SetDrawColor(255, 255, 255, 255)
 
-			draw.SimpleText("[F1] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Survivor"))), "TVCD",
-					scrW * 0.975, (scrH * 0.95) - 130, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-			draw.SimpleText("[F2] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Slasher"))), "TVCD",
-					scrW * 0.975, (scrH * 0.95) - 160, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("READY_SURVIVOR") .. "] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Survivor"))), "TVCD",
+					scrW * 0.975, (scrH * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("READY_SLASHER") .. "] " .. SlashCo.Language("ReadyAs", string.upper(SlashCo.Language("Slasher"))), "TVCD",
+					scrW * 0.975, (scrH * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 
-			if TimeLeft ~= nil and TimeLeft > 0 and TimeLeft < 61 then
-				draw.SimpleText(tostring(TimeLeft), "LobbyFont2", scrW * 0.5, scrH * 0.65, color_white,
+			draw.SimpleText("[" .. SlashCo.GetKeyButtonName("OPEN_KEYBINDS") .. "] " .. SlashCo.Language("keyboard_bind_keybinds"), "TVCD",
+					scrW * 0.975, (scrH * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+
+			if GameData.TimeLeft and GameData.TimeLeft > 0 and GameData.TimeLeft < 61 then
+				draw.SimpleText(tostring(GameData.TimeLeft), "LobbyFont2", scrW * 0.5, scrH * 0.65, color_white,
 						TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 
-			local mul_y = 1
-
-			draw.SimpleText("[" .. plynum .. "/7] ", "TVCD", scrW * 0.025, scrH * 0.22, color_white, TEXT_ALIGN_LEFT,
-					TEXT_ALIGN_TOP)
-
-			for i = 1, #Lobby_Players do
-				local pos_y = 0.27
-				local x_pos = scrW * 0.025
-				local iconsize = ScrW() / 45
-
-				surface.SetDrawColor(0, 0, 0)
-				surface.DrawRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, 60)
-				surface.SetDrawColor(50, 50, 50)
-				surface.DrawOutlinedRect(scrW * 0.018, (scrH * (pos_y * mul_y)) - 18, longest_name + 65, 60, 3)
-
-				if string.len(Lobby_Players[i].Name) * 15 > longest_name then
-					longest_name = string.len(Lobby_Players[i].Name) * 15
-				end
-
-				draw.SimpleText(Lobby_Players[i].Name, "PlayersFont", scrW * 0.025, scrH * (pos_y * mul_y),
-						color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
-
-				local icon_pos_x = x_pos + longest_name
-				local icon_pos_y = (scrH * (pos_y * mul_y)) - 8
-
-				surface.SetDrawColor(255, 255, 255, 255)
-				if Lobby_Players[i].Ready > 0 then
-					surface.SetMaterial(ReadyCheck)
-				else
-					surface.SetMaterial(UnReadyCheck)
-				end
-
-				surface.DrawTexturedRect(icon_pos_x, icon_pos_y, iconsize, iconsize)
-
-				mul_y = mul_y + 0.25
-			end
+			local currentYPos = scrH * 0.22
+			local width, height = draw.SimpleText("[" .. plynum .. "/" .. GameData.MaxPlayers .. "] ", "TVCD", scrW * 0.025, currentYPos, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 
 			if clientReadiness then
-				if clientReadiness < 1 then
-					draw.SimpleText("       [" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025,
-							scrH * 0.22, grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
-				elseif clientReadiness == 1 then
-					draw.SimpleText("       [" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025, scrH * 0.22,
-							green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
-				elseif clientReadiness == 2 then
-					draw.SimpleText("       [" .. SlashCo.Language("ReadyAs",
-							string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025, scrH * 0.22, red,
-							TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+				if clientReadiness == SlashCo.ReadyState.NotReady then
+					draw.SimpleText("[" .. SlashCo.Language("NotReady") .. "]", "TVCD", scrW * 0.025 + width, currentYPos,
+						grey, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+				elseif clientReadiness == SlashCo.ReadyState.Survivor then
+					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
+						string.upper(SlashCo.Language("Survivor"))) .. "]", "TVCD", scrW * 0.025 + width, currentYPos,
+						green, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
+				elseif clientReadiness == SlashCo.ReadyState.Slasher then
+					draw.SimpleText("[" .. SlashCo.Language("ReadyAs",
+						string.upper(SlashCo.Language("Slasher"))) .. "]", "TVCD", scrW * 0.025 + width, currentYPos,
+						red, TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP)
 				end
+			end
+
+			currentYPos = currentYPos + height
+
+			local lobbyPlayerCount = #Lobby_Players
+			local boxSize = 55
+			local screenHeight = ScrH()
+			if (GameData.CachedLobbyPlayerListCount or -1) == lobbyPlayerCount then
+				boxSize = GameData.CachedLobbyPlayerListSize
+			else
+				while screenHeight < (currentYPos + ((boxSize + 5) * lobbyPlayerCount)) and boxSize != 15 do
+					boxSize = boxSize > 15 and (boxSize - 1) or boxSize
+				end
+				GameData.CachedLobbyPlayerListCount = lobbyPlayerCount
+				GameData.CachedLobbyPlayerListSize = boxSize
+			end
+
+			local iconsize = boxSize - 10 -- Icons always have a padding
+			for i = 1, lobbyPlayerCount do
+				local lobbyPly = Lobby_Players[i]
+				local x_pos = scrW * 0.025
+
+				currentYPos = currentYPos + 5
+				surface.SetDrawColor(0, 0, 0)
+				surface.DrawRect(scrW * 0.018, currentYPos, longest_name + iconsize, boxSize)
+
+				surface.SetDrawColor((lobbyPly.Ready == 2 and 50 or 0) + 50, (lobbyPly.Ready == 1 and 50 or 0) + 50, 50)
+				surface.DrawOutlinedRect(scrW * 0.018, currentYPos, longest_name + iconsize, boxSize, 3)
+
+				surface.SetFont("PlayersFont")
+				surface.SetTextColor(255, 255, 255, 255)
+
+				local _, nameHeight = surface.GetTextSize(lobbyPly.Name)
+				surface.SetTextPos(scrW * 0.025, currentYPos + (boxSize / 2) - (nameHeight / 2))
+				surface.DrawText(lobbyPly.Name)
+
+				surface.SetDrawColor(255, 255, 255, 255)
+				surface.SetMaterial((Lobby_Players[i].Ready > 0) and ReadyCheck or UnReadyCheck)
+				surface.DrawTexturedRect((scrW * 0.018) + longest_name - 5, currentYPos + 5, iconsize, iconsize)
+
+				currentYPos = currentYPos + boxSize
 			end
 		end
 	end

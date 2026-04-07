@@ -1,10 +1,6 @@
 AddCSLuaFile()
 
---local SlashCo = SlashCo
-local SlashCoItems = SlashCoItems
-
 ENT.Type = "anim"
-
 ENT.ClassName 		= "sc_activebeacon"
 ENT.PrintName		= "active beacon"
 ENT.Author			= "Manti"
@@ -13,21 +9,40 @@ ENT.Purpose			= "Rescue."
 ENT.Instructions	= ""
 ENT.PingType = "DISTRESS BEACON"
 
-local rotate = 0
-local intensity = 0
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "BeaconBroken")
+	self:NetworkVar("Bool", 1, "ArmingBeacon")
+end
 
 local function ArmBeacon(ent)
-	if ent:GetNWBool("BeaconBroken") then return end
+	if ent:GetBeaconBroken() then return end
 
 	timer.Remove(ent:EntIndex() .. "_BeaconBlipSound")
-	ent:PlayGlobalSound("slashco/survivor/distress_siren.wav", 100)
-	ent:SetNWBool("ArmingBeacon", false)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/distress_siren.mp3",
+		identifier = "BeaconSiren",
+		minDistance = 1000 * SlashCo.MapSize,
+		maxDistance = 2000 * SlashCo.MapSize,
+		entity = ent,
+		volume = 1,
+		fadeIn = 0,
+	})
+
+	ent:SetArmingBeacon(false)
 	SlashCo.BeaconArming = nil
 	SlashCo.SummonEscapeHelicopter(true)
 	SlashCo.CurRound.DistressBeaconUsed = true
 end
 
 if SERVER then
+	hook.Add("SlashCo:Precache", "PrecacheBeacon", function()
+		SlashCo.PrecacheSound("slashco/survivor/distress_siren.mp3")
+		SlashCo.PrecacheSound("slashco/beacon_connect.mp3")
+		SlashCo.PrecacheSound("slashco/beacon_break.mp3")
+		SlashCo.PrecacheModel("models/props_c17/light_cagelight02_off.mdl")
+	end)
+
 	function ENT:UpdateTransmitState()
 		return TRANSMIT_ALWAYS
 	end
@@ -40,7 +55,7 @@ if SERVER then
 	end
 
 	function ENT:Think()
-		if self:GetNWBool("BeaconBroken") then return end
+		if self:GetBeaconBroken() then return end
 
 		if self.DoArming and not self.TimersStarted then
 			local ms = SlashCo.MapSize --SCInfo.Maps[game.GetMap()].SIZE
@@ -49,32 +64,50 @@ if SERVER then
 
 			print("[SlashCo] Beacon set to arm in " .. fin_time .. " seconds.")
 
-			timer.Create(self:EntIndex() .. "_BeaconArming",fin_time, 1, function()
+			timer.Create(self:EntIndex() .. "_BeaconArming", fin_time, 1, function()
 				ArmBeacon(self)
 			end)
 			timer.Create(self:EntIndex() .. "_BeaconBlipSound",3 , 0, function()
-				self:PlayGlobalSound("slashco/beacon_connect.mp3", 100)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/beacon_connect.mp3",
+					identifier = "BeaconConnect",
+					minDistance = 800 * SlashCo.MapSize,
+					maxDistance = 1200 * SlashCo.MapSize,
+					entity = self,
+					volume = 1,
+					fadeIn = 0,
+				})
 			end)
 			self.TimersStarted = true
 		end
 
 
-		if self:GetNWBool("ArmingBeacon") and team.NumPlayers(TEAM_SURVIVOR) < 2 then
+		if self:GetArmingBeacon() and team.NumPlayers(TEAM_SURVIVOR) < 2 then
 			timer.Remove(self:EntIndex() .. "_BeaconArming")
 			ArmBeacon(self)
 		end
 
-		if not self:GetNWBool("ArmingBeacon") then return end
+		if not self:GetArmingBeacon() then return end
 
 		for k, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if v:GetPos():Distance(self:GetPos()) < 50 then
-				self:EmitSound("slashco/beacon_break.mp3", 85)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/beacon_break.mp3",
+					identifier = "BeaconBreak",
+					minDistance = 400,
+					maxDistance = 900,
+					entity = self,
+					volume = 1,
+					fadeIn = 0,
+				})
+
 				timer.Remove(self:EntIndex() .. "_BeaconArming")
 				timer.Remove(self:EntIndex() .. "_BeaconBlipSound")
 				self:SetModel("models/props_c17/light_cagelight02_off.mdl")
 
-				self:SetNWBool("ArmingBeacon", false)
+				self:SetArmingBeacon(false)
 				SlashCo.BeaconArming = nil
+				SlashCo.CurRound.DistressBeaconUsed = false
 				self:PhysicsInit(SOLID_VPHYSICS)
 				self:SetMoveType(MOVETYPE_VPHYSICS)
 
@@ -84,7 +117,7 @@ if SERVER then
 
 				phys:ApplyForceCenter(Vector(math.random(-25,25),math.random(-25,25),math.random(-25,25)))
 
-				self:SetNWBool("BeaconBroken", true)
+				self:SetBeaconBroken(true)
 			end
 		end
 	end
@@ -93,13 +126,15 @@ else
 		self:DrawModel()
 	end
 
+	local rotate = 0
+	local intensity = 0
 	function ENT:Think()
-		if self:GetNWBool("BeaconBroken") then return end
+		if self:GetBeaconBroken() then return end
 
-		if self:GetNWBool("ArmingBeacon") then
+		if self:GetArmingBeacon() then
 			intensity = intensity + (FrameTime() * 300)
 
-			local dlight = DynamicLight(self:EntIndex() + 99996)
+			local dlight = DynamicLight(self:EntIndex())
 			if dlight then
 				dlight.pos = self:GetPos()
 				dlight.r = 255
@@ -120,12 +155,11 @@ else
 				self.Light2:Remove()
 				self.Light2 = nil
 			end
+
+			return
 		end
 
-		if self:GetNWBool("ArmingBeacon") then return end
-
 		rotate = rotate + (FrameTime() * 300)
-
 		if self.Light then
 			local position = self:GetPos() + Vector(0,0,20)
 

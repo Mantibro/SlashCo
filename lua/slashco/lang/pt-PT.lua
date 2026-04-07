@@ -1,7 +1,7 @@
 --[[
 
-    Language: pt-PT, (Portuguese (Portugal)), (Português)
-    Translator: Felipaquee, Emily The Fennec
+	Language: pt-PT, (Portuguese (Portugal)), (Português)
+	Translator: Felipaquee, Emily The Fennec
 
 ]]
 
@@ -23,6 +23,9 @@ SlashCo.LangTable["SomeRescued"] = "Apenas alguns dos Trabalhadores SlashCo deix
 SlashCo.LangTable["NoneRescued"] = "Os Trabalhadores SlashCo deixados não puderam ser resgatados."
 SlashCo.LangTable["Cursed"] = "Sua alma agora está perdida."
 SlashCo.LangTable["Judgement"] = "JULGAMENTO"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Prima [%s] para gerar"
+SlashCo.LangTable["slasher_replacement"] = "Foste escolhido como o novo assassino"
+SlashCo.LangTable["item_refund"] = "Foste reembolsado em %s pontos pelos teus itens"
 
 SlashCo.LangTable["InLobby"] = "No Lobby"
 SlashCo.LangTable["InGame"] = "No jogo (%s)"

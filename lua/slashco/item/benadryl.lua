@@ -6,37 +6,37 @@ ITEM.EntClass = "sc_benadryl"
 ITEM.Price = 30
 ITEM.Description = "Benadryl_desc"
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.DisplayColor = function()
+
+function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
-ITEM.OnUse = function(ply)
-	ply:AddPoints("benadryl")
-	ply:EmitSound("slashco/survivor/benadryl_eat.mp3")
 
-	timer.Simple(60, function()
-		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-			ply:SetNWBool("SurvivorBenadryl", true)
-		end
+function ITEM.OnUse(ply)
+	ply:AddRoundPoints("benadryl")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/benadryl/benadryl_cornstarch.ogg",
+		identifier = "BenadrylEat",
+		minDistance = 250,
+		maxDistance = 550,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
 
+	if ply:GetNW2Float("InitialBenadrylTime", 0) == 0 then
+		ply:SetNW2Float("InitialBenadrylTime", CurTime())
 		timer.Simple(60, function()
-			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-				ply:SetNWBool("SurvivorBenadrylFull", true)
-			end
+			GameData.TestHatMan = ents.Create("sc_hatman")
+			GameData.TestHatMan:SetTarget(ply)
+			GameData.TestHatMan:Spawn()
 		end)
-
-		timer.Simple(480, function()
-			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-				ply:SetNWBool("SurvivorBenadrylFull", false)
-			end
-		end)
-
-		timer.Simple(535, function()
-			if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-				ply:SetNWBool("SurvivorBenadryl", false)
-			end
-		end)
-	end)
+	else
+		GameData.TestHatMan = ents.Create("sc_hatman")
+		GameData.TestHatMan:SetTarget(ply)
+		GameData.TestHatMan:Spawn()
+	end
 end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
@@ -77,159 +77,136 @@ ITEM.WorldModel = {
 SlashCo.RegisterItem(ITEM, "Benadryl")
 
 if SERVER then
-	hook.Add("Think", "Benadryl", function()
-		for _, ply in ipairs(player.GetAll()) do
-			if ply:Team() ~= TEAM_SURVIVOR then
-				if ply:GetNWBool("SurvivorBenadryl") then
-					ply:SetNWBool("SurvivorBenadryl", false)
-				end
+	hook.Add("PostPlayerDeath", "SlashCo:RemoveBenadrylEffect", function(ply)
+		if ply:Team() ~= TEAM_SPECTATOR then return end -- They survived, let their suffering continue.
 
-				if ply:GetNWBool("SurvivorBenadrylFull") then
-					ply:SetNWBool("SurvivorBenadrylFull", false)
-				end
-			end
-		end
+		ply:SetNW2Float("InitialBenadrylTime", 0) -- Reset the benadryl time for its effects to stop.
 	end)
+
+	function TestHatMan()
+		if IsValid(GameData.TestHatMan) then
+			GameData.TestHatMan:Remove()
+		end
+
+		GameData.TestHatMan = ents.Create("sc_hatman")
+		GameData.TestHatMan:SetTarget(Entity(1))
+		GameData.TestHatMan:Spawn()
+	end
 
 	return
 end
 
+local fullBenadrylTime = 60 -- Time in seconds after which the benadryl is in full effect.
+local function GetBenadrylTime(ply)
+	return ply:GetNW2Float("InitialBenadrylTime", 0) -- if 0 benadryl isn't active.
+end
+
 local rand = 0
 hook.Add("RenderScreenspaceEffects", "Benadryl", function()
-	if LocalPlayer():GetNWBool("SurvivorBenadryl") then
-		if not LocalPlayer().BenadrylIntensity then
-			LocalPlayer().BenadrylIntensity = RealFrameTime()
-		end
-
-		LocalPlayer().BenadrylIntensity = LocalPlayer().BenadrylIntensity + (RealFrameTime() / 277)
-		if LocalPlayer().BenadrylIntensity > 1 then
-			LocalPlayer().BenadrylIntensity = -1
-		end
-
-		local freaker = math.min(math.abs(LocalPlayer().BenadrylIntensity) * 2, 1)
-		rand = rand + (math.random() / 3)
-		local contrast = 3.5 + math.sin((CurTime() + rand) / 10) * 3
-		local bloom = 3 + math.cos((CurTime() + rand) / 2) * 1
-		local bloom2 = 3 + math.cos((CurTime() + rand) / 4) * 1
-		local bokeh = -3 + math.cos((CurTime() + rand) / 20) * 4
-
-		DrawBloom(0.5, freaker * bloom * 1.5, freaker * bloom2 * 9, freaker * bloom2 * 9, 1, 8, 2, 2, 2)
-		DrawBokehDOF(12 * freaker, freaker * bokeh, 4 * freaker)
-
-		local tab = {
-			["$pp_colour_addr"] = 0,
-			["$pp_colour_addg"] = 0,
-			["$pp_colour_addb"] = 0,
-			["$pp_colour_brightness"] = 0,
-			["$pp_colour_contrast"] = 1 + (freaker * contrast),
-			["$pp_colour_colour"] = 1 - freaker,
-			["$pp_colour_mulr"] = 0,
-			["$pp_colour_mulg"] = 0,
-			["$pp_colour_mulb"] = 0
-		}
-
-		DrawColorModify(tab)
-		DrawMotionBlur(freaker * 0.75 + (contrast * 0.08), freaker * 0.8, freaker * 0.07)
-		DrawSharpen(freaker * bloom, freaker * bloom)
-	else
-		LocalPlayer().BenadrylIntensity = 0
-	end
-end)
-
-local BenadrylSound
-local CreateShadowPerson = function(pos, ang)
-	if not LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
+	local benadrylTime = GetBenadrylTime(GameData.LocalPlayer)
+	if benadrylTime == 0 then
 		return
 	end
 
-	local Ent = ents.CreateClientside("sc_shadowman")
+	GameData.LocalPlayer.BenadrylIntensity = (GameData.LocalPlayer.BenadrylIntensity or RealFrameTime()) + (RealFrameTime() / 277)
+	if GameData.LocalPlayer.BenadrylIntensity > 1 then
+		GameData.LocalPlayer.BenadrylIntensity = -1
+	end
 
-	if not IsValid(Ent) then
-		MsgC(Color(255, 50, 50),
-				"[SlashCo] Something went wrong when trying to create a " .. class .. " at (" .. tostring(pos) .. "), entity was NULL.\n")
+	local freaker = math.min(math.abs(GameData.LocalPlayer.BenadrylIntensity) * 2, 1)
+	rand = rand + (math.random() / 3)
+	local contrast = 3.5 + math.sin((CurTime() + rand) / 10) * 3
+	local bloom = 3 + math.sin((CurTime() + rand) / 2) * 1
+	local bloom2 = 3 + math.sin((CurTime() + rand) / 4) * 1
+	local bokeh = -3 + math.sin((CurTime() + rand) / 20) * 4
+
+	local lookingTime = GameData.LocalPlayer:GetNW2Float("LookingAtHatMan", 0)
+	if lookingTime > 0 then
+		lookingTime = 1 + CurTime() - lookingTime
+	else
+		lookingTime = 1
+	end
+
+	DrawBloom(0.5, freaker * bloom * 1.5, freaker * bloom2 * 9, freaker * bloom2 * 9, 1, 8, 2, 2, 2)
+	DrawBokehDOF(2 * freaker * lookingTime, freaker, 4 * freaker)
+
+	local tab = {
+		["$pp_colour_addr"] = 0,
+		["$pp_colour_addg"] = 0,
+		["$pp_colour_addb"] = 0,
+		["$pp_colour_brightness"] = 0,
+		["$pp_colour_contrast"] = 1 + (freaker * contrast) * lookingTime,
+		["$pp_colour_colour"] = 1 - freaker,
+		["$pp_colour_mulr"] = 0,
+		["$pp_colour_mulg"] = 0,
+		["$pp_colour_mulb"] = 0
+	}
+
+	DrawColorModify(tab)
+	DrawMotionBlur(freaker * 0.75 + (contrast * 0.08), freaker * 0.008, freaker * 0.0007)
+	DrawSharpen(freaker * bloom, freaker * bloom)
+end)
+
+local function CreateShadowPerson(pos, ang)
+	local benadrylTime = GetBenadrylTime(GameData.LocalPlayer)
+	if benadrylTime == 0 or benadrylTime < fullBenadrylTime then
+		return
+	end
+
+	local ent = ents.CreateClientside("sc_shadowman")
+	if not IsValid(ent) then
+		MsgC(Color(255, 50, 50), "[SlashCo] Something went wrong when trying to create a " .. class .. " at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
 
-	Ent:SetPos(pos)
-	Ent:SetAngles(ang)
-	Ent:Spawn()
-	Ent:Activate()
+	ent:SetPos(pos)
+	ent:SetAngles(ang)
+	ent:Spawn()
+	ent:Activate()
 
-	local id = Ent:EntIndex()
-
-	return id
+	return ent:EntIndex()
 end
 
+GameData.BenadrylSoundID = GameData.BenadrylSoundID or math.random(1, 3)
 hook.Add("Think", "Benadryl", function()
-	if LocalPlayer():GetNWBool("SurvivorBenadryl") then
-		if not BenadrylSound then
-			sound.PlayFile("sound/slashco/benadryl_base.mp3", "noplay", function(music, errCode, errStr)
-				if IsValid(music) then
-					BenadrylSound = music
-
-					timer.Simple(0.01, function()
-						BenadrylSound:Play()
-					end)
-
-				end
-			end)
+	local benadrylTime = GetBenadrylTime(GameData.LocalPlayer)
+	if benadrylTime ~= 0 then
+		if not IsValid(GameData.BenadrylSound) then
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/benadryl/benadryl_mid" .. GameData.BenadrylSoundID .. ".ogg",
+				identifier = "Benadryl",
+				entity = 0, -- Play as Mono
+				volume = 0,
+				fadeIn = 0,
+				callback = function(channel)
+					GameData.BenadrylSound = channel
+				end,
+			})
 		else
 			local vol = 0
-			if LocalPlayer().BenadrylIntensity then
-				vol = math.abs(LocalPlayer().BenadrylIntensity)
+			if GameData.LocalPlayer.BenadrylIntensity then
+				vol = math.abs(GameData.LocalPlayer.BenadrylIntensity)
 			end
-			BenadrylSound:SetVolume(vol)
+			GameData.BenadrylSound:SetVolume(vol)
 		end
 
-		if not LocalPlayer().ShadowManTick then
-			LocalPlayer().ShadowManTick = CurTime()
+		if not GameData.LocalPlayer.ShadowManTick then
+			GameData.LocalPlayer.ShadowManTick = CurTime()
 		end
 
 		local frequency = 0
 
-		if LocalPlayer().BenadrylIntensity then
-			frequency = math.abs(LocalPlayer().BenadrylIntensity)
+		if GameData.LocalPlayer.BenadrylIntensity then
+			frequency = math.abs(GameData.LocalPlayer.BenadrylIntensity)
 		end
 
-		if CurTime() - LocalPlayer().ShadowManTick > 3 - (frequency * 2) then
-			CreateShadowPerson(LocalPlayer():GetPos() + Vector(math.random(-750, 750), math.random(-750, 750),
+		if (CurTime() - GameData.LocalPlayer.ShadowManTick) > (3 - (frequency * 2)) then
+			CreateShadowPerson(GameData.LocalPlayer:GetPos() + Vector(math.random(-750, 750), math.random(-750, 750),
 					math.random(50, 50)), Angle(0, math.random(1, 360), 0))
-			LocalPlayer().ShadowManTick = CurTime()
+			GameData.LocalPlayer.ShadowManTick = CurTime()
 		end
-	elseif IsValid(BenadrylSound) then
-		BenadrylSound:Stop()
-		BenadrylSound = nil
-	end
-end)
-
-hook.Add("HUDPaint", "Benadryl", function()
-	if LocalPlayer():GetNWBool("SurvivorBenadrylFull") then
-		if not LocalPlayer().BenadrylVisionTick then
-			LocalPlayer().BenadrylVisionTick = 10
-		end
-
-		if not LocalPlayer().BenadrylVision then
-			LocalPlayer().BenadrylVision = math.random(0, 30)
-		end
-
-		if LocalPlayer().BenadrylVisionTick < 1 then
-
-			local Overlay = Material("slashco/ui/overlays/benadryl_visions")
-			Overlay:SetInt("$frame", math.floor(LocalPlayer().BenadrylVision))
-
-			Overlay:SetFloat("$alpha", LocalPlayer().BenadrylVisionTick / 8)
-
-			surface.SetDrawColor(255, 255, 255, 255)
-			surface.SetMaterial(Overlay)
-			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
-
-		end
-
-		if LocalPlayer().BenadrylVisionTick < 0 then
-			LocalPlayer().BenadrylVision = math.random(0, 30)
-			LocalPlayer().BenadrylVisionTick = 1 + (math.random() * 5)
-		end
-
-		LocalPlayer().BenadrylVisionTick = LocalPlayer().BenadrylVisionTick - (RealFrameTime() * 1)
+	elseif IsValid(GameData.BenadrylSound) then
+		SlashCo.AudioSystem.DestroyChannel(GameData.BenadrylSound, 0)
+		GameData.BenadrylSound = nil
 	end
 end)

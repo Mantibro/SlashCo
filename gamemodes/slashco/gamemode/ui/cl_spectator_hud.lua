@@ -1,7 +1,3 @@
-net.Receive("mantislashcoLobbySlasherInformation", function()
-	LobbySlasherInfo = net.ReadTable()
-end)
-
 local blur = Material("pp/blurscreen")
 function SlashCo.Blur(panel)
 	local x, y = 0, 0
@@ -39,19 +35,17 @@ end
 
 local spin = 0
 local flash = 0
-
-hook.Add("HUDPaint", "Spectator_Vision", function()
-	local ply = LocalPlayer()
-
-	if ply:Team() ~= TEAM_SPECTATOR then
+local slashershow_tick = 0
+hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
+	local plyTeam = GameData.LocalPlayer:Team()
+	if plyTeam ~= TEAM_SPECTATOR then
 		return
 	end
 
 	--Cool Spectator Lobby Menu
-
-	if #team.GetPlayers(TEAM_SURVIVOR) < 1 and game.GetMap() == "sc_lobby" then
-		local srvwin_count = CL_srvwin_count or 0
-		local slswin_count = CL_slswin_count or 0
+	if GameData.IsLobby and team.NumPlayers(TEAM_SURVIVOR) == 0 then
+		local srvwin_count = GameData.LocalPlayer:GetSurvivorRoundsWon(0)
+		local slswin_count = GameData.LocalPlayer:GetSlasherRoundsWon(0)
 
 		SlashCo.Blur()
 
@@ -61,65 +55,65 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 			spin = 1
 		end
 
-		local blip = "☞ [,] ☜"
-		if #team.GetPlayers(TEAM_LOBBY) > 6 then
-			blip = "☓ [,] ☓"
+		local blip = "☞ [" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "] ☜"
+		if GameData.IsNewPlayer then
+			blip = SlashCo.Language("newplayer_spawnnotice", SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR")) --"Press [R] to Spawn"
 		else
-			flash = flash + RealFrameTime()
-			if flash > 1 then flash = 0 end
+			if team.NumPlayers(TEAM_LOBBY) > (GameData.MaxPlayers - 1) then
+				blip = "☓ [" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "] ☓"
+			else
+				flash = flash + RealFrameTime()
+				if flash > 1 then flash = 0 end
 
-			if flash > 0.5 then
-				blip = "☛[,]☚"
+				if flash > 0.5 then
+					blip = "☛[" .. SlashCo.GetKeyButtonName("TOGGLE_SPECTATOR") .. "]☚"
+				end
 			end
 		end
 
 		spinSkull(spin)
 
-		draw.SimpleText(SlashCo.Language("Welcome", string.upper(LocalPlayer():Nick())), "TVCD", ScrW() / 2, ScrH() / 3.5,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText(SlashCo.Language("Welcome", string.upper(GameData.LocalPlayer:Nick())), "TVCD", ScrW() / 2, ScrH() / 3.5,
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText("SLASHCO", "LobbyFont2", ScrW() / 2, ScrH() / 4,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText(blip, "TVCD", ScrW() / 2, ScrH() / 2,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
-		local players = CL_LobbyPlayers or #team.GetPlayers(TEAM_LOBBY)
-
-		draw.SimpleText("[" .. players .. " / 7]", "TVCD", ScrW() / 2, ScrH() / 2.5,
-				Color(255, 255, 255, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleText("[" .. team.NumPlayers(TEAM_LOBBY) .. " / " .. GameData.MaxPlayers .. "]", "TVCD", ScrW() / 2, ScrH() / 2.5,
+				color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 
 		draw.SimpleText("[" .. srvwin_count .. " " .. SlashCo.Language("SurvivorWins") .. "]  [" .. slswin_count .. " " .. SlashCo.Language("SlasherWins") .. "]",
 				"TVCD", ScrW() * 0.5, ScrH() * 0.75, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 
-	if LobbySlasherInfo ~= nil then
-		if LobbySlasherInfo.player ~= LocalPlayer():SteamID64() then
-			return
+	local pickedSlasher = GameData.LocalPlayer:GetPickedSlasher()
+	if pickedSlasher and pickedSlasher ~= "" then
+		if slashershow_tick < 255 then
+			slashershow_tick = slashershow_tick + (FrameTime() * 10)
+		else
+			slashershow_tick = 255
 		end
 
-		if slashershow_tick == nil then
-			slashershow_tick = 0
-		end
-		slashershow_tick = slashershow_tick + 0.25
-
-		draw.SimpleText("You will play as: " .. LobbySlasherInfo.slasher, "LobbyFont2", ScrW() * 0.5, ScrH() * 0.6, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		draw.SimpleText(SlashCo.Language("slasher_lobbyselection", pickedSlasher), "LobbyFont2", ScrW() * 0.5, ScrH() * 0.6, Color(255, 0, 0, slashershow_tick), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
-	if game.GetMap() == "sc_lobby" then
-		return
-	end
+	if GameData.IsLobby then return end
 
 	local show_slasher_anticipation = false
 
 	if SlasherTeam then
-		for i = 1, #SlasherTeam do
-			if SlasherTeam[i] and SlasherTeam[i].s_id == LocalPlayer():SteamID64() then
-				if LocalPlayer():GetNWString("Slasher") and LocalPlayer():GetNWString("Slasher") ~= show_slasher_anticipation then
+		local localSlasher = GameData.LocalPlayer:GetNWString("Slasher")
+		for _, slasherData in ipairs(SlasherTeam) do
+			if slasherData.steamid == GameData.LocalSteamID64 then
+				if localSlasher and localSlasher ~= show_slasher_anticipation then
 					local shower = "UNASSIGNED!"
-					if SlashCoSlashers[LocalPlayer():GetNWString("Slasher")] then
-						shower = SlashCo.Language(LocalPlayer():GetNWString("Slasher"))
+					if SlashCoSlashers[localSlasher] then
+						shower = SlashCo.Language(localSlasher)
 					end
+
 					show_slasher_anticipation = shower
 				end
 			end
@@ -128,77 +122,82 @@ hook.Add("HUDPaint", "Spectator_Vision", function()
 
 	if show_slasher_anticipation ~= false then
 		draw.SimpleText(SlashCo.Language("slasher_anticipation", show_slasher_anticipation), "LobbyFont2", ScrW() * 0.5, (ScrH() * 0.4), Color(255, 50, 50, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-		return
+		--return
 	end
 
 	if input.IsKeyDown(KEY_Q) then
 		return
 	end
 
-	if GetGlobalBool("SpectatorsCanPing") then
-		draw.SimpleText(SlashCo.Language("surv_ping", "MMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 230, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	if not show_slasher_anticipation then
+		if SlashCo.CanSpectatorsPing() then
+			draw.SimpleText(SlashCo.Language("surv_ping", SlashCo.GetKeyButtonName("PING")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 230, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+		end
+		
+		draw.SimpleText("[" .. SlashCo.Language("spectating") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.05, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
-	draw.SimpleText("[" .. SlashCo.Language("spectating") .. "]", "TVCD", ScrW() * 0.5, ScrH() * 0.05, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-
 	draw.SimpleText(SlashCo.Language("hide_info", "Q"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 290, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("toggle_halo", "ALT"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("toggle_halo_gas", "E"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("toggle_halo", string.upper(input.LookupBinding("+walk") or "ALT")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 200, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("toggle_halo_gas", string.upper(input.LookupBinding("+use") or "E")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 170, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("player_follow", "LMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 140, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("player_cycle", "RMB"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 110, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("switch_view", "SPACE"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
-	draw.SimpleText(SlashCo.Language("toggle_light", "R"), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("switch_view", SlashCo.GetKeyButtonName("SPECTATE_PLAYER")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
+	draw.SimpleText(SlashCo.Language("toggle_light", string.upper(input.LookupBinding("+reload") or "R")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 end)
 
 if CLIENT then
 	hook.Add("PlayerButtonDown", "TestConfig_ID", function(ply, button)
-		if ply ~= LocalPlayer() then
+		if ply ~= GameData.LocalPlayer then
 			return
 		end
 		if not IsFirstTimePredicted() then
 			return
 		end
-		if button ~= 107 or not SlashCoTestConfig then
+		if button ~= KEY_COUNT or not SlashCoTestConfig then
 			return
 		end
-
-		if IsValid(ply:GetEyeTrace().Entity) then
-			ply:ChatPrint("ENTITY SPAWNPOINT ID: " .. ply:GetEyeTrace().Entity:GetNWInt("SpawnPoint_ID"))
+		
+		local eyeTrace = ply:GetEyeTrace()
+		if IsValid(eyeTrace.Entity) then
+			ply:ChatPrint("ENTITY SPAWNPOINT ID: " .. eyeTrace.Entity:GetNWInt("SpawnPoint_ID"))
 		end
 	end)
 end
-
 
 hook.Add("KeyPress", "ToggleLight", function(ply, key)
 	if not IsFirstTimePredicted() then
 		return
 	end
-	if ply ~= LocalPlayer() or LocalPlayer():Team() ~= TEAM_SPECTATOR or SERVER then
+	if ply ~= GameData.LocalPlayer or GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR or SERVER then
 		return
 	end
-	if SlasherSteamID ~= nil and SlasherSteamID == LocalPlayer():SteamID64() then
+	if SlasherSteamID ~= nil and SlasherSteamID == GameData.LocalSteamID64 then
+		return
+	end
+	if GameData.IsLobby then
 		return
 	end
 
-	if key == 8192 then
+	if key == IN_RELOAD then
 		vision = not vision
-		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
 		Sndd:ChangePitch(100, 0)
 	end
 
-	if key == 262144 then
+	if key == IN_WALK then
 		showHalos = not showHalos
-		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
 		Sndd:ChangePitch(100, 0)
 	end
 
-	if key == 32 then
+	if key == IN_USE then
 		showGasCanHalos = not showGasCanHalos
-		local Sndd = CreateSound(ply, Sound("slashco/blip.wav"))
+		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
 		Sndd:ChangePitch(100, 0)
@@ -210,28 +209,28 @@ hook.Add("Think", "Spectator_Vision_Light", function()
 		vision = false
 	end
 
-	if LocalPlayer():Team() ~= TEAM_SPECTATOR then
+	if GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR then
 		return
 	end
 	if not vision then
 		return
 	end
 
-	if SlasherSteamID ~= nil and SlasherSteamID == LocalPlayer():SteamID64() then
+	if SlasherSteamID ~= nil and SlasherSteamID == GameData.LocalSteamID64 then
 		return
 	end
 
 	--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright )
 
-	local dlight = DynamicLight(LocalPlayer():EntIndex() + 984)
+	local dlight = DynamicLight(GameData.LocalPlayer:EntIndex())
 	if dlight then
-		dlight.pos = LocalPlayer():GetShootPos()
+		dlight.pos = GameData.LocalPlayer:GetShootPos()
 		dlight.r = 255
 		dlight.g = 255
 		dlight.b = 255
-		dlight.brightness = 1
+		dlight.brightness = 2
 		dlight.Decay = 1000
-		dlight.Size = 2500
+		dlight.Size = 1000
 		dlight.DieTime = CurTime() + 0.1
 	end
 end)
@@ -283,7 +282,7 @@ local cur_pos = Vector(0, 0, 0)
 local cur_ang = Angle(0, 0, 0)
 
 hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
-	if game.GetMap() ~= "sc_lobby" then
+	if not GameData.IsLobby then
 		return
 	end
 
@@ -291,16 +290,39 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 		return
 	end
 
+	if SlashCo.IsLobbyStarting() then
+		local helicopter = SlashCo.Helicopter
+		if not helicopter:IsValid() then return end
+
+		local helicopterPos = helicopter:GetPos()
+		local helicopterAng = helicopter:GetAngles()
+
+		local posOffset = Vector(-150, -80, 100)
+		local rotatedOffset = helicopterAng:Forward() * posOffset.x + helicopterAng:Right() * posOffset.y + helicopterAng:Up() * posOffset.z
+
+		cur_pos = helicopterPos + rotatedOffset
+		cur_ang = helicopterAng + Angle(20, -10, 0)
+		return GAMEMODE:CalcView(pl, cur_pos, cur_ang, fov)
+	end
+
+	if GameData.LocalIsSlasher then
+		return
+	end
+
 	if not cur_scene then
 		cur_scene = math.random(1, #cutscene_views)
 		cur_pos = cutscene_views[cur_scene].Start[1]
 		cur_ang = cutscene_views[cur_scene].Start[2]
+
+		net.Start("slashCo_SpectatorSceneToPVS")
+			net.WriteVector(cur_pos)
+		net.SendToServer()
 	end
 
 	local cur_dist = cur_pos:Distance( cutscene_views[cur_scene].Stop[1] )
 
 	if cur_dist > 1 then
-		local add = (cutscene_views[cur_scene].Stop[1] - cur_pos):GetNormalized()*RealFrameTime() * 30
+		local add = (cutscene_views[cur_scene].Stop[1] - cur_pos):GetNormalized() * RealFrameTime() * 30
 		cur_pos = cur_pos + add * cutscene_views[cur_scene].Speed
 
 		local total_dist = cutscene_views[cur_scene].Start[1]:Distance( cutscene_views[cur_scene].Stop[1] )
@@ -311,6 +333,10 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 		cur_scene = math.random(1, #cutscene_views)
 		cur_pos = cutscene_views[cur_scene].Start[1]
 		cur_ang = cutscene_views[cur_scene].Start[2]
+
+		net.Start("slashCo_SpectatorSceneToPVS")
+			net.WriteVector(cur_pos)
+		net.SendToServer()
 	end
 
 	return GAMEMODE:CalcView(pl, cur_pos, cur_ang, fov)

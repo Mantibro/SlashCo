@@ -1,7 +1,7 @@
 --[[
 
-    Language: en, (Pirate English), (Pirate English)
-    "Translator": Kōfuku
+	Language: en, (Pirate English), (Pirate English)
+	"Translator": Kōfuku
 
 ]]
 
@@ -23,6 +23,9 @@ SlashCo.LangTable["SomeRescued"] = "Only some o' th' buccaneers be back aboard."
 SlashCo.LangTable["NoneRescued"] = "Th' win'ed galleon be empty o' maties"
 SlashCo.LangTable["Cursed"] = "Yer soul be Davy Jone's now."
 SlashCo.LangTable["Judgement"] = "JUDGEMENT"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Press [%s] t’ be castin’ yer lot into this here world"
+SlashCo.LangTable["slasher_replacement"] = "Ye be chosen as the new slasher"
+SlashCo.LangTable["item_refund"] = "Ye got %s points refunded fer yer loot"
 
 SlashCo.LangTable["InLobby"] = "In Lobby"
 SlashCo.LangTable["inGame"] = "In Game (%s)"
@@ -530,20 +533,21 @@ SlashCo.LangTable["cant_fuel"] = "[ALREADY FULL]"
 SlashCo.LangTable["cant_power"] = "[ALREADY HAS A BATTERY]"
 
 --main objectives
-SlashCo.LangTable["objective_generators"] = "POWER %s GENERATORS"
+SlashCo.LangTable["objective_generators"] = "POWER %s/%s GENERATORS"
 SlashCo.LangTable["objective_generator"] = "POWER 1 GENERATOR"
 SlashCo.LangTable["objective_heliwait"] = "WAIT FER TH' GALLEON"
 SlashCo.LangTable["objective_helicopter"] = "GET IN TH' GALLEON"
 
 --optional objectives
-SlashCo.LangTable["objective_trashs"] = "(OPTIONAL) GATHER %s PIECES O' GARBAGE" --item spawns
-SlashCo.LangTable["objective_trash"] = "(OPTIONAL) GATHER 1 PIECE O' GARBAGE"
-SlashCo.LangTable["objective_mops"] = "(OPTIONAL) MOP %s SPILLS" --gen spawns
-SlashCo.LangTable["objective_mop"] = "(OPTIONAL) MOP 1 SPILL"
-SlashCo.LangTable["objective_traps"] = "(OPTIONAL) RESET %s MOUSETRAPS" --battery spawns
-SlashCo.LangTable["objective_trap"] = "(OPTIONAL) RESET 1 MOUSETRAP"
-SlashCo.LangTable["objective_pages"] = "(OPTIONAL) COLLECT %s DOCUMENTS" --gascan spawns
-SlashCo.LangTable["objective_page"] = "(OPTIONAL) COLLECT 1 DOCUMENT"
+SlashCo.LangTable["optional"] = "OPTIONAL"
+SlashCo.LangTable["objective_trashs"] = "GATHER %s/%s PIECES O' GARBAGE" --item spawns
+SlashCo.LangTable["objective_trash"] = "GATHER 1 PIECE O' GARBAGE"
+SlashCo.LangTable["objective_mops"] = "MOP %s/%s SPILLS" --gen spawns
+SlashCo.LangTable["objective_mop"] = "MOP 1 SPILL"
+SlashCo.LangTable["objective_traps"] = "RESET %s/%s MOUSETRAPS" --battery spawns
+SlashCo.LangTable["objective_trap"] = "RESET 1 MOUSETRAP"
+SlashCo.LangTable["objective_pages"] = "COLLECT %s/%s DOCUMENTS" --gascan spawns
+SlashCo.LangTable["objective_page"] = "COLLECT 1 DOCUMENT"
 
 --points summary
 SlashCo.LangTable["point_summary"] = "- DOUBLOONS STOLEN -"
@@ -567,6 +571,7 @@ SlashCo.LangTable["points_left_behind"] = "[%s] LEFT BEHIND"
 SlashCo.LangTable["points_survive"] = "[%s] SURVIVED"
 
 SlashCo.LangTable["points_item"] = "[%s] ITEM BUY-BACK" --misc points
-SlashCo.LangTable["points_fast"] = "[%s] SWIFT SUCCESS"
+SlashCo.LangTable["points_quickescape"] = "[%s] QUICK ESCAPE"
+SlashCo.LangTable["points_slowescape"] = "[%s] SLOW ESCAPE"
 SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] DOIN' YER JOB"

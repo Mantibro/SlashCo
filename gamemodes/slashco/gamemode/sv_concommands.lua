@@ -19,7 +19,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 		return
 	end
 
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		doPrint(ply, "Cannot assign a player as a survivor while in the lobby.")
 		return
 	end
@@ -42,7 +42,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 
 		if not IsValid(target) then
 			local targetSelect, tooMany
-			for _, v in ipairs(player.GetAll()) do
+			for _, v in player.Iterator() do
 				if string.find(v:Nick(), args[1]) then
 					if targetSelect then
 						tooMany = true
@@ -51,10 +51,12 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 					targetSelect = v
 				end
 			end
+
 			if tooMany then
 				doPrint(ply, "There's more than one player your arguments apply to.")
 				return
 			end
+
 			if targetSelect then
 				target = targetSelect
 			end
@@ -68,14 +70,15 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 
 	local id = target:SteamID64()
 	for k, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
-		if v.s_id == id then
+		if v.steamid == id then
 			SlashCo.CurRound.SlasherData.AllSlashers[k] = nil
 			break
 		end
 	end
+
 	local found
 	for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-		if v.id == id then
+		if v.steamid == id then
 			found = true
 			break
 		end
@@ -84,7 +87,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 	SlashCo.CurRound.Slashers[target:SteamID64()] = nil
 
 	if not found then
-		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = id, GameContribution = 0 })
+		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = id })
 	end
 
 	doPrint(ply, "New Survivor successfully assigned.")
@@ -105,7 +108,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		return
 	end
 
-	if game.GetMap() == "sc_lobby" then
+	if GameData.IsLobby then
 		doPrint(ply, "Cannot assign a player as a slasher while in the lobby.")
 		return
 	end
@@ -133,7 +136,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 
 		if not IsValid(target) then
 			local targetSelect, tooMany
-			for _, v in ipairs(player.GetAll()) do
+			for _, v in player.Iterator() do
 				if string.find(v:Nick(), args[2]) then
 					if targetSelect then
 						tooMany = true
@@ -157,22 +160,24 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		end
 	end
 
-	local id = target:SteamID64()
+	local steamid = target:SteamID64()
 	for k, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
-		if v.id == id then
+		if v.steamid == steamid then
 			SlashCo.CurRound.SlasherData.AllSurvivors[k] = nil
 			break
 		end
 	end
+
 	local found
 	for _, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
-		if v.s_id == id then
+		if v.steamid == steamid then
 			found = true
 			break
 		end
 	end
+
 	if not found then
-		table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { s_id = id, slasherkey = args[1] })
+		table.insert(SlashCo.CurRound.SlasherData.AllSlashers, { steamid = steamid, slasherID = args[1] })
 	end
 
 	SlashCo.SelectSlasher(args[1], target:SteamID64())
@@ -182,9 +187,11 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		if not IsValid(target) then
 			return
 		end
+
 		if IsValid(ply) then
 			doPrint(ply, "New Slasher successfully assigned.")
 		end
+
 		SlashCo.DropAllItems(target)
 		target:StripWeapons()
 		target:SetTeam(TEAM_SLASHER)
@@ -259,7 +266,7 @@ concommand.Add("slashco_debug_run_survivor", function(ply)
 			k:SetTeam(TEAM_SURVIVOR)
 			k:Spawn()
 
-			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { id = k:SteamID64(), GameContribution = 0 })
+			table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = k:SteamID64() })
 			doPrint(ply, k:Name() .. " is now a survivor")
 		end
 	end)
@@ -275,31 +282,33 @@ concommand.Add("slashco_debug_datatest_makedummy", function(ply)
 		return
 	end
 
-	if CLIENT then
-		return
-	end
-
-	if not sql.TableExists("slashco_table_basedata") and not sql.TableExists("slashco_table_survivordata") and not sql.TableExists("slashco_table_slasherdata") then
+	if cookie.GetString("slashco_table_basedata") == nil and not sql.TableExists("slashco_table_survivordata") and not sql.TableExists("slashco_table_slasherdata") then
 		--Create the database table
 
 		local diff = SlashCo.LobbyData.SelectedDifficulty
 		local offer = SlashCo.LobbyData.Offering
 		local survivorgasmod = SlashCo.LobbyData.SurvivorGasMod
-		--local slasher1id = GetRandomSlasher()
 		local slasher1id = "Abomignat"
-		local slasher2id = GetRandomSlasher()
 
-		sql.Query("CREATE TABLE slashco_table_basedata(Difficulty NUMBER , Offering NUMBER , SlasherIDPrimary TEXT , SlasherIDSecondary TEXT , SurviorGasMod NUMBER);")
-		sql.Query("CREATE TABLE slashco_table_survivordata(Survivors TEXT, Item TEXT);")
-		sql.Query("CREATE TABLE slashco_table_slasherdata(Slashers TEXT);")
+		sql.Query("CREATE TABLE slashco_table_survivordata(SteamID TEXT, Item TEXT, Item2 TEXT);")
+		sql.Query("CREATE TABLE slashco_table_slasherdata(SteamID TEXT, SlasherID TEXT);")
 
-		sql.Query("INSERT INTO slashco_table_slasherdata( Slashers ) VALUES( 76561198070087838 );")
-		sql.Query("INSERT INTO slashco_table_survivordata( Survivors, Item ) VALUES( 90071996842377216, " .. sql.SQLStr("none") .. " );")
-		sql.Query("INSERT INTO slashco_table_basedata( Difficulty, Offering, SlasherIDPrimary, SlasherIDSecondary, SurviorGasMod ) VALUES( " .. diff .. ", " .. offer .. ", '" .. slasher1id .. "', '" .. slasher2id .. "', " .. survivorgasmod .. " );")
+		sql.Query("INSERT INTO slashco_table_slasherdata( SteamID, SlasherID ) VALUES( 76561198070087838, " .. sql.SQLStr(slasher1id) .. " );")
+		sql.Query("INSERT INTO slashco_table_survivordata( SteamID, Item, Item2 ) VALUES( 90071996842377216, " .. sql.SQLStr("none") .. ", " .. sql.SQLStr("none") .. " );")
+
+		local slasherTable = SlashCo.GetSlasherTable(slasher1id)
+		cookie.Set("slashco_table_basedata", util.TableToJSON({
+			Difficulty = diff,
+			SlasherDanger = SlashCo.DangerLevel.Unknown,
+			SlasherClass = SlashCo.DangerLevel.Unknown,
+			SlasherID = 0,
+			Offering = offer,
+			SurviorGasMod = survivorgasmod,
+		}))
 		doPrint(ply, "Dummy Database made.")
 	else
 		doPrint(ply, "Database already exists.")
-		local baseTable = sql.TableExists("slashco_table_basedata") and "present" or "nil"
+		local baseTable = (cookie.GetString("slashco_table_basedata") ~= nil) and "present" or "nil"
 		local survivorTable = sql.TableExists("slashco_table_survivordata") and "present" or "nil"
 		local slasherTable = sql.TableExists("slashco_table_slasherdata") and "present" or "nil"
 		doPrint(ply, "base table: " .. baseTable)
@@ -311,21 +320,17 @@ concommand.Add("slashco_debug_datatest_makedummy", function(ply)
 end, nil, "Make a bare-minimum data table to be able to run a round.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_datatest_read", function(ply)
-	if CLIENT then
-		return
-	end
-
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
 		doPrint(ply, "Only admins can use debug commands!")
 		return
 	end
 
 	doPrint(ply, "basedata: ")
-	PrintTable(sql.Query("SELECT * FROM slashco_table_basedata; ") or "nil")
+	PrintTable(util.JSONToTable(cookie.Get("slashco_table_basedata") or "") or {})
 	doPrint(ply, "survivordata: ")
-	PrintTable(sql.Query("SELECT * FROM slashco_table_survivordata; ") or "nil")
+	PrintTable(sql.Query("SELECT * FROM slashco_table_survivordata;") or "nil")
 	doPrint(ply, "slasherdata: ")
-	PrintTable(sql.Query("SELECT * FROM slashco_table_slasherdata; ") or "nil")
+	PrintTable(sql.Query("SELECT * FROM slashco_table_slasherdata;") or "nil")
 end, nil, "Read out the current data table.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_datatest_error", function(ply, _, _)
@@ -334,33 +339,25 @@ concommand.Add("slashco_debug_datatest_error", function(ply, _, _)
 		return
 	end
 
-	if SERVER then
-		doPrint(ply, sql.LastError())
-	end
+	doPrint(ply, sql.LastError())
 end, nil, "Print the latest data error.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_datatest_delete", function(_, _, _)
-	if SERVER then
-		SlashCo.ClearDatabase()
-	end
+	SlashCo.ClearDatabase()
 end, nil, "Delete the current data table.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 --//items//--
 
 concommand.Add("slashco_give_item", function(ply, _, args)
-	if CLIENT then
-		return
-	end
-
 	if ply:Team() ~= TEAM_SURVIVOR then
 		doPrint(ply, "Only survivors can have items")
 		return
 	end
 
 	if SlashCoItems[args[1]] then
-		SlashCo.ChangeSurvivorItem(ply, args[1])
+		SlashCo.ChangeSurvivorItem(ply, "item", args[1])
 	else
-		SlashCo.ChangeSurvivorItem(ply, "none")
+		SlashCo.ChangeSurvivorItem(ply, "item", "none")
 	end
 end, function(cmd, args)
 	--this is for autocomplete
@@ -377,6 +374,62 @@ end, function(cmd, args)
 	end
 	return tbl1
 end, "Give yourself an item", FCVAR_CHEAT)
+
+concommand.Add("slashco_give_points", function(ply, _, args)
+	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+		doPrint(ply, "Only admins can use debug commands!")
+		return
+	end
+
+	local target = ply
+	if args[1] then
+		target = nil
+
+		if tonumber(args[1]) then
+			target = Player(tonumber(args[1]))
+
+			if not IsValid(target) then
+				target = player.GetBySteamID64(args[1])
+			end
+		end
+
+		if not IsValid(target) then
+			target = player.GetBySteamID(args[1])
+		end
+
+		if not IsValid(target) then
+			local targetSelect, tooMany
+			for _, v in player.Iterator() do
+				if string.find(v:Nick(), args[1]) then
+					if targetSelect then
+						tooMany = true
+						break
+					end
+					targetSelect = v
+				end
+			end
+			if tooMany then
+				doPrint(ply, "There's more than one player your arguments apply to.")
+				return
+			end
+			if targetSelect then
+				target = targetSelect
+			end
+		end
+
+		if not IsValid(target) then
+			doPrint(ply, "Not a valid target.")
+			return
+		end
+	end
+
+	local steamid = target:SteamID64()
+	local name = target:Nick()
+	local number = "number" and args[2] or 0
+
+	SlashCoDatabase.UpdateStats(steamid, "Points", number)
+	doPrint(ply, "Player " .. name .. " received " .. number.. " points")
+end, "Give a player more points", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_printents", function(ply, _, args)
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
@@ -397,7 +450,7 @@ concommand.Add("slashco_debug_printents", function(ply, _, args)
 
 		if class == "sc_generator" then
 			genCount = genCount + 1
-			cansNeeded = cansNeeded + (v.CansRemaining or GetGlobal2Int("SlashCoGasCansPerGenerator", SlashCo.GasPerGen))
+			cansNeeded = cansNeeded + (v.CansRemaining or SlashCo.GetGasCansPerGenerator())
 			if not v.HasBattery then
 				batsNeeded = batsNeeded + 1
 			end
@@ -468,3 +521,209 @@ concommand.Add("slashco_debug_printbats", function(ply)
 
 	doPrint(ply, string.format("total: %s", count))
 end, nil, "Print all battery spawns and their associated generators", FCVAR_CHEAT + FCVAR_PROTECTED)
+
+-- NOTE: This could be abused.
+-- ToDo: Verify that its accurate enouth to not be abused. Maybe add a distance limit
+concommand.Add("slashco_unstuck", function(ply, _, args)
+	if not ply:IsStuck() then
+		ply:ChatPrint("Your not stuck.")
+		return
+	end
+
+	ply:ChatPrint("Look at a free spot and wait 3 seconds")
+	timer.Simple(3, function()
+		local pos = ply:GetEyeTrace().HitPos
+		local tr = util.TraceEntityHull({
+			start = pos,
+			endpos = pos,
+			filter = ply,
+		}, ply)
+
+		if not tr.Hit then
+			ply:SetPos(tr.HitPos)
+		end
+	end)
+end)
+
+timer.Create("SlashCo:CheckStuck", 5, 0, function()
+	for _, ply in player.Iterator() do
+		if not ply:IsStuck() then continue end
+		if ply.IsImpervious and not ply:IsStuck(true) then continue end
+		if SlashCo.State != SlashCo.States.IN_GAME then continue end
+
+		ply._STUCKCOUNT = (ply._STUCKCOUNT or 0) + 1
+		if ply._STUCKCOUNT >= 3 then
+			ply:ChatPrint("If your stuck, run the \"slashco_unstuck\" console command and look at a free spot")
+			ply._STUCKCOUNT = 0
+		end
+	end
+end)
+
+concommand.Add("slashco_debug_lobbybot", function(ply)
+	if GameData.LobbyBot and GameData.LobbyBot:IsValid() then
+		GameData.LobbyBot:Kick("Bye")
+	end
+
+	timer.Simple(0, function()
+		GameData.LobbyBot = player.CreateNextBot("Bot")
+
+		timer.Simple(0, function()
+			if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
+
+			hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_R)
+		end)
+	end)
+end)
+
+concommand.Add("slashco_debug_lobbybot_readysurvivor", function(ply)
+	if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
+
+	hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_F1)
+end)
+
+concommand.Add("slashco_debug_lobbybot_readyslasher", function(ply)
+	if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
+
+	hook.Run("PlayerButtonDown", GameData.LobbyBot, KEY_F2)
+end)
+
+hook.Add("StartCommand", "LobbyBot", function(ply, cmd)
+	if ply != GameData.LobbyBot then return end
+
+	cmd:ClearMovement() 
+	cmd:ClearButtons()
+
+	if ply:Team() == TEAM_SURVIVOR then
+		if not ply._REACHED_ELEVATOR then
+			ply._REACHED_ELEVATOR = CurTime()
+			local elevator = ents.FindByClass("func_movelinear")[1]
+			if not IsValid(elevator) then return end
+
+			ply:SetPos(elevator:GetPos() + Vector(0, 0, 10))
+		end
+
+		if (CurTime() - (ply._REACHED_ELEVATOR or 0)) > 30 and not g_SlashCoDebug then
+			if not IsValid(SlashCo.Helicopter) then return end
+			if ply:InVehicle() then return end -- RaphaelIT7: Holy shit, since I had forgotten this, the bot spammed entered... 7000+ helicoper seats got created
+
+			SlashCo.Helicopter:Use(ply, ply)
+		end
+	end
+end)
+
+local bannedslashers = CreateConVar("slashco_bannedslashers", "", FCVAR_ARCHIVE, "A list with all banned slashers seperated using ;")
+function SlashCo.GetBannedSlashers(reverseOnly)
+	local banned = bannedslashers:GetString()
+	if banned == "" then
+		return {}
+	end
+
+	local results = string.Split(banned, ";")
+	for id, slasherName in ipairs(results) do -- Add additional entries so you can do things like: if result[SlasherName] then [code] end
+		if reverseOnly then
+			results[slasherName] = true
+			results[id] = nil
+		else
+			results[slasherName] = id -- We set the ID as value so that you can call table.remove(result, result[SlasherName]) to quickly remove a entry
+		end
+	end
+
+	return results
+end
+
+-- Tries to find the slasher by the slasherID, allowing you to use the slasher name, the registered name, or even the ID number that a slasher uses.
+local function SlasherIDToSlasher(slasherID)
+	local slasher = SlashCoSlashers[slasherID]
+	if not slasher then
+		slasherID = string.lower(tostring(slasherID))
+		for slasherName, slasherTbl in pairs(SlashCoSlashers) do
+			if string.lower(slasherTbl.Name) == slasherID or tostring(slasherTbl.ID) == slasherID then
+				slasher = slasherTbl
+				break
+			end
+		end
+
+		if not slasher then
+			return nil
+		end
+	end
+
+	return slasher, slasher.Name
+end
+
+function SlashCo.IsSlasherBanned(slasherID)
+	local slasher, slasherID = SlasherIDToSlasher(slasherID)
+	if not slasher then
+		return false
+	end
+
+	local banned = SlashCo.GetBannedSlashers()
+	return banned[slasherID] ~= nil
+end
+
+function SlashCo.BanSlasher(slasherID)
+	local slasher, slasherID = SlasherIDToSlasher(slasherID)
+	if not slasher then
+		return false
+	end
+
+	local banned = SlashCo.GetBannedSlashers()
+	if banned[slasherID] then
+		return true
+	end
+
+	table.insert(banned, slasherID)
+	bannedslashers:SetString(table.concat(banned, ";"))
+	return true
+end
+
+function SlashCo.UnbanSlasher(slasherID)
+	local slasher, slasherID = SlasherIDToSlasher(slasherID)
+	if not slasher then
+		return false
+	end
+
+	local banned = SlashCo.GetBannedSlashers()
+	if not banned[slasherID] then
+		return true
+	end
+
+	table.remove(banned, banned[slasherID])
+	bannedslashers:SetString(table.concat(banned, ";"))
+	return true
+end
+
+concommand.Add("slashco_banslasher", function(ply, _, _, argStr)
+	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+		doPrint(ply, "Only admins can use this command!")
+		return
+	end
+
+	if SlashCo.BanSlasher(argStr) then
+		doPrint(ply, "Successfully banned slasher \"" .. argStr .. "\"")
+	else
+		doPrint(ply, "Failed to ban slasher \"" .. argStr .. "\", you probably wrote the name wrong")
+	end
+end)
+
+concommand.Add("slashco_unbanslasher", function(ply, _, _, argStr)
+	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+		doPrint(ply, "Only admins can use this command!")
+		return
+	end
+
+	if SlashCo.BanSlasher(argStr) then
+		doPrint(ply, "Successfully unbanned slasher \"" .. argStr .. "\"")
+	else
+		doPrint(ply, "Failed to unban slasher \"" .. argStr .. "\", you probably wrote the name wrong")
+	end
+end)
+
+concommand.Add("slashco_announcement", function(ply, _, _, argStr)
+	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
+		doPrint(ply, "Only admins can use this command!")
+		return
+	end
+
+	SlashCo.BroadcastAnnouncement(argStr)
+end)

@@ -1,83 +1,85 @@
-net.Receive("mantislashcoOfferingVoteOut", function()
-	local t = net.ReadTable()
+net.Receive("SlashCo:OfferingVoteOut", function()
+	local offeror = net.ReadEntity()
+	GameData.OfferingName = net.ReadString()
+	GameData.OfferorName = IsValid(offeror) and offeror:GetName() or nil
 
-	offeror_name = player.GetBySteamID64(t.ply):GetName()
-
-	offering_name = t.name
-
-	if offeror_name == nil or offering_name == nil then
-		show_vote_screen = false
+	if GameData.OfferorName == nil or GameData.OfferingName == "" then
+		GameData.ShowVoteScreen = false
 		return
 	end
 
-	if t.ply == LocalPlayer():SteamID64() then
-		show_vote_screen = false
+	if offeror == GameData.LocalPlayer then
+		GameData.ShowVoteScreen = false
 		return
 	end
 
-	show_vote_screen = true
+	GameData.ShowVoteScreen = true
 end)
 
-net.Receive("mantislashcoOfferingEndVote", function()
-	local t = net.ReadTable()
+net.Receive("SlashCo:OfferingEndVote", function()
+	local steamID64 = net.ReadUInt64()
 
-	if t.ply ~= LocalPlayer():SteamID64() then
+	if steamID64 ~= GameData.LocalSteamID64 then
 		return
 	end
 
-	show_vote_screen = false
+	GameData.ShowVoteScreen = false
 end)
 
-net.Receive("mantislashcoOfferingVoteFinished", function()
-	local t = net.ReadTable()
+net.Receive("SlashCo:OfferingVoteFinished", function()
+	GameData.OfferingRarity = net.ReadUInt(2)
 
-	offering_vote_result = t.r
-
-	show_offering_result_screen = true
+	GameData.ShowOfferingResultScreen = true
 end)
 
-hook.Add("HUDPaint", "OfferingVoteHUD", function()
-	local ply = LocalPlayer()
-
-	if show_offering_result_screen == true then
-		if offerjingle_antispam == nil then
-			surface.PlaySound("slashco/music/slashco_offering_" .. offering_vote_result .. ".mp3")
-			offerjingle_antispam = true
+hook.Add("SlashCo:DrawHUD", "OfferingVoteHUD", function()
+	if GameData.ShowOfferingResultScreen then
+		if GameData.OfferingSoundAntiSpam == nil then
+			local ID = "offering_" .. (GameData.OfferingRarity or 1)
+			--[[SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/music/slashco_" .. ID .. ".mp3",
+				identifier = ID,
+				volume = 1,
+				entity = 0,
+			})]]
+			surface.PlaySound("slashco/music/slashco_" .. ID .. ".mp3")
+			GameData.OfferingSoundAntiSpam = true
 		end
 
-		stop_lobbymusic = true
+		SlashCo.AudioSystem.DisableBackgroundMusic()
 
-		if o_tick == nil then
-			o_tick = 1
+		if GameData.OfferingTick == nil then
+			GameData.OfferingTick = 1
 		end
-		if o_tick ~= 0 then
-			o_tick = o_tick + 1
-		end
-
-		if o_tick > 3000 then
-			o_tick = -255
+		if GameData.OfferingTick ~= 0 then
+			GameData.OfferingTick = GameData.OfferingTick + 1
 		end
 
-		if o_tick == 0 then
-			show_offering_result_screen = false
-			stop_lobbymusic = false
-			lobbymusic_antispam = false
+		if GameData.OfferingTick > 3000 then
+			GameData.OfferingTick = -255
 		end
 
-		draw.SimpleText(SlashCo.Language("offervote_success", SlashCo.Language("Offering_name", offering_name)),
-				"LobbyFont2", ScrW() * 0.5, ScrH() * 0.5, Color(255, 255, 255, math.abs(o_tick)), TEXT_ALIGN_CENTER,
+		if GameData.OfferingTick == 0 then
+			GameData.ShowOfferingResultScreen = false
+			GameData.OfferingSoundAntiSpam = nil
+			GameData.OfferingTick = 1
+			SlashCo.AudioSystem.EnableBackgroundMusic()
+		end
+
+		draw.SimpleText(SlashCo.Language("offervote_success", SlashCo.Language("Offering_name", GameData.OfferingName or "")),
+				"LobbyFont2", ScrW() * 0.5, ScrH() * 0.5, Color(255, 255, 255, math.abs(GameData.OfferingTick)), TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_TOP)
 	end
 
-	if ply:Team() ~= TEAM_LOBBY then
+	if GameData.LocalPlayer:Team() ~= TEAM_LOBBY then
 		return
 	end
 
-	if show_vote_screen ~= true then
+	if GameData.ShowVoteScreen ~= true then
 		return
 	end
 
-	draw.SimpleText(SlashCo.Language("offervote_1", offeror_name, SlashCo.Language("Offering_name", offering_name)),
+	draw.SimpleText(SlashCo.Language("offervote_1", GameData.OfferorName, SlashCo.Language("Offering_name", GameData.OfferingName or "")),
 			"LobbyFont1", ScrW() * 0.5, ScrH() * 0.27, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 
 	draw.SimpleText("[F4]", "TVCD", ScrW() * 0.5, ScrH() * 0.33, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)

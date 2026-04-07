@@ -11,22 +11,39 @@ function SlashCo.RegisterSlasher(table, name)
 		return
 	end
 
+	name = name or table.Name
 	SlashCoSlashers[name] = table
+
+	if SERVER then
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
+			if slasherTbl.OnBalanceForPlayers then
+				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+			end
+		end
+
+		if SC_CURRENT_SLASHER_FILE then
+			SlashCo.PrecacheSlasherAddon(SC_CURRENT_SLASHER_FILE)
+		end
+	end
 end
 
 function SlashCo.GetSlasherTable(name)
 	return SlashCoSlashers[name]
 end
 
-SC_LOADEDSLASHERS = nil
-
-local slasher_files = file.Find("slashco/slasher/*.lua", "LUA")
-for _, v in ipairs(slasher_files) do
-	AddCSLuaFile("slashco/slasher/" .. v)
-	include("slashco/slasher/" .. v)
+function SlashCo.LoadSlashers()
+	SC_LOADEDSLASHERS = nil
+	local slasher_files = file.Find("slashco/slasher/*.lua", "LUA")
+	for _, v in ipairs(slasher_files) do
+		AddCSLuaFile("slashco/slasher/" .. v)
+		SC_CURRENT_SLASHER_FILE = "slashco/slasher/" .. v
+		include("slashco/slasher/" .. v)
+		SC_CURRENT_SLASHER_FILE = nil
+	end
+	SC_LOADEDSLASHERS = true
 end
-
-SC_LOADEDSLASHERS = true
+SlashCo.LoadSlashers()
 
 ---remainder of init code
 
@@ -51,64 +68,93 @@ function PLAYER:SlasherFunction(value, ...)
 	end
 end
 
+function PLAYER:SlasherStunDeafen(duration)
+	local currentDuration = self:GetDeafenTime() - CurTime()
+	if currentDuration < 0 then
+		currentDuration = 0
+	end
+
+	if currentDuration > duration then return end -- Something already deafened him for longer. So we return to avoid conflicts.
+	self:SetDeafenTime(CurTime() + duration)
+end
+
+function PLAYER:SlasherIsStunDeaf()
+	return self:GetDeafenTime() > CurTime()
+end
+
 function TranslateSlasherClass(id)
-	if id == 0 then
-		return "Unknown"
-	end
-	if id == 1 then
-		return "Cryptid"
-	end
-	if id == 2 then
-		return "Demon"
-	end
-	if id == 3 then
-		return "Umbra"
-	end
+	return SlashCo.SlasherClass[id]
 end
 
 function TranslateDangerLevel(id)
-	if id == 0 then
-		return "Unknown"
-	end
-	if id == 1 then
-		return "Moderate"
-	end
-	if id == 2 then
-		return "Considerable"
-	end
-	if id == 3 then
-		return "Devastating"
-	end
+	return SlashCo.DangerLevel[id]
 end
 
-function GetRandomSlasher()
-	local keys = table.GetKeys(SlashCoSlashers)
-	local rand, rand_name
-	repeat
-		rand = math.random(1, #keys)
-		rand_name = keys[rand] --random id for this roll
-	until SlashCoSlashers[rand_name].IsSelectable and rand_name ~= "Leuonard"
+function SlashCo.GetRandomSlasher(dangerlevel, slasherClass)
+	dangerlevel = dangerlevel or SlashCo.DangerLevel.Unknown
+	slasherClass = slasherClass or SlashCo.SlasherClass.Unknown
 
-	return rand_name
+	local acceptableSlashers = {}
+	for id, slasher in pairs(SlashCoSlashers) do
+		if not slasher.IsSelectable then continue end
+		if slasher.Name == "Leuonard" then continue end
+
+		if dangerlevel ~= SlashCo.DangerLevel.Unknown and dangerlevel ~= slasher.DangerLevel then continue end
+		if slasherClass ~= SlashCo.SlasherClass.Unknown and slasherClass ~= slasher.Class then continue end
+
+		table.insert(acceptableSlashers, id)
+	end
+
+	return acceptableSlashers[math.random(1, #acceptableSlashers)]
+end
+
+-- RaphaelIT7: No AddSlasherAnger for client!
+
+function SlashCo.GetSlasherAnger(slasher)
+	return slasher:GetNW2Float("SlasherAnger", 0)
+end
+
+function SlashCo.GetGlobalSlasherAnger()
+	local slashers = team.GetPlayers(TEAM_SLASHER)
+	local count = #slashers
+	local totalAnger = 0
+
+	for _, slasher in ipairs(slashers) do
+		totalAnger = totalAnger + SlashCo.GetSlasherAnger(slasher)
+	end
+
+	return totalAnger / count
+end
+
+function SlashCo.GetHighestSlasherAnger()
+	local highestAnger = 0
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		local anger = SlashCo.GetSlasherAnger(slasher)
+		if anger > highestAnger then
+			highestAnger = anger
+		end
+	end
+
+	return highestAnger
 end
 
 --Slasher Animation Controller
-hook.Add("CalcMainActivity", "SlashCoSlasherAnimator", function(ply, vel)
+hook.Add("CalcMainActivity", "SlashCo:SlasherAnimator", function(ply, vel)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Animator", vel)
 end)
 
-hook.Add("PlayerFootstep", "SlashCoSlasherFootstep", function(ply)
+hook.Add("PlayerFootstep", "SlashCo:SlasherFootstep", function(ply)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Footstep")
 end)
 
-hook.Add("Move", "SlashCoSlasherMove", function(ply, mv)
+hook.Add("Move", "SlashCo:SlasherMove", function(ply, mv)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("Move", mv)
 end)
 
-hook.Add("FinishMove", "SlashCoSlasherFinishMove", function(ply, mv)
+hook.Add("FinishMove", "SlashCo:SlasherFinishMove", function(ply, mv)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("FinishMove", mv)
 end)
@@ -116,31 +162,32 @@ end)
 if CLIENT then
 	local StepNotice = Material("slashco/ui/particle/step_notice")
 	local timeSinceLast = 0
-	hook.Add("Think", "Slasher_Vision_Light", function()
-		if LocalPlayer():Team() ~= TEAM_SLASHER then
+	local emitter = nil
+	hook.Add("Think", "SlashCo:SlasherVisionLight", function()
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			return
 		end
 
-		local Eyesight = LocalPlayer():GetNWInt("Slasher_Eyesight")
+		local Eyesight = GameData.LocalPlayer:GetEyeSight(1)
 
 		--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright )
 
-		local dlight = DynamicLight(LocalPlayer():EntIndex())
+		local dlight = DynamicLight(GameData.LocalPlayer:EntIndex())
 		if dlight then
-			dlight.pos = LocalPlayer():GetShootPos()
+			dlight.pos = GameData.LocalPlayer:GetShootPos()
 			dlight.r = 50 + (Eyesight * 2)
 			dlight.g = 50 + (Eyesight * 2)
 			dlight.b = 50 + (Eyesight * 2)
-			dlight.brightness = 0.1 + Eyesight / 50
+			dlight.brightness = 0.2 + Eyesight / 50
 			dlight.Decay = 1000
-			dlight.Size = 70 + 250 * Eyesight
+			dlight.Size = 100 + 250 * Eyesight
 			dlight.DieTime = CurTime() + 1
 		end
 
-		local slasherpos = LocalPlayer():GetPos()
+		local slasherpos = GameData.LocalPlayer:GetPos()
 		local PerceptionReal = 0
-		if not LocalPlayer():GetNWBool("InSlasherChaseMode") then
-			PerceptionReal = LocalPlayer():GetNWInt("Slasher_Perception")
+		if not GameData.LocalPlayer:GetNWBool("InSlasherChaseMode") then
+			PerceptionReal = GameData.LocalPlayer:GetPerception()
 		end
 
 		timeSinceLast = timeSinceLast + FrameTime() / 3
@@ -148,10 +195,18 @@ if CLIENT then
 			timeSinceLast = 0
 		end
 
-		--Survivor Step Notice
-		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			local survivor = v
+		if not IsValid(emitter) then
+			emitter = ParticleEmitter(Vector(0, 0, 0))
+		end
 
+		GameData.LocalPlayer:SlasherFunction("ClientSideEffect")
+
+		if GameData.LocalPlayer:GetNW2Bool("Slasher:NoFootsteps") or GameData.LocalPlayer:SlasherIsStunDeaf() then
+			return
+		end
+
+		--Survivor Step Notice
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if survivor:ItemFunction("OnFootstep") then
 				continue
 			end
@@ -159,8 +214,8 @@ if CLIENT then
 			local vel = (survivor:GetVelocity()):Length()
 			local range = 3 * vel * PerceptionReal
 			local pos = survivor:GetPos()
-			local em = ParticleEmitter(pos)
-			local part = em:Add(StepNotice, pos)
+			emitter:SetPos(pos)
+			local part = emitter:Add(StepNotice, pos)
 
 			if part and timeSinceLast == 0 and (slasherpos):Distance(pos) < range and survivor:IsOnGround() then
 				part:SetColor(255, 255, 255, math.random(255))
@@ -170,19 +225,16 @@ if CLIENT then
 				part:SetStartSize(25)
 				part:SetEndSize(0)
 			end
-
-			em:Finish()
 		end
 
 		--Step Decoy Step Notice
-		for i = 1, #ents.FindByClass("sc_stepdecoy") do
-			local boot = ents.FindByClass("sc_stepdecoy")[i]
+		for _, boot in ipairs(ents.FindByClass("sc_stepdecoy")) do
 			local vel = 300
 			local range = 3 * vel * PerceptionReal
 			local offsetpos = Vector(math.random(-2, 2), math.random(-2, 2), 0)
 			local pos = boot:GetPos() + offsetpos
-			local em = ParticleEmitter(pos)
-			local part = em:Add(StepNotice, pos)
+			emitter:SetPos(pos)
+			local part = emitter:Add(StepNotice, pos)
 
 			if part and timeSinceLast == 0 and (slasherpos):Distance(pos) < range then
 				part:SetColor(255, 255, 255, math.random(255))
@@ -192,19 +244,15 @@ if CLIENT then
 				part:SetStartSize(25)
 				part:SetEndSize(0)
 			end
-
-			em:Finish()
 		end
-
-		LocalPlayer():SlasherFunction("ClientSideEffect")
 	end)
 
-	hook.Add("RenderScreenspaceEffects", "SlasherVision", function()
-		if LocalPlayer():Team() ~= TEAM_SLASHER then
+	hook.Add("RenderScreenspaceEffects", "SlashCo:SlasherVision", function()
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			return
 		end
 
-		local Eyesight = LocalPlayer():GetNWInt("Slasher_Eyesight")
+		local Eyesight = GameData.LocalPlayer:GetEyeSight(1)
 
 		local tab = {
 			["$pp_colour_addr"] = 0.01,
@@ -222,9 +270,17 @@ if CLIENT then
 	end)
 end
 
----load patch files; these are specifically intended to modify existing addon code
-local slasher_patches = file.Find("slashco/patch/slasher/*.lua", "LUA")
-for _, v in ipairs(slasher_patches) do
-	AddCSLuaFile("slashco/patch/slasher/" .. v)
-	include("slashco/patch/slasher/" .. v)
+function SlashCo.LoadSlasherPatches()
+	---load patch files; these are specifically intended to modify existing addon code
+	local slasher_patches = file.Find("slashco/patch/slasher/*.lua", "LUA")
+	for _, v in ipairs(slasher_patches) do
+		AddCSLuaFile("slashco/patch/slasher/" .. v)
+		include("slashco/patch/slasher/" .. v)
+	end
 end
+SlashCo.LoadSlasherPatches()
+
+hook.Add("GameContentChanged", "SlashCo:RefreshSlashers", function()
+	SlashCo.LoadSlashers()
+	SlashCo.LoadSlasherPatches()
+end)

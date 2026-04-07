@@ -5,10 +5,10 @@ local EFFECT = {}
 EFFECT.Name = "Buzzed"
 EFFECT.ChangesSpeed = true
 EFFECT.FuelSpeed = 0.75
-EFFECT.OnApplied = function(ply)
+function EFFECT.OnApplied(ply)
 	ply:AddSpeedEffect("buzzEffect", 275, 20)
 end
-EFFECT.OnExpired = function(ply)
+function EFFECT.OnExpired(ply)
 	ply:RemoveSpeedEffect("buzzEffect")
 end
 
@@ -24,7 +24,7 @@ local colors = {
 	["$pp_colour_mulb"] = 0
 }
 
-EFFECT.Screenspace = function()
+function EFFECT.Screenspace()
 	DrawSharpen(0.6, 0.6)
 	DrawMotionBlur(0.1, 0.2, 0.01)
 	DrawToyTown(3, ScrH() / 2)

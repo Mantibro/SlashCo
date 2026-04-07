@@ -4,10 +4,10 @@ local EFFECT = {}
 
 EFFECT.Name = "Awareness"
 
-EFFECT.OnApplied = function(ply)
+function EFFECT.OnApplied(ply)
 	SlashCo.SendValue(ply, "Awareness", true)
 end
-EFFECT.OnExpired = function(ply)
+function EFFECT.OnExpired(ply)
 	SlashCo.SendValue(ply, "Awareness", false)
 end
 
@@ -23,21 +23,34 @@ local colors = {
 	["$pp_colour_mulb"] = 0
 }
 
-EFFECT.Screenspace = function()
+local halo_color = Color(255, 0, 0)
+function EFFECT.Screenspace()
 	local blur, pos = 99999
-	for _, v in pairs(ents.FindInSphere(LocalPlayer():EyePos(), 1000)) do
+	local slashers = {}
+	for _, v in pairs(ents.FindInSphere(GameData.LocalPlayer:EyePos(), 1000)) do
 		if v:IsPlayer() and v:Team() == TEAM_SLASHER then
-			local dist = math.max(8 - (v:WorldSpaceCenter():DistToSqr(LocalPlayer():EyePos()) * 0.000008), 0)
+			local dist = math.max(8 - (v:WorldSpaceCenter():DistToSqr(GameData.LocalPlayer:EyePos()) * 0.000008), 0)
 			if dist < blur then
 				blur = dist
 				pos = v:WorldSpaceCenter()
 			end
+			table.insert(slashers, v)
 		end
 	end
 
+	halo.Render({
+		Ents = slashers,
+		Color = halo_color,
+		BlurX = 1,
+		BlurY = 1,
+		DrawPasses = 1,
+		Additive = true,
+		IgnoreZ = true,
+	})
+
 	if blur < 99999 then
-		local diff = pos - LocalPlayer():GetShootPos()
-		local aim = (LocalPlayer():GetAimVector():Dot(diff) / diff:Length()) + 1
+		local diff = pos - GameData.LocalPlayer:GetShootPos()
+		local aim = (GameData.LocalPlayer:GetAimVector():Dot(diff) / diff:Length()) + 1
 
 		DrawSharpen(blur * 0.25 + aim * 4, blur)
 	end
@@ -54,9 +67,9 @@ if CLIENT then
 
 		local num = render.GetBlend()
 		local dist = 0.5
-		for _, v in pairs(ents.FindInSphere(LocalPlayer():EyePos(), 1000)) do
+		for _, v in pairs(ents.FindInSphere(GameData.LocalPlayer:EyePos(), 1000)) do
 			if v:IsPlayer() and v:Team() == TEAM_SLASHER then
-				local lDist = math.max(v:WorldSpaceCenter():DistToSqr(LocalPlayer():EyePos()) * 0.0000001, 0)
+				local lDist = math.max(v:WorldSpaceCenter():DistToSqr(GameData.LocalPlayer:EyePos()) * 0.0000001, 0)
 				if lDist < dist then
 					dist = lDist
 				end
@@ -67,6 +80,7 @@ if CLIENT then
 		for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			ply:DrawModel()
 		end
+
 		for _, v in ipairs(ents.FindByClass("sc_generator")) do
 			v:DrawModel()
 		end
@@ -78,11 +92,11 @@ if CLIENT then
 
 	hook.Add("scValue_Awareness", "SlashCoAwareness", function(state)
 		if state then
-			hook.Add("HUDPaint", "SlashCoAwareness", showSurvivors)
+			hook.Add("SlashCo:DrawHUD", "SlashCoAwareness", showSurvivors)
 			return
 		end
 
-		hook.Remove("HUDPaint", "SlashCoAwareness")
+		hook.Remove("SlashCo:DrawHUD", "SlashCoAwareness")
 	end)
 end
 

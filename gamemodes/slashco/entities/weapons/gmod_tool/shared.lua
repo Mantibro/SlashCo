@@ -1,0 +1,1 @@
+-- Nothing. Gmod just loves to load this file for no reason at all.

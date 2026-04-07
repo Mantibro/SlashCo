@@ -13,9 +13,22 @@ PLAYER.WalkSpeed = 200
 PLAYER.RunSpeed = 350
 PLAYER.StartHealth = 100
 PLAYER.MaxHealth = 100
+PLAYER.AvoidPlayers = false -- Stops players from being pushed out of each other.
 
 function PLAYER:Loadout()
 	self.Player:RemoveAllAmmo()
+end
+
+function PLAYER:SetModel()
+	local modelname
+	local cl_modelname = self.Player:GetInfo("slashco_cl_playermodel")
+	if SlashCo.SurvivorModels[cl_modelname] then
+		modelname = cl_modelname
+	else
+		modelname = SlashCo.SurvivorModels[math.random(1, #SlashCo.SurvivorModels)]
+	end
+
+	self.Player:SetModel(modelname)
 end
 
 function PLAYER:SetupDataTables()

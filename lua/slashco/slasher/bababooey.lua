@@ -1,9 +1,14 @@
 local SLASHER = {}
 
 SLASHER.Name = "Bababooey"
+SLASHER.Aliases = {
+	"Phantom",
+	"The Man",
+	"The Mist",
+}
 SLASHER.ID = 1
-SLASHER.Class = 1
-SLASHER.DangerLevel = 1
+SLASHER.Class = SlashCo.SlasherClass.Cryptid
+SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/baba/baba.mdl"
 SLASHER.GasCanMod = 0
@@ -18,21 +23,58 @@ SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 1.5
-SLASHER.ChaseMusic = "slashco/slasher/baba_chase.wav"
-SLASHER.KillSound = "slashco/slasher/baba_kill.mp3"
+SLASHER.ChaseMusic = "slashco/slasher/bababooey/baba_chase.ogg"
+SLASHER.KillSound = "slashco/slasher/bababooey/baba_kill.mp3"
 SLASHER.Description = "Bababooey_desc"
 SLASHER.ProTip = "Bababooey_tip"
 SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
+-- Balancement Vars
+SLASHER.CooldownReduction = 0 -- Additional number that is added to FrameTime to decrease cooldowns.
+SLASHER.AppearCooldownReduction = 0 -- Appear Cooldown reduction, same as above but used when quitely appearing
+SLASHER.MaxClones = 1 -- How many clones he can have.
 
-SLASHER.OnSpawn = function(slasher)
-	SLASHER.DoSound(slasher)
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+	local SO = SlashCo.CurRound.OfferingData.Singularity
+
+	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
+	SLASHER.MaxClones = 1 + SO
+
+	if additionalSurvivors > 0 then -- If we got more than the default players.
+		SLASHER.MaxClones = SLASHER.MaxClones + math.floor(additionalSurvivors / 4) -- For every 4 additional survivors we allow one more clone.
+
+		SLASHER.CooldownReduction = (SO * 0.04) + (0.01 * additionalSurvivors)
+		SLASHER.AppearCooldownReduction = (SO * 6) + (0.05 * additionalSurvivors)
+		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 298 + (0.5 * additionalSurvivors)
+		SLASHER.KillDistance = 135 + (5 * additionalSurvivors)
+	end
 end
 
-SLASHER.DoSound = function(slasher)
+function SLASHER.OnSpawn(slasher)
+	SLASHER.DoSound(slasher)
+
+	slasher.TriggerCooldown = 0
+	slasher.KillCooldown = 0
+	slasher.SpookCooldown = 0
+end
+
+function SLASHER.DoSound(slasher)
+	if not IsValid(slasher) then return end
+
 	if slasher:GetNWBool("BababooeyInvisibility") then
-		slasher:EmitSound("slashco/slasher/baba_laugh" .. math.random(2, 4) .. ".mp3", 30 + math.random(1, 45))
+		local idx = math.random(2, 4)
+		local idx2 = math.random(0.1, 0.5)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/baba_laugh" .. idx .. ".mp3",
+			identifier = "BababooeyLaugh" .. idx,
+			minDistance = 200,
+			maxDistance = 1200,
+			entity = slasher,
+			volume = 0.3 + idx2,
+			fadeIn = 0,
+		})
 	end
 
 	timer.Simple(math.random(6, 10), function()
@@ -40,18 +82,16 @@ SLASHER.DoSound = function(slasher)
 	end)
 end
 
-SLASHER.OnTickBehaviour = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
+function SLASHER.OnTickBehaviour(slasher)
+	local TriggerCD = slasher.TriggerCooldown or 0 --Cooldown for being able to trigger
+	local KillCD = slasher.KillCooldown or 0 --Cooldown for being able to kill
+	local SpookCD = slasher.SpookCooldown or 0 --Cooldown for spook animation
 
-	local v1 = slasher.SlasherValue1 --Cooldown for being able to trigger
-	local v2 = slasher.SlasherValue2 --Cooldown for being able to kill
-	local v3 = slasher.SlasherValue3 --Cooldown for spook animation
-
-	if v1 > 0 then
-		slasher.SlasherValue1 = v1 - (FrameTime() + (SO * 0.04))
+	if TriggerCD > 0 then
+		slasher.TriggerCooldown = TriggerCD - (FrameTime() + SLASHER.CooldownReduction)
 	end
 
-	if v2 > 0 then
+	if KillCD > 0 then
 		slasher:SetNWBool("CanKill", false)
 	elseif not slasher:GetNWBool("BababooeyInvisibility") then
 		slasher:SetNWBool("CanKill", true)
@@ -61,40 +101,33 @@ SLASHER.OnTickBehaviour = function(slasher)
 
 	slasher:SetNWBool("CanChase", not slasher:GetNWBool("BababooeyInvisibility"))
 
-	if v3 < 0.01 then
+	if SpookCD < 0.01 then
 		slasher:SetNWBool("BababooeySpooking", false)
 	end
 
-	if v2 > 0 then
-		slasher.SlasherValue2 = v2 - (FrameTime() + (SO * 0.04))
-	end
-	if v3 > 0 then
-		slasher.SlasherValue3 = v3 - (FrameTime() + (SO * 0.04))
+	if KillCD > 0 then
+		slasher.KillCooldown = KillCD - (FrameTime() + SLASHER.CooldownReduction)
 	end
 
-	slasher:SetNWFloat("Slasher_Eyesight", SLASHER.Eyesight)
-	slasher:SetNWInt("Slasher_Perception", SLASHER.Perception)
+	if SpookCD > 0 then
+		slasher.SpookCooldown = SpookCD - (FrameTime() + SLASHER.CooldownReduction)
+	end
+
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 end
 
-SLASHER.OnPrimaryFire = function(slasher, target)
+function SLASHER.OnPrimaryFire(slasher, target)
 	SlashCo.Jumpscare(slasher, target)
 end
 
-SLASHER.OnSecondaryFire = function(slasher)
+function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-SLASHER.OnMainAbilityFire = function(slasher, target)
-	local SO = SlashCo.CurRound.OfferingData.SO
-
-	local cooldown = slasher.SlasherValue1
-
-	if cooldown > 0 then
-		return
-	end
-	if slasher:GetNWBool("InSlasherChaseMode") then
-		return
-	end
+function SLASHER.OnMainAbilityFire(slasher, target)
+	if slasher.TriggerCooldown > 0 then return end
+	if slasher:GetNWBool("InSlasherChaseMode") then return end
 
 	slasher:SetNWBool("BababooeyInvisibility", not slasher:GetNWBool("BababooeyInvisibility"))
 
@@ -105,21 +138,46 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", false)
 		slasher:SlasherHudFunc("SetControlVisible", "RMB", false)
 
-		slasher.SlasherValue1 = 4
-		slasher:EmitSound("slashco/slasher/baba_hide.mp3")
+		slasher.TriggerCooldown = 4
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/baba_hide.mp3",
+			identifier = "BababooeyHide",
+			minDistance = 600,
+			maxDistance = 1200,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		timer.Simple(1, function()
+			if not IsValid(slasher) then return end
 			--Delay for entering invisibility
 
 			slasher:SetVisible(false)
 
-			slasher:PlayGlobalSound("slashco/slasher/bababooey_loud.mp3", 130)
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/bababooey/bababooey_loud.mp3",
+				identifier = "BababooeyLoud",
+				minDistance = 1200,
+				maxDistance = 2000,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
 
 			slasher:SetRunSpeed(200)
 			slasher:SetWalkSpeed(200)
 		end)
 	else
-		slasher:EmitSound("slashco/slasher/baba_reveal.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/baba_reveal.mp3",
+			identifier = "BababooeyReveal",
+			minDistance = 800,
+			maxDistance = 1600,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
 
 		slasher:SlasherHudFunc("SetAvatar", "default")
 		slasher:SlasherHudFunc("SetControlVisible", "LMB", true)
@@ -133,11 +191,20 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 
 			if slasher:GetPos():Distance(target:GetPos()) < 150 then
 				slasher:SetNWBool("BababooeySpooking", true)
-				slasher.SlasherValue2 = 2
-				slasher.SlasherValue3 = 2
-				slasher:EmitSound("slashco/slasher/baba_scare.mp3", 100)
+				slasher.KillCooldown = 2
+				slasher.SpookCooldown = 2
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/bababooey/baba_scare.mp3",
+					identifier = "BababooeyScare",
+					minDistance = 200,
+					maxDistance = 800,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
 				slasher:Freeze(true)
 				timer.Simple(2.5, function()
+					if not IsValid(slasher) then return end
 					slasher:Freeze(false)
 				end)
 
@@ -151,8 +218,8 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 		:: SKIP ::
 
 		--Quiet appear
-		slasher.SlasherValue2 = math.random(3, 13 - (SO * 6))
-		slasher.SlasherValue1 = 8
+		slasher.KillCooldown = math.random(3, 13 - SLASHER.AppearCooldownReduction)
+		slasher.TriggerCooldown = 8
 
 		:: SPOOKAPPEAR ::
 
@@ -163,12 +230,8 @@ SLASHER.OnMainAbilityFire = function(slasher, target)
 	end
 end
 
-SLASHER.OnSpecialAbilityFire = function(slasher)
-	local SO = SlashCo.CurRound.OfferingData.SO
-
-	if #ents.FindByClass("sc_babaclone") > SO then
-		return
-	end
+function SLASHER.OnSpecialAbilityFire(slasher)
+	if #ents.FindByClass("sc_babaclone") >= SLASHER.MaxClones then return end
 
 	local ent = SlashCo.CreateItem("sc_babaclone", slasher:GetPos(), slasher:GetAngles())
 	if IsValid(ent) then
@@ -180,7 +243,7 @@ SLASHER.OnSpecialAbilityFire = function(slasher)
 	end
 end
 
-SLASHER.Animator = function(ply)
+function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local spook = ply:GetNWBool("BababooeySpooking")
 
@@ -203,40 +266,43 @@ SLASHER.Animator = function(ply)
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
 
-SLASHER.Footstep = function(ply)
-	if SERVER then
-		if ply:GetNWBool("BababooeyInvisibility") then
-			return true
-		end
-
-		ply:EmitSound("slashco/slasher/babastep_0" .. math.random(1, 3) .. ".mp3")
-		return true
+function SLASHER.Footstep(ply)
+	if SERVER and not ply:GetNWBool("BababooeyInvisibility") then
+		local idx = math.random(1, 3)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
+			identifier = "BababooeyFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
-	if CLIENT then
-		return true
-	end
+	return true
 end
 
-hook.Add("HUDPaint", SLASHER.Name .. "_Jumpscare", function()
-	if LocalPlayer():GetNWBool("SurvivorJumpscare_Bababooey") == true then
-		if LocalPlayer().baba_f == nil then
-			LocalPlayer().baba_f = 0
+hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
+	if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Bababooey") == true then
+		if GameData.LocalPlayer.baba_f == nil then
+			GameData.LocalPlayer.baba_f = 0
 		end
-		LocalPlayer().baba_f = LocalPlayer().baba_f + (FrameTime() * 20)
-		if LocalPlayer().baba_f > 45 then
+		GameData.LocalPlayer.baba_f = GameData.LocalPlayer.baba_f + (FrameTime() * 20)
+		if GameData.LocalPlayer.baba_f > 45 then
 			return
 		end
 
 		local Overlay = Material("slashco/ui/overlays/jumpscare_1")
-		Overlay:SetInt("$frame", math.floor(LocalPlayer().baba_f))
+		Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.baba_f))
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(Overlay)
 		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
 	else
-		LocalPlayer().baba_f = nil
+		GameData.LocalPlayer.baba_f = nil
 	end
 end)
 
@@ -255,7 +321,7 @@ local cloneTable = {
 	["d/set clone"] = Material("slashco/ui/icons/slasher/s_1_a2_1")
 }
 
-SLASHER.InitHud = function(_, hud)
+function SLASHER.InitHud(_, hud)
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Bababooey")
 

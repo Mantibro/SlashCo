@@ -8,78 +8,89 @@ ITEM.Price = 30
 ITEM.Description = "PocketSand_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
-ITEM.OnUse = function(ply)
-    local found = {}
 
-    for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-        if s:GetPos():Distance(ply:GetPos()) > 200 then
-            continue
-        end
+function ITEM.OnUse(ply)
+	-- RaphaelIT7: We use their center to be more accurate of the origin of the particles & as the origin to find all slashers.
+	local particlePos = ply:WorldSpaceCenter()
+	local found = SlashCo.FindPlayersInRange(particlePos, 200, TEAM_SLASHER, ply)
+	if table.IsEmpty(found) then
+		return true
+	end
 
-        local tr = util.TraceLine({
-            start = ply:EyePos(),
-            endpos = s:WorldSpaceCenter(),
-            filter = ply
-        })
+	GameData.PocketSandID = (GameData.PocketSandID or 0) + 1
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3",
+		identifier = "PocketSandThrow" .. GameData.PocketSandID,
+		minDistance = 200,
+		maxDistance = 400,
+		position = particlePos,
+		volume = 1,
+		fadeIn = 0,
+	})
 
-        if tr.Entity == s then
-            table.insert(found, s)
-        end
-    end
+	GameData.PocketSandID = (GameData.PocketSandID or 0) + 1
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/pocketsand_linger.mp3",
+		identifier = "PocketSandLinger" .. GameData.PocketSandID,
+		minDistance = 200,
+		maxDistance = 400,
+		position = particlePos,
+		volume = 1,
+		fadeIn = 0,
+	})
 
-    if table.IsEmpty(found) then
-        return true
-    end
+	timer.Simple(0, function() -- Something causes particles to be nuked >:(
+		ParticleEffect("pocketsand", particlePos, angle_zero)
+	end)
 
-    for _, v in ipairs(found) do
-        v:SetNWBool("SlasherBlinded", true)
-    end
+	for _, slasher in ipairs(found) do
+		slasher:SetNWBool("SlasherBlinded", true)
+		slasher:SlasherFunction("OnHitByPocketSand", ply)
+	end
 
-    ply:EmitSound("slashco/survivor/pocketsand_throw" .. math.random(1, 2) .. ".mp3")
-    ply:EmitSound("slashco/survivor/pocketsand_linger.mp3")
-
-    timer.Simple(8, function()
-        for _, v in ipairs(found) do
-            if not IsValid(v) then continue end
-            v:SetNWBool("SlasherBlinded", false)
-        end
-    end)
+	timer.Simple(8, function()
+		for _, slasher in ipairs(found) do
+			if not IsValid(slasher) then continue end
+			slasher:SetNWBool("SlasherBlinded", false)
+		end
+	end)
 end
+
 ITEM.ViewModel = {
-    model = "models/slashco/items/pocketsand.mdl",
-    pos = Vector(64, 0, -6),
-    angle = Angle(45, -70, -120),
-    size = Vector(0.5, 0.5, 0.5),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	model = ITEM.Model,
+	pos = Vector(64, 0, -6),
+	angle = Angle(45, -70, -120),
+	size = Vector(0.5, 0.5, 0.5),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModelHolstered = {
-    model = "models/slashco/items/pocketsand.mdl",
-    bone = "ValveBiped.Bip01_Pelvis",
-    pos = Vector(5, 2, 5),
-    angle = Angle(110, -80, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	model = ITEM.Model,
+	bone = "ValveBiped.Bip01_Pelvis",
+	pos = Vector(5, 2, 5),
+	angle = Angle(110, -80, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 ITEM.WorldModel = {
-    holdtype = "slam",
-    model = "models/slashco/items/pocketsand.mdl",
-    bone = "ValveBiped.Bip01_R_Hand",
-    pos = Vector(3, 2.5, -1),
-    angle = Angle(180, 0, 0),
-    size = Vector(1, 1, 1),
-    color = color_white,
-    surpresslightning = false,
-    material = "",
-    skin = 0,
-    bodygroup = {}
+	holdtype = "slam",
+	model = ITEM.Model,
+	bone = "ValveBiped.Bip01_R_Hand",
+	pos = Vector(3, 2.5, -1),
+	angle = Angle(180, 0, 0),
+	size = Vector(1, 1, 1),
+	color = color_white,
+	surpresslightning = false,
+	material = "",
+	skin = 0,
+	bodygroup = {}
 }
 
 SlashCo.RegisterItem(ITEM, "PocketSand")

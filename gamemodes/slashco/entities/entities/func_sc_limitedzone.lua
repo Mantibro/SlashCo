@@ -98,6 +98,44 @@ function ENT:Leave(ent)
 	end
 end
 
+hook.Add("SlashCo:Precache", "PrecacheZone", function()
+	for k=1, 5 do
+		SlashCo.PrecacheSound("physics/flesh/flesh_impact_bullet" .. k .. ".wav")
+	end
+
+	SlashCo.PrecacheSound("physics/flesh/flesh_bloody_break.wav")
+
+	for k=1, 3 do
+		SlashCo.PrecacheSound("physics/flesh/flesh_strider_impact_bullet" .. k .. ".wav")
+	end
+
+	for k=1, 4 do
+		SlashCo.PrecacheSound("physics/glass/glass_pottery_break" .. k .. ".wav")
+	end
+
+	for k=1, 4 do
+		SlashCo.PrecacheSound("physics/glass/glass_strain" .. k .. ".wav")
+	end
+
+	for k=1, 4 do
+		SlashCo.PrecacheSound("physics/flesh/flesh_squishy_impact_hard" .. k .. ".wav")
+	end
+
+	SlashCo.PrecacheSound("physics/flesh/flesh_bloody_break.wav")
+
+	for k=1, 4 do
+		SlashCo.PrecacheSound("physics/flesh/flesh_squishy_impact_hard" .. k .. ".wav")
+	end
+
+	for k=1, 4 do
+		SlashCo.PrecacheSound("physics/glass/glass_pottery_break" .. k .. ".wav")
+	end
+
+	for k=1, 4 do
+		SlashCo.PrecacheSound("physics/glass/glass_strain" .. k .. ".wav")
+	end
+end)
+
 local damageSounds = {
 	[1] = function(ent, damage)
 		--default

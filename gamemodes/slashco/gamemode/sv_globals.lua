@@ -2,65 +2,73 @@ SlashCo = SlashCo or {}
 
 SlashCo.CurConfig = {}
 
---Difficulty ENUM
-SlashCo.Difficulty = {
-	EASY = 0,
-	NOVICE = 1,
-	INTERMEDIATE = 2,
-	HARD = 3
-}
-
 function GetRandomMap(ply_count)
 	local keys = table.GetKeys(SCInfo.Maps)
-	local rand, rand_name
-	repeat
-		rand = math.random(1, #keys)
-		rand_name = keys[rand] --random id for this roll
-	until SCInfo.Maps[rand_name].MIN_PLAYERS <= (ply_count + (SCInfo.MinimumMapPlayers - 1)) and rand_name ~= "error"
+	if #keys == 0 then -- if we have no maps, we return early as else we enter a infinite loop that would crash the game.
+		return "error"
+	end
 
-	return rand_name
+	local tries = #keys * 4
+	for k=1, tries do -- This formerly was a repeat until loop, that loved to crash the game.
+		local rand = math.random(1, #keys)
+		local rand_name = keys[rand]
+		if rand_name ~= "error" and SCInfo.Maps[rand_name].MIN_PLAYERS <= (ply_count + (SCInfo.MinimumMapPlayers - 1)) then
+			return rand_name
+		end
+	end
+
+	--[[local key, val = next( SCInfo.Maps )
+	if val then
+		return val
+	end]]
+
+	print("[SlashCo] Ran out of tries to select map to stop a game crash, this should usualy never happen.")
+	return "error"
 end
 
-SlashCo.MAXPLAYERS = 7
+function SlashCo.ResetLobbyData()
+	SlashCo.LobbyData = {
+		LOBBYSTATE = 0,
+		Offering = 0,
+		ButtonDoorPrimary = NULL,
+		ButtonDoorPrimaryClose = NULL,
+		ButtonDoorSecondary = NULL,
+		ButtonDoorSecondaryClose = NULL,
+		ButtonDoorItems = NULL,
+		Players = {},
+		Offerors = {},
+		VotedOffering = 0,
+		ReadyTimerStarted = false,
+		PotentialSurvivors = {},
+		PotentialSlashers = {},
+		NonPickedPotentialSlashers = {}, -- RaphaelIT7: After slashers were picked this table contains all now survivors who wanted to be an slasher but weren't picked
+		AssignedSurvivors = {},
+		AssignedSlashers = {},
+		FinishedPicking = false,
+		SelectedDifficulty = SlashCo.DifficultyLevel.EASY,
+		SurvivorGasMod = 0,
+		SelectedSlasherInfo = {
+			ID = 0,
+			CLASS = 0,
+			DANGER = 0,
+			NAME = 0,
+			TIP = "--//--"
+		},
+		SelectedMap = "sc_summercamp",
+		--DeathwardsLeft = 0 --not used
+	}
+end
 
-SlashCo.LobbyData = {
-	LOBBYSTATE = 0,
-	Offering = 0,
-	ButtonDoorPrimary = NULL,
-	ButtonDoorPrimaryClose = NULL,
-	ButtonDoorSecondary = NULL,
-	ButtonDoorSecondaryClose = NULL,
-	ButtonDoorItems = NULL,
-	Players = {},
-	Offerors = {},
-	VotedOffering = 0,
-	ReadyTimerStarted = false,
-	PotentialSurvivors = {},
-	PotentialSlashers = {},
-	AssignedSurvivors = {},
-	AssignedSlashers = {},
-	SelectedDifficulty = 0,
-	SurvivorGasMod = 0,
-	SelectedSlasherInfo = {
-
-		ID = 0,
-		CLS = 0,
-		DNG = 0,
-		NAME = 0,
-		TIP = "--//--"
-
-	},
-	SelectedMap = "sc_summercamp",
-	PickedSlasher = "None",
-	--DeathwardsLeft = 0 --not used
-
-}
+if not SlashCo.LobbyData then
+	SlashCo.ResetLobbyData()
+end
 
 --Holds all the information about the ongoing round
-SlashCo.ResetCurRoundData = function()
+function SlashCo.ResetCurRoundData()
 	SlashCo.CurRound = {
-		Difficulty = SlashCo.Difficulty.EASY,
+		Difficulty = SlashCo.DifficultyLevel.EASY,
 		ExpectedPlayers = {},
+		DisconnectedPlayers = {},
 		--ExpectedPlayersLoaded = false, --not used
 		--ConnectedPlayers = {}, --not used
 		AntiLoopSpawn = false,
@@ -68,11 +76,11 @@ SlashCo.ResetCurRoundData = function()
 			CurrentOffering = 0,
 			OfferingName = "",
 			GasCanMod = 0,
-			SO = 0,
-			DO = false,
-			SatO = 0,
+			Singularity = 0,
+			Duality = false,
+			Satiation = 0,
 			--DrainageTick = 0, --not used
-			ItemMod = 0
+			ItemMod = 0 -- Number of additional items to add/remove
 		},
 		SlasherData = {
 			AllSurvivors = {}, --This table holds all survivors loaded for this round, dead or alive, as well as their contribution value to the round. (TODO: game contribution)
@@ -89,7 +97,6 @@ SlashCo.ResetCurRoundData = function()
 		},
 		ExposureSpawns = {}, --This is only used in TestConfig()
 		Items = {},
-		Helicopter = 0,
 		SlashersToBeSpawned = {},
 		Slashers = {},
 		--GeneratorCount = 2,
@@ -103,13 +110,50 @@ SlashCo.ResetCurRoundData = function()
 		EscapeHelicopterSummoned = false,
 		DistressBeaconUsed = false,
 	}
-end
-SlashCo.ResetCurRoundData()
 
-SlashCo.PlayerData = SlashCo.PlayerData or {} --Holds all loaded playerdata
+	local OldOfferingKeys = {
+		["SO"] = "Singularity",
+		["DO"] = "Duality",
+		["SatO"] = "Satiation",
+	}
+	local OfferingMeta = { -- Backwards compatiblity with any addons that use the old keys.
+		__index = function(self, key)
+			return rawget(self, OldOfferingKeys[key] or key)
+		end,
+
+		__newindex = function(self, key, value)
+			rawset(self, OldOfferingKeys[key] or key, value)
+		end,
+	}
+
+	debug.setmetatable(SlashCo.CurRound.OfferingData, OfferingMeta)
+
+	local CurRoundMeta = { -- Backwards compatiblity with any addons that use the old keys.
+		__index = function(self, key)
+			if key == "Helicopter" then
+				return IsValid(SlashCo.Helicopter) and SlashCo.Helicopter:EntIndex() or 0
+			end
+
+			return rawget(self, key)
+		end,
+
+		__newindex = function(self, key, value)
+			if key == "Helicopter" then
+				SlashCo.Helicopter = isnumber(value) and Entity(value) or nil
+			end
+
+			rawset(self, key, value)
+		end,
+	}
+	debug.setmetatable(SlashCo.CurRound, CurRoundMeta)
+end
+
+if not SlashCo.CurRound then
+	SlashCo.ResetCurRoundData()
+end
 
 --Spawn a gas can
-SlashCo.CreateGasCan = function(pos, ang)
+function SlashCo.CreateGasCan(pos, ang)
 	local Ent = ents.Create("sc_gascan")
 
 	if not IsValid(Ent) then
@@ -121,12 +165,31 @@ SlashCo.CreateGasCan = function(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+
+	return Ent
+end
+
+-- Spawn a document
+function SlashCo.CreateDocument(pos, ang)
+	local Ent = ents.Create("sc_document")
+
+	if not IsValid(Ent) then
+		MsgC(Color(255, 64, 64),
+				"[SlashCo] Something went wrong when trying to create a gas can at (" .. tostring(pos) .. "), entity was NULL.\n")
+		return nil
+	end
+
+	Ent:SetPos(pos)
+	Ent:SetAngles(ang)
+	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	return Ent
 end
 
 --Spawn an Item( or any entity, including slasher entities )
-SlashCo.CreateItem = function(class, pos, ang)
+function SlashCo.CreateItem(class, pos, ang)
 	local Ent = ents.Create(class)
 
 	if not IsValid(Ent) then
@@ -139,12 +202,13 @@ SlashCo.CreateItem = function(class, pos, ang)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
 	Ent:Activate()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
 	return Ent
 end
 
 --Spawn the helicopter
-SlashCo.CreateHelicopter = function(pos, ang)
+function SlashCo.CreateHelicopter(pos, ang)
 	local Ent = ents.Create("sc_helicopter")
 
 	if not IsValid(Ent) then
@@ -156,13 +220,13 @@ SlashCo.CreateHelicopter = function(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-	SlashCo.CurRound.Helicopter = Ent:EntIndex()
 	return Ent
 end
 
 --Spawn the item stash 
-SlashCo.CreateItemStash = function(pos, ang)
+function SlashCo.CreateItemStash(pos, ang)
 	local Ent = ents.Create("sc_itemstash")
 
 	if not IsValid(Ent) then
@@ -174,14 +238,13 @@ SlashCo.CreateItemStash = function(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-	local id = Ent:EntIndex()
-
-	return id
+	return Ent:EntIndex()
 end
 
 --Spawn the offering table
-SlashCo.CreateOfferTable = function(pos, ang)
+function SlashCo.CreateOfferTable(pos, ang)
 	local Ent = ents.Create("sc_offertable")
 
 	if not IsValid(Ent) then
@@ -193,14 +256,13 @@ SlashCo.CreateOfferTable = function(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-	local id = Ent:EntIndex()
-
-	return id
+	return Ent:EntIndex()
 end
 
 --Spawn the radio
-SlashCo.CreateRadio = function(pos, ang)
+function SlashCo.CreateRadio(pos, ang)
 	local Ent = ents.Create("radio")
 
 	if not IsValid(Ent) then
@@ -212,13 +274,12 @@ SlashCo.CreateRadio = function(pos, ang)
 	Ent:SetPos(pos)
 	Ent:SetAngles(ang)
 	Ent:Spawn()
+	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-	local id = Ent:EntIndex()
-
-	return id
+	return Ent:EntIndex()
 end
 
-SlashCo.RemoveAllCurRoundEnts = function()
+function SlashCo.RemoveAllCurRoundEnts()
 	local gens = ents.FindByClass("sc_generator")
 	for _, v in ipairs(gens) do
 		local can = v.FuelingCan --make sure any attached cans and bats go too
@@ -252,26 +313,40 @@ SlashCo.RemoveAllCurRoundEnts = function()
 	end
 end
 
-SlashCo.ChangeMap = function(mapname)
+function SlashCo.DisableSoundScapes()
+	for _, ent in ipairs(ents.FindByClass("env_soundscape")) do
+		ent:Fire("Disable")
+	end
+end
+
+function SlashCo.EnableSoundScapes()
+	for _, ent in ipairs(ents.FindByClass("env_soundscape")) do
+		ent:Fire("Enable")
+	end
+end
+
+function SlashCo.ChangeMap(mapname)
+	if g_SlashCoDebug then return end -- Don't change map when debugging
+
 	RunConsoleCommand("changelevel", mapname)
 end
 
-SlashCo.GoToLobby = function()
-	SlashCo.ChangeMap("sc_lobby")
+function SlashCo.GoToLobby()
+	SlashCo.ChangeMap(GameData.Lobby)
 end
 
-SlashCo.SummonEscapeHelicopter = function(distress)
+function SlashCo.SummonEscapeHelicopter(distress)
 	if SlashCo.CurRound.EscapeHelicopterSummoned then
 		return true
 	end
 
 	timer.Simple(math.random(2, 5), function()
 		if distress then
-			SlashCo.HelicopterRadioVoice(4)
+			SlashCo.HelicopterRadioVoice(SlashCo.HelicopterVoices.BEACON)
 
 			SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.FAILED)
 		else
-			SlashCo.HelicopterRadioVoice(2)
+			SlashCo.HelicopterRadioVoice(SlashCo.HelicopterVoices.APPROACH)
 
 			SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.COMPLETE)
 		end
@@ -288,8 +363,18 @@ SlashCo.SummonEscapeHelicopter = function(distress)
 		Difficulty 1,2 - 30-100 seconds
 		Difficulty 3 - 30-140 seconds
 	]]
+	
+	local helicopterArriveTime = -1
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		local arriveTime = slasher:SlasherValue("HelicopterArriveTime", -1)
+		if arriveTime ~= -1 and (helicopterArriveTime ~= -1 and (arriveTime < helicopterArriveTime) or helicopterArriveTime == -1) then
+			helicopterArriveTime = arriveTime
+		end
 
-	local delay = 30 + math.random(0, 30 + (SlashCo.CurRound.Difficulty * 20))
+		slasher:SlasherFunction("OnHelicopterSummon")
+	end
+	
+	local delay = helicopterArriveTime ~= -1 and helicopterArriveTime or (30 + math.random(0, 30 + (SlashCo.CurRound.Difficulty * 20)))
 
 	print("[SlashCo] Generators On. The Helicopter will arrive in " .. delay .. " seconds.")
 
@@ -301,12 +386,23 @@ SlashCo.SummonEscapeHelicopter = function(distress)
 			SlashCo.HelicopterGoAboveLand(ent)
 		end)
 
-		net.Start("mantislashcoHelicopterMusic")
-		net.Broadcast()
+		local disableHelicopterMusic = false
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			if slasher:SlasherValue("DisableHelicopterMusic", false) then
+				disableHelicopterMusic = true
+				break
+			end
+		end
+
+		if not disableHelicopterMusic then
+			GameData.HelicopterMusic = true
+			SlashCo.AudioSystem.EnableBackgroundMusic()
+			SlashCo.AudioSystem.SetBackgroundMusic("slashco/music/slashco_helicopter.wav", 1)
+		end
 	end)
 end
 
-SlashCo.HelicopterGoAboveLand = function(ent)
+function SlashCo.HelicopterGoAboveLand(ent)
 	local target = SlashCo.SelectSpawnsNoForce(ents.FindByClass("info_sc_helicopter"))
 	if not IsValid(target) then
 		SlashCo.Abort("Missing helicopter landing entities")
@@ -322,11 +418,11 @@ SlashCo.HelicopterGoAboveLand = function(ent)
 	end)
 end
 
-SlashCo.HelicopterLand = function(pos)
+function SlashCo.HelicopterLand(pos)
 	SlashCo.CurRound.HelicopterTargetPosition = pos
 
 	timer.Simple(math.random(4, 6), function()
-		SlashCo.HelicopterRadioVoice(3)
+		SlashCo.HelicopterRadioVoice(SlashCo.HelicopterVoices.LAND)
 
 		SlashCo.UpdateObjective("heliwait", SlashCo.ObjStatus.COMPLETE)
 		SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.INCOMPLETE, nil, true)
@@ -335,7 +431,7 @@ SlashCo.HelicopterLand = function(pos)
 
 	--Will the Helicopter Abandon players?
 
-	if SlashCo.CurRound.Difficulty ~= 3 then
+	if SlashCo.CurRound.Difficulty ~= SlashCo.DifficultyLevel.HARD then
 		return
 	end
 
@@ -351,75 +447,72 @@ SlashCo.HelicopterLand = function(pos)
 	end)
 end
 
-SlashCo.HelicopterTakeOff = function()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],
-			SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
+function SlashCo.HelicopterTakeOff()
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition)
+	SlashCo.CurRound.HelicopterTargetPosition[3] = SlashCo.CurRound.HelicopterTargetPosition[3] + 1000
 
 	timer.Simple(9, function()
 		SlashCo.HelicopterFinalLeave()
 	end)
 end
 
-SlashCo.HelicopterTakeOffIntro = function()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition[1],
-			SlashCo.CurRound.HelicopterTargetPosition[2], SlashCo.CurRound.HelicopterTargetPosition[3] + 1000)
+function SlashCo.HelicopterTakeOffIntro()
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterTargetPosition)
+	SlashCo.CurRound.HelicopterTargetPosition[3] = SlashCo.CurRound.HelicopterTargetPosition[3] + 1000
 
 	timer.Simple(9, function()
 		SlashCo.HelicopterLeaveForIntro()
 	end)
 end
 
-SlashCo.HelicopterFinalLeave = function()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
-			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3])
+function SlashCo.HelicopterFinalLeave()
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition)
 end
 
-SlashCo.HelicopterLeaveForIntro = function()
-	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
-			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3])
+function SlashCo.HelicopterLeaveForIntro()
+	SlashCo.CurRound.HelicopterTargetPosition = Vector(SlashCo.CurRound.HelicopterSpawnPosition)
 
-	local delay = math.sqrt(ents.GetByIndex(SlashCo.CurRound.Helicopter):GetPos():Distance(Vector(SlashCo.CurRound.HelicopterSpawnPosition[1],
-			SlashCo.CurRound.HelicopterSpawnPosition[2], SlashCo.CurRound.HelicopterSpawnPosition[3]))) / 5
+	local heli = SlashCo.Helicopter
+	if not IsValid(heli) then
+		return
+	end
+
+	local delay = math.sqrt(heli:GetPos():Distance(SlashCo.CurRound.HelicopterSpawnPosition)) / 5
 
 	timer.Simple(delay, function()
-		local heli = ents.GetByIndex(SlashCo.CurRound.Helicopter)
-
 		if not IsValid(heli) then
 			return
 		end
 
-		heli:StopSound("slashco/helicopter_engine_distant.wav")
-		heli:StopSound("slashco/helicopter_rotors_distant.wav")
-		heli:StopSound("slashco/helicopter_engine_close.wav")
-		heli:StopSound("slashco/helicopter_rotors_close.wav")
-
+		SlashCo.QuietHeli()
 		timer.Simple(0.05, function()
-			if IsValid(heli) then
-				heli:StopSound("slashco/helicopter_engine_distant.wav")
-				heli:StopSound("slashco/helicopter_rotors_distant.wav")
-				heli:StopSound("slashco/helicopter_engine_close.wav")
-				heli:StopSound("slashco/helicopter_rotors_close.wav")
-			end
+			SlashCo.QuietHeli()
 			SlashCo.RemoveHelicopter()
 
-			net.Start("mantislashcoMapAmbientPlay")
+			net.Start("SlashCo:MapAmbientPlay")
 			net.Broadcast()
 		end)
 	end)
 end
 
-SlashCo.UpdateHelicopterSeek = function(pos)
+function SlashCo.UpdateHelicopterSeek(pos)
 	SlashCo.CurRound.HelicopterTargetPosition = pos
 end
 
-SlashCo.RemoveHelicopter = function()
-	local ent = ents.GetByIndex(SlashCo.CurRound.Helicopter)
+function SlashCo.RemoveHelicopter()
+	local ent = SlashCo.Helicopter
 	if IsValid(ent) then
 		ent:Remove()
 	end
 end
 
-SlashCo.RadialTester = function(ent, dist, secondary)
+function SlashCo.QuietHeli()
+	if IsValid(SlashCo.Helicopter) then
+		SlashCo.Helicopter:QuietHeli()
+	end
+end
+
+function SlashCo.RadialTester(ent, dist, secondary)
 	local last_best_angle = 0
 	local last_greatest_distance = 0
 
@@ -446,12 +539,16 @@ SlashCo.RadialTester = function(ent, dist, secondary)
 	return last_best_angle
 end
 
-SlashCo.ClearDatabase = function()
-	if SERVER then
-		print("[SlashCo] Clearing Database. . .")
+function SlashCo.ClearDatabase()
+	if CLIENT then return end
+	
+	print("[SlashCo] Clearing Database. . .")
 
-		sql.Query("DROP TABLE slashco_table_basedata;")
-		sql.Query("DROP TABLE slashco_table_survivordata;")
-		sql.Query("DROP TABLE slashco_table_slasherdata;")
-	end
+	cookie.Delete("slashco_table_basedata")
+	sql.Query("DROP TABLE slashco_table_survivordata;")
+	sql.Query("DROP TABLE slashco_table_slasherdata;")
+	sql.Query("DROP TABLE slashco_table_potentialslashers;")
+
+	-- RaphaelIT7: If a table already did not exist it will have thrown an error. But we do not care.
+	sql.m_strError = nil
 end

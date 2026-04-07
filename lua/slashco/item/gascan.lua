@@ -11,26 +11,33 @@ ITEM.CamPos = Vector(80, 0, 0)
 ITEM.ChangesSpeed = true
 ITEM.IsSpawnable = false
 ITEM.IsFuel = true
-ITEM.MaxAllowed = function()
+
+function ITEM.MaxAllowed()
 	return 2
 end
-ITEM.OnDrop = function(ply)
+
+function ITEM.OnDrop(ply)
 	return 45
 end
-ITEM.OnSwitchFrom = function(ply)
+
+function ITEM.OnSwitchFrom(ply)
 	ply:RemoveSpeedEffect("gas")
 end
-ITEM.OnBuy = function(_)
+
+function ITEM.OnBuy(_)
 	SlashCo.LobbyData.SurvivorGasMod = SlashCo.LobbyData.SurvivorGasMod + 1
 end
-ITEM.OnPickUp = function(ply)
-	ply:AddSpeedEffect("gas", 200, 10)
+
+function ITEM.OnPickUp(ply)
+	ply:AddSpeedEffect("gas", 150, 10)
 end
-ITEM.EquipSound = function()
-	return "slashco/survivor/gascan_pickup" .. math.random(1, 3) .. ".wav"
+
+function ITEM.EquipSound()
+	return "slashco/survivor/gascan_pickup" .. math.random(1, 3) .. ".mp3"
 end
+
 ITEM.ViewModel = {
-	model = "models/props_junk/metalgascan.mdl",
+	model = ITEM.Model,
 	pos = Vector(60, 0, 0),
 	angle = Angle(0, 90, 90),
 	size = Vector(0.5, 0.5, 0.5),
@@ -42,7 +49,7 @@ ITEM.ViewModel = {
 }
 ITEM.WorldModel = {
 	holdtype = "duel",
-	model = "models/props_junk/metalgascan.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(-2.597, 10.909, 1.557),
 	angle = Angle(0, -10, 180),

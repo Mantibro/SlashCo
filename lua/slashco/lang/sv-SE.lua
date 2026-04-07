@@ -1,7 +1,7 @@
 --[[
 
-    Language: sv-SE, (Swedish), (Svenska)
-    Translator: DC:marreknarre STEAM: Marrebarre (steamcommunity.com/id/TomteJagare)
+	Language: sv-SE, (Swedish), (Svenska)
+	Translator: DC:marreknarre STEAM: Marrebarre (steamcommunity.com/id/TomteJagare)
 
 ]]
 
@@ -23,6 +23,9 @@ SlashCo.LangTable["SomeRescued"] = "Bara ett fåtal av de utskickade SlashCo Arb
 SlashCo.LangTable["NoneRescued"] = "Dom utskickande SlashCo Arbetarna kunde ej bli räddade."
 SlashCo.LangTable["Cursed"] = "Din själ är nu försvunnen."
 SlashCo.LangTable["Judgement"] = "UTSLAG"
+SlashCo.LangTable["newplayer_spawnnotice"] = "Tryck på [%s] för att skapa"
+SlashCo.LangTable["slasher_replacement"] = "Du har blivit utsedd till den nya slashern"
+SlashCo.LangTable["item_refund"] = "Du fick %s poäng återbetalda för dina föremål"
 
 SlashCo.LangTable["InLobby"] = "I Väntrummet"
 SlashCo.LangTable["InGame"] = "I Spel (%s)"

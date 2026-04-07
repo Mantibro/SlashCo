@@ -4,26 +4,71 @@ ITEM.Model = "models/slashco/items/deathward.mdl"
 ITEM.EntClass = "sc_deathward"
 ITEM.Name = "Deathward"
 ITEM.Icon = "slashco/ui/icons/items/item_2"
-ITEM.Price = 50
+ITEM.Price = 80
 ITEM.Description = "Deathward_desc"
 ITEM.CamPos = Vector(40, 0, 15)
-ITEM.MaxAllowed = function()
+ITEM.IsSpawnable = true
+
+function ITEM.MaxAllowed()
 	return 2
 end
-ITEM.IsSpawnable = true
-ITEM.OnDie = function(ply)
-	ply:EmitSound("slashco/survivor/deathward.mp3")
-	ply:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")
 
-	SlashCo.ChangeSurvivorItem(ply, "DeathWardUsed")
+function ITEM.OnDie(ply)
+	SlashCo.ChangeSurvivorItem(ply, "item", "DeathWard (Used)", true)
+	local pos = ply:WorldSpaceCenter()
+	SlashCo.DropItem(ply, function(ply, item, droppedItem, phys)
+		phys:SetPos(pos, true)
+		phys:SetVelocityInstantaneous(vector_origin)
+	end)
+
+	hook.Run("SlashCo:OnDeathWardUsed", ply)
+
+	ply:ClearEffects()
+	ply:SetVisible(false)
+	ply:SetImpervious(true)
+	ply:GodEnable()
+	ply:Freeze(true)
+
+	ply:SetNW2Bool("ShowDeathUI", true)
+	ply:SetNW2Bool("DeathWardUI", true)
+	ply:SetNW2Float("DeathUITime", CurTime())
+
+	timer.Simple(9, function()
+		if not IsValid(ply) then return end
+
+		local spawnEnt = SlashCo.FindSpawn(ply)
+		SlashCo.AudioSystem.PlaySound({ -- Leak the location of the player that respawned to everyone >:3
+			soundPath = "slashco/survivor/deathward.mp3",
+			identifier = "DeathWard",
+			position = IsValid(spawnEnt) and spawnEnt:GetPos() or ply:GetPos(),
+			minDistance = 2500,
+			maxDistance = 15000,
+			volume = 1,
+			fadeIn = 0,
+		})
+
+		timer.Simple(1, function()
+			if not IsValid(ply) then return end
+
+			ply:SetNW2Bool("ShowDeathUI", false)
+			ply:SetNW2Bool("DeathWardUI", false)
+
+			ply:SetVisible(true)
+			ply:SetImpervious(false)
+			ply:GodDisable()
+			ply:Freeze(false)
+		end)
+	end)
 
 	return true
 end
-ITEM.OnSwitchFrom = function(ply)
+
+function ITEM.OnSwitchFrom(ply)
 	timer.Remove("deathWardDamage_" .. ply:UserID())
 end
-ITEM.OnPickUp = function(ply)
-	if game.GetMap() == "sc_lobby" then
+
+function ITEM.OnPickUp(ply)
+	if GameData.IsLobby then
 		return
 	end
 
@@ -41,8 +86,9 @@ ITEM.OnPickUp = function(ply)
 		ply:SetHealth(hp + 1)
 	end)
 end
+
 ITEM.ViewModel = {
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(45, -70, -120),
 	size = Vector(0.5, 0.5, 0.5),
@@ -53,7 +99,7 @@ ITEM.ViewModel = {
 	bodygroup = { [0] = 0 }
 }
 ITEM.WorldModelHolstered = {
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_Pelvis",
 	pos = Vector(5, 2, 5),
 	angle = Angle(110, -80, 0),
@@ -66,7 +112,7 @@ ITEM.WorldModelHolstered = {
 }
 ITEM.WorldModel = {
 	holdtype = "slam",
-	model = "models/slashco/items/deathward.mdl",
+	model = ITEM.Model,
 	bone = "ValveBiped.Bip01_R_Hand",
 	pos = Vector(4, 1, -2),
 	angle = Angle(10, -20, 200),

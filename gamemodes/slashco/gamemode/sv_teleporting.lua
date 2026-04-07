@@ -156,30 +156,45 @@ end
 SlashCo.LocalizedTraceHullLocatorAdvanced = SlashCo.LocalizedTraceHullLocator
 
 --Determines map size
-local function init()
-	local verts = {}
-	for _, v in ipairs(game.GetWorld():GetBrushSurfaces()) do
-		if v:IsNoDraw() or v:IsSky() or v:IsWater() then
-			continue
+function SlashCo.InitMapMesh()
+	local brushSurfaces = game.GetWorld():GetBrushSurfaces()
+	if not brushSurfaces then
+		print("[SlashCo] Weird map! Entity:GetBrushSurfaces failed on the world? This will result in slightly inaccurate map bounds.")
+
+		local mins, maxs = game.GetWorld():GetModelBounds()
+		SlashCo.MinVec = mins
+		SlashCo.MaxVec = maxs
+	else -- This code uses GetBrushSurfaces to figure out the world box but WITHOUT the 3D sky box or other stuff that really isn't part of it.
+		local verts = {}
+		for _, v in ipairs(brushSurfaces) do
+			if v:IsNoDraw() or v:IsSky() or v:IsWater() then
+				continue
+			end
+			local verts1 = v:GetVertices()
+			table.Add(verts, verts1)
 		end
-		local verts1 = v:GetVertices()
-		table.Add(verts, verts1)
+
+		local amt = #verts
+		for i = 1, amt - 1 do
+			OrderVectors(verts[i], verts[i + 1])
+		end
+		SlashCo.MaxVec = verts[amt]
+
+		for i = 2, amt - 1 do
+			OrderVectors(verts[amt - i], verts[amt - i + 1])
+		end
+		SlashCo.MinVec = verts[1]
 	end
 
-	local amt = #verts
-	for i = 1, amt - 1 do
-		OrderVectors(verts[i], verts[i + 1])
+	if not SlashCo.MaxVec then
+		print("[SlashCo] Completely failed InitMapMesh!")
+		SlashCo.MidVec = vector_origin
+		SlashCo.MapSizeExact = 2.5
+	else
+		SlashCo.MidVec = (SlashCo.MaxVec + SlashCo.MinVec) / 2
+		SlashCo.MapSizeExact = SlashCo.MaxVec:Distance(SlashCo.MinVec) / 8500
 	end
-	SlashCo.MaxVec = verts[amt]
-
-	for i = 2, amt - 1 do
-		OrderVectors(verts[amt - i], verts[amt - i + 1])
-	end
-	SlashCo.MinVec = verts[1]
-
-	SlashCo.MidVec = (SlashCo.MaxVec + SlashCo.MinVec) / 2
-	SlashCo.MapSizeExact = SlashCo.MaxVec:Distance(SlashCo.MinVec) / 8500
+	
 	SlashCo.MapSize = math.ceil(SlashCo.MapSizeExact)
-	SetGlobal2Int("SlashCoMapSize", SlashCo.MapSize)
+	SlashCo.SetMapSize(SlashCo.MapSize)
 end
-hook.Add("InitPostEntity", "SlashCo_InitMapMesh", init)
