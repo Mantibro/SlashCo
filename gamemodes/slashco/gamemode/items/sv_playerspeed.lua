@@ -53,5 +53,4 @@ local function ResetSpeed(ply)
 	end
 end
 
-hook.Add("PlayerDeath", "SlashCo:ResetSpeedEffects", ResetSpeed)
-hook.Add("PlayerSilentDeath", "SlashCo:ResetSpeedEffects", ResetSpeed)
+hook.Add("SlashCo:PlayerDeath", "SlashCo:ResetSpeedEffects", ResetSpeed)

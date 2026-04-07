@@ -548,3 +548,9 @@ timer.Create("SlashCo:SlasherAnger", 1, 0, function()
 		SlashCo.AudioSystem.SetBackgroundMusicVolume(SlashCo.GetGlobalSlasherAnger() / 100)
 	end
 end)
+
+hook.Add("SlashCo:PlayerDeath", "SlashCo:RunSlasherPlayerDeath", function(victim)
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		slasher:SlasherFunction("OnPlayerDeath", victim)
+	end
+end)

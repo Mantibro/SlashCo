@@ -588,78 +588,88 @@ function GM:PlayerDeath(victim)
 	victim.Lives = victim.Lives or 1
 	victim.Lives = victim.Lives - 1
 
-	if victim.Lives <= 0 then
-		print("[SlashCo] '" .. victim:GetName() .. "' is out of lives, moving them to the Spectator team.")
+	if victim.Lives > 0 then return end
 
-		--Spawn the Ragdoll
-		local ragdoll = ents.Create("prop_ragdoll")
-		ragdoll:SetModel(victim:GetModel())
-		ragdoll.PingType = "DEAD BODY"
-		ragdoll.SurvivorSteamID = victim:SteamID64()
-		ragdoll:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+	hook.Run("SlashCo:PlayerDeath", victim)
 
-		victim.DeadBody = ragdoll
-		if victim.Devastate then
-			ragdoll:SetModel("models/player/corpse1.mdl")
-		end
+	print("[SlashCo] '" .. victim:GetName() .. "' is out of lives, moving them to the Spectator team.")
 
-		ragdoll:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-		ragdoll:SetPos(victim:GetPos())
-		ragdoll:SetNoDraw(false)
-		ragdoll:Spawn()
-		ragdoll:Activate()
+	--Spawn the Ragdoll
+	local ragdoll = ents.Create("prop_ragdoll")
+	ragdoll:SetModel(victim:GetModel())
+	ragdoll.PingType = "DEAD BODY"
+	ragdoll.SurvivorSteamID = victim:SteamID64()
+	ragdoll:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 
-		local vel = victim:GetVelocity()
-		for i = 0, ragdoll:GetPhysicsObjectCount() - 1 do
-			local phys = ragdoll:GetPhysicsObjectNum(i)
-			if not IsValid(phys) then continue end
-
-			local boneid = ragdoll:TranslatePhysBoneToBone(i)
-			if boneid < 0 then continue end
-
-			local matrix = victim:GetBoneMatrix(boneid)
-			if not matrix then continue end
-
-			phys:SetPos(matrix:GetTranslation())
-			phys:SetAngles(matrix:GetAngles())
-			phys:AddVelocity(vel)
-		end
-
-		table.insert(SlashCo.DeadBodies, ragdoll)
-
-		if victim:GetNWBool("SurvivorDecapitate") then
-			ragdoll:ManipulateBoneScale(ragdoll:LookupBone("ValveBiped.Bip01_Head1"), Vector(0, 0, 0))
-
-			local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone("ValveBiped.Bip01_Head1"))
-
-			local bloodfx = EffectData()
-			bloodfx:SetOrigin(vPoint)
-			util.Effect("BloodImpact", bloodfx)
-
-			local dripfx = EffectData()
-			dripfx:SetOrigin(vPoint)
-			dripfx:SetFlags(3)
-			dripfx:SetColor(0)
-			dripfx:SetScale(6)
-			util.Effect("bloodspray", dripfx)
-
-			ang_offset = 180
-		end
-
-		if team.NumPlayers(TEAM_SURVIVOR) == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
-			team.GetPlayers(TEAM_SURVIVOR)[1]:SetRoundPoints("last_survive")
-		end
-
-		victim:SetTeam(TEAM_SPECTATOR)
-		timer.Simple(0, function()
-			if IsValid(victim) and IsValid(ragdoll) then
-				victim:Spawn()
-				victim:SetPos(ragdoll:GetPos())
-				victim:SpectateEntity(ragdoll)
-				victim:SetObserverMode(OBS_MODE_CHASE)
-			end
-		end)
+	victim.DeadBody = ragdoll
+	if victim.Devastate then
+		ragdoll:SetModel("models/player/corpse1.mdl")
 	end
+
+	ragdoll:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	ragdoll:SetPos(victim:GetPos())
+	ragdoll:SetNoDraw(false)
+	ragdoll:Spawn()
+	ragdoll:Activate()
+
+	local vel = victim:GetVelocity()
+	for i = 0, ragdoll:GetPhysicsObjectCount() - 1 do
+		local phys = ragdoll:GetPhysicsObjectNum(i)
+		if not IsValid(phys) then continue end
+
+		local boneid = ragdoll:TranslatePhysBoneToBone(i)
+		if boneid < 0 then continue end
+
+		local matrix = victim:GetBoneMatrix(boneid)
+		if not matrix then continue end
+
+		phys:SetPos(matrix:GetTranslation())
+		phys:SetAngles(matrix:GetAngles())
+		phys:AddVelocity(vel)
+	end
+
+	table.insert(SlashCo.DeadBodies, ragdoll)
+
+	if victim:GetNWBool("SurvivorDecapitate") then
+		ragdoll:ManipulateBoneScale(ragdoll:LookupBone("ValveBiped.Bip01_Head1"), Vector(0, 0, 0))
+
+		local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone("ValveBiped.Bip01_Head1"))
+
+		local bloodfx = EffectData()
+		bloodfx:SetOrigin(vPoint)
+		util.Effect("BloodImpact", bloodfx)
+
+		local dripfx = EffectData()
+		dripfx:SetOrigin(vPoint)
+		dripfx:SetFlags(3)
+		dripfx:SetColor(0)
+		dripfx:SetScale(6)
+		util.Effect("bloodspray", dripfx)
+
+		ang_offset = 180
+	end
+
+	if team.NumPlayers(TEAM_SURVIVOR) == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
+		team.GetPlayers(TEAM_SURVIVOR)[1]:SetRoundPoints("last_survive")
+	end
+
+	victim:SetTeam(TEAM_SPECTATOR)
+	timer.Simple(0, function()
+		if not IsValid(victim) or not IsValid(ragdoll) then return end
+
+		victim:Spawn()
+		victim:SetPos(ragdoll:GetPos())
+		victim:SpectateEntity(ragdoll)
+		victim:SetObserverMode(OBS_MODE_CHASE)
+	end)
+end
+
+function GM:PlayerSilentDeath(victim)
+	-- Base gamemode stuff to not break anything
+	victim.NextSpawnTime = CurTime() + 2
+	victim.DeathTime = CurTime()
+
+	hook.Run("SlashCo:PlayerDeath", victim)
 end
 
 function GM:PlayerSpray(ply)

@@ -83,15 +83,6 @@ function SLASHER.OnTickBehaviour(slasher, target)
 				slasher:Freeze(false)
 			end)
 		end
-
-		timer.Simple(SLASHER_STUN_TIME, function()
-			if not IsValid(slasher) then return end
-
-			if slasher:IsFrozen() then
-				slasher:Freeze(false)
-				slasher:SetImpervious(false)
-			end
-		end)
 	end
 
 	if slasher:GetNWBool("CloakTackling") then
@@ -156,6 +147,17 @@ function SLASHER.OnTickBehaviour(slasher, target)
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
+end
+
+function SLASHER.OnPlayerDeath(slasher, victim)
+	if slasher.TackledPlayer ~= victim then return end
+
+	slasher.TackledPlayer = nil
+	victim:SetNWBool("SurvivorTackled", false)
+	victim:SetNWBool("MarkedByCloaks", false)
+
+	slasher:Freeze(false)
+	slasher:SetImpervious(false)
 end
 
 function SLASHER.OnPrimaryFire(slasher)

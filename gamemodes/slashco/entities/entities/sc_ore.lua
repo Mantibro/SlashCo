@@ -90,8 +90,7 @@ if SERVER then
 		end
 	end
 
-	hook.Add("PlayerDeath", "SlashCo:CancelMining", CancelMining)
-	hook.Add("PlayerSilentDeath", "SlashCo:CancelMining", CancelMining)
+	hook.Add("SlashCo:PlayerDeath", "SlashCo:CancelMining", CancelMining)
 else
 	function ENT:Draw()
 	    local curTime = CurTime()
