@@ -1,9 +1,6 @@
 ## Notes
 Some newly added sounds will be from the SlashCo VR version.<br>
 
-> [!WARNING]
-> When we release these changes, revert `gamemodes/slashco/slashco.txt` -> `workshopid` back to the main addon -> `2844428843`
-
 ## GamePlay changes
 [+] A dark fog that dynamically adjusts to the environment lighting.<br>
 -> In the background this is an entire fog system that was implemented.<br>
@@ -350,10 +347,11 @@ This documentation wasn't finished yet<br>
 [+] Added `SlashCo.GetBannedSlashers`, `SlashCo.IsSlasherBanned`, `SlashCo.BanSlasher`, `SlashCo.UnbanSlasher` functions<br>
 [+] Added `SlashCo.SetGlobalFogMult`, `SlashCo.GetGlobalFogMult`, `SlashCo.SetGlobalFogColor`, `SlashCo.GetGlobalFogColor` functions<br>
 [+] Added `Player:SetFogMult`, `Player:GetFogMult`, `Player:MarkAsSeenBySlasher`, `Player:WasSeenBySlasher`, `Player:FindPlayersInView`, `Player:IsStuck` functions<br>
+[+] Added `SLASHER.OnHitByPocketSand`, `SLASHER.OnHitByBeerKeg`, `SLASHER.OnHitByTeslaCoil`, `SLASHER.OnPlayerDeath`, `SLASHER.OnHelicopterSummon` functions<br>
 [+] Added `SlashCo.States`, `SlashCo.DifficultyLevel`, `SlashCo.SlasherClass`, `SlashCo.DangerLevel` enums<br>
 [+] Added `SlashCo.GetRoundTime`, `SlashCo.IsQuickEscape`, `SlashCo.IsSlowEscape`, `SlashCo.GetRoundStartTime` functions<br>
 [+] Added `SlashCo.GetDangerColor`, `SlashCo.GetDangerSound`, `SlashCo.GetNameColor`, `SlashCo.GetClassColor`, `SlashCo.CopyColor` functions<br>
-[+] Added `SlashCo.AddDangerLevel` and `SlashCo.AddSlasherClass` funcitons<br>
+[+] Added `SlashCo.AddDangerLevel` and `SlashCo.AddSlasherClass` functions<br>
 [+] Added `SlashCo:OnObjectiveComplete(objectiveName)` lua hook<br>
 [#] Changed `SlashCo.OfferingData` keys.<br>
 \-> Renamed `SO` to `Singularity`<br>
