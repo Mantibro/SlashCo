@@ -230,6 +230,7 @@ function SLASHER.Footstep(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
 			identifier = "CovenantFootstep" .. idx,
+			group = "SlasherFootstep",
 			minDistance = 200,
 			maxDistance = 500,
 			entity = ply,

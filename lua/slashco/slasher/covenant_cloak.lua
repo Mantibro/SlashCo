@@ -42,7 +42,7 @@ end
 function SLASHER.TackleFail(slasher)
 	if not IsValid(slasher) then return end
 	if slasher.TackledPlayer ~= nil then return end
-			
+
 	slasher:SetNWBool("CloakTackleFail", true)
 	slasher:Freeze(true)
 
@@ -76,12 +76,22 @@ function SLASHER.OnTickBehaviour(slasher, target)
 			slasher.TackledPlayer:SetNWBool("SurvivorTackled", false)
 			slasher:SetPos(slasher.TackledPlayer:GetPos() + Vector(0, 0, 80))
 			slasher.TackledPlayer = nil
+
 			timer.Simple(2.0, function()
 				if not IsValid(slasher) then return end
 
 				slasher:Freeze(false)
 			end)
 		end
+
+		timer.Simple(SLASHER_STUN_TIME, function()
+			if not IsValid(slasher) then return end
+
+			if slasher:IsFrozen() then
+				slasher:Freeze(false)
+				slasher:SetImpervious(false)
+			end
+		end)
 	end
 
 	if slasher:GetNWBool("CloakTackling") then
