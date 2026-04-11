@@ -120,6 +120,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			local physCount = ragdoll:GetPhysicsObjectCount()
 
 			timer.Simple(2, function()
+				if not IsValid(ragdoll) then return end
 				for i = 0, (physCount - 1) do
 					local PhysBone = ragdoll:GetPhysicsObjectNum(i)
 
@@ -131,10 +132,12 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			if not slasher.RockSummoned then
 				timer.Simple(4, function() -- First victim becomes Rocks
+					if not IsValid(target) then return end
 					SLASHER.SummonRocks(target)
 					target:Freeze(true)
 
 					timer.Simple(3, function()
+						if not IsValid(target) then return end
 						target:Freeze(false)
 						target:SetNWBool("RocksBeingSummoned", false)
 					end)
@@ -149,6 +152,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					return
 				else
 					timer.Simple(4, function() -- Next victims becomes Cloaks
+						if not IsValid(target) then return end
 						SLASHER.SummonCovenantMembers(target)
 						target:Freeze(true)
 
@@ -165,16 +169,17 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			timer.Simple(6, function()
 				local Dissolver = ents.Create("env_entity_dissolver")
 				timer.Simple(1, function()
-					if IsValid(Dissolver) then
-						Dissolver:Remove() -- backup edict save on error
-					end
+					if not IsValid(Dissolver) then return end
+					Dissolver:Remove() -- backup edict save on error
 				end)
 
 				Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
 				Dissolver:SetKeyValue("dissolvetype", 0)
 				Dissolver:SetKeyValue("magnitude", 0)
 				Dissolver:SetPos(ragdoll:GetPos())
-				Dissolver:SetPhysicsAttacker(slasher)
+				if IsValid(slasher) then
+					Dissolver:SetPhysicsAttacker(slasher)
+				end
 				Dissolver:Spawn()
 
 				ragdoll:SetName(Dissolver.Target)
@@ -182,6 +187,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				Dissolver:Fire("Dissolve", Dissolver.Target, 0)
 				Dissolver:Fire("Kill", "", 0.1)
 
+				if not IsValid(slasher) then return end
 				slasher:SetNWBool("CovenantSummoning", false)
 				slasher:Freeze(false)
 			end)
