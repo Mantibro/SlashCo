@@ -619,9 +619,10 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 end)
 
 net.Receive("SlashCo:HelicopterVoice", function()
+	if not IsValid(GameData.LocalPlayer) then return end
+
 	local t = net.ReadUInt(4)
 	local id = net.ReadUInt(4)
-
 	if t == SlashCo.HelicopterVoices.INTRO then
 		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_intro" .. id .. ".mp3", 100)
 		return
