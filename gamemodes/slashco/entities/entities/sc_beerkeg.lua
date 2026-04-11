@@ -126,6 +126,10 @@ function ENT:PhysicsCollide(data)
 	self.ExplodeMeter = self.ExplodeMeter + math.random(0.1, 0.25)
 	self.NextImpact = CurTime() + 0.5
 
+	if IsValid(data.HitEntity) and data.HitEntity:IsPlayer() and data.HitEntity:Team() == TEAM_SLASHER then
+		self:Explode()
+	end
+
 	if self.ExplodeMeter >= 1 then
 		self:Explode()
 	else
