@@ -340,10 +340,6 @@ function PLAYER:SlamDoor(door_ent)
 		return
 	end
 
-	if door_ent:GetInternalVariable("m_flSpeed") > 500 then
-		return
-	end
-
 	-- RaphaelIT7: We prevent door slam on locked doors due to them else completely breaking somehow
 	if door_ent:GetInternalVariable("m_bLocked") then
 		return
