@@ -125,7 +125,7 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 				-- RaphaelIT7: Temporary debug stuff for Rubat.
 				local size = file.Size(soundFile, "GAME")
 				local content = file.Read(soundFile, "GAME")
-				ErrorNoHaltWithStack("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", " .. soundFile .. " | Debug Info: BRANCH:" .. tostring(BRANCH) .. " File Size:" .. tostring(size or -1) .. " File Content Size:" .. tostring(content and string.len(content) or -1) .. " File Content Hash:" .. (content and util.CRC(content) or "[no content]") .. "\n")
+				ErrorNoHaltWithStack("[SlashCo] Failed to create audio channel! (" .. errCode .. ", " .. errStr .. ", \"" .. soundFile .. "\" | Debug Info: BRANCH:" .. tostring(BRANCH) .. " File Size:" .. tostring(size or -1) .. " File Content Size:" .. tostring(content and string.len(content) or -1) .. " File Content Hash:" .. (content and util.CRC(content) or "[no content]") .. "\n")
 			end
 			return
 		else
