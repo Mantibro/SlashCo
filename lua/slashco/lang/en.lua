@@ -686,7 +686,7 @@ SlashCo.LangTable["Dolphinman_docDesc"] = [[A humanoid cryptid creature, having 
 SlashCo.LangTable["Dolphinman_docDescAdd"] = [[This Slasher is extremely sensitive to sound and has extremely poor eyesight. If agitated with a loud sound, Dolphinman will begin wailing loudly and start HUNTING. When HUNTING, Dolphinman has very good eyesight. Sensitivity to loud sounds increases with [ANGER].]]
 
 SlashCo.LangTable["FreeSmiley_docDesc"] = [[A cryptid entity that represents the appearance of a yellow tall guy with a big smile, it is said that he roams endlessly laughing near residential areas.]]
-SlashCo.LangTable["FreeSmiley_docDescAdd"] = [[We have reports of him being followed by two floating creatures that will try to harm anyone that cross they line of sight]]
+SlashCo.LangTable["FreeSmiley_docDescAdd"] = [[We have reports of him being followed by two floating creatures that will try to harm anyone that cross they line of sight.]]
 
 SlashCo.LangTable["Hatman_docDesc"] = [[A consistent hallucination reported to be seen by those who have ingested excessive doses of Diphenhydramine. Most who have experienced this entity claim to be somehow monetarily indebted to it. Other common hallucinations include visions of various large insects as well as silhouettes of people. The Hat Man will continuously head towards your current location. Staring at The Hat Man will stop him, and after a short moment will get him to temporarily disappear.]]
 --SlashCo.LangTable["HatMan_docDescAdd"] =
