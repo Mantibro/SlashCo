@@ -217,12 +217,33 @@ function SLASHER.OnMainAbilityFire(slasher)
 	if not slasher:GetNWBool("BrenNoclip") then
 		if !slasher:OnGround() and slasher:WaterLevel() == 0 and !slasher:IsStuck() then return end
 		if slasher.NoclipCooldown > 0.01 then return end
-		
+
 		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
 		slasher:SlasherHudFunc("SetControlEnabled", "RMB", false)
 
 		slasher:SetNWBool("BrenNoclip", true)
 		slasher:SetNWBool("CanChase", false)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bren/bren_noclip_start.mp3",
+			identifier = "BrenNoclipStart",
+			minDistance = 600 * SlashCo.MapSize,
+			maxDistance = 1000 * SlashCo.MapSize,
+			entity = slasher,
+			volume = 0.8,
+			fadeIn = 0,
+		})
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bren/bren_noclip.mp3",
+			identifier = "BrenNoclipLoop",
+			minDistance = 600 * SlashCo.MapSize,
+			maxDistance = 1000 * SlashCo.MapSize,
+			looping = true,
+			entity = slasher,
+			volume = 0.6,
+			fadeIn = 3,
+		})
 	else
 		local trace = util.TraceHull({
 			start = slasher:GetPos(),
@@ -233,9 +254,21 @@ function SLASHER.OnMainAbilityFire(slasher)
 			mask = MASK_PLAYERSOLID,
 		})
 		if trace.Hit then return end
-		
+
 		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
 		slasher:SlasherHudFunc("SetControlEnabled", "RMB", true)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/bren/bren_noclip_end.mp3",
+			identifier = "BrenNoclipEnd",
+			minDistance = 600 * SlashCo.MapSize,
+			maxDistance = 1000 * SlashCo.MapSize,
+			entity = slasher,
+			volume = 0.8,
+			fadeIn = 0,
+		})
+
+		SlashCo.AudioSystem.StopSound("BrenNoclipLoop", 1, slasher)
 
 		slasher:SetNWBool("BrenNoclip", false)
 		slasher:SetNWBool("CanChase", true)

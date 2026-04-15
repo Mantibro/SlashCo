@@ -148,6 +148,7 @@ end
 
 if CLIENT then
 	CreateClientConVar("slashco_tyler_endless_chase_music", "1", true, false, "When 0 the endless chase music is changed to be the normal one", 0, 1)
+	CreateClientConVar("slashco_tyler_disable_shake", "0", true, false, "When 1 the screen shake will be disabled", 0, 1)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -776,7 +777,7 @@ if CLIENT then
 						effectScale = scale
 					end
 
-					if not slasher:IsDormant() then -- Play the shake every time he's visible.
+					if not slasher:IsDormant() and not GetConVar("slashco_tyler_disable_effect"):GetBool() then -- Play the shake every time he's visible.
 						util.ScreenShake(slasher:GetPos(), 10 * scale, 40, 1, SLASHER.MaxEffectRadius, true)
 					end
 				end
