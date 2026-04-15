@@ -643,6 +643,7 @@ SlashCo.LangTable["points_quickescape"] = "[%s] БЫСТРЫЙ ПОБЕГ"
 SlashCo.LangTable["points_slowescape"] = "[%s] МЕДЛЕННЫЙ ПОБЕГ"
 SlashCo.LangTable["points_benadryl"] = "[%s] БЕНАДРИЛ"
 SlashCo.LangTable["points_working"] = "[%s] ХОРОШАЯ РАБОТА"
+SlashCo.LangTable["points_generator"] = "[%s] НАЙДЕНЫ ГЕНЕРАТОРЫ"
 
 -- Documents
 
@@ -652,7 +653,7 @@ SlashCo.LangTable["documentSlashers"] = "УБИЙЦЫ"
 SlashCo.LangTable["documentLocations"] = "МЕСТОПОЛОЖЕНИЕ"
 SlashCo.LangTable["documentArchive"] = "АРХИВ"
 SlashCo.LangTable["documentPerks"] = "ПЕРКИ"
-SlashCo.LangTable["documentEncounter"] = "СТОЛКНИТЕСЬ С УБИЙЦЕЙ, ЧТОБЫ РАЗБЛОКИРОВАТЬ ЕГО ДОКУПЕНТ"
+SlashCo.LangTable["documentEncounter"] = "СТОЛКНИТЕСЬ С УБИЙЦЕЙ, ДЛЯ РАЗБЛОКИРОВКИ ДОКУМЕНТА"
 SlashCo.LangTable["documentEntry"] = "ИМЯ: \""
 SlashCo.LangTable["documentAliases"] = "ПСЕВДОНИМЫ:"
 SlashCo.LangTable["documentClass"] = "КЛАСС:"
