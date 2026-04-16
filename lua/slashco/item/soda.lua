@@ -26,9 +26,9 @@ end
 
 ITEM.ViewModel = {
 	model = ITEM.Model,
-	pos = Vector(64, 0, -6),
+	pos = Vector(63, 0, -6),
 	angle = Angle(45, -70, -120),
-	size = Vector(0.5, 0.5, 0.5),
+	size = Vector(0.7, 0.7, 0.7),
 	color = color_white,
 	surpresslightning = false,
 	material = "",
