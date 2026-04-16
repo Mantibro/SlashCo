@@ -1,6 +1,6 @@
 local ITEM = {}
 
-ITEM.Model = "models/props_junk/PopCan01a.mdl"
+ITEM.Model = "models/slashco/items/bgonesoda.mdl"
 ITEM.Name = "Soda"
 ITEM.EntClass = "sc_soda"
 ITEM.Icon = "slashco/ui/icons/items/item_8"

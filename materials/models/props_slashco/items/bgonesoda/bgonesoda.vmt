@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/props_slashco/items/bgonesoda/bgonesoda"
+                "$bumpmap" "models/props_slashco/items/bgonesoda/bgonenormal"
+}
