@@ -227,22 +227,22 @@ function SLASHER.OnMainAbilityFire(slasher)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bren/bren_noclip_start.mp3",
 			identifier = "BrenNoclipStart",
-			minDistance = 600 * SlashCo.MapSize,
-			maxDistance = 1000 * SlashCo.MapSize,
+			minDistance = 500 * SlashCo.MapSize,
+			maxDistance = 900 * SlashCo.MapSize,
 			entity = slasher,
-			volume = 0.8,
+			volume = 0.6,
 			fadeIn = 0,
 		})
 
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/bren/bren_noclip.mp3",
+			soundPath = "slashco/slasher/bren/bren_noclip.ogg",
 			identifier = "BrenNoclipLoop",
-			minDistance = 600 * SlashCo.MapSize,
-			maxDistance = 1000 * SlashCo.MapSize,
+			minDistance = 400 * SlashCo.MapSize,
+			maxDistance = 800 * SlashCo.MapSize,
 			looping = true,
 			entity = slasher,
-			volume = 0.6,
-			fadeIn = 3,
+			volume = 0.4,
+			fadeIn = 5,
 		})
 	else
 		local trace = util.TraceHull({
@@ -261,10 +261,10 @@ function SLASHER.OnMainAbilityFire(slasher)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bren/bren_noclip_end.mp3",
 			identifier = "BrenNoclipEnd",
-			minDistance = 600 * SlashCo.MapSize,
-			maxDistance = 1000 * SlashCo.MapSize,
+			minDistance = 500 * SlashCo.MapSize,
+			maxDistance = 900 * SlashCo.MapSize,
 			entity = slasher,
-			volume = 0.8,
+			volume = 0.6,
 			fadeIn = 0,
 		})
 
