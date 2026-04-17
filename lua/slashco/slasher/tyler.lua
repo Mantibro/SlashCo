@@ -777,7 +777,7 @@ if CLIENT then
 						effectScale = scale
 					end
 
-					if not slasher:IsDormant() and not GetConVar("slashco_tyler_disable_effect"):GetBool() then -- Play the shake every time he's visible.
+					if not slasher:IsDormant() and not GetConVar("slashco_tyler_disable_shake"):GetBool() then -- Play the shake every time he's visible.
 						util.ScreenShake(slasher:GetPos(), 10 * scale, 40, 1, SLASHER.MaxEffectRadius, true)
 					end
 				end
