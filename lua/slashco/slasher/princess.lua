@@ -374,7 +374,7 @@ function SLASHER.Maul(slasher, target)
 			local idx2 = math.random(1, 5)
 
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/body_medium_impact_hard" .. idx .. ".wav",
+				soundPath = "slashco/body_medium_impact_hard" .. idx .. ".mp3",
 				identifier = "PrincessRagdollMaul1" .. idx,
 				minDistance = 200,
 				maxDistance = 700,
