@@ -1,0 +1,10 @@
+"vertexlitgeneric"
+{
+    "$basetexture"  "models\slashco\slashers\dream\ore-coal"
+    "$surfaceprop"  "Mrock"
+    "$halflambert"  "1"
+    "$reflectivity" "[0.675 0.675 0.675]"
+
+    "$blendtintbybasealpha" "1"
+    "$blendtintcoloroverbase" "0"
+}
