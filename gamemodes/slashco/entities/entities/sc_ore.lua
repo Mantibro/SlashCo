@@ -18,7 +18,7 @@ function ENT:Initialize()
 	if SERVER then
 		self.DONTPICKUP = true
 		self:SetModel("models/slashco/slashers/dream/ore.mdl")
-		self:SetSkin(7)
+		self:SetSkin(1)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
