@@ -179,6 +179,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeChasingAsHuman = 0
 	end
 
+	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress > 4 then
+		SlashCo.AudioSystem.EnableBackgroundMusic()
+		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/male07/male07_ambience.ogg", 1)
+	end
+
 	if slasher:GetNWInt("Male07State") ~= State then
 		slasher:SetNWInt("Male07State", State)
 	end

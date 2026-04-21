@@ -210,7 +210,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerChaseGain)
 	end
-	
+
+	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress > 4 then
+		SlashCo.AudioSystem.EnableBackgroundMusic()
+		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/borgmire/borgmire_ambience.ogg", 1)
+	end
+
 	local anger = SlashCo.GetSlasherAnger(slasher)
 	slasher:SetNWBool("CanThrow", anger > 50)
 
