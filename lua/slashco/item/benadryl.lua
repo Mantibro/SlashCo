@@ -77,9 +77,7 @@ ITEM.WorldModel = {
 SlashCo.RegisterItem(ITEM, "Benadryl")
 
 if SERVER then
-	hook.Add("PostPlayerDeath", "SlashCo:RemoveBenadrylEffect", function(ply)
-		if ply:Team() ~= TEAM_SPECTATOR then return end -- They survived, let their suffering continue.
-
+	hook.Add("PlayerChangedTeam", "SlashCo:RemoveBenadrylEffect", function(ply)
 		ply:SetNW2Float("InitialBenadrylTime", 0) -- Reset the benadryl time for its effects to stop.
 	end)
 
@@ -205,8 +203,10 @@ hook.Add("Think", "Benadryl", function()
 					math.random(50, 50)), Angle(0, math.random(1, 360), 0))
 			GameData.LocalPlayer.ShadowManTick = CurTime()
 		end
-	elseif IsValid(GameData.BenadrylSound) then
-		SlashCo.AudioSystem.DestroyChannel(GameData.BenadrylSound, 0)
-		GameData.BenadrylSound = nil
+	else
+		if IsValid(GameData.BenadrylSound) then
+			SlashCo.AudioSystem.DestroyChannel(GameData.BenadrylSound, 0)
+			GameData.BenadrylSound = nil
+		end
 	end
 end)
