@@ -373,7 +373,7 @@ end, function(cmd, args)
 		end
 	end
 	return tbl1
-end, "Give yourself an item", FCVAR_CHEAT)
+end, nil, "Give yourself an item", FCVAR_CHEAT)
 
 concommand.Add("slashco_give_points", function(ply, _, args)
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
@@ -429,7 +429,7 @@ concommand.Add("slashco_give_points", function(ply, _, args)
 
 	SlashCoDatabase.UpdateStats(steamid, "Points", number)
 	doPrint(ply, "Player " .. name .. " received " .. number.. " points")
-end, "Give a player more points", FCVAR_CHEAT + FCVAR_PROTECTED)
+end, nil, "Give a player more points", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 concommand.Add("slashco_debug_printents", function(ply, _, args)
 	if IsValid(ply) and ply:IsPlayer() and not ply:IsAdmin() then
