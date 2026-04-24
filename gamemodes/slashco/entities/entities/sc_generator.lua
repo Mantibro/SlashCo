@@ -75,16 +75,18 @@ if CLIENT then
 
 		local curTime = CurTime()
 		local dlight = DynamicLight(cacheData.entindex)
-		if dlight then
-			dlight.pos = cacheData.pos
-			dlight.r = not running and 255 or 0
-			dlight.g = running and 255 or 0
-			dlight.b = 0
-			dlight.brightness = 5
-			dlight.Decay = 1000
-			--dlight.nomodel = true -- We don't need that.
-			dlight.Size = math.abs(running and 1 or math.sin(curTime)) * 200
-			dlight.DieTime = curTime + (running and 60 or 0.1)
+		if not self:GetNWBool("GeneratorMalfunction") then
+			if dlight then
+				dlight.pos = cacheData.pos
+				dlight.r = not running and 255 or 0
+				dlight.g = running and 255 or 0
+				dlight.b = 0
+				dlight.brightness = 5
+				dlight.Decay = 1000
+				--dlight.nomodel = true -- We don't need that.
+				dlight.Size = math.abs(running and 1 or math.sin(curTime)) * 200
+				dlight.DieTime = curTime + (running and 60 or 0.1)
+			end
 		end
 
 		self:DrawModel()
@@ -113,6 +115,23 @@ if CLIENT then
 	end
 
 	return
+end
+
+function ENT:DoSpark()
+	local effect = EffectData()
+	effect:SetOrigin(self:GetPos())
+	util.Effect("StunstickImpact", effect)
+
+	local rng = math.random(1, 9)
+	if rng == 4 then rng = 5 end
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "ambient/energy/zap" .. rng .. ".wav",
+		identifier = "CustardMachineSpark" .. rng,
+		minDistance = 250,
+		maxDistance = 800,
+		entity = self,
+		volume = 1,
+	})
 end
 
 function ENT:Initialize()
@@ -272,6 +291,12 @@ end
 
 function ENT:Use(activator)
 	if activator:Team() ~= TEAM_SURVIVOR or activator:GetPos():Distance(self:GetPos()) > 100 then
+		return
+	end
+
+	if self:GetNWBool("GeneratorMalfunction") then
+		activator:ChatText("Generator_Blocked")
+		self:DoSpark()
 		return
 	end
 
