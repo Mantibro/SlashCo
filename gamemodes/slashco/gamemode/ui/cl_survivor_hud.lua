@@ -457,6 +457,38 @@ hook.Add("SlashCo:DrawHUD", "SurvivorHUD", function()
 	showScreenMessage()
 end)
 
+hook.Add("SlashCo:DrawHUD", "SurvivorStruggle", function()
+	local ply = GameData.LocalPlayer
+
+	local team = ply:Team()
+	if team == TEAM_LOBBY then return end
+	if team == TEAM_SPECTATOR then return end
+	if team ~= TEAM_SURVIVOR then return end
+
+	if (ply:GetNWBool("SurvivorTackled") == true) or (ply:GetNWBool("SurvivorGrabbed") == true) then
+		if GameData.LocalPlayer.struggle_key == nil then
+			GameData.LocalPlayer.struggle_key = 0
+		end
+
+		GameData.LocalPlayer.struggle_key = GameData.LocalPlayer.struggle_key + (FrameTime() * 10)
+
+		if GameData.LocalPlayer.struggle_key > 2 then
+			GameData.LocalPlayer.struggle_key = 0
+		end
+
+		local Overlay = Material("slashco/ui/survivor_quicktime")
+
+		Overlay:SetFloat("$alpha", 1)
+		Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.struggle_key))
+
+		surface.SetDrawColor(255, 255, 255, 100)
+		surface.SetMaterial(Overlay)
+		surface.DrawTexturedRect(0, 0, 512, 512)
+	else
+		GameData.LocalPlayer.struggle_key = nil
+	end
+end)
+
 hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)
 	if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SURVIVOR then
 		return

@@ -201,7 +201,7 @@ SlashCo.LangTable["PocketSand_desc"] = "Siega a Slashers que están a rango cerc
 SlashCo.LangTable["Rock"] = "La Roca"
 SlashCo.LangTable["Rock_desc"] = "Te hace completamente silencioso, pero no puedes correr. Cuando dejada caer, se empujara hacia la Gasolina má​​​​​​​s cercana ocasionalmente."
 
-SlashCo.LangTable["Soda"] = "Soda marca D-Saparece"
+SlashCo.LangTable["Soda"] = "Soda D-Saparece"
 SlashCo.LangTable["Soda_desc"] = "Te hace invisible cuando usada."
 
 SlashCo.LangTable["StepDecoy"] = "Cebo de Pasos"
@@ -233,6 +233,15 @@ SlashCo.LangTable["Newports_desc"] = "USA puede intentar todo lo que quiera bane
 
 SlashCo.LangTable["JonklerCart"] = "Carta Malvada del Jonkler"
 SlashCo.LangTable["JonklerCart_desc"] = "Un parlante que hace ruido, cualquier cosa cercana a el se llenara de furia al instante, incluyendo al Slasher."
+
+SlashCo.LangTable["Orange"] = "Naranja Molesta"
+SlashCo.LangTable["Orange_desc"] = "Una naranja que no para de hablar. Su poder es mas de 9000!"
+
+SlashCo.LangTable["Burger"] = "Hamburguesa Loca"
+SlashCo.LangTable["Burger_desc"] = "Una hamburguesa creada por un payaso lunatico. Emite un humo verde"
+
+SlashCo.LangTable["CocaCola"] = "Refresco de Cola"
+SlashCo.LangTable["CocaCola_desc"] = "Pedimos granadas y esto fue lo que nos dieron. Ten cuidado al usarla."
 
 --GameInfo
 
@@ -328,6 +337,7 @@ SlashCo.LangTable["stop chasing"] = "dejar de seguir"
 SlashCo.LangTable["slasher_speedrate"] = "Velocidad"
 SlashCo.LangTable["slasher_eyerate"] = "Vista"
 SlashCo.LangTable["slasher_diffrate"] = "Dificultad"
+SlashCo.LangTable["Generator_Blocked"] = "El generador esta bloqueado!"
 
 --Every Slasher:
 
@@ -586,6 +596,18 @@ SlashCo.LangTable["Bren_desc"] = [[Un terrorifico Umbra que puede atravesar supe
 SlashCo.LangTable["Bren_tip"] = "-Cuida tu espalda."
 SlashCo.LangTable["snap"] = "chasquido"
 
+-- HOOVYDUNDY
+SlashCo.LangTable["Hoovydundy"] = "Hoovydundy"
+SlashCo.LangTable["Hoovydundy_desc"] = [[Aquel que rechazaron su amistad.
+
+-Hoovydundy puede detener el progreso de los generadores.
+-Emite una luz roja en todo momento.
+-Este slasher se mueve muy lento.]]
+SlashCo.LangTable["Hoovydundy_tip"] = "-No intentes frenarlo."
+
+SlashCo.LangTable["genblock"] = "bloquear generador"
+SlashCo.LangTable["entangle"] = "amarrar"
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Los espectadores ahora pueden marcar."
 SlashCo.LangTable["unhide"] = "levantarse" -- for dolphinman to unhide
@@ -653,6 +675,9 @@ SlashCo.LangTable["documentClass"] = "CLASE:"
 SlashCo.LangTable["documentDanger"] = "PELIGRO:"
 SlashCo.LangTable["documentAttFile"] = "[VER ARCHIVO ADJUNTO]"
 SlashCo.LangTable["documentSurvive"] = "[SOBREVIVE PARA MAS INFORMACION]"
+
+SlashCo.LangTable["Hoovydundy_docDesc"] = [[Lo que comenzo como simples rumores al parecer resulto ser cierto. Un equipo de slashco fue enviado a hacer su rutina diaria, pero se toparon con EL. Solo uno de los empleados sobrevivio para contarnos su experiencia ante la entidad.]]
+SlashCo.LangTable["Hoovydundy_docDescAdd"] = [[Este slasher es lento y siempre emitira una luz roja alrededor suyo, siendo facil de localizar. Puede agarrar a sus victimas con cuerdas provenientes de su cuerpo. Es capaz de interferir con la restauracion de los generadores. Se recomienda no tratar de aturdir este slasher de NINGUNA MANERA.]]
 
 -- Perks
 

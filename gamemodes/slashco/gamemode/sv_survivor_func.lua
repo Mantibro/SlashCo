@@ -78,16 +78,6 @@ hook.Add("KeyPress", "SlashCo:SurvivorFunctions", function(ply, button)
 		return
 	end
 
-	--Covenant Tackle
-	if ply:GetNWBool("SurvivorTackled") then
-		if button == IN_MOVERIGHT or button == IN_MOVELEFT and ply.LastTackleStruggleKey ~= button then
-			ply.LastTackleStruggleKey = button
-			ply.TackleStruggle = (ply.TackleStruggle or 0) + 1
-		end
-
-		return
-	end
-
 	local lookent = ply:GetEyeTrace().Entity
 
 	if button ~= IN_ATTACK or ply:GetVelocity():Length() <= 250 then
@@ -107,6 +97,37 @@ hook.Add("KeyPress", "SlashCo:SurvivorFunctions", function(ply, button)
 
 			ply:ViewPunch(Angle(-15, 0, 0))
 		end)
+	end
+end)
+
+hook.Add("KeyPress", "SlashCo:SurvivorStruggles", function(ply, key)
+	local team = ply:Team()
+	if team ~= TEAM_SURVIVOR then
+		return
+	end
+
+	--Covenant Tackle
+	if ply:GetNWBool("SurvivorTackled") then
+		if key == 11 or key == 14 then
+			if ply.LastTackleStruggleKey ~= key then
+				ply.LastTackleStruggleKey = key
+				ply.TackleStruggle = (ply.TackleStruggle or 0) + 1
+			end
+		end
+
+		return
+	end
+
+	--Hoovydundy RopeGrab
+	if ply:GetNWBool("SurvivorGrabbed") then
+		if key == 11 or key == 14 then
+			if ply.LastRopeStruggleKey ~= key then
+				ply.LastRopeStruggleKey = key
+				ply.RopeStruggle = (ply.RopeStruggle or 0) + 1
+			end
+		end
+
+		return
 	end
 end)
 

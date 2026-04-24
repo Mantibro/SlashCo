@@ -227,6 +227,15 @@ SlashCo.LangTable["Newports_desc"] = "The US might try as hard as it can to ban 
 SlashCo.LangTable["JonklerCart"] = "Evil Jonkler Cart"
 SlashCo.LangTable["JonklerCart_desc"] = "A noisemaking speaker, sure to drive anything near it furious and insane, including the Slasher."
 
+SlashCo.LangTable["Orange"] = "Annoying Orange"
+SlashCo.LangTable["Orange_desc"] = "An orange that keeps talking non-stop. His power level is over 9000."
+
+SlashCo.LangTable["Burger"] = "Crazy Hamburger"
+SlashCo.LangTable["Burger_desc"] = "A hamburger made by a crazy clown. Emits a big green smoke."
+
+SlashCo.LangTable["CocaCola"] = "Cola Soda"
+SlashCo.LangTable["CocaCola_desc"] = "We requested grenades, this is what we got. Careful while using it."
+
 --GameInfo
 
 SlashCo.LangTable["SurvivorInfo"] = [[Welcome to the SlashCo Power Recovery Program.
@@ -327,6 +336,7 @@ SlashCo.LangTable["stop chasing"] = "stop chasing"
 SlashCo.LangTable["slasher_speedrate"] = "Speed"
 SlashCo.LangTable["slasher_eyerate"] = "Eyesight"
 SlashCo.LangTable["slasher_diffrate"] = "Difficulty"
+SlashCo.LangTable["Generator_Blocked"] = "The generator is blocked!"
 
 --Every Slasher:
 
@@ -592,6 +602,18 @@ SlashCo.LangTable["Kamenchik_desc"] = [[The Overwhelming Slasher who works for 3
 -.]]
 SlashCo.LangTable["Kemenchik_tip"] = "-You may as well give up."
 
+-- HOOVYDUNDY
+SlashCo.LangTable["Hoovydundy"] = "Hoovydundy"
+SlashCo.LangTable["Hoovydundy_desc"] = [[The one whose friendship was denied.
+
+-Hoovydundy can stop the progress of generators.
+-Emits a red light everytime.
+-This slasher is really slow.]]
+SlashCo.LangTable["Hoovydundy_tip"] = "-Never try to stun him."
+
+SlashCo.LangTable["genblock"] = "block generator"
+SlashCo.LangTable["entangle"] = "entangle"
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide" -- for dolphinman to unhide
@@ -720,6 +742,9 @@ SlashCo.LangTable["Tyler_docDesc"] = [[A transcendent non-corporeal entity which
 
 SlashCo.LangTable["Watcher_docDesc"] = [[An umbra entity, taking the form of an extremely tall old man wearing an olive overcoat, round glasses and a hat. The entity awkwardly stumbles when moving, and has mostly been reported to observe victims patiently while hidden in the dark. This Slasher has been reported to prefer to stay in groups, and has shown to be a brutal killer when acting alone.]]
 SlashCo.LangTable["Watcher_docDescAdd"] = [[This Slasher cannot passively gain [ANGER]. The Watcher will VERY RAPIDLY gain [ANGER] when observing a victim.]]
+
+SlashCo.LangTable["Hoovydundy_docDesc"] = [[What began as mere rumors turned out to be true. A Slashco crew was sent out to perform their daily routine, but they encountered HIM. Only one of our loyal employees manages to survive to tell us about his encounter with the entity.]]
+SlashCo.LangTable["Hoovydundy_docDescAdd"] = [[This slasher is slow and always emits a red light around him, making it easy to spot and avoid. It can grab his victims with a rope that comes from his body. He is able to interfere with REFUELING generators. It is strongly recommended that you DO NOT ATTEMPT to stun this slasher under any circumstances.]]
 
 -- Perks
 

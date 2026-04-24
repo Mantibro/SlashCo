@@ -207,3 +207,41 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 	end
 	updateSelection()
 end
+
+local Death = {
+	CurInput = 1,
+	Sequence = {
+		18,
+		14,
+		3,
+		1,
+		2,
+		8,
+		64
+	}
+}
+
+hook.Add("PlayerButtonDown", "FriendlyMatch", function(ply, key)
+	if ply ~= LocalPlayer() then return end
+	if not IsFirstTimePredicted() then return end
+
+	if IsValid(SlasherSelectFrame) then
+		if key == Death.Sequence[Death.CurInput] then
+			Death.CurInput = Death.CurInput + 1
+			ply:EmitSound("slashco/blip.wav")
+			if Death.CurInput > 7 then
+				ply:ChatPrint("What have you done. . .")
+				ply:EmitSound("slashco/slasher/hoovydundy/kill.mp3")
+				SlashCoSlashers.Hoovydundy.IsSelectable = true
+				if (IsValid(SlasherSelectFrame)) then
+					SlasherSelectFrame:Remove()
+					SlasherSelectFrame = nil
+				end
+				SelectedSlasher = "Hoovydundy"
+				DrawTheSlasherSelectorBox()
+			end
+		else
+			Death.CurInput = 1
+		end
+	end
+end)

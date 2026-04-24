@@ -70,6 +70,13 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 		return ply.CalcIdeal, ply.CalcSeqOverride
 	end
 
+	if ply:GetNWBool("SurvivorGrabbed") then
+		ply.CalcIdeal = ACT_DIESIMPLE
+		ply.CalcSeqOverride = ply:LookupSequence("idle_all_cower")
+
+		return ply.CalcIdeal, ply.CalcSeqOverride
+	end
+
 	if not ply:GetNWBool("SurvivorSidExecution") and not ply:GetNWBool("Taunt_MNR") then
 		ply.surv_anim_antispam = false
 	end

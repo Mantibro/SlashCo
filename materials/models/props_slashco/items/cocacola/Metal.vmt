@@ -1,0 +1,7 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/props_slashco/items/cocacola/Metal"
+                 "$envmap" "env_cubemap"
+                "$envmaptint" "[0.5 0.5 0.5]"
+                "$surfaceprop" "Metal"
+}

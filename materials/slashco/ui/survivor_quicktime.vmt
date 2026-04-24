@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/survivor_quicktime"
+	"$alphatest" 1
+	"$translucent" 1
+	"$ignorez" 1
+}
