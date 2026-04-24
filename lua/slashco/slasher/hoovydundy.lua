@@ -494,6 +494,7 @@ if CLIENT then
 
 	hook.Add("Tick", "HoovyLight", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			if SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
 			if v == GameData.LocalPlayer then return end
 
 			if not v:GetNWBool("InSlasherChaseMode") then
