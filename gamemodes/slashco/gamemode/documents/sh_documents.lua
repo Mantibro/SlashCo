@@ -34,5 +34,5 @@ function SlashCo.LoadDocuments()
 	end
 	SC_LOADEDDOCUMENTS = true
 end
-hook.Add("GameContentChanged", "SlashCo:RefreshDocuments", SlashCo.LoadDocuments)
+hook.Add("SlashCo:GameContentChanged", "SlashCo:RefreshDocuments", SlashCo.LoadDocuments)
 SlashCo.LoadDocuments()

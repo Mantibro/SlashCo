@@ -13,7 +13,7 @@ SlashCo.AudioSystem.LastAcknowledgedTick = SlashCo.AudioSystem.LastAcknowledgedT
 -- These intentionally are nuked on autorefresh
 local ErrorList = {} -- A table containing all the files we failed to open, if the file is in this list and we fail loading again, then we won't throw another error.
 local Fake3DList = {}
-local OGGRetryList = {} -- RaphaelIT7: We remapp ogg files from the VFS to a location actually on disk as it seems like things mounted through GMA cause bass to fail?
+local SoundRetryList = {} -- RaphaelIT7: We remapp ogg files from the VFS to a location actually on disk as it seems like things mounted through GMA cause bass to fail?
 
 -- So that we don't depend on the GameData table as this system is meant to also work as a standalone library.
 SlashCo.AudioSystem.IsSinglePlayer = SlashCo.AudioSystem.IsSinglePlayer or game.SinglePlayer()
@@ -77,10 +77,10 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 		return
 	end
 
-	local usedOGGRemap = false
-	if OGGRetryList[soundFile] then
-		soundFile = OGGRetryList[soundFile]
-		usedOGGRemap = true
+	local usedSoundRemap = false
+	if SoundRetryList[soundFile] then
+		soundFile = SoundRetryList[soundFile]
+		usedSoundRemap = true
 	end
 
 	local soundFunc = isURL and sound.PlayURL or sound.PlayFile
@@ -95,7 +95,7 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 				ErrorList[soundFile] = true
 
 				-- RaphaelIT7: This one specific OGG issue >:(
-				if string.EndsWith(soundFile, ".ogg") and errStr == "BASS_ERROR_FILEFORM" and OGGRetryList[soundFile] == nil then
+				if errStr == "BASS_ERROR_FILEFORM" and SoundRetryList[soundFile] == nil then
 					local folderName = soundFile
 					local lastSlash = string.find(folderName, "/")
 					local currentSlash = lastSlash
@@ -111,12 +111,12 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 					-- RaphaelIT7: Let's write the file to disk to avoid VFS issues
 					file.CreateDir("slashco_oggcache/" .. folderName)
 
-					local oggRetryName = "slashco_oggcache/" .. soundFile
-					file.Write(oggRetryName, file.Read(soundFile, "GAME"))
+					local soundRetryName = "slashco_oggcache/" .. soundFile
+					file.Write(soundRetryName, file.Read(soundFile, "GAME"))
 
-					oggRetryName = "data/" .. oggRetryName
-					OGGRetryList[soundFile] = oggRetryName
-					OGGRetryList[oggRetryName] = soundFile
+					soundRetryName = "data/" .. soundRetryName
+					SoundRetryList[soundFile] = soundRetryName
+					SoundRetryList[soundRetryName] = soundFile
 					
 					SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallback)
 					return
@@ -129,11 +129,11 @@ function SlashCo.AudioSystem.CreateChannel(soundFile, mode, callback, errorCallb
 			end
 			return
 		else
-			--[[if usedOGGRemap and game.IsDedicated() then -- RapahelIT7: Let me find this in the server logs
+			--[[if usedSoundRemap and game.IsDedicated() then -- RapahelIT7: Let me find this in the server logs
 				local size = file.Size(soundFile, "GAME")
 				local content = file.Read(soundFile, "GAME")
-				local VFSsize = file.Size(OGGRetryList[soundFile], "GAME")
-				local VFScontent = file.Read(OGGRetryList[soundFile], "GAME")
+				local VFSsize = file.Size(SoundRetryList[soundFile], "GAME")
+				local VFScontent = file.Read(SoundRetryList[soundFile], "GAME")
 				ErrorNoHaltWithStack(
 					"(Debug message - ignore this) Managed to play previously failing OGG file from disk! (" .. soundFile .. ") | Debug Info: "
 					.. " Branch:" .. tostring(BRANCH)

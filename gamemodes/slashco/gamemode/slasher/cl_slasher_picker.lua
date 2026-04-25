@@ -84,7 +84,12 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 
 		function Slash.Paint(self, w, h)
 			if is_available then
-				surface.SetMaterial(Material("slashco/ui/icons/slasher/s_" .. SlashCoSlashers[slasherName].ID))
+				local mat = "slashco/ui/icons/slasher/"
+				if SlashCoSlashers[slasherName].IsLegacyID then
+					mat = mat .. "s_"
+				end
+
+				surface.SetMaterial(Material(mat .. SlashCoSlashers[slasherName].IDName))
 			else
 				surface.SetMaterial(Material("slashco/ui/icons/slasher/kill_disabled"))
 			end
@@ -163,7 +168,7 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 	local mat = vgui.Create("Material", SlasherSelectFrame)
 	mat:SetPos(ScrW() - (ScrW() / 2.5), 0)
 	mat:SetSize(ScrW() / 2.5, ScrH() / 1.5)
-	mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_1")
+	mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_sid")
 	mat.AutoSize = false
 	mat:SetZPos(-1) -- Else it would cut off our labels. This took like an hour to figure out :sob:
 	mat:SetVisible(false)
@@ -179,7 +184,7 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 		else
 			confirmselect:SetDisabled(false)
 			mat:SetVisible(true)
-			mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_" .. SlashCoSlashers[GameData.SelectedSlasher].ID)
+			mat:SetMaterial("slashco/ui/icons/slasher/preview/preview_" .. SlashCoSlashers[GameData.SelectedSlasher].IDName)
 
 			ILabel:SetText(SlashCo.Language(GameData.SelectedSlasher))
 			ISDesc:SetText(SlashCo.Language(GameData.SelectedSlasher .. "_desc") .. "\n\n" .. SlashCo.Language("slasher_speedrate") .. ": " .. SlashCoSlashers[GameData.SelectedSlasher].SpeedRating .. "\n" .. SlashCo.Language("slasher_eyerate") .. ": " .. SlashCoSlashers[GameData.SelectedSlasher].EyeRating .. "\n" .. SlashCo.Language("slasher_diffrate") .. ": " .. SlashCoSlashers[GameData.SelectedSlasher].DiffRating)

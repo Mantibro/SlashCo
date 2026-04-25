@@ -31,7 +31,7 @@ local worldScale = 0.15  -- Scale factor to convert from screen pixels to world 
 local screenMins = Vector(0, 0, 0)
 local screenMaxs = Vector(screenSize * worldScale, -screenSize * worldScale, 1)
 
-local unknownIcon = Material("slashco/ui/icons/slasher/s_0")
+local unknownIcon = Material("slashco/ui/icons/slasher/unknown")
 local starFilled = Material("slashco/ui/star_filled")
 local starUnfilled = Material("slashco/ui/star_unfilled")
 GameData.DocumentPointer = GameData.DocumentPointer or 0
@@ -258,7 +258,7 @@ local selection = {
 		local slasher = hasDocument and SlashCoSlashers[selectedDocument.Slasher] or nil
 
 		surface.SetDrawColor(255, 255, 255, 255)
-		surface.SetMaterial(slasher and Material("slashco/ui/icons/slasher/s_" .. slasher.ID) or (selectedDocument.ID and Material("slashco/ui/icons/slasher/s_" .. selectedDocument.ID) or unknownIcon))
+		surface.SetMaterial(slasher and Material("slashco/ui/icons/slasher/" .. slasher.IDName) or (selectedDocument.ID and Material("slashco/ui/icons/slasher/" .. selectedDocument.ID) or unknownIcon))
 		surface.DrawTexturedRect(w / 20, h - (h / 2.7), w / 3, h / 3)
 
 		draw.SimpleText("[" .. string.upper(hasDocument and (slasher and slasher.Name or selectedDocument.Name) or "UNKNOWN") .. "]", "TVCDMediumBig", h / 1.45, w / 1.3, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
@@ -377,14 +377,14 @@ for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 	local Class = string.upper(SlashCo.SlasherClass[document.Class or (slasher and slasher.Class or SlashCo.SlasherClass.Unknown)])
 	local DangerLevel = string.upper(SlashCo.DangerLevel[document.DangerLevel or (slasher and slasher.DangerLevel or SlashCo.DangerLevel.Unknown)])
 	local Name = slasher and slasher.Name or document.Name
-	local ID = slasher and slasher.ID or document.ID
+	local ID = slasher and slasher.IDName or document.ID
 
 	if not Aliases or not Class or not DangerLevel or not ID then continue end -- No slasher and no data? Then something is invalid
 
 	local descriptionRows = SplitTextIntoRows(SlashCo.Language(document.Description), "TVCD", screenSize / 1.01)
 	local additionalDescriptionRows = SplitTextIntoRows(SlashCo.Language(document.AdditionalDescription), "TVCD", screenSize / 1.01)
 
-	local icon = Material("slashco/ui/icons/slasher/s_" .. ID)
+	local icon = Material("slashco/ui/icons/slasher/" .. ID)
 	selection["Slasher-" .. (document.Slasher or document.Name)] = function(w, h)
 		local row = 1
 		local rowSize = w / 32

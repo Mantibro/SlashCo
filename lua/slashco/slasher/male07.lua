@@ -1,7 +1,6 @@
 local SLASHER = {}
 
 SLASHER.Name = "Male_07"
-SLASHER.ID = 6
 SLASHER.Class = SlashCo.SlasherClass.Umbra
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -396,15 +395,15 @@ function SLASHER.Footstep(ply)
 end
 
 local possessTable = {
-	["possess vessel"] = Material("slashco/ui/icons/slasher/s_6"),
+	["possess vessel"] = Material("slashco/ui/icons/slasher/male07"),
 	["d/possess vessel"] = Material("slashco/ui/icons/slasher/kill_disabled"),
-	["unpossess vessel"] = Material("slashco/ui/icons/slasher/s_6_s0")
+	["unpossess vessel"] = Material("slashco/ui/icons/slasher/male07_s0")
 }
 
 local avatarTable = {
-	default = Material("slashco/ui/icons/slasher/s_6"),
-	specter = Material("slashco/ui/icons/slasher/s_6_s0"),
-	monster = Material("slashco/ui/icons/slasher/s_6_s2")
+	default = Material("slashco/ui/icons/slasher/male07"),
+	specter = Material("slashco/ui/icons/slasher/male07_s0"),
+	monster = Material("slashco/ui/icons/slasher/male07_s2")
 }
 
 function SLASHER.InitHud(_, hud)
@@ -481,7 +480,7 @@ if CLIENT then
 				return
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_6")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_male07")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.male_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

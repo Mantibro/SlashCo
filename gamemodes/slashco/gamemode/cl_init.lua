@@ -2,10 +2,16 @@
 
 SlashCo = SlashCo or {}
 
+include("sh_shared.lua")
+include("sh_content.lua")
+
 SlashCo.LangTable = {}
-include("slashco/lang/en.lua")
-SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
 SlashCo.CurrentLang = SlashCo.CurrentLang or "en"
+local currentLang = string.lower(language.GetPhrase("slashco.language"))
+if currentLang ~= "en" then -- Let's save us 1 filesystem call
+	include("slashco/lang/en.lua")
+	SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
+end
 
 function SlashCo.LoadLanguage()
 	local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
@@ -13,10 +19,12 @@ function SlashCo.LoadLanguage()
 		local lang = string.lower(language.GetPhrase("slashco.language"))
 		if lang == string.lower(string.Replace(v, ".lua", "")) then
 			include("slashco/lang/" .. v)
-
-			if file.Exists("slashco/patch/lang/" .. v, "LUA") then
-				include("slashco/patch/lang/" .. v)
+			if lang == "en" and not SlashCo.LangTableFallback then
+				SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
 			end
+
+			-- Any SlashCo addon can have their own language file to add additional keys :)
+			SlashCo.LoadFileFromAddons("lua/slashco/lang/" .. v)
 
 			if SlashCo.CurrentLang != lang then
 				SlashCo.CurrentLang = lang
@@ -52,8 +60,6 @@ function SlashCo.Language(key, ...)
 	end
 end
 
-include("sh_shared.lua")
-include("sh_content.lua")
 include("ui/cl_scoreboard.lua")
 include("cl_headbob.lua")
 include("ui/cl_fonts.lua")
@@ -419,11 +425,11 @@ net.Receive("SlashCo:GlobalSound", function()
 	end
 end)
 
-local KillIcon = Material("slashco/ui/icons/slasher/s_0")
+local KillIcon = Material("slashco/ui/icons/slasher/unknown")
 local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
 
-local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
-local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
+local SurvivorIcon = Material("slashco/ui/icons/slasher/survivor")
+local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/survivor_dead")
 
 hook.Add("SlashCo:DrawHUD", "AwaitingPlayersHUD", function()
 	if GameData.IsLobby then
@@ -597,19 +603,18 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		draw.SimpleText(slasherDangerTranslated, "BriefingFont", 900 - monitorsize / 2, 450 - monitorsize / 2, txtcolor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		draw.SimpleText(SlashCo.Language("Notes") .. ":", "BriefingFont", 25 - monitorsize / 2, 700 - monitorsize / 2, color_white)
 
-		local icondrawid = 0
+		local icondrawid = "unknown"
 		if b_tick > 200 then
 			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
 
 			if slasherID and slasherID ~= 0 then
-				icondrawid = SlashCoSlashers[slasherID].ID
+				icondrawid = SlashCo.GetSlasherTableByID(slasherID).IDName
 			end
 		else
 			draw.SimpleText("...", "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
-			icondrawid = 0
 		end
 
-		local MainIcon = Material("slashco/ui/icons/slasher/s_" .. icondrawid)
+		local MainIcon = Material("slashco/ui/icons/slasher/" .. icondrawid)
 
 		surface.SetDrawColor(255, 255, 255, 255)
 		surface.SetMaterial(MainIcon)

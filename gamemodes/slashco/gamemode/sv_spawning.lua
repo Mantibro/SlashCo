@@ -793,6 +793,8 @@ local function startRound(noSetup)
 		settingsEnt:TriggerOutput("OnRoundStarted", settingsEnt, settingsEnt, #SlashCo.CurRound.ExpectedPlayers)
 	end
 
+	hook.Run("SlashCo:OnRoundStarted", #SlashCo.CurRound.ExpectedPlayers)
+
 	SlashCo.UpdateObjective("generator", SlashCo.ObjStatus.INCOMPLETE, SlashCo.GetGeneratorsNeeded())
 	if GameData.RequiredDocumentCount and GameData.RequiredDocumentCount > 0 and not GameData.FailedToSpawnDocuments then
 		SlashCo.UpdateObjective("page", SlashCo.ObjStatus.INCOMPLETE, GameData.RequiredDocumentCount)

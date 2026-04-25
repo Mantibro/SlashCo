@@ -1,6 +1,0 @@
-"UnlitGeneric"
-{
-	"$basetexture" "slashco/ui/icons/slasher/s_punch"
-	"$translucent" 1
-	"$halflambert" 1
-}

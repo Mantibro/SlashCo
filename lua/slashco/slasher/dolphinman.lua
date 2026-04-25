@@ -4,7 +4,6 @@ SLASHER.Name = "Dolphinman"
 SLASHER.Aliases = {
 	"Dolfin",
 }
-SLASHER.ID = 16
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
@@ -320,13 +319,13 @@ function SLASHER.Footstep(ply)
 end
 
 local hideIcons = {
-	["default"] = Material("slashco/ui/icons/slasher/s_16"),
-	["unhide"] = Material("slashco/ui/icons/slasher/s_10_a1"),
+	["default"] = Material("slashco/ui/icons/slasher/dolphinman"),
+	["unhide"] = Material("slashco/ui/icons/slasher/watcher_a1"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_16"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/dolphinman"))
 	hud:SetTitle("Dolphinman")
 
 	hud:AddControl("R", "hide", hideIcons)
@@ -365,7 +364,7 @@ if CLIENT then
 				GameData.LocalPlayer.dolf_f = 28
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_16")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_dolphinman")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.dolf_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

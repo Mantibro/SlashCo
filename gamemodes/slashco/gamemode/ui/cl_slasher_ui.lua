@@ -3,11 +3,11 @@
 --local ProgressBarBase = Material("slashco/ui/icons/slasher/progbar_base")
 --local ProgressBarIcon = Material("slashco/ui/icons/slasher/progbar_icon")
 --local ProgressBarIconTop = Material("slashco/ui/icons/slasher/progbar_icon2")
---local SurvivorIcon = Material("slashco/ui/icons/slasher/s_survivor")
---local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/s_survivor_dead")
---local KillIcon = Material("slashco/ui/icons/slasher/s_0")
+--local SurvivorIcon = Material("slashco/ui/icons/slasher/survivor")
+--local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/survivor_dead")
+--local KillIcon = Material("slashco/ui/icons/slasher/unknown")
 --local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
---local ChaseIcon = Material("slashco/ui/icons/slasher/s_chase")
+--local ChaseIcon = Material("slashco/ui/icons/slasher/chase")
 --local ChaseDisabledIcon = Material("slashco/ui/icons/slasher/chase_disabled")
 --local SlashID = 0
 
@@ -66,7 +66,7 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 
 	if SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID ~= SlashID then
 		SlashID = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID
-		MainIcon = Material("slashco/ui/icons/slasher/s_" .. SlashID)
+		MainIcon = Material("slashco/ui/icons/slasher/" .. SlashID)
 	end
 
 	local GameProgress = GameData.LocalPlayer:GetNWInt("GameProgressDisplay")

@@ -1,7 +1,6 @@
 local SLASHER = {}
 
 SLASHER.Name = "CovenantRocks"
-SLASHER.ID = "covenantrocks"
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = false
@@ -145,10 +144,10 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_rocks"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/rocks"))
 	hud:SetTitle("CovenantRocks")
 	
-	hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/s_0"))
+	hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/unknown"))
 	hud:UntieControl("LMB")
 	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
 	

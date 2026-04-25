@@ -4,7 +4,6 @@ SLASHER.Name = "Bren"
 SLASHER.Aliases = {
 	"The Council",
 }
-SLASHER.ID = 24
 SLASHER.Class = SlashCo.SlasherClass.Umbra
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -387,12 +386,12 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_24"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/bren"))
 	hud:SetTitle("Bren")
 
 	hud:ChaseAndKill()
-	hud:AddControl("R", "noclip", Material("slashco/ui/icons/slasher/s_bren_noclip"))
-	hud:AddControl("F", "snap", Material("slashco/ui/icons/slasher/s_bren_snap"))
+	hud:AddControl("R", "noclip", Material("slashco/ui/icons/slasher/bren_noclip"))
+	hud:AddControl("F", "snap", Material("slashco/ui/icons/slasher/bren_snap"))
 
 	hud:TieControl("R", "CanNoclip")
 	hud:TieControlVisible("R", "CanNoclip")

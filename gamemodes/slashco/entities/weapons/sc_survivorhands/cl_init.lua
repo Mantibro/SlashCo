@@ -1,6 +1,9 @@
 include("shared.lua")
 include("slashco/gamemode/items/items_init.lua")
 
+-- RaphaelIT7: We must use _BOTH since some items may be translucent!
+SWEP.RenderGroup = RENDERGROUP_BOTH
+
 function SWEP:Initialize()
 	self.heldEntity = ClientsideModel("models/props_junk/metalgascan.mdl", RENDER_GROUP_VIEW_MODEL_OPAQUE)
 	if IsValid(self.heldEntity) then
@@ -45,7 +48,7 @@ function SWEP:OnRemove()
 	end
 end
 
-function SWEP:RenderModel(v, model, owner, flipVM, xPos, item)
+function SWEP:RenderModel(v, model, owner, flipVM, xPos, item, flags)
 	if not IsValid(model) then
 		self:Initialize()
 		return
@@ -111,7 +114,7 @@ function SWEP:RenderModel(v, model, owner, flipVM, xPos, item)
 
 	render.SetColorModulation(v.color.r / 255, v.color.g / 255, v.color.b / 255)
 	render.SetBlend(v.color.a / 255)
-	model:DrawModel()
+	model:DrawModel(flags)
 	render.SetBlend(1)
 	render.SetColorModulation(1, 1, 1)
 
@@ -122,7 +125,7 @@ function SWEP:RenderModel(v, model, owner, flipVM, xPos, item)
 	model.LastPaint = RealTime()
 end
 
-function SWEP:ViewModelDrawn()
+function SWEP:ViewModelDrawn(flags)
 	local owner = self:GetOwner()
 	if not IsValid(owner) then
 		return
@@ -170,7 +173,7 @@ function SWEP:ViewModelDrawn()
 	owner:ItemFunction2("OnRenderHand", item, self.heldEntity)
 end
 
-function SWEP:DrawWorldModel()
+function SWEP:DrawWorldModelTranslucent(flags)
 	local owner = self:GetOwner()
 	if not IsValid(owner) or not owner:CanBeSeen() or not GameData.LocalPlayer:CanSeeFlashlights() then
 		if IsValid(self.heldEntityWorld) then
@@ -205,7 +208,7 @@ function SWEP:DrawWorldModel()
 
 	self:SetHoldType(v.holdtype)
 
-	self:RenderModel(v, self.heldEntityWorld, owner, nil, nil, item)
+	self:RenderModel(v, self.heldEntityWorld, owner, nil, nil, item, flags)
 	owner:ItemFunction2("OnRenderWorld", item, self.heldEntityWorld)
 
 	if itemH and SlashCoItems[itemH] and SlashCoItems[itemH].WorldModelHolstered then

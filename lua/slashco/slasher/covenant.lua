@@ -6,7 +6,6 @@ SLASHER.Name = "The Covenant"
 SLASHER.Aliases = {
 	"Low Tier God",
 }
-SLASHER.ID = 18
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -249,11 +248,11 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_18"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/covenant"))
 	hud:SetTitle("Covenant")
 
-	hud:AddControl("LMB", "covenant_member", Material("slashco/ui/icons/slasher/s_covenantcloak"))
-	hud:AddControl("RMB", "chase", Material("slashco/ui/icons/slasher/s_chase"))
+	hud:AddControl("LMB", "covenant_member", Material("slashco/ui/icons/slasher/covenantcloak"))
+	hud:AddControl("RMB", "chase", Material("slashco/ui/icons/slasher/chase"))
 
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()

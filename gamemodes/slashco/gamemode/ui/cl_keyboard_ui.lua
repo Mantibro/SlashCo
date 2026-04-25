@@ -1,4 +1,9 @@
 function SlashCo.OpenKeyboardUI()
+	if not GameData.KeyboardBinds then
+		ErrorNoHaltWithStack("Report this! How did the KeyboardBinds fail to load!")
+		return
+	end
+
 	if GameData.KeyBoardUI then
 		GameData.KeyBoardUI:Remove()
 	end

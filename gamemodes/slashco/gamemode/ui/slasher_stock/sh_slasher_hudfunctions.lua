@@ -55,14 +55,14 @@ end
 g_SlasherHud = GetHUDPanel():Add("slashco_slasher_stockhud")
 
 local iconTable = {
-	["cungus"] = Material("slashco/ui/icons/slasher/s_7"),
-	["d/cungus"] = Material("slashco/ui/icons/slasher/s_7_s1"),
-	["bugnus"] = Material("slashco/ui/icons/slasher/s_17"),
-	["le chase"] = Material("slashco/ui/icons/slasher/s_4"),
+	["cungus"] = Material("slashco/ui/icons/slasher/tyler"),
+	["d/cungus"] = Material("slashco/ui/icons/slasher/tyler_s1"),
+	["bugnus"] = Material("slashco/ui/icons/slasher/princess"),
+	["le chase"] = Material("slashco/ui/icons/slasher/amogus"),
 }
 
 g_SlasherHud:SetTitle("AMONG US")
---g_SlasherHud:SetAvatar(Material("slashco/ui/icons/slasher/s_4"))
+--g_SlasherHud:SetAvatar(Material("slashco/ui/icons/slasher/amogus"))
 g_SlasherHud:AddControl("K", "le chase", "chase")
 g_SlasherHud:AddControl("SPACE", "walk")
 g_SlasherHud:AddControl("G", "cungus", iconTable, 2)

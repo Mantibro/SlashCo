@@ -1,7 +1,6 @@
 local SLASHER = {}
 
 SLASHER.Name = "Covenant Cloak"
-SLASHER.ID = "covenantcloak"
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = false
@@ -248,10 +247,10 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_covenantcloak"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/covenantcloak"))
 	hud:SetTitle("CovenantCloak")
 	
-	hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/s_0"))
+	hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/unknown"))
 	
 	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()

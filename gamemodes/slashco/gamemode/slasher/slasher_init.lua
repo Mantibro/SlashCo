@@ -2,9 +2,11 @@ AddCSLuaFile()
 
 SlashCo = SlashCo or {}
 SlashCoSlashers = SlashCoSlashers or {}
+SlashCoSlashersByID = SlashCoSlashersByID or {}
 
 ---load slashers
 
+GameData.NextSlasherID = 1
 function SlashCo.RegisterSlasher(table, name)
 	if SC_LOADEDSLASHERS then
 		error("Tried to register a slasher illegally", 2)
@@ -12,7 +14,38 @@ function SlashCo.RegisterSlasher(table, name)
 	end
 
 	name = name or table.Name
+	table.IDName = string.lower(name) -- IDName will always be the registered name in lower case!
+
+	local ID = nil
+	local existingEntry = SlashCoSlashers[name]
+	if existingEntry then
+		ID = existingEntry.ID
+		table.IsLegacyID = existingEntry.IsLegacyID
+		if table.IsLegacyID then
+			table.IDName = tostring(ID)
+		end
+	end
+
+	if not ID then
+		if table.ID then
+			print("[SlashCo] The Slasher \"" .. table.Name .. "\" is defining their own ID! They shouldn't be doing that!")
+			ID = table.ID
+			table.IDName = tostring(ID) -- Legacy behavior to not break all slasher addons!
+			table.IsLegacyID = true
+		else
+			ID = GameData.NextSlasherID
+			-- Due to legacy behavior some custom addons may have registered in between so we must skip used IDs!
+			while SlashCoSlashersByID[ID] do
+				GameData.NextSlasherID = GameData.NextSlasherID + 1
+				ID = GameData.NextSlasherID
+			end
+			GameData.NextSlasherID = GameData.NextSlasherID + 1
+		end
+	end
+	table.ID = ID
+
 	SlashCoSlashers[name] = table
+	SlashCoSlashersByID[ID] = table
 
 	if SERVER then
 		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
@@ -30,6 +63,10 @@ end
 
 function SlashCo.GetSlasherTable(name)
 	return SlashCoSlashers[name]
+end
+
+function SlashCo.GetSlasherTableByID(id)
+	return SlashCoSlashersByID[id]
 end
 
 function SlashCo.LoadSlashers()
@@ -280,7 +317,7 @@ function SlashCo.LoadSlasherPatches()
 end
 SlashCo.LoadSlasherPatches()
 
-hook.Add("GameContentChanged", "SlashCo:RefreshSlashers", function()
+hook.Add("SlashCo:GameContentChanged", "SlashCo:RefreshSlashers", function()
 	SlashCo.LoadSlashers()
 	SlashCo.LoadSlasherPatches()
 end)

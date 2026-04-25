@@ -4,7 +4,6 @@ SLASHER.Name = "Speedrunner"
 SLASHER.Aliases = {
 	"The Hunted",
 }
-SLASHER.ID = 15
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -317,11 +316,11 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_15"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/speedrunner"))
 	hud:SetTitle("Speedrunner")
 
 	hud:AddControl("R", "rng sacrifice", "chase")
-	hud:AddControl("F", "mine ore", Material("slashco/ui/icons/slasher/s_minethecraft"))
+	hud:AddControl("F", "mine ore", Material("slashco/ui/icons/slasher/minethecraft"))
 	hud:ChaseAndKill(true)
 
 	hud:AddMeter("speed", 235, "", nil, true)
@@ -391,7 +390,7 @@ if CLIENT then
 				GameData.LocalPlayer.spd_f = 25
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_15")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_speedrunner")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.spd_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

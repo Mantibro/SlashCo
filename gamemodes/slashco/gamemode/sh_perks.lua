@@ -169,5 +169,5 @@ function SlashCo.LoadPerks()
 	end
 	SC_LOADEDPERKS = true
 end
-hook.Add("GameContentChanged", "SlashCo:RefreshPerks", SlashCo.LoadPerks)
+hook.Add("SlashCo:GameContentChanged", "SlashCo:RefreshPerks", SlashCo.LoadPerks)
 SlashCo.LoadPerks()

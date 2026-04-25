@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"Sidney Monster",
 	"Cookie Monster",
 }
-SLASHER.ID = 2
 SLASHER.Class = SlashCo.SlasherClass.Demon
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
@@ -782,32 +781,32 @@ function SLASHER.Footstep(ply)
 end
 
 local gunTable = {
-	["equip gun"] = Material("slashco/ui/icons/slasher/s_2_a1"),
-	["unequip gun"] = Material("slashco/ui/icons/slasher/s_2_a1_unavailable"),
-	["d/"] = Material("slashco/ui/icons/slasher/s_2_a1_disabled")
+	["equip gun"] = Material("slashco/ui/icons/slasher/sid_a1"),
+	["unequip gun"] = Material("slashco/ui/icons/slasher/sid_a1_unavailable"),
+	["d/"] = Material("slashco/ui/icons/slasher/sid_a1_disabled")
 }
 
 local attackTable = {
-	default = Material("slashco/ui/icons/slasher/s_0"),
+	default = Material("slashco/ui/icons/slasher/unknown"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled"),
-	shoot = Material("slashco/ui/icons/slasher/s_2_a2")
+	shoot = Material("slashco/ui/icons/slasher/sid_a2")
 }
 
 local aimTable = {
-	default = Material("slashco/ui/icons/slasher/s_chase"),
+	default = Material("slashco/ui/icons/slasher/chase"),
 	["d/"] = Material("slashco/ui/icons/slasher/chase_disabled"),
-	aim = Material("slashco/ui/icons/slasher/s_2_a3"),
+	aim = Material("slashco/ui/icons/slasher/sid_a3"),
 	["d/aim"] = Material("slashco/ui/icons/slasher/kill_disabled"),
-	["lower gun"] = Material("slashco/ui/icons/slasher/s_2_a3")
+	["lower gun"] = Material("slashco/ui/icons/slasher/sid_a3")
 }
 
 local cookieTable = {
-	default = Material("slashco/ui/icons/slasher/s_2"),
+	default = Material("slashco/ui/icons/slasher/sid"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_2"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/sid"))
 	hud:SetTitle("Sid")
 
 	hud:AddControl("R", "eat cookie", cookieTable)
@@ -970,7 +969,7 @@ if CLIENT then
 				GameData.LocalPlayer.sid_f = GameData.LocalPlayer.sid_f + (FrameTime() * 30)
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_2")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_sid")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.sid_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

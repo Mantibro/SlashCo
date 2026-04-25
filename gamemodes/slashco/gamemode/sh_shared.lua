@@ -634,7 +634,7 @@ function SlashCo.LoadMapConfigs(initialCheck)
 end
 
 SlashCo.LoadMapConfigs(true)
-hook.Add("GameContentChanged", "SlashCo:RefreshMapConfigs", SlashCo.LoadMapConfigs)
+hook.Add("SlashCo:GameContentChanged", "SlashCo:RefreshMapConfigs", SlashCo.LoadMapConfigs)
 
 -- determine if a position is far enough away from generators and survivors
 function SlashCo.IsPositionLegalForSlashers(pos, noSurvivorCheck, distFactor)

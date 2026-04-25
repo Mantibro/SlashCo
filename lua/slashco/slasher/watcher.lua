@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"The Agent",
 	"Big Brother",
 }
-SLASHER.ID = 10
 SLASHER.Class = SlashCo.SlasherClass.Umbra
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
@@ -328,7 +327,7 @@ function SLASHER.Footstep(ply)
 end
 
 local surveyTable = {
-	default = Material("slashco/ui/icons/slasher/s_10_a1"),
+	default = Material("slashco/ui/icons/slasher/watcher_a1"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
@@ -340,7 +339,7 @@ end
 local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
 local red = Color(255, 0, 0)
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_10"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/watcher"))
 	hud:SetTitle("Watcher")
 
 	hud:AddControl("R", "survey", surveyTable)

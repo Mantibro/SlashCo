@@ -3,6 +3,10 @@ SlashCo.Content = SlashCo.Content or {}
 SlashCo.Content.AddedMapToWorkshop = SlashCo.Content.AddedMapToWorkshop or false
 SlashCo.Content.AddedGamemodeToWorkshop = SlashCo.Content.AddedGamemodeToWorkshop or false
 SlashCo.Content.AddedSlashersToWorkshop = SlashCo.Content.AddedSlashersToWorkshop or {}
+SlashCo.Content.SlashCoWorkshopAddons = SlashCo.Content.SlashCoWorkshopAddons or {}
+
+-- List if NON SlashCo addons used to skip some expensive filesystem operations
+SlashCo.Content.NonSlashCoWorkshopAddons = SlashCo.Content.NonSlashCoWorkshopAddons or {}
 
 --[[
 	These precache tables store every single precached thing.
@@ -26,7 +30,7 @@ end
 
 function SlashCo.FindWorkshopID(fileName)
 	for _, addon in ipairs(engine.GetAddons()) do
-		if file.Exists(fileName, addon.title) then
+		if addon.mounted and file.Exists(fileName, addon.title) then
 			return addon.wsid, addon.title
 		end
 	end
@@ -50,29 +54,115 @@ function SlashCo.FindSlasherWorkshopID(slasherFile)
 	return SlashCo.FindWorkshopID("lua/" .. slasherFile)
 end
 
-if SERVER then
-	if not SlashCo.Content.AddedMapToWorkshop then
-		local wsid, title = SlashCo.FindMapWorkshopID(game.GetMap())
-		if wsid then
-			if wsid ~= SlashCo.Content.WorkshopID then
-				print("[Content] Current map is from Addon \"" .. title .. "\"")
-			end
+function SlashCo.GetAddons()
+	return SlashCo.Content.SlashCoWorkshopAddons
+end
 
-			resource.AddWorkshop(wsid) -- Adds the current map to the server download.
-			SlashCo.Content.AddedMapToWorkshop = true
+local function OpenFile(fileName, mode, addonTitle)
+	return addonTitle:StartsWith("addons/") and file.Open(addonTitle .. fileName, mode, "MOD") or file.Open(fileName, mode, addonTitle)
+end
+
+local function CodeName(fileName, addonTitle)
+	return addonTitle:StartsWith("addons/") and (addonTitle .. fileName) or (fileName .. " - " .. addonTitle)
+end
+
+-- Loads a lua file from all addons that contain one with the same name
+function SlashCo.LoadFileFromAddons(fileName)
+	local addons = SlashCo.GetAddons()
+	for _, addonTitle in pairs(addons) do
+		local fh = OpenFile(fileName, "rb", addonTitle)
+		if not fh then continue end
+		
+		local code = fh:Read()
+		fh:Close()
+
+		local codeName = CodeName(fileName, addonTitle)
+		local errMsg = RunString(code, codeName, false) 
+		if errMsg then
+			ErrorNoHaltWithStack("Failed to load " .. codeName .. " (" .. errMsg .. ")")
 		end
-	end
-
-	if not SlashCo.Content.AddedGamemodeToWorkshop then
-		-- Add the gamemode itself, just to be sure that it was added since somehow people still miss content.
-		resource.AddWorkshop(SlashCo.Content.WorkshopID)
-		SlashCo.Content.AddedGamemodeToWorkshop = true
 	end
 end
 
+local function InternalRegisterAddon(wsid, title)
+	if wsid == SlashCo.Content.WorkshopID or SlashCo.Content.SlashCoWorkshopAddons[wsid] then return end
+
+	if SERVER then
+		resource.AddWorkshop(wsid)
+	end
+
+	SlashCo.Content.SlashCoWorkshopAddons[wsid] = title
+	SlashCo.Content.NonSlashCoWorkshopAddons[wsid] = nil
+end
+
+-- Registers a SlashCo addon, normally we won't require this as any addon that registers a slasher is also registered!
+function SlashCo.RegisterAddon(workshopid)
+	if SlashCo.Content.SlashCoWorkshopAddons[workshopid] then return true end
+
+	for _, addon in ipairs(engine.GetAddons()) do
+		if addon.mounted and addon.wsid == workshopid then
+			InternalRegisterAddon(workshopid, addon.title)
+			return true
+		end
+	end
+
+	return false
+end
+
+function SlashCo.FindSlashCoAddons()
+	SlashCo.Content.SlashCoWorkshopAddons = {} -- Empty our list
+	for _, addon in ipairs(engine.GetAddons()) do
+		if not addon.mounted or SlashCo.Content.NonSlashCoWorkshopAddons[addon.wsid] then continue end
+
+		-- GMod Bug! file.IsDir does not work on workshop addons! (ToDo: Report this!)
+		local _, folders = file.Find("lua/*", addon.title)
+		local isValid = false
+		for _, folder in ipairs(folders) do
+			if folder == "slashco" then
+				isValid = true
+				break
+			end
+		end
+
+		if isValid then
+			InternalRegisterAddon(addon.wsid, addon.title)
+		else
+			SlashCo.Content.NonSlashCoWorkshopAddons[addon.wsid] = true
+		end
+	end
+
+	-- We also check for legacy addons to not make development harder for addon developers :)
+	local _, folders = file.Find("addons/*", "MOD")
+	for _, folder in ipairs(folders) do
+		if not file.IsDir("addons/" .. folder .. "/lua/slashco", "MOD") then continue end
+
+		-- Let's make sure were not registering the main gamemode (No custom addon should be touching that!)
+		-- if not file.IsDir("addons/" .. folder .. "/gamemodes/slashco", "MOD") then continue end
+
+		local nextFreeID = -1
+		while SlashCo.Content.SlashCoWorkshopAddons[tostring(nextFreeID)] do
+			nextFreeID = nextFreeID - 1
+		end
+
+		SlashCo.Content.SlashCoWorkshopAddons[tostring(nextFreeID)] = "addons/" .. folder .. "/"
+	end
+
+	-- Any SlashCo addon can use this hook to register themselves using SlashCo.RegisterAddon(workshopID)
+	hook.Run("SlashCo:RegisterAddons")
+end
+SlashCo.FindSlashCoAddons()
+
+function SlashCo.GameContentChanged()
+	SlashCo.FindSlashCoAddons()
+
+	hook.Run("SlashCo:GameContentChanged")
+end
+
+hook.Add("GameContentChanged", "SlashCo:Content", SlashCo.GameContentChanged)
+
 if CLIENT then
-	net.Receive("slashco_PrecacheAddon", function() -- Goal is to reduce loading time by starting the map download in the lobby already.
-		local wsid = net.ReadString()
+	net.Receive("SlashCo:PrecacheAddon", function() -- Goal is to reduce loading time by starting the map download in the lobby already.
+		local wsid = net.ReadUInt64()
 		local title = net.ReadString()
 
 		DebugPrint("[Content] Received precache signal for addon")
@@ -92,7 +182,7 @@ if CLIENT then
 		end)
 	end)
 else
-	util.AddNetworkString("slashco_PrecacheAddon")
+	util.AddNetworkString("SlashCo:PrecacheAddon")
 	function SlashCo.PrecacheNextMap()
 		local mapName = SlashCo.LobbyData.SelectedMap
 		local wsid, title = SlashCo.FindWorkshopID(mapName)
@@ -103,8 +193,8 @@ else
 			DebugPrint("[Content] Sent out precache signal for map \"" .. mapName .. "\" (\"" .. title .. "\" - " .. wsid .. ")")
 		end
 
-		net.Start("slashco_PrecacheAddon")
-			net.WriteString(wsid)
+		net.Start("SlashCo:PrecacheAddon")
+			net.WriteUInt64(wsid)
 			net.WriteString(title)
 		net.Broadcast()
 	end
@@ -115,14 +205,33 @@ else
 		local wsid, title = SlashCo.FindSlasherWorkshopID(slasherFile)
 		if wsid and wsid ~= SlashCo.Content.WorkshopID then
 			print("[Content] Slasher found from Addon \"" .. title .. "\"")
-			resource.AddWorkshop(wsid) -- Adds the current map to the server download.
-			SlashCo.Content.AddedSlashersToWorkshop[slasherFile] = true
 
-			net.Start("slashco_PrecacheAddon")
-				net.WriteString(wsid)
+			SlashCo.Content.AddedSlashersToWorkshop[slasherFile] = true
+			InternalRegisterAddon(wsid, title)
+
+			net.Start("SlashCo:PrecacheAddon")
+				net.WriteUInt64(wsid)
 				net.WriteString(title)
 			net.Broadcast()
 		end
+	end
+
+	if not SlashCo.Content.AddedMapToWorkshop then
+		local wsid, title = SlashCo.FindMapWorkshopID(game.GetMap())
+		if wsid then
+			if wsid ~= SlashCo.Content.WorkshopID then
+				print("[Content] Current map is from Addon \"" .. title .. "\"")
+			end
+
+			InternalRegisterAddon(wsid, title) -- Adds the current map to the server download.
+			SlashCo.Content.AddedMapToWorkshop = true
+		end
+	end
+
+	if not SlashCo.Content.AddedGamemodeToWorkshop then
+		-- Add the gamemode itself, just to be sure that it was added since somehow people still miss content.
+		resource.AddWorkshop(SlashCo.Content.WorkshopID)
+		SlashCo.Content.AddedGamemodeToWorkshop = true
 	end
 end
 

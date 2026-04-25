@@ -7,7 +7,6 @@ SLASHER.Aliases = {
 	"The Friendly",
 	"HOOVYDUNDE",
 }
-SLASHER.ID = 27
 SLASHER.Class = SlashCo.SlasherClass.Umbra
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = false
@@ -438,7 +437,7 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_27"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/hoovydundy"))
 	hud:SetTitle("Hoovydundy")
 
 	hud:ChaseAndKill()
@@ -481,7 +480,7 @@ if CLIENT then
 				GameData.LocalPlayer.hoovy_f = GameData.LocalPlayer.hoovy_f + (FrameTime() * 6)
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_27")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_hoovydundy")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.hoovy_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

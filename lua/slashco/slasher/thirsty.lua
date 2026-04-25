@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"Thirsty Demon",
 	"Milk Demon",
 }
-SLASHER.ID = 5
 SLASHER.Class = SlashCo.SlasherClass.Demon
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
@@ -270,13 +269,13 @@ function SLASHER.Footstep()
 end
 
 local milkTable = {
-	default = Material("slashco/ui/icons/slasher/s_5"),
+	default = Material("slashco/ui/icons/slasher/thirsty"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 local gray = Color(128, 128, 128)
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_5"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/thirsty"))
 	hud:SetTitle("Thirsty")
 
 	hud:AddControl("R", "drink milk", milkTable)
@@ -348,7 +347,7 @@ if CLIENT then
 				GameData.LocalPlayer.thrs_f = 25
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_5")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_thirsty")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.thrs_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

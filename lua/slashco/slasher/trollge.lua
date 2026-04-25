@@ -4,7 +4,6 @@ SLASHER.Name = "Trollge"
 SLASHER.Aliases = {
 	"Comedy",
 }
-SLASHER.ID = 3
 SLASHER.Class = SlashCo.SlasherClass.Umbra
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -591,19 +590,19 @@ function SLASHER.CanSeeFlashlights(ply)
 end
 
 local avatarTable = {
-	default = Material("slashco/ui/icons/slasher/s_3"),
-	stage1 = Material("slashco/ui/icons/slasher/s_3_s1"),
-	stage2 = Material("slashco/ui/icons/slasher/s_3_s2")
+	default = Material("slashco/ui/icons/slasher/trollge"),
+	stage1 = Material("slashco/ui/icons/slasher/trollge_s1"),
+	stage2 = Material("slashco/ui/icons/slasher/trollge_s2")
 }
 
 local killTable = {
-	default = Material("slashco/ui/icons/slasher/s_0"),
+	default = Material("slashco/ui/icons/slasher/unknown"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled"),
-	claw = Material("slashco/ui/icons/slasher/s_3_a1")
+	claw = Material("slashco/ui/icons/slasher/trollge_a1")
 }
 
 local dashTable = {
-	default = Material("slashco/ui/icons/slasher/s_3"),
+	default = Material("slashco/ui/icons/slasher/trollge"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled"),
 }
 
@@ -750,7 +749,7 @@ if CLIENT then
 				return
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_3")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_trollge")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.troll_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

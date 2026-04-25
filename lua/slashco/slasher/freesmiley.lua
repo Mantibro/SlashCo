@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"Yellow Guy",
 	"Smiley",
 }
-SLASHER.ID = 13
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
@@ -238,20 +237,20 @@ function SLASHER.Footstep(ply)
 end
 
 local dealTable = {
-	["deal a zany"] = Material("slashco/ui/icons/slasher/s_13_a1"),
-	["deal a pensive"] = Material("slashco/ui/icons/slasher/s_13_a2"),
-	["max zanies"] = Material("slashco/ui/icons/slasher/s_0"),
-	["max pensives"] = Material("slashco/ui/icons/slasher/s_0"),
+	["deal a zany"] = Material("slashco/ui/icons/slasher/freesmiley_a1"),
+	["deal a pensive"] = Material("slashco/ui/icons/slasher/freesmiley_a2"),
+	["max zanies"] = Material("slashco/ui/icons/slasher/unknown"),
+	["max pensives"] = Material("slashco/ui/icons/slasher/unknown"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 local dealSwitchTable = {
-	default = Material("slashco/ui/icons/slasher/s_13"),
+	default = Material("slashco/ui/icons/slasher/freesmiley"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_13"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/freesmiley"))
 	hud:SetTitle("FreeSmiley")
 
 	hud:AddControl("R", "switch deal", dealSwitchTable)
@@ -353,7 +352,7 @@ end
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_FreeSmiley") == true then
-			local Overlay = Material("slashco/ui/overlays/jumpscare_13")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_freesmiley")
 
 			Overlay:SetFloat("$alpha", 1)
 

@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"Tyler The Creator",
 	"Tyler The Destroyer",
 }
-SLASHER.ID = 7
 SLASHER.Class = SlashCo.SlasherClass.Demon
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -630,12 +629,12 @@ function SLASHER.CanBeSeen(ply)
 end
 
 local avatarTable = {
-	creator = Material("slashco/ui/icons/slasher/s_7"),
-	destroyer = Material("slashco/ui/icons/slasher/s_7_s1")
+	creator = Material("slashco/ui/icons/slasher/tyler"),
+	destroyer = Material("slashco/ui/icons/slasher/tyler_s1")
 }
 
 local manifestTable = {
-	default = Material("slashco/ui/icons/slasher/s_7_s1"),
+	default = Material("slashco/ui/icons/slasher/tyler_s1"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
@@ -743,7 +742,7 @@ if CLIENT then
 				GameData.LocalPlayer.tyl_f = 25
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_7")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_tyler")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.tyl_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

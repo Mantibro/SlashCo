@@ -4,7 +4,6 @@ SLASHER.Name = "Leuonard"
 SLASHER.Aliases = {
 	"MONDAY NIGHT RAW",
 }
-SLASHER.ID = 14
 SLASHER.Class = SlashCo.SlasherClass.Demon
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = false
@@ -303,7 +302,7 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_14"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/leuonard"))
 	hud:SetTitle("Leuonard")
 
 	hud:ChaseAndKill()
@@ -356,7 +355,7 @@ if CLIENT then
 				GameData.LocalPlayer.leuo_f = 0
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_14")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_leuonard")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.leuo_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

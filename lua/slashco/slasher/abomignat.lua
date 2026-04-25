@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"The Alien",
 	"The Rat",
 }
-SLASHER.ID = 11
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
@@ -488,12 +487,12 @@ SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, ni
 SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end
 
 local controlTable = {
-	default = Material("slashco/ui/icons/slasher/s_slash"),
+	default = Material("slashco/ui/icons/slasher/slash"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_11"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/abomignat"))
 	hud:SetTitle("Abomignat")
 
 	hud:AddControl("R", "enable crawling")

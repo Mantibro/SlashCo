@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"The Worst",
 	"Itsy Bitsy",
 }
-SLASHER.ID = 9
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
 SLASHER.IsSelectable = true
@@ -563,12 +562,12 @@ local function targetPaint(ply)
 end
 
 local nestTable = {
-	default = Material("slashco/ui/icons/slasher/s_9"),
+	default = Material("slashco/ui/icons/slasher/manspider"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_9"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/manspider"))
 	hud:SetTitle("Manspider")
 
 	hud:AddControl("R", "nest", nestTable)
@@ -577,7 +576,7 @@ function SLASHER.InitHud(_, hud)
 	hud:UntieControl("RMB")
 	hud:TieControlVisible("LMB", "CanKill")
 	hud:TieControlVisible("RMB", "CanChase")
-	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/s_punch"))
+	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/punch"))
 	hud:TieControlVisible("F", "ManspiderNested", true, false, false)
 	hud:TieControl("F", "CanLeap", false, true)
 
@@ -655,7 +654,7 @@ if CLIENT then
 				GameData.LocalPlayer.mans_f = 58
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_9")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_manspider")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.mans_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

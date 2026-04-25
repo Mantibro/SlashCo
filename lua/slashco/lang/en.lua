@@ -779,6 +779,7 @@ SlashCo.LangTable["keyboard_bind_special_ability"] = "Use Special Ability"
 
 -- CUSTOM SLASHER SUPPORT
 -- Doing this as a temp fix to patch files corrupting the entire language system
+-- Update: Please start moving them out of here now :)
 
 SlashCo.LangTable["Buffsoldier"] = "Buff Soldier"
 SlashCo.LangTable["Buffsoldier_desc"] = [[Very strong and scary russian man.

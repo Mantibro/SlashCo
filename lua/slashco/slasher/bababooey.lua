@@ -6,7 +6,6 @@ SLASHER.Aliases = {
 	"The Man",
 	"The Mist",
 }
-SLASHER.ID = 1
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
@@ -294,7 +293,7 @@ hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 			return
 		end
 
-		local Overlay = Material("slashco/ui/overlays/jumpscare_1")
+		local Overlay = Material("slashco/ui/overlays/jumpscare_bababooey")
 		Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.baba_f))
 
 		surface.SetDrawColor(255, 255, 255, 255)
@@ -307,18 +306,18 @@ hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 end)
 
 local avatarTable = {
-	default = Material("slashco/ui/icons/slasher/s_1"),
-	invisible = Material("slashco/ui/icons/slasher/s_1_a1")
+	default = Material("slashco/ui/icons/slasher/bababooey"),
+	invisible = Material("slashco/ui/icons/slasher/bababooey_a1")
 }
 
 local invisTable = {
-	["disable invisibility"] = Material("slashco/ui/icons/slasher/s_1"),
-	["enable invisibility"] = Material("slashco/ui/icons/slasher/s_1_a1")
+	["disable invisibility"] = Material("slashco/ui/icons/slasher/bababooey"),
+	["enable invisibility"] = Material("slashco/ui/icons/slasher/bababooey_a1")
 }
 
 local cloneTable = {
-	["set clone"] = Material("slashco/ui/icons/slasher/s_1_a2"),
-	["d/set clone"] = Material("slashco/ui/icons/slasher/s_1_a2_1")
+	["set clone"] = Material("slashco/ui/icons/slasher/bababooey_a2"),
+	["d/set clone"] = Material("slashco/ui/icons/slasher/bababooey_a2_1")
 }
 
 function SLASHER.InitHud(_, hud)

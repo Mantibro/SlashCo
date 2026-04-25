@@ -6,7 +6,6 @@ SLASHER.Aliases = {
 	"The Psycho",
 	"Jerma985",
 }
-SLASHER.ID = 4
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
@@ -368,7 +367,7 @@ hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 			GameData.LocalPlayer.amog_f = 50
 		end
 
-		local Overlay = Material("slashco/ui/overlays/jumpscare_4")
+		local Overlay = Material("slashco/ui/overlays/jumpscare_amogus")
 		Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.amog_f))
 
 		surface.SetDrawColor(255, 255, 255, 255)
@@ -380,20 +379,20 @@ hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
 end)
 
 local avatarTable = {
-	default = Material("slashco/ui/icons/slasher/s_4"),
-	survivor = Material("slashco/ui/icons/slasher/s_4_a1"),
-	fuel = Material("slashco/ui/icons/slasher/s_4_a2")
+	default = Material("slashco/ui/icons/slasher/amogus"),
+	survivor = Material("slashco/ui/icons/slasher/amogus_a1"),
+	fuel = Material("slashco/ui/icons/slasher/amogus_a2")
 }
 
 local disguiseTable = {
-	["disguise as survivor"] = Material("slashco/ui/icons/slasher/s_4_a1"),
-	["reveal yourself"] = Material("slashco/ui/icons/slasher/s_4")
+	["disguise as survivor"] = Material("slashco/ui/icons/slasher/amogus_a1"),
+	["reveal yourself"] = Material("slashco/ui/icons/slasher/amogus")
 }
 
 local killTable = {
-	["kill survivor"] = Material("slashco/ui/icons/slasher/s_0"),
+	["kill survivor"] = Material("slashco/ui/icons/slasher/unknown"),
 	["d/kill survivor"] = Material("slashco/ui/icons/slasher/kill_disabled"),
-	["sneak kill"] = Material("slashco/ui/icons/slasher/s_4_a1"),
+	["sneak kill"] = Material("slashco/ui/icons/slasher/amogus_a1"),
 	["d/sneak kill"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
@@ -403,7 +402,7 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("R", "disguise as survivor", disguiseTable)
 	hud:ChaseAndKill()
-	hud:AddControl("F", "disguise as fuel", Material("slashco/ui/icons/slasher/s_4_a2"))
+	hud:AddControl("F", "disguise as fuel", Material("slashco/ui/icons/slasher/amogus_a2"))
 	hud:SetControlIconTable("LMB", killTable)
 	hud:TieControlVisible("F", "AmogusDisguised", true)
 	hud:TieControlVisible("RMB", "AmogusDisguised", true)

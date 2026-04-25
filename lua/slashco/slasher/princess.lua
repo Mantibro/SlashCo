@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"Cupcake",
 	"Satan Death Destroyer",
 }
-SLASHER.ID = 17
 SLASHER.Class = SlashCo.SlasherClass.Demon
 SLASHER.DangerLevel = SlashCo.DangerLevel.Moderate
 SLASHER.IsSelectable = true
@@ -638,15 +637,15 @@ function SLASHER.Footstep(ply)
 end
 
 local maulTable = {
-	default = Material("slashco/ui/icons/slasher/s_17_a1"),
+	default = Material("slashco/ui/icons/slasher/princess_a1"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_17"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/princess"))
 	hud:SetTitle("Princess")
 
-	hud:AddControl("R", "sniff", Material("slashco/ui/icons/slasher/s_17"))
+	hud:AddControl("R", "sniff", Material("slashco/ui/icons/slasher/princess"))
 	hud:AddControl("LMB", "maul", maulTable)
 	hud:TieControl("LMB", "DemonPacified", true, false, false)
 	hud:ChaseAndKill(nil, true)

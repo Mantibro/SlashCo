@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"Borg",
 	"Tim",
 }
-SLASHER.ID = 8
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -534,13 +533,13 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/s_8"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/borgmire"))
 	hud:SetTitle("Borgmire")
 
-	hud:AddControl("LMB", "punch", Material("slashco/ui/icons/slasher/s_punch"))
+	hud:AddControl("LMB", "punch", Material("slashco/ui/icons/slasher/punch"))
 	hud:ChaseAndKill(nil, true)
-	hud:AddControl("R", "kick", Material("slashco/ui/icons/slasher/s_kick"))
-	hud:AddControl("F", "throw", Material("slashco/ui/icons/slasher/s_punch"))
+	hud:AddControl("R", "kick", Material("slashco/ui/icons/slasher/kick"))
+	hud:AddControl("F", "throw", Material("slashco/ui/icons/slasher/punch"))
 	
 	hud:AddMeter("anger", 100, "", nil, true)
 	hud:TieMeterInt("anger", "BorgmireAnger")

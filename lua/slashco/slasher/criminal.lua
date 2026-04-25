@@ -5,7 +5,6 @@ SLASHER.Aliases = {
 	"The Man Behind the Slaughter",
 	"The Purple Guy",
 }
-SLASHER.ID = 12
 SLASHER.Class = SlashCo.SlasherClass.Umbra
 SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
@@ -214,8 +213,8 @@ function SLASHER.Footstep(ply)
 end
 
 local avatarTable = {
-	default = Material("slashco/ui/icons/slasher/s_12"),
-	rage = Material("slashco/ui/icons/slasher/s_12_1")
+	default = Material("slashco/ui/icons/slasher/criminal"),
+	rage = Material("slashco/ui/icons/slasher/criminal_1")
 }
 
 function SLASHER.InitHud(_, hud)
@@ -223,9 +222,9 @@ function SLASHER.InitHud(_, hud)
 	hud:SetTitle("Criminal")
 
 	hud:ChaseAndKill(true)
-	hud:AddControl("RMB", "summon clones", Material("slashco/ui/icons/slasher/s_12_a1"))
+	hud:AddControl("RMB", "summon clones", Material("slashco/ui/icons/slasher/criminal_a1"))
 	hud:TieControlText("RMB", "CriminalCloning", "unsummon clones", "summon clones", nil)
-	hud:AddControl("F", "rage", Material("slashco/ui/icons/slasher/s_12_1"))
+	hud:AddControl("F", "rage", Material("slashco/ui/icons/slasher/criminal_1"))
 	hud:SetControlVisible("F", false)
 
 	hud.prevRage = GameData.LocalPlayer:GetNWBool("CriminalRage")
@@ -264,7 +263,7 @@ if CLIENT then
 				GameData.LocalPlayer.crim_f = 11
 			end
 
-			local Overlay = Material("slashco/ui/overlays/jumpscare_12")
+			local Overlay = Material("slashco/ui/overlays/jumpscare_criminal")
 			Overlay:SetInt("$frame", math.floor(GameData.LocalPlayer.crim_f))
 
 			surface.SetDrawColor(255, 255, 255, 255)

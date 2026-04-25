@@ -3,10 +3,10 @@ local PANEL = {}
 local red = Color(255, 0, 0)
 local darkRed = Color(128, 0, 0)
 
-local defaultIcon = Material("slashco/ui/icons/slasher/s_0")
+local defaultIcon = Material("slashco/ui/icons/slasher/unknown")
 
 local chaseTable = {
-	default = Material("slashco/ui/icons/slasher/s_chase"),
+	default = Material("slashco/ui/icons/slasher/chase"),
 	["d/"] = Material("slashco/ui/icons/slasher/chase_disabled")
 }
 
@@ -18,7 +18,7 @@ function PANEL:Init()
 	self.IconTable = {
 		default = defaultIcon,
 		["d/"] = Material("slashco/ui/icons/slasher/kill_disabled"),
-		slash = Material("slashco/ui/icons/slasher/s_slash")
+		slash = Material("slashco/ui/icons/slasher/slash")
 	}
 
 	self.Ties = {}

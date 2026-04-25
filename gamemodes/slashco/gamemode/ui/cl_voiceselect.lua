@@ -28,6 +28,11 @@ local voiceText = {
 }
 
 function PANEL:Init()
+	if IsValid(GameData.VoiceSay) then
+		GameData.VoiceSay:Remove()
+	end
+	GameData.VoiceSay = self
+
 	local voices = {}
 
 	self:SetSize(ScrW(), ScrH())
@@ -108,9 +113,22 @@ function PANEL:Think()
 	else
 		self.VoiceCursor:SetText("")
 	end
+
+	local button = SlashCo.GetKeyButton("VOICE_SELECT")
+	if not input.IsButtonDown(button) then
+		GameData.VoiceSay:Remove()
+
+		if GameData.VoiceSay.CursorSelect then
+			net.Start("SlashCo:SurvivorVoicePrompt")
+				net.WriteString(GameData.VoiceSay.CursorSelect)
+			net.SendToServer()
+		end
+		GameData.VoiceSay = nil
+	end
 end
 
 function PANEL:OnKeyCodeReleased(keyCode)
+	-- BUG: GMod doesn't call this for the initial ButtonDown even???
 	if SlashCo.IsKeyPressed("VOICE_SELECT", nil, keyCode) then
 		self:Remove()
 
@@ -119,6 +137,7 @@ function PANEL:OnKeyCodeReleased(keyCode)
 				net.WriteString(self.CursorSelect)
 			net.SendToServer()
 		end
+		GameData.VoiceSay = nil
 	end
 end
 

@@ -60,7 +60,6 @@ function SlashCo.LoadItems()
 	end
 	SC_LOADEDITEMS = true
 end
-hook.Add("GameContentChanged", "SlashCo:RefreshItems", SlashCo.LoadItems)
 SlashCo.LoadItems()
 
 ---remainder of init code
@@ -387,7 +386,7 @@ function SlashCo.LoadItemPatches()
 end
 SlashCo.LoadItemPatches()
 
-hook.Add("GameContentChanged", "SlashCo:RefreshItems", function()
+hook.Add("SlashCo:GameContentChanged", "SlashCo:RefreshItems", function()
 	SlashCo.LoadItems()
 	SlashCo.LoadItemPatches()
 end)
