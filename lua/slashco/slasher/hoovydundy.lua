@@ -494,32 +494,33 @@ if CLIENT then
 
 	hook.Add("Tick", "HoovyLight", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if SlashCoSlashers[v:GetNWString("Slasher")] ~= SLASHER then return end
 			if v == GameData.LocalPlayer then return end
 
-			if not v:GetNWBool("InSlasherChaseMode") then
-				local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
-				if tlight then
-					tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
-					tlight.r = 255
-					tlight.g = 0
-					tlight.b = 0
-					tlight.brightness = 2
-					tlight.Decay = 500
-					tlight.Size = 1000
-					tlight.DieTime = CurTime() + 1
-				end
-			else
-				local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
-				if tlight then
-					tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
-					tlight.r = 255
-					tlight.g = 0
-					tlight.b = 0
-					tlight.brightness = 3
-					tlight.Decay = 2300
-					tlight.Size = 2000
-					tlight.DieTime = CurTime() + 1
+			if SlashCoSlashers[v:GetNWString("Slasher")] == SLASHER then
+				if not v:GetNWBool("InSlasherChaseMode") then
+					local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
+					if tlight then
+						tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
+						tlight.r = 255
+						tlight.g = 0
+						tlight.b = 0
+						tlight.brightness = 2
+						tlight.Decay = 500
+						tlight.Size = 1000
+						tlight.DieTime = CurTime() + 1
+					end
+				else
+					local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
+					if tlight then
+						tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
+						tlight.r = 255
+						tlight.g = 0
+						tlight.b = 0
+						tlight.brightness = 3
+						tlight.Decay = 2300
+						tlight.Size = 2000
+						tlight.DieTime = CurTime() + 1
+					end
 				end
 			end
 		end
