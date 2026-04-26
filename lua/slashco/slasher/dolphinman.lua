@@ -48,6 +48,8 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	slasher.Jump = slasher:GetJumpPower()
+	
+	slasher.HuntPower = 0
 end
 
 local function PlayCallSound(slasher)
