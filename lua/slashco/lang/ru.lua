@@ -227,6 +227,15 @@ SlashCo.LangTable["Newports_desc"] = "США могут изо всех сил �
 SlashCo.LangTable["JonklerCart"] = "Злая карта Жонклера"
 SlashCo.LangTable["JonklerCart_desc"] = "Громкий динамик, способный привести в ярость все, что находится рядом с ним, включая убийцу."
 
+SlashCo.LangTable["Orange"] = "Надоедливый Апельсин"
+SlashCo.LangTable["Orange_desc"] = "Апельсин, который болтает без умолку. Его уровень энергии превышает 9000."
+
+SlashCo.LangTable["Burger"] = "Сумасшедший гамбургер"
+SlashCo.LangTable["Burger_desc"] = "Гамбургер, приготовленный сумасшедшим клоуном. Выпускает большое количество зеленого дыма."
+
+SlashCo.LangTable["CocaCola"] = "Кола Сода"
+SlashCo.LangTable["CocaCola_desc"] = "Мы просили гранаты, вот что мы получили. Будьте осторожны при их использовании."
+
 --GameInfo
 
 SlashCo.LangTable["SurvivorInfo"] = [[Добро пожаловать в программу по восстановлению электроэнергии SlashCo.
@@ -327,6 +336,7 @@ SlashCo.LangTable["stop chasing"] = "Прекратить погоню"
 SlashCo.LangTable["slasher_speedrate"] = "Скорость"
 SlashCo.LangTable["slasher_eyerate"] = "Зрение"
 SlashCo.LangTable["slasher_diffrate"] = "Сложность"
+SlashCo.LangTable["Generator_Blocked"] = "Генератор заблокирован!"
 
 --Every Slasher:
 
@@ -592,6 +602,18 @@ SlashCo.LangTable["Kamenchik_desc"] = [[Прикольный убийца, ко�
 -.]]
 SlashCo.LangTable["Kemenchik_tip"] = "-Ты можешь просто сдаться."
 
+-- HOOVYDUNDY
+SlashCo.LangTable["Hoovydundy"] = "Hoovydundy"
+SlashCo.LangTable["Hoovydundy_desc"] = [[Тот, в чьей дружбе было отказано.
+
+-Hoovydundy может остановить работу генераторов.
+-Всегда излучает красный свет.
+-Этот убийца действительно медленный.]]
+SlashCo.LangTable["Hoovydundy_tip"] = "-Никогда не пытайся оглушить его."
+
+SlashCo.LangTable["genblock"] = "заблокировать генератор"
+SlashCo.LangTable["entangle"] = "запутывать"
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Наблюдатели теперь могут делать метки для выживших."
 SlashCo.LangTable["unhide"] = "показаться"
@@ -653,7 +675,7 @@ SlashCo.LangTable["documentSlashers"] = "УБИЙЦЫ"
 SlashCo.LangTable["documentLocations"] = "МЕСТОПОЛОЖЕНИЕ"
 SlashCo.LangTable["documentArchive"] = "АРХИВ"
 SlashCo.LangTable["documentPerks"] = "ПЕРКИ"
-SlashCo.LangTable["documentEncounter"] = "СТОЛКНИТЕСЬ С УБИЙЦЕЙ, ДЛЯ РАЗБЛОКИРОВКИ ДОКУМЕНТА"
+SlashCo.LangTable["documentEncounter"] = "СТОЛКНИТЕСЬ С УБИЙЦЕЙ, ДЛЯ ЕГО РАЗБЛОКИРОВКИ"
 SlashCo.LangTable["documentEntry"] = "ИМЯ: \""
 SlashCo.LangTable["documentAliases"] = "ПСЕВДОНИМЫ:"
 SlashCo.LangTable["documentClass"] = "КЛАСС:"
@@ -676,7 +698,6 @@ SlashCo.LangTable["Borgmire_docDescAdd"] = [[Этот убийца быстро 
 SlashCo.LangTable["Bren_docDesc"] = [[Тело этого умбры - тело пожилого человека мужского пола. Тело Умбры также имеет характерное красное свечение и, кажется, левитирует.]]
 SlashCo.LangTable["Bren_docDescAdd"] = [[Ужасающий умбра, которая может проходить сквозь твердые предметы. Чрезвычайно агрессивен.	Разозлившись, этот убийца начинает проходить сквозь двери, стены и другие подобные объекты, чтобы добраться до своей жертвы.]]
 
--- Maybe this not translatable, because this is meme
 SlashCo.LangTable["Covenant_docDesc"] = [[How about I take my motherfucking goddamn Covenant, chase you down in the middle of the motherfucking snow you're running. You see a bunch of us in Black cloaks running towards you. You see me in a gold cloak, big tall muscular evil ass motherfucker running at you. First I start off like this cuz I don't need my full speed to catch you. Then I see you start to speed up then I start speeding. Then I just go and I just sick my whole Covenant and they're just chasing you running at you like wolves in black..]]
 SlashCo.LangTable["Covenant_docDescAdd"] = [[Не позволяй Роксу засунуть эту палку тебе в задницу.]]
 
@@ -722,6 +743,9 @@ SlashCo.LangTable["Tyler_docDesc"] = [[Трансцендентная бесте
 SlashCo.LangTable["Watcher_docDesc"] = [[Умбра принимающий облик чрезвычайно высокого старика в оливковом пальто, круглых очках и шляпе. Существо неуклюже спотыкается при движении и, как сообщается, терпеливо наблюдает за жертвами, прячась в темноте. Сообщалось, что этот убийца предпочитает держаться группами и проявляет себя как жестокий убийца, когда действует в одиночку.]]
 SlashCo.LangTable["Watcher_docDescAdd"] = [[Этот Убийца не может пассивно вызывать [ГНЕВ]. Наблюдая за жертвой, Наблюдатель ОЧЕНЬ БЫСТРО накапливает [ГНЕВ].]]
 
+SlashCo.LangTable["Hoovydundy_docDesc"] = [[То, что начиналось как простые слухи, оказалось правдой. Команда Slashco была отправлена выполнять свои повседневные обязанности, но они столкнулись с НИМ. Выжить удалось только одному из наших преданных сотрудников, который рассказал нам о своей встрече с существом.]]
+SlashCo.LangTable["Hoovydundy_docDescAdd"] = [[Этот слэшер медлителен и всегда излучает вокруг себя красный свет, благодаря чему его легко заметить и избежать столкновения. Он может хватать своих жертв с помощью веревки, которая тянется от его тела. Он способен мешать заправке генераторов. Настоятельно рекомендуется, чтобы вы НИ при каких обстоятельствах не пытались оглушить этого слэшера.]]
+
 -- Perks
 
 SlashCo.LangTable["perk_nameui"] = "НАЗВАНИЕ: \""
@@ -752,55 +776,3 @@ SlashCo.LangTable["keyboard_bind_voices"] = "Открыть меню фраз"
 SlashCo.LangTable["keyboard_bind_keybinds"] = "Открыть меню биндов"
 SlashCo.LangTable["keyboard_bind_main_ability"] = "Использовать главную способность"
 SlashCo.LangTable["keyboard_bind_special_ability"] = "Использовать специальную способность"
-
--- CUSTOM SLASHER SUPPORT
--- Doing this as a temp fix to patch files corrupting the entire language system
-
-SlashCo.LangTable["Buffsoldier"] = "МГЕ солдат"
-SlashCo.LangTable["Buffsoldier_desc"] = [[Очень сильный и страшный русский мужчина.
-
--МГЕ солдат должен наращивать мускулы, чтобы стать сильнее.
--МГЕ солдат может курить, чтобы терять силу и набирать её еще больше.
--Этот убийца страдает плохим зрением в начале раунда.]]
-SlashCo.LangTable["Buffsoldier_tip"] = "-Избегайте удара от него."
-
-SlashCo.LangTable["cigar"] = "сигара"
-SlashCo.LangTable["muscles gained"] = "наращенные мышцы"
-
-SlashCo.LangTable["Buffsoldier_docDesc"] = [[Очень крупный человек, родом из России. МГЕ солдат хорошо известен как убийца номер один в России и в настоящее время находится на территории slashco.]]
-SlashCo.LangTable["Buffsoldier_docDescAdd"] = [[MGE будет наращивать [МУСКУЛЫ] с каждым ударом, нанесенным выжившим. Чем больше [МУСКУЛОВ] он наберет, тем сильнее будут удары.]]
-
---The Screamer
-SlashCo.LangTable["Screamer"] = "Крикун"
-SlashCo.LangTable["Screamer_desc"] = [[Дружелюбный убийца, который, кажется, скрывает свою истинную сущность.
-
--Крикун может трансформироваться и развивать высокую скорость передвижения.
--Может очень легко добраться до своей жертвы.
--Его трудно разозлить.]]
-SlashCo.LangTable["Screamer_tip"] = "-Не проявляй милосердия."
-
---TOPO.MP4
-SlashCo.LangTable["Topomp4"] = "Topo.mp4"
-SlashCo.LangTable["Topomp4_desc"] = [[Я тоже в затерянном регионе, о боже... и не умею летать..
-
--Topo.mp4 может издавать мощный крик.
--Он не может атаковать, если только не преследует.
--У этого убийцы плохое восприятие.]]
-SlashCo.LangTable["Topomp4_tip"] = "-Спокойной ночи."
-
--- HOTDOGMAN
-SlashCo.LangTable["Hotdogman"] = "Hotdogman"
-SlashCo.LangTable["Hotdogman_desc"] = [[Я люблю хот-доги.
-
--Хот-догмен может прыгать только во время погони.
--Ему нужно найти хот-доги.
--Этот убийца работает медленно.]]
-SlashCo.LangTable["Hotdogman_tip"] = "-Часто блюёт."
-
-SlashCo.LangTable["find hotdog"] = "найти хот-дог"
-SlashCo.LangTable["eat hotdog"] = "съесть хот-дог"
-SlashCo.LangTable["vomit"] = "блевать"
-SlashCo.LangTable["nausea"] = "тошнота"	
-
-SlashCo.LangTable["Hotdogman_docDesc"] = [[[Этот демон имеет внешность взрослого толстяка, который выделяется тем, что держит хот-дог в голове.]]
-SlashCo.LangTable["Hotdogman_docDescAdd"] = [[Этот убийца может бегать медленно, но легко наносить большой урон. Хот-доги дают ему больше силы.]]
