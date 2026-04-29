@@ -116,7 +116,7 @@ if CLIENT then
 	hook.Add("PlayerBindPress", "SlashCo:KeyboardBinds", function(_, bind, _, code)
 		-- We respect blocked concommands and won't block them!
 		-- We also won't block any inputs like +attack or +jump!
-		if not IsConCommandBlocked(bind) and not bind:StartsWith("+") and GameData.KeyboardBinds and GameData.KeyboardBinds[code] and blockBinds:GetBool() then
+		if not IsConCommandBlocked(bind) and not bind:StartsWith("+") and not bind:StartsWith("impulse") and GameData.KeyboardBinds and GameData.KeyboardBinds[code] and blockBinds:GetBool() then
 			return true
 		end
 	end)
