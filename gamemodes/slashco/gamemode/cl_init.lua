@@ -608,7 +608,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 			draw.SimpleText(SlashCo.Language(pro_tip), "BriefingNoteFont", 25 - monitorsize / 2, 800 - monitorsize / 2, color_white)
 
 			if slasherID and slasherID ~= 0 then
-				local slasherTable = SlashCo.GetSlasherTableByID(slasherID)
+				local slasherTable = SlashCo.GetSlasherTable(slasherID)
 				if slasherTable then
 					icondrawid = slasherTable.IDName
 				end
