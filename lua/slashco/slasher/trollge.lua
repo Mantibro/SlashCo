@@ -20,7 +20,7 @@ SLASHER.ChaseRadius = 0.0
 SLASHER.ChaseDuration = 0.0
 SLASHER.ChaseCooldown = 3
 SLASHER.JumpscareDuration = 2
-SLASHER.ChaseMusic = "slashco/slasher/trollge/trollge_chase.ogg"
+SLASHER.ChaseMusic = ""
 SLASHER.KillSound = "slashco/slasher/trollge/trollge_kill.mp3"
 SLASHER.Description = "Trollge_desc"
 SLASHER.ProTip = "Trollge_tip"
@@ -31,7 +31,7 @@ SLASHER.AngerIncrease = 10
 SLASHER.AngerPassiveGain = 0.05
 SLASHER.AngerChaseGain = 0
 -- Only when he's really angry his ambiance should play. This is why we only set it for HighAnger.
-SLASHER.HighAngerBackgroundMusic = "slashco/slasher/trollge/trollge_stage6.ogg"
+SLASHER.HighAngerBackgroundMusic = "slashco/slasher/trollge/trollge_chase.ogg"
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	if additionalSurvivors > 0 then
