@@ -43,7 +43,7 @@ function ITEM.OnUse(ply)
 			ply:AddEffect("BalkanTrip", 132)
 		end
 	end)
-		
+
 	timer.Create("BalkanBoostFinish:" .. ply:UserID(), 164, 1, function()
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
 			ply:SetNWBool("SurvivorBalkanFull", false)
@@ -157,7 +157,9 @@ hook.Add("Think", "SlashCo:BalkanBoost", function()
 
 			GameData.BalkanSoundLastCreation = CurTime()
 		end
-	elseif IsValid(GameData.BalkanSound) then
-		SlashCo.AudioSystem.DestroyChannel(GameData.BalkanSound, 1)
+	else
+		if IsValid(GameData.BalkanSound) then
+			SlashCo.AudioSystem.DestroyChannel(GameData.BalkanSound, 1)
+		end
 	end
 end)
