@@ -16,7 +16,7 @@ SLASHER.ChaseSpeed = 280
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 2
 SLASHER.KillDistance = 135
-SLASHER.ChaseRange = 1000
+SLASHER.ChaseRange = 1400
 SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
 SLASHER.ChaseCooldown = 3
@@ -29,6 +29,7 @@ SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.ItemToSpawn = "Baby"
+SLASHER.MaulForward = 800 -- Force to apply forward when Princess maul.
 SLASHER.AngerIncrease = 5
 SLASHER.AngerPassiveGain = 0.04
 SLASHER.AngerChaseGain = 0
@@ -62,11 +63,11 @@ local function PlayIdle(slasher)
 end
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	-- If we have more than the default survivors, the ChaseSpeed is increased by 7.5, if we have less than the default, we only decrease it by 2.5
-	SLASHER.ChaseSpeed = 280 + (((additionalSurvivors > 0) and 7.5 or 2.5) * additionalSurvivors)
-
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
+
 	if additionalSurvivors > 0 then -- Only increase these if we have more than the default survivors.
+		SLASHER.MaulForward = 800 + (5 * additionalSurvivors)
+		SLASHER.ChaseSpeed = 280 + (2 * additionalSurvivors)
 		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
 	end
 end
@@ -117,6 +118,110 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	--find children to maul
+	for _, v in ipairs(ents.FindByClass("sc_baby")) do
+		if v:GetPos():Distance(slasher:GetPos()) < 100 and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessSniffing") and not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingSurvivor") and not slasher:GetNWBool("DemonPacified") then
+			--mauling child
+			SlashCo.StopChase(slasher)
+			slasher:SetNWBool("PrincessMaulingChild", true)
+			slasher:Freeze(true)
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/princess/princess_maul.mp3",
+				identifier = "PrincessMaul",
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+
+			--baby in jaw
+
+			v:Remove()
+
+			local pos = slasher:LocalToWorld(Vector(0, 10, -5))
+			local ang = slasher:LocalToWorldAngles(Angle(90, 0, 0))
+
+			local mauled_child = ents.Create("prop_physics")
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/survivor/baby_use.mp3",
+				identifier = "PrincessBabyMaul1",
+				minDistance = 200,
+				maxDistance = 700,
+				entity = slasher,
+				volume = 1,
+				fadeIn = 0,
+			})
+
+			mauled_child:SetMoveType(MOVETYPE_NONE)
+			mauled_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+			mauled_child:SetModel(SlashCoItems.Baby.Model)
+			mauled_child:SetPos(pos)
+			mauled_child:SetAngles(ang)
+			mauled_child:FollowBone(slasher, slasher:LookupBone("head"))
+
+			for i = 1, math.random(9, 12) do
+				timer.Simple((i / 3.5) * (0.7 + (math.random() * 0.3)), function()
+					local vPoint = mauled_child:GetPos()
+					local bloodfx = EffectData()
+					bloodfx:SetOrigin(vPoint)
+					util.Effect("BloodImpact", bloodfx)
+
+					local idx = math.random(2, 4)
+					SlashCo.AudioSystem.PlaySound({
+						soundPath = "physics/flesh/flesh_squishy_impact_hard" .. idx .. ".wav",
+						identifier = "PrincessBabyMaul2" .. idx,
+						minDistance = 200,
+						maxDistance = 700,
+						entity = slasher,
+						volume = 1,
+						fadeIn = 0,
+					})
+				end)
+			end
+
+			timer.Simple(3.75, function()
+				if not IsValid(slasher) then return end
+
+				local vPoint = mauled_child:GetPos()
+				local bloodfx = EffectData()
+				bloodfx:SetOrigin(vPoint)
+				util.Effect("BloodImpact", bloodfx)
+
+				local idx = math.random(2, 4)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "physics/body/body_medium_break" .. idx .. ".wav",
+					identifier = "PrincessBabyMaul3" .. idx,
+					minDistance = 200,
+					maxDistance = 700,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
+
+				mauled_child:Remove()
+
+				slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
+				slasher.Aggression = Aggression - math.random(25, Aggression + 26)
+			end)
+
+			---yeah
+
+			timer.Simple(4.5, function()
+				if not IsValid(slasher) then return end
+
+				slasher:Freeze(false)
+				slasher:SetNWBool("PrincessMaulingChild", false)
+				slasher:SetNWBool("DemonPacified", true)
+
+				timer.Simple(math.random(10, 25), function()
+					slasher:SetNWBool("DemonPacified", false)
+				end)
+			end)
+		end
+	end
+
 	if slasher:GetNWBool("InSlasherChaseMode") then
 		--Get Aggro
 		if Aggression < AggressionTH then
@@ -139,110 +244,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			if lookent:GetClass() == "func_breakable" or lookent:GetClass() == "func_breakable_surf" then
 				lookent:TakeDamage(10000, slasher, slasher)
-			end
-		end
-
-		for _, v in ipairs(ents.FindByClass("sc_baby")) do
-			if v:GetPos():Distance(slasher:GetPos()) < 100 and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessSniffing") and not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingSurvivor") then
-				--mauling child
-				SlashCo.StopChase(slasher)
-				slasher:SetNWBool("PrincessMaulingChild", true)
-				slasher:Freeze(true)
-
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/princess/princess_maul.mp3",
-					identifier = "PrincessMaul",
-					minDistance = 200,
-					maxDistance = 700,
-					entity = slasher,
-					volume = 1,
-					fadeIn = 0,
-				})
-
-				--baby in jaw
-
-				v:Remove()
-
-				local pos = slasher:LocalToWorld(Vector(0, 10, -5))
-				local ang = slasher:LocalToWorldAngles(Angle(90, 0, 0))
-
-				local mauled_child = ents.Create("prop_physics")
-
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/survivor/baby_use.mp3",
-					identifier = "PrincessBabyMaul1",
-					minDistance = 200,
-					maxDistance = 700,
-					entity = slasher,
-					volume = 1,
-					fadeIn = 0,
-				})
-
-				mauled_child:SetMoveType(MOVETYPE_NONE)
-				mauled_child:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
-				mauled_child:SetModel(SlashCoItems.Baby.Model)
-				mauled_child:SetPos(pos)
-				mauled_child:SetAngles(ang)
-				mauled_child:FollowBone(slasher, slasher:LookupBone("head"))
-
-				for i = 1, math.random(9, 12) do
-					timer.Simple((i / 3.5) * (0.7 + (math.random() * 0.3)), function()
-						local vPoint = mauled_child:GetPos()
-						local bloodfx = EffectData()
-						bloodfx:SetOrigin(vPoint)
-						util.Effect("BloodImpact", bloodfx)
-
-						local idx = math.random(2, 4)
-						SlashCo.AudioSystem.PlaySound({
-							soundPath = "physics/flesh/flesh_squishy_impact_hard" .. idx .. ".wav",
-							identifier = "PrincessBabyMaul2" .. idx,
-							minDistance = 200,
-							maxDistance = 700,
-							entity = slasher,
-							volume = 1,
-							fadeIn = 0,
-						})
-					end)
-				end
-
-				timer.Simple(3.75, function()
-					if not IsValid(slasher) then return end
-
-					local vPoint = mauled_child:GetPos()
-					local bloodfx = EffectData()
-					bloodfx:SetOrigin(vPoint)
-					util.Effect("BloodImpact", bloodfx)
-
-					local idx = math.random(2, 4)
-					SlashCo.AudioSystem.PlaySound({
-						soundPath = "physics/body/body_medium_break" .. idx .. ".wav",
-						identifier = "PrincessBabyMaul3" .. idx,
-						minDistance = 200,
-						maxDistance = 700,
-						entity = slasher,
-						volume = 1,
-						fadeIn = 0,
-					})
-
-					mauled_child:Remove()
-
-					slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
-					slasher.Aggression = Aggression - math.random(25, Aggression + 26)
-				end)
-
-				---yeah
-
-				timer.Simple(4.5, function()
-					if not IsValid(slasher) then return end
-
-					slasher:Freeze(false)
-					slasher:SetNWBool("PrincessMaulingChild", false)
-					slasher:SetNWBool("DemonPacified", true)
-
-					timer.Simple(math.random(10, 25), function()
-						slasher:SetNWBool("DemonPacified", false)
-					end)
-				end)
 			end
 		end
 	end
@@ -332,6 +333,7 @@ function SLASHER.Maul(slasher, target)
 				if not IsValid(slasher) then return end
 
 				slasher.victimragdoll = target and (target.DeadBody or NULL)
+				slasher.victimragdoll:FollowBone(slasher, slasher:LookupBone("head"))
 			end)
 		end)
 	end
@@ -395,13 +397,14 @@ function SLASHER.Maul(slasher, target)
 
 	timer.Simple(2, function()
 		if not IsValid(slasher) then return end
-		
+
 		slasher:Freeze(false)
 
 		slasher:SetNWBool("PrincessMaulingSurvivor", false)
 		slasher:SetNWBool("PrincessMaulingBase", false)
-		
+
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
+		SLASHER.MaulForward = SLASHER.MaulForward + SlashCo.GetSlasherAnger(slasher)
 
 		if IsValid(slasher.ref_child) then
 			slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
@@ -467,7 +470,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	})
 
 	if slasher:IsOnGround() then
-		slasher:SetVelocity(slasher:GetForward() * 800)
+		slasher:SetVelocity(slasher:GetForward() * SLASHER.MaulForward)
 	end
 
 	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()

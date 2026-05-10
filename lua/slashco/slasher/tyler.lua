@@ -92,6 +92,14 @@ function TylerSwitchForm(slasher, newForm)
 	slasher.TylerBlink = 0
 	slasher.tyler_destroyer_entrance_antispam = nil
 
+	if newForm == TYLER_CREATOR then
+		slasher.TylerTimerHUD = slasher.TylerTime
+	elseif newForm == TYLER_SPECTER then
+		slasher.TylerTimerHUD = SLASHER.TimeAsSpecter
+	else
+		slasher.TylerTimerHUD = 0
+	end
+
 	if newForm == TYLER_CREATOR or newForm == TYLER_SPECTER then
 		SLASHER.HideTime(slasher)
 		if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and slasher.WasDestroyerOnce then -- If its already playing, we don't need to start it again.
@@ -117,6 +125,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher.TimeAsTylerForm = 0
 	slasher.TimeAsTylerSpecter = 0
 	slasher.TylerBlink = 0
+	slasher.TylerTimerHUD = 0
 	TylerSwitchForm(slasher, TYLER_SPECTER)
 end
 
@@ -124,7 +133,7 @@ function SLASHER.Precache()
 end
 
 function SLASHER.HideTime(slasher)
-	slasher.TylerTime = (100 + SLASHER.MinTylerTime + ((team.NumPlayers(TEAM_SURVIVOR) + SlashCo.MapSize) * 5)) - SlashCo.GetSlasherAnger(slasher)
+	slasher.TylerTime = (90 + SLASHER.MinTylerTime + ((team.NumPlayers(TEAM_SURVIVOR) + SlashCo.MapSize) * 5)) - SlashCo.GetSlasherAnger(slasher)
 	-- print("Tyler transformation time: " .. slasher.TylerTime)
 end
 
@@ -154,11 +163,16 @@ function SLASHER.OnTickBehaviour(slasher)
 	local TylerState = slasher.TylerState or 0 --State
 	local TimeAsTylerForm = slasher.TimeAsTylerForm or 0 --Time Spent as Creator or destroyer
 	local TylerBlink = slasher.TylerBlink or 0 --Destoyer Blink
+	local TylerHidingTimer = slasher.TylerTimerHUD or 0
 	local anger = SlashCo.GetSlasherAnger(slasher)
 	local endlessChase = EndlessChase()
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
+
+	if TylerHidingTimer > 0 then
+		slasher.TylerTimerHUD = TylerHidingTimer - FrameTime()
+	end
 
 	if (TylerState == TYLER_SPECTER or TylerState == TYLER_CREATOR) and endlessChase then
 		TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
@@ -424,6 +438,26 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanSeePlayers(true)
 		final_perception = 2.0
 
+		if endlessChase then
+			local find = ents.FindInSphere(slasher:GetPos(), 500)
+
+			for f = 1, #find do
+				local ent = find[f]
+
+				if ent:GetClass() == "func_breakable" or ent:GetClass() == "func_breakable_surf" then
+					ent:TakeDamage(100, slasher, slasher)
+				elseif ent:GetClass() == "prop_door_rotating" or ent:GetClass() == "func_door_rotating" then
+					SlashCo.BustDoor(slasher, ent, 50000)
+				elseif ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer" then
+					timer.Simple(1.0, function()
+						if not IsValid(slasher) or not IsValid(ent) then return end
+
+						ent:SetVelocity(slasher:GetForward() * 500)
+					end)
+				end
+			end
+		end
+
 		if TimeAsTylerForm > math.max((((2 + SlashCo.MapSize) / 1.5) * anger * (0.5 + (team.NumPlayers(TEAM_SURVIVOR) / 10))), SLASHER.MinChase) and not endlessChase then
 			TylerSwitchForm(slasher, TYLER_SPECTER)
 		end
@@ -447,6 +481,14 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if slasher:GetNWInt("TylerState") ~= TylerState then
 		slasher:SetNWInt("TylerState", TylerState)
+	end
+
+	if slasher:GetNWInt("TylerHideTime") ~= math.floor(TylerHidingTimer) then
+		slasher:SetNWInt("TylerHideTime", math.floor(TylerHidingTimer))
+	end
+
+	if slasher:GetNWInt("TylerAnger") ~= math.floor(anger) then
+		slasher:SetNWInt("TylerAnger", math.floor(anger))
 	end
 
 	slasher:SetEyeSight(final_eyesight)
@@ -646,6 +688,13 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("LMB", "destroy", manifestTable)
 	hud:TieControlVisible("LMB", "CanKill")
+
+	hud:AddMeter("anger", 100, "", nil, true)
+	hud:TieMeterInt("anger", "TylerAnger")
+
+	function hud.TitleCard.Label:PaintOver()
+		draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", 4, 18, red)
+	end
 
 	hud.prevState = -1
 	hud.destroyEnabled = true
