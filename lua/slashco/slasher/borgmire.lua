@@ -227,6 +227,7 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
+	if slasher:GetNWBool("BorgmireStunned") then return end
 	if slasher:GetNWBool("BorgmireThrow") then return end
 	if slasher.BorgKicking then return end
 
@@ -305,6 +306,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
+	if slasher:GetNWBool("BorgmireStunned") then return end
 	if slasher:GetNWBool("BorgmireThrow") then return end
 	if slasher.BorgPunching then return end
 
@@ -375,6 +377,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
+	if slasher:GetNWBool("BorgmireStunned") then return end
 	if not slasher:GetNWBool("CanThrow") then return end
 	if slasher.BorgPunching then return end
 	if slasher.BorgKicking then return end
