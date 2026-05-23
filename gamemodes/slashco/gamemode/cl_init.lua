@@ -9,22 +9,23 @@ SlashCo.LangTable = {}
 SlashCo.CurrentLang = SlashCo.CurrentLang or "en"
 local currentLang = string.lower(language.GetPhrase("slashco.language"))
 if currentLang ~= "en" then -- Let's save us 1 filesystem call
-	include("slashco/lang/en.lua")
-	SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
+	SlashCo.LoadGamemodeFile("slashco/lang/en.lua")
+	SlashCo.LangTableFallback = SlashCo.LangTable -- Works since SlashCo.LangTable is replaced in SlashCo.LoadLanguage()
 end
 
 function SlashCo.LoadLanguage()
+	SlashCo.LangTable = {}
 	local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
 	for _, v in ipairs(lang_files) do
 		local lang = string.lower(language.GetPhrase("slashco.language"))
 		if lang == string.lower(string.Replace(v, ".lua", "")) then
-			include("slashco/lang/" .. v)
+			SlashCo.LoadGamemodeFile("slashco/lang/" .. v)
 			if lang == "en" and not SlashCo.LangTableFallback then
 				SlashCo.LangTableFallback = table.Copy(SlashCo.LangTable)
 			end
 
 			-- Any SlashCo addon can have their own language file to add additional keys :)
-			SlashCo.LoadFileFromAddons("lua/slashco/lang/" .. v)
+			SlashCo.LoadFileFromAddons("lua/slashco/lang/*/" .. v)
 
 			if SlashCo.CurrentLang != lang then
 				SlashCo.CurrentLang = lang

@@ -18,8 +18,8 @@ SlashCo.Content.PrecacheItems = SlashCo.Content.PrecacheItems or {}
 SlashCo.Content.PrecacheSlashers = SlashCo.Content.PrecacheSlashers or {}
 SlashCo.Content.DebugPrint = SlashCo.Content.DebugPrint or false -- For debugging
 
-local GamemodeInfo = util.KeyValuesToTable(file.Read((GAMEMODE or GM).Folder .. "/" .. (GAMEMODE or GM).FolderName .. ".txt", "GAME") or "")
-SlashCo.Content.WorkshopID = GamemodeInfo.workshopid or "2844428843" -- Fallback ID! Currently the Main Addon!
+SlashCo.Content.WorkshopID = "2844428843" -- Fallback ID! Currently the Main Addon!
+SlashCo.Content.MainAddonTitle = nil -- If this is set, the gamemode is mounted through workshop which will change how we read files!
 
 -- NOTE: Errors aren't put behind DebugPrint as something clearly went wrong.
 local function DebugPrint(msg)
@@ -66,22 +66,61 @@ local function CodeName(fileName, addonTitle)
 	return addonTitle:StartsWith("addons/") and (addonTitle .. fileName) or (fileName .. " - " .. addonTitle)
 end
 
+-- BUG! GMod's file.Read function is apparently broken
+--[[function SlashCo.LoadFileFromAddon(fileName, addonTitle)
+	local fh = OpenFile(fileName, "rb", addonTitle)
+	if not fh then return end
+		
+	local code = fh:Read()
+	fh:Close()
+
+	local codeName = CodeName(fileName, addonTitle)
+	local errMsg = RunString(code, codeName, false) 
+	if errMsg then
+		ErrorNoHaltWithStack("Failed to load " .. codeName .. " (" .. errMsg .. ")")
+	end
+end]]
+
 -- Loads a lua file from all addons that contain one with the same name
 function SlashCo.LoadFileFromAddons(fileName)
+	local wildcard = string.find(fileName, "*")
+	if not wildcard then
+		-- Usually we would fall back to simply looking up the files in addons themselves but thats broken for now
+		-- We must rely on include which is not that great
+
+		ErrorNoHaltWithStack("No wildcard was given for path! (" .. fileName .. ")")
+		return
+	end
+
+	local searchPath = string.sub(fileName, 0, wildcard-1)
+	local leftoverPath = string.sub(fileName, wildcard+1)
+
 	local addons = SlashCo.GetAddons()
 	for _, addonTitle in pairs(addons) do
-		local fh = OpenFile(fileName, "rb", addonTitle)
-		if not fh then continue end
-		
-		local code = fh:Read()
-		fh:Close()
+		-- SlashCo.LoadFileFromAddon(fileName, addonTitle)
 
-		local codeName = CodeName(fileName, addonTitle)
-		local errMsg = RunString(code, codeName, false) 
-		if errMsg then
-			ErrorNoHaltWithStack("Failed to load " .. codeName .. " (" .. errMsg .. ")")
+		local _, folders = file.Find(searchPath .. "*", addonTitle)
+		for _, folder in ipairs(folders) do
+			local filePath = searchPath .. folder .. leftoverPath
+			if file.Exists(filePath, addonTitle) then
+				if filePath:StartsWith("lua/") then
+					filePath = filePath:sub(5)
+				end
+
+				include(filePath)
+				-- print("Loaded file " .. filePath .. " from addon \"" .. addonTitle .. "\"")
+			end
 		end
 	end
+end
+
+function SlashCo.LoadGamemodeFile(fileName)
+	--if not SlashCo.Content.MainAddonTitle then
+		include(fileName)
+		return
+	--end
+
+	--return SlashCo.LoadFileFromAddon(fileName, SlashCo.Content.MainAddonTitle)
 end
 
 local function InternalRegisterAddon(wsid, title)
@@ -109,6 +148,28 @@ function SlashCo.RegisterAddon(workshopid)
 	return false
 end
 
+-- Implicit behavior Note: workshop is checked first, then the file system, which ensures SlashCo.Content.MainAddonTitle = nil
+local function CheckForMainGamemode(filePath, addon)
+	local gamemodeFile = (GAMEMODE or GM).Folder .. "/" .. (GAMEMODE or GM).FolderName .. ".txt"
+	if not addon then -- if it exists on DISK we try to read it
+		local contents = file.Read(filePath .. gamemodeFile, "MOD")
+		if contents then
+			local GamemodeInfo = util.KeyValuesToTable(contents)
+			SlashCo.Content.WorkshopID = GamemodeInfo.workshopid
+			SlashCo.Content.MainAddonTitle = nil -- Not mounted over workshop!
+			return true
+		end
+	else -- if its mounted through workshop we must use file.Exists as file.Read does NOT work on workshop mounted addons!
+		if file.Exists(gamemodeFile, addon.title) then
+			SlashCo.Content.WorkshopID = addon.wsid
+			SlashCo.Content.MainAddonTitle = addon.title
+			return true
+		end
+	end
+
+	return false
+end
+
 function SlashCo.FindSlashCoAddons()
 	SlashCo.Content.SlashCoWorkshopAddons = {} -- Empty our list
 	for _, addon in ipairs(engine.GetAddons()) do
@@ -124,6 +185,8 @@ function SlashCo.FindSlashCoAddons()
 			end
 		end
 
+		if CheckForMainGamemode("", addon) then continue end
+
 		if isValid then
 			InternalRegisterAddon(addon.wsid, addon.title)
 		else
@@ -134,10 +197,8 @@ function SlashCo.FindSlashCoAddons()
 	-- We also check for legacy addons to not make development harder for addon developers :)
 	local _, folders = file.Find("addons/*", "MOD")
 	for _, folder in ipairs(folders) do
-		if not file.IsDir("addons/" .. folder .. "/lua/slashco", "MOD") then continue end
-
 		-- Let's make sure were not registering the main gamemode (No custom addon should be touching that!)
-		-- if not file.IsDir("addons/" .. folder .. "/gamemodes/slashco", "MOD") then continue end
+		if CheckForMainGamemode("addons/" .. folder .. "/", nil) then continue end
 
 		local nextFreeID = -1
 		while SlashCo.Content.SlashCoWorkshopAddons[tostring(nextFreeID)] do
