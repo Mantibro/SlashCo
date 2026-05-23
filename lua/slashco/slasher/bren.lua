@@ -14,7 +14,7 @@ SLASHER.ProwlSpeed = 200
 SLASHER.ChaseSpeed = 290
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 3
-SLASHER.KillDistance = 135
+SLASHER.KillDistance = 105
 SLASHER.ChaseRange = 1200
 SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 10.0
@@ -79,7 +79,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	if SlashCo.CurRound.GameProgress > 4 then
 		slasher:SetImpervious(true)
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerPassiveGain)
-		final_perception = 3.0
+		final_perception = 2.0
 	end
 
 	if not slasher:GetNWBool("InSlasherChaseMode") then
