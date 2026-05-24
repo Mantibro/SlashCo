@@ -24,6 +24,7 @@ SLASHER.ProTip = "Male07_tip"
 SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
+SLASHER.CustomBackgroundMusic = true
 SLASHER.PrimaryDamage = 50 -- How much damage he does with his primary attack.
 SLASHER.GameProgressMult = 1 -- Used to multiply the GameProgress when deciding if he should become a monster. Raising it will allow him to enter the monster form earlier.
 
@@ -180,7 +181,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress > 4 then
 		SlashCo.AudioSystem.EnableBackgroundMusic()
-		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/male07/male07_ambience.ogg", 1)
+		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/male07/male07_ambience.ogg", 0.5)
 	end
 
 	if slasher:GetNWInt("Male07State") ~= State then

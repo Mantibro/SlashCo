@@ -28,6 +28,7 @@ SLASHER.ProTip = "Borgmire_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
+SLASHER.CustomBackgroundMusic = true
 SLASHER.AngerIncrease = 10 -- Anger increase by punching and kicking people.
 SLASHER.AngerPassiveGain = 0
 SLASHER.AngerChaseGain = 0.01
@@ -212,7 +213,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress > 4 then
 		SlashCo.AudioSystem.EnableBackgroundMusic()
-		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/borgmire/borgmire_ambience.ogg", 1)
+		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/borgmire/borgmire_ambience.ogg", 0.5)
 	end
 
 	local anger = SlashCo.GetSlasherAnger(slasher)
