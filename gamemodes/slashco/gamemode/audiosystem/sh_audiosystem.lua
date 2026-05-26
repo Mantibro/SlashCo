@@ -26,10 +26,6 @@ function SlashCo.AudioSystem.ShouldPlayBackgroundMusic()
 	return GetGlobal2Bool("SlashCo:ShouldPlayBackgroundMusic", false)
 end
 
-function SlashCo.AudioSystem.EnableBackgroundMusic()
-	SetGlobal2Bool("SlashCo:ShouldPlayBackgroundMusic", true)
-end
-
 function SlashCo.AudioSystem.EnableBackgroundMusic(forced)
 	if forced then
 		SlashCo.AudioSystem.ForcedDisable = false
