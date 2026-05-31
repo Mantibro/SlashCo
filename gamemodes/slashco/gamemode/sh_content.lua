@@ -102,7 +102,7 @@ function SlashCo.LoadFileFromAddons(fileName)
 		local _, folders = file.Find(searchPath .. "*", addonTitle)
 		for _, folder in ipairs(folders) do
 			local filePath = searchPath .. folder .. leftoverPath
-			if file.Exists(filePath, addonTitle) then
+			if file.Exists(filePath, addonTitle) and file.Exists(filePath, "LUA") then
 				if filePath:StartsWith("lua/") then
 					filePath = filePath:sub(5)
 				end
