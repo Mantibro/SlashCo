@@ -85,7 +85,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	else
 		slasher.SurveyLength = 1
 		slasher.WatcherWatched = 0.65
-		SlashCoSlashers[slasher:GetNWString("Slasher")].CanChase = false
+		slasher:SetNWBool("CanChase", false)
 	end
 
 	if slasher:GetNWBool("InSlasherChaseMode") then
@@ -226,8 +226,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("WatcherRage") then return end
-
 	SlashCo.StartChaseMode(slasher)
 end
 
@@ -380,7 +378,6 @@ function SLASHER.InitHud(_, hud)
 		end
 
 		surface.SetDrawColor(255, 255, 255, 255)
-		surface.SetMaterial(surveyNoticeIcon)
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if not survivor:GetNWBool("SurvivorWatcherSurveyed") then
 				continue
@@ -392,6 +389,7 @@ function SLASHER.InitHud(_, hud)
 
 			local pos = survivor:EyePos():ToScreen()
 			if pos.visible then
+				surface.SetMaterial(surveyNoticeIcon)
 				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 			end
 		end

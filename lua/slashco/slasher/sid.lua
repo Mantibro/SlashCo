@@ -433,7 +433,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				target:SetPos(slasher:GetPos())
 				target:SetEyeAngles(Angle(0, pick_ang, 0))
 
-				slasher.KillDelayTick = SlashCoSlashers[slasher:GetNWString("Slasher")].KillDelay
+				slasher.KillDelayTick = SLASHER.KillDelay
 
 				timer.Simple(1, function()
 					if not IsValid(target) then return end

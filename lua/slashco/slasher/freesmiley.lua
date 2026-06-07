@@ -146,7 +146,6 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 	end)
 end
 SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
-SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.OnHitByTeslaCoil(slasher)
 	SlashCo.StopChase(slasher)

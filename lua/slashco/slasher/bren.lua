@@ -34,15 +34,16 @@ SLASHER.MediumAngerBackgroundMusic = "slashco/slasher/bren/bren_ambience.ogg"
 SLASHER.HighAngerBackgroundMusic = "slashco/slasher/bren/bren_ambience.ogg"
 -- Balancement Vars
 SLASHER.FogIncreaseLength = 12
+SLASHER.NoclipCooldownLength = 25
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ChaseDuration = 10.0 + (2 * additionalSurvivors)
-	SLASHER.FogIncreaseLength = 12 + (1.5 * additionalSurvivors)
-	
+	SLASHER.FogIncreaseLength = 12 + (1 * additionalSurvivors)
+
 	if additionalSurvivors > 0 then
 		SLASHER.ProwlSpeed = 200 + (3 * additionalSurvivors)
 		SLASHER.ChaseSpeed = 290 + (0.5 * additionalSurvivors)
-		SLASHER.KillDistance = 135 + (1 * additionalSurvivors)
+		SLASHER.KillDistance = 105 + (1 * additionalSurvivors)
 	end
 end
 
@@ -60,22 +61,22 @@ function SLASHER.OnTickBehaviour(slasher)
 	local MainCD = slasher.MainCooldown or 0 -- kill cooldown
 	local NoclipCD = slasher.NoclipCooldown or 0 -- noclip cooldown
 	local SnapCD = slasher.SnapCooldown or 0 -- snap cooldown
-	
+
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
-	
+
 	if MainCD > 0 then
 		slasher.MainCooldown = MainCD - FrameTime()
 	end
-	
+
 	if NoclipCD > 0 then
 		slasher.NoclipCooldown = NoclipCD - FrameTime()
 	end
-	
+
 	if SnapCD > 0 then
 		slasher.SnapCooldown = SnapCD - FrameTime()
 	end
-	
+
 	if SlashCo.CurRound.GameProgress > 4 then
 		slasher:SetImpervious(true)
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerPassiveGain)
@@ -88,7 +89,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerChaseGain)
 		slasher:SetBodygroup(0, 1)
 	end
-	
+
 	local anger = SlashCo.GetSlasherAnger(slasher)
 	slasher:SetNWBool("CanNoclip", anger > 50)
 
@@ -103,18 +104,34 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_eyesight = 1
 	end
 
+	if not slasher:GetNWBool("BrenSnapState") then
+		if not slasher:GetNWBool("InSlasherChaseMode") then
+			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+		else
+			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
+			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
+			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
+		end
+	else
+		slasher:SetRunSpeed(350)
+		slasher:SetWalkSpeed(350)
+		slasher:SetSlowWalkSpeed(350)
+	end
+
 	if slasher:GetNWInt("BrenAnger") ~= math.floor(anger) then
 		slasher:SetNWInt("BrenAnger", math.floor(anger))
 	end
-	
+
 	if slasher:GetNWInt("MainCooldown") ~= math.floor(MainCD) then
 		slasher:SetNWInt("MainCooldown", math.floor(MainCD))
 	end
-	
+
 	if slasher:GetNWInt("SnapCooldown") ~= math.floor(SnapCD) then
 		slasher:SetNWInt("SnapCooldown", math.floor(SnapCD))
 	end
-	
+
 	if slasher:GetNWInt("NoclipCooldown") ~= math.floor(NoclipCD) then
 		slasher:SetNWInt("NoclipCooldown", math.floor(NoclipCD))
 	end
@@ -129,15 +146,19 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	if not IsValid(target) or not target:IsPlayer() then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
-	
+
 	local dist = SLASHER.KillDistance
 	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
 	timer.Simple(0.1, function()
 		if not IsValid(slasher) or not IsValid(target) then return end
 
+		local slasher_angle = slasher:LocalToWorldAngles(Angle(0, 0, 0))
+		target:SetEyeAngles(-slasher_angle)
+
 		slasher:Freeze(true)
 		target:Freeze(true)
+
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "ambient/voices/citizen_beaten4.wav",
 			identifier = "SurvivorHitBren",
@@ -163,7 +184,16 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			if not IsValid(target) then return end
 
 			target:Freeze(false)
-			target:TakeDamage(99999, slasher, slasher)
+
+			local rand_dmg = math.random(50, 60)
+			if target:Health() < 51 then
+				target:TakeDamage(99999, slasher, slasher)
+			else
+				target:TakeDamage(rand_dmg, slasher, slasher)
+				if IsValid(target) then
+					target:RandomTeleport()
+				end
+			end
 
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/bren/bren_kill.mp3",
@@ -268,10 +298,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 		})
 
 		SlashCo.AudioSystem.StopSound("BrenNoclipLoop", 1, slasher)
+		local anger = SlashCo.GetSlasherAnger(slasher) / 8
 
 		slasher:SetNWBool("BrenNoclip", false)
 		slasher:SetNWBool("CanChase", true)
-		slasher.NoclipCooldown = 5
+
+		slasher.NoclipCooldown = math.Round((SLASHER.NoclipCooldownLength - anger), 0)
 		slasher.MainCooldown = 5
 		SlashCo.AddSlasherAnger(slasher, -25)
 	end
@@ -281,15 +313,26 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if slasher:GetNWBool("BrenKill") then return end
 	if slasher.SnapCooldown > 0.01 then return end
 
+	SlashCo.StopChase(slasher)
+
 	slasher.SnapCooldown = 60
 	slasher:SetNWBool("BrenSnapAnim", true)
+	slasher:SetNWBool("CanChase", false)
 	slasher:Freeze(true)
 
 	timer.Simple(1.0, function()
 		if not IsValid(slasher) then return end
 
 		slasher:SetNWBool("BrenSnapAnim", false)
+		slasher:SetNWBool("BrenSnapState", true)
 		slasher:Freeze(false)
+		slasher:DrawShadow(false)
+		slasher:SetVisible(false)
+
+		slasher.MainCooldown = SLASHER.FogIncreaseLength + 7
+		slasher.NoclipCooldown = SLASHER.FogIncreaseLength + 7
+		SlashCo.AddSlasherAnger(slasher, -15)
+
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bren/bren_snap.mp3",
 			identifier = "BrenSnap",
@@ -322,6 +365,11 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 
 		timer.Simple(SLASHER.FogIncreaseLength, function()
 			SlashCo.RemoveFog("BrenSnap", TEAM_SURVIVOR)
+
+			slasher:SetNWBool("BrenSnapState", false)
+			slasher:SetNWBool("CanChase", true)
+			slasher:DrawShadow(true)
+			slasher:SetVisible(true)
 		end)
 	end)
 end
@@ -329,7 +377,7 @@ end
 function SLASHER.Animator(ply)
 	local bren_kill = ply:GetNWBool("BrenKill")
 	local bren_snap = ply:GetNWBool("BrenSnapAnim")
-	
+
 	if not bren_kill and not bren_snap then
 		ply.anim_antispam = false
 	end
@@ -340,19 +388,19 @@ function SLASHER.Animator(ply)
 	else
 		ply.CalcSeqOverride = ply:LookupSequence("slashco_breen_idle")
 	end
-	
+
 	ply:SetPoseParameter("move_x", ply:GetVelocity():Length() / 100)
 
 	if ply:GetVelocity():Length() < 30 then
 		ply.CalcIdeal = ACT_IDLE
 		ply.CalcSeqOverride = ply:LookupSequence("slashco_breen_idle")
 	end
-	
+
 	if bren_kill and (ply.anim_antispam == nil or ply.anim_antispam == false) then
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("slashco_breen_kill"), 0, true)
 		ply.anim_antispam = true
 	end
-	
+
 	if bren_snap and (ply.anim_antispam == nil or ply.anim_antispam == false) then
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("slashco_breen_snap"), 0, true)
 		ply.anim_antispam = true

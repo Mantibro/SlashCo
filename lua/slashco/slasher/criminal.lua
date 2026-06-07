@@ -28,8 +28,7 @@ SLASHER.ProTip = "Criminal_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★★★"
-SLASHER.HighAngerBackgroundMusic = "slashco/slasher/criminal/criminal_ambience.ogg"
-SLASHER.AngerIncrease = 100
+SLASHER.CustomBackgroundMusic = true
 -- Balancement Vars
 SLASHER.ChaseSpeedDecreaseInRageDiv = 4
 SLASHER.ChaseSpeedDecreaseDiv = 5
@@ -71,7 +70,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	local ClonTimer = slasher.ClonDuration or 0 --Cloning Duration
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
-	local anger = SlashCo.GetSlasherAnger(slasher)
 
 	if slasher:GetVelocity():Length() > 5 then
 		slasher:SetNWBool("CanKill", false)
@@ -88,13 +86,13 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.ClonDuration = ClonTimer + FrameTime()
 
 		if not slasher:GetNWBool("CriminalRage") then
-			local speed = SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseInRageDiv)
+			local speed = SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseDiv)
 
 			slasher:SetSlowWalkSpeed(speed)
 			slasher:SetWalkSpeed(speed)
 			slasher:SetRunSpeed(speed)
 		else
-			local speed = 25 + SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseDiv)
+			local speed = 25 + SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseInRageDiv)
 
 			slasher:SetSlowWalkSpeed(speed)
 			slasher:SetWalkSpeed(speed)
@@ -113,8 +111,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_eyesight = 6
 	end
 
-	if SlashCo.CurRound.GameProgress > 6 and anger < 100 then -- let's do it this way then 7-7
-		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
+	if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and SlashCo.CurRound.GameProgress > 5 then
+		SlashCo.AudioSystem.EnableBackgroundMusic()
+		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/criminal/criminal_ambience.ogg", 0.5)
 	end
 
 	slasher:SetEyeSight(final_eyesight)
@@ -163,7 +162,7 @@ end
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if not slasher:GetNWBool("CriminalCloning") then return end
 	if slasher:GetNWBool("CriminalRage") then return end
-	if SlashCo.CurRound.GameProgress < 7 then return end
+	if SlashCo.CurRound.GameProgress < 6 then return end
 
 	for i = 1, math.random(2 + SLASHER.AdditionalSpecialClones, 4 + SLASHER.AdditionalSpecialClones) do
 		local clone = ents.Create("sc_crimclone")
@@ -237,13 +236,13 @@ function SLASHER.InitHud(_, hud)
 		end
 
 		local progress = GameData.LocalPlayer:GetNWInt("GameProgressDisplay")
-		if progress > 6 then
+		if progress > 5 then
 			if not hud.RageEnabled then
 				hud:SetControlVisible("F", true)
 				hud:ShakeControl("F")
 				hud.RageEnabled = true
 			end
-		elseif progress < 7 then
+		elseif progress < 6 then
 			if hud.RageEnabled then
 				hud:SetControlVisible("F", false)
 				hud.RageEnabled = false

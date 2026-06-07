@@ -677,6 +677,7 @@ function SLASHER.InitHud(_, hud)
 			local xClamp = math.Clamp(screenPos.x, 200, ScrW() - 200)
 			local yClamp = math.Clamp(screenPos.y, 200, ScrH() - 200)
 
+			surface.SetDrawColor(255, 255, 255, 255)
 			surface.SetMaterial(self.SniffIcon)
 			surface.DrawTexturedRect(xClamp - ScrW() / 64, yClamp - ScrW() / 64, ScrW() / 32, ScrW() / 32)
 		end)
