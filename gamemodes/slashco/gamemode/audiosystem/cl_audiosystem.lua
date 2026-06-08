@@ -555,11 +555,11 @@ local function CalculateChannelVolume(channel, targetVol)
 				end
 			end
 
-			return volume
+			return math.Clamp(volume, 0, 1)
 		end
 	end
 
-	return targetVol
+	return math.Clamp(targetVol, 0, 1)
 end
 
 -- ToDo: Check if we even need this function anymore or if we fixed it unknowingly that it could become nan somehow.
