@@ -260,6 +260,10 @@ local function EatCookie(slasher, target)
 	})
 
 	target:SetNWBool("BeingEaten", true)
+	local beingEatenFunc = target.BeingEaten
+	if beingEatenFunc then
+		beingEatenFunc(target)
+	end
 
 	timer.Simple(1.3, function()
 		SlashCo.AudioSystem.PlaySound({
