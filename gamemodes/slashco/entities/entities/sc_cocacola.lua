@@ -33,7 +33,7 @@ function ENT:SetColaVelocity(velocity)
 end
 
 function ENT:WarningSound()
-	timer.Simple(2.5, function()
+	timer.Simple(1.5, function()
 		if not IsValid(self) then return end
 
 		SlashCo.AudioSystem.PlaySound({
@@ -62,7 +62,7 @@ function ENT:Explode()
 	})
 
 	local pos = self:GetPos()
-	for _, ply in ipairs(SlashCo.FindPlayersInRange(pos, 250, nil, self)) do
+	for _, ply in ipairs(SlashCo.FindPlayersInRange(pos, 400, nil, self)) do
 		local team = ply:Team()
 
 		if team == TEAM_SURVIVOR then
@@ -102,11 +102,11 @@ function ENT:PhysicsCollide(data)
 		maxDistance = 700,
 		looping = true,
 		entity = self,
-		volume = 1,
+		volume = 0.5,
 		fadeIn = 0,
 	})
 
-	timer.Simple(4, function()
+	timer.Simple(3, function()
 		if not IsValid(self) then return end
 
 		self:Explode()
