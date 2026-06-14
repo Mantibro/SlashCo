@@ -1,272 +1,109 @@
-local SlashCo = SlashCo or {}
+SlashCo = SlashCo or {}
+SlashCo.LobbyConvos = {}
 
-local ConvoCount = 30
+-- RaphaelIT7: We force voice lines to be .mp3 and don't support any other even if we could. If it's truly needed tell me but I doubt that.
 
-SlashCo.LobbyConvos = {
-	{
-		Length1 = 4,
-		Length2 = 4,
-		Length3 = 4
-	},
+local voiceFolder = "slashco/survivor/voice/"
+local function LoadVoiceLines()
+	SlashCo.LobbyConvos = {}
+	local lookup = {}
+	local voiceFiles = file.Find("sound/slashco/survivor/voice/maleconv_*", "GAME")
+	for _, fileName in ipairs(voiceFiles) do
+		local convoID, partID = string.match(fileName, "^maleconv_(%d+)_(%d+)%.mp3$")
 
-	{
-		Length1 = 2,
-		Length2 = 2,
-		Length3 = 3
-	},
+		local convoTbl = SlashCo.LobbyConvos[lookup[convoID]]
+		if not convoTbl then
+			convoTbl = {
+				ID = convoID, -- Used for file lookups later!
+				Parts = 0,
+			}
+			lookup[convoID] = table.insert(SlashCo.LobbyConvos, convoTbl)
+		end
 
-	{
-		Length1 = 5.5,
-		Length2 = 4,
-		Length3 = 2
-	},
+		-- If at any point a convo is falsely named like maleconv_1_1 and then maleconv_1_3 skipping 2 then the third part is treated as invalid too!
+		if (convoTbl.Parts + 1) == tonumber(partID) then
+			convoTbl.Parts = convoTbl.Parts + 1
+		end
+	end
 
-	{
-		Length1 = 2.5,
-		Length2 = 2,
-		Length3 = 3
-	},
+	-- Now we remove any invalid index that has no parts
+	-- We keep SlashCo.LobbyConvos as a sequential table!
+	local idx = 1
+	while idx <= #SlashCo.LobbyConvos do
+		if SlashCo.LobbyConvos[idx].Parts == 0 then
+			table.remove(SlashCo.LobbyConvos, idx)
+		else
+			idx = idx + 1
+		end
+	end
+end
+LoadVoiceLines()
 
-	{
-		Length1 = 4,
-		Length2 = 2,
-		Length3 = 10
-	},
+hook.Add("SlashCo:GameContentChanged", "SlashCo:VoiceLines", LoadVoiceLines)
 
-	{
-		Length1 = 5,
-		Length2 = 5,
-		Length3 = 3
-	},
+-- Performance wise this is not great- but this is only supposed to be called once in the lobby sooo it'll be fine.
+local function GetTotalConvoLength(convoTbl)
+	local lengthData = {}
+	for partID=1, convoTbl.Parts do
+		lengthData[partID] = SoundDuration("slashco/survivor/voice/maleconv_" .. convoTbl.ID .. "_" .. partID .. ".mp3")
+	end
 
-	{
-		Length1 = 4,
-		Length2 = 1,
-		Length3 = 4
-	},
-
-	{
-		Length1 = 3,
-		Length2 = 2,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 11,
-		Length2 = 1,
-		Length3 = 1
-	},
-
-	{
-		Length1 = 13,
-		Length2 = 1,
-		Length3 = 6
-	},
-
-	{
-		Length1 = 2,
-		Length2 = 2,
-		Length3 = 4
-	},
-
-	{
-		Length1 = 5,
-		Length2 = 3,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 0.85,
-		Length2 = 2,
-		Length3 = 4
-	},
-
-	{
-		Length1 = 6,
-		Length2 = 2,
-		Length3 = 1
-	},
-
-	{
-		Length1 = 5,
-		Length2 = 2,
-		Length3 = 2
-	},
-
-	{
-		Length1 = 4,
-		Length2 = 3,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 5,
-		Length2 = 2,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 3,
-		Length2 = 9.5,
-		Length3 = 6
-	},
-
-	{
-		Length1 = 2,
-		Length2 = 3,
-		Length3 = 2
-	},
-
-	{
-		Length1 = 1.5,
-		Length2 = 1.3,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 1.8,
-		Length2 = 4,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 10,
-		Length2 = 3,
-		Length3 = 4
-	},
-
-	{
-		Length1 = 2,
-		Length2 = 3,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 6,
-		Length2 = 1.5,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 11,
-		Length2 = 1,
-		Length3 = 1
-	},
-
-	{
-		Length1 = 4,
-		Length2 = 3,
-		Length3 = 2
-	},
-
-	{
-		Length1 = 6,
-		Length2 = 5,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 3,
-		Length2 = 3,
-		Length3 = 4
-	},
-
-	{
-		Length1 = 5,
-		Length2 = 9,
-		Length3 = 5
-	},
-
-	{
-		Length1 = 5,
-		Length2 = 5,
-		Length3 = 2
-	},
-
-	{
-		Length1 = 5,
-		Length2 = 7,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 2,
-		Length2 = 3,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 3,
-		Length2 = 3,
-		Length3 = 6
-	},
-
-	{
-		Length1 = 4,
-		Length2 = 2,
-		Length3 = 3
-	},
-
-	{
-		Length1 = 13,
-		Length2 = 1.5,
-		Length3 = 1.5
-	},
-
-	{
-		Length1 = 5,
-		Length2 = 5,
-		Length3 = 4
-	}
-
-}
+	return lengthData
+end
 
 function SlashCo.LobbyBanter()
 	local survivors = team.GetPlayers(TEAM_SURVIVOR)
-
-	if #survivors < 2 then
+	local totalSurvivors = #survivors
+	if totalSurvivors < 2 then
 		return 5
 	end
 
 	local predelay = math.random(2, 4)
+	local convoTbl = SlashCo.LobbyConvos[math.random(1, #SlashCo.LobbyConvos)]
+	local lengthData = GetTotalConvoLength(convoTbl)
+	local function playVocal(convoTbl, partID, ply)
+		if not IsValid(ply) or not convoTbl then return end
 
-	local convo = math.random(1, ConvoCount)
-
-	local totalLength = SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2 + SlashCo.LobbyConvos[convo].Length3 + predelay
-
-	local function playVocal(conv, id, plyid)
-		if not IsValid(survivors[plyid]) then return end
-		survivors[plyid]:EmitSound("slashco/survivor/voice/maleconv_" .. conv .. "_" .. id .. ".mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/survivor/voice/maleconv_" .. convoTbl.ID .. "_" .. partID .. ".mp3",
+			identifier = "SurvivorVoice",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
-	local firstid = math.random(1, #survivors)
+	local talkingSurvivors = {}
+	for k=1, convoTbl.Parts do
+		if #survivors > 0 then
+			table.insert(talkingSurvivors, table.remove(survivors, math.random(1, #survivors))) -- It is guaranteed due to the above check that at minimum two survivors exist!
+		else
+			-- Funky!
+			-- k-1 because else it uses the second and not first in some cases
+			-- Using totalSurvivors since if we used #talkingSurvivors the calculation would break
+			-- +1 since else we may use 0 which is not an index in Lua
+			table.insert(talkingSurvivors, talkingSurvivors[((k - 1) % totalSurvivors) + 1])
+		end
+	end
+
+	-- Now talkingSurvivors should contain an equal amount of entires for the parts count!
+
 	timer.Simple(predelay, function()
-		playVocal(convo, 1, firstid)
+		playVocal(convoTbl, 1, talkingSurvivors[1])
 	end)
 
-	local secondid = math.random(1, #survivors)
-	if secondid == firstid then
-		secondid = 1
-	end
-	if secondid == firstid then
-		secondid = 2
-	end
+	local totalLength = predelay
+	for partID=2, convoTbl.Parts do
+		local partLength = lengthData[partID] or 0
+		if partLength <= 0 then continue end
 
-	local thirdid = math.random(1, #survivors)
-	if thirdid == secondid then
-		thirdid = 1
+		totalLength = totalLength + partLength
+		timer.Simple(predelay + totalLength, function()
+			playVocal(convoTbl, partID, talkingSurvivors[partID])
+		end)
 	end
-	if thirdid == secondid then
-		thirdid = 2
-	end
-
-	timer.Simple(predelay + SlashCo.LobbyConvos[convo].Length1, function()
-		playVocal(convo, 2, secondid)
-	end)
-
-	timer.Simple(predelay + SlashCo.LobbyConvos[convo].Length1 + SlashCo.LobbyConvos[convo].Length2, function()
-		playVocal(convo, 3, thirdid)
-	end)
 
 	return totalLength
 end
@@ -282,47 +119,55 @@ net.Receive("SlashCo:SurvivorVoicePrompt", function(_, ply)
 	ply.VoicePromptCooldown = CurTime()
 
 	local prompt = net.ReadString()
-	ply:EmitSound("slashco/survivor/voice/prompt_" .. prompt .. math.random(1, 5) .. ".mp3")
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/voice/prompt_" .. prompt .. math.random(1, 5) .. ".mp3",
+		identifier = "SurvivorVoicePrompt",
+		minDistance = 200,
+		maxDistance = 400,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
 end)
 
 function SlashCo.EscapeVoicePrompt()
-	if team.NumPlayers(TEAM_SURVIVOR) < 1 then
+	local survivors = team.GetPlayers(TEAM_SURVIVOR)
+	if #survivors == 0 then
 		return
 	end
 
 	local function playVoice(ply)
-		ply:EmitSound("slashco/survivor/voice/prompt_escape" .. math.random(1, 5) .. ".mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/survivor/voice/prompt_escape" .. math.random(1, 5) .. ".mp3",
+			identifier = "SurvivorVoicePrompt",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 
-	local survs = team.GetPlayers(TEAM_SURVIVOR)
-
-	local speaking_survs = {}
-
-	if #survs < 2 then
-		playVoice(survs[1])
+	if #survivors == 1 then
+		playVoice(survivors[1])
 		return
 	end
 
-	table.insert(speaking_survs, survs[1])
-
-	for i = 1, #survs do
-		local survivor = survs[i]
-
-		for s = 1, #speaking_survs do
-			if speaking_survs[s] == survivor then
-				goto SKIP
+	local talkingSurvivors = { survivors[1] }
+	for idx, survivor in ipairs(survivors) do
+		for talkingIdx=1, #talkingSurvivors do
+			if talkingSurvivors[talkingIdx] == survivor then
+				break
 			end
 
-			if survivor:GetPos():Distance(speaking_survs[s]:GetPos()) > 750 then
-				table.insert(speaking_survs, survs[i])
-				goto SKIP
+			if survivor:GetPos():Distance(talkingSurvivors[talkingIdx]:GetPos()) > 750 then
+				table.insert(talkingSurvivors, survivor)
+				break
 			end
 		end
-
-		:: SKIP ::
 	end
 
-	for s = 1, #speaking_survs do
-		playVoice(speaking_survs[s])
+	for _, talkingPly in ipairs(talkingSurvivors) do
+		playVoice(talkingPly)
 	end
 end
