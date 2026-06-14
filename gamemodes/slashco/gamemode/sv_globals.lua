@@ -379,6 +379,9 @@ function SlashCo.SummonEscapeHelicopter(distress)
 	print("[SlashCo] Generators On. The Helicopter will arrive in " .. delay .. " seconds.")
 
 	timer.Simple(delay, function()
+		-- RaphaelIT7: We don't want the helicopter to spawn when the round already ended
+		if SlashCo.State ~= SlashCo.States.IN_GAME then return end
+
 		local ent = SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterSpawnPosition, Angle(0, 0, 0))
 
 		SlashCo.EscapeVoicePrompt()
