@@ -544,8 +544,33 @@ function SlashCo.AudioSystem.EnsureValidVolume(volume)
 	return 0 -- math.Clamp(volume, -10, 10) -- We return 0 as else if it would clamp to 10 it could errape the client.
 end
 
+local MuteState = {
+	MUTED = 1,
+	WAS_MUTED = 2,
+	PLAYING = 3
+}
+local function ShouldMuteVolue()
+	-- RaphaelIT7: In SlashCo I may test with like 3 multirun clients soo let's only play sounds from the focused client!
+	local mute = GameData and GameData.IsLan and not system.HasFocus()
+	if mute then
+		GameData.WasAudioSystemMuted = CurTime()
+		return MuteState.MUTED
+	end
+
+	if not mute and GameData.WasAudioSystemMuted and GameData.WasAudioSystemMuted > (CurTime() - 0.5) then
+		return MuteState.WAS_MUTED
+	end
+
+	return MuteState.PLAYING
+end
+
 -- Helper function to wrap around CalculateChannelFadeVolume
 local function CalculateChannelVolume(channel, targetVol)
+	-- RaphaelIT7: In SlashCo I may test with like 3 multirun clients soo let's only play sounds from the focused client!
+	if ShouldMuteVolue() == MuteState.MUTED then
+		return 0
+	end
+
 	local channelData = SlashCo.AudioSystem.Channels[channel]
 	if channelData.group then
 		local modifyGroupTbl = SlashCo.AudioSystem.ModifiedChannelGroups[channelData.group]
@@ -867,6 +892,14 @@ local function UpdateBackgroundMusic()
 	else
 		if SlashCo.AudioSystem.BackgroundChannel:GetState() ~= GMOD_CHANNEL_PLAYING then -- Fk stopsound
 			SlashCo.AudioSystem.BackgroundChannel:Play()
+		end
+
+		local muteState = ShouldMuteVolue()
+		if muteState == MuteState.MUTED then
+			SlashCo.AudioSystem.BackgroundChannel:SetVolume(0)
+			return
+		elseif muteState == MuteState.WAS_MUTED then
+			SlashCo.AudioSystem.BackgroundChannel:SetVolume(SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled())
 		end
 
 		local backgroundMusicTime = SlashCo.AudioSystem.GetBackgroundMusicTime()
