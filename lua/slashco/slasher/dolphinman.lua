@@ -28,7 +28,9 @@ SLASHER.SpeedRating = "★★☆☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.CannotBeSpectated = true
+SLASHER.AlertDistance = 400 -- Make dolphinman able to detect survivors in a range and start chase by itself if wanted.
 -- Balancement Vars
+SLASHER.HuntPowerKill = 20 -- Used to give huntpower per kill based on survivor amount
 SLASHER.HuntPowerDiv = 1 -- Used to divide FrameTime, raising it will make his hunt last longer.
 SLASHER.HuntPowerGainDiv = 2 -- Used to divide FrameTime, raising it will make him gain hunt power SLOWER
 
@@ -36,11 +38,14 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	-- math.max so it cannot go below 0.5.
+	SLASHER.HuntPowerKill = math.max(20 + SO + (2 * additionalSurvivors), 10)
 	SLASHER.HuntPowerDiv = math.max(1 + SO + (0.1 * additionalSurvivors), 0.5)
 	SLASHER.HuntPowerGainDiv = math.max(2 - (0.5 * SO) - (0.02 * additionalSurvivors), 0.5)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 
 	if additionalSurvivors > 0 then
+		SLASHER.AlertDistance = 400 + (5 * additionalSurvivors)
+		SLASHER.Perception = 1.0 + (0.1 * additionalSurvivors)
 		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
 		SLASHER.ChaseSpeed = 315 + (0.5 * additionalSurvivors)
 	end
@@ -48,8 +53,10 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	slasher.Jump = slasher:GetJumpPower()
-	
+	slasher:SetNWBool("DolphinCanActivate", false)
+
 	slasher.HuntPower = 0
+	slasher.dolfin_final_antispam = nil
 end
 
 local function PlayCallSound(slasher)
@@ -76,12 +83,55 @@ local function PlayCallSound(slasher)
 	})
 end
 
+local function PlayCallSoundFinal(slasher)
+	if slasher.dolfin_final_antispam == nil then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/dolfin/dolfin_call.mp3",
+			identifier = "DolfinCall",
+			minDistance = 700 * SlashCo.MapSize,
+			maxDistance = 1240 * SlashCo.MapSize,
+			looping = true,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/dolfin/dolfin_call_far.mp3",
+			identifier = "DolfinCallFar",
+			minDistance = 1250 * SlashCo.MapSize,
+			maxDistance = 2250 * SlashCo.MapSize,
+			looping = true,
+			entity = slasher,
+			volume = 0.8,
+			fadeIn = 0,
+		})
+
+		slasher.dolfin_final_antispam = 0
+	end
+
+	if slasher.dolfin_final_antispam then
+		slasher.dolfin_final_antispam = slasher.dolfin_final_antispam + FrameTime()
+	end
+end
+
+local function DolphinHunt(slasher)
+	slasher:SetNWBool("DolphinFound", true)
+	PlayCallSound(slasher)
+
+	timer.Simple(10, function()
+		slasher:SetNWBool("DolphinFound", false)
+		slasher:SetNWBool("DolphinInHiding", false)
+		slasher:SetNWBool("DolphinHunting", true)
+	end)
+end
+
 function SLASHER.OnTickBehaviour(slasher)
 	local HuntPower = slasher.HuntPower or 0 --Hunt power
 	local hunt_boost = 0
 
 	if not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
-		if math.random(1, 1000) == 1 then
+		if math.random(1, 1500) == 1 then
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/dolfin/dolfin_click" .. math.random(1, 2) .. ".ogg",
 				identifier = "DolfinClick",
@@ -92,6 +142,16 @@ function SLASHER.OnTickBehaviour(slasher)
 				fadeIn = 0,
 			})
 		end
+	end
+
+	if SlashCo.CurRound.EscapeHelicopterSummoned then
+		slasher:SetNWBool("DolphinFound", false)
+		slasher:SetNWBool("DolphinInHiding", false)
+		slasher:SetNWBool("DolphinHunting", true)
+		slasher:SetNWBool("DolphinFinal", true)
+		slasher:SetNWBool("CanKill", true)
+
+		PlayCallSoundFinal(slasher)
 	end
 
 	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
@@ -107,48 +167,43 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		--Survivore finderore
 
-		if SlashCo.CurRound.EscapeHelicopterSummoned then
-			slasher:SetNWBool("DolphinFound", true)
-
-			PlayCallSound(slasher)
-
-			timer.Simple(5, function()
-				slasher:SetNWBool("DolphinFound", false)
-				slasher:SetNWBool("DolphinInHiding", false)
-				slasher:SetNWBool("DolphinHunting", true)
-
-				slasher:SetNWBool("CanKill", true)
-			end)
-		end
-
-		for _, s in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not s:CanBeSeen() then
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not survivor:CanBeSeen() then
 				continue
 			end
 
-			if s:GetPos():Distance(slasher:GetPos()) > 500 then
+			if survivor:GetPos():Distance(slasher:GetPos()) > 400 then
 				continue
 			end
 
 			local tr = util.TraceLine({
 				start = slasher:EyePos(),
-				endpos = s:WorldSpaceCenter(),
+				endpos = survivor:WorldSpaceCenter(),
 				filter = slasher
 			})
 
-			if tr.Entity ~= s then
+			if tr.Entity ~= survivor then
 				continue
 			end
 
-			slasher:SetNWBool("DolphinFound", true)
+			DolphinHunt(slasher)
+		end
 
-			PlayCallSound(slasher)
+		for _, alert_surv in player.Iterator() do
+			if alert_surv:Team() ~= TEAM_SURVIVOR then
+				continue
+			end
 
-			timer.Simple(10, function()
-				slasher:SetNWBool("DolphinFound", false)
-				slasher:SetNWBool("DolphinInHiding", false)
-				slasher:SetNWBool("DolphinHunting", true)
-			end)
+			local alert_area = SLASHER.AlertDistance + ((2 * HuntPower) + 100)
+
+			if alert_surv:GetPos():Distance(slasher:GetPos()) > alert_area then
+				alert_surv:SetNWBool("SurvivorAlert", false)
+				--slasher:SetNWBool("DolphinCanActivate", false)
+				continue
+			end
+
+			alert_surv:SetNWBool("SurvivorAlert", true)
+			slasher:SetNWBool("DolphinCanActivate", true)
 		end
 
 		if slasher:GetNWBool("CanKill") then
@@ -159,9 +214,15 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("CanKill", true)
 		end
 
-		if SlashCo.CurRound.EscapeHelicopterSummoned then
-			if HuntPower < 100 then
-				slasher.HuntPower = HuntPower + (FrameTime() / SLASHER.HuntPowerGainDiv)
+		if slasher:GetNWBool("DolphinCanActivate") then
+			slasher:SetNWBool("DolphinCanActivate", false)
+		end
+
+		for _, surv in player.Iterator() do
+			if surv:Team() == TEAM_SURVIVOR then
+				if surv:GetNWBool("SurvivorAlert") then
+					surv:SetNWBool("SurvivorAlert", false)
+				end
 			end
 		end
 
@@ -185,7 +246,9 @@ function SLASHER.OnTickBehaviour(slasher)
 			hunt_boost = 1
 
 			--oh fuck i'm losing my hunt!!
-			slasher.HuntPower = HuntPower - (FrameTime() / SLASHER.HuntPowerDiv)
+			if not SlashCo.CurRound.EscapeHelicopterSummoned then
+				slasher.HuntPower = HuntPower - (FrameTime() / SLASHER.HuntPowerDiv)
+			end
 
 			--damn shit
 			if HuntPower <= 0 then
@@ -210,6 +273,9 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 	slasher:SetNWBool("DolphinInHiding", false)
 	slasher:SetNWBool("DolphinHunting", false)
 	slasher:Freeze(true)
+
+	SlashCo.AudioSystem.StopSound("DolfinCall", 0.5, slasher)
+	SlashCo.AudioSystem.StopSound("DolfinCallFar", 0.5, slasher)
 
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
@@ -237,14 +303,7 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if SlashCo.Jumpscare(slasher, target) then
-		if slasher:GetNWBool("DolphinHunting") then
-			slasher.HuntPower = math.min(100, slasher.HuntPower + 15)
-			slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
-
-			return
-		end
-
-		slasher.HuntPower = math.min(100, slasher.HuntPower + 20)
+		slasher.HuntPower = math.min(100, slasher.HuntPower + SLASHER.HuntPowerKill)
 		slasher.DolphinKills = (slasher.DolphinKills or 0) + 1
 	end
 end
@@ -253,6 +312,8 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
+	if slasher:GetNWBool("DolphinFinal") then return end
+
 	if not slasher:GetNWBool("DolphinHunting") and not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
 		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then return end
 
@@ -272,6 +333,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
+	if slasher:GetNWBool("DolphinFinal") then return end
+	if slasher:GetNWBool("DolphinFound") then return end
+	if slasher:GetNWBool("DolphinHunting") then return end
+	if not slasher:GetNWBool("DolphinCanActivate") then return end
+
+	DolphinHunt(slasher)
 end
 
 function SLASHER.Animator(ply)
@@ -320,6 +387,21 @@ function SLASHER.Footstep(ply)
 	return true
 end
 
+local mat = Material("lights/white")
+local function targetPaint(ply)
+	if not IsValid(ply) then return end
+
+	cam.Start3D()
+	render.MaterialOverride(mat)
+	render.SetColorModulation(1, 0, 0)
+
+	ply:DrawModel()
+
+	render.SetColorModulation(1, 1, 1)
+	render.MaterialOverride("")
+	cam.End3D()
+end
+
 local hideIcons = {
 	["default"] = Material("slashco/ui/icons/slasher/dolphinman"),
 	["unhide"] = Material("slashco/ui/icons/slasher/watcher_a1"),
@@ -332,7 +414,9 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("R", "hide", hideIcons)
 	hud:ChaseAndKill(true)
+	hud:AddControl("F", "hunt", Material("slashco/ui/icons/slasher/dolphinman"))
 	hud:TieControlVisible("LMB", "DolphinInHiding", true, true)
+	hud:TieControlVisible("F", "DolphinCanActivate")
 	hud:TieControlVisible("R", "DolphinHunting", true, true)
 	hud:TieControlText("R", "DolphinInHiding", "unhide", "hide", true)
 
@@ -352,7 +436,27 @@ function SLASHER.InitHud(_, hud)
 			hud:SetControlEnabled("R", hide)
 			hud.prevHide = hide
 		end
+
+		if GameData.LocalPlayer:GetNWBool("DolphinFinal") then
+			hud:SetControlVisible("R", false)
+			hud:SetControlVisible("F", false)
+		end
 	end
+
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+			return
+		end
+
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not survivor:GetNWBool("SurvivorAlert") then
+				continue
+			end
+
+			targetPaint(survivor)
+		end
+	end)
 end
 
 if CLIENT then

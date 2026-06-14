@@ -151,7 +151,7 @@ function SLASHER.InitHud(_, hud)
 	hud:UntieControl("LMB")
 	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
 	
-	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+	local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
@@ -166,7 +166,8 @@ function SLASHER.InitHud(_, hud)
 				local pos = survivor:WorldSpaceCenter():ToScreen()
 
 				if pos.visible then
-					surface.SetMaterial(surveyNoticeIcon)
+					surface.SetDrawColor(255, 255, 255, 60)
+					surface.SetMaterial(cloakNoticeIcon)
 					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 				end
 			end
