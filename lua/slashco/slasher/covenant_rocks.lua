@@ -155,6 +155,7 @@ function SLASHER.InitHud(_, hud)
 	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
 			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+			return
 		end
 
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
