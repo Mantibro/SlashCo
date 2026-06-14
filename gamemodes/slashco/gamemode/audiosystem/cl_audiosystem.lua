@@ -282,28 +282,38 @@ local function CalculateChannelFadeVolume(playerPos, channelPos, initialVolume, 
 	local startDistance = soundData.startDistance
 	local startEndDistance = soundData.startEndDistance
 	if startDistance and startEndDistance then
-		if distance < startDistance then
-			return 0
-		end
+		local fadeRange = startEndDistance - startDistance
+		if fadeRange > 0 then
+			if distance < startDistance then
+				return 0
+			end
 
-		if distance < startEndDistance then
-			return initialVolume * (1 - ((distance - startEndDistance) / (startDistance - startEndDistance)))
+			if distance < startEndDistance then
+				return initialVolume * ((distance - startDistance) / fadeRange)
+			end
+		else
+			return distance < startDistance and 0 or initialVolume
 		end
 	end
 
 	local minDistance = soundData.minDistance
 	local maxDistance = soundData.maxDistance
 	if minDistance and maxDistance then
-		if distance <= minDistance then
-			return initialVolume
-		end
+		local fadeRange = maxDistance - minDistance
+		if fadeRange > 0 then
+			if distance <= minDistance then
+				return initialVolume
+			end
 
-		if distance < maxDistance then
-			return initialVolume * (1 - ((distance - minDistance) / (maxDistance - minDistance)))
-		end
+			if distance < maxDistance then
+				return initialVolume * (1 - ((distance - minDistance) / fadeRange))
+			end
 
-		if distance >= maxDistance then
-			return 0
+			if distance >= maxDistance then
+				return 0
+			end
+		else
+			return distance < minDistance and initialVolume or 0
 		end
 	end
 
@@ -525,6 +535,15 @@ local function RemoveModifyChannelGroup(channel, channelData)
 	end
 end
 
+-- ToDo: Check if we even need this function anymore or if we fixed it unknowingly that it could become nan somehow.
+function SlashCo.AudioSystem.EnsureValidVolume(volume)
+	if volume == volume and volume ~= math.huge and volume ~= -math.huge then -- if its not nan and not inf and not -inf, we can say its safe
+		return volume
+	end
+
+	return 0 -- math.Clamp(volume, -10, 10) -- We return 0 as else if it would clamp to 10 it could errape the client.
+end
+
 -- Helper function to wrap around CalculateChannelFadeVolume
 local function CalculateChannelVolume(channel, targetVol)
 	local channelData = SlashCo.AudioSystem.Channels[channel]
@@ -555,20 +574,11 @@ local function CalculateChannelVolume(channel, targetVol)
 				end
 			end
 
-			return math.Clamp(volume, 0, 1)
+			return math.Clamp(SlashCo.AudioSystem.EnsureValidVolume(volume), 0, 1.5)
 		end
 	end
 
-	return math.Clamp(targetVol, 0, 1)
-end
-
--- ToDo: Check if we even need this function anymore or if we fixed it unknowingly that it could become nan somehow.
-function SlashCo.AudioSystem.EnsureValidVolume(volume)
-	if volume == volume then -- if its not nan, we can say its safe
-		return volume
-	end
-
-	return 0 -- math.Clamp(volume, -10, 10) -- We return 0 as else if it would clamp to 10 it could errape the client.
+	return math.Clamp(SlashCo.AudioSystem.EnsureValidVolume(targetVol), 0, 1.5)
 end
 
 -- Callback called before a channel is gc'd / completely destroyed.
