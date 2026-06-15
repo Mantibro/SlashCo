@@ -351,7 +351,20 @@ function GM:PlayerShouldTakeDamage(ply, attacker)
 		return false
 	end
 
-	return ply:Team() == TEAM_SURVIVOR
+	-- RaphaelIT7 (ToDo): For Extermination we may allow slashers to be damaged!
+
+	local isSurvivor = ply:Team() == TEAM_SURVIVOR
+	if not isSurvivor then
+		return false
+	end
+
+	-- RaphaelIT7: iirc there were a few times when custom Slashers were able to kill people inside helicopters. Let's avoid that.
+	local vehicle = ply:GetVehicle()
+	if IsValid(vehicle) and vehicle.IsHelicopterSeat then
+		return false
+	end
+
+	return true
 end
 
 hook.Add("OnPlayerChangedTeam", "SlashCo:OnPlayerChangedTeam", function(ply, oldTeam, newTeam)
@@ -500,7 +513,6 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 	hook.Run("LobbyInfoText")
 
 	SlashCoDatabase.OnPlayerJoined(ply:SteamID64())
-	SlashCo.LoadPlayerFromDatabase(ply)
 
 	SlashCo.AwaitExpectedPlayers()
 	SlashCo.BroadcastGlobalData(ply)
@@ -539,7 +551,7 @@ hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, oldTeam
 		return
 	end
 
-	SlashCo.LoadPlayerFromDatabase(ply)
+	SlashCoDatabase.LoadPlayer(ply)
 
 	if newTeam == TEAM_SURVIVOR then
 		ply.Lives = 1
@@ -584,11 +596,23 @@ function GM:PlayerDeath(victim)
 		return
 	end
 
+	if hook.Run("SlashCo:PrePlayerDeath", victim) then
+		return
+	end
+
 	SlashCo.DropAllItems(victim)
 	victim.Lives = victim.Lives or 1
 	victim.Lives = victim.Lives - 1
 
 	if victim.Lives > 0 then return end
+	-- RaphaelIT7 (ToDo): This is for later I think. Still need to think more xd
+	--[[if hook.Run("SlashCo:PrePlayerDeath", victim) then
+		if victim.Lives <= 0 then
+			victim.Lives = 1
+		end
+
+		return
+	end]]
 
 	hook.Run("SlashCo:PlayerDeath", victim)
 

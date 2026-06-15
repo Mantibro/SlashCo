@@ -1094,9 +1094,17 @@ hook.Add("scValue_genProg", "slashCoGetGenProg", function(gen, hasBattery, cansR
 
 		if playSound then
 			if panel.HasBattery and panel.CansRemaining <= 0 then
-				surface.PlaySound("slashco/slashco_progress_full.mp3")
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slashco_progress_full.mp3",
+					identifier = "GeneratorProgress",
+					volume = 1,
+				})
 			else
-				surface.PlaySound("slashco/slashco_progress.mp3")
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slashco_progress.mp3",
+					identifier = "GeneratorProgress",
+					volume = 1,
+				})
 			end
 		end
 	end)

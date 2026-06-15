@@ -19,7 +19,7 @@ function ENT:SetupDataTables()
 end
 
 if SERVER then
-	hook.Add("SlashCo:Precache", "PrecacheBeacon", function()
+	hook.Add("SlashCo:Precache", "SlashCo:PrecacheBeacon", function()
 		SlashCo.PrecacheSound("slashco/survivor/teslacoil_chargeup.mp3")
 		SlashCo.PrecacheSound("slashco/survivor/teslacoil_stun.mp3")
 		SlashCo.PrecacheModel("models/props_c17/utilityconnecter006c.mdl")

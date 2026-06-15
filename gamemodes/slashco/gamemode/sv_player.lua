@@ -1,5 +1,3 @@
---local SlashCo = SlashCo
-
 function GM:PlayerSwitchWeapon()
 	return false
 end
@@ -121,7 +119,7 @@ hook.Add("PlayerCanHearPlayersVoice", "SlashCo:VoiceChat", function(listener, ta
 	return CanPlayersHearEachOther(listener, talker, true)
 end)
 
-hook.Add("GetFallDamage", "RealisticDamage", function(_, speed)
+hook.Add("GetFallDamage", "SlashCo:RealisticDamage", function(_, speed)
 	return speed / 24
 end)
 
@@ -129,12 +127,32 @@ hook.Add("PlayerCanSeePlayersChat", "SlashCo:TeamChat", function(_, _, listener,
 	return CanPlayersHearEachOther(listener, talker, false)
 end)
 
-hook.Add("ShowTeam", "DoNotAllowTeamSwitch", function()
+hook.Add("ShowTeam", "SlashCo:NoTeamSwitch", function()
 	return false
 end)
 
-hook.Add("PlayerUse", "STOP", function(ply, _)
+hook.Add("PlayerUse", "SlashCo:NoSpectatorUse", function(ply, _)
 	if ply:Team() == TEAM_SPECTATOR then
 		return false
 	end
 end)
+
+local PLAYER = FindMetaTable("Player")
+-- Required by DB since we force code to stay in sync with any calls to UpdateStats!
+-- These are serverside only values!
+function PLAYER:SetSlasherChance(value)
+	self.SlasherChance = value
+end
+
+function PLAYER:GetSlasherChance()
+	return self.SlasherChance or 0
+end
+
+-- RaphaelIT7: @Xerk If this is needed for clients to know tell me :)
+function PLAYER:SetUnlockedContent(value)
+	self.UnlockedContent = value
+end
+
+function PLAYER:GetUnlockedContent()
+	return self.UnlockedContent or ""
+end

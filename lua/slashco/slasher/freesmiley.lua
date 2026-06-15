@@ -254,7 +254,7 @@ function SLASHER.Animator(ply)
 
 	if smiley_summon then
 		ply.CalcSeqOverride = ply:LookupSequence("summon")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
@@ -262,7 +262,7 @@ function SLASHER.Animator(ply)
 
 	if smiley_sand_stun then
 		ply.CalcSeqOverride = ply:LookupSequence("stun")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
@@ -270,7 +270,7 @@ function SLASHER.Animator(ply)
 
 	if smiley_tesla_stun then
 		ply.CalcSeqOverride = ply:LookupSequence("death")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end

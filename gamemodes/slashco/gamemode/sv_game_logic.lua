@@ -431,6 +431,13 @@ function SlashCo.EndRound()
 		end
 	end
 
+	if #survivors == 0 and SlashCo.IsQuickEscape() then
+		local slashers = team.GetPlayers(TEAM_SLASHER)
+		for _, slasher in ipairs(survivors) do
+			slasher:SetRoundPoints("slasher_quick")
+		end
+	end
+
 	local SurvivorCount = #survivors
 	local heliCount = #SlashCo.CurRound.HelicopterRescuedPlayers
 	if SurvivorCount == 0 then

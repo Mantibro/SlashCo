@@ -102,12 +102,6 @@ local function WriteSoundField(value, writeFunc, ...)
 	end
 end
 
-local function WritePulseEffect(table)
-	WriteSoundField(table.entity, WriteEntIndex)
-	WriteSoundField(table.entityClass, net.WriteString)
-	WriteSoundField(table.frequency, net.ReadUInt, 16)
-end
-
 local function WriteDeltaSoundField(value, deltaValue, writeFunc, ...)
 	local isNil = value == nil or value == deltaValue
 	net.WriteBool(isNil)
@@ -115,6 +109,12 @@ local function WriteDeltaSoundField(value, deltaValue, writeFunc, ...)
 		-- print("Writing delta value", type(value), value)
 		writeFunc(value, ...)
 	end
+end
+
+local function WritePulseEffect(table)
+	WriteSoundField(table.entity, WriteEntIndex)
+	WriteSoundField(table.entityClass, net.WriteString)
+	WriteSoundField(table.frequency, net.ReadUInt, 16)
 end
 
 local function WriteDeltaPulseEffect(table, deltaTable)
@@ -226,6 +226,7 @@ deltaMerge = DeltaMerge
 	Serverside only fields:
 		number sendToTeam - Sends the given sound only to the specific team
 		Entity/Table sendToEntity - Sends the given sound only to a specific player/table of players
+		table langPaths - A table where key is the language like "en", "de", "ru" and value is a path to a sound file. It overrides soundData.soundPath with the right language sound file!
 ]]
 util.AddNetworkString("slashCo_AudioSystem_PlaySound")
 function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for documentation of the table.
@@ -281,12 +282,25 @@ function NetworkSettings.PlaySound.ProcessFunc(data, ply)
 	local soundData = data.soundData
 	local deltaTable = data.deltaTable -- if we had no data when PlaySound was called we do not want to check here for delta.
 	local plyDeltaTable = SlashCo.AudioSystem.PlayerDeltaSoundCache[ply]
+	-- We must do this here since else delta sending will be messed up!
+	local originalSoundPath = soundData.soundPath
+	if soundData.langPaths then
+		local clientLang = ply:GetInfo("gmod_language")
+		local soundPath = soundData.langPaths[clientLang]
+		if soundPath then
+			soundData.soundPath = soundPath
+		end
+	end
+
 	if deltaTable and plyDeltaTable and plyDeltaTable[identifier] then
 		SendToPlayersWithDelta(soundData, deltaTable)
 	else
 		SendToPlayersWithNoDelta(soundData)
 		deltaTable = {}
 		-- print("We had no delta :sob:")
+
+		-- We restore it to not break delta later on!
+		soundData.soundPath = originalSoundPath
 
 		-- Yes, this is not the best way, we should probably ALWAYS update the delta though I don't like that idea really as then delta recover gets tricky.
 		-- Also really only position & entity fields should change.

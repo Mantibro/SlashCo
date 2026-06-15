@@ -98,7 +98,7 @@ function ENT:Leave(ent)
 	end
 end
 
-hook.Add("SlashCo:Precache", "PrecacheZone", function()
+hook.Add("SlashCo:Precache", "SlashCo:PrecacheZone", function()
 	for k=1, 5 do
 		SlashCo.PrecacheSound("physics/flesh/flesh_impact_bullet" .. k .. ".wav")
 	end

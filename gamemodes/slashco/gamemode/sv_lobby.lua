@@ -230,6 +230,37 @@ local function BeginSlasherSelection(specificSlasher)
 	end
 end
 
+-- RaphaelIT7: All of this feels very hacky! Perhaps we should just rework lobbyRoundSetup() once properly
+local function PickRandomPotentialSlasher()
+	local data = table.remove(SlashCo.LobbyData.PotentialSlashers, math.random(1, #SlashCo.LobbyData.PotentialSlashers))
+	
+	-- We remove all occurrences of the same ID since for the whole slasher chance stuff we may have inserted them multiple times.
+	local idx = 1
+	while idx <= #SlashCo.LobbyData.PotentialSlashers do
+		if SlashCo.LobbyData.PotentialSlashers[idx].steamid == data.steamid then
+			table.remove(SlashCo.LobbyData.PotentialSlashers, idx)
+		else
+			idx = idx + 1
+		end
+	end
+
+	return data
+end
+
+local function CleanupPotentialSlashers()
+	local entires = {}
+	local idx = 1
+	while idx <= #SlashCo.LobbyData.PotentialSlashers do
+		local steamid = SlashCo.LobbyData.PotentialSlashers[idx].steamid
+		if entires[steamid] then -- We already found one entry!
+			table.remove(SlashCo.LobbyData.PotentialSlashers, idx)
+		else
+			entires[steamid] = true
+			idx = idx + 1
+		end
+	end
+end
+
 --				***Assign the values for the incoming Round***
 local function lobbyRoundSetup()
 	SlashCo.BroadcastGlobalData()
@@ -265,7 +296,9 @@ local function lobbyRoundSetup()
 			table.insert(SlashCo.LobbyData.PotentialSurvivors, { steamid = ply:SteamID64() })
 			print("(Debug) " .. ply:GetName() .. " now is a potential Survivor.")
 		elseif readyState == SlashCo.ReadyState.Slasher then
-			table.insert(SlashCo.LobbyData.PotentialSlashers, { steamid = ply:SteamID64() })
+			for k=1, (ply:GetSlasherChance()+1) do
+				table.insert(SlashCo.LobbyData.PotentialSlashers, { steamid = ply:SteamID64() })
+			end
 			print("(Debug) " .. ply:GetName() .. " now is a potential Slasher.")
 		end
 	end
@@ -282,13 +315,13 @@ local function lobbyRoundSetup()
 		elseif not SlashCo.LobbyData.PotentialSurvivors[1] then
 			--If no none readied as Survivor, the slasher will be randomly picked from the slasher-ready players.
 
-			local randomSlasher = table.remove(SlashCo.LobbyData.PotentialSlashers, math.random(1, #SlashCo.LobbyData.PotentialSlashers))
+			local randomSlasher = PickRandomPotentialSlasher()
 			table.insert(SlashCo.LobbyData.AssignedSlashers, randomSlasher)
 		else
 			--If the ready states are mixed, pick the slasher from slasher-ready players.
 			-- RaphaelIT7: This case shouldn't be possible?
 
-			local randomSlasher = table.remove(SlashCo.LobbyData.PotentialSlashers, math.random(1, #SlashCo.LobbyData.PotentialSlashers))
+			local randomSlasher = PickRandomPotentialSlasher()
 			table.insert(SlashCo.LobbyData.AssignedSlashers, randomSlasher)
 		end
 
@@ -309,7 +342,7 @@ local function lobbyRoundSetup()
 
 		local randomPly
 		if #SlashCo.LobbyData.PotentialSlashers > 0 then
-			randomPly = table.remove(SlashCo.LobbyData.PotentialSlashers, math.random(1, #SlashCo.LobbyData.PotentialSlashers))
+			randomPly = PickRandomPotentialSlasher()
 		elseif #SlashCo.LobbyData.PotentialSurvivors > 1 then -- There must be more than 1 survivor left!
 			randomPly = table.remove(SlashCo.LobbyData.PotentialSurvivors, math.random(1, #SlashCo.LobbyData.PotentialSurvivors))
 		end
@@ -317,12 +350,16 @@ local function lobbyRoundSetup()
 		if randomPly then
 			table.insert(SlashCo.LobbyData.AssignedSlashers, randomPly)
 
-			local p = player.GetBySteamID64(randomPly.steamid)
-			p:ChatText("second_slasher")
+			local ply = player.GetBySteamID64(randomPly.steamid)
+			if IsValid(ply) then
+				ply:ChatText("second_slasher")
+			end
 		else
 			print("[SlashCo] Found no player that could fill the second slasher slot")
 		end
 	end
+
+	CleanupPotentialSlashers() -- We must remove all duplicate entries first!
 
 	-- Move leftover slashers over
 	for key, slasher in ipairs(SlashCo.LobbyData.PotentialSlashers) do
@@ -332,9 +369,24 @@ local function lobbyRoundSetup()
 	SlashCo.LobbyData.PotentialSlashers = {}
 	SlashCo.LobbyData.FinishedPicking = true
 
+	for _, data in ipairs(SlashCo.LobbyData.NonPickedPotentialSlashers) do
+		SlashCoDatabase.UpdateStats(data.steamid, "SlasherChance", 1)
+	end
+
 	--Finalize teams
 	if SlashCo.LobbyData.AssignedSurvivors[1] and SlashCo.LobbyData.AssignedSlashers[1] then
 		--print(player.GetBySteamID64(SlashCo.LobbyData.AssignedSurvivors[1].steamid):GetName() .. player.GetBySteamID64(SlashCo.LobbyData.AssignedSlashers[1].steamid):GetName())
+
+		for _, data in ipairs(SlashCo.LobbyData.AssignedSlashers) do
+			--The Slasher becomes a spectator in the lobby.
+
+			SlashCoDatabase.UpdateStats(data.steamid, "SlasherChance", 0, true)
+			local ply = player.GetBySteamID64(data.steamid)
+			if IsValid(ply) then
+				ply:SetTeam(TEAM_SPECTATOR)
+				ply:Spawn()
+			end
+		end
 
 		for idx, data in ipairs(SlashCo.LobbyData.AssignedSurvivors) do
 			--The Survivors become survivors
@@ -348,15 +400,14 @@ local function lobbyRoundSetup()
 				print("[SlashCo] Survivor " .. idx .. " selection successful, the Survivor is: " .. ply:GetName())
 			end
 		end
+		
+		-- Failsafe logic in case a player gets lost in selection
+		for _, ply in ipairs(team.GetPlayers(TEAM_LOBBY)) do
+			ply:SetTeam(TEAM_SURVIVOR)
+			ply:Spawn()
+			ply:SetAvoidPlayers(false) -- Disable being pushed out of players while being in the lobby.
 
-		for _, data in ipairs(SlashCo.LobbyData.AssignedSlashers) do
-			--The Slasher becomes a spectator in the lobby.
-
-			local ply = player.GetBySteamID64(data.steamid)
-			if IsValid(ply) then
-				ply:SetTeam(TEAM_SPECTATOR)
-				ply:Spawn()
-			end
+			print("[SlashCo] Survivor failsafe hit for " .. ply:GetName())
 		end
 	end
 

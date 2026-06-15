@@ -6,6 +6,7 @@ local pointAmounts = {
 	slasher_win = 20, --
 	slasher_escape = 10, --
 	slasher_perfect = 15, --
+	slasher_quick = 5, -- Killed everyone quickly
 	objective = 20, --
 	optional = 10, -- not implemented
 	escape = 10, --

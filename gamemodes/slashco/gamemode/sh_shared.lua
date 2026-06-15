@@ -331,9 +331,17 @@ SlashCo.ReadyState = {
 }
 
 --[[
+	Active Gamemode
+]]
+SlashCo.Gamemode = {
+	ESCAPE = 0,
+	EXTERMINATION = 1,
+	RESEARCH = 2
+}
+
+--[[
 	Round States
 ]]
-
 SlashCo.RoundState = {
 	[0] = WON_ALL_ALIVE,
 	WON_ALL_ALIVE = 0,
@@ -377,6 +385,7 @@ GameData.TotalSlots = game.MaxPlayers()
 GameData.IsSinglePlayer = game.SinglePlayer()
 GameData.IsLan = GetConVar("sv_lan"):GetBool()
 GameData.World = GameData.World or game.GetWorld()
+GameData.Gamemode = SlashCo.Gamemode.ESCAPE
 MAX_EDICT = math.pow(2, MAX_EDICT_BITS)
 
 if CLIENT then
@@ -393,6 +402,7 @@ if CLIENT then
 	GameData.IsLan = GetGlobal2Bool("SlashCo:IsLan", GameData.IsLan)
 	GameData.IsNewPlayer = cookie.GetNumber("slashco_totalplaycount", 0) < 3 -- We keep track how many rounds they played. If they played more than 3 rounds, their not considered a new player anymore. this variable is used to enable hints for them.
 	GameData.MaxPlayers = GetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers) -- For autorefresh
+	GameData.Gamemode = GetGlobal2Int("SlashCo:Gamemode", GameData.Gamemode)
 
 	function GM:InitPostEntity()
 		GameData.World = game.GetWorld()
@@ -403,6 +413,11 @@ if CLIENT then
 		GameData.IsLobby = GetGlobal2Bool("SlashCo:IsLobby", GameData.IsLobby)
 		GameData.World:SetNW2VarProxy("SlashCo:IsLobby", function(_, _, _, newVal)
 			GameData.IsLobby = newVal
+		end)
+
+		GameData.Gamemode = GetGlobal2Int("SlashCo:Gamemode", GameData.Gamemode)
+		GameData.World:SetNW2VarProxy("SlashCo:Gamemode", function(_, _, _, newVal)
+			GameData.Gamemode = newVal
 		end)
 		
 		GameData.Lobby = GetGlobal2String("SlashCo:Lobby", GameData.Lobby)
@@ -451,6 +466,7 @@ else
 		SetGlobal2Bool("SlashCo:IsLan", GameData.IsLan)
 		GameData.MaxPlayers = math.min(maxplayers and maxplayers:GetInt() or GameData.MaxPlayers, GameData.TotalSlots)
 		SetGlobal2Int("SlashCo:MaxPlayers", GameData.MaxPlayers)
+		SetGlobal2Int("SlashCo:Gamemode", GameData.Gamemode)
 
 		if GameData.IsLan then
 			SlashCo.SetupLanOverrides()

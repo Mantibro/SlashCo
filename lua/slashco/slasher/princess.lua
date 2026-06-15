@@ -577,28 +577,28 @@ function SLASHER.Animator(ply)
 	if maul_child then
 		ply.CalcSeqOverride = ply:LookupSequence("maul_child")
 		ply:SetPlaybackRate(1)
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
 	elseif maul_normal then
 		ply.CalcSeqOverride = ply:LookupSequence("maul")
 		ply:SetPlaybackRate(1)
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
 	elseif maul_survivor then
 		ply.CalcSeqOverride = ply:LookupSequence("maul_survivor")
 		ply:SetPlaybackRate(1)
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
 	elseif sniff then
 		ply.CalcSeqOverride = ply:LookupSequence("sniff")
 		ply:SetPlaybackRate(1)
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end

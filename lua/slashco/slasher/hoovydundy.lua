@@ -366,13 +366,13 @@ function SLASHER.Animator(ply)
 		end
 
 		ply.CalcSeqOverride = ply:LookupSequence(GrabAnim)
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
 	end
 
-	if hoovy_grabloop and (ply.anim_antispam == nil or ply.anim_antispam == false) then
+	if hoovy_grabloop and (not ply.anim_antispam) then
 		local GrabLoopAnim = ""
 		if GrabAnim == "hoovy_grab1" then
 			GrabLoopAnim = "hoovy_grab1_idle"
@@ -386,7 +386,7 @@ function SLASHER.Animator(ply)
 
 	if hoovy_stun then
 		ply.CalcSeqOverride = ply:LookupSequence("PRIMARY_stun_middle")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end

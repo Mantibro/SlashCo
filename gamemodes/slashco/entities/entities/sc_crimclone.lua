@@ -7,7 +7,7 @@ ENT.Type			= "nextbot"
 ENT.ClassName 		= "sc_crimclone"
 ENT.Spawnable		= true
 
-hook.Add("SlashCo:Precache", "PrecacheClone", function()
+hook.Add("SlashCo:Precache", "SlashCo:PrecacheClone", function()
 	SlashCo.PrecacheModel("models/slashco/slashers/criminal/criminal.mdl")
 	SlashCo.PrecacheSound("slashco/slasher/criminal/criminal_rage.mp3")
 	SlashCo.PrecacheSound("slashco/slasher/criminal/criminal_loop.mp3")

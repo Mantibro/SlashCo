@@ -1,6 +1,6 @@
 local PLAYER = FindMetaTable("Player")
 
-hook.Add("EntityNetworkedVarChanged", "SlashCoImpervious", function(ent, name, _, new)
+hook.Add("EntityNetworkedVarChanged", "SlashCo:Impervious", function(ent, name, _, new)
 	if name ~= "IsImpervious" then return end
 
 	ent.IsImpervious = new
@@ -56,7 +56,7 @@ function PLAYER:SetupHands(spec_ply)
 	-- Nothing. We don't need gmod_hands
 end]]
 
-hook.Add("PlayerDeath", "slashCoRemoveImpervious", function(victim)
+hook.Add("PlayerDeath", "SlashCo:RemoveImpervious", function(victim)
 	victim:SetImpervious(false)
 end)
 
@@ -302,7 +302,8 @@ SetupSlashCoNetworkVar("Float", 1, "DeafenTime")
 SetupSlashCoNetworkVar("Bool", 0, "CanSeePlayers")
 SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")
 
-SetupSlashCoNetworkVar("String", 0, "PickedSlasher") -- RaphaelIT7: Only used to display which slasher they'll be.
-SetupSlashCoNetworkVar("String", 1, "ActivePerks")
-SetupSlashCoNetworkVar("String", 2, "OwnedPerks") -- RaphaelIT7: I do not like this... a problem for later me
-SetupSlashCoNetworkVar("String", 3, "ActiveEffects")
+-- RaphaelIT7: I do not like this... a problem for later me... (Update) I hate myself.
+-- ToDo: Rework the entire perk networking, as in the future with more perks we may hit the networking limit of 511 characters!
+SetupSlashCoNetworkVar("String", 0, "OwnedPerks")
+SetupSlashCoNetworkVar("String", 1, "ActiveEffects")
+SetupSlashCoNetworkVar("String", 2, "PickedSlasher") -- RaphaelIT7: Only used to display which slasher they'll be. If we need more string lots this one is easy to remove!

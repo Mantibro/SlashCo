@@ -472,7 +472,7 @@ function SLASHER.Animator(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("jump")
 	end
 
-	if borg_punch and (ply.anim_antispam == nil or ply.anim_antispam == false) then
+	if borg_punch and (not ply.anim_antispam) then
 		local r = math.random(1, 2)
 		local PunchAnim = ""
 		if r == 1 then
@@ -485,12 +485,12 @@ function SLASHER.Animator(ply)
 		ply.anim_antispam = true
 	end
 
-	if borg_throw and (ply.anim_antispam == nil or ply.anim_antispam == false) then
+	if borg_throw and (not ply.anim_antispam) then
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("attack_throw"), 0, true)
 		ply.anim_antispam = true
 	end
 
-	if borg_kick and (ply.anim_antispam == nil or ply.anim_antispam == false) then
+	if borg_kick and (not ply.anim_antispam) then
 		local rand2 = math.random(1, 2)
 		local KickAnim = ""
 		if rand2 == 1 then

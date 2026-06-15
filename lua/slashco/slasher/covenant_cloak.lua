@@ -212,7 +212,7 @@ function SLASHER.Animator(ply, veloc)
 
 	if ply:GetNWBool("CloakTackleFail") then
 		ply.CalcSeqOverride = ply:LookupSequence("zombie_slump_rise_01")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end

@@ -650,6 +650,7 @@ SlashCo.LangTable["points_slasher_demon"] = "[%s] FULLY SATIATED"
 SlashCo.LangTable["points_slasher_win"] = "[%s] ALL EMPLOYEES KILLED" --slasher objective thwarting
 SlashCo.LangTable["points_slasher_escape"] = "[%s] MISSION ABORTED"
 SlashCo.LangTable["points_slasher_perfect"] = "[%s] MISSION RUINED"
+SlashCo.LangTable["points_slasher_quick"] = "[%s] QUICK ROUND"
 
 SlashCo.LangTable["points_objective"] = "[%s] MAIN OBJECTIVE COMPLETE" --objectives
 SlashCo.LangTable["points_optional"] = "[%s] OPTIONAL OBJECTIVE COMPLETE"
@@ -757,8 +758,11 @@ SlashCo.LangTable["perk_buy"] = "Buy Perk"
 SlashCo.LangTable["perk_enable"] = "Enable Perk"
 SlashCo.LangTable["perk_disable"] = "Disable Perk"
 
-SlashCo.LangTable["faster_fueling"] = "Faster Fueling"
-SlashCo.LangTable["faster_fueling_desc"] = "Increases the fueling speed by 25% at the cost of 10% walking speed while holding fuel"
+SlashCo.LangTable["perk_faster_fueling"] = "Faster Fueling"
+SlashCo.LangTable["perk_faster_fueling_desc"] = "Increases the fueling speed by 25% at the cost of 10% walking speed while holding fuel"
+
+SlashCo.LangTable["perk_secondchance"] = "Second Chance"
+SlashCo.LangTable["perk_secondchance_desc"] = "You have a 2% chance to be revived on death- but all your items will be dropped"
 
 -- Keyboard UI
 
@@ -768,6 +772,7 @@ SlashCo.LangTable["keyboard_changekey"] = "Change Key"
 SlashCo.LangTable["keyboard_pressnewkey"] = "Press the new Keyboard button"
 SlashCo.LangTable["keyboard_confirmkey"] = "Press the key again to confirm new key: %s"
 
+SlashCo.LangTable["keyboard_bind_offering_vote"] = "Offering Vote"
 SlashCo.LangTable["keyboard_bind_drop_item"] = "Drop Item"
 SlashCo.LangTable["keyboard_bind_use_item"] = "Use Item"
 SlashCo.LangTable["keyboard_bind_ping"] = "Ping"

@@ -12,14 +12,14 @@ local healthIndicatorShift = 0
 
 local screenMessage
 
-hook.Add("scValue_cantFuel", "CantFuel", function()
+hook.Add("scValue_cantFuel", "SlashCo:CantFuel", function()
 	screenMessage = "cant_fuel"
 	timer.Create("ScreenMessage", 1.5, 1, function()
 		screenMessage = nil
 	end)
 end)
 
-hook.Add("scValue_cantPower", "CantPower", function()
+hook.Add("scValue_cantPower", "SlashCo:CantPower", function()
 	screenMessage = "cant_power"
 	timer.Create("ScreenMessage", 1.5, 1, function()
 		screenMessage = nil
@@ -214,7 +214,7 @@ local function slamIndicator()
 		return
 	end
 
-	if lookent:GetPos():Distance(GameData.LocalPlayer:GetPos()) >= 150 or lookent.IsOpen then
+	if lookent:GetPos():Distance(GameData.LocalPlayer:GetPos()) >= 150 or SlashCo.IsDoorOpen(lookent) then
 		return
 	end
 
@@ -343,8 +343,9 @@ end
 local lastDeathSecond = 0
 local lastDeathTime = 0
 local skull = Material("slashco/ui/slashco_skull", "noclamp")
+local skullBroken = Material("slashco/ui/slashco_skull_broken", "noclamp")
 local deathward = Material("slashco/ui/deathward", "noclamp")
-local deathwardBorken = Material("slashco/ui/deathward_broken", "noclamp")
+local deathwardBroken = Material("slashco/ui/deathward_broken", "noclamp")
 hook.Add("PreRender", "SlashCo:DeathUI", function()
 	if not GameData.LocalPlayer:GetNW2Bool("ShowDeathUI", false) then return end
 
@@ -361,6 +362,7 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 
 	local animTime = (CurTime() - curTime) * 2
 	local isDeathWard = GameData.LocalPlayer:GetNW2Bool("DeathWardUI", false)
+	local isRevive = GameData.LocalPlayer:GetNW2Bool("DeathReviveUI", false)
 	if lastDeathSecond ~= math.floor(animTime) then
 		lastDeathSecond = math.floor(animTime)
 
@@ -381,9 +383,18 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 				fadeIn = 0,
 			})
 		end
+
+		if lastDeathSecond == 12 and isRevive then
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/survivor/revive.mp3",
+				identifier = "Revive",
+				volume = 2,
+				fadeIn = 0,
+			})
+		end
 	end
 
-	local endTime = isDeathWard and 18 or 7
+	local endTime = isDeathWard and 18 or (isRevive and 24 or 7)
 	if endTime + 2 < animTime then return end -- We were supposed to be done already!
 
 	cam.Start2D()
@@ -394,7 +405,7 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 		if animTime > 2 then
 			surface.SetDrawColor(color_white)
 			if lastDeathSecond % 2 == 1 and animTime < 8 then
-				surface.SetMaterial(skull)
+				surface.SetMaterial(skullBroken)
 				surface.DrawTexturedRect(scrW / 2 - 128, scrH / 2 - 128, 256, 256)
 			end
 
@@ -411,13 +422,32 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 						surface.DrawTexturedRect(scrW / 2 - 128, scrH / 2 - 128, 256, 256)
 					end
 				else
-					surface.SetMaterial(deathwardBorken)
+					surface.SetMaterial(deathwardBroken)
 
 					if animTime > 18 then
 						surface.DrawTexturedRect(scrW / 2 - 128 + math.random(-shakeStrength, shakeStrength), scrH / 2 - 128 + math.random(-shakeStrength, shakeStrength), 256, 256)
 					else
 						surface.DrawTexturedRect(scrW / 2 - 128, scrH / 2 - 128, 256, 256)
 					end
+				end
+			end
+
+			if isRevive and animTime > 10 then
+				local shakeStrength = 25
+				surface.SetMaterial(animTime < 19 and skullBroken or skull)
+
+				if animTime > 12 then
+					local scale
+					if animTime < 18 then
+						scale = 1 + ((animTime - 12) / 3)
+					else
+						scale = ((24 - animTime) / 4)
+					end
+
+					local strength = scale * shakeStrength
+					surface.DrawTexturedRect(scrW / 2 - 128 + math.random(-strength, strength), scrH / 2 - 128 + math.random(-strength, strength), 256, 256)
+				else
+					surface.DrawTexturedRect(scrW / 2 - 128, scrH / 2 - 128, 256, 256)
 				end
 			end
 		end

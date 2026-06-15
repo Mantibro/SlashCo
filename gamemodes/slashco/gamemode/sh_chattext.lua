@@ -21,7 +21,7 @@ function SlashCo.ChatText(...)
 	chat.AddText(unpack(toPrint))
 end
 
-hook.Add("scValue_ChatText", "SlashCoChatText", SlashCo.ChatText)
+hook.Add("scValue_ChatText", "SlashCo:ChatText", SlashCo.ChatText)
 
 if CLIENT then return end
 -- Server only function

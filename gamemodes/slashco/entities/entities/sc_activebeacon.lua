@@ -36,7 +36,7 @@ local function ArmBeacon(ent)
 end
 
 if SERVER then
-	hook.Add("SlashCo:Precache", "PrecacheBeacon", function()
+	hook.Add("SlashCo:Precache", "SlashCo:PrecacheBeacon", function()
 		SlashCo.PrecacheSound("slashco/survivor/distress_siren.mp3")
 		SlashCo.PrecacheSound("slashco/beacon_connect.mp3")
 		SlashCo.PrecacheSound("slashco/beacon_break.mp3")

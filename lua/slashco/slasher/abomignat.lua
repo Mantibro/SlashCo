@@ -419,7 +419,7 @@ function SLASHER.Animator(ply)
 
 	if abomignat_mainslash then
 		ply.CalcSeqOverride = ply:LookupSequence("slash_charge")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
@@ -427,7 +427,7 @@ function SLASHER.Animator(ply)
 
 	if abomignat_lunge then
 		ply.CalcSeqOverride = ply:LookupSequence("lunge")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
@@ -435,7 +435,7 @@ function SLASHER.Animator(ply)
 
 	if abomignat_lungefinish then
 		ply.CalcSeqOverride = ply:LookupSequence("lunge_post")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end

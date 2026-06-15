@@ -8,6 +8,7 @@ function SlashCo.SettingsEntity()
 			return ent
 		end
 	end
+
 	return ent
 end
 
@@ -68,6 +69,7 @@ function SlashCo.SelectSpawnsNoForce(elements, amount, conditions, forceTable)
 		if forceTable then
 			return {}, 0
 		end
+
 		return
 	end
 

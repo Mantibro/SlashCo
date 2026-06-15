@@ -544,7 +544,7 @@ function SLASHER.Animator(ply)
 			else
 				ply.CalcSeqOverride = ply:LookupSequence("walk")
 
-				if ply.anim_antispam == nil or ply.anim_antispam == false then
+				if not ply.anim_antispam then
 					ply:AddVCDSequenceToGestureSlot(1, 2, 0, true)
 					ply.anim_antispam = true
 				end

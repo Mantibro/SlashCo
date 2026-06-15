@@ -550,6 +550,12 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	end
 end
 
+hook.Add("ShouldDrawLocalPlayer", "SlashCo:SidExecution", function()
+	if GameData.LocalPlayer:GetNWBool("SurvivorSidExecution") then
+		return true
+	end
+end)
+
 function SLASHER.OnSecondaryFire(slasher)
 	if not slasher:GetNWBool("SidGunEquipped") then
 		SlashCo.StartChaseMode(slasher)
@@ -713,14 +719,14 @@ function SLASHER.Animator(ply)
 				
 				if eating_surv then
 					ply.CalcSeqOverride = ply:LookupSequence("eat2")
-					if ply.anim_antispam == nil or ply.anim_antispam == false then
+					if not ply.anim_antispam then
 						ply:SetCycle(0)
 						ply.anim_antispam = true
 					end
 				end
 			else
 				ply.CalcSeqOverride = ply:LookupSequence("eat1")
-				if ply.anim_antispam == nil or ply.anim_antispam == false then
+				if not ply.anim_antispam then
 					ply:SetCycle(0)
 					ply.anim_antispam = true
 				end
@@ -728,7 +734,7 @@ function SLASHER.Animator(ply)
 		end
 	else
 		ply.CalcSeqOverride = ply:LookupSequence("arm")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
@@ -736,7 +742,7 @@ function SLASHER.Animator(ply)
 
 	if aiming_gun then
 		ply.CalcSeqOverride = ply:LookupSequence("readygun")
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end
@@ -747,7 +753,7 @@ function SLASHER.Animator(ply)
 			ply.CalcSeqOverride = ply:LookupSequence("readyidle")
 		else
 			ply.CalcSeqOverride = ply:LookupSequence("shoot")
-			if ply.anim_antispam == nil or ply.anim_antispam == false then
+			if not ply.anim_antispam then
 				ply:SetCycle(0)
 				ply.anim_antispam = true
 			end
@@ -757,7 +763,7 @@ function SLASHER.Animator(ply)
 	if sid_executing then
 		ply.CalcSeqOverride = ply:LookupSequence("execution")
 		ply:SetPlaybackRate(1)
-		if ply.anim_antispam == nil or ply.anim_antispam == false then
+		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
 		end

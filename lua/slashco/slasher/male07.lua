@@ -381,7 +381,7 @@ function SLASHER.Animator(ply)
 			ply.CalcSeqOverride = ply:LookupSequence("float")
 		end
 
-		if male_slashing and ply.anim_antispam == nil or ply.anim_antispam == false then
+		if male_slashing and not ply.anim_antispam then
 			ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("slash"), 0, true)
 			ply.anim_antispam = true
 		end
@@ -389,7 +389,7 @@ function SLASHER.Animator(ply)
 		if male_transforming then
 			ply.CalcSeqOverride = ply:LookupSequence("transform")
 
-			if ply.anim_antispam == nil or ply.anim_antispam == false then
+			if not ply.anim_antispam then
 				ply:SetCycle(0)
 				ply.anim_antispam = true
 			end

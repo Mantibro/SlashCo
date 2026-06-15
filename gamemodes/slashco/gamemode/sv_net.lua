@@ -23,7 +23,6 @@ util.AddNetworkString("SlashCo:OfferingVoteFinished")
 util.AddNetworkString("SlashCo:SendRoundData")
 util.AddNetworkString("SlashCo:SurvivorVoicePrompt")
 util.AddNetworkString("SlashCo:SurvivorPings")
-util.AddNetworkString("SlashCo:HelicopterVoice")
 util.AddNetworkString("SlashCo:MapAmbientPlay")
 util.AddNetworkString("SlashCo:AskToBecomeSlasher")
 util.AddNetworkString("SlashCo:Announcement")
@@ -254,26 +253,48 @@ function SlashCo.BroadcastGlobalData(ply)
 	end
 end
 
-function SlashCo.LoadPlayerFromDatabase(ply)
-	if not IsValid(ply) then return end
-
-	local data = sql.Query("SELECT * FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(ply:SteamID64()) .. ";")
-	if not data or not data[1] then return end
-
-	ply:SetSurvivorRoundsWon(tonumber(data[1].SurvivorRoundsWon))
-	ply:SetSlasherRoundsWon(tonumber(data[1].SlasherRoundsWon))
-	ply:SetPoints(tonumber(data[1].Points))
-	ply:SetExperience(tonumber(data[1].Experience))
-	ply:SetActivePerks(data[1].ActivePerks)
-	ply:SetOwnedPerks(data[1].OwnedPerks)
-end
-
 -- All types are defined in sh_shared.lua -> SlashCo.HelicopterVoices
 function SlashCo.HelicopterRadioVoice(type)
-	net.Start("SlashCo:HelicopterVoice")
-		net.WriteUInt(type, 4)
-		net.WriteUInt(math.random(1, type == SlashCo.HelicopterVoices.INTRO and 8 or 5), 4) -- Sound index
-	net.Broadcast()
+	local id = math.random(1, type == SlashCo.HelicopterVoices.INTRO and 8 or 5), 4
+	if type == SlashCo.HelicopterVoices.INTRO then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/helipilot/helipilot_intro" .. id .. ".mp3",
+			identifier = "HelipilotIntro",
+			volume = 1,
+			fadeIn = 0,
+		})
+		return
+	end
+
+	if type == SlashCo.HelicopterVoices.APPROACH then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/helipilot/helipilot_approach" .. id .. ".mp3",
+			identifier = "HelipilotApproach",
+			volume = 1,
+			fadeIn = 0,
+		})
+		return
+	end
+
+	if type == SlashCo.HelicopterVoices.LAND then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/helipilot/helipilot_land" .. id .. ".mp3",
+			identifier = "HelipilotLand",
+			volume = 1,
+			fadeIn = 0,
+		})
+		return
+	end
+
+	if type == SlashCo.HelicopterVoices.BEACON then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/helipilot/helipilot_beacon" .. id .. ".mp3",
+			identifier = "HelipilotBeacon",
+			volume = 1,
+			fadeIn = 0,
+		})
+		return
+	end
 end
 
 function SlashCo.BroadcastAnnouncement(text, time, ply)

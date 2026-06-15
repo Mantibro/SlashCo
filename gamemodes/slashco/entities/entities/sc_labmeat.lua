@@ -5,7 +5,7 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "LabMeat"
 ENT.ClassName = "sc_labmeat"
 
-hook.Add("SlashCo:Precache", "PrecacheLabMeat", function()
+hook.Add("SlashCo:Precache", "SlashCo:PrecacheLabMeat", function()
 	SlashCo.PrecacheModel("models/slashco/items/labmeat.mdl")
 	SlashCo.PrecacheSound("slashco/survivor/eat_mayo.mp3")
 	

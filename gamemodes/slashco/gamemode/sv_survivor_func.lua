@@ -353,7 +353,7 @@ function PLAYER:SlamDoor(door_ent)
 		return
 	end
 
-	if door_ent.IsOpen then
+	if SlashCo.IsDoorOpen(door_ent) then
 		return
 	end
 

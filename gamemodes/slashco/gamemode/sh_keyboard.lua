@@ -42,7 +42,7 @@ SlashCo.KeyboardBinds = {
 		button = KEY_F2,
 	},
 	OFFERING_VOTE = {
-		name = "Offering Vote",
+		name = "keyboard_bind_offering_vote",
 		button = KEY_F4,
 	},
 	TOGGLE_SPECTATOR = {

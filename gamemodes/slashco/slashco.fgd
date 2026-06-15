@@ -155,6 +155,14 @@
         0 : "No"
     ]
 
+// RaphaelIT7: It may remain hidden for now :)
+//    gamemode(choices) : "Gamemode" : 0 : "The Gamemode this map is for" =
+//    [
+//        0 : "Escape"
+//        1 : "Extermination"
+//        2 : "Research"
+//    ]
+
     normal_lights_name(string) : "Normal Lights Name" : "" : "The names that normal lights use which if inserted here will be disabled when alarm lights are turned on, multiple names can be used by seperating them using ;"
 
     // Inputs

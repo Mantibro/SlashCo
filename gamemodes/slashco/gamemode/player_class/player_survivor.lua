@@ -34,7 +34,7 @@ for idx, fileName in ipairs(SlashCo.SurvivorModels) do
 	SlashCo.SurvivorModels[SlashCo.SurvivorModels[idx]] = idx
 end
 
-hook.Add("SlashCo:Precache", "PrecacheSurvivorModels", function()
+hook.Add("SlashCo:Precache", "SlashCo:PrecacheSurvivorModels", function()
 	for _, modelName in ipairs(SlashCo.SurvivorModels) do
 		SlashCo.PrecacheModel(modelName)
 	end

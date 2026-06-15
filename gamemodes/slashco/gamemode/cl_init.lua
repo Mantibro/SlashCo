@@ -104,8 +104,7 @@ include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("cl_limitedzone.lua")
 
 CreateClientConVar("slashco_cl_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
-CreateClientConVar("slashco_cl_playermodel", "models/slashco/survivor/male_01.mdl", true, true,
-		"SlashCo Survivor Playermodel")
+CreateClientConVar("slashco_cl_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel")
 
 --[[
 cvars.AddChangeCallback("slashco_cl_playermodel", function(_, _, newVal)
@@ -123,7 +122,7 @@ local disable = {
 	CHudWeaponSelection = true
 }
 
-hook.Add("HUDShouldDraw", "DisableDefaultHUD", function(name)
+hook.Add("HUDShouldDraw", "SlashCo:DisableDefaultHUD", function(name)
 	return not disable[name]
 end)
 
@@ -133,7 +132,7 @@ end
 
 local fx_t = 0
 
-hook.Add("RenderScreenspaceEffects", "BloomEffect", function()
+hook.Add("RenderScreenspaceEffects", "SlashCo:BloomEffect", function()
 	if GameData.LocalPlayer:Team() ~= TEAM_SURVIVOR then
 		return
 	end
@@ -432,7 +431,7 @@ local KillDisabledIcon = Material("slashco/ui/icons/slasher/kill_disabled")
 local SurvivorIcon = Material("slashco/ui/icons/slasher/survivor")
 local SurvivorDeadIcon = Material("slashco/ui/icons/slasher/survivor_dead")
 
-hook.Add("SlashCo:DrawHUD", "AwaitingPlayersHUD", function()
+hook.Add("SlashCo:DrawHUD", "SlashCo:AwaitingPlayersHUD", function()
 	if GameData.IsLobby then
 		return
 	end
@@ -624,32 +623,6 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		surface.SetMaterial(MainIcon)
 		surface.DrawTexturedRect(150, 90, monitorsize / 3, monitorsize / 3)
 		cam.End3D2D()
-	end
-end)
-
-net.Receive("SlashCo:HelicopterVoice", function()
-	if not IsValid(GameData.LocalPlayer) then return end
-
-	local t = net.ReadUInt(4)
-	local id = net.ReadUInt(4)
-	if t == SlashCo.HelicopterVoices.INTRO then
-		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_intro" .. id .. ".mp3", 100)
-		return
-	end
-
-	if t == SlashCo.HelicopterVoices.APPROACH then
-		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_approach" .. id .. ".mp3", 100)
-		return
-	end
-
-	if t == SlashCo.HelicopterVoices.LAND then
-		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_land" .. id .. ".mp3", 100)
-		return
-	end
-
-	if t == SlashCo.HelicopterVoices.BEACON then
-		GameData.LocalPlayer:EmitSound("slashco/helipilot/helipilot_beacon" .. id .. ".mp3", 100)
-		return
 	end
 end)
 

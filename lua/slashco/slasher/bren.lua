@@ -396,12 +396,12 @@ function SLASHER.Animator(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("slashco_breen_idle")
 	end
 
-	if bren_kill and (ply.anim_antispam == nil or ply.anim_antispam == false) then
+	if bren_kill and (not ply.anim_antispam) then
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("slashco_breen_kill"), 0, true)
 		ply.anim_antispam = true
 	end
 
-	if bren_snap and (ply.anim_antispam == nil or ply.anim_antispam == false) then
+	if bren_snap and (not ply.anim_antispam) then
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("slashco_breen_snap"), 0, true)
 		ply.anim_antispam = true
 	end

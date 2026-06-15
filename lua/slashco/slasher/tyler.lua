@@ -638,7 +638,7 @@ function SLASHER.Animator(ply)
 			ply.anim_antispam = false
 		else
 			ply.CalcSeqOverride = ply:LookupSequence("create")
-			if ply.anim_antispam == nil or ply.anim_antispam == false then
+			if not ply.anim_antispam then
 				ply:SetCycle(0)
 				ply.anim_antispam = true
 			end

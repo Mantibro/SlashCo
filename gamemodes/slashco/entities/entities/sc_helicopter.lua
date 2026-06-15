@@ -17,7 +17,7 @@ ENT.PingType = "HELICOPTER"
 --local plyCount = 0
 --local self.switch = false
 
-hook.Add("SlashCo:Precache", "PrecacheHelicopter", function()
+hook.Add("SlashCo:Precache", "SlashCo:PrecacheHelicopter", function()
 	SlashCo.PrecacheSound("slashco/helicopter_engine_distant.mp3")
 	SlashCo.PrecacheSound("slashco/helicopter_rotors_distant.mp3")
 	SlashCo.PrecacheSound("slashco/helicopter_engine_close.mp3")
@@ -57,9 +57,7 @@ function ENT:Initialize()
 		self.targsmoothz = self.targsmoothz or 0
 		self.vel = self.vel or 0
 		self.Seats = {}
-	end
-
-	if CLIENT then
+	else
 		self.pixvis = util.GetPixelVisibleHandle()
 	end
 

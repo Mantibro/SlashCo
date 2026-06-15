@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/perks/secondchance"
+	"$alphatest" 1
+	"$halflambert" 1
+}

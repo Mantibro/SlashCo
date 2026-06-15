@@ -8,7 +8,7 @@ local ambiences = {
 }
 
 local zoneAmbience, snd
-hook.Add("scValue_limitedZone", "SlashCoLimitedZone", function(effect)
+hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
 	local ply = GameData.LocalPlayer
 
 	-- [[ soundpatch method
@@ -236,7 +236,7 @@ local function renderFog(scale)
 	end
 end
 
-hook.Add("SetupWorldFog", "SlashCoZoneFog", function()
+hook.Add("SetupWorldFog", "SlashCo:ZoneFog", function()
 	if not GameData.LocalPlayer.ZoneEffect then
 		return
 	end
@@ -244,7 +244,7 @@ hook.Add("SetupWorldFog", "SlashCoZoneFog", function()
 	return renderFog(1)
 end)
 
-hook.Add("SetupSkyboxFog", "SlashCoZoneFog", function(scale)
+hook.Add("SetupSkyboxFog", "SlashCo:ZoneFog", function(scale)
 	if not GameData.LocalPlayer.ZoneEffect then
 		return
 	end
@@ -332,7 +332,7 @@ local colorSettings = {
 	}
 }
 
-hook.Add("RenderScreenspaceEffects", "SlashCoZoneScreenSpace", function()
+hook.Add("RenderScreenspaceEffects", "SlashCo:ZoneScreenSpace", function()
 	local ply = GameData.LocalPlayer
 	if not ply.ZoneEffect then
 		return

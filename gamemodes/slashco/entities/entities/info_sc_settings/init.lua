@@ -42,6 +42,10 @@ function ENT:KeyValue(key, value)
 		GameData.IsLobby = true -- NOTE: This value is networked for clients inside GM:InitPostEntity() -> sh_shared.lua
 	end
 
+	if key == "gamemode" then
+		GameData.Gamemode = tonumber(value)
+	end
+
 	if key == "normal_lights_name" then
 		GameData.NonAlarmLightsName = value
 		return

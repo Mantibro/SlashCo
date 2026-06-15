@@ -13,7 +13,7 @@ ENT.Instructions = ""
 ENT.PingType = "GENERATOR"
 ENT.PingExpiryTime = -1 -- Permanently pinged
 
-hook.Add("SlashCo:Precache", "PrecacheGenerator", function()
+hook.Add("SlashCo:Precache", "SlashCo:PrecacheGenerator", function()
 	SlashCo.PrecacheSound("slashco/generator_fill.mp3")
 	SlashCo.PrecacheSound("slashco/generator_start.mp3")
 	SlashCo.PrecacheSound("slashco/generator_loop.mp3")
