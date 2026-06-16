@@ -360,25 +360,59 @@ local selection = {
 	end,
 }
 
+local function utf8_chars(str)
+	local chars = {}
+	for c in string.gmatch(str, "[%z\1-\127\194-\244][\128-\191]*") do
+		chars[#chars + 1] = c
+	end
+	return chars
+end
+
 local function SplitTextIntoRows(text, font, maxRowWidth)
 	surface.SetFont(font)
-	local splitDescription = string.Split(text, " ")
-	local descriptionRows = {}
-	local currentRow = ""
-	for _, word in ipairs(splitDescription) do
-		local prevText = currentRow
-		currentRow = currentRow .. " " .. word
 
-		local width, _ = surface.GetTextSize(currentRow)
-		if width > maxRowWidth then
-			table.insert(descriptionRows, prevText:Trim())
-			currentRow = word
+	local rows = {}
+	local function push(currentRow)
+		if currentRow ~= "" then
+			table.insert(rows, currentRow)
 		end
 	end
 
-	table.insert(descriptionRows, currentRow:Trim())
+	for line in string.gmatch(text or "", "[^\n]+") do
+		local currentRow = ""
 
-	return descriptionRows
+		local isEnglish = string.find(line, " ")
+
+		if isEnglish then
+			for _, word in ipairs(string.Split(line, " ")) do
+				if word == "" then continue end
+
+				local test = (currentRow == "" and word) or (currentRow .. " " .. word)
+
+				if surface.GetTextSize(test) > maxRowWidth then
+					push(currentRow)
+					currentRow = word
+				else
+					currentRow = test
+				end
+			end
+		else
+			for _, char in ipairs(utf8_chars(line)) do
+				local test = currentRow .. char
+
+				if surface.GetTextSize(test) > maxRowWidth then
+					push(currentRow)
+					currentRow = char
+				else
+					currentRow = test
+				end
+			end
+		end
+
+		push(currentRow)
+	end
+
+	return rows
 end
 
 local function GenerateDocuments()
