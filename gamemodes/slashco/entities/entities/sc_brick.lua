@@ -22,6 +22,7 @@ function ENT:SetBrickVelocity(velocity)
 		phys:AddGameFlag(FVPHYSICS_WAS_THROWN)
 	end
 
+	self:SetPhysicsAttacker(self:GetOwner(), 5)
 	self.InitialVelocity = velocity -- We save our velocity so that if we hit two doors at once, we can 
 	self.Active = true
 end
@@ -53,6 +54,7 @@ function ENT:PhysicsCollide(data)
 	effectdata:SetScale(1.5)
 
 	util.Effect("GlassImpact", effectdata)
+	local owner = self:GetOwner()
 	local velocity = self.InitialVelocity or self:GetPhysicsObject():GetVelocity()
 	if IsValid(data.HitEntity) then
 		if data.HitEntity:IsPlayer() and data.HitEntity:Team() == TEAM_SLASHER then
@@ -68,12 +70,21 @@ function ENT:PhysicsCollide(data)
 
 			self:Break()
 		elseif data.HitEntity:GetClass() == "prop_door_rotating" then
-			SlashCo.BustDoor(self, data.HitEntity, velocity * 50, function()
+			SlashCo.BustDoor(self, data.HitEntity, velocity * 50, function(_, doorProps)
+				if IsValid(owner) then -- Inherit Physics Attacker!
+					for _, prop in ipairs(doorProps) do
+						prop:SetPhysicsAttacker(owner, 5)
+					end
+				end
+
 				self:Break()
 			end)
 		else
 			if not data.HitEntity:IsWorld() then
 				data.HitObject:ApplyForceCenter(velocity * 50)
+				if IsValid(owner) then -- Inherit Physics Attacker!
+					data.HitEntity:SetPhysicsAttacker(owner, 5)
+				end
 			end
 		end
 	else

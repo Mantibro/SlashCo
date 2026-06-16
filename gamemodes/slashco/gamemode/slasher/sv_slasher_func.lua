@@ -55,7 +55,9 @@ function SlashCo.PrepareSlasherForSpawning()
 		The Slasher will spawn at a spawn powint furthest away from the Survivors.
 	]]
 
-	if SERVER then
+	if CLIENT then return end
+
+	if GameData.Gamemode == SlashCo.Gamemode.ESCAPE then
 		local delay = (4 - SlashCo.CurRound.Difficulty) * 20
 		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			local slasherSpawnDelay = slasher:SlasherValue("SpawnDelay", -1)
@@ -69,6 +71,8 @@ function SlashCo.PrepareSlasherForSpawning()
 		timer.Simple(delay, function()
 			SlashCo.SpawnSlasher()
 		end)
+	else
+		print("[SlashCo] Slasher is set to wait.")
 	end
 end
 
@@ -116,7 +120,7 @@ end
 
 
 --On-Tick Behaviour
-hook.Add("Tick", "HandleSlasherAbilities", function()
+hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 	local gens = ents.FindByClass("sc_generator")
 	if #gens == 0 then return end
 
@@ -314,6 +318,18 @@ function SlashCo.StopChase(slasher)
 			ply:SetNWEntity("SurvivorChased", NULL)
 		end
 	end
+
+	local anyChasing = false
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		if slasher:GetNWBool("InSlasherChaseMode") then
+			anyChasing = true
+			break
+		end
+	end
+
+	if not anyChasing then
+		SlashCo.RemoveFog("SlasherChase")
+	end
 end
 
 function SlashCo.StartChaseMode(slasher)
@@ -399,6 +415,15 @@ function SlashCo.StartChaseMode(slasher)
 		volume = 0.7,
 		fadeIn = 1,
 	})
+
+	SlashCo.AddFog({
+		name = "SlasherChase",
+		fogType = SlashCo.FogType.GLOBAL,
+		priority = 0,
+		worldColorScaleR = 1.25,
+		worldColorScaleG = 0.7,
+		worldColorScaleB = 0.7,
+	})
 end
 
 function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
@@ -436,6 +461,7 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 			return
 		end
 
+		local props = {}
 		for _, door in ipairs(doors) do
 			if not IsValid(door) then continue end
 
@@ -467,10 +493,12 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 			end
 
 			door:Remove()
+
+			table.insert(props, prop)
 		end
 
 		if callback then
-			callback(true)
+			callback(true, props)
 		end
 	end)
 end
@@ -552,5 +580,11 @@ end)
 hook.Add("SlashCo:PlayerDeath", "SlashCo:RunSlasherPlayerDeath", function(victim)
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		slasher:SlasherFunction("OnPlayerDeath", victim)
+	end
+end)
+
+hook.Add("SlashCo:OnBeerKegExplode", "SlashCo:RunSlasherFunction", function(beerkeg)
+	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		slasher:SlasherFunction("OnBeerKegExplode", beerkeg)
 	end
 end)

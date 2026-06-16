@@ -81,6 +81,8 @@ function ENT:Explode()
 		fadeIn = 0,
 	})
 
+	hook.Run("SlashCo:OnBeerKegExplode", self)
+
 	local pos = self:GetPos()
 	for _, ply in ipairs(SlashCo.FindPlayersInRange(pos, 200, nil, self)) do
 		local team = ply:Team()

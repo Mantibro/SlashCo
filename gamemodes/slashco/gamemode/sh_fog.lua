@@ -14,7 +14,7 @@ SlashCo.FogType = {
 }]]
 
 local skyBoxVec = Vector(0, 0, 100000)
-function SlashCo.GetCurrentFogMultiplier(ply)
+function SlashCo.GetCurrentFogMultiplier(ply, infoTbl)
 	local highest = -999999
 	local highestFogInfo = nil
 	
@@ -39,9 +39,41 @@ function SlashCo.GetCurrentFogMultiplier(ply)
 
 		highest = fogInfo.priority
 		highestFogInfo = fogInfo
+
+		-- Merge info info
+		-- The info is built upon all existing infos
+		if infoTbl then
+			infoTbl.multiplier = fogInfo.multiplier or infoTbl.multiplier
+			infoTbl.worldColorR = fogInfo.worldColorR or infoTbl.worldColorR
+			infoTbl.worldColorG = fogInfo.worldColorG or infoTbl.worldColorG
+			infoTbl.worldColorB = fogInfo.worldColorB or infoTbl.worldColorB
+			infoTbl.worldColorScaleR = fogInfo.worldColorScaleR or infoTbl.worldColorScaleR
+			infoTbl.worldColorScaleG = fogInfo.worldColorScaleG or infoTbl.worldColorScaleG
+			infoTbl.worldColorScaleB = fogInfo.worldColorScaleB or infoTbl.worldColorScaleB
+		end
 	end
 
-	return highestFogInfo and highestFogInfo.multiplier or 1
+	return highestFogInfo and highestFogInfo.multiplier or 1, highestFogInfo
+end
+
+function SlashCo.FillTableWithFogInfo(infoTbl, ply)
+	local r, g, b = SlashCo.GetGlobalFogColor(2)
+
+	infoTbl.multiplier = 1
+	infoTbl.worldColorScaleR = 1
+	infoTbl.worldColorScaleG = 1
+	infoTbl.worldColorScaleB = 1
+	infoTbl.worldColorR = r
+	infoTbl.worldColorG = g
+	infoTbl.worldColorB = b
+
+	SlashCo.GetCurrentFogMultiplier(ply, infoTbl)
+
+	infoTbl.worldColorScaledR = infoTbl.worldColorR * infoTbl.worldColorScaleR
+	infoTbl.worldColorScaledG = infoTbl.worldColorG * infoTbl.worldColorScaleG
+	infoTbl.worldColorScaledB = infoTbl.worldColorB * infoTbl.worldColorScaleB
+
+	--PrintTable(infoTbl)
 end
 
 --[[
@@ -52,12 +84,23 @@ if SERVER then
 	goto serverside
 end
 
+GameData.WorldFogInfo = GameData.WorldFogInfo or {}
 function GM:SetupWorldFog() -- A basic world fog that dynamicly changes depending on the environment
 	if GameData.IsLobby then return end
 
-	local r, g, b = SlashCo.GetGlobalFogColor(2)
+	local lerpTime = RealFrameTime() / 2
+	local worldInfo =  GameData.WorldFogInfo
+
+	-- Update fog info
+	SlashCo.FillTableWithFogInfo(worldInfo, GameData.LocalPlayer)
+	local worldR, worldG, worldB = worldInfo.worldColorScaledR, worldInfo.worldColorScaledG, worldInfo.worldColorScaledB
+
+	GameData.LastFogColorR = Lerp(lerpTime, GameData.LastFogColorR or worldR, worldR)
+	GameData.LastFogColorG = Lerp(lerpTime, GameData.LastFogColorG or worldG, worldG)
+	GameData.LastFogColorB = Lerp(lerpTime, GameData.LastFogColorB or worldB, worldB)
+
 	render.FogMode(MATERIAL_FOG_LINEAR)
-	render.FogColor(r, g, b)
+	render.FogColor(GameData.LastFogColorR, GameData.LastFogColorG, GameData.LastFogColorB)
 	render.FogMaxDensity(1)
 
 	local targetFogStart = 200
@@ -97,9 +140,9 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 		targetFogEnd = targetFogStart * 1.5
 	end
 
-	local fogMult = SlashCo.GetCurrentFogMultiplier(GameData.LocalPlayer)
-	GameData.LastFogStart = Lerp(0.005, GameData.LastFogStart or 3000, targetFogStart * fogMult)
-	GameData.LastFogEnd = Lerp(0.005, GameData.LastFogEnd or 3000, targetFogEnd * fogMult)
+	local fogMult = worldInfo.multiplier
+	GameData.LastFogStart = Lerp(lerpTime, GameData.LastFogStart or 3000, targetFogStart * fogMult)
+	GameData.LastFogEnd = Lerp(lerpTime, GameData.LastFogEnd or 3000, targetFogEnd * fogMult)
 
 	render.FogStart(GameData.LastFogStart)
 	render.FogEnd(GameData.LastFogEnd)
@@ -115,14 +158,16 @@ net.Receive("SlashCo:UpdateFog", function()
 		return
 	end
 
-	local fogType = net.ReadUInt(2)
-	local multiplier = net.ReadFloat()
-	local priority = net.ReadUInt(32)
-
 	local fogInfo = {
-		fogType = fogType,
-		multiplier = multiplier,
-		priority = priority,
+		fogType = net.ReadUInt(2),
+		priority = net.ReadUInt(32),
+		multiplier = SlashCo.ReadOptional(net.ReadFloat),
+		worldColorR = SlashCo.ReadOptional(net.ReadFloat),
+		worldColorG = SlashCo.ReadOptional(net.ReadFloat),
+		worldColorB = SlashCo.ReadOptional(net.ReadFloat),
+		worldColorScaleR = SlashCo.ReadOptional(net.ReadFloat),
+		worldColorScaleG = SlashCo.ReadOptional(net.ReadFloat),
+		worldColorScaleB = SlashCo.ReadOptional(net.ReadFloat),
 	}
 
 	if fogType == SlashCo.FogType.PLAYER then
@@ -144,14 +189,16 @@ net.Receive("SlashCo:InitialFog", function()
 			return
 		end
 
-		local fogType = net.ReadUInt(2)
-		local multiplier = net.ReadFloat()
-		local priority = net.ReadUInt(32)
-
 		local fogInfo = {
-			fogType = fogType,
-			multiplier = multiplier,
-			priority = priority,
+			fogType = net.ReadUInt(2),
+			priority = net.ReadUInt(32),
+			multiplier = SlashCo.ReadOptional(net.ReadFloat),
+			worldColorR = SlashCo.ReadOptional(net.ReadFloat),
+			worldColorG = SlashCo.ReadOptional(net.ReadFloat),
+			worldColorB = SlashCo.ReadOptional(net.ReadFloat),
+			worldColorScaleR = SlashCo.ReadOptional(net.ReadFloat),
+			worldColorScaleG = SlashCo.ReadOptional(net.ReadFloat),
+			worldColorScaleB = SlashCo.ReadOptional(net.ReadFloat),
 		}
 
 		if fogType == SlashCo.FogType.PLAYER then
@@ -170,7 +217,31 @@ if CLIENT then return end
 
 -- RaphaelIT7: Checks the needed fields for a change
 local function CompareFogInfo(fogInfo1, fogInfo2)
-	if math.IsNearlyEqual(fogInfo1.multiplier, fogInfo2.multiplier, 0.05) then
+	if fogInfo1.multiplier and math.IsNearlyEqual(fogInfo1.multiplier, fogInfo2.multiplier, 0.05) then
+		return false
+	end
+
+	if fogInfo1.worldColorR and math.IsNearlyEqual(fogInfo1.worldColorR, fogInfo2.worldColorR, 0.05) then
+		return false
+	end
+
+	if fogInfo1.worldColorG and math.IsNearlyEqual(fogInfo1.worldColorG, fogInfo2.worldColorG, 0.05) then
+		return false
+	end
+
+	if fogInfo1.worldColorB and math.IsNearlyEqual(fogInfo1.worldColorB, fogInfo2.worldColorB, 0.05) then
+		return false
+	end
+
+	if fogInfo1.worldColorScaleR and math.IsNearlyEqual(fogInfo1.worldColorScaleR, fogInfo2.worldColorScaleR, 0.05) then
+		return false
+	end
+
+	if fogInfo1.worldColorScaleG and math.IsNearlyEqual(fogInfo1.worldColorScaleG, fogInfo2.worldColorScaleG, 0.05) then
+		return false
+	end
+
+	if fogInfo1.worldColorScaleB and math.IsNearlyEqual(fogInfo1.worldColorScaleB, fogInfo2.worldColorScaleB, 0.05) then
 		return false
 	end
 
@@ -201,8 +272,14 @@ function SlashCo.AddFog(info)
 	local fogInfo = {
 		name = info.name,
 		fogType = info.fogType,
-		multiplier = info.multiplier,
 		priority = info.priority or 0,
+		multiplier = info.multiplier,
+		worldColorR = info.worldColorR,
+		worldColorG = info.worldColorG,
+		worldColorB = info.worldColorB,
+		worldColorScaleR = info.worldColorScaleR,
+		worldColorScaleG = info.worldColorScaleG,
+		worldColorScaleB = info.worldColorScaleB,
 	}
 
 	if fogInfo.fogType == SlashCo.FogType.PLAYER then
@@ -233,8 +310,14 @@ function SlashCo.AddFog(info)
 		net.WriteBool(false)
 		net.WriteString(fogInfo.name)
 		net.WriteUInt(fogInfo.fogType, 2)
-		net.WriteFloat(fogInfo.multiplier)
 		net.WriteInt(fogInfo.priority, 32)
+		SlashCo.WriteOptional(fogInfo.multiplier, net.WriteFloat)
+		SlashCo.WriteOptional(fogInfo.worldColorR, net.WriteFloat)
+		SlashCo.WriteOptional(fogInfo.worldColorG, net.WriteFloat)
+		SlashCo.WriteOptional(fogInfo.worldColorB, net.WriteFloat)
+		SlashCo.WriteOptional(fogInfo.worldColorScaleR, net.WriteFloat)
+		SlashCo.WriteOptional(fogInfo.worldColorScaleG, net.WriteFloat)
+		SlashCo.WriteOptional(fogInfo.worldColorScaleB, net.WriteFloat)
 		if fogInfo.fogType == SlashCo.FogType.PLAYER then
 			net.WriteUInt(fogInfo.entIndex, 13)
 		elseif fogInfo.fogType == SlashCo.FogType.TEAM then
@@ -270,8 +353,14 @@ hook.Add("PlayerInitialSpawn", "SlashCo:NetworkFog", function(ply)
 		for name, fogInfo in pairs(GameData.FogData) do
 			net.WriteString(name)
 			net.WriteUInt(fogInfo.fogType, 2)
-			net.WriteFloat(fogInfo.multiplier)
 			net.WriteInt(fogInfo.priority, 32)
+			SlashCo.WriteOptional(fogInfo.multiplier, net.WriteFloat)
+			SlashCo.WriteOptional(fogInfo.worldColorR, net.WriteFloat)
+			SlashCo.WriteOptional(fogInfo.worldColorG, net.WriteFloat)
+			SlashCo.WriteOptional(fogInfo.worldColorB, net.WriteFloat)
+			SlashCo.WriteOptional(fogInfo.worldColorScaleR, net.WriteFloat)
+			SlashCo.WriteOptional(fogInfo.worldColorScaleG, net.WriteFloat)
+			SlashCo.WriteOptional(fogInfo.worldColorScaleB, net.WriteFloat)
 			if fogInfo.fogType == SlashCo.FogType.PLAYER then
 				net.WriteUInt(fogInfo.entIndex, 13)
 			elseif fogInfo.fogType == SlashCo.FogType.TEAM then

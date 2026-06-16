@@ -188,8 +188,8 @@ net.Receive("SlashCo:TestConfigHalos", function()
 	SlashCoTestConfig = true
 end)
 
-showHalos = true
-showGasCanHalos = false
+GameData.showHalos = GameData.showHalos or true
+GameData.showGasCanHalos = GameData.showGasCanHalos or false
 
 local colors = {
 	red = Color(255, 0, 0),
@@ -242,11 +242,11 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 	end
 
 	if _team == TEAM_SPECTATOR then
-		if showHalos then
+		if GameData.showHalos then
 			SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER), "red")
-			if showGasCanHalos then
+			if GameData.showGasCanHalos then
 				SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "gray")
 				SlashCo.DrawHalo(ents.FindByClass("sc_battery"), "green")
 			end
@@ -708,7 +708,8 @@ end
 
 -- RaphaelIT7: We use PostDrawHUD instead of DrawOverlay to avoid rendering OVER the main menu.
 hook.Add("PostDrawHUD", "SlashCo:DrawHUD", function()
-	if not GameData.LocalPlayer then return end -- DrawHUD is only called when the localplayer is valid!
+	-- RaphaelIT7: iirc on 64x DrawHUD can be called BEFORE LocalPlayer is valid.
+	if not IsValid(GameData.LocalPlayer) then return end -- SlashCo:DrawHUD should only called when the LocalPlayer is valid!
 
 	cam.Start2D() -- Wiki says we need this :/
 		hook.Run("SlashCo:DrawHUD")

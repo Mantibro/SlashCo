@@ -149,14 +149,22 @@ end
 
 local stringTable = {
 	[SlashCo.RoundState.WON_ALL_ALIVE] = function()
-		surface.PlaySound("slashco/music/slashco_win_full.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/music/slashco_win_full.mp3",
+			identifier = "RoundState",
+			volume = 1,
+		})
 		return {
 			SlashCo.Language("AssignmentSuccess"),
 			SlashCo.Language("AllRescued"),
 		}
 	end,
 	[SlashCo.RoundState.WON_SOME_DEAD] = function(survivors, rescued)
-		surface.PlaySound("slashco/music/slashco_win_2.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/music/slashco_win_2.mp3",
+			identifier = "RoundState",
+			volume = 1,
+		})
 		local lines = {
 			SlashCo.Language("AssignmentSuccess"),
 			SlashCo.Language("SomeRescued"),
@@ -166,21 +174,33 @@ local stringTable = {
 		return lines
 	end,
 	[SlashCo.RoundState.WON_ALL_DEAD] = function()
-		surface.PlaySound("slashco/music/slashco_lost_active.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/music/slashco_lost_active.mp3",
+			identifier = "RoundState",
+			volume = 1,
+		})
 		return {
 			SlashCo.Language("AssignmentSuccess"),
 			SlashCo.Language("NoneRescued"),
 		}
 	end,
 	[SlashCo.RoundState.LOST] = function()
-		surface.PlaySound("slashco/music/slashco_lost.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/music/slashco_lost.mp3",
+			identifier = "RoundState",
+			volume = 1,
+		})
 		return {
 			SlashCo.Language("AssignmentFail"),
 			SlashCo.Language("NoneRescued"),
 		}
 	end,
 	[SlashCo.RoundState.WON_DISTRESS] = function(survivors, rescued)
-		surface.PlaySound("slashco/music/slashco_win_db.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/music/slashco_win_db.mp3",
+			identifier = "RoundState",
+			volume = 1,
+		})
 		local lines = {
 			SlashCo.Language("AssignmentAborted"),
 		}
@@ -189,7 +209,11 @@ local stringTable = {
 		return lines
 	end,
 	[SlashCo.RoundState.CURSED] = function()
-		surface.PlaySound("slashco/music/slashco_lost.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/music/slashco_lost.mp3",
+			identifier = "RoundState",
+			volume = 1,
+		})
 		local lines = {}
 		for i = 0, 19 do
 			local line = string.Split(SlashCo.Language("Cursed"), SlashCo.Language("WordSeparator"))
@@ -202,7 +226,11 @@ local stringTable = {
 		return lines
 	end,
 	[SlashCo.RoundState.INTRO] = function(info)
-		surface.PlaySound(SlashCo.GetDangerSound(info[4]))
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = SlashCo.GetDangerSound(info[4]),
+			identifier = "RoundState",
+			volume = 1,
+		})
 		local lines = {
 			SlashCo.Language("cur_assignment", info[1]),
 			SlashCo.Language("slasher_assess"),

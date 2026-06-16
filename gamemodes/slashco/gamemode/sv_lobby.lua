@@ -906,15 +906,14 @@ end
 
 function SlashCo.LobbyLeave()
 	SlashCo.ClearDatabase()
-
-	timer.Simple(1, function()
-		lobbySaveCurData()
-	end)
+	lobbySaveCurData()
 end
 
-util.AddNetworkString("slashCo_SpectatorSceneToPVS")
+util.AddNetworkString("SlashCo:SpectatorSceneToPVS")
 if GameData.IsLobby then
-	net.Receive("slashCo_SpectatorSceneToPVS", function(len, ply)
+	-- IMPORTANT! This is spammed by the client to stay up to date
+	-- RaphaelIT7 (ToDo): Rework this to perhaps make the scene be serverside?
+	net.Receive("SlashCo:SpectatorSceneToPVS", function(len, ply)
 		if ply:Team() ~= TEAM_SPECTATOR then
 			return
 		end

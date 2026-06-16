@@ -286,8 +286,16 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		end
 	end)
 end
-SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand -- RIP your ears xD
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
+
+function SLASHER.OnBeerKegExplode(slasher, beerkeg)
+	if slasher:GetPos():Distance(beerkeg:GetPos()) < 2000 then
+		-- GGs - A beerkeg exploded somewhere nearby.
+		slasher.HuntPower = 100
+		DolphinHunt(slasher)
+	end
+end
 
 function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("DolphinInHiding")

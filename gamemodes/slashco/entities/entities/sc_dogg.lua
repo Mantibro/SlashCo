@@ -47,8 +47,14 @@ if SERVER then
 		self.SoundTick = self.SoundTick + math.random(0, 1)
 
 		if self.SoundTick > 100 then
-
-			self:EmitSound("slashco/dogg" .. math.random(1, 4) .. ".mp3")
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/dogg" .. math.random(1, 4) .. ".mp3",
+				identifier = "Dogg",
+				minDistance = 250,
+				maxDistance = 2000,
+				entity = self,
+				volume = 1,
+			})
 			self.SoundTick = 0
 		end
 

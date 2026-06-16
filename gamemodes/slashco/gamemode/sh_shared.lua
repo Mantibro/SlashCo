@@ -226,7 +226,7 @@ function SlashCo.WriteOptional(value, writeFunc, ...)
 end
 
 function SlashCo.ReadOptional(readFunc, ...)
-	local isNil = net.ReadBool(isNil)
+	local isNil = net.ReadBool()
 	if not isNil then
 		return readFunc(...)
 	end

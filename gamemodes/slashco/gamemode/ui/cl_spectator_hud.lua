@@ -165,22 +165,13 @@ if CLIENT then
 	end)
 end
 
-hook.Add("KeyPress", "ToggleLight", function(ply, key)
-	if not IsFirstTimePredicted() then
-		return
-	end
-	if ply ~= GameData.LocalPlayer or GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR or SERVER then
-		return
-	end
-	if SlasherSteamID ~= nil and SlasherSteamID == GameData.LocalSteamID64 then
-		return
-	end
-	if GameData.IsLobby then
-		return
-	end
+hook.Add("KeyPress", "SlashCo:ToggleLight", function(ply, key)
+	if not IsFirstTimePredicted() then return end
+	if ply ~= GameData.LocalPlayer or GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR or SERVER then return end
+	if GameData.IsLobby then return end
 
 	if key == IN_RELOAD then
-		vision = not vision
+		GameData.vision = not GameData.vision
 		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
@@ -188,7 +179,7 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 	end
 
 	if key == IN_WALK then
-		showHalos = not showHalos
+		GameData.showHalos = not GameData.showHalos
 		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
@@ -196,7 +187,7 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 	end
 
 	if key == IN_USE then
-		showGasCanHalos = not showGasCanHalos
+		GameData.showGasCanHalos = not GameData.showGasCanHalos
 		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 		Sndd:Play()
 		Sndd:ChangeVolume(0.5, 0)
@@ -204,21 +195,13 @@ hook.Add("KeyPress", "ToggleLight", function(ply, key)
 	end
 end)
 
-hook.Add("Think", "Spectator_Vision_Light", function()
-	if vision == nil then
-		vision = false
+hook.Add("Think", "SlashCo:SpectatorVisionLight", function()
+	if GameData.vision == nil then
+		GameData.vision = false
 	end
 
-	if GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR then
-		return
-	end
-	if not vision then
-		return
-	end
-
-	if SlasherSteamID ~= nil and SlasherSteamID == GameData.LocalSteamID64 then
-		return
-	end
+	if GameData.LocalPlayer:Team() ~= TEAM_SPECTATOR then return end
+	if not GameData.vision then return end
 
 	--Eyesight - an arbitrary range from 1 - 10 which decides how illuminated the Slasher 'vision is client-side. (1 - barely any illumination, 10 - basically fullbright )
 
@@ -314,7 +297,7 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 		cur_pos = cutscene_views[cur_scene].Start[1]
 		cur_ang = cutscene_views[cur_scene].Start[2]
 
-		net.Start("slashCo_SpectatorSceneToPVS")
+		net.Start("SlashCo:SpectatorSceneToPVS")
 			net.WriteVector(cur_pos)
 		net.SendToServer()
 	end
@@ -334,7 +317,7 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 		cur_pos = cutscene_views[cur_scene].Start[1]
 		cur_ang = cutscene_views[cur_scene].Start[2]
 
-		net.Start("slashCo_SpectatorSceneToPVS")
+		net.Start("SlashCo:SpectatorSceneToPVS")
 			net.WriteVector(cur_pos)
 		net.SendToServer()
 	end

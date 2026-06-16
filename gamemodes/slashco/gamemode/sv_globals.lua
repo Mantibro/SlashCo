@@ -189,7 +189,7 @@ function SlashCo.CreateDocument(pos, ang)
 end
 
 --Spawn an Item( or any entity, including slasher entities )
-function SlashCo.CreateItem(class, pos, ang)
+function SlashCo.CreateItem(class, pos, ang, owner)
 	local Ent = ents.Create(class)
 
 	if not IsValid(Ent) then
@@ -203,6 +203,9 @@ function SlashCo.CreateItem(class, pos, ang)
 	Ent:Spawn()
 	Ent:Activate()
 	Ent:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+	if IsValid(owner) then
+		Ent:SetOwner(owner)
+	end
 
 	return Ent
 end

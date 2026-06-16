@@ -565,9 +565,9 @@ local function ShouldMuteVolue()
 end
 
 -- Helper function to wrap around CalculateChannelFadeVolume
-local function CalculateChannelVolume(channel, targetVol)
+local function CalculateChannelVolume(channel, targetVol, ignoreMuted)
 	-- RaphaelIT7: In SlashCo I may test with like 3 multirun clients soo let's only play sounds from the focused client!
-	if ShouldMuteVolue() == MuteState.MUTED then
+	if not ignoreMuted and ShouldMuteVolue() == MuteState.MUTED then
 		return 0
 	end
 
@@ -709,9 +709,11 @@ local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, cha
 	end
 
 	if isVolume then
-		local channelVolume = CalculateChannelVolume(channel, vol)
+		local channelVolume = CalculateChannelVolume(channel, vol, true)
 		channelData.volume = SlashCo.AudioSystem.EnsureValidVolume(channelVolume)
-		channel:SetVolume(channelData.volume)
+		if ShouldMuteVolue() ~= MuteState.MUTED then
+			channel:SetVolume(channelData.volume)
+		end
 	else
 		channelData.playbackRate = SlashCo.AudioSystem.EnsureValidVolume(vol)
 		channel:SetPlaybackRate(channelData.playbackRate)
@@ -1219,7 +1221,9 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channel:SetVolume(0)
 			channelData.volume = 0
 		else
-			channel:SetVolume(soundData.volume)
+			if ShouldMuteVolue() ~= MuteState.MUTED then
+				channel:SetVolume(soundData.volume)
+			end
 			channelData.volume = soundData.volume
 		end
 
@@ -1242,10 +1246,9 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		end
 
 		if soundData.position then
+			channelData.pos = soundData.position
 			if channelData.is3D then
 				channel:SetPos(soundData.position)
-			else
-				channelData.pos = soundData.position
 			end
 		end
 
