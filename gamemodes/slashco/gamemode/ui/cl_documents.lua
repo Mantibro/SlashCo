@@ -543,7 +543,7 @@ local function GenerateDocuments()
 				textColor = perk.Price > GameData.LocalPlayer:GetPoints() and deniedColor or allowedColor
 			end
 
-			local text
+			local text -- IMPORTANT! We compare against enableText and such so DONT modify the value once set!
 			local conflictPerkTbl = nil
 			if SlashCo.IsActivePerk(GameData.LocalPlayer, perk.ID) then
 				text = disableText
@@ -566,8 +566,7 @@ local function GenerateDocuments()
 
 			row = row + 2
 			if not conflictPerkTbl then
-				text = "[" .. text .. "]"
-				wasHit = DrawTextWithHitbox(text, "TVCDMedium", (h / 75), rowSize * row, textColor, 0, TEXT_ALIGN_CENTER)
+				wasHit = DrawTextWithHitbox("[" .. text .. "]", "TVCDMedium", (h / 75), rowSize * row, textColor, 0, TEXT_ALIGN_CENTER)
 			else
 				draw.SimpleText(text, "TVCD", h / 75, rowSize * row, textColor, 0, TEXT_ALIGN_CENTER)
 				row = row + 1
@@ -587,6 +586,7 @@ local function GenerateDocuments()
 				if IsPressing(MOUSE_LEFT) and unpressed then
 					unpressed = false
 
+					SlashCo.AudioSystem.PlayPrecachedChannel("DocumentLeftClick")
 					if text == buyText then
 						SlashCo.BuyPerk(perk.ID)
 					elseif text == enableText then
