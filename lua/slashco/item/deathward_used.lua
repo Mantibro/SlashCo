@@ -36,6 +36,14 @@ function ITEM.OnPickUp(ply)
 	end)
 end
 
+-- RaphaelIT7:
+-- A used deathward cannot be dropped normally which was originally intended.
+-- This is as a downside- you dodged death yet you can no longer use any items.
+-- "in-lore the deathward works through stabbing it into your hand, hence why you cant use items/drop it"
+function ITEM.PreDrop()
+	return true
+end
+
 ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
