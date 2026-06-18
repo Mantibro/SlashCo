@@ -30,6 +30,7 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.ItemToSpawn = "Baby"
 SLASHER.MaulForward = 800 -- Force to apply forward when Princess maul.
+SLASHER.MaulingSpeed = 100 -- Speed when dragging a survivor.
 SLASHER.AngerIncrease = 5
 SLASHER.AngerPassiveGain = 0.04
 SLASHER.AngerChaseGain = 0
@@ -66,6 +67,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 
 	if additionalSurvivors > 0 then -- Only increase these if we have more than the default survivors.
+		SLASHER.MaulingSpeed = 100 + (5 * additionalSurvivors)
 		SLASHER.MaulForward = 800 + (5 * additionalSurvivors)
 		SLASHER.ChaseSpeed = 280 + (2 * additionalSurvivors)
 		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
@@ -273,6 +275,77 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
+	if IsValid(slasher.SurvivorDragged) then
+		slasher:SetRunSpeed(SLASHER.MaulingSpeed)
+		slasher:SetWalkSpeed(SLASHER.MaulingSpeed)
+		slasher:SetSlowWalkSpeed(SLASHER.MaulingSpeed)
+
+		slasher.SurvivorDragged:SetPos(slasher:GetForward() * 2)
+		for i = 1, 350 do
+			timer.Simple(0.1 + (i / 10), function()
+				if not IsValid(slasher.SurvivorDragged) or not IsValid(slasher) then return end
+
+				slasher.SurvivorDragged:SetPos(slasher:GetForward() * 2)
+
+				slasher.SurvivorDragged:TakeDamage(3, slasher, slasher)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "physics/flesh/flesh_bloody_break.wav",
+					identifier = "SurvivorDragged",
+					minDistance = 600,
+					maxDistance = 800,
+					entity = slasher.SurvivorDragged,
+					volume = 1,
+					fadeIn = 0,
+				})
+			end)
+		end
+
+		if slasher.SurvivorDragged.DragStruggle ~= nil and slasher.SurvivorDragged.DragStruggle > 25 then
+			slasher.SurvivorDragged:RemoveSpeedEffect("princessmaul")
+			slasher.SurvivorDragged.DragStruggle = 0
+			slasher.SurvivorRoped:SetNWBool("SurvivorDragged", false)
+			slasher.SurvivorDragged = nil
+
+			slasher:SetNWBool("PrincessDraggingSurvivor", false)
+
+			timer.Simple(3, function()
+				if not IsValid(slasher) then return end
+				slasher:SetNWBool("PrincessCanMaul", true)
+			end)
+		end
+
+		timer.Simple(15, function()
+			if not IsValid(slasher.SurvivorDragged) then return end
+
+			slasher:SetNWBool("CanChase", true)
+			slasher:SetNWBool("PrincessDraggingSurvivor", false)
+
+			slasher.SurvivorDragged:RemoveSpeedEffect("princessmaul")
+			slasher.SurvivorDragged.DragStruggle = 0
+			slasher.SurvivorRoped:SetNWBool("SurvivorDragged", false)
+			slasher.SurvivorDragged = nil
+
+			timer.Simple(3, function()
+				if not IsValid(slasher) then return end
+				slasher:SetNWBool("PrincessCanMaul", true)
+			end)
+		end)
+	else
+		if not slasher:GetNWBool("InSlasherChaseMode") then
+			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+		else
+			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
+			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
+			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
+		end
+
+		slasher:SetNWBool("CanChase", true)
+		slasher:SetNWBool("PrincessCanMaul", true)
+		slasher.SurvivorDragged = nil
+	end
+
 	slasher:SetEyeSight(eyesight)
 	slasher:SetPerception(perception)
 end
@@ -333,6 +406,9 @@ function SLASHER.Maul(slasher, target)
 				if not IsValid(slasher) then return end
 
 				slasher.victimragdoll = target and (target.DeadBody or NULL)
+
+				local phys = slasher.victimragdoll:GetPhysicsObject()
+				phys:Wake()
 				slasher.victimragdoll:FollowBone(slasher, slasher:LookupBone("head"))
 			end)
 		end)
@@ -454,6 +530,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("PrincessSniffing") then return end
 	if slasher:GetNWBool("DemonPacified") then return end
 	if slasher:GetNWBool("PrincessMaulingBase") then return end
+	if not slasher:GetNWBool("PrincessCanMaul") then return end
 	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then return end
 
 	slasher.MaulTime = CurTime()
@@ -502,6 +579,20 @@ function SLASHER.OnPrimaryFire(slasher)
 		end
 
 		if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
+			if slasher.Aggression >= 50 and slasher.Aggression <= 99 then
+				if math.random(1, 100) > 49 then -- 50% chance to grab a surv
+					SlashCo.StopChase(slasher)
+
+					slasher.SurvivorDragged = target
+					slasher.SurvivorDragged:SetNWBool("SurvivorDragged", true)
+					slasher.SurvivorDragged:AddSpeedEffect("princessmaul", 50, 2)
+
+					slasher:SetNWBool("CanChase", false)
+					slasher:SetNWBool("PrincessCanMaul", false)
+					slasher:SetNWBool("PrincessDraggingSurvivor", true)
+				end
+			end
+
 			SLASHER.Maul(slasher, target)
 		end
 	end)
@@ -551,6 +642,18 @@ end
 function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
+function SLASHER.OnHitByBeerKeg(slasher, ply)
+	SlashCo.StopChase(slasher)
+
+	slasher:SetNWBool("PrincessStunned", true)
+	timer.Simple(11, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("PrincessStunned", false)
+	end)
+end
+SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByBeerKeg
+
 function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("PrincessMaulingChild") or ply:GetNWBool("PrincessMaulingSurvivor") or ply:GetNWBool("PrincessSniffing")
 end
@@ -560,7 +663,9 @@ function SLASHER.Animator(ply)
 	local maul_child = ply:GetNWBool("PrincessMaulingChild")
 	local maul_normal = ply:GetNWBool("PrincessMaulingBase")
 	local maul_survivor = ply:GetNWBool("PrincessMaulingSurvivor")
+	local maul_grab = ply:GetNWBool("PrincessDraggingSurvivor")
 	local sniff = ply:GetNWBool("PrincessSniffing")
+	local stun = ply:GetNWBool("PrincessStunned")
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -597,6 +702,20 @@ function SLASHER.Animator(ply)
 		end
 	elseif sniff then
 		ply.CalcSeqOverride = ply:LookupSequence("sniff")
+		ply:SetPlaybackRate(1)
+		if not ply.anim_antispam then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	elseif stun then
+		ply.CalcSeqOverride = ply:LookupSequence("stun")
+		ply:SetPlaybackRate(1)
+		if not ply.anim_antispam then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	elseif maul_grab then
+		ply.CalcSeqOverride = ply:LookupSequence("grab_attack")
 		ply:SetPlaybackRate(1)
 		if not ply.anim_antispam then
 			ply:SetCycle(0)

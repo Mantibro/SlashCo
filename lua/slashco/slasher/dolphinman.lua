@@ -189,11 +189,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			DolphinHunt(slasher)
 		end
 
-		for _, alert_surv in player.Iterator() do
-			if alert_surv:Team() ~= TEAM_SURVIVOR then
-				continue
-			end
-
+		for _, alert_surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			local alert_area = SLASHER.AlertDistance + ((2 * HuntPower) + 100)
 
 			if alert_surv:GetPos():Distance(slasher:GetPos()) > alert_area then

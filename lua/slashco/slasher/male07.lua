@@ -339,12 +339,40 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end
 end
 
+function SLASHER.OnHitByPocketSand(slasher, ply)
+	if slasher.MaleState == MALE07_GHOST or slasher.MaleState == MALE07_POSESSED then
+		slasher:SetColor(Color(255, 255, 255, 255))
+		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
+		slasher:SetVisible(true)
+		slasher:DrawShadow(true)
+		slasher:SetMoveType(MOVETYPE_WALK)
+		slasher.MaleCooldown = 3
+
+		Male07Transform(slasher)
+		slasher:SetNWBool("CanChase", true)
+	else
+		SlashCo.StopChase(slasher)
+
+		slasher:SetNWBool("Male07Stunned", true)
+		slasher:Freeze(true)
+		timer.Simple(9, function()
+			if not IsValid(slasher) then return end
+
+			slasher:SetNWBool("Male07Stunned", false)
+			slasher:Freeze(false)
+		end)
+	end
+end
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
+
 function SLASHER.Animator(ply)
 	local male_slashing = ply:GetNWBool("Male07Slashing")
 	local male_transforming = ply:GetNWBool("Male07Transforming")
+	local male_stunned = ply:GetNWBool("Male07Stunned")
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
-	if ply:GetModel() == "models/humans/group01/male_07.mdl" then
+	if ply:GetModel() == maleModelName then
 		if ply:IsOnGround() then
 			if not chase then
 				ply.CalcIdeal = ACT_WALK
@@ -365,7 +393,7 @@ function SLASHER.Animator(ply)
 			ply.CalcSeqOverride = ply:LookupSequence("idle_all")
 		end
 	elseif ply:GetModel() == monsterModelName then
-		if not male_slashing and not male_transforming then
+		if not male_slashing and not male_transforming and not male_stunned then
 			ply.anim_antispam = false
 		end
 
@@ -394,43 +422,19 @@ function SLASHER.Animator(ply)
 				ply.anim_antispam = true
 			end
 		end
+
+		if male_stunned then
+			ply.CalcSeqOverride = ply:LookupSequence("stun")
+
+			if not ply.anim_antispam then
+				ply:SetCycle(0)
+				ply.anim_antispam = true
+			end
+		end
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
-
-function SLASHER.OnHitByPocketSand(slasher, ply)
-	if slasher.MaleState == MALE07_GHOST or slasher.MaleState == MALE07_POSESSED then
-		slasher:SetColor(Color(255, 255, 255, 255))
-		slasher:SetRenderMode(RENDERMODE_TRANSCOLOR)
-		slasher:SetVisible(true)
-		slasher:DrawShadow(true)
-		slasher:SetMoveType(MOVETYPE_WALK)
-		slasher.MaleCooldown = 3
-
-		Male07Transform(slasher)
-		slasher:SetNWBool("CanChase", true)
-
-		timer.Simple(9, function()
-			if not IsValid(slasher) then return end
-
-			SlashCo.StartChaseMode(slasher)
-		end)
-	else
-		SlashCo.StopChase(slasher)
-
-		slasher:SetNWBool("Male07Stunned", true)
-		slasher:Freeze(true)
-		timer.Simple(9, function()
-			if not IsValid(slasher) then return end
-
-			slasher:SetNWBool("Male07Stunned", false)
-			slasher:Freeze(false)
-		end)
-	end
-end
-SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
-SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.OnItemSpawn()
 	local diff = SlashCo.CurRound.Difficulty

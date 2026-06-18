@@ -120,8 +120,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if IsValid(slasher.SurvivorRoped) then
-		slasher.SurvivorRoped.RopeStruggle = 0
-
 		slasher:SetRunSpeed(100)
 		slasher:SetWalkSpeed(100)
 		slasher:SetSlowWalkSpeed(100)
@@ -275,7 +273,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				slasher:SetNWBool("CanChase", false)
 
 				slasher.SurvivorRoped = find_p
-				find_p:SetNWBool("SurvivorGrabbed", true)
+				slasher.SurvivorRoped.RopeStruggle = 0
+				slasher.SurvivorRoped:SetNWBool("SurvivorGrabbed", true)
 
 				SlashCo.StopChase(slasher)
 				PlayPanicMusic(slasher)

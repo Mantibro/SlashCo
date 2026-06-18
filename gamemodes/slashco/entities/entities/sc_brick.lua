@@ -79,6 +79,9 @@ function ENT:PhysicsCollide(data)
 
 				self:Break()
 			end)
+		elseif data.HitEntity:GetClass() == "sc_manspidernest" then
+			local hp = data.HitEntity:Health()
+			data.HitEntity:SetHealth(hp - 10)
 		else
 			if not data.HitEntity:IsWorld() then
 				data.HitObject:ApplyForceCenter(velocity * 50)

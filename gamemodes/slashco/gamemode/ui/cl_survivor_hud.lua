@@ -495,7 +495,7 @@ hook.Add("SlashCo:DrawHUD", "SurvivorStruggle", function()
 	if team == TEAM_SPECTATOR then return end
 	if team ~= TEAM_SURVIVOR then return end
 
-	if (ply:GetNWBool("SurvivorTackled") == true) or (ply:GetNWBool("SurvivorGrabbed") == true) then
+	if (ply:GetNWBool("SurvivorTackled") == true) or (ply:GetNWBool("SurvivorGrabbed") == true) or (ply:GetNWBool("SurvivorDragged") == true) then
 		if GameData.LocalPlayer.struggle_key == nil then
 			GameData.LocalPlayer.struggle_key = 0
 		end

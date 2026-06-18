@@ -129,6 +129,18 @@ hook.Add("KeyPress", "SlashCo:SurvivorStruggles", function(ply, key)
 
 		return
 	end
+
+	--Princess drag
+	if ply:GetNWBool("SurvivorDragged") then
+		if key == 11 or key == 14 then
+			if ply.LastDragStruggleKey ~= key then
+				ply.LastDragStruggleKey = key
+				ply.DragStruggle = (ply.DragStruggle or 0) + 1
+			end
+		end
+
+		return
+	end
 end)
 
 local PLAYER = FindMetaTable("Player")
