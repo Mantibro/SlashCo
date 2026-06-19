@@ -3,7 +3,7 @@ local ITEM = {}
 ITEM.Model = "models/slashco/porchlight.mdl"
 ITEM.Name = "PorchLight"
 ITEM.EntClass = "sc_porchlight"
-ITEM.Price = 150
+ITEM.Price = 90
 ITEM.Description = "PorchLight_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 
