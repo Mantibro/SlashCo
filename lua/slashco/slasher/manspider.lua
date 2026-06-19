@@ -83,22 +83,23 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+local grabBlacklist = {
+	["sc_manspidernest"] = true,
+	["sc_activebeacon"] = true,
+	["sc_activecrazyburger"] = true,
+	["sc_activeteslacoil"] = true,
+	["sc_porchlight"] = true,
+}
+
 local function GrabItem(slasher, target)
 	if not IsValid(target) then return end
-
 	if not slasher:GetNWBool("ManspiderNestActive") then return end
 
-	local corpse
-	if target:IsPlayer() then
-		corpse = target.DeadBody
-	else
-		corpse = target
-	end
-
+	local corpse = target:IsPlayer() and target.DeadBody or target
 	if (not target == corpse and target.PingType ~= "ITEM") then return end
 
 	local class = target:GetClass()
-	if class == "sc_manspidernest" or class == "sc_activebeacon" or class == "sc_activecrazyburger" or class == "sc_activeteslacoil" or class == "sc_porchlight" then return end
+	if grabBlacklist[class] then return end
 
 	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance then return end
 
@@ -496,6 +497,14 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	end
 end
 
+local climbIgnore = {
+	nil, -- will be set to the player
+	"prop_physics",
+	"prop_door_rotating",
+	"func_door",
+	"func_door_rotating"
+}
+
 local function ManspiderClimbCheck(ply, mv)
 	local eyeDir = ply:EyeAngles():Forward()
 	local traceDist = 50
@@ -503,13 +512,12 @@ local function ManspiderClimbCheck(ply, mv)
 	local startPos = ply:EyePos()
 	local endPos = startPos + eyeDir * traceDist
 
-	local filter = {ply, "prop_physics", "prop_door_rotating", "func_door", "func_door_rotating"}
-
+	climbIgnore[1] = ply
 	local tr = util.TraceLine({
 		start = startPos,
 		endpos = endPos,
 		mask = MASK_PLAYERSOLID,
-		filter = filter
+		filter = climbIgnore
 	})
 
 	if not tr.Hit then
@@ -519,7 +527,7 @@ local function ManspiderClimbCheck(ply, mv)
 				start = startPos,
 				endpos = startPos + offsetDir * traceDist,
 				mask = MASK_PLAYERSOLID,
-				filter = filter
+				filter = climbIgnore
 			})
 			if tr.Hit then break end
 		end
@@ -570,6 +578,7 @@ local function ManspiderClimbing(tr)
 	if not tr.HitSky and tr.Hit and tr.HitWorld and tr.HitNormal.z <= 0.29 then
 		return true
 	end
+
 	return false
 end
 
