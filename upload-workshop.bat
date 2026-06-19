@@ -2,6 +2,7 @@
 
 REM curl -o _workshop/maps/sc_lobby_v2.bsp https://slashco-maps.raphaelit7.com/sc_lobby_v2.bsp?download=true
 COPY gamemodes\slashco\slashco.txt _workshop\gamemodes\slashco\slashco.txt /y
+COPY gamemodes\slashco\gamemode\sh_content.lua _workshop\gamemodes\slashco\gamemode\sh_content.lua /y
 
 "C:\Program Files (x86)\Steam\steamapps\common\GarrysMod\bin\gmad.exe" create -folder "_workshop/" -out "_workshop.gma"
 "C:\Program Files (x86)\Steam\steamapps\common\GarrysMod\bin\gmpublish.exe" update -id "2844428843" -addon "_workshop.gma"
