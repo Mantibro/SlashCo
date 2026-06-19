@@ -73,26 +73,35 @@ function ENT:Think()
 			self:SetAngles(Angle(0, self:GetAngles()[2], 0))
 		end
 
-		local etrStartPos = self:LocalToWorld(offsetVec1)
+		local startPos = self:LocalToWorld(offsetVec1)
 		local ground = util.TraceLine({
-			start = etrStartPos,
+			start = startPos,
 			endpos = self:LocalToWorld(offsetVec2),
 			filter = self,
 			collisiongroup = COLLISION_GROUP_WORLD,
 			mask = MASK_SOLID_BRUSHONLY,
 		})
 
+		
 		local forward = self:GetForward()
-		--self:SetPos(self:GetPos() + forward * 3)
+		forward:Mul(3)
 		local pos = self:GetPos()
-		self:SetPos(Vector(pos[1], pos[2], ground.HitPos[3] + 5))
+		pos:Add(forward)
+		-- Let's reuse forward as a temp vector
+		forward:SetUnpacked(pos[1], pos[2], ground.HitPos[3] + 5)
+		self:SetPos(forward)
 
-		local etrEndPos = etrStartPos + forward
-		etrEndPos:Mul(6)
+		-- RaphaelIT7: We don't cache Forward above as it may change due to SetPos
+		-- We also abuse forward as a temp vector again for math
+		local newForward = self:GetForward()
+		forward:Set(newForward)
+		forward:Mul(6)
+		startPos = self:LocalToWorld(offsetVec1)
+		local endPos = startPos + forward
 		
 		local etr = util.TraceLine({
-			start = etrStartPos,
-			endpos = etrEndPos,
+			start = startPos,
+			endpos = endPos,
 			filter = self,
 			collisiongroup = COLLISION_GROUP_WORLD,
 			mask = MASK_SOLID_BRUSHONLY,
@@ -102,9 +111,9 @@ function ENT:Think()
 			if physObj:IsValid() then
 				physObj:Wake()
 				
-				forward:Mul(-15)
-				forward:Add(offsetVec1)
-				physObj:ApplyForceCenter(forward)
+				newForward:Mul(-15)
+				newForward:Add(offsetVec1)
+				physObj:ApplyForceCenter(newForward)
 			end
 
 			self:SetStepDecoyActive(false)

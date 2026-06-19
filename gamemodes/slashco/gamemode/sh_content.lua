@@ -28,9 +28,9 @@ local function DebugPrint(msg)
 	end
 end
 
-function SlashCo.FindWorkshopID(fileName)
+function SlashCo.FindWorkshopID(fileName, allowUnmounted)
 	for _, addon in ipairs(engine.GetAddons()) do
-		if addon.mounted and file.Exists(fileName, addon.title) then
+		if (allowUnmounted or addon.mounted) and file.Exists(fileName, addon.title) then
 			return addon.wsid, addon.title
 		end
 	end
@@ -38,12 +38,12 @@ function SlashCo.FindWorkshopID(fileName)
 	return nil, nil
 end
 
-function SlashCo.FindMapWorkshopID(mapName)
+function SlashCo.FindMapWorkshopID(mapName, allowUnmounted)
 	if not string.EndsWith(mapName, ".bsp") then
 		mapName = mapName .. ".bsp"
 	end
 
-	return SlashCo.FindWorkshopID("maps/" .. mapName)
+	return SlashCo.FindWorkshopID("maps/" .. mapName, allowUnmounted)
 end
 
 function SlashCo.FindSlasherWorkshopID(slasherFile)
@@ -246,7 +246,7 @@ else
 	util.AddNetworkString("SlashCo:PrecacheAddon")
 	function SlashCo.PrecacheNextMap()
 		local mapName = SlashCo.LobbyData.SelectedMap
-		local wsid, title = SlashCo.FindWorkshopID(mapName)
+		local wsid, title = SlashCo.FindMapWorkshopID(mapName, true)
 		if not wsid then -- Could happen if a server uses fastdl
 			print("[Content] Failed to precache next map as it wasn't found in any addon! (" .. mapName .. ")")
 			return
