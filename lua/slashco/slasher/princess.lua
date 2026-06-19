@@ -283,7 +283,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.SurvivorDragged:SetPos(slasher:GetForward() * 2)
 		for i = 1, 350 do
 			timer.Simple(0.1 + (i / 10), function()
-				if not IsValid(slasher.SurvivorDragged) or not IsValid(slasher) then return end
+				if not IsValid(slasher) or not IsValid(slasher.SurvivorDragged) then return end
 
 				slasher.SurvivorDragged:SetPos(slasher:GetForward() * 2)
 
@@ -310,12 +310,13 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			timer.Simple(3, function()
 				if not IsValid(slasher) then return end
+
 				slasher:SetNWBool("PrincessCanMaul", true)
 			end)
 		end
 
 		timer.Simple(15, function()
-			if not IsValid(slasher.SurvivorDragged) then return end
+			if not IsValid(slasher) or not IsValid(slasher.SurvivorDragged) then return end
 
 			slasher:SetNWBool("CanChase", true)
 			slasher:SetNWBool("PrincessDraggingSurvivor", false)
