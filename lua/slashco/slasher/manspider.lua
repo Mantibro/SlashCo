@@ -137,7 +137,6 @@ local function GrabItem(slasher, target)
 	slasher:SetNWBool("CanLeap", false)
 	slasher:SetNWBool("ManspiderStealing", true)
 	slasher.ItemStealed = target
-	slasher.ItemStealed:SetNWBool("ItemIsBeingStealed", true)
 
 	local angle = slasher:LocalToWorldAngles(Angle(100, 0, 0))
 	slasher.ItemStealed:SetAngles(angle)
@@ -146,10 +145,9 @@ local function GrabItem(slasher, target)
 end
 
 local function DropItem(slasher, target)
-	if slasher.ItemStealed == NULL then return end
+	if not IsValid(slasher.ItemStealed) then return end
 
 	target = slasher.ItemStealed
-
 	local trace = util.TraceHull({
 		start = target:GetPos(),
 		endpos = target:GetPos(),
@@ -166,13 +164,7 @@ local function DropItem(slasher, target)
 	slasher:SetNWBool("CanLeap", true)
 	slasher:SetNWBool("ManspiderStealing", false)
 	slasher.KillDelayTick = SLASHER.KillDelay
-	target:SetNWBool("ItemIsBeingStealed", false)
-
-	timer.Simple(0.1, function()
-		if not IsValid(slasher.ItemStealed) then return end
-
-		slasher.ItemStealed = NULL
-	end)
+	slasher.ItemStealed = nil
 end
 
 function SLASHER.OnSpawn(slasher)
@@ -186,7 +178,6 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("ManspiderNested", false)
 
 	slasher.TargetPlayer = NULL
-	slasher.ItemStealed = NULL
 	slasher.LeapCooldown = 0
 	slasher.ItemStealCooldown = 0
 	slasher.TimeNested = 0
@@ -194,7 +185,6 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local Target = slasher.TargetPlayer or NULL --Target Player
-	local ItemStealed = slasher.ItemStealed or NULL --Item manspider is stealing
 	local LeapCD = slasher.LeapCooldown or 0 --Leap Cooldown
 	local ItemPickCD = slasher.ItemStealCooldown or 0 --Item Stealing Cooldown
 	local TimeNested = slasher.TimeNested or 0 --Time spend nested
