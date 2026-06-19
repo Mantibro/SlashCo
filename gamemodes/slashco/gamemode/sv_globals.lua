@@ -550,7 +550,9 @@ function SlashCo.ClearDatabase()
 	
 	print("[SlashCo] Clearing Database. . .")
 
-	cookie.Delete("slashco_table_basedata")
+	-- RaphaelIT7: GMod Bug! cookie.Delete does not respect execution order so any Set immediately afterwards has no affect! So we delete it immediately ourselves which fixes it
+	-- cookie.Delete("slashco_table_basedata")
+	sql.Query("DELETE FROM cookies WHERE key = " .. SQLStr("slashco_table_basedata"))
 	sql.Query("DROP TABLE slashco_table_survivordata;")
 	sql.Query("DROP TABLE slashco_table_slasherdata;")
 	sql.Query("DROP TABLE slashco_table_potentialslashers;")

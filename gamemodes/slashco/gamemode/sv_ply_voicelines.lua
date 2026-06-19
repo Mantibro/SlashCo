@@ -10,6 +10,7 @@ local function LoadVoiceLines()
 	local voiceFiles = file.Find("sound/slashco/survivor/voice/maleconv_*", "GAME")
 	for _, fileName in ipairs(voiceFiles) do
 		local convoID, partID = string.match(fileName, "^maleconv_(%d+)_(%d+)%.mp3$")
+		if not convoID or not partID then continue end
 
 		local convoTbl = SlashCo.LobbyConvos[lookup[convoID]]
 		if not convoTbl then
