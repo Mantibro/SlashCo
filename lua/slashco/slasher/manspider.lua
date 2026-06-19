@@ -6,7 +6,7 @@ SLASHER.Aliases = {
 	"Itsy Bitsy",
 }
 SLASHER.Class = SlashCo.SlasherClass.Cryptid
-SLASHER.DangerLevel = SlashCo.DangerLevel.Considerable
+SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/manspider/manspider.mdl"
 SLASHER.GasCanMod = 0
@@ -83,20 +83,120 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+local function GrabItem(slasher, target)
+	if not IsValid(target) then return end
+
+	if not slasher:GetNWBool("ManspiderNestActive") then return end
+
+	local corpse
+	if target:IsPlayer() then
+		corpse = target.DeadBody
+	else
+		corpse = target
+	end
+
+	if (not target == corpse and target.PingType ~= "ITEM") then return end
+
+	local class = target:GetClass()
+	if class == "sc_manspidernest" or class == "sc_activebeacon" or class == "sc_activecrazyburger" or class == "sc_activeteslacoil" or class == "sc_porchlight" then return end
+
+	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance then return end
+
+	SlashCo.StopChase(slasher)
+
+	if not target:IsRagdoll() then
+		local idxItem = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/survivor/item_equip" .. idxItem .. ".mp3",
+			identifier = "ManspiderGrabbingItem",
+			minDistance = 200,
+			maxDistance = 800,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+	else
+		local idxCorpse = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "physics/flesh/flesh_squishy_impact_hard" .. idxCorpse .. ".wav",
+			identifier = "ManspiderGrabbingCorpse",
+			minDistance = 200,
+			maxDistance = 800,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+	end
+
+	if target == corpse then
+		local phys = target:GetPhysicsObject()
+		phys:Wake()
+	end
+
+	slasher.ItemStealCooldown = 3
+	slasher:SetNWBool("CanLeap", false)
+	slasher:SetNWBool("ManspiderStealing", true)
+	slasher.ItemStealed = target
+	slasher.ItemStealed:SetNWBool("ItemIsBeingStealed", true)
+
+	local angle = slasher:LocalToWorldAngles(Angle(100, 0, 0))
+	slasher.ItemStealed:SetAngles(angle)
+	slasher.ItemStealed:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
+	slasher.ItemStealed:SetMoveParent(slasher)
+end
+
+local function DropItem(slasher, target)
+	if slasher.ItemStealed == NULL then return end
+
+	target = slasher.ItemStealed
+
+	local trace = util.TraceHull({
+		start = target:GetPos(),
+		endpos = target:GetPos(),
+		mins = target:OBBMins() * 0.5,
+		maxs = target:OBBMaxs() * 0.5,
+		filter = {slasher, target},
+		mask = MASK_PLAYERSOLID,
+	})
+	if trace.Hit then return end
+
+	target:SetMoveParent(NULL)
+
+	slasher.ItemStealCooldown = 3
+	slasher:SetNWBool("CanLeap", true)
+	slasher:SetNWBool("ManspiderStealing", false)
+	slasher.KillDelayTick = SLASHER.KillDelay
+	target:SetNWBool("ItemIsBeingStealed", false)
+
+	timer.Simple(0.1, function()
+		if not IsValid(slasher.ItemStealed) then return end
+
+		slasher.ItemStealed = NULL
+	end)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
 	slasher.Jump = slasher:GetJumpPower()
+
 	slasher:SetNWBool("ManspiderClimbing", false)
+	slasher:SetNWBool("ManspiderStealing", false)
+	slasher:SetNWBool("ManspiderNestActive", false)
+	slasher:SetNWBool("ManspiderNested", false)
 
 	slasher.TargetPlayer = NULL
+	slasher.ItemStealed = NULL
 	slasher.LeapCooldown = 0
+	slasher.ItemStealCooldown = 0
 	slasher.TimeNested = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local Target = slasher.TargetPlayer or NULL --Target Player
+	local ItemStealed = slasher.ItemStealed or NULL --Item manspider is stealing
 	local LeapCD = slasher.LeapCooldown or 0 --Leap Cooldown
+	local ItemPickCD = slasher.ItemStealCooldown or 0 --Item Stealing Cooldown
 	local TimeNested = slasher.TimeNested or 0 --Time spend nested
 
 	if LeapCD > 0 then
@@ -104,6 +204,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("CanLeap", false)
 	else
 		slasher:SetNWBool("CanLeap", true)
+	end
+
+	if ItemPickCD > 0 then
+		slasher.ItemStealCooldown = ItemPickCD - FrameTime()
 	end
 
 	if not IsValid(Target) then
@@ -183,7 +287,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 
 				local d = survivor:GetPos():Distance(slasher:GetPos())
-
 				if d >= 350 then
 					continue
 				end
@@ -211,18 +314,35 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if slasher:GetNWEntity("ManspiderTarget") ~= Target then
-		slasher:SetNWEntity("ManspiderTarget", Target)
+	if slasher:GetNWBool("ManspiderStealing") then
+		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not survivor:CanBeSeen() then
+				continue
+			end
+
+			local d = survivor:GetPos():Distance(slasher:GetPos())
+			if d > 130 then
+				continue
+			end
+
+			local tr = util.TraceLine({
+				start = survivor:EyePos(),
+				endpos = slasher:WorldSpaceCenter(),
+				filter = survivor
+			})
+
+			if tr.Entity ~= slasher then
+				continue
+			end
+
+			DropItem(slasher, target)
+			SlashCo.AddSlasherAnger(slasher, 30)
+			PlayScream(slasher)
+		end
 	end
 
-	if TimeNested > 30 then
-		if slasher:GetNWBool("ManspiderCanLeaveNest") ~= true then
-			slasher:SetNWBool("ManspiderCanLeaveNest", true)
-		end
-	else
-		if slasher:GetNWBool("ManspiderCanLeaveNest") ~= false then
-			slasher:SetNWBool("ManspiderCanLeaveNest", false)
-		end
+	if slasher:GetNWEntity("ManspiderTarget") ~= Target then
+		slasher:SetNWEntity("ManspiderTarget", Target)
 	end
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
@@ -239,27 +359,93 @@ function SLASHER.OnKillPlayer(slasher, target)
 	SlashCo.AddSlasherAnger(slasher, -anger)
 end
 
+function SLASHER.HandleDOT(slasher, target)
+	target.ManspiderPoison = target.ManspiderPoison or 3
+
+	local poison_damage = 3 * (SlashCo.GetSlasherAnger(slasher) / 10)
+	timer.Create("ManspiderBite_" .. target:UserID(), 0.75, target.ManspiderPoison, function()
+		if not IsValid(target) or target:Team() == TEAM_SPECTATOR then return end
+
+		target:TakeDamage(poison_damage, slasher, slasher)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
+			identifier = "ManspiderDOT",
+			minDistance = 600,
+			maxDistance = 800,
+			entity = target,
+			volume = 1,
+			fadeIn = 0,
+		})
+	end)
+
+	target.ManspiderPoison = target.ManspiderPoison + 3
+end
+
 function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher.KillDelayTick > 0 then return end
-	if not IsValid(target) or not target:IsPlayer() then return end
+	if slasher:GetNWBool("ManspiderNested") then return end
 
 	if target ~= slasher.TargetPlayer then
-		slasher:ChatPrint("You can only kill your Prey.")
+		slasher:SetNWBool("ManspiderBite", false)
+		timer.Remove("ManspiderBiteDecay")
+
+		slasher.KillDelayTick = SLASHER.KillDelay
+
+		timer.Simple(0.3, function()
+			if not IsValid(slasher) then return end
+
+			local damage = 5 * (SlashCo.GetSlasherAnger(slasher) / 5)
+			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
+					Vector(-35, -45, -60), Vector(35, 45, 60), damage, DMG_SLASH, 5, false)
+
+			if not target:IsValid() then return end
+
+			SlashCo.BustDoor(slasher, target, 60000)
+			if target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/manspider/manspider_bite.mp3",
+					identifier = "ManspiderBite",
+					minDistance = 600,
+					maxDistance = 800,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
+
+				SLASHER.HandleDOT(slasher, target)
+
+				local o = Vector(0, 0, 50)
+				local vPoint = target:GetPos() + o
+				local bloodfx = EffectData()
+				bloodfx:SetOrigin(vPoint)
+				util.Effect("BloodImpact", bloodfx)
+
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
+					identifier = "SurvivorBited",
+					minDistance = 600,
+					maxDistance = 800,
+					entity = target,
+					volume = 1,
+					fadeIn = 0,
+				})
+			end
+		end)
+
+		timer.Simple(0.05, function()
+			if not IsValid(slasher) then return end
+
+			slasher:SetNWBool("ManspiderBite", true)
+			timer.Create("ManspiderBiteDecay", 1.5, 1, function()
+				if not IsValid(slasher) then return end
+
+				slasher:SetNWBool("ManspiderBite", false)
+			end)
+		end)
+
 		return
 	else
 		SlashCo.Jumpscare(slasher, target)
-	end
-end
-
-function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("ManspiderNested")
-end
-
-function SLASHER.CanBeSeen(ply)
-	if SERVER then return end
-
-	if ply:IsVisible() and not ply:GetNWBool("ManspiderNested") then
-		return true
 	end
 end
 
@@ -272,18 +458,50 @@ function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
 end
 
-function SLASHER.OnMainAbilityFire(slasher)
-	if not slasher:GetNWBool("ManspiderNested") then
-		if IsValid(slasher.TargetPlayer) then return end
-		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then return end
-		if not slasher:IsOnGround() and not slasher:GetNWBool("ManspiderClimbing") then return end
+function SLASHER.OnMainAbilityFire(slasher, target)
+	if slasher:GetNWBool("ManspiderStealing") then
+		if slasher.ItemStealCooldown > 0.01 then return end
 
-		slasher:SetNWBool("ManspiderNested", true)
-		return
-	end
+		for _, nest in ipairs(ents.FindByClass("sc_manspidernest")) do
+			if nest:GetPos():Distance(slasher:GetPos()) < 200 then
+				DropItem(slasher, target)
+			end
+		end
+	else
+		if not slasher:GetNWBool("ManspiderNested") then
+			if slasher:GetNWBool("ManspiderNestActive") then
+				if slasher.ItemStealCooldown > 0.01 then return end
 
-	if slasher.TimeNested > 30 then
-		slasher:SetNWBool("ManspiderNested", false)
+				GrabItem(slasher, target)
+				return
+			end
+
+			if IsValid(slasher.TargetPlayer) then return end
+			if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then return end
+			if not slasher:IsOnGround() and not slasher:GetNWBool("ManspiderClimbing") then return end
+
+			slasher:SetNWBool("ManspiderNested", true)
+
+			local TimeToNest = math.random(17, 32)
+			timer.Simple(TimeToNest, function()
+				if not IsValid(slasher) or slasher:GetNWBool("ManspiderNested") ~= true then return end
+
+				slasher:SetNWBool("ManspiderNested", false)
+
+				if slasher:GetNWBool("ManspiderClimbing") then return end
+
+				local manspider_nest = ents.Create("sc_manspidernest")
+				manspider_nest:SetPos(slasher:LocalToWorld(Vector(80, 0, 0)))
+				manspider_nest:SetAngles(slasher:GetAngles())
+				manspider_nest:SetOwner(slasher)
+				manspider_nest:Spawn()
+				manspider_nest:Activate()
+
+				slasher:SetNWBool("ManspiderNestActive", true)
+			end)
+
+			return
+		end
 	end
 end
 
@@ -294,11 +512,13 @@ local function ManspiderClimbCheck(ply, mv)
 	local startPos = ply:EyePos()
 	local endPos = startPos + eyeDir * traceDist
 
+	local filter = {ply, "prop_physics", "prop_door_rotating", "func_door", "func_door_rotating"}
+
 	local tr = util.TraceLine({
 		start = startPos,
 		endpos = endPos,
-		mask = MASK_VISIBLE,
-		filter = ply
+		mask = MASK_PLAYERSOLID,
+		filter = filter
 	})
 
 	if not tr.Hit then
@@ -307,8 +527,8 @@ local function ManspiderClimbCheck(ply, mv)
 			tr = util.TraceLine({
 				start = startPos,
 				endpos = startPos + offsetDir * traceDist,
-				mask = MASK_VISIBLE,
-				filter = ply
+				mask = MASK_PLAYERSOLID,
+				filter = filter
 			})
 			if tr.Hit then break end
 		end
@@ -321,7 +541,7 @@ local function ManspiderKillCheck(ply, mv)
 	if not ply:GetNWBool("ManspiderLeaping") then return end
 
 	local velocity = ply:GetVelocity()
-	if velocity:Length() < 200 then return nil end
+	if velocity:Length() == 0 then return nil end
 
 	local speedDir = velocity:GetNormalized()
 	local traceDist = 200
@@ -355,6 +575,13 @@ local function ManspiderKillCheck(ply, mv)
 	return nil
 end
 
+local function ManspiderClimbing(tr)
+	if not tr.HitSky and tr.Hit and tr.HitWorld and tr.HitNormal.z <= 0.29 then
+		return true
+	end
+	return false
+end
+
 local vectorAddNormal = Vector(0, 0, 0)
 local vectorAddHigh = Vector(0, 0, 64)
 function SLASHER.Move(ply, mv)
@@ -362,22 +589,30 @@ function SLASHER.Move(ply, mv)
 		ply:SetRunSpeed(1)
 		ply:SetWalkSpeed(1)
 		ply:SetSlowWalkSpeed(1)
+		ply:SetVelocity(-ply:GetVelocity())
 
 		return true
 	end
 
-	ply:SetRunSpeed(SLASHER.ProwlSpeed)
-	ply:SetWalkSpeed(SLASHER.ProwlSpeed)
-	ply:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+	if ply:GetNWBool("InSlasherChaseMode") then
+		ply:SetRunSpeed(SLASHER.ChaseSpeed)
+		ply:SetWalkSpeed(SLASHER.ChaseSpeed)
+		ply:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
+	else
+		ply:SetRunSpeed(SLASHER.ProwlSpeed)
+		ply:SetWalkSpeed(SLASHER.ProwlSpeed)
+		ply:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+	end
 
 	if ply:OnGround() or ply:WaterLevel() > 0 then
 		ply:SetNWString("ManspiderClimbEntity", "")
 		ply:SetNWBool("ManspiderLeaping", false)
+		ply.leap_damage_anti_spam = false
 		return
 	end
 
 	local tr = ManspiderClimbCheck(ply, mv)
-	if !tr.HitSky and tr.Hit and tr.HitWorld and tr.HitNormal.z <= 0 then
+	if ManspiderClimbing(tr) then
 		if SERVER then
 			if tr.HitNormal.z >= -0.2 then
 				local vectoradd = vectorAddNormal
@@ -427,7 +662,12 @@ function SLASHER.Move(ply, mv)
 					mv:SetOrigin(tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 7)
 				end
 			end
-			
+
+			local forced_angle = tr.HitNormal:Angle()
+			forced_angle.p = -forced_angle.p
+
+			ply:SetRenderAngles(forced_angle)
+
 			ply:SetNWBool("ManspiderClimbing", true)
 		end
 
@@ -445,9 +685,15 @@ function SLASHER.Move(ply, mv)
 
 	-- RaphaelIT7: tr.Entity will never be nil - it'll be NULL, and we can use IsPlayer on NULL and if it returns true we can also be sure that it's valid-
 	if not tr.Entity:IsPlayer() then return end
-	
+
+	ply.leap_damage_anti_spam = ply.leap_damage_anti_spam or false
+	if ply.leap_damage_anti_spam then return end
+
+	ply.leap_damage_anti_spam = true
+
 	local victim = tr.Entity
-	victim:TakeDamage(50, ply, ply)
+	local leap_damage = math.random(35, 50)
+	victim:TakeDamage(leap_damage, ply, ply)
 
 	local edata = EffectData()
 	edata:SetOrigin(tr.HitPos)
@@ -470,8 +716,10 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	if slasher:GetNWBool("ManspiderClimbing") then 
 		slasher:SetNWBool("ManspiderClimbing", false)
 		slasher:SetNWString("ManspiderClimbEntity", "")
+		slasher:SetRenderAngles(slasher:GetAngles())
 		slasher:SetMoveType(MOVETYPE_WALK)
-		slasher:SetVelocity((slasher:EyeAngles():Forward() * 400) + Vector(0, 0, 200))
+
+		slasher:SetVelocity((slasher:EyeAngles():Forward() * 500) + Vector(0, 0, 300))
 		slasher:SetNWBool("ManspiderLeaping", true)
 		slasher.KillDelayTick = SLASHER.KillDelay
 
@@ -482,7 +730,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	if not slasher:IsOnGround() then return end
 	if slasher:GetNWBool("ManspiderNested") then return end
 
-	slasher.LeapCooldown = 15
+	slasher.LeapCooldown = 10
 
 	slasher:Freeze(true)
 	local idx = math.random(1, 4)
@@ -506,9 +754,54 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end)
 end
 
+function SLASHER.Thirdperson(ply)
+	return ply:GetNWBool("ManspiderNested") or ply:GetNWBool("ManspiderStunned")
+end
+
+function SLASHER.CanBeSeen(ply)
+	if SERVER then return end
+
+	if ply:IsVisible() and not ply:GetNWBool("ManspiderNested") then
+		return true
+	end
+end
+
+function SLASHER.OnHitByPocketSand(slasher, ply)
+	SlashCo.StopChase(slasher)
+
+	slasher:SetNWBool("ManspiderStunned", true)
+	slasher:Freeze(true)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/manspider/manspider_stun.mp3",
+		identifier = "ManspiderStun",
+		minDistance = 700,
+		maxDistance = 1240,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+
+	timer.Simple(9, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("ManspiderStunned", false)
+		slasher:Freeze(false)
+	end)
+end
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
+
 function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local manspider_nest = ply:GetNWBool("ManspiderNested")
+	local manspider_climbing = ply:GetNWBool("ManspiderClimbing")
+	local manspider_bite = ply:GetNWBool("ManspiderBite")
+	local manspider_stun = ply:GetNWBool("ManspiderStunned")
+
+	if not manspider_bite then
+		ply.anim_antispam = false
+	end
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -525,6 +818,27 @@ function SLASHER.Animator(ply)
 	if manspider_nest then
 		ply.CalcSeqOverride = ply:LookupSequence("nest")
 	end
+
+	if manspider_climbing then
+		ply.CalcSeqOverride = ply:LookupSequence("prowl")
+	end
+
+	if manspider_bite then
+		ply.CalcSeqOverride = ply:LookupSequence("bite_attack")
+		if not ply.anim_antispam then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	end
+
+	-- WIP
+	--[[if manspider_stun then
+		ply.CalcSeqOverride = ply:LookupSequence("stun")
+		if not ply.anim_antispam then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	end]]
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
 end
@@ -572,9 +886,8 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("R", "nest", nestTable)
 	hud:ChaseAndKill()
-	hud:UntieControl("LMB")
 	hud:UntieControl("RMB")
-	hud:TieControlVisible("LMB", "CanKill")
+	hud:TieControlText("LMB", "CanKill", "kill", "bite", true)
 	hud:TieControlVisible("RMB", "CanChase")
 	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/punch"))
 	hud:TieControlVisible("F", "ManspiderNested", true, false, false)
@@ -585,21 +898,46 @@ function SLASHER.InitHud(_, hud)
 	end
 
 	hud.prevNested = -1
-	hud.prevLeave = -1
 	hud.prevHide = -1
 	function hud.AlsoThink()
 		local nested = GameData.LocalPlayer:GetNWBool("ManspiderNested")
-		if nested ~= hud.prevNested then
-			hud:ShakeControl("R")
-			if nested then
-				hud:SetControlText("R", "waiting for prey")
+		local active_nest = GameData.LocalPlayer:GetNWBool("ManspiderNestActive")
+		local holding_item = GameData.LocalPlayer:GetNWBool("ManspiderStealing")
+		if nested ~= hud.prevNested or active_nest ~= hud.prevNested or holding_item ~= hud.prevNested then
+			if nested ~= hud.prevNested then
+				hud:SetControlText("R", "nesting")
 				hud:SetControlEnabled("R", false)
+
+				hud.prevNested = nested
 			else
 				hud:SetControlText("R", "nest")
+
+				hud.prevNested = nested
 			end
 
-			hud.prevNested = nested
+			if active_nest ~= hud.prevNested then
+				hud:SetControlText("R", "steal item")
+
+				hud.prevNested = active_nest
+			else
+				hud:SetControlText("R", "nest")
+
+				hud.prevNested = active_nest
+			end
+
+			if holding_item ~= hud.prevNested then
+				if holding_item then
+					hud:SetControlText("R", "drop in nest")
+
+					hud.prevNested = holding_item
+				else
+					hud:SetControlText("R", "steal item")
+
+					hud.prevNested = holding_item
+				end
+			end
 		end
+
 		local climbing = GameData.LocalPlayer:GetNWBool("ManspiderClimbing")
 		if climbing then
 			hud:ShakeControl("F")
@@ -612,17 +950,6 @@ function SLASHER.InitHud(_, hud)
 			end
 
 			hud.prevHide = hide
-		end
-
-		local canLeave = GameData.LocalPlayer:GetNWBool("ManspiderCanLeaveNest")
-		if canLeave ~= hud.prevLeave then
-			if nested and canLeave then
-				hud:SetControlText("R", "abandon nest")
-				hud:SetControlEnabled("R", true)
-				hud:ShakeControl("R")
-			end
-
-			hud.prevLeave = canLeave
 		end
 	end
 

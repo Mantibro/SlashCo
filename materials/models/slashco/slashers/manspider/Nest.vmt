@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/manspider/Nest"
+                "$ambientocclusion" "1"
+                "$bumpmap" "models/slashco/slashers/manspider/Nest_normal"
+                 "$phong" "1"
+                 "$phongboost" "3"
+                 "$phongexponent" "12"
+                 "$phongfresnelranges" "[0.2 0.5 1]"
+}

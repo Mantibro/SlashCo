@@ -449,6 +449,10 @@ end
 SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
+function SLASHER.Thirdperson(ply)
+	return ply:GetNWBool("BorgmireStunned")
+end
+
 function SLASHER.Animator(ply)
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local borg_punch = ply:GetNWBool("BorgmirePunch")
