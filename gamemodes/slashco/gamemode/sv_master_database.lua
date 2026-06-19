@@ -49,6 +49,7 @@ function SlashCoDatabase.EstablishDatabase()
 			sql.m_strError = nil -- Clear any old errors
 
 			-- GMod's uses SQLite 3.26.0 BUT DROP COLUMN was added with 3.35.0
+			sql.Query("DROP TABLE IF EXISTS slashco_master_database_new;")
 			sql.Query([[
 				CREATE TABLE slashco_master_database_new(
 					PlayerID TEXT PRIMARY KEY,
@@ -63,20 +64,35 @@ function SlashCoDatabase.EstablishDatabase()
 				);
 			]])
 
+			if sql.LastError() then
+				print("[DEBUG] 0 - ActivePerks migration failed! (" .. sql.LastError() .. ")")
+			end
+
 			sql.Query([[
 				INSERT INTO slashco_master_database_new
 				SELECT
 					PlayerID,
-					PlayerName,
-					SurvivorRoundsWon,
-					SlasherRoundsWon,
+					MAX(PlayerName),
+					SUM(COALESCE(SurvivorRoundsWon, 0)),
+					SUM(COALESCE(SlasherRoundsWon, 0)),
 					0,
-					Points,
-					Experience,
-					OwnedPerks,
+					SUM(COALESCE(Points, 0)),
+					SUM(COALESCE(Experience, 0)),
+					(
+						SELECT t2.OwnedPerks
+						FROM slashco_master_database t2
+						WHERE t2.PlayerID = t1.PlayerID
+						ORDER BY LENGTH(COALESCE(t2.OwnedPerks, '')) DESC
+						LIMIT 1
+					),
 					''
-				FROM slashco_master_database;
+				FROM slashco_master_database t1
+				GROUP BY PlayerID;
 			]])
+
+			if sql.LastError() then
+				print("[DEBUG] 1 - ActivePerks migration failed! (" .. sql.LastError() .. ")")
+			end
 
 			local rows = sql.Query("SELECT PlayerID, OwnedPerks, ActivePerks FROM slashco_master_database;")
 
