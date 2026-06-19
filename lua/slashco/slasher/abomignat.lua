@@ -89,6 +89,7 @@ end
 
 -- We create these only once since we use them every tick.
 local crawling_viewoffset = Vector(0, 0, 20)
+local crouching_viewoffset = Vector(0, 0, 50)
 local standing_viewoffset = Vector(0, 0, 70)
 function SLASHER.OnTickBehaviour(slasher)
 	local SlashCooldown = slasher.SlashCooldown or 0 --Main Slash Cooldown
@@ -176,11 +177,19 @@ function SLASHER.OnTickBehaviour(slasher)
 	else
 		slasher:SetNWBool("CanChase", slasher:GetNWBool("AbomignatCanMainSlash"))
 
-		eyesight_final = 6
-		perception_final = 0.5
+		if slasher:GetNWBool("AbomignatCrouch") then
+			eyesight_final = 0
+			perception_final = 1.0
 
-		slasher:SetViewOffset(standing_viewoffset)
-		slasher:SetCurrentViewOffset(standing_viewoffset)
+			slasher:SetViewOffset(crouching_viewoffset)
+			slasher:SetCurrentViewOffset(crouching_viewoffset)
+		else
+			eyesight_final = 6
+			perception_final = 0.5
+
+			slasher:SetViewOffset(standing_viewoffset)
+			slasher:SetCurrentViewOffset(standing_viewoffset)
+		end
 
 		if not slasher:GetNWBool("InSlasherChaseMode") then
 			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
@@ -391,12 +400,20 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 						slasher.LungeAntiSpam = 2
 						slasher.LungeDuration = 0
 						slasher:SetNWBool("AbomignatLungeFinish", false)
-						slasher:Freeze(false)
+
+						slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+						slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+						slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 					end
 				end)
 			end)
+
+			return
 		else
-			slasher:Freeze(false)
+			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+
 			slasher:SetNWBool("AbomignatCrouch", false)
 			slasher:SetNWBool("AbomignatLungeLarge", true)
 
@@ -414,13 +431,17 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher.TimeCrouching = 0
 
 			slasher:SetVelocity((slasher:EyeAngles():Forward() * 400) + Vector(0, 0, 300))
+
+			return
 		end
 
 		return
 	end
 
 	slasher.LungeAntiSpam = 0
-	slasher:Freeze(true)
+	slasher:SetSlowWalkSpeed(1)
+	slasher:SetWalkSpeed(1)
+	slasher:SetRunSpeed(1)
 
 	slasher:SetNWBool("AbomignatCrouch", true)
 	slasher.TimeCrouching = slasher.TimeCrouching + (CurTime() + 1)
