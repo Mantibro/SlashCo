@@ -178,6 +178,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("ManspiderNested", false)
 
 	slasher.TargetPlayer = NULL
+	slasher.ItemStealed = NULL
 	slasher.LeapCooldown = 0
 	slasher.ItemStealCooldown = 0
 	slasher.TimeNested = 0
