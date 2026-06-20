@@ -1,4 +1,7 @@
-SlashCo.Perks = SlashCo.Perks or {}
+SlashCo.Perks = SlashCo.Perks or {
+	TEAM_SURVIVOR = {},
+	TEAM_SLASHER = {},
+}
 -- SlashCo.PerksData = SlashCo.PerksData or {} -- RunTime data! Unused for now.
 
 function SlashCo.RegisterPerk(perkTbl, perkID)
