@@ -88,7 +88,7 @@ local grabBlacklist = {
 	["sc_activebeacon"] = true,
 	["sc_activecrazyburger"] = true,
 	["sc_activeteslacoil"] = true,
-	["sc_porchlight"] = true,
+	["sc_porchlight"] = true
 }
 
 local function GrabItem(slasher, target)
@@ -946,12 +946,16 @@ function SLASHER.InitHud(_, hud)
 		end
 
 		local hide = SlashCo.IsPositionLegalForSlashers(GameData.LocalPlayer:GetPos())
-		if hud.prevHide ~= hide then
-			if not nested then
-				hud:SetControlEnabled("R", hide)
-			end
+		if not active_nest then
+			if hud.prevHide ~= hide then
+				if not nested then
+					hud:SetControlEnabled("R", hide)
+				end
 
-			hud.prevHide = hide
+				hud.prevHide = hide
+			end
+		else
+			hud:SetControlEnabled("R", true)
 		end
 	end
 

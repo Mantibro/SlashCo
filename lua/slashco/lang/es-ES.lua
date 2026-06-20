@@ -1,7 +1,7 @@
 --[[
 
 	Language: es-ES, (Spanish), (Español)
-	Translator: Sherrifdoggo
+	Translator: Sherrifdoggo, Xerk
 
 ]]
 
@@ -354,6 +354,7 @@ SlashCo.LangTable["enable crawling"] = "tirarte al suelo"
 SlashCo.LangTable["disable crawling"] = "pararte"
 SlashCo.LangTable["slash charge"] = "embestida"
 SlashCo.LangTable["lunge"] = "estocada"
+SlashCo.LangTable["crouch"] = "agacharse"
 
 
 --Amogus
@@ -483,8 +484,10 @@ SlashCo.LangTable["Manspider_tip"] = "-La Araña-Hombre le gusta atacar selectiv
 SlashCo.LangTable["nest"] = "nidar"
 SlashCo.LangTable["Manspider_yourprey"] = "tu presa: "
 SlashCo.LangTable["waiting for prey"] = "esperando la presa"
-SlashCo.LangTable["abandon nest"] = "abandonar nido"
+SlashCo.LangTable["nesting"] = "anidando"
 SlashCo.LangTable["leap"] = "saltar"
+SlashCo.LangTable["steal item"] = "robar objeto"
+SlashCo.LangTable["drop in nest"] = "soltar objeto (en nido)"
 
 --Princess
 SlashCo.LangTable["Princess"] = "Princesita"
@@ -644,6 +647,7 @@ SlashCo.LangTable["points_slasher_demon"] = "[%s] SACIADO"
 SlashCo.LangTable["points_slasher_win"] = "[%s] ASESINAR A TODOS" --slasher objective thwarting
 SlashCo.LangTable["points_slasher_escape"] = "[%s] MISION ABORTADA"
 SlashCo.LangTable["points_slasher_perfect"] = "[%s] MISION ARRUINADA"
+SlashCo.LangTable["points_slasher_quick"] = "[%s] MISION RAPIDA"
 
 SlashCo.LangTable["points_objective"] = "[%s] OBJETIVO COMPLETADO" --objectives
 SlashCo.LangTable["points_optional"] = "[%s] OBJETIVO OPCIONAL COMPLETADO"
@@ -748,9 +752,15 @@ SlashCo.LangTable["perk_descui"] = "[Descripcion]"
 SlashCo.LangTable["perk_buy"] = "Comprar Perk"
 SlashCo.LangTable["perk_enable"] = "Activar Perk"
 SlashCo.LangTable["perk_disable"] = "Desactivar Perk"
+SlashCo.LangTable["perk_not_owned"] = "No obtenida"
+SlashCo.LangTable["perk_level_too_low"] = "Nivel muy bajo"
+SlashCo.LangTable["perk_conflict"] = "Conflicto con perk activa"
 
-SlashCo.LangTable["faster_fueling"] = "Carga Rapida"
-SlashCo.LangTable["faster_fueling_desc"] = "Aumenta la velocidad a la que cargas combustible un 25%, a costa de restar un 10% tu velocidad mientras llevas una gasolina en mano"
+SlashCo.LangTable["perk_faster_fueling"] = "Carga Rapida"
+SlashCo.LangTable["perk_faster_fueling_desc"] = "Aumenta la velocidad a la que cargas combustible un 25%, a costa de restar un 10% tu velocidad mientras llevas una gasolina en mano"
+
+SlashCo.LangTable["perk_secondchance"] = "Segunda Chance"
+SlashCo.LangTable["perk_secondchance_desc"] = "Tienes un 2% de chance de revivir al morir- pero todos tus items se soltaran"
 
 -- Keyboard UI
 
@@ -760,6 +770,7 @@ SlashCo.LangTable["keyboard_changekey"] = "Cambiar Tecla"
 SlashCo.LangTable["keyboard_pressnewkey"] = "Presiona una nueva tecla"
 SlashCo.LangTable["keyboard_confirmkey"] = "Presiona nuevamente para confirmar la nueva tecla: %s"
 
+SlashCo.LangTable["keyboard_bind_offering_vote"] = "Votar Ofrenda"
 SlashCo.LangTable["keyboard_bind_drop_item"] = "Soltar Objeto"
 SlashCo.LangTable["keyboard_bind_use_item"] = "Usar Objeto"
 SlashCo.LangTable["keyboard_bind_ping"] = "Marcar"
