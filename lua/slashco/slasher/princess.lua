@@ -30,7 +30,7 @@ SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.ItemToSpawn = "Baby"
 SLASHER.MaulForward = 800 -- Force to apply forward when Princess maul.
-SLASHER.MaulingSpeed = 100 -- Speed when dragging a survivor.
+SLASHER.MaulingSpeed = 30 -- Speed when dragging a survivor.
 SLASHER.AngerIncrease = 5
 SLASHER.AngerPassiveGain = 0.04
 SLASHER.AngerChaseGain = 0
@@ -67,7 +67,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 
 	if additionalSurvivors > 0 then -- Only increase these if we have more than the default survivors.
-		SLASHER.MaulingSpeed = 100 + (5 * additionalSurvivors)
+		SLASHER.MaulingSpeed = 30 + (5 * additionalSurvivors)
 		SLASHER.MaulForward = 800 + (5 * additionalSurvivors)
 		SLASHER.ChaseSpeed = 280 + (2 * additionalSurvivors)
 		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
@@ -280,27 +280,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetWalkSpeed(SLASHER.MaulingSpeed)
 		slasher:SetSlowWalkSpeed(SLASHER.MaulingSpeed)
 
-		slasher.SurvivorDragged:SetPos(slasher:GetForward() * 2)
-		for i = 1, 350 do
-			timer.Simple(0.1 + (i / 10), function()
-				if not IsValid(slasher) or not IsValid(slasher.SurvivorDragged) then return end
+		slasher.SurvivorDragged:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
 
-				slasher.SurvivorDragged:SetPos(slasher:GetForward() * 2)
-
-				slasher.SurvivorDragged:TakeDamage(3, slasher, slasher)
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "physics/flesh/flesh_bloody_break.wav",
-					identifier = "SurvivorDragged",
-					minDistance = 600,
-					maxDistance = 800,
-					entity = slasher.SurvivorDragged,
-					volume = 1,
-					fadeIn = 0,
-				})
-			end)
-		end
-
-		if slasher.SurvivorDragged.DragStruggle ~= nil and slasher.SurvivorDragged.DragStruggle > 25 then
+		if slasher.SurvivorDragged.DragStruggle ~= nil and slasher.SurvivorDragged.DragStruggle > 50 then
 			slasher.SurvivorDragged:RemoveSpeedEffect("princessmaul")
 			slasher.SurvivorDragged.DragStruggle = 0
 			slasher.SurvivorRoped:SetNWBool("SurvivorDragged", false)
@@ -308,28 +290,29 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			slasher:SetNWBool("PrincessDraggingSurvivor", false)
 
-			timer.Simple(3, function()
+			timer.Simple(5, function()
 				if not IsValid(slasher) then return end
-
 				slasher:SetNWBool("PrincessCanMaul", true)
 			end)
 		end
 
-		timer.Simple(15, function()
-			if not IsValid(slasher) or not IsValid(slasher.SurvivorDragged) then return end
+		timer.Simple(10, function()
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("CanChase", true)
 			slasher:SetNWBool("PrincessDraggingSurvivor", false)
 
-			slasher.SurvivorDragged:RemoveSpeedEffect("princessmaul")
-			slasher.SurvivorDragged.DragStruggle = 0
-			slasher.SurvivorRoped:SetNWBool("SurvivorDragged", false)
-			slasher.SurvivorDragged = nil
-
-			timer.Simple(3, function()
+			timer.Simple(5, function()
 				if not IsValid(slasher) then return end
 				slasher:SetNWBool("PrincessCanMaul", true)
 			end)
+
+			if not IsValid(slasher.SurvivorDragged) then return end
+
+			slasher.SurvivorDragged:RemoveSpeedEffect("princessmaul")
+			slasher.SurvivorDragged.DragStruggle = 0
+			slasher.SurvivorDragged:SetNWBool("SurvivorDragged", false)
+			slasher.SurvivorDragged = nil
 		end)
 	else
 		if not slasher:GetNWBool("InSlasherChaseMode") then
@@ -343,7 +326,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		slasher:SetNWBool("CanChase", true)
-		slasher:SetNWBool("PrincessCanMaul", true)
 		slasher.SurvivorDragged = nil
 	end
 
@@ -526,11 +508,19 @@ function SLASHER.Maul(slasher, target)
 	end)
 end
 
+function SLASHER.OnKillPlayer(slasher, target)
+	if target == slasher.SurvivorDragged then
+		slasher.SurvivorDragged = nil
+	end
+end
+
 function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("PrincessMaulingChild") then return end
 	if slasher:GetNWBool("PrincessSniffing") then return end
 	if slasher:GetNWBool("DemonPacified") then return end
 	if slasher:GetNWBool("PrincessMaulingBase") then return end
+	if slasher:GetNWBool("PrincessStunned") then return end
+	if slasher:GetNWBool("PrincessDraggingSurvivor") then return end
 	if not slasher:GetNWBool("PrincessCanMaul") then return end
 	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then return end
 
@@ -581,12 +571,20 @@ function SLASHER.OnPrimaryFire(slasher)
 
 		if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
 			if slasher.Aggression >= 50 and slasher.Aggression <= 99 then
-				if math.random(1, 100) > 49 then -- 50% chance to grab a surv
+				if math.random(1, 100) > 59 then -- 40% chance to grab a surv
 					SlashCo.StopChase(slasher)
 
 					slasher.SurvivorDragged = target
 					slasher.SurvivorDragged:SetNWBool("SurvivorDragged", true)
 					slasher.SurvivorDragged:AddSpeedEffect("princessmaul", 50, 2)
+
+					for i = 1, 100 do
+						timer.Simple(1 + (i / 10), function()
+							if not IsValid(slasher.SurvivorDragged) or not IsValid(slasher) then return end
+
+							slasher.SurvivorDragged:TakeDamage(0.3, slasher, slasher)
+						end)
+					end
 
 					slasher:SetNWBool("CanChase", false)
 					slasher:SetNWBool("PrincessCanMaul", false)
@@ -608,6 +606,9 @@ function SLASHER.OnPrimaryFire(slasher)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
+	if slasher:GetNWBool("PrincessStunned") then return end
+	if slasher:GetNWBool("PrincessDraggingSurvivor") then return end
+
 	SlashCo.StartChaseMode(slasher)
 end
 
@@ -616,6 +617,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("PrincessMaulingSurvivor") then return end
 	if slasher:GetNWBool("PrincessMaulingBase") then return end
 	if slasher:GetNWBool("PrincessSniffing") then return end
+	if slasher:GetNWBool("PrincessStunned") then return end
+	if slasher:GetNWBool("PrincessDraggingSurvivor") then return end
 	if slasher:GetNWBool("InSlasherChaseMode") then return end
 
 	slasher:SetNWBool("PrincessSniffing", true)
@@ -647,13 +650,16 @@ function SLASHER.OnHitByBeerKeg(slasher, ply)
 	SlashCo.StopChase(slasher)
 
 	slasher:SetNWBool("PrincessStunned", true)
+	slasher:Freeze(true)
 	timer.Simple(11, function()
 		if not IsValid(slasher) then return end
 
 		slasher:SetNWBool("PrincessStunned", false)
+		slasher:Freeze(false)
 	end)
 end
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByBeerKeg
+SLASHER.OnHitByPocketSand = SLASHER.OnHitByBeerKeg
 
 function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("PrincessMaulingChild") or ply:GetNWBool("PrincessMaulingSurvivor") or ply:GetNWBool("PrincessSniffing")

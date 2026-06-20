@@ -19,7 +19,7 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_NONE)
-	--self:SetCollisionGroup(COLLISION_GROUP_NONE)
+	self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
 
 	self:SetHealth(100)
 	self.NestAlert = false
@@ -42,10 +42,6 @@ function ENT:Think()
 		if survivor:GetPos():Distance(self:GetPos()) >= 500 then continue end
 
 		self.NestAlert = true
-
-		if SlashCo.GetSlasherAnger(slasher) >= 100 then
-			slasher.TargetPlayer = survivor
-		end
 	end
 
 	if self:Health() < 1 then

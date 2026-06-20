@@ -355,6 +355,17 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 
 		slasher:SetNWBool("Male07Stunned", true)
 		slasher:Freeze(true)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "vo/npc/male01/no02.wav",
+			identifier = "Male07Stun",
+			minDistance = 400,
+			maxDistance = 1200,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+
 		timer.Simple(9, function()
 			if not IsValid(slasher) then return end
 
@@ -366,13 +377,17 @@ end
 SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
+function SLASHER.Thirdperson(ply)
+	return ply:GetNWBool("Male07Stunned")
+end
+
 function SLASHER.Animator(ply)
 	local male_slashing = ply:GetNWBool("Male07Slashing")
 	local male_transforming = ply:GetNWBool("Male07Transforming")
 	local male_stunned = ply:GetNWBool("Male07Stunned")
 	local chase = ply:GetNWBool("InSlasherChaseMode")
 
-	if ply:GetModel() == maleModelName then
+	if ply:GetModel() == "models/humans/group01/male_07.mdl" then
 		if ply:IsOnGround() then
 			if not chase then
 				ply.CalcIdeal = ACT_WALK

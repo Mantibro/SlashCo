@@ -120,6 +120,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		if (slasher:GetVelocity():Length() < 450 or target:IsValid()) and LungeDuration > 30 and slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
+				if not IsValid(slasher) then return end
+
 				AbomignatScream(slasher)
 			end)
 
@@ -130,6 +132,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.LungeAntiSpam = 1
 
 			timer.Simple(4, function()
+				if not IsValid(slasher) then return end
+
 				if AntiSpam == 1 then
 					slasher.LungeAntiSpam = 2
 					slasher.LungeDuration = 0
@@ -148,7 +152,13 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if slasher:IsOnGround() or target:IsValid() then
 			slasher:SetNWBool("AbomignatLungeLarge", false)
-			slasher:SetNWBool("AbomignatCrawling", true)
+			slasher.ForwardCharge = 0
+
+			timer.Simple(0.3, function()
+				if not IsValid(slasher) then return end
+
+				slasher:SetNWBool("AbomignatCrawling", true)
+			end)
 		end
 	end
 
@@ -181,20 +191,30 @@ function SLASHER.OnTickBehaviour(slasher)
 			eyesight_final = 0
 			perception_final = 1.0
 
+			slasher.TimeCrouching = slasher.TimeCrouching + FrameTime()
+
 			slasher:SetViewOffset(crouching_viewoffset)
 			slasher:SetCurrentViewOffset(crouching_viewoffset)
 		else
 			eyesight_final = 6
 			perception_final = 0.5
 
+			slasher.TimeCrouching = 0
+
 			slasher:SetViewOffset(standing_viewoffset)
 			slasher:SetCurrentViewOffset(standing_viewoffset)
 		end
 
 		if not slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+			if slasher:GetNWBool("AbomignatCrouch") or slasher:GetNWBool("AbomignatLungeFinish") then
+				slasher:SetSlowWalkSpeed(1)
+				slasher:SetWalkSpeed(1)
+				slasher:SetRunSpeed(1)
+			else
+				slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
+				slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+				slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+			end
 		else
 			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
 			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
@@ -208,6 +228,10 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if SlashCooldown <= 0 and not slasher:GetNWBool("AbomignatCanMainSlash") then
 		slasher:SetNWBool("AbomignatCanMainSlash", true)
+	end
+
+	if slasher:GetNWInt("AbomignatLungeChange") ~= math.floor(TimeCrouching) then
+		slasher:SetNWInt("AbomignatLungeChange", math.floor(TimeCrouching))
 	end
 
 	slasher:SetEyeSight(eyesight_final)
@@ -269,6 +293,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("AbomignatCrawling") then return end
 	if slasher:GetNWBool("AbomignatCrouch") then return end
 	if slasher:GetNWBool("AbomignatSlashing") then return end
+	if slasher:GetNWBool("AbomignatStunned") then return end
 	if slasher.SlashCooldown > 0 then return end
 
 	slasher:SetNWBool("AbomignatSlashing", true)
@@ -336,6 +361,8 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
+	if slasher:GetNWBool("AbomignatStunned") then return end
+
 	if slasher:GetNWBool("AbomignatCrawling") then
 		slasher:SetNWBool("AbomignatCrawling", false)
 		slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
@@ -356,6 +383,7 @@ end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if slasher:GetNWBool("AbomignatCrawling") then return end
+	if slasher:GetNWBool("AbomignatStunned") then return end
 	if slasher.SlashCooldown > 0 then return end
 
 	if slasher:GetNWBool("AbomignatCrouch") then
@@ -377,7 +405,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			})
 
 			slasher:SlasherHudFunc("ShakeControl", "F")
-			slasher.TimeCrouching = 0
+			slasher:Freeze(true)
 
 			timer.Simple(1.75, function()
 				if not IsValid(slasher) then return end
@@ -400,6 +428,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 						slasher.LungeAntiSpam = 2
 						slasher.LungeDuration = 0
 						slasher:SetNWBool("AbomignatLungeFinish", false)
+						slasher:Freeze(false)
 
 						slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 						slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
@@ -428,7 +457,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			})
 
 			slasher:SlasherHudFunc("ShakeControl", "F")
-			slasher.TimeCrouching = 0
 
 			slasher:SetVelocity((slasher:EyeAngles():Forward() * 400) + Vector(0, 0, 300))
 
@@ -439,32 +467,10 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end
 
 	slasher.LungeAntiSpam = 0
-	slasher:SetSlowWalkSpeed(1)
-	slasher:SetWalkSpeed(1)
-	slasher:SetRunSpeed(1)
-
 	slasher:SetNWBool("AbomignatCrouch", true)
-	slasher.TimeCrouching = slasher.TimeCrouching + (CurTime() + 1)
-end
 
-function SLASHER.OnHitByPocketSand(slasher, ply)
 	SlashCo.StopChase(slasher)
-
-	slasher:SetNWBool("AbomignatStunned", true)
-	slasher:Freeze(true)
-
-	slasher:SetNWBool("AbomignatCrouch", false)
-	slasher:SetNWBool("AbomignatCrawling", false)
-
-	timer.Simple(9, function()
-		if not IsValid(slasher) then return end
-
-		slasher:SetNWBool("AbomignatStunned", false)
-		slasher:Freeze(false)
-	end)
 end
-SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
-SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Thirdperson(ply)
 	return ply:GetNWBool("AbomignatLungeShort") or ply:GetNWBool("AbomignatLungeFinish") or ply:GetNWBool("AbomignatStunned")
@@ -581,6 +587,8 @@ end
 
 function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
 	StopBreathing(slasher)
+	SlashCo.StopChase(slasher)
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/abomignat/abomignat_rage" .. math.random(1, 2) .. ".ogg",
 		identifier = "AbomignatBlinded",
@@ -591,11 +599,19 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
 		fadeIn = 0,
 	})
 
+	slasher:SetNWBool("AbomignatStunned", true)
+	slasher:Freeze(true)
+
+	slasher:SetNWBool("AbomignatCrouch", false)
+	slasher:SetNWBool("AbomignatCrawling", false)
+
 	SlashCo.AddSlasherAnger(slasher, 5 + (additionalRage or 0)) -- We did not like that
-	timer.Simple(3.5, function()
+	timer.Simple(8, function()
 		if not IsValid(slasher) then return end
 
 		PlayBreathing(slasher)
+		slasher:SetNWBool("AbomignatStunned", false)
+		slasher:Freeze(false)
 	end)
 end
 SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 5) end -- +5 additioal anger just because it deafened us.
@@ -622,6 +638,13 @@ function SLASHER.InitHud(_, hud)
 
 	function hud.AlsoThink()
 		local crawling = GameData.LocalPlayer:GetNWBool("AbomignatCrawling")
+		local timeCrouching = GameData.LocalPlayer:GetNWInt("AbomignatLungeChange")
+
+		if timeCrouching > 3 then
+			hud:SetControlText("F", "leap")
+		else
+			hud:SetControlText("F", "lunge")
+		end
 
 		if crawling then
 			hud:SetControlVisible("LMB", false)

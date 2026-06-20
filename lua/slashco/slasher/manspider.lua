@@ -141,8 +141,6 @@ local function GrabItem(slasher, target)
 
 	local angle = slasher:LocalToWorldAngles(Angle(100, 0, 0))
 	slasher.ItemStealed:SetAngles(angle)
-	slasher.ItemStealed:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
-	slasher.ItemStealed:SetMoveParent(slasher)
 end
 
 local function DropItem(slasher, target)
@@ -158,8 +156,6 @@ local function DropItem(slasher, target)
 		mask = MASK_PLAYERSOLID,
 	})
 	if trace.Hit then return end
-
-	target:SetMoveParent(NULL)
 
 	slasher.ItemStealCooldown = 3
 	slasher:SetNWBool("CanLeap", true)
@@ -221,6 +217,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		if not IsValid(Target) or Target:Team() ~= TEAM_SURVIVOR then
 			slasher.TargetPlayer = NULL
 		end
+	end
+
+	if IsValid(slasher.ItemStealed) then
+		slasher.ItemStealed:SetPos(slasher:LocalToWorld(Vector(40, 0, 20)))
 	end
 
 	if slasher:GetNWBool("ManspiderNested") then
@@ -313,7 +313,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			local d = survivor:GetPos():Distance(slasher:GetPos())
-			if d > 130 then
+			if d > 100 then
 				continue
 			end
 
@@ -346,15 +346,17 @@ function SLASHER.OnHitByTeslaCoil(slasher)
 end
 
 function SLASHER.OnKillPlayer(slasher, target)
+	timer.Remove("ManspiderBite_" .. target:UserID())
+
 	local anger = SlashCo.GetSlasherAnger(slasher)
 	slasher.TargetPlayer = NULL -- We killed our prey, so reset it or else he might persist in case he had multiple lives
 	SlashCo.AddSlasherAnger(slasher, -anger)
 end
 
 function SLASHER.HandleDOT(slasher, target)
-	target.ManspiderPoison = target.ManspiderPoison or 3
+	target.ManspiderPoison = target.ManspiderPoison or 1
 
-	local poison_damage = 3 * (SlashCo.GetSlasherAnger(slasher) / 10)
+	local poison_damage = 1 + (SlashCo.GetSlasherAnger(slasher) / 10)
 	timer.Create("ManspiderBite_" .. target:UserID(), 0.75, target.ManspiderPoison, function()
 		if not IsValid(target) or target:Team() == TEAM_SPECTATOR then return end
 
@@ -370,7 +372,7 @@ function SLASHER.HandleDOT(slasher, target)
 		})
 	end)
 
-	target.ManspiderPoison = target.ManspiderPoison + 3
+	target.ManspiderPoison = target.ManspiderPoison + 1
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
@@ -386,7 +388,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		timer.Simple(0.3, function()
 			if not IsValid(slasher) then return end
 
-			local damage = 5 * (SlashCo.GetSlasherAnger(slasher) / 5)
+			local damage = 5 + (SlashCo.GetSlasherAnger(slasher) / 5)
 			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
 					Vector(-35, -45, -60), Vector(35, 45, 60), damage, DMG_SLASH, 5, false)
 
@@ -459,6 +461,8 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 				DropItem(slasher, target)
 			end
 		end
+
+		return
 	else
 		if not slasher:GetNWBool("ManspiderNested") then
 			if slasher:GetNWBool("ManspiderNestActive") then
@@ -491,8 +495,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 				slasher:SetNWBool("ManspiderNestActive", true)
 			end)
-
-			return
 		end
 	end
 end
