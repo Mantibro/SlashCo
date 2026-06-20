@@ -506,6 +506,18 @@ hook.Add("PostGamemodeLoaded", "SlashCo:PostGamemodeLoaded", function()
 	end)
 end)
 
+function SlashCo.AddLateSurvivor(ply)
+	local steamID = ply:SteamID64()
+	for _, data in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
+		if data.steamid == steamID then
+			-- Already inside!
+			return
+		end
+	end
+
+	table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = steamID })
+end
+
 hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 	ply:SetTeam(TEAM_SPECTATOR)
 	ply:Spawn()
@@ -526,18 +538,25 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 		SlashCo.BroadcastCurrentRoundData(false)
 
 		if not IsValid(ply) then return end
-		if GameData.IsLobby or not SlashCo.RoundStarted or SlashCo.GetRoundTime() > SlashCo.MaximumLateJoinTime then return end
+		if GameData.IsLobby or not SlashCo.RoundStarted or not SlashCo.AllowLateJoin or SlashCo.GetRoundTime() > SlashCo.MaximumLateJoinTime then return end
 		local steamID = ply:SteamID64()
+		local isExpected = false
 		for _, data in ipairs(SlashCo.CurRound.ExpectedPlayers) do
 			if data.steamid ~= steamID then continue end
-					
-			ply:SetTeam(TEAM_SURVIVOR)
-			ply:Spawn()
 
-			if not GameData.SurvivorData then break end
+			isExpected = true
+			break
+		end
+		
+		ply:SetTeam(TEAM_SURVIVOR)
+		ply:Spawn()
+		SlashCo.AddLateSurvivor(ply)
+
+		if isExpected then
+			if not GameData.SurvivorData then return end
 					
 			local itemEntry = GameData.SurvivorData[steamID]
-			if not itemEntry then break end
+			if not itemEntry then return end
 
 			SlashCo.DropAllItems(ply)
 			SlashCo.ChangeSurvivorItem(ply, "item", itemEntry.Item, true)

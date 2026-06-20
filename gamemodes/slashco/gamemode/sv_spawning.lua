@@ -476,6 +476,7 @@ function SlashCo.SetupPlayers()
 		if survivors[steamid] or SlashCo.AllowLateJoin then
 			ply:SetTeam(TEAM_SURVIVOR)
 			ply:Spawn()
+			SlashCo.AddLateSurvivor(ply)
 			print(ply:Name() .. " now Survivor")
 			continue
 		end
