@@ -631,7 +631,6 @@ function SLASHER.InitHud(_, hud)
 	hud:AddControl("LMB", "slash charge", controlTable)
 	hud:ChaseAndKill(nil, true)
 	hud:AddControl("F", "lunge", controlTable)
-	hud:TieControlText("F", "AbomignatCrouch", "lunge", "crouch", true)
 
 	hud:TieControl("LMB", "AbomignatCanMainSlash")
 	hud:TieControl("F", "AbomignatCanMainSlash")
@@ -643,7 +642,7 @@ function SLASHER.InitHud(_, hud)
 		if timeCrouching > 3 then
 			hud:SetControlText("F", "leap")
 		else
-			hud:SetControlText("F", "lunge")
+			hud:TieControlText("F", "AbomignatCrouch", "lunge", "crouch", true)
 		end
 
 		if crawling then
