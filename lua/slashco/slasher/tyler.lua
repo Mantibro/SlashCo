@@ -535,7 +535,7 @@ local function DestroyItem(slasher, target)
 	dissolver:Fire("Kill", "", 1)
 end
 
-local function StopTyperChase(slasher, switchForm)
+local function StopTylerChase(slasher, switchForm)
 	if IsValid(slasher) then
 		slasher:Freeze(false)
 		if not EndlessChase() and switchForm then
@@ -554,6 +554,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	local class = target:GetClass()
 	if (not target:IsPlayer() and target.PingType ~= "ITEM") or class == "sc_beacon" or class == "sc_battery" then return end
 	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then return end
+	if target:IsPlayer() and target:Team() == TEAM_SLASHER then return end
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SLASHER.KillSound,
@@ -574,7 +575,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					droppedItem.DONTPICKUP = true
 					DestroyItem(slasher, droppedItem)
 				end
-				StopTyperChase(slasher, true)
+				StopTylerChase(slasher, true)
 			end, "Unbreakable")
 			return
 		end
@@ -585,7 +586,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					droppedItem.DONTPICKUP = true
 					DestroyItem(slasher, droppedItem)
 				end
-				StopTyperChase(slasher, false)
+				StopTylerChase(slasher, false)
 			end, "Unbreakable")
 			return
 		end
@@ -599,7 +600,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	end
 
 	timer.Simple(SLASHER.JumpscareDuration, function()
-		StopTyperChase(slasher, IsValid(target) and target:GetClass() == "sc_gascan") -- Only stop instantly, if he destoryed a fuelcan
+		StopTylerChase(slasher, IsValid(target) and target:GetClass() == "sc_gascan") -- Only stop instantly, if he destoryed a fuelcan
 
 		if IsValid(target) then
 			target:SetNWBool("SurvivorBeingJumpscared", false)
