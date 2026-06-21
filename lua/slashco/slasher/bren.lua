@@ -150,6 +150,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	local dist = SLASHER.KillDistance
 	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
 
+	slasher.MainCooldown = 5
+
 	timer.Simple(0.1, function()
 		if not IsValid(slasher) or not IsValid(target) then return end
 
@@ -169,7 +171,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			fadeIn = 0,
 		})
 
-		slasher.MainCooldown = 5
 		slasher:SetNWBool("CanChase", false)
 		slasher:SetNWBool("BrenKill", true)
 

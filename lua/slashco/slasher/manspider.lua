@@ -10,7 +10,7 @@ SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/manspider/manspider.mdl"
 SLASHER.GasCanMod = 0
-SLASHER.KillDelay = 5
+SLASHER.KillDelay = 3
 SLASHER.ProwlSpeed = 250
 SLASHER.ChaseSpeed = 315
 SLASHER.Perception = 1.0
@@ -88,7 +88,14 @@ local grabBlacklist = {
 	["sc_activebeacon"] = true,
 	["sc_activecrazyburger"] = true,
 	["sc_activeteslacoil"] = true,
-	["sc_porchlight"] = true
+	["sc_porchlight"] = true,
+	["sc_generator"] = true,
+	["sc_helicopter"] = true,
+	["sc_zanysmiley"] = true,
+	["sc_pensivesmiley"] = true,
+	["sc_maleclone"] = true,
+	["sc_babaclone"] = true,
+	["sc_ore"] = true,
 }
 
 local function GrabItem(slasher, target)
@@ -96,7 +103,7 @@ local function GrabItem(slasher, target)
 	if not slasher:GetNWBool("ManspiderNestActive") then return end
 
 	local corpse = target:IsPlayer() and target.DeadBody or target
-	if (not target == corpse and target.PingType ~= "ITEM") then return end
+	if (not target == corpse) or target.PingType ~= "ITEM" then return end
 
 	local class = target:GetClass()
 	if grabBlacklist[class] then return end

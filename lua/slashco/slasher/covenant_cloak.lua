@@ -55,7 +55,7 @@ function SLASHER.TackleFail(slasher)
 end
 
 local SURVIVOR_STUN_TIME = 5.0
-local SLASHER_STUN_TIME = 6.0
+local SLASHER_STUN_TIME = 7.0
 
 function SLASHER.OnTickBehaviour(slasher, target)
 	if IsValid(slasher.TackledPlayer) then
@@ -69,7 +69,7 @@ function SLASHER.OnTickBehaviour(slasher, target)
 
 		slasher:SetPos(slasher.TackledPlayer:GetPos() + Vector(10, 0, 0))
 
-		if slasher.TackledPlayer.TackleStruggle ~= nil and slasher.TackledPlayer.TackleStruggle > 100 then
+		if slasher.TackledPlayer.TackleStruggle ~= nil and slasher.TackledPlayer.TackleStruggle > 50 then
 			slasher.TackledPlayer.TackleStruggle = 0
 			slasher.TackledPlayer:Freeze(false)
 			slasher.TackledPlayer:SetNWBool("SurvivorTackled", false)
@@ -99,22 +99,25 @@ function SLASHER.OnTickBehaviour(slasher, target)
 					ply:SetNWBool("SurvivorTackled", true)
 					ply:SetNWBool("MarkedByCloaks", true)
 					ply.SlashCo_PushDir = (ply:GetPos() - slasher:GetPos()):GetNormalized()
+					ply:SetImpervious(true)
 					timer.Simple(SURVIVOR_STUN_TIME, function()
 						if not IsValid(ply) then return end
-						
+
 						ply:SetNWBool("SurvivorTackled", false)
 						ply:Freeze(false)
+						ply:SetImpervious(false)
 						if IsValid(slasher) and slasher.TackledPlayer == ply then
 							slasher.TackledPlayer = nil
+							slasher.TackledPlayer.TackleStruggle = 0
 						end
-						
+
 						if ply.SlashCo_PushDir then
 							local pushStrength = 400
 							ply:SetVelocity(ply.SlashCo_PushDir * pushStrength + Vector(0,0,120))
 							ply.SlashCo_PushDir = nil
 						end
 					end)
-					
+
 					timer.Simple(10.0, function()
 						if not IsValid(ply) then return end
 						

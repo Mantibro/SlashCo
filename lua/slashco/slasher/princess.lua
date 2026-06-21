@@ -80,6 +80,7 @@ function SLASHER.OnSpawn(slasher)
 
 	slasher.AggressionThreshold = 50
 	slasher.Aggression = 0
+	slasher:SetNWBool("PrincessCanMaul", true)
 
 	SLASHER.DoSound(slasher)
 end
@@ -511,6 +512,7 @@ end
 function SLASHER.OnKillPlayer(slasher, target)
 	if target == slasher.SurvivorDragged then
 		slasher.SurvivorDragged = nil
+		slasher:SetNWBool("PrincessCanMaul", true)
 	end
 end
 
