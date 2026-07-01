@@ -281,6 +281,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetWalkSpeed(SLASHER.MaulingSpeed)
 		slasher:SetSlowWalkSpeed(SLASHER.MaulingSpeed)
 
+		slasher:SetCollisionBounds(Vector(-70, 0 , 0), Vector(70, 0 , 0))
+
 		slasher.SurvivorDragged:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
 
 		if slasher.SurvivorDragged.DragStruggle ~= nil and slasher.SurvivorDragged.DragStruggle > 50 then
@@ -546,6 +548,11 @@ function SLASHER.OnPrimaryFire(slasher)
 	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()
 		if not IsValid(slasher) then return end
 
+		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
+		--		Vector(-40, -40, -60), Vector(40, 40, 60),
+		--		damage, DMG_SLASH, 5, false)
+
+		slasher:LagCompensation(true)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
 			endpos = slasher:LocalToWorld(Vector(45, 0, 30)),
@@ -554,11 +561,10 @@ function SLASHER.OnPrimaryFire(slasher)
 			filter = slasher,
 			ignoreworld = true,
 		})
+		slasher:LagCompensation(false)
+
 		local target = tr.Entity
 		local damage = math.random(20, 35) + math.random(0, math.floor(slasher.Aggression / 4))
-		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-		--		Vector(-40, -40, -60), Vector(40, 40, 60),
-		--		damage, DMG_SLASH, 5, false)
 
 		if target:IsValid() and (not target:IsPlayer() or (target:Team() == TEAM_SURVIVOR and not IsPlayerHoldingBaby(target, false))) then
 			local dmg = DamageInfo()

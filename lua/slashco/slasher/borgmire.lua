@@ -254,8 +254,33 @@ function SLASHER.OnPrimaryFire(slasher)
 
 			slasher.PunchSlowdown = 2
 
-			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
-					Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.PunchDamage, DMG_SLASH, 5, false)
+			--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
+			--		Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.PunchDamage, DMG_SLASH, 5, false)
+
+			slasher:LagCompensation(true)
+			local tr = util.TraceHull({
+				start = slasher:EyePos(),
+				endpos = slasher:LocalToWorld(Vector(50, 0, 50)),
+				maxs = Vector(35, 45, 60),
+				mins = Vector(-35, -45, -60),
+				filter = slasher,
+				ignoreworld = true,
+			})
+			slasher:LagCompensation(false)
+
+			local target = tr.Entity
+			local damage = SLASHER.PunchDamage
+
+			if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+				local dmg = DamageInfo()
+				dmg:SetDamageType(DMG_SLASH)
+				dmg:SetAttacker(slasher)
+				dmg:SetInflictor(slasher)
+				dmg:SetDamage(damage)
+				dmg:SetDamageForce(Vector(1, 1, 1))
+				dmg:SetDamagePosition(tr.HitPos)
+				target:TakeDamageInfo(dmg)
+			end
 
 			if not target:IsValid() then return end
 
@@ -329,8 +354,33 @@ function SLASHER.OnMainAbilityFire(slasher)
 				fadeIn = 0,
 			})
 
-			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
-				Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.KickDamage, DMG_SLASH, 5, false)
+			--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
+			--	Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.KickDamage, DMG_SLASH, 5, false)
+
+			slasher:LagCompensation(true)
+			local tr = util.TraceHull({
+				start = slasher:EyePos(),
+				endpos = slasher:LocalToWorld(Vector(50, 0, 50)),
+				maxs = Vector(35, 45, 60),
+				mins = Vector(-35, -45, -60),
+				filter = slasher,
+				ignoreworld = true,
+			})
+			slasher:LagCompensation(false)
+
+			local target = tr.Entity
+			local damage = SLASHER.KickDamage
+
+			if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+				local dmg = DamageInfo()
+				dmg:SetDamageType(DMG_SLASH)
+				dmg:SetAttacker(slasher)
+				dmg:SetInflictor(slasher)
+				dmg:SetDamage(damage)
+				dmg:SetDamageForce(Vector(1, 1, 1))
+				dmg:SetDamagePosition(tr.HitPos)
+				target:TakeDamageInfo(dmg)
+			end
 
 			if not target:IsValid() then return end
 

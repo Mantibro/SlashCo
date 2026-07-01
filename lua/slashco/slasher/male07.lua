@@ -226,8 +226,33 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			})
 
 			if SERVER then
-				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
-						Vector(-30, -40, -60), Vector(30, 40, 60), SLASHER.PrimaryDamage, DMG_SLASH, 2, false)
+				--local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
+				--		Vector(-30, -40, -60), Vector(30, 40, 60), SLASHER.PrimaryDamage, DMG_SLASH, 2, false)
+
+				slasher:LagCompensation(true)
+				local tr = util.TraceHull({
+					start = slasher:EyePos(),
+					endpos = slasher:LocalToWorld(Vector(45, 0, 60)),
+					maxs = Vector(30, 40, 60),
+					mins = Vector(-30, -40, -60),
+					filter = slasher,
+					ignoreworld = true,
+				})
+				slasher:LagCompensation(false)
+
+				local target = tr.Entity
+				local damage = SLASHER.PrimaryDamage
+
+				if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+					local dmg = DamageInfo()
+					dmg:SetDamageType(DMG_SLASH)
+					dmg:SetAttacker(slasher)
+					dmg:SetInflictor(slasher)
+					dmg:SetDamage(damage)
+					dmg:SetDamageForce(Vector(1, 1, 1))
+					dmg:SetDamagePosition(tr.HitPos)
+					target:TakeDamageInfo(dmg)
+				end
 
 				if not target1:IsValid() then return end
 

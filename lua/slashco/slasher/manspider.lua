@@ -392,27 +392,51 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 		slasher.KillDelayTick = SLASHER.KillDelay
 
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/manspider/manspider_bite.mp3",
+			identifier = "ManspiderBite",
+			minDistance = 600,
+			maxDistance = 800,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+
 		timer.Simple(0.3, function()
 			if not IsValid(slasher) then return end
 
+			--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
+			--		Vector(-35, -45, -60), Vector(35, 45, 60), damage, DMG_SLASH, 5, false)
+
+			slasher:LagCompensation(true)
+			local tr = util.TraceHull({
+				start = slasher:EyePos(),
+				endpos = slasher:LocalToWorld(Vector(50, 0, 50)),
+				maxs = Vector(35, 45, 60),
+				mins = Vector(-35, -45, -60),
+				filter = slasher,
+				ignoreworld = true,
+			})
+			slasher:LagCompensation(false)
+
+			local target = tr.Entity
 			local damage = 5 + (SlashCo.GetSlasherAnger(slasher) / 5)
-			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
-					Vector(-35, -45, -60), Vector(35, 45, 60), damage, DMG_SLASH, 5, false)
+
+			if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+				local dmg = DamageInfo()
+				dmg:SetDamageType(DMG_SLASH)
+				dmg:SetAttacker(slasher)
+				dmg:SetInflictor(slasher)
+				dmg:SetDamage(damage)
+				dmg:SetDamageForce(Vector(1, 1, 1))
+				dmg:SetDamagePosition(tr.HitPos)
+				target:TakeDamageInfo(dmg)
+			end
 
 			if not target:IsValid() then return end
 
 			SlashCo.BustDoor(slasher, target, 60000)
 			if target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/manspider/manspider_bite.mp3",
-					identifier = "ManspiderBite",
-					minDistance = 600,
-					maxDistance = 800,
-					entity = slasher,
-					volume = 1,
-					fadeIn = 0,
-				})
-
 				SLASHER.HandleDOT(slasher, target)
 
 				local o = Vector(0, 0, 50)

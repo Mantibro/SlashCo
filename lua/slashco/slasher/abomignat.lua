@@ -110,8 +110,33 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNWBool("AbomignatLungeShort") then
-		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 30)),
-				Vector(-15, -15, -60), Vector(15, 15, 60), 60, DMG_SLASH, 5, false)
+		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 30)),
+		--		Vector(-15, -15, -60), Vector(15, 15, 60), 60, DMG_SLASH, 5, false)
+
+		slasher:LagCompensation(true)
+		local tr = util.TraceHull({
+			start = slasher:EyePos(),
+			endpos = slasher:LocalToWorld(Vector(55, 0, 30)),
+			maxs = Vector(15, 15, 60),
+			mins = Vector(-15, -15, -60),
+			filter = slasher,
+			ignoreworld = true,
+		})
+		slasher:LagCompensation(false)
+
+		local target = tr.Entity
+		local damage = 60
+
+		if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+			local dmg = DamageInfo()
+			dmg:SetDamageType(DMG_SLASH)
+			dmg:SetAttacker(slasher)
+			dmg:SetInflictor(slasher)
+			dmg:SetDamage(damage)
+			dmg:SetDamageForce(Vector(1, 1, 1))
+			dmg:SetDamagePosition(tr.HitPos)
+			target:TakeDamageInfo(dmg)
+		end
 
 		SlashCo.BustDoor(slasher, target, 25000)
 
@@ -145,8 +170,33 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNWBool("AbomignatLungeLarge") then
-		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 30)),
-				Vector(-15, -15, -60), Vector(15, 15, 60), 100, DMG_SLASH, 5, false)
+		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 30)),
+		--		Vector(-15, -15, -60), Vector(15, 15, 60), 100, DMG_SLASH, 5, false)
+
+		slasher:LagCompensation(true)
+		local tr = util.TraceHull({
+			start = slasher:EyePos(),
+			endpos = slasher:LocalToWorld(Vector(55, 0, 30)),
+			maxs = Vector(15, 15, 60),
+			mins = Vector(-15, -15, -60),
+			filter = slasher,
+			ignoreworld = true,
+		})
+		slasher:LagCompensation(false)
+
+		local target = tr.Entity
+		local damage = 100
+
+		if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+			local dmg = DamageInfo()
+			dmg:SetDamageType(DMG_SLASH)
+			dmg:SetAttacker(slasher)
+			dmg:SetInflictor(slasher)
+			dmg:SetDamage(damage)
+			dmg:SetDamageForce(Vector(1, 1, 1))
+			dmg:SetDamagePosition(tr.HitPos)
+			target:TakeDamageInfo(dmg)
+		end
 
 		SlashCo.BustDoor(slasher, target, 25000)
 
@@ -317,10 +367,33 @@ function SLASHER.OnPrimaryFire(slasher)
 		slasher:Freeze(true)
 		slasher.ForwardCharge = 0
 
+		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 0)),
+		--		Vector(-40, -40, -60), Vector(40, 40, 60), damage, DMG_SLASH, 5, false)
+
+		slasher:LagCompensation(true)
+		local tr = util.TraceHull({
+			start = slasher:EyePos(),
+			endpos = slasher:LocalToWorld(Vector(55, 0, 0)),
+			maxs = Vector(40, 40, 60),
+			mins = Vector(-40, -40, -60),
+			filter = slasher,
+			ignoreworld = true,
+		})
+		slasher:LagCompensation(false)
+
+		local target = tr.Entity
 		local damage = 50 + slasher.AbomignatKills * 10
 
-		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 0)),
-				Vector(-40, -40, -60), Vector(40, 40, 60), damage, DMG_SLASH, 5, false)
+		if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+			local dmg = DamageInfo()
+			dmg:SetDamageType(DMG_SLASH)
+			dmg:SetAttacker(slasher)
+			dmg:SetInflictor(slasher)
+			dmg:SetDamage(damage)
+			dmg:SetDamageForce(Vector(1, 1, 1))
+			dmg:SetDamagePosition(tr.HitPos)
+			target:TakeDamageInfo(dmg)
+		end
 
 		SlashCo.BustDoor(slasher, target, 20000)
 

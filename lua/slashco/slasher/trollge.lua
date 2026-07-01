@@ -241,8 +241,34 @@ function SLASHER.OnTickBehaviour(slasher)
 		local target = nil
 
 		if not slasher:GetNWBool("TrollgeDashFinish") then
-			target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-					Vector(-15, -15, -60), Vector(15, 15, 60), 50, DMG_SLASH, 5, false)
+			--target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
+			--		Vector(-15, -15, -60), Vector(15, 15, 60), 50, DMG_SLASH, 5, false)
+
+			slasher:LagCompensation(true)
+			local tr = util.TraceHull({
+				start = slasher:EyePos(),
+				endpos = slasher:LocalToWorld(Vector(45, 0, 30)),
+				maxs = Vector(15, 15, 60),
+				mins = Vector(-15, -15, -60),
+				filter = slasher,
+				ignoreworld = true,
+			})
+			slasher:LagCompensation(false)
+
+			local target = tr.Entity
+			local damage = 50
+
+			if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+				local dmg = DamageInfo()
+				dmg:SetDamageType(DMG_SLASH)
+				dmg:SetAttacker(slasher)
+				dmg:SetInflictor(slasher)
+				dmg:SetDamage(damage)
+				dmg:SetDamageForce(Vector(1, 1, 1))
+				dmg:SetDamagePosition(tr.HitPos)
+				target:TakeDamageInfo(dmg)
+			end
+
 			SlashCo.BustDoor(slasher, target, 25000)
 			slasher:SetVelocity(slasher:GetForward() * 100)
 
@@ -458,8 +484,33 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			})
 
 			if SERVER then
-				local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
-						Vector(-30, -30, -60), Vector(30, 30, 60), 10, DMG_SLASH, 5, false)
+				--local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
+				--		Vector(-30, -30, -60), Vector(30, 30, 60), 10, DMG_SLASH, 5, false)
+
+				slasher:LagCompensation(true)
+				local tr = util.TraceHull({
+					start = slasher:EyePos(),
+					endpos = slasher:LocalToWorld(Vector(45, 0, 0)),
+					maxs = Vector(30, 30, 60),
+					mins = Vector(-30, -30, -60),
+					filter = slasher,
+					ignoreworld = true,
+				})
+				slasher:LagCompensation(false)
+
+				local target = tr.Entity
+				local damage = 10
+
+				if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+					local dmg = DamageInfo()
+					dmg:SetDamageType(DMG_SLASH)
+					dmg:SetAttacker(slasher)
+					dmg:SetInflictor(slasher)
+					dmg:SetDamage(damage)
+					dmg:SetDamageForce(Vector(1, 1, 1))
+					dmg:SetDamagePosition(tr.HitPos)
+					target:TakeDamageInfo(dmg)
+				end
 
 				if target1:IsPlayer() then
 					if target1:Team() ~= TEAM_SURVIVOR then return end
