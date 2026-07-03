@@ -77,6 +77,11 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
+	if target:GetClass() == "sc_gascan" and (slasher:GetPos():Distance(target:GetPos()) <= SLASHER.KillDistance) then
+		target:RandomTeleport(Vector(0, 0, 50))
+		return
+	end
+
 	if SlashCo.Jumpscare(slasher, target) then
 		slasher.Speedrun = math.min(slasher.Speedrun + 30, slasher.Speedrunned)
 	end
@@ -376,7 +381,8 @@ function SLASHER.InitHud(_, hud)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_ore"), "red")
+	SlashCo.DrawHalo(ents.FindByClass("sc_ore"), "green")
+	SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "red")
 end
 
 if CLIENT then

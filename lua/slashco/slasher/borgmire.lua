@@ -217,8 +217,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	local anger = SlashCo.GetSlasherAnger(slasher)
-	slasher:SetNWBool("CanThrow", anger > 50)
-
 	if slasher:GetNWInt("BorgmireAnger") ~= math.floor(anger) then
 		slasher:SetNWInt("BorgmireAnger", math.floor(anger))
 	end
@@ -340,7 +338,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetNWBool("BorgmireKick", false)
 		slasher.BorgKicking = true
 		timer.Remove("BorgmireKickDecay")
-		slasher.KickCooldown = 15
+		slasher.KickCooldown = 15 - (SlashCo.GetSlasherAnger(slasher) / 10)
 
 		timer.Simple(2.0, function()
 			local idx = math.random(1, 2)
@@ -429,7 +427,6 @@ end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if slasher:GetNWBool("BorgmireStunned") then return end
-	if not slasher:GetNWBool("CanThrow") then return end
 	if slasher.BorgPunching then return end
 	if slasher.BorgKicking then return end
 	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then return end
@@ -470,8 +467,8 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 			if target:Health() > 1 then
 				target:SetHealth(target:Health() * 0.75)
 			end
-			
-			slasher.ThrowCooldown = 3
+
+			slasher.ThrowCooldown = 40 - (SlashCo.GetSlasherAnger(slasher) / 5)
 			SlashCo.AddSlasherAnger(slasher, -30)
 		end)
 
@@ -601,17 +598,6 @@ function SLASHER.InitHud(_, hud)
 	
 	hud:AddMeter("anger", 100, "", nil, true)
 	hud:TieMeterInt("anger", "BorgmireAnger")
-
-	function hud.AlsoThink()
-		local canThrow = GameData.LocalPlayer:GetNWBool("CanThrow")
-		if not canThrow then
-			hud:SetControlEnabled("F", false)
-			hud:SetControlVisible("F", false)
-		else
-			hud:SetControlEnabled("F", true)
-			hud:SetControlVisible("F", true)
-		end
-	end
 end
 
 SlashCo.RegisterSlasher(SLASHER, "Borgmire")
