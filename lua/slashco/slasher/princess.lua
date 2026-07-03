@@ -231,7 +231,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.Aggression = Aggression + FrameTime()
 		end
 
-		local speed = SLASHER.ChaseSpeed + (Aggression / 8)
+		local speed = SLASHER.ChaseSpeed + (Aggression / 5)
 
 		slasher:SetRunSpeed(speed)
 		slasher:SetWalkSpeed(speed)
