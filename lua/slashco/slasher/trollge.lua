@@ -512,10 +512,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					target:TakeDamageInfo(dmg)
 				end
 
-				if target1:IsPlayer() then
-					if target1:Team() ~= TEAM_SURVIVOR then return end
+				if target:IsPlayer() then
+					if target:Team() ~= TEAM_SURVIVOR then return end
 
-					local vPoint = target1:GetPos() + Vector(0, 0, 50)
+					local vPoint = target:GetPos() + Vector(0, 0, 50)
 					local bloodfx = EffectData()
 					bloodfx:SetOrigin(vPoint)
 					util.Effect("BloodImpact", bloodfx)
@@ -525,7 +525,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 						identifier = "TrollgeHit1",
 						minDistance = 600,
 						maxDistance = 800,
-						entity = target1,
+						entity = target,
 						volume = 1,
 						fadeIn = 0,
 					})

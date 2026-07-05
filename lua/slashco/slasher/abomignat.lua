@@ -374,8 +374,8 @@ function SLASHER.OnPrimaryFire(slasher)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
 			endpos = slasher:LocalToWorld(Vector(55, 0, 0)),
-			maxs = Vector(40, 40, 60),
-			mins = Vector(-40, -40, -60),
+			maxs = Vector(50, 50, 60),
+			mins = Vector(-50, -50, -60),
 			filter = slasher,
 			ignoreworld = true,
 		})
@@ -397,7 +397,7 @@ function SLASHER.OnPrimaryFire(slasher)
 
 		SlashCo.BustDoor(slasher, target, 20000)
 
-		timer.Simple(1.3, function()
+		timer.Simple(0.7, function()
 			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("AbomignatSlashing", false)

@@ -237,6 +237,10 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 		SlashCo.DrawHalo(ents.FindByClass("sc_maleclone"))
 		ply:SlasherFunction("PreDrawHalos")
 
+		if SlashCo.IsSlowEscape() then
+			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
+		end
+
 		g_SlashCoDrawingHalos = false
 		return
 	end

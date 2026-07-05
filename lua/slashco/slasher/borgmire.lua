@@ -259,8 +259,8 @@ function SLASHER.OnPrimaryFire(slasher)
 			local tr = util.TraceHull({
 				start = slasher:EyePos(),
 				endpos = slasher:LocalToWorld(Vector(50, 0, 50)),
-				maxs = Vector(35, 45, 60),
-				mins = Vector(-35, -45, -60),
+				maxs = Vector(45, 45, 60),
+				mins = Vector(-45, -45, -60),
 				filter = slasher,
 				ignoreworld = true,
 			})
@@ -359,8 +359,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 			local tr = util.TraceHull({
 				start = slasher:EyePos(),
 				endpos = slasher:LocalToWorld(Vector(50, 0, 50)),
-				maxs = Vector(35, 45, 60),
-				mins = Vector(-35, -45, -60),
+				maxs = Vector(45, 45, 60),
+				mins = Vector(-45, -45, -60),
 				filter = slasher,
 				ignoreworld = true,
 			})
