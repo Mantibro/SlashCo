@@ -229,7 +229,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if stage == 1 then
-		final_eyesight = 10 - (slasher:GetVelocity():Length() / 35)
+		final_eyesight = 10
 		final_perception = 5 - (slasher:GetVelocity():Length() / 60)
 	end
 

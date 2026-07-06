@@ -156,7 +156,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.ForwardCharge = 0
 			slasher.LungeAntiSpam = 1
 
-			timer.Simple(4, function()
+			timer.Simple(2, function()
 				if not IsValid(slasher) then return end
 
 				if AntiSpam == 1 then
@@ -200,11 +200,11 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		SlashCo.BustDoor(slasher, target, 25000)
 
-		if slasher:IsOnGround() or target:IsValid() then
+		if slasher:IsOnGround() or (target:IsValid() and target:IsPlayer()) then
 			slasher:SetNWBool("AbomignatLungeLarge", false)
 			slasher.ForwardCharge = 0
 
-			timer.Simple(0.3, function()
+			timer.Simple(0.1, function()
 				if not IsValid(slasher) then return end
 
 				slasher:SetNWBool("AbomignatCrawling", true)
@@ -374,8 +374,8 @@ function SLASHER.OnPrimaryFire(slasher)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
 			endpos = slasher:LocalToWorld(Vector(55, 0, 0)),
-			maxs = Vector(50, 50, 60),
-			mins = Vector(-50, -50, -60),
+			maxs = Vector(60, 60, 60),
+			mins = Vector(-60, -60, -60),
 			filter = slasher,
 			ignoreworld = true,
 		})

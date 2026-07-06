@@ -30,7 +30,7 @@ SLASHER.DiffRating = "★★★★☆"
 SLASHER.CannotBeSpectated = true
 SLASHER.AlertDistance = 400 -- Make dolphinman able to detect survivors in a range and start chase by itself if wanted.
 -- Balancement Vars
-SLASHER.HuntPowerKill = 20 -- Used to give huntpower per kill based on survivor amount
+SLASHER.HuntPowerKill = 15 -- Used to give huntpower per kill based on survivor amount
 SLASHER.HuntPowerDiv = 1 -- Used to divide FrameTime, raising it will make his hunt last longer.
 SLASHER.HuntPowerGainDiv = 2 -- Used to divide FrameTime, raising it will make him gain hunt power SLOWER
 
@@ -38,7 +38,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
 	-- math.max so it cannot go below 0.5.
-	SLASHER.HuntPowerKill = math.max(20 + SO + (2 * additionalSurvivors), 10)
+	SLASHER.HuntPowerKill = math.max(15 + SO + (2 * additionalSurvivors), 5)
 	SLASHER.HuntPowerDiv = math.max(1 + SO + (0.1 * additionalSurvivors), 0.5)
 	SLASHER.HuntPowerGainDiv = math.max(2 - (0.5 * SO) - (0.02 * additionalSurvivors), 0.5)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
