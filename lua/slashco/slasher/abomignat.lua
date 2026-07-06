@@ -462,6 +462,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	if slasher:GetNWBool("AbomignatCrouch") then
 		slasher.SlashCooldown = 10 - SLASHER.CooldownReduction
 		slasher.ForwardCharge = 8 + SLASHER.CooldownReduction
+		PlayBreathing(slasher)
 
 		if slasher.TimeCrouching < 4 then
 			slasher:SetNWBool("AbomignatCrouch", false)
@@ -496,7 +497,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 					slasher.LungeAntiSpam = 1
 				end
 
-				timer.Simple(4, function()
+				timer.Simple(2, function()
 					if slasher.LungeAntiSpam == 1 then
 						slasher.LungeAntiSpam = 2
 						slasher.LungeDuration = 0
@@ -541,6 +542,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 	slasher.LungeAntiSpam = 0
 	slasher:SetNWBool("AbomignatCrouch", true)
+	StopBreathing(slasher)
 
 	SlashCo.StopChase(slasher)
 end
