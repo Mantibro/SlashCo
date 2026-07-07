@@ -523,7 +523,13 @@ local DoorSlamWhitelist = {
 }
 
 function SlashCo.CheckDoorWL(ent)
-	return DoorSlamWhitelist[ent:GetModel()]
+	if ent:GetClass() == "func_door_rotating" then
+		return
+	end
+
+	if ent:GetClass() == "prop_door_rotating" then
+		return DoorSlamWhitelist[ent:GetModel()]
+	end
 end
 
 function SlashCo.Dampen(speed, from, to)

@@ -210,11 +210,15 @@ local function slamIndicator()
 	end
 
 	local lookent = GameData.LocalPlayer:GetEyeTrace().Entity
-	if not IsValid(lookent) or lookent:GetClass() ~= "prop_door_rotating" or not SlashCo.CheckDoorWL(lookent) then
+	if not IsValid(lookent) or lookent:GetClass() ~= "prop_door_rotating" and lookent:GetClass() ~= "func_door_rotating" then
 		return
 	end
 
-	if lookent:GetPos():Distance(GameData.LocalPlayer:GetPos()) >= 150 or SlashCo.IsDoorOpen(lookent) then
+	if lookent:GetPos():Distance(GameData.LocalPlayer:GetPos()) >= 150 or SlashCo.IsDoorOpen(lookent) and lookent:GetClass() ~= "func_door_rotating" then
+		return
+	end
+
+	if lookent:GetInternalVariable("m_bLocked") then
 		return
 	end
 

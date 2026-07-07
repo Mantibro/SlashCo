@@ -23,6 +23,19 @@ function SlashCo.IsDoorOpen(ent)
 	end
 end
 
+function SlashCo.IsFuncDoorOpen(ent)
+	if ent:GetClass() ~= "func_door_rotating" then
+		return false
+	end
+
+	if CLIENT then
+		-- m_eDoorState is networked by the engine :)
+		return ent:GetInternalVariable("m_toggle_state") ~= doorStates.DOOR_STATE_CLOSED
+	else
+		return ent.IsOpen or false
+	end
+end
+
 if CLIENT then return end
 -- Server only functions
 
@@ -55,12 +68,20 @@ local function SetupMapLua()
 		ent:Fire("AddOutput", "OnOpen triggerhook:RunPassedCode:hook.Run( 'DoorOpen' ):0:-1")
 		ent:Fire("AddOutput", "OnClose triggerhook:RunPassedCode:hook.Run( 'DoorClose' ):0:-1")
 	end
+
+	for _, ent in ipairs(ents.FindByClass("func_door_rotating")) do
+		OnDoorStateChanged(ent, ent:GetInternalVariable("m_toggle_state") ~= doorStates.DOOR_STATE_CLOSED)
+
+		ent:Fire("AddOutput", "OnOpen triggerhook:RunPassedCode:hook.Run( 'DoorOpen' ):0:-1")
+		ent:Fire("AddOutput", "OnClose triggerhook:RunPassedCode:hook.Run( 'DoorClose' ):0:-1")
+	end
+
 end
 
 hook.Add("InitPostEntity", "SlashCo:SetupMapLua", SetupMapLua)
 
 hook.Add("PlayerUse", "SlashCo:Doors", function(ply, ent)
-	if ent:GetClass() ~= "prop_door_rotating" then return end
+	if ent:GetClass() ~= "prop_door_rotating" and ent:GetClass() ~= "func_door_rotating" then return end
 
 	if (ent.NextDoorUse or 0) > CurTime() then
 		return false -- Block use

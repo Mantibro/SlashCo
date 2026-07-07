@@ -361,15 +361,15 @@ function PLAYER:SurvivorPing()
 end
 
 function PLAYER:SlamDoor(door_ent)
-	if door_ent:GetClass() ~= "prop_door_rotating" then
+	if door_ent:GetClass() ~= "prop_door_rotating" and door_ent:GetClass() ~= "func_door_rotating" then
 		return
 	end
 
-	if SlashCo.IsDoorOpen(door_ent) then
+	if SlashCo.IsDoorOpen(door_ent) or SlashCo.IsFuncDoorOpen(door_ent) and door_ent:GetClass() ~= "func_door_rotating" then
 		return
 	end
 
-	if not SlashCo.CheckDoorWL(door_ent) then
+	if not SlashCo.CheckDoorWL(door_ent) and not door_ent:GetClass() == "func_door_rotating" then
 		return
 	end
 
