@@ -433,6 +433,9 @@ function SlashCo.HelicopterLand(pos)
 		SlashCo.UpdateObjective("heliwait", SlashCo.ObjStatus.COMPLETE)
 		SlashCo.UpdateObjective("helicopter", SlashCo.ObjStatus.INCOMPLETE, nil, true)
 		SlashCo.SendObjectives()
+
+		-- Helicopter arrived effect
+		hook.Run("SlashCo:HelicopterArrived")
 	end)
 
 	--Will the Helicopter Abandon players?

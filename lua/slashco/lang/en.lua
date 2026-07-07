@@ -767,6 +767,12 @@ SlashCo.LangTable["perk_faster_fueling_desc"] = "Increases the fueling speed by 
 SlashCo.LangTable["perk_secondchance"] = "Second Chance"
 SlashCo.LangTable["perk_secondchance_desc"] = "You have a 2% chance to be revived on death- but all your items will be dropped"
 
+SlashCo.LangTable["perk_healthy"] = "Healthy"
+SlashCo.LangTable["perk_healthy_desc"] = "Consumable items heal 50% more.\nAllows you to consume Costco Frozen Pizza for minor healing."
+
+SlashCo.LangTable["perk_adrenalinerush"] = "Adrenaline Rush"
+SlashCo.LangTable["perk_adrenalinerush_desc"] = "When the helicopter arrives, you receive minor healing and a brief speed boost."
+
 -- Keyboard UI
 
 SlashCo.LangTable["keyboard_currentkey"] = "Current Key: %s"

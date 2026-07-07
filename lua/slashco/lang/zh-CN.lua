@@ -810,6 +810,12 @@ SlashCo.LangTable["perk_faster_fueling_desc"] = "提升25%加油速度，但在�
 
 SlashCo.LangTable["perk_secondchance"] = "第二次机会"
 SlashCo.LangTable["perk_secondchance_desc"] = "死亡时有 2% 概率复活，但会掉落身上的所有物品"
+
+SlashCo.LangTable["perk_healthy"] = "强化代谢"
+SlashCo.LangTable["perk_healthy_desc"] = "可食用物品的治疗效果提高50%。\n允许你食用 Costco 冷冻披萨以获得少量治疗。"
+
+SlashCo.LangTable["perk_adrenalinerush"] = "求生本能"
+SlashCo.LangTable["perk_adrenalinerush_desc"] = "直升机抵达时，激发你的求生本能，恢复少量生命并获得短暂速度提升。"
 -- Keyboard UI
 
 SlashCo.LangTable["keyboard_currentkey"] = "当前按键：%s"

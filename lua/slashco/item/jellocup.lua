@@ -11,8 +11,14 @@ ITEM.IsSpawnable = true
 function ITEM.OnUse(ply)
 	-- RaphaelIT7: Yes, it's intentional that it can go over the max health! It's limited to 1.5x of the max health
 	local maxHealth = ply:GetMaxHealth()
-	ply:SetHealth(math.min(ply:Health() + maxHealth / 3, maxHealth * 1.5))
-	
+	local healAmount = maxHealth / 3
+
+	if SlashCo.GetFoodHealMultiplier then
+		healAmount = healAmount * SlashCo.GetFoodHealMultiplier(ply)
+	end
+
+	ply:SetHealth(math.min(ply:Health() + healAmount, maxHealth * 1.5))
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/eat_mayo.mp3",
 		identifier = "JelloUse",
