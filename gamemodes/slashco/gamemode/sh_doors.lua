@@ -29,7 +29,6 @@ function SlashCo.IsFuncDoorOpen(ent)
 	end
 
 	if CLIENT then
-		-- m_eDoorState is networked by the engine :)
 		return ent:GetInternalVariable("m_toggle_state") ~= doorStates.DOOR_STATE_CLOSED
 	else
 		return ent.IsOpen or false
