@@ -487,6 +487,13 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("TylerHideTime", math.floor(TylerHidingTimer))
 	end
 
+	-- eno: weird ass fucking math shit, I hate my life. but it should work.
+	local TylerDestroyerDuration = math.max((((2 + SlashCo.MapSize) / 1.5) * anger * (0.5 + (team.NumPlayers(TEAM_SURVIVOR) / 10))), SLASHER.MinChase) -- The current formula used by Tyler to determine how long his Destroyer form lasts.
+	local DestroyerTimeleft = TylerDestroyerDuration - TimeAsTylerForm 	-- We use the duration formula and count down using TimeAsTylerForm.
+	if slasher:GetNWInt("TylerHuntTime") ~= math.floor(DestroyerTimeleft) then
+		slasher:SetNWInt("TylerHuntTime", math.floor(DestroyerTimeleft)) -- End result: DestroyerTimeleft should accurately display how long your Destroyer form lasts.
+	end
+
 	if slasher:GetNWInt("TylerAnger") ~= math.floor(anger) then
 		slasher:SetNWInt("TylerAnger", math.floor(anger))
 	end
@@ -694,8 +701,23 @@ function SLASHER.InitHud(_, hud)
 	hud:TieMeterInt("anger", "TylerAnger")
 
 	function hud.TitleCard.Label:PaintOver()
-		draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", 4, 18, red)
+		if hud.prevState ~= 3 then -- eno: Just checking if he's in any form other than Destroyer.
+			draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", 4, 18, red)
+		end
 	end
+
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+			return
+		end
+
+		if hud.prevState == 3 and hud.prevState ~= 1 then -- eno: Basically checking if he's in Destroyer form and not in Creator form.
+			if GameData.LocalPlayer:GetNWInt("TylerHuntTime") then
+				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
+		end
+	end)
 
 	hud.prevState = -1
 	hud.destroyEnabled = true
