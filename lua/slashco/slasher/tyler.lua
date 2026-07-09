@@ -700,6 +700,25 @@ function SLASHER.InitHud(_, hud)
 	hud:AddMeter("anger", 100, "", nil, true)
 	hud:TieMeterInt("anger", "TylerAnger")
 
+	function hud.TitleCard.Label:PaintOver()
+		if hud.prevState ~= 3 then -- eno: Just checking if he's in any form other than Destroyer
+			draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", 4, 18, red)
+		end
+	end
+
+	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+			return
+		end
+
+		if hud.prevState == 3 and hud.prevState ~= 1 then -- eno: Basically checking if he's in Destroyer form and not in Creator form.
+			if GameData.LocalPlayer:GetNWInt("TylerHuntTime") then
+				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
+		end
+	end)
+
 	hud.prevState = -1
 	hud.destroyEnabled = true
 	hud.prevWater = -1
@@ -748,16 +767,6 @@ function SLASHER.InitHud(_, hud)
 			end
 
 			hud.prevState = state
-		end
-
-		if hud.prevState ~= 3 then -- eno: Just checking if he's in any form other than Destroyer.
-			if GameData.LocalPlayer:GetNWInt("TylerHideTime") then
-				draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			end
-		elseif hud.prevState == 3 and hud.prevState ~= 1 then -- eno: Basically checking if he's in Destroyer form and not in Creator form.
-			if GameData.LocalPlayer:GetNWInt("TylerHuntTime") then
-				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			end
 		end
 
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
