@@ -701,7 +701,7 @@ function SLASHER.InitHud(_, hud)
 	hud:TieMeterInt("anger", "TylerAnger")
 
 	function hud.TitleCard.Label:PaintOver()
-		if hud.prevState ~= 3 then -- eno: Just checking if he's in any form other than Destroyer
+		if hud.prevState ~= 3 then -- eno: Just checking if he's in any form other than Destroyer.
 			draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", 4, 18, red)
 		end
 	end
