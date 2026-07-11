@@ -195,7 +195,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = 0
 		slasher:SetNWBool("CanKill", false)
-		slasher:SetNWBool("TylerIsDestroyer", false)
 		slasher:SetImpervious(true)
 		slasher.TimeAsTylerSpecter = (slasher.TimeAsTylerSpecter or 0) + FrameTime()
 		final_perception = 6.0
@@ -436,7 +435,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
 		slasher:SetNWBool("CanKill", true)
-		slasher:SetNWBool("TylerIsDestroyer", true)
 		slasher:SetCanSeePlayers(true)
 		final_perception = 2.0
 
