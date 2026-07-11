@@ -689,7 +689,6 @@ local manifestTable = {
 }
 
 function SLASHER.InitHud(_, hud)
-	local state = GameData.LocalPlayer:GetNWInt("TylerState")
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Tyler_creator")
 
