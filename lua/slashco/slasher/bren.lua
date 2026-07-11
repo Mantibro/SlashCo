@@ -48,7 +48,6 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 end
 
 function SLASHER.OnSpawn(slasher)
-	slasher:SetJumpPower(0)
 	slasher:DrawShadow(false)
 	slasher:SetNWBool("CanChase", true)
 
@@ -66,15 +65,24 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if MainCD > 0 then
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
 		slasher.MainCooldown = MainCD - FrameTime()
+	else
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
 	end
 
 	if NoclipCD > 0 then
+		slasher:SlasherHudFunc("SetControlEnabled", "R", false)
 		slasher.NoclipCooldown = NoclipCD - FrameTime()
+	else
+		slasher:SlasherHudFunc("SetControlEnabled", "R", true)
 	end
 
 	if SnapCD > 0 then
+		slasher:SlasherHudFunc("SetControlEnabled", "F", false)
 		slasher.SnapCooldown = SnapCD - FrameTime()
+	else
+		slasher:SlasherHudFunc("SetControlEnabled", "F", true)
 	end
 
 	if SlashCo.CurRound.GameProgress > 4 then
@@ -94,7 +102,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetNWBool("CanNoclip", anger > 50)
 
 	if not slasher:GetNWBool("BrenNoclip") then
-		slasher:SetJumpPower(0)
 		slasher:SetMoveType(MOVETYPE_WALK)
 
 		final_eyesight = SLASHER.Eyesight
@@ -124,23 +131,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWInt("BrenAnger", math.floor(anger))
 	end
 
-	if slasher:GetNWInt("MainCooldown") ~= math.floor(MainCD) then
-		slasher:SetNWInt("MainCooldown", math.floor(MainCD))
-	end
-
-	if slasher:GetNWInt("SnapCooldown") ~= math.floor(SnapCD) then
-		slasher:SetNWInt("SnapCooldown", math.floor(SnapCD))
-	end
-
-	if slasher:GetNWInt("NoclipCooldown") ~= math.floor(NoclipCD) then
-		slasher:SetNWInt("NoclipCooldown", math.floor(NoclipCD))
-	end
-
 	slasher:SetEyeSight(final_eyesight)
 	slasher:SetPerception(final_perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
+	if slasher:GetNWBool("BrenStunned") then return end
 	if slasher:GetNWBool("BrenNoclip") then return end
 	if slasher.MainCooldown > 0.01 then return end
 
@@ -237,10 +233,13 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
+	if slasher:GetNWBool("BrenStunned") then return end
+
 	SlashCo.StartChaseMode(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
+	if slasher:GetNWBool("BrenStunned") then return end
 	if slasher:GetNWBool("BrenKill") then return end
 	if not slasher:GetNWBool("CanNoclip") then return end
 
@@ -311,6 +310,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
+	if slasher:GetNWBool("BrenStunned") then return end
 	if slasher:GetNWBool("BrenKill") then return end
 	if slasher.SnapCooldown > 0.01 then return end
 
@@ -375,11 +375,27 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	end)
 end
 
+function SLASHER.OnHitByPocketSand(slasher, ply)
+	SlashCo.StopChase(slasher)
+
+	slasher:SetNWBool("BrenStunned", true)
+	slasher:Freeze(true)
+	timer.Simple(9, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("BrenStunned", false)
+		slasher:Freeze(false)
+	end)
+end
+SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
+SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
+
 function SLASHER.Animator(ply)
 	local bren_kill = ply:GetNWBool("BrenKill")
 	local bren_snap = ply:GetNWBool("BrenSnapAnim")
+	local bren_stun = ply:GetNWBool("BrenStunned")
 
-	if not bren_kill and not bren_snap then
+	if not bren_kill and not bren_snap and not bren_stun then
 		ply.anim_antispam = false
 	end
 
@@ -387,7 +403,7 @@ function SLASHER.Animator(ply)
 		ply.CalcIdeal = ACT_HL2MP_WALK
 		ply.CalcSeqOverride = ply:LookupSequence("walk_all")
 	else
-		ply.CalcSeqOverride = ply:LookupSequence("slashco_breen_idle")
+		ply.CalcSeqOverride = ply:LookupSequence("float")
 	end
 
 	ply:SetPoseParameter("move_x", ply:GetVelocity():Length() / 100)
@@ -405,6 +421,14 @@ function SLASHER.Animator(ply)
 	if bren_snap and (not ply.anim_antispam) then
 		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("slashco_breen_snap"), 0, true)
 		ply.anim_antispam = true
+	end
+
+	if bren_stun then
+		ply.CalcSeqOverride = ply:LookupSequence("stun")
+		if not ply.anim_antispam then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride
@@ -447,30 +471,6 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddMeter("anger", 100, "", nil, true)
 	hud:TieMeterInt("anger", "BrenAnger")
-
-	function hud.AlsoThink()
-		local BrenMainCooldown = GameData.LocalPlayer:GetNWInt("MainCooldown")
-		local BrenNoclipCooldown = GameData.LocalPlayer:GetNWInt("NoclipCooldown")
-		local BrenSnapCooldown = GameData.LocalPlayer:GetNWInt("SnapCooldown")
-
-		if BrenMainCooldown > 0 then
-			hud:SetControlEnabled("LMB", false)
-		else
-			hud:SetControlEnabled("LMB", true)
-		end
-
-		if BrenNoclipCooldown > 0 then
-			hud:SetControlEnabled("R", false)
-		else
-			hud:SetControlEnabled("R", true)
-		end
-
-		if BrenSnapCooldown > 0 then
-			hud:SetControlEnabled("F", false)
-		else
-			hud:SetControlEnabled("F", true)
-		end
-	end
 end
 
 SlashCo.RegisterSlasher(SLASHER, "Bren")

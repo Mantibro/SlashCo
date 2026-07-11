@@ -28,7 +28,7 @@ function ENT:SetBrickVelocity(velocity)
 end
 
 function ENT:Break()
-	if math.random(1, 5) == 1 then
+	if math.random(1, 2) == 1 then
 		local idx = math.random(1, 4)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "physics/concrete/boulder_impact_hard" .. idx .. ".wav",

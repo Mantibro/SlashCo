@@ -95,21 +95,22 @@ function SlashCo.LoadFileFromAddons(fileName)
 	local searchPath = string.sub(fileName, 0, wildcard-1)
 	local leftoverPath = string.sub(fileName, wildcard+1)
 
-	local addons = SlashCo.GetAddons()
-	for _, addonTitle in pairs(addons) do
-		-- SlashCo.LoadFileFromAddon(fileName, addonTitle)
+	if searchPath:StartsWith("lua/") then
+		searchPath = searchPath:sub(5)
+	end
 
-		local _, folders = file.Find(searchPath .. "*", addonTitle)
-		for _, folder in ipairs(folders) do
-			local filePath = searchPath .. folder .. leftoverPath
-			if file.Exists(filePath, addonTitle) and file.Exists(filePath, "LUA") then
-				if filePath:StartsWith("lua/") then
-					filePath = filePath:sub(5)
-				end
+	local _, folders = file.Find(searchPath .. "*", "LUA")
+	for _, folder in ipairs(folders) do
+		local filePath = searchPath .. folder .. leftoverPath
+		if file.Exists(filePath, "LUA") or file.Exists(filePath, "GAME") then
 
-				include(filePath)
-				-- print("Loaded file " .. filePath .. " from addon \"" .. addonTitle .. "\"")
+			if filePath:StartsWith("lua/") then
+				filePath = filePath:sub(5)
 			end
+
+			AddCSLuaFile(filePath)
+			include(filePath)
+			print("[SlashCo] Loaded file " .. filePath .. " from \"" .. folder .. "\"")
 		end
 	end
 end

@@ -77,7 +77,7 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if target:GetClass() == "sc_gascan" and (slasher:GetPos():Distance(target:GetPos()) <= SLASHER.KillDistance) then
+	if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") and target:GetClass() == "sc_gascan" and (slasher:GetPos():Distance(target:GetPos()) <= SLASHER.KillDistance) then
 		target:RandomTeleport(Vector(0, 0, 50))
 		return
 	end

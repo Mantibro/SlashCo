@@ -483,9 +483,17 @@ else
 	end
 end
 
-local lang_files, _ = file.Find("slashco/lang/*.lua", "LUA")
+local lang_files,lang_folders = file.Find("slashco/lang/*", "LUA")
 for _, v in ipairs(lang_files) do
 	AddCSLuaFile("slashco/lang/" .. v)
+end
+
+for _, v in ipairs(lang_folders) do
+	local files = file.Find("slashco/lang/" .. v .. "/*", "LUA")
+	for _, file in ipairs(files) do
+		print("[SlashCo] Adding language file: slashco/lang/" .. v .. "/" .. file)
+		AddCSLuaFile("slashco/lang/" .. v .. "/" .. file)
+	end
 end
 
 local lang_patches, _ = file.Find("slashco/patch/lang/*.lua", "LUA")

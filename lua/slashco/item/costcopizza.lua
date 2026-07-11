@@ -8,8 +8,26 @@ ITEM.Description = "CostcoPizza_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse() -- You don't use it. You just hold it.
-	return true
+function ITEM.OnUse(ply)
+	if not SlashCo.IsActivePerk(ply, "Healthy") then
+		return true
+	end
+
+	local maxHealth = ply:GetMaxHealth()
+	local healAmount = maxHealth / 4
+	ply:SetHealth(math.min(ply:Health() + healAmount, maxHealth))
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/eat_cookie.mp3",
+		identifier = "CostcoPizzaEat",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+	})
+
+	return false
 end
 
 function ITEM.OnOwnerTakeDamage(owner, dmg)

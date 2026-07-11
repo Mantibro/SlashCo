@@ -60,7 +60,14 @@ local function GetPerks(team, perks)
 			perk = perk:sub(2)
 		end
 
-		local perkTbl = team == TEAM_LOBBY and SlashCo.Perks[perk] or SlashCo.Perks[team][perk]
+		local perkTbl
+
+		if team == TEAM_LOBBY then
+			perkTbl = SlashCo.Perks[perk]
+		elseif SlashCo.Perks[team] then
+			perkTbl = SlashCo.Perks[team][perk]
+		end
+
 		if perkTbl then
 			table.insert(results, perk)
 			results[perk] = perkTbl

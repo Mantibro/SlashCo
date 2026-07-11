@@ -663,6 +663,7 @@ SlashCo.LangTable["points_benadryl"] = "[%s] BENADRYL"
 SlashCo.LangTable["points_working"] = "[%s] HACER TU TRABAJO"
 SlashCo.LangTable["points_quickescape"] = "[%s] ESCAPE RAPIDO"
 SlashCo.LangTable["points_slowescape"] = "[%s] ESCAPE LENTO"
+SlashCo.LangTable["points_generator"] = "[%s] GENERADOR ENCONTRADO"
 
 -- Documents
 
@@ -761,6 +762,12 @@ SlashCo.LangTable["perk_faster_fueling_desc"] = "Aumenta la velocidad a la que c
 
 SlashCo.LangTable["perk_secondchance"] = "Segunda Chance"
 SlashCo.LangTable["perk_secondchance_desc"] = "Tienes un 2% de chance de revivir al morir- pero todos tus items se soltaran"
+
+SlashCo.LangTable["perk_healthy"] = "Saludable"
+SlashCo.LangTable["perk_healthy_desc"] = "Items consumibles curan un 50% mas.\nTe permite consumir la Pizza congelada del Costco."
+
+SlashCo.LangTable["perk_adrenalinerush"] = "Subidon de Adrenalina"
+SlashCo.LangTable["perk_adrenalinerush_desc"] = "Cuando el helicoptero aterriza, recibes un poco de curacion y una mejora temporal de velocidad."
 
 -- Keyboard UI
 
