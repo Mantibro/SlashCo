@@ -195,6 +195,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = 0
 		slasher:SetNWBool("CanKill", false)
+		slasher:SetNWBool("TylerIsDestroyer", false)
 		slasher:SetImpervious(true)
 		slasher.TimeAsTylerSpecter = (slasher.TimeAsTylerSpecter or 0) + FrameTime()
 		final_perception = 6.0
@@ -435,6 +436,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
 		slasher:SetNWBool("CanKill", true)
+		slasher:SetNWBool("TylerIsDestroyer", true)
 		slasher:SetCanSeePlayers(true)
 		final_perception = 2.0
 
@@ -689,6 +691,7 @@ local manifestTable = {
 }
 
 function SLASHER.InitHud(_, hud)
+	local state = GameData.LocalPlayer:GetNWInt("TylerState")
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Tyler_creator")
 
@@ -701,23 +704,8 @@ function SLASHER.InitHud(_, hud)
 	hud:TieMeterInt("anger", "TylerAnger")
 
 	function hud.TitleCard.Label:PaintOver()
-		if hud.prevState ~= 3 then -- eno: Just checking if he's in any form other than Destroyer.
-			draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", 4, 18, red)
-		end
+		draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", 4, 18, red)
 	end
-
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-
-		if hud.prevState == 3 and hud.prevState ~= 1 then -- eno: Basically checking if he's in Destroyer form and not in Creator form.
-			if GameData.LocalPlayer:GetNWInt("TylerHuntTime") then
-				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			end
-		end
-	end)
 
 	hud.prevState = -1
 	hud.destroyEnabled = true
@@ -768,6 +756,19 @@ function SLASHER.InitHud(_, hud)
 
 			hud.prevState = state
 		end
+
+		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+			return
+		end
+		
+		if state == 3 then
+			if GameData.LocalPlayer:GetNWInt("TylerHuntTime")  then
+				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
+		end
+	end)
 
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
 		local class = IsValid(target) and target:GetClass()
