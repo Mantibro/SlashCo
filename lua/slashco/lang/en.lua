@@ -236,6 +236,9 @@ SlashCo.LangTable["Burger_desc"] = "A hamburger made by a crazy clown. Emits a b
 SlashCo.LangTable["CocaCola"] = "Cola Soda"
 SlashCo.LangTable["CocaCola_desc"] = "We requested grenades, this is what we got. Careful while using it."
 
+SlashCo.LangTable["MERLT0N"] = "MERLT0N"
+SlashCo.LangTable["MERLT0N_desc"] = "Wanna square off against slashers? Look no further than MERLT0N! It'll patrol any area for you, any slasher nearby will get chased and stunned for 10 seconds."
+
 --GameInfo
 
 SlashCo.LangTable["SurvivorInfo"] = [[Welcome to the SlashCo Power Recovery Program.
