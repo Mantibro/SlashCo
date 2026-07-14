@@ -710,7 +710,7 @@ function SLASHER.InitHud(_, hud)
 	local HuntTimeColor = Color(255, 0, 0, 255)
 	function hud.AlsoThink()
 		local state = GameData.LocalPlayer:GetNWInt("TylerState")
-		if state == 0 then
+		if state == TYLER_SPECTER then
 			local isInWater = GameData.LocalPlayer:WaterLevel() > 1
 			if hud.prevWater ~= isInWater then
 				if isInWater then
@@ -722,10 +722,10 @@ function SLASHER.InitHud(_, hud)
 		end
 
 		if state ~= hud.prevState then
-			if state == 0 then
+			if state == TYLER_SPECTER then
 				hud:SetControlVisible("R", true)
 				hud:SetControlText("R", "manifest")
-			elseif state == 1 then
+			elseif state == TYLER_CREATOR then
 				hud:SetControlVisible("R", true)
 				hud:SetControlEnabled("R", false)
 				hud:SetControlText("R", "(hiding)")
@@ -734,7 +734,7 @@ function SLASHER.InitHud(_, hud)
 				hud:SetControlVisible("R", false)
 			end
 
-			if state <= 1 then
+			if state <= TYLER_CREATOR then
 				hud:SetTitle("Tyler_creator")
 				hud:SetAvatar("creator")
 			else
@@ -742,7 +742,7 @@ function SLASHER.InitHud(_, hud)
 				hud:SetAvatar("destroyer")
 			end
 
-			if state == 3 then
+			if state == TYLER_DESTROYER then
 				hud:SetCrosshairEnabled(true)
 			else
 				hud:SetCrosshairAlpha(0)
