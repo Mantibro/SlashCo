@@ -108,7 +108,6 @@ function ENT:RunBehaviour()
 		if not IsValid(self.AttackedPlayer) then
 			if self:HaveEnemy() then
 				-- Now that we have a enemy, the code in this block will run
-				self:SetSequence(self:LookupSequence("pound"))
 				self.loco:FaceTowards(self:GetEnemy():GetPos())	-- Face our enemy
 				self:StartActivity( ACT_RUN )			-- Set the animation
 				self.loco:SetDesiredSpeed(300)		-- Set the speed that we will be moving at. Don't worry, the animation will speed up/slow down to match
