@@ -760,7 +760,7 @@ function SLASHER.InitHud(_, hud)
 			return
 		end
 		
-		if state == 3 then
+		if TYLER_DESTROYER then
 			if GameData.LocalPlayer:GetNWInt("TylerHuntTime")  then
 				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
