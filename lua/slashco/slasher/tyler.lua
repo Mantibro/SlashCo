@@ -707,6 +707,7 @@ function SLASHER.InitHud(_, hud)
 	hud.prevState = -1
 	hud.destroyEnabled = true
 	hud.prevWater = -1
+	local HuntTimeColor = Color(255, 0, 0, 255)
 	function hud.AlsoThink()
 		local state = GameData.LocalPlayer:GetNWInt("TylerState")
 		if state == 0 then
@@ -760,9 +761,10 @@ function SLASHER.InitHud(_, hud)
 			return
 		end
 		
-		if TYLER_DESTROYER then
-			if GameData.LocalPlayer:GetNWInt("TylerHuntTime")  then
-				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		if state == TYLER_DESTROYER then
+			local HuntTime = GameData.LocalPlayer:GetNWInt("TylerHuntTime")
+			if HuntTime > 0 then -- In Lua "if 0 then" is still true.
+				draw.SimpleText("HUNT TIME: " .. math.Round(HuntTime, 1), "TVCD", ScrW() / 2, 550, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			end
 		end
 	end)
