@@ -133,6 +133,12 @@ function ENT:RunBehaviour()
 						tolerance = 50,
 						lookahead = 600
 					}) -- Walk to a random place
+					if result == "failed" then
+						self.GotStuck = true
+						self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+					elseif result == "timeout" then
+						self.GotStuck = true
+					end
 
 					coroutine.wait(0.05)
 				else
