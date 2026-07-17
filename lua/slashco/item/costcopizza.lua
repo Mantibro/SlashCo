@@ -1,7 +1,7 @@
 local ITEM = {}
 
 ITEM.Model = "models/slashco/costcopizza.mdl"
-ITEM.Name = "Costco Frozen Pizza"
+ITEM.Name = "CostcoPizza"
 ITEM.EntClass = "sc_costcopizza"
 ITEM.Price = 50
 ITEM.Description = "CostcoPizza_desc"

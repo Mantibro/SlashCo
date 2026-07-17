@@ -51,6 +51,7 @@ function SLASHER.TackleFail(slasher)
 		slasher:SetNWBool("CloakTackle", false)
 		slasher:SetNWBool("CloakTackleFail", false)
 		slasher:Freeze(false)
+		slasher.KillDelayTick = SLASHER.KillDelay
 	end)
 end
 
@@ -107,8 +108,10 @@ function SLASHER.OnTickBehaviour(slasher, target)
 						ply:Freeze(false)
 						ply:SetImpervious(false)
 						if IsValid(slasher) and slasher.TackledPlayer == ply then
-							slasher.TackledPlayer = nil
 							slasher.TackledPlayer.TackleStruggle = 0
+							timer.Simple(0.1, function()
+								slasher.TackledPlayer = nil
+							end)
 						end
 
 						if ply.SlashCo_PushDir then
@@ -132,6 +135,7 @@ function SLASHER.OnTickBehaviour(slasher, target)
 						
 						slasher:Freeze(false)
 						slasher:SetImpervious(false)
+						slasher.KillDelayTick = SLASHER.KillDelay
 					end)
 
 					break
@@ -165,6 +169,7 @@ end
 function SLASHER.OnPrimaryFire(slasher)
 	if IsValid(slasher.TackledPlayer) then return end
 	if slasher:IsFrozen() then return end
+	if slasher.KillDelayTick > 0 then return end
 
 	if not slasher:GetNWBool("CloakTackle") then
 		slasher:SetNWBool("CloakTackle", true)

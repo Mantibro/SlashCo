@@ -2,10 +2,10 @@ local ITEM = {}
 
 ITEM.Model = "models/dog.mdl"
 ITEM.EntClass = "sc_merlton"
-ITEM.Name = "MERLT0N"
+ITEM.Name = "Merlton"
 ITEM.Icon = "slashco/ui/icons/items/item_merlton"
 ITEM.Price = 100
-ITEM.Description = "MERLT0N_desc"
+ITEM.Description = "Merlton_desc"
 ITEM.CamPos = Vector(100, 200, 300)
 ITEM.IsSpawnable = false
 
@@ -53,4 +53,4 @@ ITEM.WorldModel = {
 	bodygroup = {}
 }
 
-SlashCo.RegisterItem(ITEM, ITEM.Name)
+SlashCo.RegisterItem(ITEM, "Merlton")

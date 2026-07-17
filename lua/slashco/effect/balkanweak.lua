@@ -1,13 +1,13 @@
 local EFFECT = {}
 
-EFFECT.Name = "Balkan"
+EFFECT.Name = "BalkanTripWeak"
 EFFECT.ChangesSpeed = true
-EFFECT.FuelSpeed = 3.5
+EFFECT.FuelSpeed = 1.75
 function EFFECT.OnApplied(ply)
-	ply:AddSpeedEffect("balkanEffect", 600, 20)
+	ply:AddSpeedEffect("balkantripweak", 600, 20)
 end
 function EFFECT.OnExpired(ply)
-	ply:RemoveSpeedEffect("balkanEffect")
+	ply:RemoveSpeedEffect("balkantripweak")
 end
 
 local colors = {
@@ -30,4 +30,4 @@ function EFFECT.Screenspace()
 	DrawColorModify(colors)
 end
 
-SlashCo.RegisterEffect(EFFECT, "BalkanTrip")
+SlashCo.RegisterEffect(EFFECT, "BalkanTripWeak")

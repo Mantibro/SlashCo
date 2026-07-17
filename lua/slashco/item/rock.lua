@@ -19,7 +19,13 @@ function ITEM.OnSwitchFrom(ply)
 end
 
 function ITEM.OnPickUp(ply)
-	ply:AddSpeedEffect("rock", 200, 10)
+	if not SlashCo.IsActivePerk(ply, "extremelybuff") then
+		ply:AddSpeedEffect("rock", 250, 10)
+		return
+	else
+		ply:AddSpeedEffect("rock", 270, 10)
+		return
+	end
 end
 
 ITEM.ViewModel = {

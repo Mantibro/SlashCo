@@ -22,7 +22,6 @@ function ENT:Initialize()
 	self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE)
 
 	self:SetHealth(100)
-	self.NestAlert = false
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/manspider/manspider_nest.mp3",
@@ -41,22 +40,13 @@ function ENT:Think()
 	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		if survivor:GetPos():Distance(self:GetPos()) >= 500 then continue end
 
-		self.NestAlert = true
+		SlashCo.AddSlasherAnger(slasher, 0.05)
 	end
 
 	if self:Health() < 1 then
 		self:SetOwner(NULL)
 		slasher:SetNWBool("ManspiderNestActive", false)
-		self.NestAlert = false
 
 		SafeRemoveEntityDelayed(self, 0.1)
 	end
 end
-
-hook.Add("SlashCo:OnAngerTick", "ManspiderNest", function(slasher)
-	for _, nest in ipairs(ents.FindByClass("sc_manspidernest")) do
-		if not nest.NestAlert then return end
-
-		SlashCo.AddSlasherAnger(slasher, 0.010)
-	end
-end)

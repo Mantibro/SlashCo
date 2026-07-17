@@ -142,7 +142,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		slasher.LungeDuration = LungeDuration + 1
 
-		if (slasher:GetVelocity():Length() < 450 or target:IsValid()) and LungeDuration > 30 and slasher.LungeAntiSpam == 0 then
+		if (slasher:GetVelocity():Length() < 250 or target:IsValid()) and LungeDuration > 30 and slasher.LungeAntiSpam == 0 then
 			slasher:SetNWBool("AbomignatLungeFinish", true)
 			timer.Simple(0.6, function()
 				if not IsValid(slasher) then return end
@@ -532,7 +532,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 			slasher:SlasherHudFunc("ShakeControl", "F")
 
-			slasher:SetVelocity((slasher:EyeAngles():Forward() * 400) + Vector(0, 0, 300))
+			slasher:SetVelocity((slasher:EyeAngles():Forward() * 500) + Vector(0, 0, 300))
 
 			return
 		end
@@ -562,7 +562,7 @@ function SLASHER.Animator(ply)
 	local abomignat_crouch = ply:GetNWBool("AbomignatCrouch")
 	local abomignat_stun = ply:GetNWBool("AbomignatStunned")
 
-	if not abomignat_mainslash and not abomignat_lunge and not abomignat_lungefinish and not abomignat_lungelarge and not abomignat_crouch and not abomignat_stun then
+	if not abomignat_mainslash and not abomignat_lunge and not abomignat_lungefinish and not abomignat_stun then
 		ply.anim_antispam = false
 	end
 
@@ -608,10 +608,6 @@ function SLASHER.Animator(ply)
 
 	if abomignat_lungelarge then
 		ply.CalcSeqOverride = ply:LookupSequence("jumpattack_air")
-		if not ply.anim_antispam then
-			ply:SetCycle(0)
-			ply.anim_antispam = true
-		end
 	end
 
 	if abomignat_crouch then
@@ -623,10 +619,6 @@ function SLASHER.Animator(ply)
 		end
 
 		ply.CalcSeqOverride = ply:LookupSequence(CrouchAnim)
-		if not ply.anim_antispam then
-			ply:SetCycle(0)
-			ply.anim_antispam = true
-		end
 	end
 
 	if abomignat_stun then

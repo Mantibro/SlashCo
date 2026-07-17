@@ -2,7 +2,7 @@ local ITEM = {}
 
 ITEM.Model = "models/slashco/items/deathward.mdl"
 ITEM.EntClass = "sc_deathward_used"
-ITEM.Name = "Deathward (Used)"
+ITEM.Name = "DeathWard (Used)"
 ITEM.Icon = "slashco/ui/icons/items/item_2_99"
 ITEM.Description = "You broke it!"
 ITEM.CamPos = Vector(40,0,15)

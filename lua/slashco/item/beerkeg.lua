@@ -1,7 +1,7 @@
 local ITEM = {}
 
 ITEM.Model = "models/slashco/beerkeg.mdl"
-ITEM.Name = "Beer Keg"
+ITEM.Name = "BeerKeg"
 ITEM.EntClass = "sc_beerkeg"
 ITEM.Price = 60
 ITEM.Description = "BeerKeg_desc"

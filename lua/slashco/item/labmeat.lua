@@ -46,7 +46,7 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	ply:AddEffect("Awareness", 120)
+	ply:AddEffect("Awareness",SlashCo.GetConsumableEffectDuration(ply, 120))
 end
 
 function ITEM.OnSetModel(model)

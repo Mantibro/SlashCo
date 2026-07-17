@@ -21,7 +21,7 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	ply:AddEffect("Invisibility", 30)
+	ply:AddEffect("Invisibility",SlashCo.GetConsumableEffectDuration(ply, 30))
 end
 
 ITEM.ViewModel = {

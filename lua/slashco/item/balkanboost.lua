@@ -40,7 +40,12 @@ function ITEM.OnUse(ply)
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
 			ply:SetNWBool("SurvivorBalkanFull", true)
 			ply:SetNWBool("MarkedBySmiley", true)
-			ply:AddEffect("BalkanTrip", 132)
+
+			if SlashCo.IsActivePerk(ply, "BalkanWarrior") then
+				ply:AddEffect("BalkanTripWeak", 132)
+			else
+				ply:AddEffect("BalkanTrip", 132)
+			end
 		end
 	end)
 
@@ -49,9 +54,13 @@ function ITEM.OnUse(ply)
 			ply:SetNWBool("SurvivorBalkanFull", false)
 			ply:SetNWBool("SurvivorBalkan", false)
 			ply:SetNWBool("MarkedBySmiley", false)
-			ply:AddEffect("Slowness", 9999)
-			local hpafter = ply:Health() / 6
-			ply:SetHealth(hpafter)
+
+			if not SlashCo.IsActivePerk(ply, "BalkanWarrior") then
+				ply:AddEffect("Slowness", 9999)
+
+				local hpafter = ply:Health() / 6
+				ply:SetHealth(hpafter)
+			end
 		end
 	end)
 end

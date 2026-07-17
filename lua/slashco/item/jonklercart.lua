@@ -1,7 +1,7 @@
 local ITEM = {}
 
 ITEM.Model = "models/slashco/jonklercart.mdl"
-ITEM.Name = "Evil Jonkler Cart"
+ITEM.Name = "JonklerCart"
 ITEM.EntClass = "sc_jonklercart"
 ITEM.Price = 50
 ITEM.Description = "JonklerCart_desc"

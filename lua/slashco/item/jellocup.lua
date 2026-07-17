@@ -29,7 +29,7 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	ply:AddEffect("Resistance", math.random(20, 50))
+	ply:AddEffect("Resistance", SlashCo.GetConsumableEffectDuration(ply, math.random(20, 50)))
 end
 
 ITEM.ViewModel = {

@@ -100,7 +100,7 @@ SlashCo.LangTable["Drainage"] = "Drainage"
 SlashCo.LangTable["Drainage_desc"] = "Gas cans will be plentiful,\nBut\nGenerators will leak fuel over time."
 
 SlashCo.LangTable["Duality"] = "Duality"
-SlashCo.LangTable["Duality_desc"] = "Only one generator will need to be powered,\nBut\nYou will face two Slashers."
+SlashCo.LangTable["Duality_desc"] = "You will face two Slashers."
 
 SlashCo.LangTable["Singularity"] = "Singularity"
 SlashCo.LangTable["Singularity_desc"] = "Gas Cans will be plentiful,\nBut\nThe Slasher will grow much more powerful."
@@ -195,7 +195,7 @@ SlashCo.LangTable["PocketSand"] = "Pocket Sand"
 SlashCo.LangTable["PocketSand_desc"] = "Blinds a nearby slasher."
 
 SlashCo.LangTable["Rock"] = "The Rock"
-SlashCo.LangTable["Rock_desc"] = "Become silent but unable to sprint while equipped. When dropped, this will occasionally nudge itself to the nearest gas can."
+SlashCo.LangTable["Rock_desc"] = "Become silent but your sprint is slower while equipped. When dropped, this will occasionally nudge itself to the nearest gas can."
 
 SlashCo.LangTable["Soda"] = "B-Gone Soda"
 SlashCo.LangTable["Soda_desc"] = "Become invisible on use."
@@ -236,8 +236,8 @@ SlashCo.LangTable["Burger_desc"] = "A hamburger made by a crazy clown. Emits a b
 SlashCo.LangTable["CocaCola"] = "Cola Soda"
 SlashCo.LangTable["CocaCola_desc"] = "We requested grenades, this is what we got. Careful while using it."
 
-SlashCo.LangTable["MERLT0N"] = "MERLT0N"
-SlashCo.LangTable["MERLT0N_desc"] = "Wanna square off against slashers? Look no further than MERLT0N! It'll patrol any area for you, any slasher nearby will get chased and stunned for 10 seconds."
+SlashCo.LangTable["Merlton"] = "MERLT0N"
+SlashCo.LangTable["Merlton_desc"] = "Wanna square off against slashers? Look no further than MERLT0N! It'll patrol any area for you, any slasher nearby will get chased and dazed for 10 seconds."
 
 --GameInfo
 
@@ -775,6 +775,15 @@ SlashCo.LangTable["perk_healthy_desc"] = "Consumable items heal 50% more.\nAllow
 
 SlashCo.LangTable["perk_adrenalinerush"] = "Adrenaline Rush"
 SlashCo.LangTable["perk_adrenalinerush_desc"] = "When the helicopter arrives, you receive minor healing and a brief speed boost."
+
+SlashCo.LangTable["perk_extremely_buff"] = "Extremely Buff"
+SlashCo.LangTable["perk_extremely_buff_desc"] = "-Carrying heavy will slow you down less.\n-All incoming damage is increased by 50%."
+
+SlashCo.LangTable["perk_balkan_warrior"] = "Balkan Warrior"
+SlashCo.LangTable["perk_balkan_warrior_desc"] = "-The after-effect of Balkan Boost no longer cripples you.\n-The Fueling Speed bonus of Balkan Boost is decreased."
+
+SlashCo.LangTable["perk_glutton"] = "Glutton"
+SlashCo.LangTable["perk_glutton_desc"] = "-All consumable item effects deplete 50% slower.\n-Consumable items heal 50% less."
 
 -- Keyboard UI
 

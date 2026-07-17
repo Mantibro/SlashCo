@@ -29,7 +29,13 @@ function ITEM.OnBuy(_)
 end
 
 function ITEM.OnPickUp(ply)
-	ply:AddSpeedEffect("gas", 150, 10)
+	if not SlashCo.IsActivePerk(ply, "extremelybuff") then
+		ply:AddSpeedEffect("gas", 150, 10)
+		return
+	else
+		ply:AddSpeedEffect("gas", 200, 10)
+		return
+	end
 end
 
 function ITEM.EquipSound()

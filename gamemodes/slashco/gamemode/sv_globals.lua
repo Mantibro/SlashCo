@@ -435,7 +435,7 @@ function SlashCo.HelicopterLand(pos)
 		SlashCo.SendObjectives()
 
 		-- Helicopter arrived effect
-		hook.Run("SlashCo:HelicopterArrived")
+		hook.Run("SlashCo:HelicopterLanded")
 	end)
 
 	--Will the Helicopter Abandon players?

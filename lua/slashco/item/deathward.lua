@@ -2,7 +2,7 @@ local ITEM = {}
 
 ITEM.Model = "models/slashco/items/deathward.mdl"
 ITEM.EntClass = "sc_deathward"
-ITEM.Name = "Deathward"
+ITEM.Name = "DeathWard"
 ITEM.Icon = "slashco/ui/icons/items/item_2"
 ITEM.Price = 80
 ITEM.Description = "Deathward_desc"

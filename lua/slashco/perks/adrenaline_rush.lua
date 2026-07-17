@@ -10,17 +10,16 @@ PERK.Price = 50
 
 SlashCo.RegisterPerk(PERK, PERK.ID)
 
-hook.Add("SlashCo:HelicopterArrived", "AdrenalineRush", function()
+hook.Add("SlashCo:HelicopterLanded", "SlashCo:AdrenalineRush", function()
 	for _, ply in ipairs(team.GetPlayers(PERK.Team)) do
-		if not SlashCo.IsActivePerk(ply, PERK.ID) then
-			continue
-		end
+		if not SlashCo.IsActivePerk(ply, PERK.ID) then continue end
 
 		ply:SetHealth(math.min(ply:Health() + 20, ply:GetMaxHealth()))
 
 		ply:AddSpeedEffect("AdrenalineRush", 315, 2)
-		timer.Simple(8, function()
+		timer.Simple(10, function()
 			if not IsValid(ply) then return end
+
 			ply:RemoveSpeedEffect("AdrenalineRush")
 		end)
 	end

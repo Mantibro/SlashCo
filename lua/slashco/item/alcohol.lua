@@ -1,7 +1,7 @@
 local ITEM = {}
 
 ITEM.Model = "models/props_junk/glassjug01.mdl"
-ITEM.Name = "\"Moonshine\""
+ITEM.Name = "Alcohol"
 ITEM.EntClass = "sc_alcohol"
 ITEM.Description = "Unfortunate."
 ITEM.CamPos = Vector(30, 0, 0)
@@ -20,7 +20,7 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	ply:AddEffect("Buzzed", 45)
+	ply:AddEffect("Buzzed",SlashCo.GetConsumableEffectDuration(ply, 45))
 end
 
 ITEM.ViewModel = {

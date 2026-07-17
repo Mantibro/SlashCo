@@ -21,7 +21,7 @@ function ITEM.OnUse(ply)
 	})
 
 	SlashCoSlashers.Sid.SidRage(ply)
-	ply:AddEffect("FuelSpeed", 30)
+	ply:AddEffect("FuelSpeed",SlashCo.GetConsumableEffectDuration(ply, 30))
 end
 
 ITEM.ViewModel = {

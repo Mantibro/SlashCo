@@ -1,13 +1,15 @@
 AddCSLuaFile()
 
-ENT.Type = "nextbot"
+local SlashCo = SlashCo
+
 ENT.Base = "base_nextbot"
+ENT.Type = "nextbot"
 ENT.PrintName = "MERLT0N"
 ENT.ClassName = "sc_merlton"
 ENT.PingType = "MERLT0N"
 
 if SERVER then
-	hook.Add("SlashCo:Precache", "SlashCo:PrecacheBeacon", function()
+	hook.Add("SlashCo:Precache", "SlashCo:PrecacheMerlton", function()
 		SlashCo.PrecacheSound("ambient/explosions/explode_1.wav")
 		SlashCo.PrecacheSound("npc/dog/dog_angry1.wav")
         SlashCo.PrecacheSound("npc/dog/dog_angry2.wav")
@@ -23,10 +25,12 @@ end
 
 function ENT:Initialize()
 	self:SetModel("models/dog.mdl")
+	self:SetModelScale(0.7)
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 
 	self.CollideSwitch = 3
 	self.AttackEngage = false
+	self.AttackedPlayer = nil
 	self.LoseTargetDist = 1500	-- How far the enemy has to be before we lose them
 	self.SearchRadius = 1000	-- How far to search for enemies
 end
@@ -104,11 +108,11 @@ function ENT:RunBehaviour()
 	while true do
 		-- Lets use the above mentioned functions to see if we have/can find a enemy
 		self:StartActivity(ACT_IDLE)
-        self:PlayDogIdle()
+		self:PlayDogIdle()
 		if not IsValid(self.AttackedPlayer) then
 			if self:HaveEnemy() then
 				-- Now that we have a enemy, the code in this block will run
-				self:SetSequence(self:LookupSequence("pound"))
+				self:SetSequence(self:LookupSequence("run_all"))
 				self.loco:FaceTowards(self:GetEnemy():GetPos())	-- Face our enemy
 				self:StartActivity( ACT_RUN )			-- Set the animation
 				self.loco:SetDesiredSpeed(300)		-- Set the speed that we will be moving at. Don't worry, the animation will speed up/slow down to match
@@ -121,7 +125,8 @@ function ENT:RunBehaviour()
 			else
 				-- Since we can't find an enemy, lets wander
 				-- Its the same code used in Garry's test bot
-				self:StartActivity( ACT_WALK )			-- Walk anmimation
+				self:SetSequence(self:LookupSequence("walk_all"))
+				self:StartActivity(ACT_WALK)
 				self.loco:SetDesiredSpeed(125)		-- Walk speed
 
 				local pos = SlashCo.LocalizedTraceHullLocatorAdvanced(self, 100, 200, self.GotStuck and -20 or 150)
@@ -133,23 +138,19 @@ function ENT:RunBehaviour()
 						tolerance = 50,
 						lookahead = 600
 					}) -- Walk to a random place
-					if result == "failed" then
-						self.GotStuck = true
-						self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
-					elseif result == "timeout" then
+					if result == "timeout" then
 						self.GotStuck = true
 					end
 
 					coroutine.wait(0.05)
 				else
-					coroutine.wait(4)
+					coroutine.wait(1)
 				end -- Walk to a random place
-				--self:StartActivity( ACT_IDLE )
 			end
 		else
-			self:StartActivity( 10 )
+			self:SetSequence(self:LookupSequence("pound"))
 			self.loco:FaceTowards(self.AttackedPlayer:GetPos())	-- Face our enemy
-			coroutine.wait(math.Rand(4, 12))
+			coroutine.wait(math.Rand(2, 3))
 		end
 		-- At this point in the code the bot has stopped chasing the player or finished walking to a random spot
 		-- Using this next function we are going to wait 2 seconds until we go ahead and repeat it 
@@ -268,12 +269,14 @@ function ENT:Think()
 		self.CollideSwitch = self.CollideSwitch - FrameTime()
 	elseif not self.SolidCooldown or CurTime() - self.SolidCooldown > 0.5 then
 		local notSolid = false
+
 		for _, v in ipairs(ents.FindInSphere(self:WorldSpaceCenter(), 40)) do
-			if v ~= self and v.Smiley then
+			if v ~= self then
 				notSolid = true
 				break
 			end
 		end
+
 		self:SetNotSolid(notSolid)
 		self.SolidCooldown = CurTime()
 	end
@@ -300,19 +303,25 @@ function ENT:Think()
 			if v:IsPlayer() and v:Team() == TEAM_SLASHER and v:GetPos():Distance(self:GetPos()) < 100 then
 				self.AttackedPlayer = v
 				self.Enemy = nil
-                self:AddGestureSequence(157) -- Set according sequence
+                SlashCo.StopChase(v)
                 v:Freeze(true)                  -- Freeze the enemy
-                timer.Simple(1.25, function()      -- How long it takes to kill the entity
+
+                timer.Simple(1.55, function()      -- How long it takes to kill the entity
+					if not IsValid(self) or not IsValid(v) then return end
+
+					v:SetNWBool("MerltonBlur", true)
+					v:Freeze(false)
                     self:Explode()                  -- Explode effect
 	            end)
-                timer.Simple(10, function()      -- How long it takes to unfreeze the enemy
-			    if not IsValid(v) then return end
-			        v:Freeze(false)                 -- Unfreeze
+
+                timer.Simple(12, function()      -- How long it takes to unfreeze the enemy
+					if not IsValid(v) then return end
+
+			        v:SetNWBool("MerltonBlur", false)
 	            end)
 			end
 		end
 	else
-
 		if self.AttackEngage == false then
 			local idx = math.random(1, 3)
 			SlashCo.AudioSystem.PlaySound({
@@ -334,6 +343,7 @@ end
 -- MERLT0N "Self-destructs"
 function ENT:Explode()
 	self.Exploded = true
+	self.AttackedPlayer = nil
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "ambient/explosions/explode_1.wav",
@@ -367,4 +377,13 @@ function ENT:PlayDogIdle()
 		volume = 1,
 		fadeIn = 0,
 	})
+end
+
+if CLIENT then
+	hook.Add("SlashCo:DrawHUD", "Merlton", function()
+		if GameData.LocalPlayer:GetNWBool("MerltonBlur") then
+			DrawSobel(0.2)
+			DrawToyTown(5, ScrH() / 2)
+		end
+	end)
 end

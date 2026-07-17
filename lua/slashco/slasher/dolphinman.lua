@@ -268,7 +268,9 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 	slasher:SetNWBool("DolphinFound", false)
 	slasher:SetNWBool("DolphinInHiding", false)
 	slasher:SetNWBool("DolphinHunting", false)
+
 	slasher:Freeze(true)
+	slasher:SetNWBool("DolphinStunned", true)
 
 	SlashCo.AudioSystem.StopSound("DolfinCall", 0.5, slasher)
 	SlashCo.AudioSystem.StopSound("DolfinCallFar", 0.5, slasher)
@@ -277,6 +279,8 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		if not IsValid(slasher) then return end
 
 		slasher:Freeze(false)
+		slasher:SetNWBool("DolphinStunned", false)
+
 		if not slasher:GetNWBool("CanKill") then
 			slasher:SetNWBool("CanKill", true)
 		end
@@ -349,6 +353,7 @@ function SLASHER.Animator(ply)
 	local hunt = ply:GetNWBool("DolphinHunting")
 	local hide = ply:GetNWBool("DolphinInHiding")
 	local found = ply:GetNWBool("DolphinFound")
+	local stun = ply:GetNWBool("DolphinStunned")
 
 	if ply:IsOnGround() then
 		if not hunt then
@@ -368,6 +373,16 @@ function SLASHER.Animator(ply)
 
 	if found then
 		ply.CalcSeqOverride = ply:LookupSequence("found")
+	end
+
+	if stun then
+		ply.CalcSeqOverride = ply:LookupSequence("stun")
+		if not ply.anim_antispam then
+			ply:SetCycle(0)
+			ply.anim_antispam = true
+		end
+	else
+		ply.anim_antispam = false
 	end
 
 	return ply.CalcIdeal, ply.CalcSeqOverride

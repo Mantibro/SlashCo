@@ -53,6 +53,7 @@ function ENT:DestroyJonkler()
 	})
 
 	SlashCo.AudioSystem.StopSound("JonklerCart", 5, self)
+	self:Remove()
 end
 
 function ENT:Think()
@@ -64,9 +65,21 @@ function ENT:Think()
 
 	local pos = self:GetPos()
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if slasher:GetPos():Distance(pos) > 300 then continue end -- out of range
+		if slasher:GetPos():Distance(pos) > 200 then continue end -- out of range
 
 		self:DestroyJonkler()
 		break
+	end
+end
+
+if CLIENT then
+	function ENT:Think()
+		local pos = self:GetPos()
+		for _, slashers in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			if slashers:GetPos():Distance(pos) > 700 then continue end
+
+			local lookAngle = (pos - slashers:GetPos()):Angle()
+			slashers:SetEyeAngles(lookAngle)
+		end
 	end
 end

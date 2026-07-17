@@ -35,7 +35,7 @@ SLASHER.AngerIncrease = 10 -- Anger increase of objectives being completed & eve
 SLASHER.AngerPassiveGain = 0
 SLASHER.AngerChaseGain = 0
 SLASHER.MinChase = 20 -- Number of seconds that are the minimum for a chase
-SLASHER.MinTylerTime = 5 -- Number of seconds he has to be at minimum as tyler the creator.
+SLASHER.MinTylerTime = 15 -- Number of seconds he has to be at minimum as tyler the creator.
 SLASHER.AllowEndlessChase = false -- If true, tyler will enter a endless chase once a round has reached the slow escape mark.
 SLASHER.CustomBackgroundMusic = true -- Tyler has his own background music.
 SLASHER.DisableHelicopterMusic = true
@@ -56,7 +56,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.TimeAddedForPlayerKill = 180 - (10 * additionalSurvivors)
 	SLASHER.TimeRemovedWhenFound = math.max(10 - additionalSurvivors, 2) -- For every missing survivor we add time increasing it up to 15, for every additional we reduce it by 1
 
-	SLASHER.MinTylerTime = math.Clamp(5 + (-0.5 * additionalSurvivors), 2, 30)
+	SLASHER.MinTylerTime = math.Clamp(15 + (-0.5 * additionalSurvivors), 2, 30)
 end
 
 local function EndlessChase()
@@ -133,8 +133,8 @@ function SLASHER.Precache()
 end
 
 function SLASHER.HideTime(slasher)
-	slasher.TylerTime = (90 + SLASHER.MinTylerTime + ((team.NumPlayers(TEAM_SURVIVOR) + SlashCo.MapSize) * 5)) - SlashCo.GetSlasherAnger(slasher)
-	-- print("Tyler transformation time: " .. slasher.TylerTime)
+	slasher.TylerTime = (90 + SLASHER.MinTylerTime + (SlashCo.MapSize * 4)) - SlashCo.GetSlasherAnger(slasher)
+	--print("[SlashCo] Tyler transformation time: " .. slasher.TylerTime)
 end
 
 --[[
@@ -703,9 +703,10 @@ function SLASHER.InitHud(_, hud)
 	hud.prevState = -1
 	hud.destroyEnabled = true
 	hud.prevWater = -1
+	local HuntTimeColor = Color(255, 0, 0, 255)
 	function hud.AlsoThink()
 		local state = GameData.LocalPlayer:GetNWInt("TylerState")
-		if state == 0 then
+		if state == TYLER_SPECTER then
 			local isInWater = GameData.LocalPlayer:WaterLevel() > 1
 			if hud.prevWater ~= isInWater then
 				if isInWater then
@@ -717,10 +718,10 @@ function SLASHER.InitHud(_, hud)
 		end
 
 		if state ~= hud.prevState then
-			if state == 0 then
+			if state == TYLER_SPECTER then
 				hud:SetControlVisible("R", true)
 				hud:SetControlText("R", "manifest")
-			elseif state == 1 then
+			elseif state == TYLER_CREATOR then
 				hud:SetControlVisible("R", true)
 				hud:SetControlEnabled("R", false)
 				hud:SetControlText("R", "(hiding)")
@@ -729,7 +730,7 @@ function SLASHER.InitHud(_, hud)
 				hud:SetControlVisible("R", false)
 			end
 
-			if state <= 1 then
+			if state <= TYLER_CREATOR then
 				hud:SetTitle("Tyler_creator")
 				hud:SetAvatar("creator")
 			else
@@ -737,7 +738,7 @@ function SLASHER.InitHud(_, hud)
 				hud:SetAvatar("destroyer")
 			end
 
-			if state == 3 then
+			if state == TYLER_DESTROYER then
 				hud:SetCrosshairEnabled(true)
 			else
 				hud:SetCrosshairAlpha(0)
@@ -750,15 +751,24 @@ function SLASHER.InitHud(_, hud)
 			hud.prevState = state
 		end
 
-		if hud.prevState ~= 3 then -- eno: Just checking if he's in any form other than Destroyer.
-			if GameData.LocalPlayer:GetNWInt("TylerHideTime") then
-				draw.SimpleText("HIDE TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHideTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+				return
 			end
-		elseif hud.prevState == 3 and hud.prevState ~= 1 then -- eno: Basically checking if he's in Destroyer form and not in Creator form.
-			if GameData.LocalPlayer:GetNWInt("TylerHuntTime") then
-				draw.SimpleText("HUNT TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("TylerHuntTime"), 1), "TVCD", ScrW() / 2, 550, Color(255, 0, 0, 255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+
+			if state == TYLER_DESTROYER then
+				local HuntTime = GameData.LocalPlayer:GetNWInt("TylerHuntTime")
+				if HuntTime > 0 then -- In Lua "if 0 then" is still true.
+					draw.SimpleText("HUNT TIME: " .. math.Round(HuntTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+				end
+			else
+				local HideTime = GameData.LocalPlayer:GetNWInt("TylerHideTime")
+				if HideTime > 0 then
+					draw.SimpleText("HIDE TIME: " .. math.Round(HideTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+				end
 			end
-		end
+		end)
 
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
 		local class = IsValid(target) and target:GetClass()

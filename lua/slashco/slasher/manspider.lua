@@ -15,7 +15,7 @@ SLASHER.ProwlSpeed = 250
 SLASHER.ChaseSpeed = 315
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 5
-SLASHER.KillDistance = 180
+SLASHER.KillDistance = 200
 SLASHER.ChaseRange = 1200
 SLASHER.ChaseRadius = 0.9
 SLASHER.ChaseDuration = 9.0
@@ -29,7 +29,7 @@ SLASHER.SpeedRating = "★★★☆☆"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★☆☆"
 SLASHER.CannotBeSpectated = true
-SLASHER.AngerPassiveGain = 0.001 -- Anger thats gained per second when hes getting surrounded by survivors.
+SLASHER.AngerPassiveGain = 0.003 -- Anger thats gained per second when hes getting surrounded by survivors.
 SLASHER.NestedRange = 1000 -- When nested, this range is used to check for any nearby survivors.
 SLASHER.AdditionalAngerMult = 0 -- Used to multiply FrameTime which is then added additionally to the Anger.
 SLASHER.JumpStrengthForward = 800 -- forward Velocity used when jumping
@@ -383,95 +383,94 @@ function SLASHER.HandleDOT(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher.KillDelayTick > 0 then return end
 	if slasher:GetNWBool("ManspiderNested") then return end
 
-	if target ~= slasher.TargetPlayer then
-		slasher:SetNWBool("ManspiderBite", false)
-		timer.Remove("ManspiderBiteDecay")
+	if target == slasher.TargetPlayer then
+		SlashCo.Jumpscare(slasher, target)
+		return
+	end
 
-		slasher.KillDelayTick = SLASHER.KillDelay
+	if slasher.KillDelayTick > 0 then return end
 
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/manspider/manspider_bite.mp3",
-			identifier = "ManspiderBite",
-			minDistance = 600,
-			maxDistance = 800,
-			entity = slasher,
-			volume = 1,
-			fadeIn = 0,
-		})
+	slasher:SetNWBool("ManspiderBite", false)
+	timer.Remove("ManspiderBiteDecay")
 
-		timer.Simple(0.3, function()
-			if not IsValid(slasher) then return end
+	slasher.KillDelayTick = SLASHER.KillDelay
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/manspider/manspider_bite.mp3",
+		identifier = "ManspiderBite",
+		minDistance = 600,
+		maxDistance = 800,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+	})
+
+	timer.Simple(0.3, function()
+		if not IsValid(slasher) then return end
 
 			--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
 			--		Vector(-35, -45, -60), Vector(35, 45, 60), damage, DMG_SLASH, 5, false)
 
-			slasher:LagCompensation(true)
-			local tr = util.TraceHull({
-				start = slasher:EyePos(),
-				endpos = slasher:LocalToWorld(Vector(50, 0, 50)),
-				maxs = Vector(35, 45, 60),
-				mins = Vector(-35, -45, -60),
-				filter = slasher,
-				ignoreworld = true,
-			})
-			slasher:LagCompensation(false)
+		slasher:LagCompensation(true)
+		local tr = util.TraceHull({
+			start = slasher:EyePos(),
+			endpos = slasher:LocalToWorld(Vector(50, 0, 50)),
+			maxs = Vector(60, 60, 60),
+			mins = Vector(-60, -60, -60),
+			filter = slasher,
+			ignoreworld = true,
+		})
+		slasher:LagCompensation(false)
 
-			local target = tr.Entity
-			local damage = 5 + (SlashCo.GetSlasherAnger(slasher) / 5)
+		local target = tr.Entity
+		local damage = 5 + (SlashCo.GetSlasherAnger(slasher) / 5)
 
-			if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
-				local dmg = DamageInfo()
-				dmg:SetDamageType(DMG_SLASH)
-				dmg:SetAttacker(slasher)
-				dmg:SetInflictor(slasher)
-				dmg:SetDamage(damage)
-				dmg:SetDamageForce(Vector(1, 1, 1))
-				dmg:SetDamagePosition(tr.HitPos)
-				target:TakeDamageInfo(dmg)
-			end
-
-			if not target:IsValid() then return end
+		if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+			local dmg = DamageInfo()
+			dmg:SetDamageType(DMG_SLASH)
+			dmg:SetAttacker(slasher)
+			dmg:SetInflictor(slasher)
+			dmg:SetDamage(damage)
+			dmg:SetDamageForce(Vector(1, 1, 1))
+			dmg:SetDamagePosition(tr.HitPos)
+			target:TakeDamageInfo(dmg)
 
 			SlashCo.BustDoor(slasher, target, 60000)
-			if target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
-				SLASHER.HandleDOT(slasher, target)
+		end
 
-				local o = Vector(0, 0, 50)
-				local vPoint = target:GetPos() + o
-				local bloodfx = EffectData()
-				bloodfx:SetOrigin(vPoint)
-				util.Effect("BloodImpact", bloodfx)
+		if target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
+			SLASHER.HandleDOT(slasher, target)
 
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
-					identifier = "SurvivorBited",
-					minDistance = 600,
-					maxDistance = 800,
-					entity = target,
-					volume = 1,
-					fadeIn = 0,
-				})
-			end
-		end)
+			local o = Vector(0, 0, 50)
+			local vPoint = target:GetPos() + o
+			local bloodfx = EffectData()
+			bloodfx:SetOrigin(vPoint)
+			util.Effect("BloodImpact", bloodfx)
 
-		timer.Simple(0.05, function()
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
+				identifier = "SurvivorBited",
+				minDistance = 600,
+				maxDistance = 800,
+				entity = target,
+				volume = 1,
+				fadeIn = 0,
+			})
+		end
+	end)
+
+	timer.Simple(0.05, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("ManspiderBite", true)
+		timer.Create("ManspiderBiteDecay", 1.5, 1, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("ManspiderBite", true)
-			timer.Create("ManspiderBiteDecay", 1.5, 1, function()
-				if not IsValid(slasher) then return end
-
-				slasher:SetNWBool("ManspiderBite", false)
-			end)
+			slasher:SetNWBool("ManspiderBite", false)
 		end)
-
-		return
-	else
-		SlashCo.Jumpscare(slasher, target)
-	end
+	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)

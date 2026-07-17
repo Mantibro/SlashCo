@@ -100,7 +100,7 @@ SlashCo.LangTable["Drainage"] = "Drenaje"
 SlashCo.LangTable["Drainage_desc"] = "Encontraras más Gasolina,\nPero\nlos Generadores perderán Gasolina lentamente."
 
 SlashCo.LangTable["Duality"] = "Dualidad"
-SlashCo.LangTable["Duality_desc"] = "Solo necesitaras prender un generador,\nPero\nApareceran dos Slashers."
+SlashCo.LangTable["Duality_desc"] = "Apareceran dos Slashers."
 
 SlashCo.LangTable["Singularity"] = "Singularidad"
 SlashCo.LangTable["Singularity_desc"] = "Encontraras más Gasolina,\nPero\nEl Slasher sera más poderoso."
@@ -199,7 +199,7 @@ SlashCo.LangTable["PocketSand"] = "Arena de Bolsillo"
 SlashCo.LangTable["PocketSand_desc"] = "Siega a Slashers que están a rango cercano."
 
 SlashCo.LangTable["Rock"] = "La Roca"
-SlashCo.LangTable["Rock_desc"] = "Te hace completamente silencioso, pero no puedes correr. Cuando dejada caer, se empujara hacia la Gasolina má​​​​​​​s cercana ocasionalmente."
+SlashCo.LangTable["Rock_desc"] = "Te hace completamente silencioso, pero tu velocidad al correr es menor. Cuando dejada caer, se empujara hacia la Gasolina má​​​​​​​s cercana ocasionalmente."
 
 SlashCo.LangTable["Soda"] = "Soda D-Saparece"
 SlashCo.LangTable["Soda_desc"] = "Te hace invisible cuando usada."
@@ -242,6 +242,9 @@ SlashCo.LangTable["Burger_desc"] = "Una hamburguesa creada por un payaso lunatic
 
 SlashCo.LangTable["CocaCola"] = "Refresco de Cola"
 SlashCo.LangTable["CocaCola_desc"] = "Pedimos granadas y esto fue lo que nos dieron. Ten cuidado al usarla."
+
+SlashCo.LangTable["Merlton"] = "MERLT0N"
+SlashCo.LangTable["Merlton_desc"] = "Quieres enfretarte a los slashers? No busques mas que MERLT0N! Patrullara el area alrededor, cualquier slasher cercano sera perseguido y paralizado por 10 segundos."
 
 --GameInfo
 
@@ -768,6 +771,15 @@ SlashCo.LangTable["perk_healthy_desc"] = "Items consumibles curan un 50% mas.\nT
 
 SlashCo.LangTable["perk_adrenalinerush"] = "Subidon de Adrenalina"
 SlashCo.LangTable["perk_adrenalinerush_desc"] = "Cuando el helicoptero aterriza, recibes un poco de curacion y una mejora temporal de velocidad."
+
+SlashCo.LangTable["perk_extremely_buff"] = "Fuerza Extrema"
+SlashCo.LangTable["perk_extremely_buff_desc"] = "Cargar objetos pesados no sera nada para ti.\nTodo el daño que recibas aumenta un 50%."
+
+SlashCo.LangTable["perk_balkan_warrior"] = "Guerrero Balkan"
+SlashCo.LangTable["perk_balkan_warrior_desc"] = "El post-efecto de Balkan Boost ya no te perjudica.\nLa velocidad al insertar gasolinas de Balkan Boost es reducida."
+
+SlashCo.LangTable["perk_glutton"] = "Gloton"
+SlashCo.LangTable["perk_glutton_desc"] = "Todos los efectos de consumibles duran un 50% mas.\nLos consumibles curan un 50% menos."
 
 -- Keyboard UI
 
