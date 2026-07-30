@@ -621,7 +621,7 @@ end
 
 GameData.CurrentDocumentScroll = GameData.CurrentDocumentScroll or 0
 hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
-	if not GameData.IsLobby or GameData.LocalPlayer:Team() == TEAM_SPECTATOR then
+	if not GameData.IsLobby or GameData.LocalPlayer:Team() == TEAM_SPECTATOR or bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then
 		return
 	end
 
