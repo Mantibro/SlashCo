@@ -243,9 +243,8 @@ function PLAYER:SurvivorPing()
 		ID = GameData.NextPingID,
 		ExpiryTime = 0, -- Time in seconds!
 		Team = self:Team(), -- Idea: Allow slasher's to ping too
+		Player = self,
 	}
-
-	pingInfo.Player = self
 
 	if pingInfo.Team == TEAM_SPECTATOR then
 		pingInfo.Type = "GHOST"
@@ -312,7 +311,16 @@ function PLAYER:SurvivorPing()
 		end
 	end
 
-	if pingInfo.Team == TEAM_SURVIVOR then
+	if pingInfo.ExpiryTime then
+		if pingInfo.ExpiryTime ~= 0 then
+			pingInfo.ExpiryTime = CurTime() + pingInfo.ExpiryTime
+		else
+			pingInfo.ExpiryTime = nil
+		end
+	end
+
+	local skipSound = hook.Run("SlashCo:OnPing", pingInfo)
+	if not skipSound and pingInfo.Team == TEAM_SURVIVOR then
 		if typeCheck[pingInfo.Type] then
 			sayPrompt(self, typeCheck[pingInfo.Type])
 		elseif pingInfo.Type == "ITEM" and pingInfo.Entity then
@@ -329,14 +337,6 @@ function PLAYER:SurvivorPing()
 					break
 				end
 			end
-		end
-	end
-
-	if pingInfo.ExpiryTime then
-		if pingInfo.ExpiryTime ~= 0 then
-			pingInfo.ExpiryTime = CurTime() + pingInfo.ExpiryTime
-		else
-			pingInfo.ExpiryTime = nil
 		end
 	end
 

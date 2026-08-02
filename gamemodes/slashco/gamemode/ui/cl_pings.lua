@@ -98,11 +98,14 @@ net.Receive("SlashCo:SurvivorPings", function()
 		end
 
 		antiDupePings(pingInfo)
-		if not fullUpdate and pingInfo.Team ~= TEAM_SLASHER then
-			if pingInfo.Type == "GENERATOR" then
-				GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
-			elseif pingInfo.Type ~= "LOOK HERE" and pingInfo.Type ~= "LOOK AT THIS" and pingInfo.Type ~= "GHOST" then
-				GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
+		if not fullUpdate then
+			local skipSound = hook.Run("SlashCo:OnPing", pingInfo)
+			if not skipSound and pingInfo.Team ~= TEAM_SLASHER then
+				if pingInfo.Type == "GENERATOR" then
+					GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
+				elseif pingInfo.Type ~= "LOOK HERE" and pingInfo.Type ~= "LOOK AT THIS" and pingInfo.Type ~= "GHOST" then
+					GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
+				end
 			end
 		end
 
