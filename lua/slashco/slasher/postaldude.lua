@@ -199,7 +199,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		-- Play a sound to let people know that they unlocked a new weapon
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/postaldude/dude_deagle1" .. ".ogg",
-			identifier = "PostalDeagle",
+			identifier = "PostalDeagleIntro",
 			minDistance = 500,
 			maxDistance = 750,
 			entity = slasher,
@@ -217,7 +217,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		-- Once again play a sound to inform the player of a new weapon being unlocked
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/postaldude/dude_machinegun1" .. ".ogg",
-			identifier = "PostalDeagle",
+			identifier = "PostalM4",
 			minDistance = 500,
 			maxDistance = 750,
 			entity = slasher,
@@ -510,7 +510,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		local idx = math.random(1, 2)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/postaldude/dude_shovelswing" .. idx .. ".ogg",
-				identifier = "PostalDeagleSwing" .. idx,
+				identifier = "PostalShovelSwing" .. idx,
 				minDistance = 500,
 				maxDistance = 750,
 				entity = slasher,
@@ -593,7 +593,7 @@ function SLASHER.OnPrimaryFire(slasher)
 				slasher:SetNWFloat("PostalDeagleShoot", CurTime())
 				SlashCo.AudioSystem.PlaySound({
 						soundPath = "slashco/slasher/postaldude/dude_deagleshoot" .. ".ogg",
-						identifier = "PostalDeagle",
+						identifier = "PostalDeagleShoot",
 						minDistance = 750,
 						maxDistance = 1250,
 						looping = false,
@@ -651,7 +651,7 @@ function SLASHER.OnPrimaryFire(slasher)
 			-- Don't have bullets? Play sound
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "weapons/shotgun/shotgun_empty" .. ".wav",
-				identifier = "PostalM4",
+				identifier = "PostalDeagleEmpty",
 				minDistance = 750,
 				maxDistance = 1250,
 				looping = false,
@@ -729,7 +729,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		else
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "weapons/shotgun/shotgun_empty" .. ".wav",
-				identifier = "PostalM4",
+				identifier = "PostalM4Empty",
 				minDistance = 750,
 				maxDistance = 1250,
 				looping = false,
@@ -1006,7 +1006,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			local idx = math.random(1, 3)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/postaldude/dude_machinegun" .. idx .. ".ogg",
-				identifier = "PostalDeagleEquip" .. idx,
+				identifier = "PostalM4Equip" .. idx,
 				minDistance = 500,
 				maxDistance = 750,
 				entity = slasher,
