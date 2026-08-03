@@ -1434,20 +1434,36 @@ end
 	-- This is the CLIENT example (Thank you Raphael)
 	--hook.Add("SlashCo:OnPing", "PostalDudeSayStuff", function(pingInfo)
 	--   if pingInfo.Team ~= TEAM_SLASHER then return end
-	--   if not pingInfo.Player then return end -- it can be nil!
+	--   --if not pingInfo.Player then return end -- it can be nil!
 --
 	--   -- pingInfo.Player is the entIndex since when a player may not always be known to a client.
 	--   local ply = Entity(pingInfo.Player)
-	--   if not IsValid(ply) then return end
+	-- 	 if not IsValid(ply) then return end
 --
 	--   -- Can be any slasher ID
 	--   if ply:GetNWString("Slasher") ~= "PostalDude" then return end
-	-- It's our slasher so play a sound
---			if pingInfo.Type == "GENERATOR" then
-	--			ply:EmitSound("slashco/ping_generator.mp3")
---			elseif pingInfo.Type == "LOOK HERE" then
---				ply:EmitSound("slashco/ping_generator.mp3")
---			end
+	----It's our slasher so play a sound
+	--		if pingInfo.Type == "GENERATOR" or pingInfo.Type == "ITEM" then
+	--			SlashCo.AudioSystem.PlaySound({
+	--			soundPath = "slashco/slasher/postaldude/dude_pingitemorgen" .. math.random(1, 3) ".ogg",
+	--			identifier = "PostalPingMisc",
+	--			minDistance = 500,
+	--			maxDistance = 750,
+	--			entity = ply,
+	--			volume = 1,
+	--			fadeIn = 0,
+	--				})
+	--		elseif pingInfo.Type == "SURVIVOR" then
+	--			SlashCo.AudioSystem.PlaySound({
+	--			soundPath = "slashco/slasher/postaldude/dude_pingsurvivor" .. math.random(1, 4) ".ogg",
+	--			identifier = "PostalPingMisc",
+	--			minDistance = 500,
+	--			maxDistance = 750,
+	--			entity = ply,
+	--			volume = 1,
+	--			fadeIn = 0,
+	--				})
+	--		end
 	--   return true -- true so that the gamemode doesn't try to also play any sounds
 	--end)
 
