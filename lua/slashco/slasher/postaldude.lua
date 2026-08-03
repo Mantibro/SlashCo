@@ -95,7 +95,6 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("PostalStage4", false)
 	slasher:SetNWBool("DeagleUnlocked", false)
 	slasher:SetNWBool("MGUnlocked", false)
-	SlashCo.AddSlasherAnger(slasher, 100)
 	DeagleBulletsControl(slasher, 6)
 	MGBulletsControl(slasher, 20)
 	slasher:SetEyeSight(SLASHER.Eyesight)
@@ -168,19 +167,21 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCo.AudioSystem.StopSound("PostalStage2", 1, slasher)
 		SlashCo.AudioSystem.StopSound("PostalStage3", 1, slasher)
 		-- Passive Ambience emitting from Postal Dude if he's not in chase
-		if not slasher:GetNWBool("PostalAmbience") then
-			slasher:SetNWBool("PostalAmbience", true)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_ambience.ogg",
-				identifier = "PostalAmbience",
-				minDistance = 1000 * SlashCo.MapSize,
-				maxDistance = 1500 * SlashCo.MapSize,
-				looping = true,
-				entity = slasher,
-				volume = 0.6,
-				fadeIn = 1,
-				sendToEntity = team.GetPlayers(TEAM_SURVIVOR)
-			})
+		if not slasher:GetNWBool("PostalStage4") then	
+			if not slasher:GetNWBool("PostalAmbience") then
+				slasher:SetNWBool("PostalAmbience", true)
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/postaldude/dude_ambience.ogg",
+					identifier = "PostalAmbience",
+					minDistance = 500 * SlashCo.MapSize,
+					maxDistance = 1000 * SlashCo.MapSize,
+					looping = true,
+					entity = slasher,
+					volume = 0.3,
+					fadeIn = 1,
+					sendToEntity = team.GetPlayers(TEAM_SURVIVOR)
+				})
+			end
 		end
 	else
 		slasher:SetNWBool("PostalAmbience", false)
