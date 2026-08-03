@@ -617,6 +617,29 @@ SlashCo.LangTable["Hoovydundy_tip"] = "-Never try to stun him."
 SlashCo.LangTable["genblock"] = "block generator"
 SlashCo.LangTable["entangle"] = "entangle"
 
+--Postal Dude
+SlashCo.LangTable["PostalDude"] = "Postal Dude"
+SlashCo.LangTable["PostalDude_desc"] = [[A very tactical slasher with an emphasis on all round range combat, short chases 
+and general versisitility.
+
+-Your patience meter depletes over time when out of chase buffing your speed
+-Patience will deplete in chase and by dealing damage
+-You have an arsenal of weapons suitable at all ranges, unlocked as the game progresses
+-You may pick up gas cans to use them offensively instead, pouring gas on the ground and igniting it with matches]]
+SlashCo.LangTable["PostalDude_tip"] = "-Postal Dude relies on ambushing unsuspecting or out of position players, make sure to pay attention to a subtle change in the ambience and plan accordingly especially when out in the open!"
+
+
+SlashCo.LangTable["patience"] = "patience"
+SlashCo.LangTable["shovel"] = "shovel"
+SlashCo.LangTable["deagle"] = "deagle"
+SlashCo.LangTable["m4"] = "m4"
+SlashCo.LangTable["kick"] = "kick"
+SlashCo.LangTable["shovel bash"] = "shovel bash"
+SlashCo.LangTable["shoot"] = "shoot"
+SlashCo.LangTable["ignite"] = "pour"
+SlashCo.LangTable["deagle ammo"] = "deagle ammo"
+SlashCo.LangTable["m4 ammo"] = "m4 ammo"
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide" -- for dolphinman to unhide
