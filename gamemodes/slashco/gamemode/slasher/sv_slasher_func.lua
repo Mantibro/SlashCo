@@ -332,69 +332,57 @@ function SlashCo.StopChase(slasher)
 	end
 end
 
-function SlashCo.StartChaseMode(slasher)
-	if (slasher.ChaseActivationCooldown or 0) > 0 then
-		return
+function SlashCo.StartChaseMode(slasher, forceChase)
+	if not forceChase then
+		if (slasher.ChaseActivationCooldown or 0) > 0 then return end
+
+		if not slasher:GetNWBool("CanChase") then return end
+
+		slasher:LagCompensation(true)
+		local trace = slasher:GetEyeTrace()
+		slasher:LagCompensation(false)
+
+		local target
+		local isFound = false
+		local dist = slasher:SlasherValue("ChaseRange", 1000)
+		if trace.Entity:IsPlayer() and trace.Entity:Team() == TEAM_SURVIVOR
+				and slasher:GetPos():Distance(trace.Entity:GetPos()) < dist then
+
+			target = trace.Entity
+			isFound = true
+		end
+
+		if not isFound then
+			local found = ents.FindInCone(slasher:GetPos(), trace.Normal, dist, slasher:SlasherValue("ChaseRadius", 0.91))
+			for _, ent in ipairs(found) do
+				if ent:IsPlayer() and ent:Team() == TEAM_SURVIVOR then
+					target = ent
+					break
+				end
+			end
+
+			if not IsValid(target) then return end
+			local tr = util.TraceLine({
+				start = slasher:EyePos(),
+				endpos = target:WorldSpaceCenter(),
+				filter = slasher
+			})
+
+			if tr.Entity ~= target then return end
+			if slasher:GetPos():Distance(target:GetPos()) >= dist then return end
+		end
 	end
 
-	if not slasher:GetNWBool("CanChase") then
-		return
-	end
-
+	-- Even if you use forceChase, you should never start a chase while being in a case!
 	if slasher:GetNWBool("InSlasherChaseMode") then
 		SlashCo.StopChase(slasher)
 		return
 	end
 
-	slasher:LagCompensation(true)
-	local trace = slasher:GetEyeTrace()
-	slasher:LagCompensation(false)
-
-	local target
-	local isFound = false
-	local dist = slasher:SlasherValue("ChaseRange", 1000)
-	if trace.Entity:IsPlayer() and trace.Entity:Team() == TEAM_SURVIVOR
-			and slasher:GetPos():Distance(trace.Entity:GetPos()) < dist then
-
-		target = trace.Entity
-		isFound = true
-	end
-
-	if not isFound then
-		local find = ents.FindInCone(slasher:GetPos(), trace.Normal, dist, slasher:SlasherValue("ChaseRadius", 0.91))
-
-		for i = 1, #find do
-			if find[i]:IsPlayer() and find[i]:Team() == TEAM_SURVIVOR then
-				target = find[i]
-				break
-			end
-		end
-
-		if not IsValid(target) then
-			return
-		end
-
-		local tr = util.TraceLine({
-			start = slasher:EyePos(),
-			endpos = target:WorldSpaceCenter(),
-			filter = slasher
-		})
-
-		if tr.Entity ~= target then
-			return
-		end
-
-		if slasher:GetPos():Distance(target:GetPos()) >= dist then
-			return
-		end
-	end
-
 	local duration = slasher:SlasherValue("ChaseDuration", 10) * 10 + 45
 	local curSlasher = slasher:GetNWString("Slasher")
 	timer.Create("SlashCoEndChase_" .. slasher:UserID(), duration, 1, function()
-		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= curSlasher then
-			return
-		end
+		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= curSlasher then return end
 
 		SlashCo.StopChase(slasher)
 	end)
