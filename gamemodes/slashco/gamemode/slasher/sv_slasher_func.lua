@@ -413,7 +413,7 @@ function SlashCo.StartChaseMode(slasher)
 		looping = true,
 		entity = slasher,
 		volume = 0.7,
-		fadeIn = 1,
+		fadeIn = 0,
 	})
 
 	SlashCo.AddFog({
