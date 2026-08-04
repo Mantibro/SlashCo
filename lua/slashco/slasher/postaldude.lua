@@ -563,7 +563,7 @@ function SLASHER.OnPrimaryFire(slasher)
 
 			if not slasher:GetNWBool("PostalStage4") then
 				if not slasher:GetNWBool("InSlasherChaseMode") then
-					SlashCo.StartChaseMode(slasher)
+					SlashCo.StartChaseMode(slasher, true)
 					slasher:SetNWBool("InSlasherChaseMode", true)
 				end
 			end
@@ -625,7 +625,7 @@ function SLASHER.OnPrimaryFire(slasher)
 										if not slasher:GetNWBool("PostalStage4") then
 												SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
 											if not slasher:GetNWBool("InSlasherChaseMode") then
-												SlashCo.StartChaseMode(slasher)
+												SlashCo.StartChaseMode(slasher, true)
 											end
 										end
     						        end
@@ -710,7 +710,7 @@ function SLASHER.OnPrimaryFire(slasher)
     								            if not slasher:GetNWBool("PostalStage4") then
 														SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
 													if not slasher:GetNWBool("InSlasherChaseMode") then
-														SlashCo.StartChaseMode(slasher)
+														SlashCo.StartChaseMode(slasher, true)
 													end
 												end
     								        end
@@ -977,7 +977,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 			if not slasher:GetNWBool("PostalStage4") then
 				if not slasher:GetNWBool("InSlasherChaseMode") then
 					if not slasher:GetNWBool("SwitchToGas") then
-						SlashCo.StartChaseMode(slasher)
+						SlashCo.StartChaseMode(slasher, true)
 						slasher:SetNWBool("InSlasherChaseMode", true)
 					end
 				end
