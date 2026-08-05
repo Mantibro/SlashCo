@@ -29,16 +29,14 @@ local function MGBulletsControl(slasher, bullets)
 	slasher:SetNW2Float("MGBulletsAmount", math.Clamp(MGBulletsAmount(slasher) + bullets, 0, 20))
 end
 
-local modelList = {
-	"models/Items/357ammo.mdl",
-	"models/Items/BoxSRounds.mdl",
-	"models/Items/BoxMRounds.mdl",
-}
-
 function ENT:Initialize()
 	if not CLIENT then return end
 
-	self:SetModel(modelList[math.random(0, #modelList)])
+	self:SetModel(({
+    "models/Items/357ammo.mdl",
+    "models/Items/BoxSRounds.mdl",
+    "models/Items/BoxMRounds.mdl"
+	})[math.random(3)])
 	self:SetSolid(SOLID_VPHYSICS)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
