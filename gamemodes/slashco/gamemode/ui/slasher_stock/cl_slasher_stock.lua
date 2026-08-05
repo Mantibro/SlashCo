@@ -238,6 +238,7 @@ function PANEL:RemoveControl(key)
 
 	self.Controls[key]:Remove()
 	self.Controls[key] = nil
+	self:ControlTies[key] = nil
 end
 
 ---removes all controlls
@@ -247,6 +248,7 @@ function PANEL:RemoveControls()
 	end
 
 	self.Controls = {}
+	self:ControlTies = {}
 end
 
 ---sets a control's text
