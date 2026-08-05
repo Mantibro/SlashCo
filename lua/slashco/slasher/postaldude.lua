@@ -27,7 +27,7 @@ SLASHER.PatienceChaseDecrease = -0.01	-- How fast Patience should decrease in ch
 SLASHER.FuelAmount = 30		-- Max amount of fuel
 SLASHER.FuelRegen = 0.005	-- How fast fuel should passively regen
 SLASHER.GunShotDecay = 0.120 -- How long he'll be in the shooting animation.
-SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
+SLASHER.ChaseMusic = ""
 SLASHER.KillSound = ""
 SLASHER.Description = "PostalDude_desc"
 SLASHER.ProTip = "PostalDude_tip"
@@ -98,8 +98,6 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("MGUnlocked", false)
 	DeagleBulletsControl(slasher, 6)
 	MGBulletsControl(slasher, 20)
-	slasher:SetEyeSight(SLASHER.Eyesight)
-	slasher:SetPerception(SLASHER.Perception)
 	slasher.PostalState = -1		-- This state is important so we display HUD information accurately to the slasher
 	slasher.DeagleAmmo = 6
 	slasher.FuelAmount = 30			-- Default fuel amount
@@ -108,6 +106,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher.M4Cooldown = 0
 	slasher.GasCooldown = 0
 	slasher.KickCooldown = 0
+	SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
 end
 
 function SLASHER.Footstep(ply)
@@ -135,6 +134,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	local KickCooldown = slasher.KickCooldown or 0 -- Kick Cooldown
 	local PostalState = slasher.PostalState or 0 -- Postal State
 	local GunSpread = slasher.GunSpread or 0
+	slasher:SetEyeSight(SLASHER.Eyesight)
+	slasher:SetPerception(SLASHER.Perception)
 
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
@@ -264,16 +265,19 @@ function SLASHER.OnTickBehaviour(slasher)
 	if stage == 1 then
 		slasher:SetNWBool("PostalStage1", true)
 		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
+		SLASHER.Perception = 1.5
 	end
 	if stage == 2 then
 		slasher:SetNWBool("DeagleUnlocked", true)
 		slasher:SetNWBool("PostalStage2", true)
 		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase2.ogg"
+		SLASHER.Perception = 2.0
 	end
 	if stage == 3 then
 		slasher:SetNWBool("MGUnlocked", true)
 		slasher:SetNWBool("PostalStage3", true)
 		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase3.ogg"
+		SLASHER.Perception = 3.0
 	end
 	if stage == 4 then
 		slasher:SetNWBool("PostalStage4", true)
@@ -283,7 +287,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		SlashCo.AddSlasherAnger(slasher, 100)
-		
+		SLASHER.Perception = 5.0
 	end
 
 	-- Mainly used for HUD control
@@ -1291,6 +1295,7 @@ function SLASHER.Animator(ply)
 	-- We can't actually play the animations through this hook, otherwise only Postal Dude will be able to see it, and no one else
 	hook.Add("PlayerButtonDown", "PostalBird", function(ply, button)
 	if button ~= KEY_1 then return end
+	if CLIENT then return end
 
 	if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SLASHER then
 		return
@@ -1302,8 +1307,8 @@ function SLASHER.Animator(ply)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/postaldude/dude_finger" .. ".ogg",
 			identifier = "PostalBird",
-			minDistance = 500,
-			maxDistance = 750,
+			minDistance = 1000,
+			maxDistance = 1200,
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
@@ -1397,11 +1402,6 @@ local SwitchToMGTable = {
 
 -- This is cancer
 function SLASHER.InitHud(_, hud)
-	local ShovelEquipped = GameData.LocalPlayer:GetNWBool("SwitchToShovel")
-	local DeagleEquipped = GameData.LocalPlayer:GetNWBool("SwitchToDeagle")
-	local MGEquipped = GameData.LocalPlayer:GetNWBool("SwitchToMG")
-	local DeagleUnlocked = GameData.LocalPlayer:GetNWBool("DeagleUnlocked")
-	local MGUnlocked = GameData.LocalPlayer:GetNWBool("MGUnlocked")
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/postaldude"))
 	hud:SetTitle("Postal Dude")
 	hud:SetCrosshairEnabled(true)
@@ -1409,15 +1409,14 @@ function SLASHER.InitHud(_, hud)
 	hud:SetCrosshairSpin(0)
 	hud:SetCrosshairTighten(0)
 	hud:SetCrosshairProngs(15)
-	hud:AddControl("R", "kick", KickTable)
-	hud:TieControl("R", "PostalDudeCanMainKick")
-	hud:TieControl("LMB", "PostalDudeCanMainSlash")
 
 	hud:AddMeter("patience", 100, "", nil, true)
 	hud:TieMeterInt("patience", "PostalDudePatience")
 
 	
 	hud:ChaseAndKill(nil, true)
+
+	GameData.LocalPlayer:GetNWInt("PostalState", -1) -- Raphael my goat once again
 
 	hud.prevState = not GameData.LocalPlayer:GetNWInt("PostalState")
 	function hud.AlsoThink()
@@ -1426,8 +1425,7 @@ function SLASHER.InitHud(_, hud)
 		if curState == hud.prevState then return end
 
 		if curState == -1 then
-			hud:RemoveControl("RMB", "ignite")
-			hud:RemoveControl("LMB", "pour")
+			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
 			hud:AddControl("LMB", "shovel bash", ShovelTable)
 			hud:ChaseAndKill(nil, true)
@@ -1435,10 +1433,7 @@ function SLASHER.InitHud(_, hud)
 			hud:TieControlText("LMB", "SwitchToShovel", "shovel bash", "shoot", true)
 		end
 		if curState == 0 then
-			hud:RemoveControl("RMB", "ignite")
-			hud:RemoveControl("F", "shovel")
-			hud:RemoveControl("LMB", "pour")
-			hud:RemoveControl("LMB", "shovel bash")
+			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
 			hud:SetMeterVisible("deagle ammo", false)
 			hud:SetMeterVisible("m4 ammo", false)
@@ -1450,9 +1445,7 @@ function SLASHER.InitHud(_, hud)
 			hud:ChaseAndKill(nil, true)
 		end
 		if curState == 1 then
-			hud:RemoveControl("RMB", "ignite")
-			hud:RemoveControl("LMB", "shovel bash")
-			hud:RemoveControl("F", "shovel")
+			hud:RemoveControls()
 			hud:AddControl("F", "shovel", ShovelTable)
 			hud:AddControl("LMB", "shoot", ShootTable)
 			hud:AddMeter("deagle ammo", 6, "", nil, true)
@@ -1463,9 +1456,7 @@ function SLASHER.InitHud(_, hud)
 			hud:ChaseAndKill(nil, true)
 		end
 		if curState == 2 then
-			hud:RemoveControl("RMB", "ignite")
-			hud:RemoveControl("F", "shovel")
-			hud:RemoveControl("LMB", "shovel bash")
+			hud:RemoveControls()
 			hud:AddControl("F", "m4", SwitchToMGTable)
 			hud:AddControl("LMB", "shoot", ShootTable)
 			hud:SetMeterVisible("fuel", false)
@@ -1477,9 +1468,7 @@ function SLASHER.InitHud(_, hud)
 			hud:ChaseAndKill(nil, true)
 		end
 		if curState == 3 then
-			hud:RemoveControl("RMB", "ignite")
-			hud:RemoveControl("F", "shovel")
-			hud:RemoveControl("LMB", "shovel bash")
+			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
 			hud:AddControl("F", "shovel", ShovelTable)
 			hud:AddControl("LMB", "shoot", ShootTable)
@@ -1490,17 +1479,19 @@ function SLASHER.InitHud(_, hud)
 			hud:ChaseAndKill(nil, true)
 		end
 		if curState == 5 then
-			hud:RemoveControl("F", "shovel")
+			hud:RemoveControls()
 			hud:AddMeter("fuel", 30, "", nil, true)
 			hud:TieMeterInt("fuel", "PostalDudeFuelAmount")
-			hud:RemoveControl("LMB", "shovel bash")
+			hud:AddControl("RMB", " ignite", IgniteTable)
 			hud:AddControl("LMB", "pour", GasTable)
-			hud:RemoveControl("RMB", "start chasing")
-			hud:AddControl("RMB", "ignite", IgniteTable)
 
 			hud:SetMeterVisible("deagle ammo", false)
 			hud:SetMeterVisible("m4 ammo", false)
 		end
+
+		hud:AddControl("R", "kick", KickTable)
+		hud:TieControl("R", "PostalDudeCanMainKick")
+		hud:TieControl("LMB", "PostalDudeCanMainSlash")
 
 		hud.prevState = curState
 	end
@@ -1532,11 +1523,13 @@ if CLIENT then
 end
 
 
+
 	-- Fun stuff
 	-- This is the CLIENT example (Thank you Raphael)
 	hook.Add("SlashCo:OnPing", "PostalDudeSayStuff", function(pingInfo)
 	   if pingInfo.Team ~= TEAM_SLASHER then return end
 	   if not pingInfo.Player then return end -- it can be nil!
+	   if CLIENT then return end
 
 	   -- pingInfo.Player is the entIndex since when a player may not always be known to a client.
 	   -- Had to update the code a little bit because ping handling got changed a bit - eno
