@@ -330,14 +330,14 @@ function SLASHER.OnTickBehaviour(slasher)
 			if SlashCo.GetSlasherAnger(slasher) == 0 and not slasher:GetNWBool("BoredAlready") then
 				slasher:SetNWBool("BoredAlready", true)
 				SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_patienceempty" .. math.random(1, 2) .. ".ogg",
-				identifier = "PostalPatienceEmpty",
-				minDistance = 500,
-				maxDistance = 750,
-				entity = slasher,
-				volume = 0.9,
-				fadeIn = 0,
-			})
+					soundPath = "slashco/slasher/postaldude/dude_patienceempty" .. math.random(1, 2) .. ".ogg",
+					identifier = "PostalPatienceEmpty",
+					minDistance = 500,
+					maxDistance = 750,
+					entity = slasher,
+					volume = 0.9,
+					fadeIn = 0,
+				})
 			elseif SlashCo.GetSlasherAnger(slasher) > 0 then
 				slasher:SetNWBool("BoredAlready", false)
 			end
@@ -393,14 +393,14 @@ hook.Add("PlayerDeath", "PostalDudeCountKills", function(victim, _, attacker)
 
 	if victim:Team() ~= TEAM_SLASHER and attacker.GetNWString and attacker:GetNWString("Slasher") == "PostalDude" then
 		SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/postaldude/dude_kill" .. math.random(1, 7) .. ".ogg",
-		identifier = "PostalKill",
-		minDistance = 500,
-		maxDistance = 750,
-		entity = attacker,
-		volume = 1,
-		fadeIn = 0,
-	})
+			soundPath = "slashco/slasher/postaldude/dude_kill" .. math.random(1, 7) .. ".ogg",
+			identifier = "PostalKill",
+			minDistance = 500,
+			maxDistance = 750,
+			entity = attacker,
+			volume = 1,
+			fadeIn = 0,
+		})
 	end
 end)
 
@@ -414,7 +414,7 @@ hook.Add("PlayerUse", "PostalGasCanPickUp", function(ply, ent)
 	SlashCo.StopChase(ply)	-- Stop chase if we pick up a Gas Can
 
 	if IsValid(ent) then
-			ent:Remove()	-- Deletes the Gas Can that the Postal Dude is trying to grab
+		ent:Remove()	-- Deletes the Gas Can that the Postal Dude is trying to grab
 	end
 
 	-- Play default gas can pickup sound
@@ -520,6 +520,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	end
 
 	local function SlashFinish()
+		if not IsValid(slasher) then return end
 		if slasher:GetNWBool("SwitchToDeagle") then return end
 		if slasher:GetNWBool("SwitchToMG") then return end
 		if slasher:GetNWBool("SwitchToGas") then return end
@@ -880,7 +881,6 @@ function SLASHER.OnSecondaryFire(slasher)
 		  phys:SetVelocity((tr.HitPos - match:GetPos()):GetNormal() * 128 * phys:GetMass())
 		end
 
-		SafeRemoveEntity(slasher.Matches, slasher.MaxMatches)
 		SafeRemoveEntityDelayed(match, 2.5)
 	end
 	if slasher:GetNWBool("SwitchToGas") then return end
@@ -908,6 +908,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	end
 
 	local function KickFinish()
+		if not IsValid(slasher) then return end
 		slasher:SlasherHudFunc("ShakeControl", "R")
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/postaldude/dude_foot_fire" .. ".ogg",
