@@ -115,7 +115,7 @@ net.Receive("SlashCo:SurvivorPings", function()
 end)
 
 --ping display
--- RaphaelIT7: Why don't we remove pings? Because we can NEVER be certain here, an entity may be outside the PVS,may not have been networked yet and so on
+-- RaphaelIT7: Why don't we remove pings? Because we can NEVER be certain here, an entity may be outside the PVS, may not have been networked yet and so on
 --             and since a round doesn't go that long, we can accept it filling up a bit.
 hook.Add("SlashCo:DrawHUD", "SlashCo:PingDisplay", function()
 	local curTime = CurTime()
