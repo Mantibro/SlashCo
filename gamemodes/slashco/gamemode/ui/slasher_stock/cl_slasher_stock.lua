@@ -93,6 +93,23 @@ function PANEL:AddMeter(name, max, component, componentIsPrefix, showMax, zPos)
 	self.Right:InvalidateChildren()
 end
 
+---removes a meter
+function PANEL:RemoveMeter(name)
+	if not self.Meters[name] then return end
+
+	self.Meters[name]:Remove()
+	self.Meters[name] = nil
+end
+
+---removes all meters
+function PANEL:RemoveMeters()
+	for _, meter in pairs(self.Meters) do
+		meter:Remove()
+	end
+
+	self.Meters = {}
+end
+
 ---sets the value of a meter
 function PANEL:SetMeterValue(name, value)
 	if not self.Meters[name] then
@@ -221,6 +238,17 @@ function PANEL:RemoveControl(key)
 
 	self.Controls[key]:Remove()
 	self.Controls[key] = nil
+	self:ControlTies[key] = nil
+end
+
+---removes all controlls
+function PANEL:RemoveControls()
+	for _, control in pairs(self.Controls) do
+		control:Remove()
+	end
+
+	self.Controls = {}
+	self:ControlTies = {}
 end
 
 ---sets a control's text
