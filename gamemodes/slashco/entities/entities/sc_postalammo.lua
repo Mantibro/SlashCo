@@ -30,8 +30,10 @@ local function MGBulletsControl(slasher, bullets)
 end
 
 function ENT:Initialize()
-	if not CLIENT then return end
-
+	if SERVER then
+		self:SetUseType(SIMPLE_USE)
+		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
+	end
 	self:SetModel(({
     "models/Items/357ammo.mdl",
     "models/Items/BoxSRounds.mdl",
