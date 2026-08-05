@@ -18,7 +18,7 @@ local function DeagleBulletsAmount(slasher)
 end
 
 local function DeagleBulletsControl(slasher, bullets)
-		slasher:SetNW2Float("DeagleBulletsAmount", math.Clamp(DeagleBulletsAmount(slasher) + bullets, 0, 6))
+	slasher:SetNW2Float("DeagleBulletsAmount", math.Clamp(DeagleBulletsAmount(slasher) + bullets, 0, 6))
 end
 
 local function MGBulletsAmount(slasher)
@@ -26,19 +26,19 @@ local function MGBulletsAmount(slasher)
 end
 
 local function MGBulletsControl(slasher, bullets)
-		slasher:SetNW2Float("MGBulletsAmount", math.Clamp(MGBulletsAmount(slasher) + bullets, 0, 20))
+	slasher:SetNW2Float("MGBulletsAmount", math.Clamp(MGBulletsAmount(slasher) + bullets, 0, 20))
 end
 
+local modelList = {
+	"models/Items/357ammo.mdl",
+	"models/Items/BoxSRounds.mdl",
+	"models/Items/BoxMRounds.mdl",
+}
+
 function ENT:Initialize()
-	if SERVER then
-		self:SetUseType(SIMPLE_USE)
-		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
-	end
-	self:SetModel(({
-    "models/Items/357ammo.mdl",
-    "models/Items/BoxSRounds.mdl",
-    "models/Items/BoxMRounds.mdl"
-	})[math.random(3)])
+	if not CLIENT then return end
+
+	self:SetModel(modelList[math.random(0, #modelList)])
 	self:SetSolid(SOLID_VPHYSICS)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -46,25 +46,23 @@ function ENT:Initialize()
 	local phys = self:GetPhysicsObject()
 
 	if phys:IsValid() then
-		phys:Wake()
+		self:PhysWake()
 	end
 	
 end
 
 if SERVER then
 	function ENT:Use(activator)
-		if activator:Team() == TEAM_SURVIVOR then return end
+		if activator:Team() ~= TEAM_SLASHER then return end
 		if activator:GetNWString("Slasher") ~= "PostalDude" then return end
 
 		
-		if activator:Team() == TEAM_SLASHER then
-			DeagleBulletsControl(activator, 2)
-			MGBulletsControl(activator, 5)
-			activator:EmitSound("slashco/slasher/postaldude/dude_ammo_pickup.ogg")
+		DeagleBulletsControl(activator, 2)
+		MGBulletsControl(activator, 5)
+		activator:EmitSound("slashco/slasher/postaldude/dude_ammo_pickup.ogg")
 
-			SlashCo.CreateItem("sc_postalammo", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
+		SlashCo.CreateItem("sc_postalammo", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 
-			self:Remove()
-		end
+		self:Remove()
 	end
 end
