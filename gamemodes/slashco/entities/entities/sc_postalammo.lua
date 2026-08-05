@@ -29,16 +29,18 @@ local function MGBulletsControl(slasher, bullets)
 	slasher:SetNW2Float("MGBulletsAmount", math.Clamp(MGBulletsAmount(slasher) + bullets, 0, 20))
 end
 
+local modelList = {
+	"models/Items/357ammo.mdl",
+	"models/Items/BoxSRounds.mdl",
+	"models/Items/BoxMRounds.mdl",
+}
+
 function ENT:Initialize()
-	if SERVER then
-		self:SetUseType(SIMPLE_USE)
-		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
-	end
-	self:SetModel(({
-    "models/Items/357ammo.mdl",
-    "models/Items/BoxSRounds.mdl",
-    "models/Items/BoxMRounds.mdl"
-	})[math.random(3)])
+	if not SERVER then return end
+
+	self:SetUseType(SIMPLE_USE)
+	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
+	self:SetModel(modelList[math.random(#modelList)])
 	self:SetSolid(SOLID_VPHYSICS)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
