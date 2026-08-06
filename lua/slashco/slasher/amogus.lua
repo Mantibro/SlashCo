@@ -112,7 +112,6 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	--if slasher:GetNWBool("AmogusFuelDisguise") then return end
 
 	if not slasher:GetNWBool("AmogusSurvivorDisguise") or not slasher:GetNWBool("AmogusFuelDisguise") then
 		SlashCo.Jumpscare(slasher, target)
