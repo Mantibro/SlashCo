@@ -251,7 +251,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			fadeIn = 0,
 		})
 	end
-	if SlashCo.CurRound.EscapeHelicopterSummoned and slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+	if SlashCo.CurRound.EscapeHelicopterSummoned and slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE and not slasher:GetNWBool("PostalShutUp") then
 		-- Fun stuff :)
 		DeagleBulletsControl(slasher, 3)
 		MGBulletsControl(slasher, 10)
@@ -300,6 +300,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	if stage == POSTAL_RAGE_STAGE then
 		slasher:SetNWInt("PostalStage", POSTAL_RAGE_STAGE)
+		slasher:SetNWBool("PostalShutUp", true)
 		slasher:SetNWBool("CanChase", false)
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			SlashCo.StopChase(slasher)
