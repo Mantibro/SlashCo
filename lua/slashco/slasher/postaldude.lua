@@ -237,7 +237,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					maxDistance = 1000 * SlashCo.MapSize,
 					looping = true,
 					entity = slasher,
-					volume = 0.1,
+					volume = 0.25,
 					fadeIn = 1,
 					sendToEntity = team.GetPlayers(TEAM_SURVIVOR)
 				})
