@@ -302,7 +302,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_milkjug"), "gray", 2, false)
+	SlashCo.DrawHalo(ents.FindByClass("sc_milkjug"), "gray", 2, true)
 
 	local plyWithItem = {}
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
