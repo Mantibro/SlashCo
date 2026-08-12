@@ -256,7 +256,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		-- Check for game progress for Stage 2
 		if SlashCo.CurRound.GameProgress >= 3 and SlashCo.CurRound.GameProgress < 6 and slasher:GetNWInt("PostalStage") ~= POSTAL_DEAGLE_STAGE then
 			SLASHER.PatienceChaseIncrease = 0.02
-			if not slasher:GetNWBool("SwitchToGas") or not slasher:GetNWBool("SwitchToBaby") and slasher.PostalState ~= POSTAL_SHOVEL_EQUIPPED then
+			if not slasher:GetNWBool("SwitchToGas") and not slasher:GetNWBool("SwitchToBaby") and slasher.PostalState ~= POSTAL_SHOVEL_EQUIPPED then
 				slasher.PostalState = POSTAL_SHOVEL_EQUIPPED -- Update HUD to show the deagle
 				slasher:SetBodygroup(1, 1)
 				slasher:SetBodygroup(2, 0)
