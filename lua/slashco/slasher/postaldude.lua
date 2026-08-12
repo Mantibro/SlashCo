@@ -290,7 +290,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			-- Once again play a sound to inform the player of a new weapon being unlocked
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/postaldude/dude_machinegun1" .. ".ogg",
-				identifier = "PostalM4",
+				identifier = "PostalM4Intro",
 				minDistance = 500,
 				maxDistance = 750,
 				entity = slasher,
@@ -777,7 +777,7 @@ function SLASHER.OnPrimaryFire(slasher)
 						slasher:SetNWFloat("PostalMGShoot", CurTime())
 						SlashCo.AudioSystem.PlaySound({
 								soundPath = "slashco/slasher/postaldude/dude_m4shoot" .. ".ogg",
-								identifier = "PostalM4",
+								identifier = "PostalM4Shoot",
 								minDistance = 750,
 								maxDistance = 1250,
 								looping = false,
