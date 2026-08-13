@@ -27,7 +27,7 @@ SLASHER.PatienceChaseDecrease = -0.01	-- How fast Patience should decrease in ch
 SLASHER.FuelAmount = 30		-- Max amount of fuel
 SLASHER.FuelRegen = 0.005	-- How fast fuel should passively regen
 SLASHER.GunShotDecay = 0.120 -- How long he'll be in the shooting animation.
-SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
+SLASHER.ChaseMusic = ""
 SLASHER.KillSound = ""
 SLASHER.Description = "PostalDude_desc"
 SLASHER.ProTip = "PostalDude_tip"
@@ -122,6 +122,8 @@ function SLASHER.OnSpawn(slasher)
 	DeagleBulletsControl(slasher, 6)
 	MGBulletsControl(slasher, 20)
 
+	SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
+
 	slasher.PostalState = -1		-- This state is important so we display HUD information accurately to the slasher
 	slasher.DeagleAmmo = 6
 	slasher.FuelAmount = 30			-- Default fuel amount
@@ -130,24 +132,6 @@ function SLASHER.OnSpawn(slasher)
 	slasher.M4Cooldown = 0
 	slasher.GasCooldown = 0
 	slasher.KickCooldown = 0
-end
-
-function SLASHER.Footstep(ply)
-	if SERVER then
-		local idx = math.random(1, 5)
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/postaldude/dude_footstep" .. idx .. ".ogg",
-			identifier = "PostalFootstep" .. idx,
-			group = "SlasherFootstep",
-			minDistance = 150,
-			maxDistance = 500,
-			entity = ply,
-			volume = 1,
-			fadeIn = 0,
-		})
-	end
-
-	return true
 end
 
 function SLASHER.OnHelicopterSummon(slasher)
@@ -175,7 +159,7 @@ function SLASHER.OnHelicopterSummon(slasher)
 			if not IsValid(slasher) then return end
 
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_phase4" .. ".ogg",
+				soundPath = "slashco/slasher/postaldude/dude_phase4.ogg",
 				identifier = "PostalRageTheme",
 				minDistance = 15000,
 				maxDistance = 20000,
@@ -188,7 +172,6 @@ function SLASHER.OnHelicopterSummon(slasher)
 	end
 end
 
--- We create these only once since we use them every tick.
 function SLASHER.OnTickBehaviour(slasher)
 	local stage = slasher.PostalDudeStage --Stage
 	local SlashCooldown = slasher.SlashCooldown or 0 -- Main Slash Cooldown
@@ -198,7 +181,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
-	local slasher_chaseMusic = SLASHER.ChaseMusic
 
 	if SlashCooldown > 0 then
 		slasher.SlashCooldown = SlashCooldown - FrameTime()
@@ -237,7 +219,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					maxDistance = 1000 * SlashCo.MapSize,
 					looping = true,
 					entity = slasher,
-					volume = 0.25,
+					volume = 0.2,
 					fadeIn = 1,
 					sendToEntity = team.GetPlayers(TEAM_SURVIVOR)
 				})
@@ -266,7 +248,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			stage = POSTAL_DEAGLE_STAGE
 			-- Play a sound to let people know that they unlocked a new weapon
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_deagle1" .. ".ogg",
+				soundPath = "slashco/slasher/postaldude/dude_deagle1.ogg",
 				identifier = "PostalDeagleIntro",
 				minDistance = 500,
 				maxDistance = 750,
@@ -289,7 +271,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			stage = POSTAL_MG_STAGE
 			-- Once again play a sound to inform the player of a new weapon being unlocked
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_machinegun1" .. ".ogg",
+				soundPath = "slashco/slasher/postaldude/dude_machinegun1.ogg",
 				identifier = "PostalM4Intro",
 				minDistance = 500,
 				maxDistance = 750,
@@ -303,22 +285,19 @@ function SLASHER.OnTickBehaviour(slasher)
 	-- Basically functions almost the same as Trollge's stages, code-wise
 	if stage == POSTAL_SHOVEL_STAGE then
 		slasher:SetNWInt("PostalStage", POSTAL_SHOVEL_STAGE)
-		slasher_chaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
+		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
 		perception_final = 1.5
-	end
-	if stage == POSTAL_DEAGLE_STAGE then
+	elseif stage == POSTAL_DEAGLE_STAGE then
 		slasher:SetNWBool("DeagleUnlocked", true)
 		slasher:SetNWInt("PostalStage", POSTAL_DEAGLE_STAGE)
-		slasher_chaseMusic = "slashco/slasher/postaldude/dude_phase2.ogg"
+		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase2.ogg"
 		perception_final = 2.0
-	end
-	if stage == POSTAL_MG_STAGE then
+	elseif stage == POSTAL_MG_STAGE then
 		slasher:SetNWBool("MGUnlocked", true)
 		slasher:SetNWInt("PostalStage", POSTAL_MG_STAGE)
-		slasher_chaseMusic = "slashco/slasher/postaldude/dude_phase3.ogg"
+		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase3.ogg"
 		perception_final = 3.0
-	end
-	if stage == POSTAL_RAGE_STAGE then
+	elseif stage == POSTAL_RAGE_STAGE then
 		slasher:SetNWInt("PostalStage", POSTAL_RAGE_STAGE)
 		slasher:SetNWBool("CanChase", false)
 		if slasher:GetNWBool("InSlasherChaseMode") then
@@ -367,9 +346,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			if SlashCo.GetSlasherAnger(slasher) == 0 and not slasher:GetNWBool("BoredAlready") then
 				slasher:SetNWBool("BoredAlready", true)
+
+				local idx = math.random(1, 2)
 				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/postaldude/dude_patienceempty" .. math.random(1, 2) .. ".ogg",
-					identifier = "PostalPatienceEmpty",
+					soundPath = "slashco/slasher/postaldude/dude_patienceempty" .. idx .. ".ogg",
+					identifier = "PostalPatienceEmpty" .. idx,
 					minDistance = 500,
 					maxDistance = 750,
 					entity = slasher,
@@ -426,10 +407,11 @@ hook.Add("PlayerDeath", "PostalDudeCountKills", function(victim, _, attacker)
 	timer.Remove("PostalDudeHit_" .. victim:UserID())
 	if not IsValid(attacker) then return end
 
-	if victim:Team() ~= TEAM_SLASHER and attacker.GetNWString and attacker:GetNWString("Slasher") == "PostalDude" then
+	if victim:Team() ~= TEAM_SLASHER and attacker:GetNWString("Slasher") == "PostalDude" then
+		local idx = math.random(1, 7)
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/postaldude/dude_kill" .. math.random(1, 7) .. ".ogg",
-			identifier = "PostalKill",
+			soundPath = "slashco/slasher/postaldude/dude_kill" .. idx .. ".ogg",
+			identifier = "PostalKill" .. idx,
 			minDistance = 500,
 			maxDistance = 750,
 			entity = attacker,
@@ -442,6 +424,7 @@ end)
 -- The code responsible for doing a fake Gas Can pick up for Postal Dude
 hook.Add("PlayerUse", "PostalGasCanPickUp", function(ply, ent)
     if ply:Team() ~= TEAM_SLASHER then return end -- If client isn't a slasher, don't do it
+	if ply:GetNWString("Slasher") ~= "PostalDude" then return end
     if ent:GetClass() ~= "sc_gascan" then return end -- If entity isn't a gas can, don't do it
 	if ply:GetPos():Distance(ent:GetPos()) >= 100 then return end -- If the distance isn't (X), don't do it
 	if ply:GetNWBool("SwitchToGas") then return end -- If Postal Dude is already carrying a Gas Can, don't delete another one
@@ -454,19 +437,22 @@ hook.Add("PlayerUse", "PostalGasCanPickUp", function(ply, ent)
 	end
 
 	-- Play default gas can pickup sound
+	local idxGas = math.random(1, 3)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/survivor/gascan_pickup" .. math.random(1, 3) .. ".mp3",
-		identifier = "DefaultGasCanPickUp",
+		soundPath = "slashco/survivor/gascan_pickup" .. idxGas .. ".mp3",
+		identifier = "DefaultGasCanPickUp" .. idxGas,
 		minDistance = 500,
 		maxDistance = 750,
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
 	})
+
 	-- Play Postal Dude voiceline
+	local idx = math.random(1, 4)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/postaldude/dude_gas" .. math.random(1, 4) .. ".ogg",
-		identifier = "PostalGasCanPickUp",
+		soundPath = "slashco/slasher/postaldude/dude_gas" .. idx .. ".ogg",
+		identifier = "PostalGasCanPickUp" .. idx,
 		minDistance = 500,
 		maxDistance = 750,
 		entity = ply,
@@ -487,7 +473,6 @@ hook.Add("PlayerUse", "PostalGasCanPickUp", function(ply, ent)
 	ply:SetBodygroup(4, 1)	-- Clear every bodygroup and use the right one
 
 	ply.PostalState = POSTAL_GAS_EQUIPPED -- Switch to Gas Can state
-
 end)
 
 ----hook.Add("PlayerUse", "PostalBabyPickUp", function(ply, ent)
@@ -531,26 +516,25 @@ end)
 
 -- Has to be server otherwise CreateGasCan will never work
 if SERVER then
-
 	-- Hook player input to detect them dropping it, should be Q because it's Q for survivors as well
 	hook.Add("PlayerButtonDown", "PostalGasCanDrop", function(ply, button)
 		-- Same stuff as above in the previous hook
 		if not SlashCo.IsKeyPressed("DROP_ITEM", ply, button) then return end
 	    if ply:Team() ~= TEAM_SLASHER then return end
+		if ply:GetNWString("Slasher") ~= "PostalDude" then return end
 		if not ply:GetNWBool("SwitchToGas") then return end
 
-		if SlashCo.IsKeyPressed("DROP_ITEM", ply, button) then
-			local startPos = ply:WorldSpaceCenter()
-			local goodPos = startPos + (ply:GetAimVector() * 1)
-	   		local DropGasCan = SlashCo.CreateGasCan(goodPos, Angle(0, 0, 0)) -- Create Gas Can when dropping the fake one, since we deleted an actual Gas Can
-			local phys = DropGasCan:GetPhysicsObject()
+		local startPos = ply:WorldSpaceCenter()
+		local goodPos = startPos + (ply:GetAimVector() * 1)
+	   	local DropGasCan = SlashCo.CreateGasCan(goodPos, Angle(0, 0, 0)) -- Create Gas Can when dropping the fake one, since we deleted an actual Gas Can
+		local phys = DropGasCan:GetPhysicsObject()
 
-			if IsValid(phys) then	-- Have to be very careful here, we don't want the Gas Can to be thrown outside of the world
-				phys:SetVelocity(ply:GetAimVector() * 250)
-				local randomvec = Vector(0, 0, 0)
-				randomvec:Random(-1000, 1000)
-				phys:SetAngleVelocity(randomvec)
-			end
+		if IsValid(phys) then	-- Have to be very careful here, we don't want the Gas Can to be thrown outside of the world
+			phys:SetVelocity(ply:GetAimVector() * 250)
+
+			local randomvec = Vector(0, 0, 0)
+			randomvec:Random(-1000, 1000)
+			phys:SetAngleVelocity(randomvec)
 		end
 
 		ply:SetNWBool("SwitchToGas", false)
@@ -575,7 +559,6 @@ if SERVER then
 		else
 			ply.PostalState = -1
 		end
-
 	end)
 end
 
@@ -588,9 +571,11 @@ function SLASHER.OnPrimaryFire(slasher)
 		slasher.SlashCooldown = 1
 		slasher:SetNWBool("PostalDudeSlashing", true)
 	end
+
 	if slasher:GetNWBool("SwitchToDeagle") then
 		slasher.SlashCooldown = 0.5
 	end
+
 	if slasher:GetNWBool("SwitchToMG") then
 		slasher.SlashCooldown = 0
 	end
@@ -601,17 +586,19 @@ function SLASHER.OnPrimaryFire(slasher)
 		if slasher:GetNWBool("SwitchToMG") then return end
 		if slasher:GetNWBool("SwitchToGas") then return end
 		if slasher:GetNWBool("SwitchToBaby") then return end
+
 		slasher:SlasherHudFunc("ShakeControl", "LMB")
+
 		local idx = math.random(1, 2)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_shovelswing" .. idx .. ".ogg",
-				identifier = "PostalShovelSwing" .. idx,
-				minDistance = 500,
-				maxDistance = 750,
-				entity = slasher,
-				volume = 0.7,
-				fadeIn = 0,
-			})
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_shovelswing" .. idx .. ".ogg",
+			identifier = "PostalShovelSwing" .. idx,
+			minDistance = 500,
+			maxDistance = 750,
+			entity = slasher,
+			volume = 0.7,
+			fadeIn = 0,
+		})
 
 		slasher:LagCompensation(true)
 		local tr = util.TraceHull({
@@ -679,56 +666,55 @@ function SLASHER.OnPrimaryFire(slasher)
 		if slasher:GetNWBool("SwitchToGas") then return end
 		if slasher:GetNWBool("SwitchToBaby") then return end
 		if slasher:GetNWInt("DeagleBulletsAmount") > 0 then -- Allows the players to fire their gun if they have enough bullets
-
 			slasher:SlasherHudFunc("ShakeControl", "LMB")
+
 			local spread = slasher.GunSpread
 			local dist = SLASHER.KillDistance
 			timer.Simple(0.05, function()
 				if not IsValid(slasher) then return end
 
 				slasher:SetNWFloat("PostalDeagleShoot", CurTime())
+
 				SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/postaldude/dude_deagleshoot" .. ".ogg",
-						identifier = "PostalDeagleShoot",
-						minDistance = 750,
-						maxDistance = 1250,
-						looping = false,
-						entity = slasher,
-						volume = 0.8,
-						fadeIn = 0,
-					})
+					soundPath = "slashco/slasher/postaldude/dude_deagleshoot.ogg",
+					identifier = "PostalDeagleShoot",
+					minDistance = 750,
+					maxDistance = 1250,
+					entity = slasher,
+					volume = 0.8,
+					fadeIn = 0,
+				})
 
 				slasher:FireBullets({
-				Callback = function(attacker, tr, dmginfo)
-			    	local target = tr.Entity
-				
-			    	if not IsValid(target) or not target:IsPlayer() then return end
-				
-			    	if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
-						
-					SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
-					if not slasher:GetNWBool("InSlasherChaseMode") then
-						SlashCo.StartChaseMode(slasher, true)
-					end
-					
-					-- Hitting someone is already hard enough, let Postal deal full damage
-				    if tr.HitGroup == HITGROUP_LEFTLEG or tr.HitGroup == HITGROUP_RIGHTLEG or tr.HitGroup == HITGROUP_LEFTARM or tr.HitGroup == HITGROUP_RIGHTARM then
-				        dmginfo:ScaleDamage(4)
-					elseif tr.HitGroup == HITGROUP_HEAD then
-						dmginfo:ScaleDamage(1)
-				    end
-			    end,
-				Damage = 20,
-				TracerName = "AirboatGunHeavyTracer",
-				Dir = slasher:GetAimVector(),
-				Src = slasher:GetPos() + Vector(0, 0, 60),
-				IgnoreEntity = slasher,
-				Spread = Vector(
-					math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
-					math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
-					0
-				)
-			}, false)
+					Callback = function(attacker, tr, dmginfo)
+						local target = tr.Entity
+						if not IsValid(target) or not target:IsPlayer() then return end
+						if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
+
+						SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
+						if not slasher:GetNWBool("InSlasherChaseMode") then
+							SlashCo.StartChaseMode(slasher, true)
+						end
+
+						-- Hitting someone is already hard enough, let Postal deal full damage
+						if tr.HitGroup == HITGROUP_LEFTLEG or tr.HitGroup == HITGROUP_RIGHTLEG or tr.HitGroup == HITGROUP_LEFTARM or tr.HitGroup == HITGROUP_RIGHTARM then
+							dmginfo:ScaleDamage(4)
+						elseif tr.HitGroup == HITGROUP_HEAD then
+							dmginfo:ScaleDamage(1)
+						end
+					end,
+
+					Damage = 20,
+					TracerName = "AirboatGunHeavyTracer",
+					Dir = slasher:GetAimVector(),
+					Src = slasher:GetPos() + Vector(0, 0, 60),
+					IgnoreEntity = slasher,
+					Spread = Vector(
+						math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
+						math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
+						0
+					)
+				}, false)
 
 				local vec, ang = slasher:GetBonePosition(slasher:LookupBone("ValveBiped.Bip01_R_Finger1"))
 				local vPoint = vec
@@ -748,27 +734,31 @@ function SLASHER.OnPrimaryFire(slasher)
 		else
 			-- Don't have bullets? Play sound
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "weapons/shotgun/shotgun_empty" .. ".wav",
+				soundPath = "weapons/shotgun/shotgun_empty.wav",
 				identifier = "PostalDeagleEmpty",
 				minDistance = 750,
 				maxDistance = 1250,
-				looping = false,
 				entity = slasher,
 				volume = 0.7,
 				fadeIn = 0,
 			})
 		end
 	end
+
 	-- The only way to make weapons automatic is by hooking a think function to them and setting their cooldown here
 	hook.Add("Think", "MGShoot", function()
 		if slasher:KeyDown(IN_ATTACK) then
 			if slasher.M4Cooldown > CurTime() then return end
-				slasher.M4Cooldown = CurTime() + 0.1
+
+			slasher.M4Cooldown = CurTime() + 0.1
+
 			if slasher:GetNWBool("SwitchToMG") then
 				if slasher:GetNWBool("SwitchToGas") then return end
 				if slasher:GetNWBool("SwitchToBaby") then return end
+
 				if slasher:GetNWInt("MGBulletsAmount") > 0 then -- Same thing as the Deagle
 					slasher:SlasherHudFunc("ShakeControl", "LMB")
+
 					local spread = slasher.GunSpread
 					local dist = SLASHER.KillDistance
 					timer.Simple(0.05, function()
@@ -776,46 +766,44 @@ function SLASHER.OnPrimaryFire(slasher)
 
 						slasher:SetNWFloat("PostalMGShoot", CurTime())
 						SlashCo.AudioSystem.PlaySound({
-								soundPath = "slashco/slasher/postaldude/dude_m4shoot" .. ".ogg",
-								identifier = "PostalM4Shoot",
-								minDistance = 750,
-								maxDistance = 1250,
-								looping = false,
-								entity = slasher,
-								volume = 0.7,
-								fadeIn = 0,
-							})
+							soundPath = "slashco/slasher/postaldude/dude_m4shoot.ogg",
+							identifier = "PostalM4",
+							minDistance = 750,
+							maxDistance = 1250,
+							entity = slasher,
+							volume = 0.7,
+							fadeIn = 0,
+						})
 
 						slasher:FireBullets({
-						Callback = function(attacker, tr, dmginfo)
-					    	local target = tr.Entity
-						
-					    	if not IsValid(target) or not target:IsPlayer() then return end
-						
-					    	if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
+							Callback = function(attacker, tr, dmginfo)
+								local target = tr.Entity
+								if not IsValid(target) or not target:IsPlayer() then return end
+								if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
 
-							SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
-							if not slasher:GetNWBool("InSlasherChaseMode") then
-								SlashCo.StartChaseMode(slasher, true)
-							end
+								SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
+								if not slasher:GetNWBool("InSlasherChaseMode") then
+									SlashCo.StartChaseMode(slasher, true)
+								end
 
-							if tr.HitGroup == HITGROUP_LEFTLEG or tr.HitGroup == HITGROUP_RIGHTLEG or tr.HitGroup == HITGROUP_LEFTARM or tr.HitGroup == HITGROUP_RIGHTARM then
-				    		    dmginfo:ScaleDamage(4)
-							elseif tr.HitGroup == HITGROUP_HEAD then
-								dmginfo:ScaleDamage(1)
-				    		end
-					    end,
-						Damage = 10,
-						TracerName = "AirboatGunHeavyTracer",
-						Dir = slasher:GetAimVector(),
-						Src = slasher:GetPos() + Vector(0, 0, 60),
-						IgnoreEntity = slasher,
-						Spread = Vector(
-							math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
-							math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
-							0
-						)
-					}, false)
+								if tr.HitGroup == HITGROUP_LEFTLEG or tr.HitGroup == HITGROUP_RIGHTLEG or tr.HitGroup == HITGROUP_LEFTARM or tr.HitGroup == HITGROUP_RIGHTARM then
+									dmginfo:ScaleDamage(4)
+								elseif tr.HitGroup == HITGROUP_HEAD then
+									dmginfo:ScaleDamage(1)
+								end
+							end,
+
+							Damage = 10,
+							TracerName = "AirboatGunHeavyTracer",
+							Dir = slasher:GetAimVector(),
+							Src = slasher:GetPos() + Vector(0, 0, 60),
+							IgnoreEntity = slasher,
+							Spread = Vector(
+								math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
+								math.Rand(-1 - (spread * 5), 1 + (spread * 5)) * 0.006,
+								0
+							)
+						}, false)
 
 						local vec, ang = slasher:GetBonePosition(slasher:LookupBone("ValveBiped.Bip01_R_Finger1"))
 						local vPoint = vec
@@ -834,11 +822,10 @@ function SLASHER.OnPrimaryFire(slasher)
 					end)
 				else
 					SlashCo.AudioSystem.PlaySound({
-						soundPath = "weapons/shotgun/shotgun_empty" .. ".wav",
+						soundPath = "weapons/shotgun/shotgun_empty.wav",
 						identifier = "PostalM4Empty",
 						minDistance = 750,
 						maxDistance = 1250,
-						looping = false,
 						entity = slasher,
 						volume = 0.7,
 						fadeIn = 0,
@@ -847,12 +834,15 @@ function SLASHER.OnPrimaryFire(slasher)
 			end
 		end
 	end)
+
 	-- All of this is just that code from that one gas can swep, god bless whoever made that
 	-- We also make the gas can automatic, we don't want players to get frustrated over spamming m1
 	hook.Add("Think", "GasPour", function()
 		if slasher:KeyDown(IN_ATTACK) then
 			if slasher.GasCooldown > CurTime() then return end
-				slasher.GasCooldown = CurTime() + 0.08
+
+			slasher.GasCooldown = CurTime() + 0.08
+
 			if slasher:GetNWBool("SwitchToGas") then
 				if slasher:GetNWInt("PostalDudeFuelAmount") > 0 then -- Same thing as the guns
 					local fire, tr
@@ -862,7 +852,7 @@ function SLASHER.OnPrimaryFire(slasher)
 					  filter = slasher
 					}
  					if not tr.Hit then return end
-				
+
 					local idx = math.random(1, 3)
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "ambient/water/water_spray" .. idx .. ".wav",
@@ -873,10 +863,13 @@ function SLASHER.OnPrimaryFire(slasher)
 						volume = 0.9,
 						fadeIn = 0,
 					})
+
 					slasher:SlasherHudFunc("ShakeControl", "LMB")
  					util.Decal("BeerSplash", tr.HitPos + tr.HitNormal, tr.HitPos - tr.HitNormal)
 					ParticleEffect("water_splash_01_surface1", tr.HitPos, tr.HitNormal:Angle())
+
 					if CLIENT then return end
+
 					fire = ents.Create("env_fire")
 					fire:SetKeyValue("health", 20)
 					fire:SetKeyValue("firesize", 36)
@@ -891,24 +884,26 @@ function SLASHER.OnPrimaryFire(slasher)
  					if IsValid(tr.Entity) then
 					  fire:SetParent(tr.Entity)
 					end
+
  					--SafeRemoveEntity(fire)
 					SafeRemoveEntityDelayed(fire, 20)
 					PostalDudeFuelControl(slasher, -1)
-					-- Ignite players who step into the fire
-					hook.Add("EntityTakeDamage", "PlayerIgnite", function(target, dmginfo)
-					    if not target:IsPlayer() then return end
-						if target:Team() == TEAM_SLASHER then return end
-					
-					    local attacker = dmginfo:GetAttacker()
-					    if not IsValid(attacker) then return end
-					
-					    if attacker:GetClass() == "env_fire" then
-					        if not target:IsOnFire() then
-					            target:Ignite(3.5) -- Don't make it too long, fire damage is crayzee
-					        end
-					    end
-					end)
 				end
+			end
+		end
+	end)
+
+	-- Ignite players who step into the fire
+	hook.Add("EntityTakeDamage", "PlayerIgnite", function(target, dmginfo)
+		if not target:IsPlayer() then return end
+		if target:Team() == TEAM_SLASHER then return end
+
+		local attacker = dmginfo:GetAttacker()
+		if not IsValid(attacker) then return end
+
+		if attacker:GetClass() == "env_fire" then
+			if not target:IsOnFire() then
+				target:Ignite(3.5) -- Don't make it too long, fire damage is crayzee
 			end
 		end
 	end)
@@ -917,29 +912,41 @@ end
 function SLASHER.OnSecondaryFire(slasher)
 	-- We have to do the Gas Can first
 	if slasher:GetNWBool("SwitchToGas") then
-		slasher:SlasherHudFunc("ShakeControl", "RMB")
 		local match = ents.Create("prop_physics")
 		local heat = ents.Create("env_firesource")
 		local att = slasher.Hand or slasher:LookupAttachment("anim_attachment_lh")
 		local phys = match:GetPhysicsObject()
 		local particle = ents.Create("info_particle_system")
 		local tr = util.TraceLine{
-		  start = slasher:GetShootPos(),
-		  endpos = slasher:GetShootPos() + slasher:GetAimVector() * 512,
-		  filter = {match, heat, slasher, particle},
+			start = slasher:GetShootPos(),
+			endpos = slasher:GetShootPos() + slasher:GetAimVector() * 512,
+			filter = {match, heat, slasher, particle},
 		}
+
+		slasher:SlasherHudFunc("ShakeControl", "RMB")
+
 		if CLIENT then return end
-		slasher:EmitSound("weapons/slam/throw.wav")
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "weapons/slam/throw.wav",
+			identifier = "ThrowMatch",
+			minDistance = 250,
+			maxDistance = 500,
+			entity = slasher,
+			volume = 1.0,
+			fadeIn = 0,
+		})
+
 		match = ents.Create("prop_physics")
 		match:SetModel("models/props_debris/wood_splinters01a.mdl")
 		match:SetOwner(slasher)
 		match:SetSolid(SOLID_NONE)
 
 		if slasher.Hand == -1 then
-		  att = slasher:GetAttachment(slasher.Hand)
-		  match:SetPos(att.Pos)
+			att = slasher:GetAttachment(slasher.Hand)
+			match:SetPos(att.Pos)
 		else
-		  match:SetPos(slasher:GetShootPos())
+			match:SetPos(slasher:GetShootPos())
 		end
 
 		match:Spawn()
@@ -953,9 +960,9 @@ function SLASHER.OnSecondaryFire(slasher)
 		phys = match:GetPhysicsObject()
 
 		tr = util.TraceLine{
-		  start = slasher:GetShootPos(),
-		  endpos = slasher:GetShootPos() + slasher:GetAimVector() * 512,
-		  filter = {match, heat, slasher, particle},
+			start = slasher:GetShootPos(),
+			endpos = slasher:GetShootPos() + slasher:GetAimVector() * 512,
+			filter = {match, heat, slasher, particle},
 		}
 
 		particle = ents.Create("info_particle_system")
@@ -968,7 +975,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		particle:Activate()
 
 		if IsValid(phys) then
-		  phys:SetVelocity((tr.HitPos - match:GetPos()):GetNormal() * 128 * phys:GetMass())
+			phys:SetVelocity((tr.HitPos - match:GetPos()):GetNormal() * 128 * phys:GetMass())
 		end
 
 		SafeRemoveEntityDelayed(match, 2.5)
@@ -985,49 +992,53 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 local function KickFinish(slasher)
-		if not IsValid(slasher) then return end
-		slasher:SlasherHudFunc("ShakeControl", "R")
+	if not IsValid(slasher) then return end
+
+	slasher:SlasherHudFunc("ShakeControl", "R")
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/postaldude/dude_foot_fire.ogg",
+		identifier = "PostalKick",
+		minDistance = 500,
+		maxDistance = 750,
+		entity = slasher,
+		volume = 1.0,
+		fadeIn = 0,
+	})
+
+	slasher:LagCompensation(true)
+	local tr = util.TraceHull({
+		start = slasher:EyePos(),
+		endpos = slasher:LocalToWorld(Vector(55, 0, 0)),
+		maxs = Vector(60, 60, 60),
+		mins = Vector(-60, -60, -60),
+		filter = slasher,
+		ignoreworld = true,
+	})
+	slasher:LagCompensation(false)
+
+	local target = tr.Entity
+	local damage = 10
+
+	if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+		local dmg = DamageInfo()
+		dmg:SetDamageType(DMG_SLASH)
+		dmg:SetAttacker(slasher)
+		dmg:SetInflictor(slasher)
+		dmg:SetDamage(damage)
+		dmg:SetDamageForce(Vector(1, 1, 1))
+		dmg:SetDamagePosition(tr.HitPos)
+		target:TakeDamageInfo(dmg)
+	end
+
+	local lookent = slasher:GetEyeTrace().Entity
+	if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then
+		SlashCo.BustDoor(slasher, lookent, 50000)
+	else
+		slasher:SlamDoor(lookent)
+
+		if lookent:IsPlayer() then
 			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_foot_fire" .. ".ogg",
-				identifier = "PostalKick",
-				minDistance = 500,
-				maxDistance = 750,
-				entity = slasher,
-				volume = 1.0,
-				fadeIn = 0,
-			})
-
-		slasher:LagCompensation(true)
-		local tr = util.TraceHull({
-			start = slasher:EyePos(),
-			endpos = slasher:LocalToWorld(Vector(55, 0, 0)),
-			maxs = Vector(60, 60, 60),
-			mins = Vector(-60, -60, -60),
-			filter = slasher,
-			ignoreworld = true,
-		})
-		slasher:LagCompensation(false)
-
-		local target = tr.Entity
-		local damage = 10
-
-		if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
-			local dmg = DamageInfo()
-			dmg:SetDamageType(DMG_SLASH)
-			dmg:SetAttacker(slasher)
-			dmg:SetInflictor(slasher)
-			dmg:SetDamage(damage)
-			dmg:SetDamageForce(Vector(1, 1, 1))
-			dmg:SetDamagePosition(tr.HitPos)
-			target:TakeDamageInfo(dmg)
-		end
-		local lookent = slasher:GetEyeTrace().Entity
-		if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then
-			SlashCo.BustDoor(slasher, lookent, 50000)
-		else
-			slasher:SlamDoor(lookent)
-			if lookent:IsPlayer() then
-				SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/postaldude/foot_kickbody.ogg",
 				identifier = "SurvivorKickDude",
 				minDistance = 600,
@@ -1036,48 +1047,47 @@ local function KickFinish(slasher)
 				volume = 1,
 				fadeIn = 0,
 			})
-			else
-				if IsValid(lookent) then
-					if lookent:GetClass() ~= "prop_door_rotating" then return end
-					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/postaldude/dude_foot_kickdoor" .. ".ogg",
-						identifier = "PostalKickDoor",
-						minDistance = 500,
-						maxDistance = 750,
-						entity = slasher,
-						volume = 1.0,
-						fadeIn = 0,
-					})
+		elseif IsValid(lookent) then
+			if lookent:GetClass() ~= "prop_door_rotating" then return end
+
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = "slashco/slasher/postaldude/dude_foot_kickdoor.ogg",
+				identifier = "PostalKickDoor",
+				minDistance = 500,
+				maxDistance = 750,
+				entity = slasher,
+				volume = 1.0,
+				fadeIn = 0,
+			})
+		end
+	end
+
+	slasher:SetNWBool("PostalDudeKicking", false)
+
+	if target:IsPlayer() then
+		if target:Team() ~= TEAM_SURVIVOR then return end
+
+		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+			if not slasher:GetNWBool("InSlasherChaseMode") then
+				if not slasher:GetNWBool("SwitchToGas") then
+					SlashCo.StartChaseMode(slasher, true)
+					slasher:SetNWBool("InSlasherChaseMode", true)
 				end
 			end
 		end
 
-		slasher:SetNWBool("PostalDudeKicking", false)
+		local vPoint = target:GetPos() + Vector(0, 0, 50)
+		local bloodfx = EffectData()
+		bloodfx:SetOrigin(vPoint)
+		util.Effect("BloodImpact", bloodfx)
 
-		if target:IsPlayer() then
-			if target:Team() ~= TEAM_SURVIVOR then return end
-
-			if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
-				if not slasher:GetNWBool("InSlasherChaseMode") then
-					if not slasher:GetNWBool("SwitchToGas") then
-						SlashCo.StartChaseMode(slasher, true)
-						slasher:SetNWBool("InSlasherChaseMode", true)
-					end
-				end
-			end
-
-			local vPoint = target:GetPos() + Vector(0, 0, 50)
-			local bloodfx = EffectData()
-			bloodfx:SetOrigin(vPoint)
-			util.Effect("BloodImpact", bloodfx)
-			
-			if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
-				if target:IsPlayer() then
-					SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
-				end
+		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+			if target:IsPlayer() then
+				SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
 			end
 		end
 	end
+end
 
 function SLASHER.OnMainAbilityFire(slasher)
 	if slasher:GetNWBool("PostalDudeStunned") then return end
@@ -1092,9 +1102,9 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher.KickCooldown = 2.5
 	end
 
-	timer.Create(slasher:EntIndex() .. "PostalDudeKick", 0.1, 1, function() KickFinish(slasher)
+	timer.Create(slasher:EntIndex() .. "PostalDudeKick", 0.1, 1, function()
+		KickFinish(slasher)
 	end)
-
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
@@ -1121,7 +1131,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				slasher.PostalState = POSTAL_DEAGLE_EQUIPPED
 			end
 
-
 			local idx = math.random(1, 3)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/postaldude/dude_deagle" .. idx .. ".ogg",
@@ -1147,6 +1156,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		end
 		if slasher:GetNWBool("MGUnlocked") then
 			slasher:SetNWBool("SwitchToMG", true)
+
 			local idx = math.random(1, 3)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/postaldude/dude_machinegun" .. idx .. ".ogg",
@@ -1157,7 +1167,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				volume = 0.8,
 				fadeIn = 0,
 			})
-
 		else
 			slasher:SetNWBool("SwitchToShovel", true)
 			slasher.PostalState = POSTAL_SHOVEL_EQUIPPED
@@ -1173,6 +1182,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher:SetBodygroup(2, 0)
 			slasher:SetBodygroup(3, 1)
 			slasher:SetBodygroup(4, 0)
+
 			return
 		end
 	end
@@ -1192,7 +1202,24 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			return
 		end
 	end
+end
 
+function SLASHER.Footstep(ply)
+	if SERVER then
+		local idx = math.random(1, 5)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_footstep" .. idx .. ".ogg",
+			identifier = "PostalFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 150,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+		})
+	end
+
+	return true
 end
 
 function SLASHER.Thirdperson(ply)
@@ -1218,49 +1245,61 @@ function SLASHER.Animator(ply)
 	local function PostalAimMatrix(ply)
 		if ply:GetNWBool("SwitchToDeagle") then
 			local seq = ply:LookupSequence("deagle_aim_matrix_2")
-			if seq < 0 then return end	
-			local layer = ply.AimMatrixLayer	
+			if seq < 0 then return end
+
+			local layer = ply.AimMatrixLayer
 			if not layer then
 		  		layer = ply:AddGestureSequence(seq)
 		  		ply.AimMatrixLayer = layer
 			end
+
 			ply:SetLayerWeight(layer, 1)
-			ply:SetLayerPlaybackRate(layer, 0)	
+			ply:SetLayerPlaybackRate(layer, 0)
+
 			local eye = ply:EyeAngles()
 			local body = ply:GetAngles()	
-			local yaw = math.AngleDifference(eye.y, body.y)	
+			local yaw = math.AngleDifference(eye.y, body.y)
+
 			ply:SetPoseParameter("body_yaw", math.Clamp(yaw, -90, 90))
 			ply:SetPoseParameter("body_pitch", math.Clamp(-eye.p, -90, 90))	
 			ply:InvalidateBoneCache()
 		elseif ply:GetNWBool("SwitchToMG") then
 			local seq = ply:LookupSequence("m4_aim_matrix")
-			if seq < 0 then return end	
-			local layer = ply.AimMatrixLayer	
+			if seq < 0 then return end
+
+			local layer = ply.AimMatrixLayer
 			if not layer then
 		  		layer = ply:AddGestureSequence(seq)
 		  		ply.AimMatrixLayer = layer
 			end
+
 			ply:SetLayerWeight(layer, 1)
-			ply:SetLayerPlaybackRate(layer, 0)	
+			ply:SetLayerPlaybackRate(layer, 0)
+
 			local eye = ply:EyeAngles()
 			local body = ply:GetAngles()	
-			local yaw = math.AngleDifference(eye.y, body.y)	
+			local yaw = math.AngleDifference(eye.y, body.y)
+
 			ply:SetPoseParameter("body_yaw", math.Clamp(yaw, -90, 90))
 			ply:SetPoseParameter("body_pitch", math.Clamp(-eye.p, -90, 90))	
 			ply:InvalidateBoneCache()
 		else
 			local seq = ply:LookupSequence("aim_matrix")
-			if seq < 0 then return end	
+			if seq < 0 then return end
+
 			local layer = ply.AimMatrixLayer	
 			if not layer then
 		  		layer = ply:AddGestureSequence(seq)
 		  		ply.AimMatrixLayer = layer
 			end
+
 			ply:SetLayerWeight(layer, 1)
-			ply:SetLayerPlaybackRate(layer, 0)	
+			ply:SetLayerPlaybackRate(layer, 0)
+
 			local eye = ply:EyeAngles()
 			local body = ply:GetAngles()	
 			local yaw = math.AngleDifference(eye.y, body.y)	
+
 			ply:SetPoseParameter("body_yaw", math.Clamp(yaw, -90, 90))
 			ply:SetPoseParameter("body_pitch", math.Clamp(-eye.p, -90, 90))	
 			ply:InvalidateBoneCache()
@@ -1297,17 +1336,16 @@ function SLASHER.Animator(ply)
 				ply.CalcSeqOverride = ply:LookupSequence("chase")
 			end
 		end
-
 	else
 		if ply:GetNWBool("SwitchToShovel") then
-				ply.CalcSeqOverride = ply:LookupSequence("shovel_glide")
-			elseif ply:GetNWBool("SwitchToDeagle") then
-				ply.CalcSeqOverride = ply:LookupSequence("deagle_glide")
-			elseif ply:GetNWBool("SwitchToMG") then
-				ply.CalcSeqOverride = ply:LookupSequence("m4_airwalk_MELEE")
-			elseif ply:GetNWBool("SwitchToGas") then
-				ply.CalcSeqOverride = ply:LookupSequence("gas_glide")
-			end
+			ply.CalcSeqOverride = ply:LookupSequence("shovel_glide")
+		elseif ply:GetNWBool("SwitchToDeagle") then
+			ply.CalcSeqOverride = ply:LookupSequence("deagle_glide")
+		elseif ply:GetNWBool("SwitchToMG") then
+			ply.CalcSeqOverride = ply:LookupSequence("m4_airwalk_MELEE")
+		elseif ply:GetNWBool("SwitchToGas") then
+			ply.CalcSeqOverride = ply:LookupSequence("gas_glide")
+		end
 	end
 
 	if ply:GetNWBool("SwitchToShovel") then
@@ -1318,33 +1356,26 @@ function SLASHER.Animator(ply)
 			else
 				ply:AddVCDSequenceToGestureSlot(2, ply:LookupSequence("shovel_swing_2"), 0, true)
 			end
-			if not ply.anim_antispam then
-				--ply:SetCycle(0)
-				--ply.anim_antispam = true
-			end
 		end
 	end
+
 	if ply:GetNWBool("SwitchToDeagle") then
-			if PostalDude_deagleshooting then
-				ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("deagle_attack"), 0, true)
-			if not ply.anim_antispam then
-				--ply:SetCycle(0)
-				--ply.anim_antispam = true
-			end
+		if PostalDude_deagleshooting then
+			ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("deagle_attack"), 0, true)
 		end
 	end
+
 	if ply:GetNWBool("SwitchToMG") then
-			if PostalDude_machinegunshooting then
-				ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("m4_attack"), 0, true)
-			if not ply.anim_antispam then
-				--ply:SetCycle(0)
-				--ply.anim_antispam = true
-			end
+		if PostalDude_machinegunshooting then
+			ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("m4_attack"), 0, true)
 		end
 	end
+
 	-- Secret Emote, the code has to be like this...for some reason, I don't know why, but if it works, it works
 	if ply:GetNWBool("PostalFinger") then
 		timer.Simple(0.01, function()
+			if not IsValid(ply) then return end
+
 			if ply:GetNWBool("SwitchToShovel") then
 				ply.CalcSeqOverride = ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("fuckyou_1"), 0, true)
 			elseif ply:GetNWBool("SwitchToDeagle") then
@@ -1355,19 +1386,18 @@ function SLASHER.Animator(ply)
 				ply.CalcSeqOverride = ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("fuckyou_4"), 0, true)
 			end
 		end)
-		if not ply.anim_antispam then
-				--ply:SetCycle(0)
-				--ply.anim_antispam = true
-			end
+
 		timer.Simple(0.05, function()
+			if not IsValid(ply) then return end
+
 			ply:SetNWBool("PostalFinger", false)
 		end)
 	end
 
 	if PostalDude_crouch then
 		local CrouchAnim = "shovel_crouch"
-
 		ply.CalcSeqOverride = ply:LookupSequence(CrouchAnim)
+
 		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
@@ -1376,6 +1406,7 @@ function SLASHER.Animator(ply)
 
 	if PostalDude_stun then
 		ply.CalcSeqOverride = ply:LookupSequence("stun")
+
 		if not ply.anim_antispam then
 			ply:SetCycle(0)
 			ply.anim_antispam = true
@@ -1383,12 +1414,8 @@ function SLASHER.Animator(ply)
 	end
 
 	if PostalDude_kick then
-				ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("kick"), 0, true)
-			if not ply.anim_antispam then
-				--ply:SetCycle(0)
-				--ply.anim_antispam = true
-			end
-		end
+		ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("kick"), 0, true)
+	end
 
 	-- Postal Dude's Emote
 	-- We can't actually play the animations through this hook, otherwise only Postal Dude will be able to see it, and no one else
@@ -1401,12 +1428,22 @@ function SLASHER.Animator(ply)
 
 		timer.Simple(0.01, function()
 			if not IsValid(ply) then return end
+
 			ply:SetNWBool("PostalFinger", true)
 		end)
 
-		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/postaldude/dude_finger" .. ".ogg",
+			soundPath = "slashco/ping_item.mp3",
+			identifier = "EmotePing",
+			minDistance = 100,
+			maxDistance = 110,
+			entity = ply,
+			volume = 0.4,
+			fadeIn = 0,
+		})
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_finger.ogg",
 			identifier = "PostalBird",
 			minDistance = 1000,
 			maxDistance = 1200,
@@ -1426,9 +1463,10 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
 	slasher:SetBodygroup(3, 0)
 	slasher:SetBodygroup(4, 0)
 
+	local idx = math.random(1, 3)
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/slasher/postaldude/dude_stunned" .. math.random(1, 3) .. ".ogg",
-		identifier = "PostalDudeBlinded",
+		soundPath = "slashco/slasher/postaldude/dude_stunned" .. idx .. ".ogg",
+		identifier = "PostalDudeBlinded" .. idx,
 		minDistance = 1000,
 		maxDistance = 2000,
 		entity = slasher,
@@ -1460,47 +1498,6 @@ end
 SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 5) end -- +5 additioal anger just because it deafened us.
 SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end
 
--- Many, many icons
-local ShovelTable = {
-	default = Material("slashco/ui/icons/slasher/postaldude_shovel"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
-local ShootTable = {
-	default = Material("slashco/ui/icons/slasher/sid_a3"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
-local GasTable = {
-	default = Material("slashco/ui/icons/slasher/postaldude_gas"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
-local IgniteTable = {
-	default = Material("slashco/ui/icons/slasher/postaldude_ignite"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
-local KickTable = {
-	default = Material("slashco/ui/icons/slasher/kick"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
-local SwitchToShovelTable = {
-	["shovel"] = Material("slashco/ui/icons/slasher/postaldude_shovel"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
-local SwitchToDeagleTable = {
-	default = Material("slashco/ui/icons/slasher/postaldude_deagle"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
-local SwitchToMGTable = {
-	default = Material("slashco/ui/icons/slasher/postaldude_m4"),
-	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
-}
-
 -- This is cancer
 function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/postaldude"))
@@ -1511,11 +1508,10 @@ function SLASHER.InitHud(_, hud)
 	hud:SetCrosshairTighten(0)
 	hud:SetCrosshairProngs(15)
 
+	hud:ChaseAndKill(nil, true)
+
 	hud:AddMeter("patience", 100, "", nil, true)
 	hud:TieMeterInt("patience", "PostalDudePatience")
-
-	
-	hud:ChaseAndKill(nil, true)
 
 	GameData.LocalPlayer:GetNWInt("PostalState", -1) -- Raphael my goat once again
 
@@ -1528,38 +1524,37 @@ function SLASHER.InitHud(_, hud)
 		if curState == -1 then
 			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
-			hud:AddControl("LMB", "shovel bash", ShovelTable)
+			hud:AddControl("LMB", "shovel bash", Material("slashco/ui/icons/slasher/postaldude_shovel"))
 			hud:ChaseAndKill(nil, true)
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
 			hud:TieControlText("LMB", "SwitchToShovel", "shovel bash", "shoot", true)
 		end
+
 		if curState == POSTAL_SHOVEL_EQUIPPED then
 			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
 			hud:SetMeterVisible("deagle ammo", false)
 			hud:SetMeterVisible("m4 ammo", false)
-			hud:AddControl("F", "shovel", SwitchToDeagleTable)
-			hud:AddControl("LMB", "shovel bash", ShovelTable)
+			hud:AddControl("F", "shovel", Material("slashco/ui/icons/slasher/postaldude_deagle"))
+			hud:AddControl("LMB", "shovel bash", Material("slashco/ui/icons/slasher/postaldude_shovel"))
 			hud:TieControlText("LMB", "SwitchToShovel", "shovel bash", "shoot", true)
 			hud:TieControlText("F", "SwitchToDeagle", "shovel", "deagle", true)
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
 			hud:ChaseAndKill(nil, true)
-		end
-		if curState == POSTAL_DEAGLE_UNEQUIPPED then
+		elseif curState == POSTAL_DEAGLE_UNEQUIPPED then
 			hud:RemoveControls()
-			hud:AddControl("F", "shovel", ShovelTable)
-			hud:AddControl("LMB", "shoot", ShootTable)
+			hud:AddControl("F", "shovel", Material("slashco/ui/icons/slasher/postaldude_shovel"))
+			hud:AddControl("LMB", "shoot", Material("slashco/ui/icons/slasher/sid_a3"))
 			hud:AddMeter("deagle ammo", 6, "", nil, true)
 			hud:SetMeterVisible("deagle ammo", true)
 			hud:SetMeterVisible("fuel", false)
 			hud:TieMeterInt("deagle ammo", "DeagleBulletsAmount")
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
 			hud:ChaseAndKill(nil, true)
-		end
-		if curState == POSTAL_DEAGLE_EQUIPPED then
+		elseif curState == POSTAL_DEAGLE_EQUIPPED then
 			hud:RemoveControls()
-			hud:AddControl("F", "m4", SwitchToMGTable)
-			hud:AddControl("LMB", "shoot", ShootTable)
+			hud:AddControl("F", "m4", Material("slashco/ui/icons/slasher/postaldude_m4"))
+			hud:AddControl("LMB", "shoot", Material("slashco/ui/icons/slasher/sid_a3"))
 			hud:SetMeterVisible("fuel", false)
 			hud:SetMeterVisible("deagle ammo", false)
 			hud:SetMeterVisible("m4 ammo", false)
@@ -1567,30 +1562,28 @@ function SLASHER.InitHud(_, hud)
 			hud:TieMeterInt("deagle ammo", "DeagleBulletsAmount")
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
 			hud:ChaseAndKill(nil, true)
-		end
-		if curState == POSTAL_MG_EQUIPPED then
+		elseif curState == POSTAL_MG_EQUIPPED then
 			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
-			hud:AddControl("F", "shovel", ShovelTable)
-			hud:AddControl("LMB", "shoot", ShootTable)
+			hud:AddControl("F", "shovel", Material("slashco/ui/icons/slasher/postaldude_shovel"))
+			hud:AddControl("LMB", "shoot", Material("slashco/ui/icons/slasher/sid_a3"))
 			hud:SetMeterVisible("deagle ammo", false)
 			hud:AddMeter("m4 ammo", 20, "", nil, true)
 			hud:TieMeterInt("m4 ammo", "MGBulletsAmount")
 			hud:SetMeterVisible("m4 ammo", true)
 			hud:ChaseAndKill(nil, true)
-		end
-		if curState == POSTAL_GAS_EQUIPPED then
+		elseif curState == POSTAL_GAS_EQUIPPED then
 			hud:RemoveControls()
 			hud:AddMeter("fuel", 30, "", nil, true)
 			hud:TieMeterInt("fuel", "PostalDudeFuelAmount")
-			hud:AddControl("RMB", "ignite", IgniteTable)
-			hud:AddControl("LMB", "pour", GasTable)
+			hud:AddControl("RMB", " ignite", Material("slashco/ui/icons/slasher/postaldude_ignite"))
+			hud:AddControl("LMB", "pour", Material("slashco/ui/icons/slasher/postaldude_gas"))
 
 			hud:SetMeterVisible("deagle ammo", false)
 			hud:SetMeterVisible("m4 ammo", false)
 		end
 
-		hud:AddControl("R", "kick", KickTable)
+		hud:AddControl("R", "kick", Material("slashco/ui/icons/slasher/kick"))
 		hud:TieControl("R", "PostalDudeCanMainKick")
 		hud:TieControl("LMB", "PostalDudeCanMainSlash")
 
@@ -1623,76 +1616,81 @@ if CLIENT then
 	end)
 end
 
-
-
-	-- Fun stuff
-	-- This is the CLIENT example (Thank you Raphael)
-	hook.Add("SlashCo:OnPing", "PostalDudeSayStuff", function(pingInfo)
-	   if pingInfo.Team ~= TEAM_SLASHER then return end
-	   if not pingInfo.Player then return end -- it can be nil!
-	   if CLIENT then return end
-
-	   -- pingInfo.Player is the entIndex since when a player may not always be known to a client.
-	   -- Had to update the code a little bit because ping handling got changed a bit - eno
-	   local ply = pingInfo.Player
-
-		-- Check isnumber for validity
-		if isnumber(ply) then
-		    ply = Entity(ply)
-		end
-
-		-- Nope, go away
-		if not IsValid(ply) then return end
-	   -- Can be any slasher ID
-	   if ply:GetNWString("Slasher") ~= "PostalDude" then return end
-			--It's our slasher so play a sound
-			if pingInfo.Type == "GENERATOR" or pingInfo.Type == "ITEM" or pingInfo.Type == "AMMO" then
-				SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_pingitemorgen" .. math.random(1, 3) .. ".ogg",
-				identifier = "PostalPingMisc",
-				minDistance = 500,
-				maxDistance = 750,
-				entity = ply,
-				volume = 1.5,
-				fadeIn = 0,
-					})
-			elseif pingInfo.Type == "SURVIVOR" then
-				SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_pingsurvivor" .. math.random(1, 4) .. ".ogg",
-				identifier = "PostalPingSurvivor",
-				minDistance = 500,
-				maxDistance = 750,
-				entity = ply,
-				volume = 1.5,
-				fadeIn = 0,
-					})
-			elseif pingInfo.Type == "LOOK HERE" then
-				SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_pinghere" .. math.random(1, 4) .. ".ogg",
-				identifier = "PostalPingHere",
-				minDistance = 500,
-				maxDistance = 750,
-				entity = ply,
-				volume = 1.5,
-				fadeIn = 0,
-					})
-			elseif pingInfo.Type == "SLASHER" then
-				SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/postaldude/dude_pingslasher" .. math.random(1, 2) .. ".ogg",
-				identifier = "PostalPingSlasher",
-				minDistance = 500,
-				maxDistance = 750,
-				entity = ply,
-				volume = 1.5,
-				fadeIn = 0,
-					})
-			end
-	   return true -- true so that the gamemode doesn't try to also play any sounds
-	end)
-
 -- Postal Dude's ammo should be outlined, he relies on it
 function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_postalammo"), nil)
 end
+
+-- Fun stuff
+-- This is the CLIENT example (Thank you Raphael)
+hook.Add("SlashCo:OnPing", "PostalDudeSayStuff", function(pingInfo)
+	if pingInfo.Team ~= TEAM_SLASHER then return end
+	if not pingInfo.Player then return end -- it can be nil!
+	if CLIENT then return end
+
+	-- pingInfo.Player is the entIndex since when a player may not always be known to a client.
+	-- Had to update the code a little bit because ping handling got changed a bit - eno
+	local ply = pingInfo.Player
+
+	-- Check isnumber for validity
+	if isnumber(ply) then
+		ply = Entity(ply)
+	end
+
+	-- Nope, go away
+	if not IsValid(ply) then return end
+
+	-- Can be any slasher ID
+	if ply:GetNWString("Slasher") ~= "PostalDude" then return end
+
+	--It's our slasher so play a sound
+	if pingInfo.Type == "GENERATOR" or pingInfo.Type == "ITEM" or pingInfo.Type == "AMMO" then
+		local idx = math.random(1, 3)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_pingitemorgen" .. idx .. ".ogg",
+			identifier = "PostalPingMisc" .. idx,
+			minDistance = 500,
+			maxDistance = 750,
+			entity = ply,
+			volume = 1.5,
+			fadeIn = 0,
+		})
+	elseif pingInfo.Type == "SURVIVOR" then
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_pingsurvivor" .. idx .. ".ogg",
+			identifier = "PostalPingSurvivor" .. idx,
+			minDistance = 500,
+			maxDistance = 750,
+			entity = ply,
+			volume = 1.5,
+			fadeIn = 0,
+		})
+	elseif pingInfo.Type == "LOOK HERE" then
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_pinghere" .. idx .. ".ogg",
+			identifier = "PostalPingHere" .. idx,
+			minDistance = 500,
+			maxDistance = 750,
+			entity = ply,
+			volume = 1.5,
+			fadeIn = 0,
+		})
+	elseif pingInfo.Type == "SLASHER" then
+		local idx = math.random(1, 2)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_pingslasher" .. idx .. ".ogg",
+			identifier = "PostalPingSlasher" .. idx,
+			minDistance = 500,
+			maxDistance = 750,
+			entity = ply,
+			volume = 1.5,
+			fadeIn = 0,
+		})
+	end
+
+	return true -- true so that the gamemode doesn't try to also play any sounds
+end)
 
 SlashCo.RegisterSlasher(SLASHER, "PostalDude")
