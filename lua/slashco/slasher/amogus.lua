@@ -112,9 +112,8 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("AmogusFuelDisguise") then return end
 
-	if not slasher:GetNWBool("AmogusSurvivorDisguise") then
+	if not slasher:GetNWBool("AmogusSurvivorDisguise") or not slasher:GetNWBool("AmogusFuelDisguise") then
 		SlashCo.Jumpscare(slasher, target)
 	end
 
@@ -406,13 +405,23 @@ function SLASHER.InitHud(_, hud)
 	hud:SetControlIconTable("LMB", killTable)
 	hud:TieControlVisible("F", "AmogusDisguised", true)
 	hud:TieControlVisible("RMB", "AmogusDisguised", true)
-	hud:TieControlVisible("LMB", "AmogusFuelDisguise", true)
 	hud:TieControlText("R", "AmogusDisguised", "reveal yourself", "disguise as survivor", true)
 
 	local control = hud:GetControl("LMB")
 	control.prevSurvivor = -1
+	control.prevGas = -1
 	function control.AlsoThink()
 		local survivor = GameData.LocalPlayer:GetNWBool("AmogusSurvivorDisguise")
+		local gascan = GameData.LocalPlayer:GetNWBool("AmogusFuelDisguise")
+		if gascan ~= control.prevGas then
+			if gascan then
+				control:SetText("sneak kill")
+			else
+				control:SetText("kill survivor")
+			end
+
+			control.prevGas = gascan
+		end
 		if survivor ~= control.prevSurvivor then
 			if survivor then
 				control:SetText("sneak kill")
@@ -423,7 +432,7 @@ function SLASHER.InitHud(_, hud)
 			control.prevSurvivor = survivor
 		end
 
-		if survivor and GameData.LocalPlayer:GetVelocity():Length() < 1 then
+		if (survivor or gascan) and GameData.LocalPlayer:GetVelocity():Length() < 1 then
 			if not control.prevKill then
 				control:SetEnabled(true)
 				control:Shake()
