@@ -1032,12 +1032,13 @@ local function KickFinish(slasher)
 				identifier = "SurvivorKickDude",
 				minDistance = 600,
 				maxDistance = 800,
-				entity = target,
+				entity = slasher,
 				volume = 1,
 				fadeIn = 0,
 			})
 			else
 				if IsValid(lookent) then
+					if lookent:GetClass() ~= "prop_door_rotating" then return end
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "slashco/slasher/postaldude/dude_foot_kickdoor" .. ".ogg",
 						identifier = "PostalKickDoor",
