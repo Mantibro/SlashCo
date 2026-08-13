@@ -3,7 +3,6 @@ AddCSLuaFile()
 local SlashCo = SlashCo
 
 ENT.Type = "anim"
-
 ENT.ClassName = "sc_postalammo"
 ENT.PrintName = "Ammo"
 ENT.Author = "eno"
@@ -36,7 +35,7 @@ local modelList = {
 }
 
 function ENT:Initialize()
-	if not SERVER then return end
+	if CLIENT then return end
 
 	self:SetUseType(SIMPLE_USE)
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
@@ -44,13 +43,7 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
-
-	local phys = self:GetPhysicsObject()
-
-	if phys:IsValid() then
-		self:PhysWake()
-	end
-	
+	self:PhysWake()
 end
 
 if SERVER then
@@ -58,13 +51,19 @@ if SERVER then
 		if activator:Team() ~= TEAM_SLASHER then return end
 		if activator:GetNWString("Slasher") ~= "PostalDude" then return end
 
-		
 		DeagleBulletsControl(activator, 2)
 		MGBulletsControl(activator, 5)
-		activator:EmitSound("slashco/slasher/postaldude/dude_ammo_pickup.ogg")
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_ammo_pickup.ogg",
+			identifier = "PostalAmmoPickUp",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = activator,
+			volume = 1.0,
+		})
 
 		SlashCo.CreateItem("sc_postalammo", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
-
 		self:Remove()
 	end
 end
