@@ -871,6 +871,7 @@ function SLASHER.OnPrimaryFire(slasher)
 					if CLIENT then return end
 
 					fire = ents.Create("env_fire")
+					fire:SetNWBool("PostalFire", true) -- Do this so we can separate map fire from Postal's fire
 					fire:SetKeyValue("health", 20)
 					fire:SetKeyValue("firesize", 36)
 					fire:SetKeyValue("fireattack", .01)
@@ -886,7 +887,7 @@ function SLASHER.OnPrimaryFire(slasher)
 					end
 
  					--SafeRemoveEntity(fire)
-					SafeRemoveEntityDelayed(fire, 20)
+					SafeRemoveEntityDelayed(fire, 30)
 					PostalDudeFuelControl(slasher, -1)
 				end
 			end
@@ -901,7 +902,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		local attacker = dmginfo:GetAttacker()
 		if not IsValid(attacker) then return end
 
-		if attacker:GetClass() == "env_fire" then
+		if attacker:GetClass() == "env_fire" and attacker:GetNWBool("PostalFire") then
 			if not target:IsOnFire() then
 				target:Ignite(3.5) -- Don't make it too long, fire damage is crayzee
 			end
@@ -1240,71 +1241,13 @@ function SLASHER.Animator(ply)
 		ply.anim_antispam = false
 	end
 
-	-- Aim Matrix
-	-- Not sure if this is gonna work, I don't do aim matrixes lmao
-	local function PostalAimMatrix(ply)
-		if ply:GetNWBool("SwitchToDeagle") then
-			local seq = ply:LookupSequence("deagle_aim_matrix_2")
-			if seq < 0 then return end
+	local ang = ply:EyeAngles()
+	local yaw = math.AngleDifference(ang.yaw, ply:GetAngles().yaw)
 
-			local layer = ply.AimMatrixLayer
-			if not layer then
-		  		layer = ply:AddGestureSequence(seq)
-		  		ply.AimMatrixLayer = layer
-			end
-
-			ply:SetLayerWeight(layer, 1)
-			ply:SetLayerPlaybackRate(layer, 0)
-
-			local eye = ply:EyeAngles()
-			local body = ply:GetAngles()	
-			local yaw = math.AngleDifference(eye.y, body.y)
-
-			ply:SetPoseParameter("body_yaw", math.Clamp(yaw, -90, 90))
-			ply:SetPoseParameter("body_pitch", math.Clamp(-eye.p, -90, 90))	
-			ply:InvalidateBoneCache()
-		elseif ply:GetNWBool("SwitchToMG") then
-			local seq = ply:LookupSequence("m4_aim_matrix")
-			if seq < 0 then return end
-
-			local layer = ply.AimMatrixLayer
-			if not layer then
-		  		layer = ply:AddGestureSequence(seq)
-		  		ply.AimMatrixLayer = layer
-			end
-
-			ply:SetLayerWeight(layer, 1)
-			ply:SetLayerPlaybackRate(layer, 0)
-
-			local eye = ply:EyeAngles()
-			local body = ply:GetAngles()	
-			local yaw = math.AngleDifference(eye.y, body.y)
-
-			ply:SetPoseParameter("body_yaw", math.Clamp(yaw, -90, 90))
-			ply:SetPoseParameter("body_pitch", math.Clamp(-eye.p, -90, 90))	
-			ply:InvalidateBoneCache()
-		else
-			local seq = ply:LookupSequence("aim_matrix")
-			if seq < 0 then return end
-
-			local layer = ply.AimMatrixLayer	
-			if not layer then
-		  		layer = ply:AddGestureSequence(seq)
-		  		ply.AimMatrixLayer = layer
-			end
-
-			ply:SetLayerWeight(layer, 1)
-			ply:SetLayerPlaybackRate(layer, 0)
-
-			local eye = ply:EyeAngles()
-			local body = ply:GetAngles()	
-			local yaw = math.AngleDifference(eye.y, body.y)	
-
-			ply:SetPoseParameter("body_yaw", math.Clamp(yaw, -90, 90))
-			ply:SetPoseParameter("body_pitch", math.Clamp(-eye.p, -90, 90))	
-			ply:InvalidateBoneCache()
-		end
-	end
+	ply:SetPoseParameter("body_pitch", -ang.pitch)
+	ply:SetPoseParameter("body_yaw", yaw)
+	ply:SetPoseParameter("move_x", ply:GetVelocity().X / SLASHER.ProwlSpeed)
+	ply:SetPoseParameter("move_y", ply:GetVelocity().Y / SLASHER.ProwlSpeed)
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -1682,6 +1625,28 @@ hook.Add("SlashCo:OnPing", "PostalDudeSayStuff", function(pingInfo)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/postaldude/dude_pingslasher" .. idx .. ".ogg",
 			identifier = "PostalPingSlasher" .. idx,
+			minDistance = 500,
+			maxDistance = 750,
+			entity = ply,
+			volume = 1.5,
+			fadeIn = 0,
+		})
+	elseif pingInfo.Type == "DEAD BODY" then
+		local idx = math.random(1, 3)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_pingbody" .. idx .. ".ogg",
+			identifier = "PostalPingDeadBody" .. idx,
+			minDistance = 500,
+			maxDistance = 750,
+			entity = ply,
+			volume = 1.5,
+			fadeIn = 0,
+		})
+	elseif pingInfo.Type == "HELICOPTER" then
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/postaldude/dude_pingchopper" .. idx .. ".ogg",
+			identifier = "PostalPingChopper" .. idx,
 			minDistance = 500,
 			maxDistance = 750,
 			entity = ply,
