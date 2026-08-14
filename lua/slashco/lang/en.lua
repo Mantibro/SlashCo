@@ -622,7 +622,7 @@ SlashCo.LangTable["PostalDude"] = "Postal Dude"
 SlashCo.LangTable["PostalDude_desc"] = [[A very tactical slasher with an emphasis on all round range combat, short chases 
 and general versisitility.
 
--Your patience meter depletes over time when out of chase buffing your speed
+-Your patience meter depletes over time when in chase, reducing your speed
 -Patience will deplete in chase and by dealing damage
 -You have an arsenal of weapons suitable at all ranges, unlocked as the game progresses
 -You may pick up gas cans to use them offensively instead, pouring gas on the ground and igniting it with matches]]

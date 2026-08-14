@@ -985,11 +985,11 @@ function SLASHER.OnSecondaryFire(slasher)
 	end
 
 	if slasher:GetNWBool("InSlasherChaseMode") then
+		--slasher:SlasherHudFunc("ChaseAndKill", "false", "true")
+		SlashCo.AddSlasherAnger(slasher, -5)
 		SlashCo.StopChase(slasher)
 		return
 	end
-
-	SlashCo.StartChaseMode(slasher)
 end
 
 local function KickFinish(slasher)
@@ -1241,13 +1241,8 @@ function SLASHER.Animator(ply)
 		ply.anim_antispam = false
 	end
 
-	local ang = ply:EyeAngles()
-	local yaw = math.AngleDifference(ang.yaw, ply:GetAngles().yaw)
-
-	ply:SetPoseParameter("body_pitch", -ang.pitch)
-	ply:SetPoseParameter("body_yaw", yaw)
-	ply:SetPoseParameter("move_x", ply:GetVelocity().X / SLASHER.ProwlSpeed)
-	ply:SetPoseParameter("move_y", ply:GetVelocity().Y / SLASHER.ProwlSpeed)
+	ply:SetPoseParameter("body_pitch", -ply:EyeAngles().pitch)
+	ply:SetPoseParameter("body_yaw", -(math.AngleDifference(ply:EyeAngles().y, select(2, ply:GetBonePosition(0)).y) + 90))
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -1451,8 +1446,6 @@ function SLASHER.InitHud(_, hud)
 	hud:SetCrosshairTighten(0)
 	hud:SetCrosshairProngs(15)
 
-	hud:ChaseAndKill(nil, true)
-
 	hud:AddMeter("patience", 100, "", nil, true)
 	hud:TieMeterInt("patience", "PostalDudePatience")
 
@@ -1468,7 +1461,6 @@ function SLASHER.InitHud(_, hud)
 			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
 			hud:AddControl("LMB", "shovel bash", Material("slashco/ui/icons/slasher/postaldude_shovel"))
-			hud:ChaseAndKill(nil, true)
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
 			hud:TieControlText("LMB", "SwitchToShovel", "shovel bash", "shoot", true)
 		end
@@ -1483,7 +1475,6 @@ function SLASHER.InitHud(_, hud)
 			hud:TieControlText("LMB", "SwitchToShovel", "shovel bash", "shoot", true)
 			hud:TieControlText("F", "SwitchToDeagle", "shovel", "deagle", true)
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
-			hud:ChaseAndKill(nil, true)
 		elseif curState == POSTAL_DEAGLE_UNEQUIPPED then
 			hud:RemoveControls()
 			hud:AddControl("F", "shovel", Material("slashco/ui/icons/slasher/postaldude_shovel"))
@@ -1493,7 +1484,6 @@ function SLASHER.InitHud(_, hud)
 			hud:SetMeterVisible("fuel", false)
 			hud:TieMeterInt("deagle ammo", "DeagleBulletsAmount")
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
-			hud:ChaseAndKill(nil, true)
 		elseif curState == POSTAL_DEAGLE_EQUIPPED then
 			hud:RemoveControls()
 			hud:AddControl("F", "m4", Material("slashco/ui/icons/slasher/postaldude_m4"))
@@ -1504,7 +1494,6 @@ function SLASHER.InitHud(_, hud)
 			hud:AddMeter("deagle ammo", 6, "", nil, true)
 			hud:TieMeterInt("deagle ammo", "DeagleBulletsAmount")
 			hud:TieControl("LMB", "PostalDudeCanMainSlash")
-			hud:ChaseAndKill(nil, true)
 		elseif curState == POSTAL_MG_EQUIPPED then
 			hud:RemoveControls()
 			hud:SetMeterVisible("fuel", false)
@@ -1514,7 +1503,6 @@ function SLASHER.InitHud(_, hud)
 			hud:AddMeter("m4 ammo", 20, "", nil, true)
 			hud:TieMeterInt("m4 ammo", "MGBulletsAmount")
 			hud:SetMeterVisible("m4 ammo", true)
-			hud:ChaseAndKill(nil, true)
 		elseif curState == POSTAL_GAS_EQUIPPED then
 			hud:RemoveControls()
 			hud:AddMeter("fuel", 30, "", nil, true)
