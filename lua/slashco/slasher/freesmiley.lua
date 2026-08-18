@@ -93,7 +93,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if (slasher.ChaseActivationCooldown or 0) > 0 then return end
 	if slasher:GetNWBool("FreeSmileySummoning") then return end
 	if slasher:GetNWBool("FreeSmileyPocketSand") or slasher:GetNWBool("FreeSmileyTeslaCoil") then return end
 
@@ -102,31 +101,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		return
 	end
 
-	slasher:SetNWBool("InSlasherChaseMode", true)
-	slasher:SetNWFloat("SlasherChaseBegin", CurTime())
-	slasher.CurrentChaseTick = 0
-	slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
-	slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-	slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-
-	SlashCo.AudioSystem.PlaySound({
-		soundPath = SLASHER.ChaseMusic,
-		identifier = "ChaseMusic",
-		minDistance = 1000 * SlashCo.MapSize,
-		maxDistance = 3000 * SlashCo.MapSize,
-		looping = true,
-		entity = slasher,
-		volume = 0.7,
-		fadeIn = 1,
-	})
-
-	local duration = (SLASHER.ChaseDuration * 10) + 55
-	local curSlasher = slasher:GetNWString("Slasher")
-	timer.Create("SlashCoEndChase_" .. slasher:UserID(), duration, 1, function()
-		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= curSlasher then return end
-
-		SlashCo.StopChase(slasher)
-	end)
+	SlashCo.StartChaseMode(slasher, true)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)

@@ -229,8 +229,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if stage == 1 then
-		final_eyesight = 10
-		final_perception = 5 - (slasher:GetVelocity():Length() / 60)
+		local movement = slasher:GetVelocity():Length()
+		final_eyesight = math.Clamp(10 - (movement / 35), 2, 10)
+		final_perception = math.Clamp(5 - (movement / 60), 1, 5)
 	end
 
 	if slasher:GetNWInt("TrollgeStage") ~= stage then
