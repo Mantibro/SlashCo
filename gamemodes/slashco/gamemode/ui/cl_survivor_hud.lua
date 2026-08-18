@@ -581,7 +581,8 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 			continue
 		end
 
-		if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage") then
+		if (not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage")) or slasher:GetNWBool("NoChaseLight")
+		then
 			continue
 		end
 
