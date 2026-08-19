@@ -209,7 +209,7 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	local haloColor = colors.red
 	if colors[color] then
 		haloColor = colors[color]
-	elseif type(colors) == "Color" then
+	elseif IsColor(color) then
 		haloColor = color
 	end
 
