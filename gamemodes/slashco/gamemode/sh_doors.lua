@@ -52,8 +52,9 @@ local function SetupMapLua()
 	for _, ent in ipairs(ents.FindByClass("prop_door_rotating")) do
 		OnDoorStateChanged(ent, ent:GetInternalVariable("m_eDoorState") ~= doorStates.DOOR_STATE_CLOSED)
 
-		ent:Fire("AddOutput", "OnOpen triggerhook:RunPassedCode:hook.Run( 'DoorOpen' ):0:-1")
-		ent:Fire("AddOutput", "OnClose triggerhook:RunPassedCode:hook.Run( 'DoorClose' ):0:-1")
+		-- RaphaelIT7: GMod Bug! We cannot use SlashCo: as : is parsed as next argument...
+		ent:Fire("AddOutput", "OnOpen triggerhook:RunPassedCode:hook.Run( 'SlashCo_DoorOpen' ):0:-1")
+		ent:Fire("AddOutput", "OnClose triggerhook:RunPassedCode:hook.Run( 'SlashCo_DoorClose' ):0:-1")
 	end
 end
 
@@ -69,10 +70,10 @@ hook.Add("PlayerUse", "SlashCo:Doors", function(ply, ent)
 	ent.NextDoorUse = CurTime() + 0.2
 end)
 
-hook.Add("DoorOpen", "SlashCo:Doors", function()
+hook.Add("SlashCo_DoorOpen", "SlashCo:Doors", function()
 	OnDoorStateChanged(CALLER, true)
 end)
 
-hook.Add("DoorClose", "SlashCo:Doors", function()
+hook.Add("SlashCo_DoorClose", "SlashCo:Doors", function()
 	OnDoorStateChanged(CALLER, false)
 end)

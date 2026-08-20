@@ -69,7 +69,7 @@ local down = Vector(0, 0, -200)
 --If offset it unspecified, it defaults to 0
 --If range is unspecified, minRange becomes the range value and the minimum range becomes 25
 function ENTITY:LocalRandomPosition(minRange, range, offset)
-	SlashCo.LocalizedTraceHullLocator(self, minRange, range, offset)
+	return SlashCo.LocalizedTraceHullLocator(self, minRange, range, offset)
 end
 
 --- for compat with things that still use the old function

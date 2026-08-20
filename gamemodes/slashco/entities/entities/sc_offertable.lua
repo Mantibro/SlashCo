@@ -83,7 +83,8 @@ function ENT:Use(activator)
 		return
 	end
 
-	if SlashCo.GetLobbyPlayerReadyState(activator) < 1 then
+	-- RaphaelIT7: I mean... why even check? I am sure we can just allow it at any time... right?
+	if SlashCo.GetLobbyPlayerReadyState(activator) == SlashCo.ReadyState.NotReady then
 		SlashCo.BroadcastGlobalData()
 		SlashCo.SendValue(activator, "openOfferingPicker")
 	else

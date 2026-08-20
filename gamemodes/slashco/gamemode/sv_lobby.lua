@@ -116,12 +116,16 @@ function SlashCo.LobbyBroadcastInfo()
 end
 
 function GM:PlayerChangedTeam(ply, oldTeam, newTeam)
-	if newTeam == TEAM_LOBBY and oldTeam ~= TEAM_LOBBY then
-		addPlayerToLobby(ply)
-	end
+	if GameData.IsLobby then
+		if newTeam == TEAM_LOBBY and oldTeam ~= TEAM_LOBBY then
+			addPlayerToLobby(ply)
+		end
 
-	if newTeam == TEAM_SPECTATOR and oldTeam ~= TEAM_SPECTATOR then
-		removePlayerFromLobby(ply)
+		if newTeam == TEAM_SPECTATOR and oldTeam ~= TEAM_SPECTATOR then
+			removePlayerFromLobby(ply)
+		end
+	else
+		SlashCo.NetworkPings(ply, newTeam)
 	end
 end
 
@@ -191,6 +195,7 @@ local function lobbyTransitionTimer()
 		SlashCo.LobbyBriefingTransition()
 
 		timer.Create("SlashCo:LobbyOpenItems", 8, 1, function()
+			lobbyBriefingLeaveTimer()
 			SlashCo.LobbyOpenItems()
 		end)
 	end)
