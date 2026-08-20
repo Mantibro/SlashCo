@@ -118,8 +118,12 @@ function SLASHER.OnTickBehaviour(slasher)
 	if MaleCD > 0 then
 		slasher.MaleCooldown = MaleCD - FrameTime()
 	end
+
 	if SlashCD > 0 then
 		slasher.SlashCooldown = SlashCD - FrameTime()
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
+	else
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
 	end
 
 	if State == 0 then
@@ -199,6 +203,7 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetNWBool("Male07Stunned") then return end
+	if slasher.SlashCooldown > 0.01 then return end
 
 	if slasher.MaleState == MALE07_POSESSED then
 		SlashCo.Jumpscare(slasher, target)
@@ -207,95 +212,90 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	if slasher.MaleState == MALE07_GHOST then return end
 
-	if slasher.SlashCooldown < 0.01 then
-		slasher:SetNWBool("Male07Slashing", false)
-		timer.Remove("Male07SlashDecay")
-		slasher.SlashCooldown = 2
+	slasher:SetNWBool("Male07Slashing", false)
+	timer.Remove("Male07SlashDecay")
+	slasher.SlashCooldown = 2
 
-		timer.Simple(0.5, function()
-			if not IsValid(slasher) then return end
+	timer.Simple(0.5, function()
+		if not IsValid(slasher) then return end
 
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/trollge/trollge_swing.mp3",
-				identifier = "Male07Swing",
-				minDistance = 600,
-				maxDistance = 800,
-				entity = slasher,
-				volume = 1,
-				fadeIn = 0,
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/trollge/trollge_swing.mp3",
+			identifier = "Male07Swing",
+			minDistance = 600,
+			maxDistance = 800,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+
+		if SERVER then
+			slasher:LagCompensation(true)
+			local tr = util.TraceHull({
+				start = slasher:EyePos(),
+				endpos = slasher:LocalToWorld(Vector(45, 0, 60)),
+				maxs = Vector(30, 40, 60),
+				mins = Vector(-30, -40, -60),
+				filter = slasher,
+				ignoreworld = true,
 			})
+			slasher:LagCompensation(false)
 
-			if SERVER then
-				--local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 60)),
-				--		Vector(-30, -40, -60), Vector(30, 40, 60), SLASHER.PrimaryDamage, DMG_SLASH, 2, false)
+			local target = tr.Entity
+			local damage = SLASHER.PrimaryDamage
 
-				slasher:LagCompensation(true)
-				local tr = util.TraceHull({
-					start = slasher:EyePos(),
-					endpos = slasher:LocalToWorld(Vector(45, 0, 60)),
-					maxs = Vector(30, 40, 60),
-					mins = Vector(-30, -40, -60),
-					filter = slasher,
-					ignoreworld = true,
-				})
-				slasher:LagCompensation(false)
-
-				local target = tr.Entity
-				local damage = SLASHER.PrimaryDamage
-
-				if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
-					local dmg = DamageInfo()
-					dmg:SetDamageType(DMG_SLASH)
-					dmg:SetAttacker(slasher)
-					dmg:SetInflictor(slasher)
-					dmg:SetDamage(damage)
-					dmg:SetDamageForce(Vector(1, 1, 1))
-					dmg:SetDamagePosition(tr.HitPos)
-					target:TakeDamageInfo(dmg)
-				end
-
-				if not target:IsValid() then return end
-
-				if target:IsPlayer() then
-					if target:Team() ~= TEAM_SURVIVOR then return end
-
-					local vPoint = target:GetPos() + Vector(0, 0, 50)
-					local bloodfx = EffectData()
-					bloodfx:SetOrigin(vPoint)
-					util.Effect("BloodImpact", bloodfx)
-
-					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
-						identifier = "SurvivorHitMale07",
-						minDistance = 600,
-						maxDistance = 800,
-						entity = target,
-						volume = 1,
-						fadeIn = 0,
-					})
-				end
-
-				SlashCo.BustDoor(slasher, target, 30000)
+			if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+				local dmg = DamageInfo()
+				dmg:SetDamageType(DMG_SLASH)
+				dmg:SetAttacker(slasher)
+				dmg:SetInflictor(slasher)
+				dmg:SetDamage(damage)
+				dmg:SetDamageForce(Vector(1, 1, 1))
+				dmg:SetDamagePosition(tr.HitPos)
+				target:TakeDamageInfo(dmg)
 			end
+
+			if not target:IsValid() then return end
+
+			if target:IsPlayer() then
+				if target:Team() ~= TEAM_SURVIVOR then return end
+
+				local vPoint = target:GetPos() + Vector(0, 0, 50)
+				local bloodfx = EffectData()
+				bloodfx:SetOrigin(vPoint)
+				util.Effect("BloodImpact", bloodfx)
+
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
+					identifier = "SurvivorHitMale07",
+					minDistance = 600,
+					maxDistance = 800,
+					entity = target,
+					volume = 1,
+					fadeIn = 0,
+				})
+			end
+
+			SlashCo.BustDoor(slasher, target, 30000)
+		end
+	end)
+
+	timer.Simple(0.1, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("Male07Slashing", true)
+
+		timer.Create("Male07SlashDecay", 1.5, 1, function()
+			slasher:SetNWBool("Male07Slashing", false)
 		end)
-
-		timer.Simple(0.1, function()
-			if not IsValid(slasher) then return end
-
-			slasher:SetNWBool("Male07Slashing", true)
-
-			timer.Create("Male07SlashDecay", 1.5, 1, function()
-				slasher:SetNWBool("Male07Slashing", false)
-			end)
-		end)
-	end
+	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
 	if slasher:GetNWBool("Male07Stunned") then return end
 
 	SlashCo.StartChaseMode(slasher)
-	slasher.KillDelayTick = SLASHER.KillDelay
+	slasher.SlashCooldown = 5
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
@@ -328,7 +328,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher.MaleState = MALE07_POSESSED
 		slasher.CurrentChaseTick = 0
 		slasher.MaleCooldown = 3
-		slasher.KillDelayTick = SLASHER.KillDelay
+		slasher.SlashCooldown = 5
 
 		slasher:SetWalkSpeed(100)
 		slasher:SetRunSpeed(100)
