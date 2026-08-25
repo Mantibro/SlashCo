@@ -304,7 +304,7 @@ end
 function SLASHER.CanBeSeen(ply)
 	if SERVER then return end
 
-	if ply:IsVisible() and not ply:GetNWBool("DolphinInHiding") then
+	if ply:GetVisible() and not ply:GetNWBool("DolphinInHiding") then
 		return true
 	end
 end

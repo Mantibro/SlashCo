@@ -199,7 +199,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.TimeAsTylerSpecter = (slasher.TimeAsTylerSpecter or 0) + FrameTime()
 		final_perception = 6.0
 
-		if slasher:IsVisible() then
+		if slasher:GetVisible() then
 			slasher:SetVisible(false) -- Just in case he somehow ends up still being visible
 		end
 
@@ -212,7 +212,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	elseif TylerState == TYLER_CREATOR then
 		--Creator
 
-		if not slasher:IsVisible() then
+		if not slasher:GetVisible() then
 			slasher:SetVisible(true) -- Just in case he somehow ends up invisible
 		end
 
@@ -673,7 +673,7 @@ end
 function SLASHER.CanBeSeen(ply)
 	if SERVER then return end
 
-	if ply:IsVisible() and ply:GetNWInt("TylerState") ~= 1 then
+	if ply:GetVisible() and ply:GetNWInt("TylerState") ~= 1 then
 		return true
 	end
 end

@@ -485,7 +485,7 @@ function SLASHER.OnItemSpawn()
 end
 
 function SLASHER.Footstep(ply)
-	return not ply:IsVisible()
+	return not ply:GetVisible()
 end
 
 local possessTable = {

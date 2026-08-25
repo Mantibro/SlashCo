@@ -91,8 +91,8 @@ include("sh_roundpoints.lua")
 include("sh_experience.lua")
 include("sh_perks.lua")
 include("ui/cl_documents.lua") -- Depends on sh_perks.lua
-include("sh_canbeseen.lua")
 include("sh_player.lua")
+include("sh_canbeseen.lua")
 include("sh_fog.lua")
 include("sh_keyboard.lua")
 

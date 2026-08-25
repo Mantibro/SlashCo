@@ -10,7 +10,6 @@ local ambiences = {
 hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
 	local ply = GameData.LocalPlayer
 
-	-- [[ soundpatch method
 	if ambiences[effect] then
 		if GameData.LimitedZoneSound ~= ambiences[effect] then
 			if GameData.LimitedZoneAmbience then
@@ -24,6 +23,10 @@ hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
 				callback = function(channel)
 					GameData.LimitedZoneAmbience = channel
 				end,
+				-- RaphaelIT7: The sounds don't even exist? So we allow silent failure
+				errorCallback = function()
+					return true
+				end
 			})
 
 			GameData.LimitedZoneSound = ambiences[effect]
