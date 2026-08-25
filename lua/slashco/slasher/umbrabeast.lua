@@ -894,7 +894,7 @@ end
 
 function SLASHER.OnSecondaryFire(slasher)
 	if slasher:GetNWBool("UmbraBeastStalk") then
-		SlashCo.StartChaseMode(slasher)
+		SlashCo.StartChaseMode(slasher, true)
 	else
 		StanLeap(slasher)
 	end
