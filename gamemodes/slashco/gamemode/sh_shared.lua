@@ -530,23 +530,6 @@ function GM:CreateTeams()
 	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235), false)
 end
 
-local DoorSlamWhitelist = {
-	["models/props_c17/door03_left.mdl"] = true,
-	["models/props_doors/doormain_rural01_small.mdl"] = true,
-	["models/props_doors/doormainmetal01.mdl"] = true,
-	["models/props_c17/door01_left.mdl"] = true,
-	["models/props_c17/door_fg.mdl"] = true,
-	["models/props_doors/doormain01.mdl"] = true,
-	["models/props_doors/doorglassmain01.mdl"] = true,
-	["models/props_doors/door_rotate_112.mdl"] = true,
-	["models/props_doors/doormainmetalwindow01.mdl"] = true,
-	["models/props_c17/door01_addg_medium.mdl"] = true
-}
-
-function SlashCo.CheckDoorWL(ent)
-	return DoorSlamWhitelist[ent:GetModel()]
-end
-
 function SlashCo.Dampen(speed, from, to)
 	return Lerp(1 - math.exp(-speed * FrameTime()), from, to)
 end
