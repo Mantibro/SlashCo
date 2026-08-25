@@ -246,7 +246,7 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 	end
 
 	if _team == TEAM_SPECTATOR then
-		if GameData.showHalos then
+		if GameData.showHalos and not GameData.IsLobby then
 			SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER), "red")
@@ -630,29 +630,6 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		cam.End3D2D()
 	end
 end)
-
-g_SCLoadedSounds = g_SCLoadedSounds or {} --set as global to protect against lua restarts
-function SlashCo.ReadSound(fileName)
-	local _sound
-	local filter
-	if not g_SCLoadedSounds[fileName] then
-		_sound = CreateSound(game.GetWorld(), fileName, filter)
-		if _sound then
-			_sound:SetSoundLevel(0)
-			g_SCLoadedSounds[fileName] = { _sound, filter }
-		end
-	else
-		_sound = g_SCLoadedSounds[fileName][1]
-		filter = g_SCLoadedSounds[fileName][2]
-	end
-
-	if _sound then
-		_sound:Stop()
-		_sound:Play()
-	end
-
-	return _sound
-end
 
 -- RaphaelIT7: We use PostDrawHUD instead of DrawOverlay to avoid rendering OVER the main menu.
 hook.Add("PostDrawHUD", "SlashCo:DrawHUD", function()

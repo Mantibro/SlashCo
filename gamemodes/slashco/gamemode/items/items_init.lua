@@ -37,6 +37,16 @@ function SlashCo.GetItemByEntity(class)
 	return nil
 end
 
+function SlashCo.FindItemWithField(key, value)
+	for name, tbl in pairs(SlashCoItems) do
+		if tbl[key] == value then
+			return name, tbl
+		end
+	end
+
+	return nil, nil
+end
+
 function SlashCo.GetItemTable(name)
 	return SlashCoItems[name]
 end

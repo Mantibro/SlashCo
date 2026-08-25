@@ -7,52 +7,32 @@ local ambiences = {
 	[6] = "ambient/windwinter.wav",
 }
 
-local zoneAmbience, snd
 hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
 	local ply = GameData.LocalPlayer
 
 	-- [[ soundpatch method
 	if ambiences[effect] then
-		timer.Remove("SCFadeOut")
-		if snd ~= ambiences[effect] then
-			if zoneAmbience then
-				zoneAmbience:FadeOut(1)
+		if GameData.LimitedZoneSound ~= ambiences[effect] then
+			if GameData.LimitedZoneAmbience then
+				SlashCo.AudioSystem.DestroyChannel(GameData.LimitedZoneAmbience, 1)
 			end
 
-			zoneAmbience = SlashCo.ReadSound(ambiences[effect])
-			zoneAmbience:ChangeVolume(0)
-			zoneAmbience:ChangeVolume(1, 1)
-			snd = ambiences[effect]
-		end
-	elseif zoneAmbience then
-		timer.Create("SCFadeOut", 0.1, 1, function()
-			zoneAmbience:FadeOut(1)
-			snd = nil
-			zoneAmbience = nil
-		end)
-	end
-	--]]
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = ambiences[effect],
+				identifier = "LimitedZone",
+				fadeIn = 1,
+				callback = function(channel)
+					GameData.LimitedZoneAmbience = channel
+				end,
+			})
 
-	--[[ playfile method
-	if ambiences[effect] and snd ~= ambiences[effect] then
-		if IsValid(zoneAmbience) then
-			zoneAmbience:Stop()
+			GameData.LimitedZoneSound = ambiences[effect]
 		end
-		snd = ambiences[effect]
-		sound.PlayFile("sound/" .. ambiences[effect], "noplay", function(music, errCode, errStr)
-			if IsValid(music) then
-				zoneAmbience = music
-				zoneAmbience:EnableLooping(true)
-				zoneAmbience:Play()
-			else
-				print("[SlashCo] Error playing zone ambience!", errCode, errStr)
-			end
-		end)
-	elseif IsValid(zoneAmbience) then
-		zoneAmbience:Stop()
-		snd = nil
+	elseif IsValid(GameData.LimitedZoneAmbience) then
+		SlashCo.AudioSystem.DestroyChannel(GameData.LimitedZoneAmbience, 1)
+		GameData.LimitedZoneSound = nil
+		GameData.LimitedZoneAmbience = nil
 	end
-	--]]
 
 	ply.ZoneEffect = effect
 	if not ply.FogColor then

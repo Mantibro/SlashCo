@@ -373,9 +373,8 @@ function SlashCo.SetHelicopterPositions()
 end
 
 function SlashCo.SpawnSlasher()
-	if GameData.SlasherSpawned then
-		return
-	end
+	if GameData.IsLobby then return end
+	if GameData.SlasherSpawned then return end
 
 	for _, ply in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		if not IsValid(ply) then continue end

@@ -194,8 +194,19 @@ end
 function ENT:MakeBattery(model)
 	self.MakingItem = nil
 
+	-- RaphaelIT7: No need to re-create the battery
+	if IsValid(self.Battery) then return end
+
 	if IsValid(self.SpawnedAt) then
 		self.SpawnedAt:TriggerOutput("OnBattery", self)
+	end
+
+	-- RaphaelIT7: If no model is given we just find a valid battery, though I do wonder if any workshop addons add their own batteries...
+	if not model then
+		local _, tbl = SlashCo.FindItemWithField("IsBattery", true)
+		if tbl then
+			model = tbl.Model
+		end
 	end
 
 	local battery = ents.Create("prop_physics")
@@ -212,6 +223,7 @@ function ENT:MakeBattery(model)
 	battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
 	battery:EmitSound("slashco/battery_insert.mp3", 125, 100, 1)
 	battery:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
+	self.Battery = battery
 
 	SlashCo.SpawnSlasher()
 end
@@ -239,12 +251,11 @@ end
 
 function ENT:CheckProgress(dontFailStart)
 	local gasPerGen = SlashCo.GetGasCansPerGenerator()
-	if (self.CansRemaining or gasPerGen) <= 0 and self.HasBattery and not self.IsRunning then
+	if (self.CansRemaining or gasPerGen) <= 0 and self.HasBattery and not self:GetRunning() then
 		if IsValid(self.SpawnedAt) then
 			self.SpawnedAt:TriggerOutput("OnComplete", self.CurrentPourer)
 		end
 
-		self.IsRunning = true
 		self.Progress = 5
 		self:SetRunning(true)
 		SlashCo.AudioSystem.PlaySound({ -- Let everyone hear that a generator was started

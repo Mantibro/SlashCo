@@ -8,6 +8,12 @@ hook.Add("InitPostEntity", "SlashCo:LobbyBackgroundMusic", function()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/music/slashco_lobby.wav", 0.4)
 
 	SlashCo.SpawnGenerators()
+
+	for _, ent in ipairs(ents.FindByClass("sc_generator")) do
+		ent:SetCansRemaining(0)
+		ent:SetRunning(true)
+		-- RaphaelIT7: No battery needed... yet :)
+	end
 end)
 
 local function lobbySaveCurData()
