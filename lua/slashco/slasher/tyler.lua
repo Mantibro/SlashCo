@@ -446,7 +446,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				if ent:GetClass() == "func_breakable" or ent:GetClass() == "func_breakable_surf" then
 					ent:TakeDamage(100, slasher, slasher)
-				elseif ent:GetClass() == "prop_door_rotating" or ent:GetClass() == "func_door_rotating" then
+				elseif SlashCo.IsValidDoor(ent) then
 					SlashCo.BustDoor(slasher, ent, 50000)
 				elseif ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer" then
 					timer.Simple(1.0, function()

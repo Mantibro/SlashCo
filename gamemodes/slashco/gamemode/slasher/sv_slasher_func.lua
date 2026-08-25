@@ -425,7 +425,7 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 	local doors = {}
 	local name = target:GetName()
 	for _, ent in ipairs(ents.FindInSphere(target:WorldSpaceCenter(), 100)) do
-		if ent:GetName() == name and (ent:GetClass() == "prop_door_rotating" or ent:GetClass() == "func_door_rotating") then
+		if ent:GetName() == name and SlashCo.IsValidDoor(ent) then
 			table.insert(doors, ent)
 		end
 	end

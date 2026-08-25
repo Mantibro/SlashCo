@@ -189,7 +189,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			for i = 1, #find do
 				local ent = find[i]
 
-				if ent:GetClass() == "prop_door_rotating" then
+				if SlashCo.IsValidDoor(ent) then
 					SlashCo.BustDoor(slasher, ent, 25000)
 				end
 

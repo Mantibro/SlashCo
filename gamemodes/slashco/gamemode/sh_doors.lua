@@ -10,9 +10,26 @@ local doorStates = {
 }
 
 SlashCo = SlashCo or {}
+SlashCo.ValidDoors = {
+	["prop_door_rotating"] = true,
+	["func_door_rotating"] = true,
+}
+
+function SlashCo.IsValidDoor(ent)
+	return IsValid(ent) and SlashCo.ValidDoors[ent:GetClass()] or false
+end
+
 function SlashCo.IsDoorOpen(ent)
-	if ent:GetClass() ~= "prop_door_rotating" then
-		return false
+	local class = ent:GetClass()
+	if class ~= "prop_door_rotating" then
+		if class ~= "func_door_rotating" then
+			return false
+		end
+
+		if CLIENT then
+			return ent:GetInternalVariable("m_toggle_state") ~= doorStates.DOOR_STATE_CLOSED
+		end
+		-- For server we fall through down where it will use ent.IsOpen
 	end
 
 	if CLIENT then
@@ -61,7 +78,7 @@ end
 hook.Add("InitPostEntity", "SlashCo:SetupMapLua", SetupMapLua)
 
 hook.Add("PlayerUse", "SlashCo:Doors", function(ply, ent)
-	if ent:GetClass() ~= "prop_door_rotating" then return end
+	if not SlashCo.IsValidDoor(ent:GetClass()) then return end
 
 	if (ent.NextDoorUse or 0) > CurTime() then
 		return false -- Block use

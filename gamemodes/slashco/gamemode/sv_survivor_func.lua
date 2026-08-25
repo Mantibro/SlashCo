@@ -423,7 +423,7 @@ local function slamDoor(door_ent, pos)
 end
 
 function PLAYER:SlamDoor(door_ent)
-	if not (door_ent:GetClass() == "prop_door_rotating" or door_ent:GetClass() == "func_door_rotating") then
+	if not SlashCo.IsValidDoor(door_ent) then
 		return
 	end
 

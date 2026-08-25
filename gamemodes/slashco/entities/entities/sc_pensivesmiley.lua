@@ -272,7 +272,7 @@ function ENT:Think()
 		filter = self
 	})
 
-	if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+	if IsValid(tr.Entity) and SlashCo.IsValidDoor(tr.Entity) and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
 			not SlashCo.IsDoorOpen(tr.Entity) and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
 		tr.Entity:Use(self)

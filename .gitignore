@@ -5,3 +5,5 @@ maps/sc_hospital.bsp
 maps/sc_redforest.bsp
 *.bak
 _workshop/**
+**.dx80.vtx
+**.sw.vtx

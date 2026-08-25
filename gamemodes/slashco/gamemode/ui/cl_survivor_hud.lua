@@ -210,7 +210,7 @@ local function slamIndicator()
 	end
 
 	local lookent = GameData.LocalPlayer:GetEyeTrace().Entity
-	if not IsValid(lookent) or not (lookent:GetClass() == "prop_door_rotating" or lookent:GetClass() == "func_door_rotating") then
+	if not IsValid(lookent) or not SlashCo.IsValidDoor(lookent) then
 		return
 	end
 

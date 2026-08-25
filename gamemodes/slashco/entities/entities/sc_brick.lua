@@ -69,7 +69,7 @@ function ENT:PhysicsCollide(data)
 			end)
 
 			self:Break()
-		elseif data.HitEntity:GetClass() == "prop_door_rotating" then
+		elseif SlashCo.IsValidDoor(data.HitEntity) then
 			SlashCo.BustDoor(self, data.HitEntity, velocity * 50, function(_, doorProps)
 				if IsValid(owner) then -- Inherit Physics Attacker!
 					for _, prop in ipairs(doorProps) do
