@@ -63,7 +63,7 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 		return
 	end
 
-	if ply:GetNWBool("SurvivorTackled") then
+	if ply:GetNWBool("SurvivorTackled") or ply:GetNWBool("SurvivorPounced") then
 		ply.CalcIdeal = ACT_DIESIMPLE
 		ply.CalcSeqOverride = ply:LookupSequence("zombie_slump_idle_01")
 
