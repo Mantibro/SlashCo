@@ -6,6 +6,8 @@ hook.Add("InitPostEntity", "SlashCo:LobbyBackgroundMusic", function()
 
 	SlashCo.AudioSystem.EnableBackgroundMusic()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/music/slashco_lobby.wav", 0.4)
+
+	SlashCo.SpawnGenerators()
 end)
 
 local function lobbySaveCurData()

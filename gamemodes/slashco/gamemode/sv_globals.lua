@@ -507,7 +507,6 @@ function SlashCo.HelicopterLeaveForIntro()
 	end
 
 	local delay = math.sqrt(heli:GetPos():Distance(SlashCo.CurRound.HelicopterSpawnPosition)) / 5
-
 	timer.Simple(delay, function()
 		if not IsValid(heli) then
 			return
@@ -517,9 +516,6 @@ function SlashCo.HelicopterLeaveForIntro()
 		timer.Simple(0.05, function()
 			SlashCo.QuietHeli()
 			SlashCo.RemoveHelicopter()
-
-			net.Start("SlashCo:MapAmbientPlay")
-			net.Broadcast()
 		end)
 	end)
 end

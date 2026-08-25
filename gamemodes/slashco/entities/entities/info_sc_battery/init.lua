@@ -1,47 +1,24 @@
 ENT.Type = "point"
 ENT.Base = "sc_forciblespawnbase"
 
-local function findGensByName(name)
-	local found = {}
-	for _, v in ents.Iterator() do
-		if v:GetName() == name and v:GetClass() == "info_sc_generator" then
-			table.insert(found, v)
-		end
-	end
-
-	return found
-end
+SlashCo.BatterySpawns = SlashCo.BatterySpawns or {
+	_noname = {}
+}
 
 function ENT:Initialize()
-	timer.Simple(0.25, function()
-		if not IsValid(self) then
-			return
+	if self.Legacy then return end
+
+	if self.GenToFind then
+		local tbl = SlashCo.BatterySpawns[self.GenToFind]
+		if not tbl then
+			tbl = {}
+			SlashCo.BatterySpawns[self.GenToFind] = tbl
 		end
 
-		if self.Legacy then
-			return
-		end
-
-		local gens
-
-		if self.GenToFind then
-			gens = findGensByName(self.GenToFind)
-		end
-
-		if not gens or table.IsEmpty(gens) then
-			gens = ents.FindByClass("info_sc_generator")
-
-			if table.IsEmpty(gens) then
-				return
-			end
-		end
-
-		self.Generators = gens
-		for _, v in ipairs(gens) do
-			v.BatterySpawns = v.BatterySpawns or {}
-			v.BatterySpawns[self] = true
-		end
-	end)
+		table.insert(tbl, self)
+	else
+		table.insert(SlashCo.BatterySpawns._noname, self)
+	end
 end
 
 function ENT:ExtraKeyValue1(key, value)

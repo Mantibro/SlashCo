@@ -23,7 +23,6 @@ util.AddNetworkString("SlashCo:OfferingVoteFinished")
 util.AddNetworkString("SlashCo:SendRoundData")
 util.AddNetworkString("SlashCo:SurvivorVoicePrompt")
 util.AddNetworkString("SlashCo:SurvivorPings")
-util.AddNetworkString("SlashCo:MapAmbientPlay")
 util.AddNetworkString("SlashCo:AskToBecomeSlasher")
 util.AddNetworkString("SlashCo:Announcement")
 

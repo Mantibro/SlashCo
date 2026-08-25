@@ -1,6 +1,7 @@
 SlashCo = SlashCo or {} -- We load VERY early.
 SlashCo.AudioSystem = SlashCo.AudioSystem or {}
 SlashCo.AudioSystem.RegisteredSounds = SlashCo.AudioSystem.RegisteredSounds or {}
+SlashCo.AudioSystem.ResolveCache = SlashCo.AudioSystem.ResolveCache or {}
 
 --[[
 	The Background music is networked & syncronized.
@@ -144,6 +145,64 @@ function SlashCo.AudioSystem.GetSoundFileFromSource(name)
 	if soundFile then
 		return (soundFile:StartsWith("(") or soundFile:StartsWith(")")) and soundFile:sub(2) or soundFile
 	end
+end
+
+--[[
+	This will try to guess what the soundPath is
+	It could be a Sound from sound.Add
+	or a wildcard to a folder
+	But this is expensive!
+
+	returns string, bool
+
+	if bool == true then it means it expects a random result due to it being a wildcard!
+]]
+function SlashCo.AudioSystem.ResolveSoundPath(soundPath)
+	soundPath = SlashCo.AudioSystem.ToSound(soundPath)
+	local resolveCache = SlashCo.AudioSystem.ResolveCache[soundPath]
+	if resolveCache == nil then
+		local found = string.find(soundPath, "*")
+		local info = sound.GetProperties(soundPath)
+		if info then
+			resolveCache = info.sound or {}
+			goto done
+		end
+
+		if found then
+			local files, folders = file.Find(soundPath, "GAME")
+			local lastSlash = string.find(soundPath, "/")
+			local dir = string.match(soundPath, "^(.*)/[^/]*$") or ""
+			for idx, fileName in pairs(files) do
+				files[idx] = dir ~= "" and (dir .. "/" .. fileName) or fileName
+			end
+
+			resolveCache = files
+		else
+			resolveCache = file.Exists(soundPath, "GAME")
+		end
+
+		::done::
+
+		SlashCo.AudioSystem.ResolveCache[soundPath] = resolveCache
+	end
+
+	if resolveCache == false then
+		return nil, false
+	end
+
+	if resolveCache == true then
+		return soundPath, false
+	end
+
+	if istable(resolveCache) and #resolveCache > 0 then
+		if #resolveCache == 1 then
+			return resolveCache[1], false
+		end
+
+		return resolveCache[math.random(1, #resolveCache)], true
+	end
+
+	return nil, false
 end
 
 -- Server & client files are loaded at last
