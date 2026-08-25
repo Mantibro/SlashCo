@@ -7,6 +7,11 @@ ENT.ClassName = "sc_jonklercart"
 
 if CLIENT then return end
 
+local function IsChristmas()
+	local date = os.date("*t")
+	return date.month == 12 and date.day >= 24 and date.day <= 25
+end
+
 function ENT:EnableJonkler()
 	self:DropToFloor()
 	self:SetMoveType(MOVETYPE_NONE)
@@ -16,7 +21,7 @@ function ENT:EnableJonkler()
 	self.DeactivationTime = CurTime() + 200
 
 	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/jonk.ogg",
+		soundPath = IsChristmas() and "slashco/jolly_jonkler.ogg" or "slashco/jonk.ogg",
 		identifier = "JonklerCart",
 		minDistance = 500,
 		maxDistance = 1000,
