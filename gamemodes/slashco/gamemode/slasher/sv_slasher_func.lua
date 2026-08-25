@@ -514,6 +514,8 @@ local midAmbientTracks = {
 	"slashco/ambienttrack/ambient_mid4.ogg",
 	"slashco/ambienttrack/ambient_mid5.ogg",
 }
+GameData.MapAmbientTrack = "sound/slashco/maps/" .. GameData.Map .. ".mp3"
+GameData.HasMapAmbientTrack = file.Exists(GameData.MapAmbientTrack, "GAME")
 timer.Create("SlashCo:SlasherAnger", 1, 0, function()
 	if GameData.IsLobby or SlashCo.State ~= SlashCo.States.IN_GAME then return end
 
@@ -551,6 +553,10 @@ timer.Create("SlashCo:SlasherAnger", 1, 0, function()
 			backgroundMusic = lowAmbientTracks[GameData.AmbientID]
 		else
 			backgroundMusic = midAmbientTracks[GameData.AmbientID]
+		end
+
+		if GameData.HasMapAmbientTrack then
+			backgroundMusic = GameData.MapAmbientTrack
 		end
 
 		--SlashCo.AudioSystem.DisableBackgroundMusic()

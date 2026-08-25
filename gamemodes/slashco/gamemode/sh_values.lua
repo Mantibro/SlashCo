@@ -112,9 +112,20 @@ function table.pack(...)
 end
 
 if SERVER then
-	util.AddNetworkString("slashCoValue")
+	util.AddNetworkString("SlashCo:Value")
 
-	local doNetwork
+	---internal function to handle the "sending message" part of the above functions
+	local function doNetwork(message, ...)
+		net.Start("SlashCo:Value")
+		net.WriteString(message)
+
+		local args = table.pack(...)
+
+		net.WriteUInt(args.n, 8)
+		for i = 1, args.n do
+			typeWrite[type(args[i])](args[i])
+		end
+	end
 
 	---networks any amount of values to provided clients with an included message
 	function SlashCo.SendValue(ply, message, ...)
@@ -134,20 +145,7 @@ if SERVER then
 		net.SendOmit(ply)
 	end
 
-	---internal function to handle the "sending message" part of the above functions
-	function doNetwork(message, ...)
-		net.Start("slashCoValue")
-		net.WriteString(message)
-
-		local args = table.pack(...)
-
-		net.WriteUInt(args.n, 8)
-		for i = 1, args.n do
-			typeWrite[type(args[i])](args[i])
-		end
-	end
-
-	net.Receive("slashCoValue", function(_, ply)
+	net.Receive("SlashCo:Value", function(_, ply)
 		local message = net.ReadString()
 		local amount = net.ReadUInt(8)
 
@@ -165,7 +163,7 @@ end
 
 ---networks any amount of values to the server
 function SlashCo.SendValue(message, ...)
-	net.Start("slashCoValue")
+	net.Start("SlashCo:Value")
 	net.WriteString(message)
 
 	local valAmount = #{ ... }
@@ -179,7 +177,7 @@ function SlashCo.SendValue(message, ...)
 	net.SendToServer()
 end
 
-net.Receive("slashCoValue", function()
+net.Receive("SlashCo:Value", function()
 	local message = net.ReadString()
 	local amount = net.ReadUInt(8)
 

@@ -143,8 +143,27 @@ hook.Add("KeyPress", "SlashCo:SurvivorStruggles", function(ply, key)
 	end
 end)
 
+local function sayPrompt(ply, input)
+	if GameData.IsLobby and SlashCo.LobbyData.LOBBYSTATE == 2 then
+		return
+	end
+
+	ply:EmitSound("slashco/survivor/voice/prompt_" .. input .. math.random(1, 3) .. ".mp3")
+end
+
+local typeCheck = {
+	["LOOK HERE"] = "look",
+	["LOOK AT THIS"] = "look",
+	["HELICOPTER"] = "helicopter",
+	["GENERATOR"] = "generator",
+	["PLUSH DOG"] = "dogg",
+	["BASKETBALL"] = "ballin",
+	["DEAD BODY"] = "deadbody",
+	["SLASHER"] = "slasher"
+}
+
+
 local PLAYER = FindMetaTable("Player")
-local slamDoor, typeCheck, sayPrompt
 
 GameData.ActivePings = GameData.ActivePings or {}
 GameData.NextPingID = GameData.NextPingID or 0
@@ -207,7 +226,9 @@ local function clearDeadPings(newPing) -- newPing if there is one to avoid dupli
 end
 
 -- We ONLY want to call this when a player joins into an active round!
-function SlashCo.NetworkPings(ply)
+function SlashCo.NetworkPings(ply, targetTeam)
+	targetTeam = targetTeam or ply:Team()
+
 	clearDeadPings()
 	local maxCount = math.Clamp(#GameData.ActivePings, 0, 127)
 	net.Start("SlashCo:SurvivorPings")
@@ -215,6 +236,7 @@ function SlashCo.NetworkPings(ply)
 		net.WriteUInt(maxCount, 7)
 		for idx, pingInfo in ipairs(GameData.ActivePings) do
 			if idx > maxCount then break end
+			if not SlashCo.CanSeePing(targetTeam, pingInfo.Team) then continue end
 
 			net.WriteUInt(pingInfo.ID, 16)
 			SlashCo.WriteOptional(pingInfo.ExpiryTime, net.WriteFloat)
@@ -355,63 +377,17 @@ function PLAYER:SurvivorPing()
 		SlashCo.WriteOptional(pingInfo.Entity, net.WriteEntity)
 		SlashCo.WriteOptional(pingInfo.Position, net.WriteVector)
 
-		local players = team.GetPlayers(pingInfo.Team == TEAM_SPECTATOR and TEAM_SURVIVOR or pingInfo.Team)
-		table.Add(players, team.GetPlayers(TEAM_SPECTATOR))
+		local players = {}
+		for _, ply in player.Iterator() do
+			if not SlashCo.CanSeePing(ply:Team(), pingInfo.Team) then continue end
+
+			table.insert(players, ply)
+		end
+
 	net.Send(players)
 end
 
-function PLAYER:SlamDoor(door_ent)
-	if door_ent:GetClass() ~= "prop_door_rotating" then
-		return
-	end
-
-	if SlashCo.IsDoorOpen(door_ent) then
-		return
-	end
-
-	if not SlashCo.CheckDoorWL(door_ent) then
-		return
-	end
-
-	-- RaphaelIT7: We prevent door slam on locked doors due to them else completely breaking somehow
-	if door_ent:GetInternalVariable("m_bLocked") then
-		return
-	end
-
-	door_ent:EmitSound("ambient/materials/door_hit1.wav", 80)
-
-	local pos = self:GetPos()
-	local name = door_ent:GetName()
-	slamDoor(door_ent, pos)
-	for _, v in ipairs(ents.FindInSphere(door_ent:WorldSpaceCenter(), 100)) do
-		if v:GetName() == name then
-			slamDoor(v, pos)
-		end
-	end
-
-	return true
-end
-
-function sayPrompt(ply, input)
-	if GameData.IsLobby and SlashCo.LobbyData.LOBBYSTATE == 2 then
-		return
-	end
-
-	ply:EmitSound("slashco/survivor/voice/prompt_" .. input .. math.random(1, 3) .. ".mp3")
-end
-
-typeCheck = {
-	["LOOK HERE"] = "look",
-	["LOOK AT THIS"] = "look",
-	["HELICOPTER"] = "helicopter",
-	["GENERATOR"] = "generator",
-	["PLUSH DOG"] = "dogg",
-	["BASKETBALL"] = "ballin",
-	["DEAD BODY"] = "deadbody",
-	["SLASHER"] = "slasher"
-}
-
-function slamDoor(door_ent, pos)
+local function slamDoor(door_ent, pos)
 	local localpos = door_ent:WorldToLocal(pos)
 	if localpos.x < 0 then
 		door_ent:SetKeyValue("opendir", "1")
@@ -444,4 +420,36 @@ function slamDoor(door_ent, pos)
 			door_ent:SetKeyValue("opendir", "0")
 		end
 	end)
+end
+
+function PLAYER:SlamDoor(door_ent)
+	if door_ent:GetClass() ~= "prop_door_rotating" then
+		return
+	end
+
+	if SlashCo.IsDoorOpen(door_ent) then
+		return
+	end
+
+	if not SlashCo.CheckDoorWL(door_ent) then
+		return
+	end
+
+	-- RaphaelIT7: We prevent door slam on locked doors due to them else completely breaking somehow
+	if door_ent:GetInternalVariable("m_bLocked") then
+		return
+	end
+
+	door_ent:EmitSound("ambient/materials/door_hit1.wav", 80)
+
+	local pos = self:GetPos()
+	local name = door_ent:GetName()
+	slamDoor(door_ent, pos)
+	for _, v in ipairs(ents.FindInSphere(door_ent:WorldSpaceCenter(), 100)) do
+		if v:GetName() == name then
+			slamDoor(v, pos)
+		end
+	end
+
+	return true
 end

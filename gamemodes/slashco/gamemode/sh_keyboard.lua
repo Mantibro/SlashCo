@@ -75,51 +75,11 @@ SlashCo.KeyboardBinds = {
 	}
 }
 
-if CLIENT then
-	function SlashCo.LoadKeyboardBinds()
-		if not GameData.KeyboardBinds then
-			GameData.KeyboardBinds = SlashCo.ParseKeyboardBinds(cookie.GetString("SlashCo:KeyboardBinds", ""))
-		end
+function SlashCo.GetDefaultKey(name)
+	local bind = SlashCo.KeyboardBinds[name]
+	if not bind then return nil end
 
-		local stringData = SlashCo.KeyboardBindsToString(GameData.KeyboardBinds)
-		net.Start("SlashCo:KeyboardBinds")
-			net.WriteString(stringData)
-		net.SendToServer()
-	end
-
-	function SlashCo.SaveKeyboardBinds()
-		cookie.Set("SlashCo:KeyboardBinds", SlashCo.KeyboardBindsToString(GameData.KeyboardBinds))
-		SlashCo.LoadKeyboardBinds() -- Acts as verification too
-	end
-
-	function SlashCo.TranslateBind(name)
-		return GameData.KeyboardBinds[name].name
-	end
-
-	function SlashCo.GetKeyButton(name)
-		if not GameData.KeyboardBinds or not GameData.KeyboardBinds[name] then
-			return SlashCo.KeyboardBinds[name] and SlashCo.KeyboardBinds[name].button or -1
-		end
-
-		return GameData.KeyboardBinds[name]
-	end
-
-	function SlashCo.GetKeyButtonName(name)
-		return string.upper(input.GetKeyName(SlashCo.GetKeyButton(name, ply)) or "UNKNOWN")
-	end
-
-	function SlashCo.IsKeyPressed(name, ply, button)
-		return button == SlashCo.GetKeyButton(name, ply)
-	end
-
-	local blockBinds = CreateClientConVar("slashco_blockbinds", "1", true, false, "If enabled, GMod key binds that overlap with SlashCo's binds will be blocked from executing")
-	hook.Add("PlayerBindPress", "SlashCo:KeyboardBinds", function(_, bind, _, code)
-		-- We respect blocked concommands and won't block them!
-		-- We also won't block any inputs like +attack or +jump!
-		if not IsConCommandBlocked(bind) and not bind:StartsWith("+") and not bind:StartsWith("impulse") and GameData.KeyboardBinds and GameData.KeyboardBinds[code] and blockBinds:GetBool() then
-			return true
-		end
-	end)
+	return bind.button
 end
 
 function SlashCo.ParseKeyboardBinds(stringData)
@@ -163,7 +123,57 @@ function SlashCo.KeyboardBindsToString(binds)
 	return data
 end
 
-if CLIENT then return end
+if CLIENT then
+	function SlashCo.LoadKeyboardBinds()
+		if not GameData.KeyboardBinds then
+			GameData.KeyboardBinds = SlashCo.ParseKeyboardBinds(cookie.GetString("SlashCo:KeyboardBinds", ""))
+		end
+
+		local stringData = SlashCo.KeyboardBindsToString(GameData.KeyboardBinds)
+		net.Start("SlashCo:KeyboardBinds")
+			net.WriteString(stringData)
+		net.SendToServer()
+	end
+
+	function SlashCo.SaveKeyboardBinds()
+		cookie.Set("SlashCo:KeyboardBinds", SlashCo.KeyboardBindsToString(GameData.KeyboardBinds))
+		SlashCo.LoadKeyboardBinds() -- Acts as verification too
+	end
+
+	function SlashCo.TranslateBind(name)
+		if not name then return nil end
+
+		return GameData.KeyboardBinds[name].name
+	end
+
+	function SlashCo.GetKeyButton(name)
+		if not GameData.KeyboardBinds or not GameData.KeyboardBinds[name] then
+			return SlashCo.KeyboardBinds[name] and SlashCo.KeyboardBinds[name].button or -1
+		end
+
+		return GameData.KeyboardBinds[name]
+	end
+
+	function SlashCo.GetKeyButtonName(name)
+		return string.upper(input.GetKeyName(SlashCo.GetKeyButton(name, ply)) or "UNKNOWN")
+	end
+
+	function SlashCo.IsKeyPressed(name, ply, button)
+		return button == SlashCo.GetKeyButton(name, ply)
+	end
+
+	local blockBinds = CreateClientConVar("slashco_blockbinds", "1", true, false, "If enabled, GMod key binds that overlap with SlashCo's binds will be blocked from executing")
+	hook.Add("PlayerBindPress", "SlashCo:KeyboardBinds", function(_, bind, _, code)
+		-- We respect blocked concommands and won't block them!
+		-- We also won't block any inputs like +attack or +jump!
+		if not IsConCommandBlocked(bind) and not bind:StartsWith("+") and not bind:StartsWith("impulse") and GameData.KeyboardBinds and GameData.KeyboardBinds[code] and blockBinds:GetBool() then
+			return true
+		end
+	end)
+
+	return
+end
+
 util.AddNetworkString("SlashCo:KeyboardBinds")
 
 net.Receive("SlashCo:KeyboardBinds", function(len, ply)
@@ -176,7 +186,10 @@ end)
 function SlashCo.IsKeyPressed(name, ply, button)
 	local binds = ply.KEYBOARD_BINDS
 	if not binds or not binds[name] then -- Falls back to default if the player didn't network their binds yet
-		return button == SlashCo.KeyboardBinds[name].button
+		local defaultBind = SlashCo.KeyboardBinds[name]
+		if not defaultBind then return false end
+
+		return button == defaultBind.button
 	end
 
 	return button == binds[name]

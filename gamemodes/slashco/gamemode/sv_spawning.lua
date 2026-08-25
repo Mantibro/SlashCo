@@ -51,9 +51,9 @@ function SlashCo.AssembleWeightedTable(elements, conditions)
 end
 
 ---Returns a random number within the range of a weighted table
-function SlashCo.GetWeightedRandom(table)
+function SlashCo.GetWeightedRandom(tbl)
 	local total = 0
-	for _, v in pairs(table) do
+	for _, v in pairs(tbl) do
 		total = total + v
 	end
 	return math.random(0, total)
@@ -148,10 +148,10 @@ function SlashCo.Spawn(elements, spawnFunc)
 end
 
 local function genCondForced(ent)
-	return SlashCo.DefaultConditionsForced(ent) and ent.BatterySpawns
+	return SlashCo.DefaultConditionsForced(ent) and SlashCo.BatterySpawns[ent:GetName()]
 end
 local function genCondNonForced(ent)
-	return SlashCo.DefaultConditionsNonForced(ent) and ent.BatterySpawns
+	return SlashCo.DefaultConditionsNonForced(ent) and SlashCo.BatterySpawns[ent:GetName()]
 end
 
 ---Spawn generators for the round
@@ -164,13 +164,13 @@ function SlashCo.SpawnGenerators()
 		true
 	)
 
-	if table.IsEmpty(gensToSpawn) then
+	if table.IsEmpty(gensToSpawn) and not GameData.IsLobby then
 		SlashCo.Abort("Missing generator spawn entities")
 		return
 	end
 
 	for _, v in pairs(gensToSpawn) do
-		local spawn = SlashCo.SelectSpawns(table.GetKeys(v.BatterySpawns))
+		local spawn = SlashCo.SelectSpawns(SlashCo.BatterySpawns[v:GetName()])
 		spawn:SpawnEnt()
 	end
 
@@ -640,12 +640,6 @@ local function convertLegacyConfig(name, skip)
 			for _, v1 in ipairs(v) do
 				local ent = makeEnt("info_sc_battery", v1)
 				ent.Legacy = true
-				ent.Generators = { gens[k] }
-
-				if IsValid(ent) and gens[k] then
-					gens[k].BatterySpawns = gens[k].BatterySpawns or {}
-					gens[k].BatterySpawns[ent] = true
-				end
 			end
 		end
 	end

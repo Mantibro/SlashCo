@@ -252,7 +252,7 @@ end
 SlashCo_DTNetworking = SlashCo_DTNetworking or {}
 local plyMeta = FindMetaTable("Player")
 local entMeta = FindMetaTable("Entity")
-local function SetupSlashCoNetworkVar(type, index, name) -- Same order as :NetworkVar
+local function SetupSlashCoNetworkVar(type, index, name, default) -- Same order as :NetworkVar
 	if not SlashCo_DTNetworking[type] then
 		SlashCo_DTNetworking[type] = {}
 	end
@@ -269,6 +269,11 @@ local function SetupSlashCoNetworkVar(type, index, name) -- Same order as :Netwo
 
 	local SetDTFunc = entMeta["SetDT" .. type]
 	local defaultFallback = defaultFallbacks[type]
+	-- RaphaelIT7: We cannot do "default ~= nil and default or defaultFallbacks[type]" above since if default is false then it would false use the fallback!
+	if default ~= nil then
+		defaultFallback = default
+	end
+
 	plyMeta["Set" .. name] = function(self, value)
 		SetDTFunc(self, index, value or defaultFallback)
 	end
@@ -301,6 +306,8 @@ SetupSlashCoNetworkVar("Float", 1, "DeafenTime")
 
 SetupSlashCoNetworkVar("Bool", 0, "CanSeePlayers")
 SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")
+SetupSlashCoNetworkVar("Bool", 2, "Visible", true)
+SetupSlashCoNetworkVar("Bool", 3, "CanSeeFlashlights", true) -- RaphaelIT7: Deprecated? Does anyone even use it?
 
 -- RaphaelIT7: I do not like this... a problem for later me... (Update) I hate myself.
 -- ToDo: Rework the entire perk networking, as in the future with more perks we may hit the networking limit of 511 characters!

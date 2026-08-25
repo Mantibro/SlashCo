@@ -20,7 +20,7 @@ function PLAYER:CanBeSeen()
 		return false
 	end
 
-	return self:IsVisible()
+	return self:GetVisible()
 end
 
 function PLAYER:CanSeeFlashlights()
@@ -37,28 +37,35 @@ function PLAYER:CanSeeFlashlights()
 		end
 	end
 
-	return self:GetNWBool("SlashCoSeeFlashlights", true)
+	-- RaphaelIT7: Deprecated? We can probably just return true here once we remove CanSeeFlashlights
+	return self:GetCanSeeFlashlights()
 end
 
--- Returns whether the player is visible (NOT accounting for item or slasher effects! Use CanBeSeen if you need to account for those)
-function PLAYER:IsVisible()
-	return self:GetNWBool("SlashCoVisible", true)
-end
+--[[
+	Returns whether the player is visible (NOT accounting for item or slasher effects! Use CanBeSeen if you need to account for those)
+	
+	RaphaelIT7:
+	SetVisible is created by SetupSlashCoNetworkVar!
+]]
+PLAYER.IsVisible = PLAYER.GetVisible
 
 if CLIENT then
-	hook.Add("Think", "hidePlayersIfCannotSee", function()
+	hook.Add("Think", "SlashCo:HidePlayers", function()
 		for _, ply in player.Iterator() do
 			local seeable = ply:CanBeSeen()
 			if ply.Seeable ~= seeable then
-				if pac then pac.TogglePartDrawing(ply, seeable) end
-				ply:SetColor(seeable and color_white or color_transparent)
+				if pac then
+					pac.TogglePartDrawing(ply, seeable)
+				end
 
+				-- RaphaelIT7: We do not call SetColor as we already use PrePlayerDraw
+				ply:DrawShadow(seeable)
 				ply.Seeable = seeable
 			end
 		end
 	end)
 
-	hook.Add("PrePlayerDraw", "hidePlayersIfCannotSee", function(ply)
+	hook.Add("PrePlayerDraw", "SlashCo:HidePlayers", function(ply)
 		if not ply:CanBeSeen() then
 			return true
 		end
@@ -67,20 +74,12 @@ if CLIENT then
 	return
 end
 
-function PLAYER:SetVisible(state)
-	self:SetNWBool("SlashCoVisible", state)
-end
-
-function PLAYER:SetCanSeeFlashlights(state)
-	self:SetNWBool("SlashCoSeeFlashlights", state)
-end
-
-hook.Add("Think", "hidePlayersIfCannotSee", function()
+hook.Add("Think", "SlashCo:HidePlayers", function()
 	for _, ply in player.Iterator() do
 		local seeable = ply:CanBeSeen()
 		if ply.Seeable ~= seeable then
-			ply:SetColor(seeable and color_white or invis)
 			ply:SetNoDraw(not seeable)
+			ply:DrawShadow(seeable)
 			ply.Seeable = seeable
 		end
 	end

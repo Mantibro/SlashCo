@@ -234,6 +234,19 @@ function SlashCo.ReadOptional(readFunc, ...)
 	return nil
 end
 
+-- RaphaelIT7: A shared function so that we avoid issues with server/client considering different teams
+function SlashCo.CanSeePing(plyTeam, pingTeam)
+	if plyTeam == TEAM_SPECTATOR then
+		return true
+	end
+
+	if pingTeam == TEAM_SPECTATOR and plyTeam == TEAM_SURVIVOR then
+		return true
+	end
+
+	return plyTeam == pingTeam
+end
+
 --[[
 	DangerLevel's
 	Use the SlashCo.AddDangerLevel and NEVER manually add stuff to SlashCo.DangerLevel
@@ -546,6 +559,7 @@ function SlashCo.AddOffering(offeringTbl)
 	-- Rarity can only range from 1 to 3. Their used only for the sound that is played when their enabled.
 	offeringTbl.Rarity = math.Clamp(offeringTbl.Rarity, 1, 3)
 	offeringTbl.ID = table.insert(SCInfo.Offering, offeringTbl)
+	offeringTbl.GasCanMod = offeringTbl.GasCanMod or 0
 
 	-- Double linked, though makes SortedPairs fail on the table.
 	SCInfo.Offering[offeringTbl.Name] = offeringTbl.ID
@@ -557,38 +571,34 @@ end
 SlashCo.AddOffering({
 	Name = "Exposure",
 	Rarity = 1,
-	GasCanMod = 0
 })
 
 SlashCo.AddOffering({
 	Name = "Satiation",
 	Rarity = 1,
-	GasCanMod = 0
 })
 
 SlashCo.AddOffering({
 	Name = "Drainage",
 	Rarity = 2,
-	GasCanMod = 6
+	GasCanMod = 6,
 })
 
 SlashCo.AddOffering({
 	Name = "Duality",
 	Rarity = 3,
-	GasCanMod = 0,
 	MinimumPlayers = 3,
 })
 
 SlashCo.AddOffering({
 	Name = "Singularity",
 	Rarity = 3,
-	GasCanMod = 6
+	GasCanMod = 6,
 })
 
 SlashCo.AddOffering({
 	Name = "Nightmare",
 	Rarity = 3,
-	GasCanMod = 0,
 })
 
 SCInfo.Maps = {

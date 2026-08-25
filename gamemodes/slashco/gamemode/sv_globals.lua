@@ -328,10 +328,30 @@ function SlashCo.EnableSoundScapes()
 	end
 end
 
-function SlashCo.ChangeMap(mapname)
-	if g_SlashCoDebug then return end -- Don't change map when debugging
+function SlashCo.DebugPrint(msg, ...)
+	local host = nil
+	for _, ply in player.Iterator() do
+		if ply:IsListenServerHost() then
+			host = ply
+			break
+		end
+	end
 
-	RunConsoleCommand("changelevel", mapname)
+	if host then
+		print("[SlashCo - Debug] " .. msg, ...)
+	else
+		print("[SlashCo - Debug] " .. msg, ...)
+	end
+end
+
+function SlashCo.ChangeMap(mapName)
+	GameData.ChangeMap = mapName
+	if g_SlashCoDebug then -- Don't change map when debugging
+		SlashCo.DebugPrint("Run slashco_debug_changemap to proceed with map change onto \"" .. mapName .. "\"")
+		return
+	end
+
+	RunConsoleCommand("changelevel", mapName)
 end
 
 function SlashCo.GoToLobby()
@@ -487,7 +507,6 @@ function SlashCo.HelicopterLeaveForIntro()
 	end
 
 	local delay = math.sqrt(heli:GetPos():Distance(SlashCo.CurRound.HelicopterSpawnPosition)) / 5
-
 	timer.Simple(delay, function()
 		if not IsValid(heli) then
 			return
@@ -497,9 +516,6 @@ function SlashCo.HelicopterLeaveForIntro()
 		timer.Simple(0.05, function()
 			SlashCo.QuietHeli()
 			SlashCo.RemoveHelicopter()
-
-			net.Start("SlashCo:MapAmbientPlay")
-			net.Broadcast()
 		end)
 	end)
 end

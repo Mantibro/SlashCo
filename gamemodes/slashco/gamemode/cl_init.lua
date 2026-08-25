@@ -209,7 +209,7 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	local haloColor = colors.red
 	if colors[color] then
 		haloColor = colors[color]
-	elseif type(colors) == "Color" then
+	elseif IsColor(color) then
 		haloColor = color
 	end
 
@@ -628,62 +628,6 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		surface.SetMaterial(MainIcon)
 		surface.DrawTexturedRect(150, 90, monitorsize / 3, monitorsize / 3)
 		cam.End3D2D()
-	end
-end)
-
-local AmbientMusic
-local AmbientLength
-local AmbientVol = 0.8
-
-net.Receive("SlashCo:MapAmbientPlay", function()
-	timer.Simple(math.random(1, 8), function()
-		SlashCoMapAmbience()
-	end)
-end)
-
-function SlashCoMapAmbience()
-	if GameData.LocalPlayer:Team() == TEAM_SLASHER then
-		return
-	end
-
-	local snd = "sound/slashco/maps/" .. GameData.Map .. ".mp3"
-	if not file.Exists(snd, "GAME") then
-		return
-	end
-
-	sound.PlayFile(snd, "noplay", function(music, errCode, errStr)
-		if IsValid(music) then
-			AmbientMusic = music
-			AmbientMusic:Play()
-
-			AmbientLength = AmbientMusic:GetLength()
-
-			timer.Simple(AmbientLength + math.random(15, 100), function()
-				SlashCoMapAmbience()
-			end)
-		else
-			print("[SlashCo] Error playing map ambient!", errCode, errStr)
-		end
-	end)
-end
-
-hook.Add("Think", "amb_vol", function()
-	if g_AmbientStop then
-		AmbientVol = 0
-	end
-
-	if IsValid(AmbientMusic) then
-		AmbientMusic:SetVolume(AmbientVol)
-	end
-
-	if IsValid(GameData.LocalPlayer:GetNWEntity("SurvivorChased")) then
-		if AmbientVol > 0 then
-			AmbientVol = AmbientVol - RealFrameTime()
-		end
-	else
-		if AmbientVol < 0.8 then
-			AmbientVol = AmbientVol + (RealFrameTime() / 100)
-		end
 	end
 end)
 

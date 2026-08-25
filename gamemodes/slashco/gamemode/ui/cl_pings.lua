@@ -35,6 +35,10 @@ local function findPos(pingInfo)
 	if pingInfo.Entity then
 		local ent = Entity(pingInfo.Entity)
 		if IsValid(ent) then
+			if ent.GetPingPos then
+				return ent:GetPingPos()
+			end
+
 			return ent:WorldSpaceCenter()
 		end
 	elseif pingInfo.Position then
@@ -127,7 +131,7 @@ hook.Add("SlashCo:DrawHUD", "SlashCo:PingDisplay", function()
 		local pingInfo = GameData.ActivePings[idx]
 		if not pingInfo then break end
 
-		if (pingInfo.Team ~= TEAM_SPECTATOR and plyTeam ~= TEAM_SURVIVOR) and (plyTeam ~= TEAM_SPECTATOR and pingInfo.Team ~= plyTeam) then
+		if not SlashCo.CanSeePing(plyTeam, pingInfo.Team) then
 			continue
 		end
 

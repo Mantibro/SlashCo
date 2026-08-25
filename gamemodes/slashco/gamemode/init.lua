@@ -87,6 +87,12 @@ Extra credits: undo, Jim, DarkGrey
 
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
+-- RaphaelIT7: Restore g_SlashCoDebug when transitioning from slashco_debug_changemap
+if SysTime() > cookie.GetNumber("slashco_debug", 0) then
+	g_SlashCoDebug = true
+	cookie.Delete("slashco_debug")
+end
+
 CreateConVar("slashco_force_difficulty", -1, FCVAR_NONE,
 		"Have the gamemode force a certan difficulty. (-1 - random, 0 - EASY, 1 - NOVICE, 2 - INTERMEDIATE, 3 - HARD)", -1, #SlashCo.DifficultyLevel)
 
@@ -130,13 +136,13 @@ end
 
 local function lobbyButtons(ply, button)
 	local plyTeam = ply:Team()
-	if SlashCo.LobbyData.LOBBYSTATE == 0 and plyTeam == TEAM_LOBBY  then
+	if SlashCo.LobbyData.LOBBYSTATE == 0 and plyTeam == TEAM_LOBBY then
 		if SlashCo.IsKeyPressed("READY_SURVIVOR", ply, button) then
-			if SlashCo.GetLobbyPlayerReadyState(ply) ~= 1 then
-				SlashCo.SetLobbyPlayerReadyState(ply, 1)
+			if SlashCo.GetLobbyPlayerReadyState(ply) ~= SlashCo.ReadyState.Survivor then
+				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.Survivor)
 				SlashCo.LobbyBroadcastInfo()
 			else
-				SlashCo.SetLobbyPlayerReadyState(ply, 0)
+				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.NotReady)
 				SlashCo.LobbyBroadcastInfo()
 			end
 			local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
@@ -146,7 +152,7 @@ local function lobbyButtons(ply, button)
 		end
 
 		if SlashCo.IsKeyPressed("READY_SLASHER", ply, button) then
-			if SlashCo.GetLobbyPlayerReadyState(ply) ~= 2 then
+			if SlashCo.GetLobbyPlayerReadyState(ply) ~= SlashCo.ReadyState.Slasher then
 				--Check if the player has made an offering or agreed to one
 				--[[if isPlyOfferer(ply) then
 					ply:ChatPrint("Cannot ready as Slasher as you have either made or agreed to an Offering.")
@@ -157,14 +163,14 @@ local function lobbyButtons(ply, button)
 					return
 				end]]
 
-				SlashCo.SetLobbyPlayerReadyState(ply, 2)
+				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.Slasher)
 				SlashCo.LobbyBroadcastInfo()
 				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 				Sndd:Play()
 				Sndd:ChangeVolume(0.5, 0)
 				Sndd:ChangePitch(100, 0)
 			else
-				SlashCo.SetLobbyPlayerReadyState(ply, 0)
+				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.NotReady)
 				SlashCo.LobbyBroadcastInfo()
 				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
 				Sndd:Play()

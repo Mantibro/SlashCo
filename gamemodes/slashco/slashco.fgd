@@ -209,28 +209,38 @@
     alarm_light_name(string) : "Alarm Light name" : "alarm_light" : "The name of the light this cagelight should be bound to/update with."
 ]
 
-@PointClass base(Angles) studio("models/editor/spot.mdl") = sc_effect_sparks : "SC: A spark effect that can be played from Lua"
+@PointClass base(Targetname) iconsprite("editor/ambient_generic.vmt") sphere(minDistance) sphere(maxDistance) sphere(startDistance) sphere(startEndDistance) = sc_audio_playsound : "SC: Play a sound through the audiosystem"
 [
-    spark_name(string) : "Spark Name" : "" : "The name for this spark effect. Multiple spark effects can have the same name to form a group"
-]
-
-@PointClass base(Angles) studio("models/editor/ground_node.mdl") = info_sc_blackout_trollge_path : "SC: A node used for the blackout even to guide trollge in the beginning"
-[
-    // Keys
-    path_type(choices) : "Path Type" : 1 : "How this path should be treated as" =
+    soundPath(*sound) : "Sound" : ""  : "the sound path for the sound to play."
+    identifier(string) : "Identifier" : ""  : "The identifier of the sound, if nil it will use the soundPath field as the identifier"
+    volume(float) : "Volume" : 1 : "The volume of the sound, defaults to 1"
+    looping(choices) : "Looping" : 0 : "If the sound should be looped or not, defaults to false" =
     [
-	3 : "Finish"
-	2 : "Door"
-        1 : "Move"
-        0 : "Start"
+        1 : "Yes"
+        0 : "No"
     ]
-
-    path_area(choices) : "Path Area" : 0 : "Whether this node belongs to the outside or inside path for Trollge" =
+    minDistance(integer) : "Minimum Distance" : 0 : "The minimum distance for the sound to start fading"
+    maxDistance(integer) : "Maximum Distance" : 0 : "The maximum distance after which the sound cannot be heard anymore"
+    startDistance(integer) : "Start Distance" : 0 : "The distance at which the sound should begin to be hearable, default 0 - close up the sound is fully audiable. This allows you to make sounds only audible at a certain distance, meaning if you're closer than this distance, it cannot be heard"
+    startEndDistance(integer) : "Start End Distance" : 0 : "The distance at which the sound should be fully audiable, default 0"
+    pan(float) : "Pan"  : 0: "The sound pan"
+    playbackRate(float) : "PlaybackRate" : 0 : "The sound playback rate"
+    group(string) : "Group" : "" : "" 
+    fadeIn(float) : "Fade In" : 0 : "How many seconds it takes for the song to fade in at the start of it"
+    fadeOut(float) : "Fade Out" : 0 : "How many seconds before the ending it should start to fade out, and when it faded out the channel is destroyed"
+    fadeOutStart(float) : "Fade Out Start" : 0 : "How many seconds after the sound start it should begin to fade out. Use negative number to use a time based off the end of the sound instead of the start"
+    forceStereo(choices) : "Force Stereo" : 0 : "Forces the sound to play as stereo. This doesn't really force it to be stereo but rather it removes the mono or 3d flag if they have been set" =
     [
-        1 : "Outside"
-	0 : "Inside"
+        1 : "Yes"
+        0 : "No"
     ]
+    dynamicPan(choices) : "Dynamic Pan" : 0 : "If set it will calculate the pan for the channel giving the sound a 3D effect" =
+    [
+        1 : "Yes"
+        0 : "No"
+    ]
+    fallbackSoundPath(string) : "Fallback Sound" : "" : "The fallback sound when the bound ConVar is disabled"
+    boundConVar(string) : "Bound ConVar" : "" : "A ConVar the sound is bound to, when the ConVar is false then it will instead play the set fallbackSoundPath"
 
-    path_name(string) : "Path Name" : "" : "The name of this path"
-    path_next(string) : "Path Next" : "" : "The name of the next path"
+    input Play(void) : "Plays the sound"
 ]

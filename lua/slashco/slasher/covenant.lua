@@ -86,7 +86,7 @@ function SLASHER.OnTickBehaviour(slasher, cloak)
 
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			if not cloak:GetNWBool("InSlasherChaseMode") then
-				SlashCo.StartChaseMode(cloak)
+				SlashCo.StartChaseMode(cloak, true)
 			end
 
 			cloak.CurrentChaseTick = 0

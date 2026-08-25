@@ -587,6 +587,10 @@ local function CalculateChannelVolume(channel, targetVol, ignoreMuted)
 			local volume = CalculateChannelFadeVolume(playerPos, channelPos, targetVol, soundData)
 			volume = CalculateRayTracedVolume(channel, channelData, soundData, channelPos, playerPos, volume)
 
+			if soundData.isMusic then
+				volume = volume * snd_musicvolume:GetInt()
+			end
+
 			if channelData.group then
 				local serverGroupVolume = SlashCo.AudioSystem.ServerGroupVolumes[channelData.group]
 				if serverGroupVolume then
@@ -850,9 +854,10 @@ local snd_musicvolume = GetConVar("snd_musicvolume")
 function SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled(fallBack)
 	local volume = SlashCo.AudioSystem.GetBackgroundMusicVolume(fallBack)
 
-	if GameData.IsLobby then
+	-- RaphaelIT7: It was requested that snd_musicvolume should always apply to background music
+	--if GameData.IsLobby then
 		volume = volume * snd_musicvolume:GetFloat()
-	end
+	--end
 
 	return volume
 end
@@ -1108,7 +1113,7 @@ end)
 		number fadeOut - How many seconds before the ending it should start to fade out, and when it faded out the channel is destroyed.
 		number fadeOutStart - How many seconds after the sound start it should begin to fade out. Use negative number to use a time based off the end of the sound instead of the start.
 		boolean forceMono - Forces the sound to play as mono. Perferably use forceStereo since it won't butcher the sound quality.
-		boolean forceStereo - Forces the sound to play as sterio. This doesn't really force it to be sterio but rather it removes the mono or 3d flag if they have been set.
+		boolean forceStereo - Forces the sound to play as stereo. This doesn't really force it to be stereo but rather it removes the mono or 3d flag if they have been set.
 		boolean noWorldSpace - If set it will use the entities EyePos instead of falling back to using it's WorldSpaceCenter position.
 		boolean dynamicPan - If set it will calculate the pan for the channel giving the sound a 3D effect.
 		string fallbackSoundPath - The fallback sound when the bound ConVar is disabled.
@@ -1119,6 +1124,7 @@ end)
 		string modifyGroup - A string containing all channel groups that should be modified while this channel is playing
 		number modifyGroupVolumeMult - The volume multiplier that should be enforced onto all channels
 		number modifyGroupVolumeFadeTime - (NOT IMPLEMENTED) Time in seconds for the volume to fade to the enforced multiplier. Clamped between a minimum of 0 and maximum of 30
+		boolean isMusic - If set then the volume will also account for snd_musicvolume
 
 		table pulseEffect - A table for the pulse effect. NOTE: This is still WIP and should not be used.
 		-> Entity entity - A entity that should pulse
@@ -1137,7 +1143,7 @@ end)
 
 		all distance fields work regardless of the channel being in 3D or not, so you can use forceStereo and still use minDistance/maxDistance without issues.
 
-		You can combine forceStereo and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in sterio/using multiple channels instead of the normal 3D that forces them into mono.
+		You can combine forceStereo and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in stereo/using multiple channels instead of the normal 3D that forces them into mono.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
 	local soundPath = soundData.soundPath
@@ -1187,7 +1193,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		return
 	end
 
-	local useMode = "" -- By default we use sterio since it sounds far better than mono.
+	local useMode = "" -- By default we use stereo since it sounds far better than mono.
 	if entIndex > 0 or soundData.position then
 		useMode = "3d"
 
@@ -1202,7 +1208,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		useMode = "mono"
 	end
 
-	-- Useful when it has a position/entity but you still want to play it as sterio.
+	-- Useful when it has a position/entity but you still want to play it as stereo.
 	if soundData.forceStereo then
 		useMode = ""
 	end
@@ -1478,7 +1484,7 @@ local function PlayServerReceivedSound(soundData)
 	-- NOTE: We intentionally do this only for sounds played by the server since they won't possibly move the channel independantly.
 	-- While clientside, the channel could be moved after PlaySound was called so if we forced it into mono we could break things.
 	if soundData.entity ~= nil and soundData.entity == SlashCo.AudioSystem.LocalEntIndex then
-		soundData.forceStereo = true -- We are playing the sound on the local player, so we switch it to sterio for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
+		soundData.forceStereo = true -- We are playing the sound on the local player, so we switch it to stereo for hopefully better quality & for no 3D audio bugs since the audio source is exacty at the ear position.
 	end
 
 	soundData.isServerside = true -- Sound was played by the server.
