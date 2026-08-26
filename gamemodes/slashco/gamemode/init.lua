@@ -88,7 +88,8 @@ Extra credits: undo, Jim, DarkGrey
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
 -- RaphaelIT7: Restore g_SlashCoDebug when transitioning from slashco_debug_changemap
-if SysTime() > cookie.GetNumber("slashco_debug", 0) then
+local debugTime = cookie.GetNumber("slashco_debug", 0)
+if debugTime ~= 0 and SysTime() > debugTime then
 	g_SlashCoDebug = true
 	cookie.Delete("slashco_debug")
 end
