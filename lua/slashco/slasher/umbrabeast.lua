@@ -30,8 +30,8 @@ SLASHER.ChaseRadius = 0.82
 SLASHER.ChaseDuration = 999.0
 SLASHER.ChaseCooldown = 0.5
 SLASHER.JumpscareDuration = 2
-SLASHER.AgitationIncrease = 0.10
-SLASHER.AgitationDecrease = -0.08
+SLASHER.AgitationIncrease = 0.20
+SLASHER.AgitationDecrease = -0.05
 SLASHER.ChaseMusic = "slashco/slasher/umbrabeast/stan_chase.ogg"
 SLASHER.KillSound = "slashco/slasher/umbrabeast/stan_jumpscare.ogg"
 SLASHER.Description = "UmbraBeast_desc"
@@ -145,14 +145,14 @@ if SERVER then
 				-- Play a "schpooky" sound from Isle with random intervals to let people know that they're in the territory. And to also spook them.
 				if inside then
 					if not NextTerritorySound[survivor] then
-						NextTerritorySound[survivor] = CurTime() + math.Rand(45, 70)
+						NextTerritorySound[survivor] = CurTime() + math.Rand(30, 60)
 					end
 
 					if CurTime() >= NextTerritorySound[survivor] then
 						net.Start("UmbraBeastTerritorySound")
 						net.Send(survivor)
 
-						NextTerritorySound[survivor] = CurTime() + math.Rand(45, 70)
+						NextTerritorySound[survivor] = CurTime() + math.Rand(30, 60)
 					end
 				else
 					NextTerritorySound[survivor] = nil
@@ -402,6 +402,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("UmbraBeastEnrage", false)
 	slasher:SetNWBool("CanKill", false)
 	slasher:SetNWBool("CanChase", false)
+	slasher:SetNWBool("DisableChaseLight", true)
 end
 
 -- We create these only once since we use them every tick.
@@ -500,7 +501,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("UmbraBeastEnrage", true)
 			slasher:SetNWBool("UmbraBeastAlreadyEnraged", true)
 
-			timer.Simple(0.1, function()
+			timer.Simple(1.0, function()
 				slasher:SetNWBool("UmbraBeastEnrage", false)
 			end)
 
@@ -548,14 +549,32 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("UmbraBeastCanChargeLeap", true)
 	end
 
-	local radius = 500 -- In Hammer Units, naturally
+	local radius = 500
+	local radiusSqr = radius * radius
+
+	if not slasher:GetNWBool("UmbraBeastStalk") or slasher:GetNWBool("InSlasherChaseMode") then
+
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationDecrease)
+	end
+
+	local SurvivorNear = false
 
 	for _, ply in ipairs(player.GetAll()) do
-		if ply ~= slasher and IsValid(ply) and ply:Team() == TEAM_SURVIVOR and ply:IsPlayer() and ply:GetPos():DistToSqr(slasher:GetPos()) <= radius * radius and slasher:GetNWBool("UmbraBeastStalk") and not slasher:GetNWBool("InSlasherChaseMode") then
-			SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationIncrease)
-		elseif ply:GetPos():DistToSqr(slasher:GetPos()) >= radius * radius or not slasher:GetNWBool("UmbraBeastStalk") or slasher:GetNWBool("InSlasherChaseMode") then
-			SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationDecrease)
+		if IsValid(ply)
+			and ply:IsPlayer()
+			and ply ~= slasher
+			and ply:Team() == TEAM_SURVIVOR
+			and ply:GetPos():DistToSqr(slasher:GetPos()) <= radiusSqr then
+
+			SurvivorNear = true
+			break
 		end
+	end
+
+	if SurvivorNear and not slasher:GetNWBool("InSlasherChaseMode") and slasher:GetNWBool("UmbraBeastStalk") then
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationIncrease)
+	else
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationDecrease)
 	end
 
 	local agitation = SlashCo.GetSlasherAnger(slasher)
@@ -894,7 +913,7 @@ end
 
 function SLASHER.OnSecondaryFire(slasher)
 	if slasher:GetNWBool("UmbraBeastStalk") then
-		SlashCo.StartChaseMode(slasher, true)
+		SlashCo.StartChaseMode(slasher)
 	else
 		StanLeap(slasher)
 	end
@@ -975,6 +994,7 @@ function SLASHER.Animator(ply)
 	local stan_maul_loop = ply:GetNWBool("UmbraBeastAnimateMauling")
 	local stan_flashed = ply:GetNWBool("BeingFlashed", false)
 	local stan_enrage = ply:GetNWBool("UmbraBeastEnrage")
+	
 
 	if not stan_stun then
 		ply.anim_antispam = false
@@ -1017,13 +1037,15 @@ function SLASHER.Animator(ply)
 	end
 
 	if stan_enrage then
-		local seq = ply:LookupSequence("enrage")
-		if seq >= 0 then
-			ply:AddVCDSequenceToGestureSlot(1, seq, 0, true)
-		end
-	end
+		if ply.UmbraBeastGesture ~= "enrage" then
+			local sequence = ply:LookupSequence("enrage")
 
-	if stan_leap_loop then
+			if sequence >= 0 then
+				ply:AddVCDSequenceToGestureSlot(1, sequence, 0, true)
+				ply.UmbraBeastGesture = "enrage"
+			end
+		end
+	elseif stan_leap_loop then
 		if ply.UmbraBeastGesture ~= "leap" then
 			local sequence = ply:LookupSequence("leap_loop_air")
 
@@ -1154,7 +1176,7 @@ local controlTable = {
 }
 
 function SLASHER.InitHud(_, hud)
-	hud:SetAvatar(Material("slashco/ui/icons/slasher/stan"))
+	hud:SetAvatar(Material("slashco/ui/icons/slasher/umbrabeast"))
 
 	local case = math.random(1, 4)
 	if case == 1 then
