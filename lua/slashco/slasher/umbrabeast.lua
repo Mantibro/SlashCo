@@ -552,11 +552,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	local radius = 500
 	local radiusSqr = radius * radius
 
-	if not slasher:GetNWBool("UmbraBeastStalk") or slasher:GetNWBool("InSlasherChaseMode") then
-
-		SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationDecrease)
-	end
-
 	local SurvivorNear = false
 
 	for _, ply in ipairs(player.GetAll()) do
