@@ -48,6 +48,7 @@ if CLIENT then
 else
 	function PLAYER:Init()
 		self.Player:RemoveEffects(EF_NOFLASHLIGHT)
+		self.Player:SetVisible(true)
 	end
 end
 
