@@ -271,12 +271,26 @@ local function SetupSlashCoNetworkVar(type, index, name, default) -- Same order 
 	end
 
 	plyMeta["Set" .. name] = function(self, value)
-		SetDTFunc(self, index, value or defaultFallback)
+		if value == nil then
+			value = defaultFallback
+		end
+
+		SetDTFunc(self, index, value)
 	end
 
 	local GetDTFunc = entMeta["GetDT" .. type]
 	plyMeta["Get" .. name] = function(self, fallback)
-		return GetDTFunc(self, index) or (fallback or defaultFallback)
+		local value = GetDTFunc(self, index)
+		-- RaphaelIT7: This is so ugly because of the sam reason as above! false is such a weird case to work with
+		if value == nil then
+			if fallback ~= nil then
+				value = fallback
+			else
+				value = defaultFallback
+			end
+		end
+
+		return value
 	end
 
 	SlashCo_DTNetworking[type][index] = name

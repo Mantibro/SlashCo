@@ -409,7 +409,9 @@ hook.Add("InitPostEntity", "SlashCo:InitPostEntity", function()
 	end
 end)
 
-local function Think()
+hook.Add("Think", "SlashCo:CoreThink", function()
+	if GameData.IsLobby then return end
+
 	if engine.TickCount() % math.floor(5 / engine.TickInterval()) == 0 then
 		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			local health = p:Health()
@@ -439,7 +441,7 @@ local function Think()
 	if SlashCo.CurRound and SlashCo.State == SlashCo.States.IN_GAME and #gens > 0 then
 		local runningCount = 0
 		for _, v in ipairs(gens) do
-			if v.IsRunning then
+			if v:GetRunning() then
 				runningCount = runningCount + 1
 			end
 		end
@@ -505,12 +507,6 @@ local function Think()
 			SlashCo.CurRound.roundOverToggle = false
 		end
 	end
-end
-
-hook.Add("PostGamemodeLoaded", "SlashCo:PostGamemodeLoaded", function()
-	timer.Simple(1, function()
-		hook.Add("Think", "SlashCo:CoreThink", Think)
-	end)
 end)
 
 function SlashCo.AddLateSurvivor(ply)

@@ -54,6 +54,9 @@ end
 
 function PLAYER:Init()
 	self.Player:AddEffects(EF_NOFLASHLIGHT)
+	-- RaphaelIT7: We must set the defaults!
+	self.Player:SetVisible(true)
+	self.Player:SetCanSeeFlashlights(true)
 end
 
 player_manager.RegisterClass("player_survivor", PLAYER, "player_default")
