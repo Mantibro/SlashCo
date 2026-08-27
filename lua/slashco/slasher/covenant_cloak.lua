@@ -57,7 +57,6 @@ end
 
 local SURVIVOR_STUN_TIME = 5.0
 local SLASHER_STUN_TIME = 7.0
-
 function SLASHER.OnTickBehaviour(slasher, target)
 	if IsValid(slasher.TackledPlayer) then
 		if not slasher:IsFrozen() then
@@ -121,21 +120,18 @@ function SLASHER.OnTickBehaviour(slasher, target)
 						end
 					end)
 
-					timer.Simple(10.0, function()
-						if not IsValid(ply) then return end
-						
-						ply:SetNWBool("MarkedByCloaks", false)
-					end)
-
 					-- Stun slasher
 					slasher:Freeze(true)
 					slasher:SetImpervious(true)
 					timer.Simple(SLASHER_STUN_TIME, function()
 						if not IsValid(slasher) then return end
-						
+
 						slasher:Freeze(false)
 						slasher:SetImpervious(false)
 						slasher.KillDelayTick = SLASHER.KillDelay
+
+						if not IsValid(ply) then return end
+						ply:SetNWBool("MarkedByCloaks", false)
 					end)
 
 					break
@@ -170,26 +166,24 @@ function SLASHER.OnPrimaryFire(slasher)
 	if IsValid(slasher.TackledPlayer) then return end
 	if slasher:IsFrozen() then return end
 	if slasher.KillDelayTick > 0 then return end
+	if slasher:GetNWBool("CloakTackle") then return end
 
-	if not slasher:GetNWBool("CloakTackle") then
-		slasher:SetNWBool("CloakTackle", true)
-		slasher:SetNWBool("CloakTackling", true)
-		slasher.TackledPlayer = nil
+	slasher:SetNWBool("CloakTackle", true)
+	slasher:SetNWBool("CloakTackling", true)
+	slasher.TackledPlayer = nil
 
-		if slasher:IsOnGround() then
-			slasher:SetVelocity(slasher:GetForward() * 500)
-		end
-
-		slasher:Freeze(true)
-
-		timer.Simple(0.8, function()
-			if not IsValid(slasher) then return end
-
-			slasher:SetNWBool("CloakTackling", false)
-			slasher:Freeze(false) -- RaphaelIT7: Somehow in one round a player managed to get permanently frozen?
-			--SLASHER.TackleFail(slasher)
-		end)
+	if slasher:IsOnGround() then
+		slasher:SetVelocity(slasher:GetForward() * 500)
 	end
+
+	slasher:Freeze(true)
+
+	timer.Simple(0.8, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNWBool("CloakTackling", false)
+		slasher:Freeze(false) -- RaphaelIT7: Somehow in one round a player managed to get permanently frozen?
+	end)
 end
 
 function SLASHER.Thirdperson(ply)
@@ -257,9 +251,9 @@ end
 function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/covenantcloak"))
 	hud:SetTitle("CovenantCloak")
-	
+
 	hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/unknown"))
-	
+
 	local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then

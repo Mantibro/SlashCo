@@ -36,13 +36,12 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("CanChase", true)
-
 	slasher.ShockCooldown = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local ShockCD = slasher.ShockCooldown or 0 --Shock cooldown
-	
+
 	if ShockCD > 0 then
 		slasher.ShockCooldown = ShockCD - FrameTime()
 	end
@@ -58,16 +57,16 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetPos():Distance(target:GetPos()) > 137 then return end
 	if slasher.ShockCooldown > 0.01 then return end
 
-	slasher:SetNWBool("RockPunching", false)
-	timer.Remove("RockPunchDecay")
 	slasher.ShockCooldown = 2
 
 	timer.Simple(0.3, function()
 		if not IsValid(slasher) then return end
 
 		if SERVER then
+			slasher:LagCompensation(true)
 			local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(137, 0, 0)),
 				Vector(-30, -30, -60), Vector(30, 30, 60), 25, DMG_SLASH, 5, false)
+			slasher:LagCompensation(false)
 
 			if target1:IsPlayer() then
 				if target1:Team() ~= TEAM_SURVIVOR then return end
@@ -93,17 +92,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				util.Effect("rocks_lightning", lightning)
 			end
 		end
-	end)
-
-	timer.Simple(0.1, function()
-		if not IsValid(slasher) then return end
-
-		slasher:SetNWBool("RockPunching", true)
-		timer.Create("RockPunchDecay", 0.6, 1, function()
-			if not IsValid(slasher) then return end
-
-			slasher:SetNWBool("RockPunching", false)
-		end)
 	end)
 end
 
@@ -146,11 +134,11 @@ end
 function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/rocks"))
 	hud:SetTitle("CovenantRocks")
-	
+
 	hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/unknown"))
 	hud:UntieControl("LMB")
 	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
-	
+
 	local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
 	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then

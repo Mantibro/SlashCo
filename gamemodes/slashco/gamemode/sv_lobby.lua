@@ -190,7 +190,7 @@ local function lobbyReadyTimer(count)
 	end)
 end
 
-local lobbyLeaveTimer = CreateConVar("slashco_lobbyleavedelay", "120", FCVAR_ARCHIVE, "The time in seconds player have to equip items and enter the helicopter before it just forces that", 1, 255)
+local lobbyLeaveTimer = CreateConVar("slashco_lobbyleavedelay", "210", FCVAR_ARCHIVE, "The time in seconds player have to equip items and enter the helicopter before it just forces that", 1, 255)
 local function lobbyBriefingLeaveTimer()
 	timer.Create("SlashCo:LobbyBriefingLeaveTimer", lobbyLeaveTimer:GetInt(), 1, function()
 		SlashCo.LobbyFinish()

@@ -29,6 +29,8 @@ SLASHER.ProTip = "Covenant_tip"
 SLASHER.SpeedRating = "★★★★☆"
 SLASHER.EyeRating = "★★☆☆☆"
 SLASHER.DiffRating = "★★★☆☆"
+SLASHER.RockProwlIncrease = 25
+SLASHER.RockChaseDecrease = 22
 
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	SLASHER.ChaseDuration = 15.0 + (2 * additionalSurvivors)
@@ -36,6 +38,9 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	if additionalSurvivors > 0 then
 		SLASHER.ProwlSpeed = 150 + (3 * additionalSurvivors)
 		SLASHER.ChaseSpeed = 297 + (0.5 * additionalSurvivors)
+
+		SLASHER.RockProwlIncrease = 25 + (0.5 * additionalSurvivors)
+		SLASHER.RockChaseDecrease = 22 - (0.5 * additionalSurvivors)
 	end
 end
 
@@ -78,11 +83,16 @@ function SLASHER.SummonRocks(vic)
 	vic:Spawn()
 	SlashCo.OnSlasherSpawned(vic)
 	SlashCo.BroadcastCurrentRoundData(false)
+
+	SLASHER.PlayersToBecomePartOfCovenant[vic:SteamID64()] = true
 end
 
 function SLASHER.OnTickBehaviour(slasher, cloak)
 	for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		--Sync the chase for every slasher, meaning every covenant member
+		if not SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[cloak:SteamID64()] then
+			continue
+		end
 
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			if not cloak:GetNWBool("InSlasherChaseMode") then
@@ -97,11 +107,6 @@ function SLASHER.OnTickBehaviour(slasher, cloak)
 		end
 	end
 
-	if slasher.RockSummoned then
-		SLASHER.ProwlSpeed = 175
-		SLASHER.ChaseSpeed = 275
-	end
-
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
@@ -110,101 +115,105 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if not IsValid(target) or not target:IsPlayer() then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	if slasher:GetPos():Distance(target:GetPos()) > SLASHER.KillDistance then return end
+	if slasher:GetNWBool("CovenantSummoning") then return end
 
-	if not slasher:GetNWBool("CovenantSummoning") then
-		target:Kill()
-		timer.Simple(FrameTime(), function()
-			local ragdoll = target.DeadBody
+	target:Kill()
+	timer.Simple(FrameTime(), function()
+		local ragdoll = target.DeadBody
+		local physCount = ragdoll:GetPhysicsObjectCount()
 
-			local physCount = ragdoll:GetPhysicsObjectCount()
+		timer.Simple(2, function()
+			if not IsValid(ragdoll) then return end
 
-			timer.Simple(2, function()
-				if not IsValid(ragdoll) then return end
-				for i = 0, (physCount - 1) do
-					local PhysBone = ragdoll:GetPhysicsObjectNum(i)
+			for i = 0, (physCount - 1) do
+				local PhysBone = ragdoll:GetPhysicsObjectNum(i)
 
-					if PhysBone:IsValid() then
-						PhysBone:EnableGravity(false)
-					end
+				if PhysBone:IsValid() then
+					PhysBone:EnableGravity(false)
 				end
+			end
+		end)
+
+		if not slasher.RockSummoned then
+			timer.Simple(4, function() -- First victim becomes Rocks
+				if not IsValid(target) then return end
+				SLASHER.SummonRocks(target)
+				target:Freeze(true)
+
+				timer.Simple(3, function()
+					if not IsValid(target) then return end
+
+					target:Freeze(false)
+					target:SetNWBool("RocksBeingSummoned", false)
+				end)
 			end)
 
-			if not slasher.RockSummoned then
-				timer.Simple(4, function() -- First victim becomes Rocks
+			slasher.PlayerToBecomeRocks = target
+			target:SetNWBool("RocksBeingSummoned", true)
+			slasher.RockSummoned = true
+
+			SLASHER.ProwlSpeed = SLASHER.ProwlSpeed + SLASHER.RockProwlIncrease
+			SLASHER.ChaseSpeed = SLASHER.ChaseSpeed - SLASHER.RockChaseDecrease
+		else
+			local slashPlys = team.GetPlayers(TEAM_SLASHER)
+			if slashPlys >= 6 then
+				return
+			else
+				timer.Simple(4, function() -- Next victims becomes Cloaks
 					if not IsValid(target) then return end
-					SLASHER.SummonRocks(target)
+
+					SLASHER.SummonCovenantMembers(target)
 					target:Freeze(true)
 
 					timer.Simple(3, function()
-						if not IsValid(target) then return end
 						target:Freeze(false)
-						target:SetNWBool("RocksBeingSummoned", false)
+						target:SetNWBool("CloaksBeingSummoned", false)
 					end)
 				end)
 
-				slasher.PlayerToBecomeRocks = target
-				target:SetNWBool("RocksBeingSummoned", true)
-				slasher.RockSummoned = true
-			else
-				local slashPlys = team.GetPlayers(TEAM_SLASHER)
-				if slashPlys == 6 then
-					return
-				else
-					timer.Simple(4, function() -- Next victims becomes Cloaks
-						if not IsValid(target) then return end
-						SLASHER.SummonCovenantMembers(target)
-						target:Freeze(true)
-
-						timer.Simple(3, function()
-							target:Freeze(false)
-							target:SetNWBool("CloaksBeingSummoned", false)
-						end)
-					end)
-
-					target:SetNWBool("CloaksBeingSummoned", true)
-				end
+				target:SetNWBool("CloaksBeingSummoned", true)
 			end
+		end
 
-			timer.Simple(6, function()
-				local Dissolver = ents.Create("env_entity_dissolver")
-				timer.Simple(1, function()
-					if not IsValid(Dissolver) then return end
-					Dissolver:Remove() -- backup edict save on error
-				end)
-
-				Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
-				Dissolver:SetKeyValue("dissolvetype", 0)
-				Dissolver:SetKeyValue("magnitude", 0)
-				Dissolver:SetPos(ragdoll:GetPos())
-				if IsValid(slasher) then
-					Dissolver:SetPhysicsAttacker(slasher)
-				end
-				Dissolver:Spawn()
-
-				ragdoll:SetName(Dissolver.Target)
-
-				Dissolver:Fire("Dissolve", Dissolver.Target, 0)
-				Dissolver:Fire("Kill", "", 0.1)
-
-				if not IsValid(slasher) then return end
-				slasher:SetNWBool("CovenantSummoning", false)
-				slasher:Freeze(false)
+		timer.Simple(6, function()
+			local Dissolver = ents.Create("env_entity_dissolver")
+			timer.Simple(1, function()
+				if not IsValid(Dissolver) then return end
+				Dissolver:Remove() -- backup edict save on error
 			end)
 
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/covenant/covenant_summoning.mp3",
-				identifier = "CovenantSummoning",
-				minDistance = 400 * SlashCo.MapSize,
-				maxDistance = 800 * SlashCo.MapSize,
-				entity = slasher,
-				volume = 1,
-				fadeIn = 0,
-			})
+			Dissolver.Target = "dissolve" .. ragdoll:EntIndex()
+			Dissolver:SetKeyValue("dissolvetype", 0)
+			Dissolver:SetKeyValue("magnitude", 0)
+			Dissolver:SetPos(ragdoll:GetPos())
+			if IsValid(slasher) then
+				Dissolver:SetPhysicsAttacker(slasher)
+			end
+			Dissolver:Spawn()
 
-			slasher:SetNWBool("CovenantSummoning", true)
-			slasher:Freeze(true)
+			ragdoll:SetName(Dissolver.Target)
+
+			Dissolver:Fire("Dissolve", Dissolver.Target, 0)
+			Dissolver:Fire("Kill", "", 0.1)
+
+			if not IsValid(slasher) then return end
+			slasher:SetNWBool("CovenantSummoning", false)
+			slasher:Freeze(false)
 		end)
-	end
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/covenant/covenant_summoning.mp3",
+			identifier = "CovenantSummoning",
+			minDistance = 400 * SlashCo.MapSize,
+			maxDistance = 800 * SlashCo.MapSize,
+			entity = slasher,
+			volume = 1,
+			fadeIn = 0,
+		})
+
+		slasher:SetNWBool("CovenantSummoning", true)
+		slasher:Freeze(true)
+	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
