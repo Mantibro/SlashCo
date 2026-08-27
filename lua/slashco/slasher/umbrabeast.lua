@@ -47,7 +47,6 @@ local UMBRA_FINAL_STAGE = 4
 local UMBRA_STATE_PROWL = 0
 local UMBRA_STATE_STALK = 1
 local UMBRA_STATE_CHASE = 2
-local UMBRA_TERRITORY_RADIUS = 2000 * SlashCo.GetMapSize() / 2 -- Arguably the most important thing here, the balancing on this is very delicate.
 local NextTerritorySound = {}
 local TerritoryCheckDelay = 0.5
 local PaintedTargets = {}
@@ -392,6 +391,8 @@ end
 function SLASHER.OnSpawn(slasher)
 	StanBreathing(slasher)
 
+	local UMBRA_TERRITORY_RADIUS = 2000 * SlashCo.MapSize / 2 -- Arguably the most important thing here, the balancing on this is very delicate.
+	slasher.UmbraBeastTerritoryRadius = UMBRA_TERRITORY_RADIUS
 	slasher.SlashCooldown = 0
 	slasher.ChargeLeapCooldown = 0
 	slasher.LeapCooldown = 0
@@ -949,7 +950,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 	slasher:SetNWBool("UmbraBeastMarkTerritory", true)
 	slasher:SetNWVector("UmbraBeastTerritoryPos", territoryPos)
-	slasher:SetNWInt("UmbraBeastTerritoryRadius", UMBRA_TERRITORY_RADIUS)
+	slasher:SetNWInt("UmbraBeastTerritoryRadius", slasher.UmbraBeastTerritoryRadius)
 end
 
 -- This is where we spawn our "territory"
@@ -963,8 +964,7 @@ if CLIENT then
 		if not slasher:GetNWBool("UmbraBeastMarkTerritory") then return end
 
 		local territoryPos = slasher:GetNWVector("UmbraBeastTerritoryPos")
-		local territoryRadius = slasher:GetNWInt("UmbraBeastTerritoryRadius", UMBRA_TERRITORY_RADIUS)
-		local territoryRadiusNoEffect = UMBRA_TERRITORY_RADIUS
+		local territoryRadius = slasher:GetNWInt("UmbraBeastTerritoryRadius", slasher.UmbraBeastTerritoryRadius)
 
 		render.SetColorMaterial()
 		render.SetBlend(1)
@@ -973,7 +973,7 @@ if CLIENT then
 		render.DrawSphere(territoryPos, territoryRadius, 32, 16, Color(255, 50, 50, 1))
 
 		-- Inner Sphere, what you see when you're inside of its radius.
-		render.DrawSphere(territoryPos, -territoryRadiusNoEffect, 32, 16, Color(255, 50, 50, 1))
+		render.DrawSphere(territoryPos, -territoryRadius, 32, 16, Color(255, 50, 50, 1))
 
 		render.SetBlend(0.1)
 	end)
