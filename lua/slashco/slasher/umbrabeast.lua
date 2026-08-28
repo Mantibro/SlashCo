@@ -95,6 +95,8 @@ local function StopUmbraBeastMauling(slasher)
 		survivor:SetNWBool("SurvivorPounced", false) -- Clear the pounced state off of the survivor.
 		survivor:Freeze(false)	-- Unfreeze the survivor who was pounced.
 
+		slasher:SetCollisionGroup(1) -- We need to remove the collisions for a second.
+
 		local pushDir = (survivor:GetPos() - slasher:GetPos()):GetNormalized()
 
 		survivor:SetVelocity(pushDir * 250 + Vector(0, 0, 100)) -- Push the survivor a lil bit away from the slasher.
@@ -102,6 +104,7 @@ local function StopUmbraBeastMauling(slasher)
 
 	-- Unfreeze the slasher after a lil bit, don't leave him softlocked...
 	timer.Simple(1.5, function()
+		slasher:SetCollisionGroup(15)
 		slasher:Freeze(false)
 	end)
 end
@@ -392,6 +395,9 @@ function SLASHER.OnSpawn(slasher)
 	StanBreathing(slasher)
 
 	local UMBRA_TERRITORY_RADIUS = 2000 * SlashCo.MapSize / 2 -- Arguably the most important thing here, the balancing on this is very delicate.
+	if SlashCo.MapSize == 1 then
+		UMBRA_TERRITORY_RADIUS = 4000
+	end
 	slasher.UmbraBeastTerritoryRadius = UMBRA_TERRITORY_RADIUS
 	slasher.SlashCooldown = 0
 	slasher.ChargeLeapCooldown = 0
@@ -865,8 +871,8 @@ hook.Add("Think", "UmbraBeastPounce", function()
 					slasher.LeapHit = false
 				end
 				timer.Simple(3, function()
-					survivor:SetCollisionGroup(0)
-					slasher:SetCollisionGroup(0)
+					survivor:SetCollisionGroup(15)
+					slasher:SetCollisionGroup(15)
 				end)
 			end)
 			break
