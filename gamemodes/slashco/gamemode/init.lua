@@ -69,6 +69,7 @@ include("sh_fog.lua")
 include("sv_holylib.lua")
 include("sv_maptools.lua")
 include("sh_keyboard.lua")
+include("sv_outfitter_block.lua")
 
 --Initialize global variable to hold functions.
 SlashCo = SlashCo or {}
