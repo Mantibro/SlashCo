@@ -224,8 +224,8 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 		slasher:SetVisible(true)
 
-		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
+		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
+		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 	end
 end
 
