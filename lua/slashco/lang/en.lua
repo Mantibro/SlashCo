@@ -617,6 +617,28 @@ SlashCo.LangTable["Hoovydundy_tip"] = "-Never try to stun him."
 SlashCo.LangTable["genblock"] = "block generator"
 SlashCo.LangTable["entangle"] = "entangle"
 
+-- STAN
+SlashCo.LangTable["UmbraBeast"] = "Umbra Beast"
+SlashCo.LangTable["UmbraBeast_desc"] = [[A creature of unknown origin capable of area denial and incredible stealth capabilities..
+
+-The Beast uses its see-through appearance to its advantage.
+-The map gets covered in fog the more progress is done.
+-Leaps long distances on unsuspecting employees.
+-It can go into stalk mode to stop emitting any noise and to charge agitation.
+-Upon filling the agitation meter, it can initiate a devastating chase.
+-This slasher is sensitive to lights.]]
+SlashCo.LangTable["Hoovydundy_tip"] = "-Pay attention to weird sounds, you might just find yourself in its territory."
+
+SlashCo.LangTable["agitation"] = "agitation"
+SlashCo.LangTable["charge_leap"] = "charge leap"
+SlashCo.LangTable["stalk"] = "stalk"
+SlashCo.LangTable["prowl"] = "prowl"
+SlashCo.LangTable["mark_territory"] = "mark territory"
+SlashCo.LangTable["chase"] = "chase"
+SlashCo.LangTable["slash"] = "slash"
+SlashCo.LangTable["leap"] = "leap"
+
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide" -- for dolphinman to unhide
@@ -749,6 +771,8 @@ SlashCo.LangTable["Watcher_docDescAdd"] = [[This Slasher cannot passively gain [
 
 SlashCo.LangTable["Hoovydundy_docDesc"] = [[What began as mere rumors turned out to be true. A Slashco crew was sent out to perform their daily routine, but they encountered HIM. Only one of our loyal employees manages to survive to tell us about his encounter with the entity.]]
 SlashCo.LangTable["Hoovydundy_docDescAdd"] = [[This slasher is slow and always emits a red light around him, making it easy to spot and avoid. It can grab his victims with a rope that comes from his body. He is able to interfere with REFUELING generators. It is strongly recommended that you DO NOT ATTEMPT to stun this slasher under any circumstances.]]
+
+SlashCo.LangTable["UmbraBeast_docDesc"] = [[This entity has been observed to "hunt" employees and other unsuspecting victims around the premises of SlashCoTMs property. Not much is known about this creature, it seems to have just appeared one day and decided to pray on anything invading its territory for a purpose as simple as to sustain itself. Despite its animalistic nature it has shown signs of sentience and an unnatural level of intelligence for this kind of being, which is why it becomes active almost exclusively whenever it knows it cannot be harmed in a way that matters. Multiple types of deals have been attempted to reason with the beast by supplying squads suspected to be attacked with fresh meat and or different types of food, this effort has been proven futile so far due to an incredibly specific and as of now unknown way of feeding. One severe weakness of note is its hypersensitivity to light, although partially inconveniencing this entity it is indeed consistently effective to shine as much natural or synthetic light in its direction. Further study required.]]
 
 -- Perks
 
