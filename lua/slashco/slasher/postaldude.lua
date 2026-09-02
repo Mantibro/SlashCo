@@ -85,18 +85,6 @@ local function PrincessBestDog()
     return false
 end
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
-	SLASHER.ChaseDuration = 7.0 + (1 * additionalSurvivors)
-
-	if additionalSurvivors > 0 then
-		SLASHER.ProwlSpeed = 305 + (3 * additionalSurvivors)
-		SLASHER.ChaseSpeed = 305 + (0.5 * additionalSurvivors)
-		SLASHER.KillDistance = 150 + (2 * additionalSurvivors)
-	end
-end
-
 function SLASHER.OnSpawn(slasher)
 	timer.Create("CreateBullets" .. slasher:UserID(), 2, 3, function()
 		if not IsValid(slasher) then return end
