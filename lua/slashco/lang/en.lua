@@ -649,6 +649,20 @@ SlashCo.LangTable["Americanpo_desc"] = [[This shooter is obsessed with being pat
 -Can ignite marked survivors with his bullets.]]
 SlashCo.LangTable["Americanpo_tip"] = "-Don't let the bottle hit you."
 
+-- HOTDOGMAN
+SlashCo.LangTable["Hotdogman"] = "Hotdogman"
+SlashCo.LangTable["Hotdogman_desc"] = [[This slasher really loves hotdogs.
+
+-Hotdogman can only leap during chase.
+-He can vomit the hotdogs to slowdown survivors.
+-This slasher can be faster than it looks.]]
+SlashCo.LangTable["Hotdogman_tip"] = "-Avoid his vomit."
+
+SlashCo.LangTable["find hotdog"] = "find hotdog"
+SlashCo.LangTable["eat hotdog"] = "eat hotdog"
+SlashCo.LangTable["vomit"] = "vomit"
+SlashCo.LangTable["nausea"] = "nausea"
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide" -- for dolphinman to unhide
@@ -787,6 +801,9 @@ SlashCo.LangTable["PostalDude_docDescAdd"] = [[This slasher gets stronger the mo
 
 SlashCo.LangTable["Americanpo_docDesc"] = [[An entity that is EXTREMELY patriotic and proud of his country, it takes the form of an average adult wearing a secondhand child's 'Po' costume. What's most striking about his appearance is the belt laden with bottles and his ever-reliable shotgun. This slasher, despite having the appearance of a normal human, is known to be not entirely human, not to mention that it has already faces the Exterminators team before his registration.]]
 SlashCo.LangTable["Americanpo_docDescAdd"] = [[This slasher typically possesses the strength and stamina of an average adult, but he can still feel pain. He usually attacks his 'unpatriotic' victims with his shotgun, alternating between his HUNTING and other attacks. If he feels useless, he'll try to block your path or hit you far away with one of his bottles. Despite having a powerful weapon, you can stun him to keep him out of the game for a while; just make sure you're not in front of him.]]
+
+SlashCo.LangTable["Hotdogman_docDesc"] = [[This demon has the appearance of an adult fat man that stands out for having a hot dog by head.]]
+SlashCo.LangTable["Hotdogman_docDescAdd"] = [[This slasher can run slow sometimes but deals high damage easily. Hotdogs grant him the ability to vomit, which can make employees move slower.]]
 
 -- Perks
 

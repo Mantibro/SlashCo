@@ -648,6 +648,19 @@ SlashCo.LangTable["switch mode"] = "cambiar modo"
 SlashCo.LangTable["MODE: HUNTER"] = "MODO: CAZADOR"
 SlashCo.LangTable["MODE: AGGRESSIVE"] = "MODO: AGRESIVO"
 
+SlashCo.LangTable["Hotdogman"] = "Hombre-hotdog"
+SlashCo.LangTable["Hotdogman_desc"] = [[A este slasher le gustan mucho los hotdogs.
+
+-Hombre-hotdog solo puede embestir durante una persecución.
+-Puede vomitar los hotdogs consumidos para ralentizar supervivientes.
+-Este slasher corre mas rapido de lo que parece]]
+SlashCo.LangTable["Hotdogman_tip"] = "-Evita su vomito a toda costa."
+
+SlashCo.LangTable["find hotdog"] = "busca hotdog"
+SlashCo.LangTable["eat hotdog"] = "comer hotdog"
+SlashCo.LangTable["vomit"] = "vomitar"
+SlashCo.LangTable["nausea"] = "nauseas"
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Los espectadores ahora pueden marcar."
 SlashCo.LangTable["unhide"] = "levantarse" -- for dolphinman to unhide
@@ -785,6 +798,9 @@ SlashCo.LangTable["PostalDude_docDescAdd"] = [[Este slasher se vuelve más fuert
 
 SlashCo.LangTable["Americanpo_docDesc"] = [[Una entidad sumamente patriota y orgullosa de su pais, adopta la forma de un adulto comun y corriente con un disfraz infantil de segunda mano de 'Po'. Lo mas llamativo de su apariencia es el cinturon cargado de botellas y su inseparable escopeta. Este slasher, a pesar de tener la apariencia de un humano normal, es conocido por no ser del todo humano, y cabe mencionar que ya se enfrento al equipo de EXTERMINADORES antes de su registro.]]
 SlashCo.LangTable["Americanpo_docDescAdd"] = [[Este slasher suele tener la fuerza y resistencia de un adulto promedio, pero aun puede sentir dolor. Generalmente ataca a sus victimas 'antipatriotas' con su escopeta, alternando entre su habilidad de CAZA y otros ataques. Si se siente inutil, intentara bloquearte el paso o golpearte desde lejos con una de sus botellas. A pesar de tener un arma poderosa, puedes aturdirlo para mantenerlo fuera de combate por un tiempo; solo asegurate de no estar frente a el.]]
+
+SlashCo.LangTable["Hotdogman_docDesc"] = [[Este demonio tiene la apariencia de un adulto grande cuya cabeza es reemplazada por un pan]]
+SlashCo.LangTable["Hotdogman_docDescAdd"] = [[Este slasher es lento pero puede causar gran daño facilmente. Los Hotdogs le permiten vomitar.]]
 
 -- Perks
 
