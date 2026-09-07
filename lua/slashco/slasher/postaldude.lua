@@ -152,6 +152,7 @@ function SLASHER.OnHelicopterSummon(slasher)
 				minDistance = 15000,
 				maxDistance = 20000,
 				looping = true,
+				isMusic = true,
 				entity = slasher,
 				volume = 1.25,
 				fadeIn = 0,
@@ -206,6 +207,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					minDistance = 500 * SlashCo.MapSize,
 					maxDistance = 1000 * SlashCo.MapSize,
 					looping = true,
+					isMusic = true,
 					entity = slasher,
 					volume = 0.2,
 					fadeIn = 1,
@@ -973,7 +975,6 @@ function SLASHER.OnSecondaryFire(slasher)
 	end
 
 	if slasher:GetNWBool("InSlasherChaseMode") then
-		--slasher:SlasherHudFunc("ChaseAndKill", "false", "true")
 		SlashCo.AddSlasherAnger(slasher, -5)
 		SlashCo.StopChase(slasher)
 		return
@@ -1275,13 +1276,17 @@ function SLASHER.Animator(ply)
 	end
 
 	if ply:GetNWBool("SwitchToShovel") then
-		if PostalDude_swing then
+		if PostalDude_swing and (not ply.anim_antispam) then
 			local randomswing = math.random(1, 2)
+			local SwingAnim = ""
 			if randomswing == 1 then
-				ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("shovel_swing_1"), 0, true)
+				SwingAnim = "shovel_swing_1"
 			else
-				ply:AddVCDSequenceToGestureSlot(2, ply:LookupSequence("shovel_swing_2"), 0, true)
+				SwingAnim = "shovel_swing_2"
 			end
+
+			ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence(SwingAnim), 0, true)
+			ply.anim_antispam = true
 		end
 	end
 
