@@ -119,6 +119,7 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	slasher:SetVisible(false)
+	slasher:SetNWBool("TylerEndlessChase", false)
 
 	slasher.GasCanCreated = 0
 	slasher.TylerState = 0
@@ -147,6 +148,7 @@ function SLASHER.OnHelicopterSummon(slasher)
 	SlashCo.AudioSystem.StopSound("TylerTheme", 1, slasher)
 	SlashCo.AudioSystem.StopSound("TylerWhisper", 1, slasher)
 	SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
+	slasher:SetNWBool("TylerEndlessChase", true)
 	TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 end
 
@@ -368,6 +370,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					minDistance = 15000,
 					maxDistance = 20000,
 					looping = true,
+					isMusic = true,
 					entity = slasher,
 					volume = 0.6,
 					fadeIn = 1,
@@ -381,6 +384,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					minDistance = 15000,
 					maxDistance = 20000,
 					looping = true,
+					isMusic = true,
 					entity = slasher,
 					volume = 0.9,
 					fadeIn = 1,
@@ -393,6 +397,7 @@ function SLASHER.OnTickBehaviour(slasher)
 						minDistance = 15000,
 						maxDistance = 20000,
 						looping = true,
+						isMusic = true,
 						entity = slasher,
 						volume = 0.8,
 						fadeIn = 1,
@@ -638,6 +643,7 @@ end
 function SLASHER.Animator(ply)
 	local tyler_creator = ply:GetNWBool("TylerTheCreator")
 	local tyler_creating = ply:GetNWBool("TylerCreating")
+	local tyler_endless = ply:GetNWBool("TylerEndlessChase")
 
 	if tyler_creator then
 		if not tyler_creating then
@@ -653,7 +659,11 @@ function SLASHER.Animator(ply)
 		end
 	else
 		if ply:GetVelocity():LengthSqr() > 5 then
-			ply.CalcSeqOverride = ply:LookupSequence("destroyer walk")
+			if tyler_endless then
+				ply.CalcSeqOverride = ply:LookupSequence("whatsgood")
+			else
+				ply.CalcSeqOverride = ply:LookupSequence("destroyer walk")
+			end
 		else
 			ply.CalcSeqOverride = ply:LookupSequence("destroyer activated")
 		end
