@@ -95,7 +95,7 @@ local function StopUmbraBeastMauling(slasher)
 		survivor:SetNWBool("SurvivorPounced", false) -- Clear the pounced state off of the survivor.
 		survivor:Freeze(false)	-- Unfreeze the survivor who was pounced.
 
-		slasher:SetCollisionGroup(1) -- We need to remove the collisions for a second.
+		slasher:SetImpervious(true) -- We need to remove the collisions for a second.
 
 		local pushDir = (survivor:GetPos() - slasher:GetPos()):GetNormalized()
 
@@ -104,7 +104,7 @@ local function StopUmbraBeastMauling(slasher)
 
 	-- Unfreeze the slasher after a lil bit, don't leave him softlocked...
 	timer.Simple(1.5, function()
-		slasher:SetCollisionGroup(15)
+		slasher:SetImpervious(false)
 		slasher:Freeze(false)
 	end)
 end
@@ -619,6 +619,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	if slasher:GetNWBool("UmbraBeastSlashing") then return end
 	if slasher:GetNWBool("UmbraBeastStunned") then return end
+	if slasher.Leaping then return end
 	if slasher.LeapHit then return end
 	if slasher.SlashCooldown > 0 then return end
 
@@ -829,7 +830,7 @@ hook.Add("Think", "UmbraBeastPounce", function()
 			if survivor:GetNWBool("SurvivorPounced") then
 				slasher:SetNWBool("UmbraBeastAnimateMauling", true)
 				timer.Create("UmbraBeastPounceDamage", 1, 0, function()
-					survivor:TakeDamage(10)
+					survivor:TakeDamage(10, slasher, slasher)
 					survivor:SetVelocity(Vector(0, 0, 0))
 					survivor:SetVelocity(-survivor:GetVelocity())
 					
@@ -857,8 +858,8 @@ hook.Add("Think", "UmbraBeastPounce", function()
 				survivor:SetNWBool("SurvivorPounced", false)
 				survivor:Freeze(false)
 				slasher:Freeze(false)
-				survivor:SetCollisionGroup(1)
-				slasher:SetCollisionGroup(1)
+				survivor:SetImpervious(true)
+				slasher:SetImpervious(true)
 				timer.Remove("UmbraBeastPounceDamage")
 				SlashCo.AudioSystem.StopSound("StanMauling", 0.1, slasher)
 
@@ -871,8 +872,8 @@ hook.Add("Think", "UmbraBeastPounce", function()
 					slasher.LeapHit = false
 				end
 				timer.Simple(3, function()
-					survivor:SetCollisionGroup(15)
-					slasher:SetCollisionGroup(15)
+					survivor:SetImpervious(false)
+					slasher:SetImpervious(false)
 				end)
 			end)
 			break
