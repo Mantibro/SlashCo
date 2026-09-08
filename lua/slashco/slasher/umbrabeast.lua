@@ -744,9 +744,9 @@ end
 hook.Add("Think", "StanLeapCharge", function()
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if not IsValid(slasher) then continue end
-		if slasher:GetVelocity():Length() > 100 then return end
-		if slasher:GetNWBool("UmbraBeastStalk") then return end
-		if slasher:GetNWString("Slasher") ~= "UmbraBeast" then return end
+		if slasher:GetVelocity():Length() > 100 then continue end
+		if slasher:GetNWBool("UmbraBeastStalk") then continue end
+		if slasher:GetNWString("Slasher") ~= "UmbraBeast" then continue end
 
 		if slasher:Crouching() and (slasher.LeapCooldown or 10) <= 0 then
 			if not slasher.LeapChargeStart then
