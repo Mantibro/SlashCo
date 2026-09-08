@@ -32,22 +32,6 @@ function ENT:SetColaVelocity(velocity)
 	self.DONTPICKUP = true -- Block being picked up again
 end
 
-function ENT:WarningSound()
-	timer.Simple(1.5, function()
-		if not IsValid(self) then return end
-
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/items/coca/cocacolawarning.mp3",
-			identifier = "CocaColaWarning",
-			minDistance = 500,
-			maxDistance = 2000,
-			entity = self,
-			volume = 1,
-			fadeIn = 0,
-		})
-	end)
-end
-
 function ENT:Explode()
 	self.Exploded = true
 
@@ -62,12 +46,17 @@ function ENT:Explode()
 	})
 
 	local pos = self:GetPos()
-	for _, ply in ipairs(SlashCo.FindPlayersInRange(pos, 400, nil, self)) do
+	for _, ply in ipairs(SlashCo.FindPlayersInRange(pos, 200, nil, self)) do
 		local team = ply:Team()
 
 		if team == TEAM_SURVIVOR then
 			ply:TakeDamage(30, self, self)
+			if ply:Alive() then
+				ply:AddEffect("Slowness", 9)
+			end
 		elseif team == TEAM_SLASHER then
+			if ply:GetNWBool("PainisRage") then return end
+
 			ply:Freeze(true)
 		end
 
@@ -76,9 +65,14 @@ function ENT:Explode()
 
 			ply:Freeze(false)
 		end)
+	end
 
-		if ply:Alive() then
-			ply:AddEffect("Slowness", 9)
+	local find = ents.FindInSphere(self:GetPos(), 500)
+	for f = 1, #find do
+		local ent = find[f]
+
+		if ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer" then
+			ent:SetVelocity(self:GetPos() * 500)
 		end
 	end
 
@@ -90,6 +84,28 @@ function ENT:Explode()
 	SlashCo.AudioSystem.StopSound("CocaColaPuddle", 0, ply)
 
 	self:Remove()
+end
+
+function ENT:WarningSound()
+	timer.Simple(0.1, function()
+		if not IsValid(self) then return end
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/items/coca/cocacolawarning.mp3",
+			identifier = "CocaColaWarning",
+			minDistance = 500,
+			maxDistance = 2000,
+			entity = self,
+			volume = 1,
+			fadeIn = 0,
+		})
+	end)
+
+	timer.Simple(1.5, function()
+		if not IsValid(self) then return end
+
+		self:Explode()
+	end)
 end
 
 function ENT:PhysicsCollide(data)
@@ -105,10 +121,4 @@ function ENT:PhysicsCollide(data)
 		volume = 0.5,
 		fadeIn = 0,
 	})
-
-	timer.Simple(3, function()
-		if not IsValid(self) then return end
-
-		self:Explode()
-	end)
 end

@@ -35,7 +35,7 @@ function ITEM.OnUse(ply)
 
 		ply:ViewPunch(Angle(-10, 0, 0))
 		local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
-		droppeditem:SetColaVelocity(ply:GetAimVector() * 150)
+		droppeditem:SetColaVelocity(ply:GetAimVector() * 550)
 		SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
 		droppeditem:SetOwner(ply)
 		droppeditem:WarningSound()
@@ -54,7 +54,7 @@ ITEM.ViewModel = {
 	model = ITEM.Model,
 	pos = Vector(64, 0, -6),
 	angle = Angle(-40, -90, -120),
-	size = Vector(0.5, 0.5, 0.5),
+	size = Vector(0.7, 0.7, 0.7),
 	color = color_white,
 	surpresslightning = false,
 	material = "",
