@@ -57,6 +57,10 @@ local function StopBreathing(slasher)
 	SlashCo.AudioSystem.StopSound("TrollgeBreath", 0.5, slasher)
 end
 
+local function StopStage1(slasher)
+	SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
+end
+
 local function PlayTransition(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/trollge/trollge_transition.mp3",
@@ -218,7 +222,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("TrollgeTransition", true)
 		slasher:SetNWBool("TrollgePhase2Swap", true)
 		slasher:Freeze(true)
-		SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
+		StopStage1(slasher)
 		PlayTransition(slasher)
 
 		for _, ply in player.Iterator() do
@@ -229,7 +233,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if not IsValid(slasher) then return end
 
 			--transit
-			SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
+			StopStage1(slasher)
 			slasher.TrollgeStage = 2
 			slasher:SetNWBool("TrollgeTransition", false)
 			slasher:SetNWBool("TrollgePhase2Swap", false)
@@ -300,7 +304,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			slasher.TrollgeDashing = Dashing + 1
 
-			if target:IsValid() and not target:IsPlayer() then
+			if target:IsValid() and not (target:GetClass() == "prop_ragdoll" or target:IsPlayer()) then
 				stopDash(slasher)
 				slasher:SetNWBool("TrollgeDashHitWall", true)
 			end
@@ -347,7 +351,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	for f = 1, #find do
 		local ent = find[f]
 
-		if ent:GetClass() == "sc_balkanboost" then
+		if ent:GetClass() == "sc_balkanboost" and not slasher:GetNWBool("TrollgeStage2") and not slasher:GetNWBool("TrollgeBalkanSwap") then
 			--WHAT HAVE YOU DONE...
 			ent:Remove()
 			slasher.TrollgeBlood = 8
@@ -355,6 +359,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("TrollgeBalkanSwap", true)
 			slasher:Freeze(true)
 			StopBreathing(slasher)
+			StopStage1(slasher)
 	 		PlayTransition(slasher)
 
 			for _, ply in player.Iterator() do
@@ -366,6 +371,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				--transit
 				StopBreathing(slasher)
+				StopStage1(slasher)
 				slasher.TrollgeStage = 2
 				slasher:SetNWBool("TrollgeTransition", false)
 				slasher:SetNWBool("TrollgeBalkanSwap", false)
@@ -660,7 +666,7 @@ function SLASHER.Animator(ply)
 	local trollge_swap_balkan = ply:GetNWBool("TrollgeBalkanSwap")
 	local trollge_stun = ply:GetNWBool("TrollgeStun")
 
-	if not trollge_slashing and not trollge_swap1 and not trollge_swap2 and not trollge_swap_balkan and not trollge_dashing_hitply and not trollge_dashing_hitwall and not trollge_dashing_nohit then
+	if not trollge_slashing and not trollge_swap1 and not trollge_swap2 and not trollge_swap_balkan then
 		ply.anim_antispam = false
 	end
 
@@ -739,23 +745,20 @@ function SLASHER.Animator(ply)
 	end
 
 	if trollge_dashend then
-		if (trollge_dashing_hitply and not trollge_dashend_hitply) and not ply.anim_antispam then
+		if trollge_dashing_hitply and not trollge_dashend_hitply then
 			ply.CalcSeqOverride = ply:LookupSequence("dash_all_hit")
-			ply.anim_antispam = true
 		elseif trollge_dashend_hitply then
 			ply.CalcSeqOverride = ply:LookupSequence("dash_all_loop_hit")
 		end
 
-		if (trollge_dashing_hitwall and not trollge_dashend_hitwall) and not ply.anim_antispam then
+		if trollge_dashing_hitwall and not trollge_dashend_hitwall then
 			ply.CalcSeqOverride = ply:LookupSequence("dash_all_hitwall")
-			ply.anim_antispam = true
 		elseif trollge_dashend_hitwall then
 			ply.CalcSeqOverride = ply:LookupSequence("dash_all_loop_stun")
 		end
 
-		if (trollge_dashing_nohit and not trollge_dashend_nohit) and not ply.anim_antispam then
+		if trollge_dashing_nohit and not trollge_dashend_nohit then
 			ply.CalcSeqOverride = ply:LookupSequence("dash_all_hitair")
-			ply.anim_antispam = true
 		elseif trollge_dashend_nohit then
 			ply.CalcSeqOverride = ply:LookupSequence("dash_all_loop_stun")
 		end
