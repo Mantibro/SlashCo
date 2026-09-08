@@ -141,10 +141,14 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetBodygroup(1, 0)
 	end
 
-	if slasher.EatedHotdogs >= 1 then
-		PlayNausea(slasher)
+	if slasher.EatedHotdogs > 0 then
+		if slasher.NauseaSound == nil then
+			PlayNausea(slasher)
+			slasher.NauseaSound = true
+		end
 	else
 		StopNausea(slasher)
+		slasher.NauseaSound = nil
 	end
 
 	local find2 = ents.FindInSphere(slasher:GetPos(), 120)
@@ -550,19 +554,7 @@ function SLASHER.InitHud(_, hud)
 	hud:AddMeter("nausea", 3, "", nil, true)
 	hud:TieMeterInt("nausea", "VomitAmount", true)
 
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-
-		if GameData.LocalPlayer:GetNWBool("HotdoginHand") then
-			draw.SimpleText("EAT THE HOTDOG! ! !", "ItemFontTip", ScrW() / 2, ScrH() / 4,
-					Color(255, 0, 0, 255),
-					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-		end
-	end)
-
+	local EatColor = Color(255, 0, 0, 255)
 	function hud.AlsoThink()
 		local hotdog = GameData.LocalPlayer:GetNWBool("HotdoginHand")
 		local vomit = GameData.LocalPlayer:GetNWInt("VomitAmount")
@@ -580,6 +572,17 @@ function SLASHER.InitHud(_, hud)
 			hud:SetControlEnabled("RMB", false)
 			hud:SetControlEnabled("F", false)
 		end
+
+		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
+				return
+			end
+
+			if GameData.LocalPlayer:GetNWBool("HotdoginHand") then
+				draw.SimpleText("EAT THE HOTDOG! ! !", "TVCD", ScrW() / 2, 750, EatColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			end
+		end)
 	end
 end
 
