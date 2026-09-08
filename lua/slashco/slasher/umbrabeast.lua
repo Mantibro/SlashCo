@@ -777,7 +777,7 @@ hook.Add("Think", "UmbraBeastPounce", function()
 	for _, slasher in ipairs(player.GetAll()) do
 		if not slasher.Leaping then continue end
 		if not IsValid(slasher) then continue end
-		if slasher:GetNWString("Slasher") ~= "UmbraBeast" then return end
+		if slasher:GetNWString("Slasher") ~= "UmbraBeast" then continue end
 
 		slasher:SetNWBool("UmbraBeastAnimateLeap", true)
 
