@@ -794,6 +794,8 @@ hook.Add("Think", "UmbraBeastPounce", function()
 			if not survivor:IsPlayer() then continue end
 			if survivor:Team() ~= TEAM_SURVIVOR then continue end
 			if survivor:GetNWBool("SurvivorPounced") then continue end
+			local vehicle = survivor:GetVehicle()
+			if IsValid(vehicle) and vehicle.IsHelicopterSeat then continue end
 
 			-- Pounced a guy.
 			slasher:SetNWBool("UmbraBeastAnimateLeap", false)
