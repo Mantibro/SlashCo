@@ -421,6 +421,16 @@ local function targetPaint(ply)
 	cam.End3D()
 end
 
+function SLASHER.DrawHUD(localPly)
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not survivor:GetNWBool("SurvivorAlert") then
+			continue
+		end
+
+		targetPaint(survivor)
+	end
+end)
+
 local hideIcons = {
 	["default"] = Material("slashco/ui/icons/slasher/dolphinman"),
 	["unhide"] = Material("slashco/ui/icons/slasher/watcher_a1"),
@@ -461,21 +471,6 @@ function SLASHER.InitHud(_, hud)
 			hud:SetControlVisible("F", false)
 		end
 	end
-
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-
-		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not survivor:GetNWBool("SurvivorAlert") then
-				continue
-			end
-
-			targetPaint(survivor)
-		end
-	end)
 end
 
 if CLIENT then

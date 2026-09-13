@@ -253,30 +253,25 @@ function SLASHER.InitHud(_, hud)
 	hud:SetTitle("CovenantCloak")
 
 	hud:AddControl("LMB", "tackle", Material("slashco/ui/icons/slasher/unknown"))
+end
 
-	local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
+local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
+function SLASHER.DrawHUD(localPly)
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not survivor:CanBeSeen() then
+			continue
 		end
 
-		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not survivor:CanBeSeen() then
-				continue
-			end
+		if survivor:GetNWBool("MarkedByCloaks") then
+			local pos = survivor:WorldSpaceCenter():ToScreen()
 
-			if survivor:GetNWBool("MarkedByCloaks") then
-				local pos = survivor:WorldSpaceCenter():ToScreen()
-
-				if pos.visible then
-					surface.SetDrawColor(255, 255, 255, 60)
-					surface.SetMaterial(cloakNoticeIcon)
-					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
-				end
+			if pos.visible then
+				surface.SetDrawColor(255, 255, 255, 60)
+				surface.SetMaterial(cloakNoticeIcon)
+				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 			end
 		end
-	end)
+	end
 end
 
 SlashCo.RegisterSlasher(SLASHER, "CovenantCloak")

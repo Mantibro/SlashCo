@@ -196,6 +196,12 @@ hook.Add("FinishMove", "SlashCo:SlasherFinishMove", function(ply, mv)
 	return ply:SlasherFunction("FinishMove", mv)
 end)
 
+hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+	local localPly = GameData.LocalPlayer
+	if localPly:Team() ~= TEAM_SLASHER then return end
+	return localPly:SlasherFunction("DrawHUD", localPly.SlasherHud)
+end)
+
 if CLIENT then
 	local StepNotice = Material("slashco/ui/particle/step_notice")
 	local timeSinceLast = 0

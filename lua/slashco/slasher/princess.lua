@@ -801,20 +801,6 @@ function SLASHER.InitHud(_, hud)
 
 		local inaccuracy = math.max(self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) / 12, 50)
 		self.SniffRandom = VectorRand(-inaccuracy, inaccuracy)
-		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER or not self.SniffPos or self.SniffPos:Distance(GameData.LocalPlayer:GetPos()) < 150 then
-				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-				return
-			end
-
-			local screenPos = (self.SniffPos + self.SniffRandom):ToScreen()
-			local xClamp = math.Clamp(screenPos.x, 200, ScrW() - 200)
-			local yClamp = math.Clamp(screenPos.y, 200, ScrH() - 200)
-
-			surface.SetDrawColor(255, 255, 255, 255)
-			surface.SetMaterial(self.SniffIcon)
-			surface.DrawTexturedRect(xClamp - ScrW() / 64, yClamp - ScrW() / 64, ScrW() / 32, ScrW() / 32)
-		end)
 	end
 
 	hud.prevThresh = -1
@@ -826,6 +812,21 @@ function SLASHER.InitHud(_, hud)
 		end
 	end
 end
+
+function SLASHER.DrawHUD(localPly. hud)
+	if not hud.SniffPos or hud.SniffPos:Distance(localPly:GetPos()) < 150 then
+		return
+	end
+
+	local screenPos = (hud.SniffPos + hud.SniffRandom):ToScreen()
+	local xClamp = math.Clamp(screenPos.x, 200, ScrW() - 200)
+	local yClamp = math.Clamp(screenPos.y, 200, ScrH() - 200)
+	local scrW = ScrW()
+
+	surface.SetDrawColor(255, 255, 255, 255)
+	surface.SetMaterial(hud.SniffIcon)
+	surface.DrawTexturedRect(xClamp - scrW / 64, yClamp - scrW / 64, scrW / 32, scrW / 32)
+end)
 
 function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_baby"), nil, 2, false)

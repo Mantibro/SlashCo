@@ -358,43 +358,38 @@ function SLASHER.InitHud(_, hud)
 	function hud.TitleCard.Label:PaintOver()
 		draw.SimpleText("STALK TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("WatcherStalkTime"), 1), "TVCD", 4, 18, red)
 	end
-
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-
-		if GameData.LocalPlayer:GetNWBool("WatcherWatched") then
-			draw.SimpleText("YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
-					Color(255, 0, 0, 255),
-					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-		end
-
-		if GameData.LocalPlayer:GetNWBool("WatcherStalking") then
-			draw.SimpleText("OBSERVING A SURVIVOR. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
-					Color(255, 0, 0, 255),
-					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-		end
-
-		surface.SetDrawColor(255, 255, 255, 255)
-		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not survivor:GetNWBool("SurvivorWatcherSurveyed") then
-				continue
-			end
-
-			if not survivor:CanBeSeen() then
-				continue
-			end
-
-			local pos = survivor:EyePos():ToScreen()
-			if pos.visible then
-				surface.SetMaterial(surveyNoticeIcon)
-				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
-			end
-		end
-	end)
 end
+
+function SLASHER.DrawHUD(localPly)
+	if localPly:GetNWBool("WatcherWatched") then
+		draw.SimpleText("YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+				Color(255, 0, 0, 255),
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	end
+
+	if localPly:GetNWBool("WatcherStalking") then
+		draw.SimpleText("OBSERVING A SURVIVOR. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+				Color(255, 0, 0, 255),
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	end
+
+	surface.SetDrawColor(255, 255, 255, 255)
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not survivor:GetNWBool("SurvivorWatcherSurveyed") then
+			continue
+		end
+
+		if not survivor:CanBeSeen() then
+			continue
+		end
+
+		local pos = survivor:EyePos():ToScreen()
+		if pos.visible then
+			surface.SetMaterial(surveyNoticeIcon)
+			surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
+		end
+	end
+end)
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()

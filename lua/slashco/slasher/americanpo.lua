@@ -838,26 +838,21 @@ function SLASHER.InitHud(_, hud)
 
 		hud:SetControlIcon("F", stateIcon)
 	end
-
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-
-		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not survivor:GetNWBool("SurvivorFueled") then
-				continue
-			end
-
-			if not survivor:CanBeSeen() then
-				continue
-			end
-
-			targetPaint(survivor)
-		end
-	end)
 end
+
+function SLASHER.DrawHUD(localPly)
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not survivor:GetNWBool("SurvivorFueled") then
+			continue
+		end
+
+		if not survivor:CanBeSeen() then
+			continue
+		end
+
+		targetPaint(survivor)
+	end
+end)
 
 if CLIENT then
 	hook.Add("Tick", "PoLight", function()

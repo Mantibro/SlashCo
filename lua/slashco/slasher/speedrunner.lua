@@ -330,19 +330,6 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddMeter("speed", 235, "", nil, true)
 	hud:TieMeterInt("speed", "SpeedrunnerSpeed")
-	
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-		
-		if GameData.LocalPlayer:GetNWBool("SpeedrunnerMining") then
-			draw.SimpleText("MINING ORE . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
-					Color(255, 0, 0, 255),
-					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-		end
-	end)
 
 	hud.prevSac1 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeOne")
 	hud.prevSac2 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeTwo")
@@ -377,6 +364,14 @@ function SLASHER.InitHud(_, hud)
 				hud.SpeedGo = false
 			end
 		end
+	end
+end
+
+function SLASHER.DrawHUD(localPly)
+	if localPly:GetNWBool("SpeedrunnerMining") then
+		draw.SimpleText("MINING ORE . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+				Color(255, 0, 0, 255),
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 end
 

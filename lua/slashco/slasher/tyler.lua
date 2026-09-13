@@ -698,6 +698,7 @@ local manifestTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
+local state = TYLER_SPECTER
 function SLASHER.InitHud(_, hud)
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Tyler_creator")
@@ -715,7 +716,7 @@ function SLASHER.InitHud(_, hud)
 	hud.prevWater = -1
 	local HuntTimeColor = Color(255, 0, 0, 255)
 	function hud.AlsoThink()
-		local state = GameData.LocalPlayer:GetNWInt("TylerState")
+		state = GameData.LocalPlayer:GetNWInt("TylerState")
 		if state == TYLER_SPECTER then
 			local isInWater = GameData.LocalPlayer:WaterLevel() > 1
 			if hud.prevWater ~= isInWater then
@@ -761,25 +762,6 @@ function SLASHER.InitHud(_, hud)
 			hud.prevState = state
 		end
 
-		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-				return
-			end
-
-			if state == TYLER_DESTROYER then
-				local HuntTime = GameData.LocalPlayer:GetNWInt("TylerHuntTime")
-				if HuntTime > 0 then -- In Lua "if 0 then" is still true.
-					draw.SimpleText("HUNT TIME: " .. math.Round(HuntTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-				end
-			else
-				local HideTime = GameData.LocalPlayer:GetNWInt("TylerHideTime")
-				if HideTime > 0 then
-					draw.SimpleText("HIDE TIME: " .. math.Round(HideTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-				end
-			end
-		end)
-
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
 		local class = IsValid(target) and target:GetClass()
 		if IsValid(target) and target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon")
@@ -805,6 +787,20 @@ function SLASHER.InitHud(_, hud)
 				hud:SetCrosshairAlpha(0)
 				hud.destroyEnabled = nil
 			end
+		end
+	end
+end
+
+function SLASHER.DrawHUD(localPly)
+	if state == TYLER_DESTROYER then
+		local HuntTime = localPly:GetNWInt("TylerHuntTime")
+		if HuntTime > 0 then -- In Lua "if 0 then" is still true.
+			draw.SimpleText("HUNT TIME: " .. math.Round(HuntTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		end
+	else
+		local HideTime = localPly:GetNWInt("TylerHideTime")
+		if HideTime > 0 then
+			draw.SimpleText("HIDE TIME: " .. math.Round(HideTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 		end
 	end
 end

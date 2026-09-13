@@ -988,23 +988,19 @@ function SLASHER.InitHud(_, hud)
 			hud:SetControlEnabled("R", true)
 		end
 	end
-
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		local target = GameData.LocalPlayer:GetNWEntity("ManspiderTarget")
-		if not IsValid(target) then return end -- RaphaelIT7: The hook is not removed since the player/target could be outside the PVS/not yet networked
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-
-		targetPaint(target)
-
-		local distColor = math.Clamp(GameData.LocalPlayer:GetPos():Distance(target:GetPos()), 0, 2048) / 16
-		draw.SimpleText("Your prey: " .. target:Name(), "ItemFontTip",
-				ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
-				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	end)
 end
+
+function SLASHER.DrawHUD(localPly)
+	local target = localPly:GetNWEntity("ManspiderTarget")
+	if not IsValid(target) then return end -- RaphaelIT7: The hook is not removed since the player/target could be outside the PVS/not yet networked
+
+	targetPaint(target)
+
+	local distColor = math.Clamp(localPly:GetPos():Distance(target:GetPos()), 0, 2048) / 16
+	draw.SimpleText("Your prey: " .. target:Name(), "ItemFontTip",
+			ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
+			TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+end)
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()

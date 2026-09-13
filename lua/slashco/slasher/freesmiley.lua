@@ -381,30 +381,26 @@ function SLASHER.InitHud(_, hud)
 			hud.prevDealAllow = false
 		end
 	end
+end
 
-	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
+local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+function SLASHER.DrawHUD(localPly)
+	local scrW = ScrW()
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not survivor:CanBeSeen() then
+			continue
 		end
 
-		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not survivor:CanBeSeen() then
-				continue
-			end
+		if survivor:GetNWBool("MarkedBySmiley") then
+			local pos = survivor:WorldSpaceCenter():ToScreen()
 
-			if survivor:GetNWBool("MarkedBySmiley") then
-				local pos = survivor:WorldSpaceCenter():ToScreen()
-
-				if pos.visible then
-					surface.SetDrawColor(255, 255, 255, 60)
-					surface.SetMaterial(surveyNoticeIcon)
-					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
-				end
+			if pos.visible then
+				surface.SetDrawColor(255, 255, 255, 60)
+				surface.SetMaterial(surveyNoticeIcon)
+				surface.DrawTexturedRect(pos.x - scrW / 32, pos.y - scrW / 32, scrW / 16, scrW / 16)
 			end
 		end
-	end)
+	end
 end
 
 function SLASHER.SmileyIdle(slasher)

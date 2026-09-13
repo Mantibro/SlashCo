@@ -916,7 +916,7 @@ local function UpdateBackgroundMusic()
 	end
 end
 
-function CalculatePan(ply, channelPos)
+local function CalculatePan(ply, channelPos)
 	if not SlashCo.AudioSystem.ValidLocalPlayer then
 		return 0
 	end
