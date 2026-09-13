@@ -30,6 +30,7 @@ SLASHER.EyeRating = "★☆☆☆☆"
 SLASHER.DiffRating = "★☆☆☆☆"
 SLASHER.CustomBackgroundMusic = true
 SLASHER.AngerIncrease = 10 -- Anger increase by punching and kicking people.
+SLASHER.AngerDecrease = -25 -- Anger decrease by kicking.
 SLASHER.AngerPassiveGain = 0
 SLASHER.AngerChaseGain = 0.01
 -- Balancement Vars
@@ -339,6 +340,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher.BorgKicking = true
 		timer.Remove("BorgmireKickDecay")
 		slasher.KickCooldown = 15 - (SlashCo.GetSlasherAnger(slasher) / 10)
+		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerDecrease) -- Drain Anger when using Kick
 
 		timer.Simple(2.0, function()
 			local idx = math.random(1, 2)

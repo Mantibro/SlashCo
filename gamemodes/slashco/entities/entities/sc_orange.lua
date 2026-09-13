@@ -5,10 +5,11 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "Orange"
 ENT.ClassName = "sc_orange"
 
-function ENT:Initialize()
+function ENT:Initialize(ply)
 	self:SetModel("models/slashco/items/annoyingorange.mdl")
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
+	self.Owner = ply -- Assign owner
 end
 
 function ENT:SetOrangeVelocity(velocity)
@@ -32,7 +33,7 @@ function ENT:SetOrangeVelocity(velocity)
 	self.DONTPICKUP = true -- Block being picked up again
 end
 
-function ENT:Explode()
+function ENT:Explode(slasher)
 	self.Exploded = true
 
 	SlashCo.AudioSystem.PlaySound({
@@ -58,34 +59,48 @@ function ENT:Explode()
 	})
 
 	local pos = self:GetPos()
-	for _, ply in ipairs(SlashCo.FindPlayersInRange(pos, 200, nil, self)) do
-		local team = ply:Team()
-		if team == TEAM_SURVIVOR then
-			ply:TakeDamage(90, self, self)
-		elseif team == TEAM_SLASHER then
-			ply:SlasherStunDeafen(5)
-			ply:SetNWBool("OrangeBlur", true)
-		end
+	local players = {}
 
-		timer.Simple(5, function()
-			if not IsValid(ply) then return end
+	-- Assign owner to table
+	if IsValid(self.Owner) then
+		table.insert(players, self.Owner)
+	end
 
-			ply:SetNWBool("OrangeBlur", false)
-		end)
+	-- Assign slasher(s) to table
+	if IsValid(slasher) and slasher:Team() == TEAM_SLASHER then
+		table.insert(players, slasher)
+	end
 
-		ply:SetVelocity((self:GetForward() * 600) + Vector(0, 0, 400))
+	for _, ply in ipairs(players) do
+		if ply:GetPos():DistToSqr(pos) <= 200 ^ 2 then
+			local team = ply:Team()
+			if team == TEAM_SURVIVOR then
+				ply:TakeDamage(90, self, self)
+			elseif team == TEAM_SLASHER then
+				ply:SlasherStunDeafen(5)
+				ply:SetNWBool("OrangeBlur", true)
+			end
 
-		if ply:Alive() then
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/beerkeg_tinnitus.ogg",
-				identifier = "OrangeTinnitus",
-				looping = true,
-				volume = 1,
-				fadeIn = 0,
-				fadeOut = 2,
-				fadeOutStart = 3,
-				sendToEntity = ply,
-			})
+			timer.Simple(5, function()
+				if not IsValid(ply) then return end
+
+				ply:SetNWBool("OrangeBlur", false)
+			end)
+
+			ply:SetVelocity((self:GetForward() * 600) + Vector(0, 0, 400))
+
+			if ply:Alive() then
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/beerkeg_tinnitus.ogg",
+					identifier = "OrangeTinnitus",
+					looping = true,
+					volume = 1,
+					fadeIn = 0,
+					fadeOut = 2,
+					fadeOutStart = 3,
+					sendToEntity = ply,
+				})
+			end
 		end
 	end
 
@@ -97,7 +112,7 @@ function ENT:PhysicsCollide(data)
 	if not self.EnableExposion then return end
 
 	if IsValid(data.HitEntity) and data.HitEntity:IsPlayer() and data.HitEntity:Team() == TEAM_SLASHER then
-		self:Explode()
+		self:Explode(data.HitEntity)
 	end
 
 	timer.Simple(2, function()
