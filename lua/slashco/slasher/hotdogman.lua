@@ -579,7 +579,7 @@ function SLASHER.DrawHUD(localPly)
 	if localPly:GetNWBool("HotdoginHand") then
 		draw.SimpleText("EAT THE HOTDOG! ! !", "TVCD", ScrW() / 2, 750, EatColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
-end)
+end
 
 function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_hotdog"), nil, 2, false)

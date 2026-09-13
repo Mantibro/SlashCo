@@ -813,7 +813,7 @@ function SLASHER.InitHud(_, hud)
 	end
 end
 
-function SLASHER.DrawHUD(localPly. hud)
+function SLASHER.DrawHUD(localPly, hud)
 	if not hud.SniffPos or hud.SniffPos:Distance(localPly:GetPos()) < 150 then
 		return
 	end
@@ -826,7 +826,7 @@ function SLASHER.DrawHUD(localPly. hud)
 	surface.SetDrawColor(255, 255, 255, 255)
 	surface.SetMaterial(hud.SniffIcon)
 	surface.DrawTexturedRect(xClamp - scrW / 64, yClamp - scrW / 64, scrW / 32, scrW / 32)
-end)
+end
 
 function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_baby"), nil, 2, false)

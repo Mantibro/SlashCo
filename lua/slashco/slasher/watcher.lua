@@ -389,7 +389,7 @@ function SLASHER.DrawHUD(localPly)
 			surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 		end
 	end
-end)
+end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
