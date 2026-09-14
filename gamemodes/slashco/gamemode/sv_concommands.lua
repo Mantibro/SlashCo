@@ -233,6 +233,25 @@ concommand.Add("slashco_run_curconfig", function(ply)
 	SlashCo.StartRound()
 end, nil, "Start a normal round with current configs.", FCVAR_PROTECTED)
 
+concommand.Add("slashco_debug_helicopter", function(ply)
+	if IsValid(ply) and not ply:IsAdmin() then return end
+
+	SlashCo.SummonEscapeHelicopter()
+end, nil, "Summon the helicopter.", FCVAR_PROTECTED)
+
+concommand.Add("slashco_debug_progress", function(ply, cmd, args)
+	if IsValid(ply) and not ply:IsAdmin() then return end
+
+	local GameProgress = tonumber(args[1])
+
+	if not GameProgress then
+		print("Usage: slashco_debug_progress <number>")
+		return
+	end
+
+	SlashCo.CurRound.GameProgress = GameProgress
+end, nil, "Set the progress of the game.", FCVAR_PROTECTED)
+
 concommand.Add("slashco_debug_itempicker", function(ply)
 	if not IsValid(ply) or not ply:IsPlayer() then
 		return
