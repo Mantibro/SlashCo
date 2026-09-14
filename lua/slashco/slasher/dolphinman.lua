@@ -429,7 +429,7 @@ function SLASHER.DrawHUD(localPly)
 
 		targetPaint(survivor)
 	end
-end)
+end
 
 local hideIcons = {
 	["default"] = Material("slashco/ui/icons/slasher/dolphinman"),

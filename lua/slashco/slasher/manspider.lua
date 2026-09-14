@@ -1000,7 +1000,7 @@ function SLASHER.DrawHUD(localPly)
 	draw.SimpleText("Your prey: " .. target:Name(), "ItemFontTip",
 			ScrW() / 2, ScrH() / 2, Color(255 - distColor, 0, 0, 255),
 			TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-end)
+end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()

@@ -852,7 +852,7 @@ function SLASHER.DrawHUD(localPly)
 
 		targetPaint(survivor)
 	end
-end)
+end
 
 if CLIENT then
 	hook.Add("Tick", "PoLight", function()
