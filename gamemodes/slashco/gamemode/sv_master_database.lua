@@ -222,7 +222,12 @@ function SlashCoDatabase.GetStat(steamid, statType)
 	end
 
 	local database = sql.Query("SELECT " .. statType .. " FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")
-	return (database[1][statType] and database[1][statType] ~= "NULL") and database[1][statType] or (validStats[statType] == "number" and 0 or "")
+	if not database or not database[1] then
+		print("[SlashCo] Failed to find \"" .. statType .. " for player \"" .. steamid .. "\" returning default!")
+		database = nil -- So that the below check fails
+	end
+
+	return (database and database[1][statType] and database[1][statType] ~= "NULL") and database[1][statType] or (validStats[statType] == "number" and 0 or "")
 end
 
 function SlashCoDatabase.OnPlayerJoined(steamid)

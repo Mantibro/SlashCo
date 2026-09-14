@@ -561,6 +561,7 @@ hook.Add("PlayerInitialSpawn", "SlashCo:PlayerInitialSpawn", function(ply)
 			SlashCo.DropAllItems(ply)
 			SlashCo.ChangeSurvivorItem(ply, "item", itemEntry.Item, true)
 			SlashCo.ChangeSurvivorItem(ply, "item2", itemEntry.Item2, true)
+			GameData.SurvivorData[steamID] = nil
 		end
 	end)
 end)
