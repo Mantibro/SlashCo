@@ -9,7 +9,7 @@ function ENT:Initialize(ply)
 	self:SetModel("models/slashco/items/annoyingorange.mdl")
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
-	self.Owner = ply -- Assign owner
+	self:SetOwner(ply) -- Assign owner
 end
 
 function ENT:SetOrangeVelocity(velocity)
@@ -62,7 +62,7 @@ function ENT:Explode(slasher)
 	local players = {}
 
 	-- Assign owner to table
-	if IsValid(self.Owner) then
+	if IsValid(self:GetOwner()) then
 		table.insert(players, self.Owner)
 	end
 
