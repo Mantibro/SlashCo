@@ -5,12 +5,7 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "Brick"
 ENT.ClassName = "sc_brick"
 
-function ENT:Initialize()
-	self:SetModel("models/props_junk/cinderblock01a.mdl")
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-
+function ENT:PostInitialize()
 	self.HitObjects = {}
 end
 

@@ -24,7 +24,7 @@ function ITEM.OnUse(ply)
 
 	SlashCoSlashers.Thirsty.ThirstyRage(ply)
 
-	ply:AddEffect("Speed",SlashCo.GetConsumableEffectDuration(ply, 15))
+	ply:AddEffect("Speed", SlashCo.GetConsumableEffectDuration(ply, 15))
 end
 
 ITEM.ViewModel = {

@@ -5,11 +5,7 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "CocaCola"
 ENT.ClassName = "sc_cocacola"
 
-function ENT:Initialize()
-	self:SetModel("models/slashco/items/cocacola.mdl")
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-
+function ENT:PostInitialize()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/items/coca/cocacolastanding.mp3",
 		identifier = "CocaColaIdle",

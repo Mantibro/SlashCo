@@ -70,6 +70,10 @@ function GM:PlayerSpawnAsSpectator(ply)
 end
 
 hook.Add("PlayerNoClip", "SlashCo:PreventSpectators", function(ply)
+	if g_SlashCoDebug then
+		return true
+	end
+
 	-- RaphaelIT7: If map tools are enabled, the server host is always allowed to noclip to make things easier.
 	if ply:IsListenServerHost() and SlashCo.MapTools.IsEnabled(true) then
 		return true

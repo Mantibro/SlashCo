@@ -5,11 +5,7 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "BeerKeg"
 ENT.ClassName = "sc_beerkeg"
 
-function ENT:Initialize()
-	self:SetModel("models/slashco/beerkeg.mdl")
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-	
+function ENT:PostInitialize()
 	local phys = self:GetPhysicsObject()
 	if IsValid(phys) then
 		phys:EnableDrag(false)

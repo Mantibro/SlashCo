@@ -210,11 +210,13 @@ local function slamIndicator()
 	end
 
 	local lookent = GameData.LocalPlayer:GetEyeTrace().Entity
-	if not IsValid(lookent) or not SlashCo.IsValidDoor(lookent) then
-		return
-	end
 
-	if lookent:GetPos():Distance(GameData.LocalPlayer:GetPos()) >= 150 or SlashCo.IsDoorOpen(lookent) then
+	if not IsValid(lookent) then return end
+
+	lookent = SlashCo.GetValidDoor(lookent)
+	if not lookent then return end
+
+	if lookent:WorldSpaceCenter():Distance(GameData.LocalPlayer:GetPos()) >= 150 or SlashCo.IsDoorOpen(lookent) then
 		return
 	end
 

@@ -20,7 +20,7 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	ply:AddEffect("Buzzed",SlashCo.GetConsumableEffectDuration(ply, 45))
+	ply:AddEffect("Buzzed", SlashCo.GetConsumableEffectDuration(ply, 45))
 end
 
 ITEM.ViewModel = {

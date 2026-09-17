@@ -5,12 +5,6 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "Orange"
 ENT.ClassName = "sc_orange"
 
-function ENT:Initialize()
-	self:SetModel("models/slashco/items/annoyingorange.mdl")
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-end
-
 function ENT:SetOrangeVelocity(velocity)
 	local phys = self:GetPhysicsObject()
 	if IsValid(phys) then

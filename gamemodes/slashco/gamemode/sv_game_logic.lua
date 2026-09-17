@@ -379,7 +379,8 @@ function SlashCo.AwaitExpectedPlayers()
 		end
 	end
 
-	if expected_count == #SlashCo.CurRound.ExpectedPlayers then
+	-- RaphaelIT7: We do >= as in some rare case it may somehow be more?
+	if expected_count >= #SlashCo.CurRound.ExpectedPlayers then
 		if player.GetCount() < 2 then
 			SlashCo.Abort("Not enouth players to start a round")
 			return

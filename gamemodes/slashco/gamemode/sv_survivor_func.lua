@@ -423,9 +423,8 @@ local function slamDoor(door_ent, pos)
 end
 
 function PLAYER:SlamDoor(door_ent)
-	if not SlashCo.IsValidDoor(door_ent) then
-		return
-	end
+	door_ent = SlashCo.GetValidDoor(door_ent)
+	if not door_ent then return end
 
 	if SlashCo.IsDoorOpen(door_ent) then
 		return

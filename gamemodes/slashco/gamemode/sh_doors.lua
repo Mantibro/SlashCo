@@ -19,6 +19,21 @@ function SlashCo.IsValidDoor(ent)
 	return IsValid(ent) and SlashCo.ValidDoors[ent:GetClass()] or false
 end
 
+function SlashCo.GetValidDoor(ent)
+	if SlashCo.IsValidDoor(ent) then
+		return ent
+	end
+
+	-- RaphaelIT7: We check the parent so that a prop that got a func_door_rotating as a parent can also be slammed
+	local parent = ent:GetParent()
+	if not SlashCo.IsValidDoor(parent) then
+		return nil
+	end
+
+	return parent
+end
+
+local DOOR_NETWORK_SLOT = 31 -- we use the boolean slot 31 for networking the state
 function SlashCo.IsDoorOpen(ent)
 	local class = ent:GetClass()
 	if class ~= "prop_door_rotating" then
@@ -27,7 +42,9 @@ function SlashCo.IsDoorOpen(ent)
 		end
 
 		if CLIENT then
-			return ent:GetInternalVariable("m_toggle_state") ~= doorStates.DOOR_STATE_CLOSED
+			-- Gmod does not give access to m_toggle_state? (BUG?)
+			--return ent:GetInternalVariable("m_toggle_state") ~= doorStates.DOOR_STATE_CLOSED
+			return ent:GetDTBool(DOOR_NETWORK_SLOT)
 		end
 		-- For server we fall through down where it will use ent.IsOpen
 	end
@@ -53,6 +70,10 @@ end
 
 local function OnDoorStateChanged(door, state)
 	door.IsOpen = state
+
+	if door:GetClass() == "func_door_rotating" then
+		door:SetDTBool(DOOR_NETWORK_SLOT, state) -- RaphaelIT7: We use DT for this
+	end
 
 	if state then
 		DoorBreakRng(door)

@@ -14,7 +14,7 @@ hook.Add("SlashCo:Precache", "SlashCo:PrecacheLabMeat", function()
 	end
 end)
 
-function ENT:Initialize()
+function ENT:PostInitialize()
 	if SERVER then
 		self.ragdoll = ents.Create("prop_ragdoll")
 		self.ragdoll:SetModel("models/slashco/items/labmeat.mdl")
@@ -24,22 +24,11 @@ function ENT:Initialize()
 		self.ragdoll:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 		self.ragdoll:Spawn()
 		self.ragdoll:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
-
-		self:SetModel("models/slashco/items/labmeat.mdl")
-		self:SetSolid(SOLID_VPHYSICS)
-		self:PhysicsInit(SOLID_BBOX)
-		self:SetUseType(SIMPLE_USE)
-		self:SetCollisionGroup(COLLISION_GROUP_DISSOLVING) --Collide with nothing
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetNoDraw(true)
 	end
 
-	local phys = self:GetPhysicsObject()
-
-	if phys:IsValid() then
-		phys:Wake()
-	end
-
+	self:PhysicsInit(SOLID_BBOX)
+	self:SetCollisionGroup(COLLISION_GROUP_DISSOLVING) --Collide with nothing
+	self:SetNoDraw(true)
 	self.SoundTick = 0
 end
 

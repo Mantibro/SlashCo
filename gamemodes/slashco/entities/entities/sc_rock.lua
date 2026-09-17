@@ -31,20 +31,7 @@ function ENT:Orient()
 	end)
 end
 
-function ENT:Initialize()
-	if SERVER then
-		self:SetModel(SlashCoItems.Rock.Model)
-		self:SetSolid(SOLID_VPHYSICS)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetUseType(SIMPLE_USE)
-		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-	end
-
-	local phys = self:GetPhysicsObject()
-
-	if phys:IsValid() then phys:Wake() end
-
+function ENT:PostInitialize()
 	timer.Simple(math.random(5) + 5, function()
 		if not IsValid(self) or not self.Orient then
 			return

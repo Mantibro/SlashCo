@@ -1,7 +1,7 @@
 include("shared.lua")
 include("slashco/gamemode/items/items_init.lua")
 
--- RaphaelIT7: We must use _BOTH since some items may be translucent!
+-- RaphaelIT7: We must use TRANSLUCENT since some items may be translucent!
 SWEP.RenderGroup = RENDERGROUP_TRANSLUCENT
 
 function SWEP:Initialize()

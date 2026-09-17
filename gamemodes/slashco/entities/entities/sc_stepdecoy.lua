@@ -9,14 +9,8 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "StepDecoyActive")
 end
 
-function ENT:Initialize()
+function ENT:PostInitialize()
 	if SERVER then
-		self:SetModel(SlashCoItems.StepDecoy.Model)
-		self:SetSolid(SOLID_VPHYSICS)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetUseType(SIMPLE_USE)
-		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
-		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetStepDecoyActive(false)
 
 		self.steppa = ents.Create("prop_physics")
@@ -41,10 +35,6 @@ function ENT:Initialize()
 			self.steppa:SetPoseParameter("move_x", 1)
 			self.steppa:SetPlaybackRate(1)
 		end)
-	end
-
-	if self:GetPhysicsObject():IsValid() then
-		self:GetPhysicsObject():Wake()
 	end
 end
 
