@@ -56,7 +56,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("DolphinCanActivate", false)
 
 	slasher.HuntPower = 0
-	slasher.dolfin_final_antispam = nil
+	slasher.dolfin_final = nil
 end
 
 local function PlayCallSound(slasher)
@@ -81,38 +81,6 @@ local function PlayCallSound(slasher)
 		volume = 0.8,
 		fadeIn = 0,
 	})
-end
-
-local function PlayCallSoundFinal(slasher)
-	if slasher.dolfin_final_antispam == nil then
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/dolfin/dolfin_call.mp3",
-			identifier = "DolfinCall",
-			minDistance = 700 * SlashCo.MapSize,
-			maxDistance = 1240 * SlashCo.MapSize,
-			looping = true,
-			entity = slasher,
-			volume = 1,
-			fadeIn = 0,
-		})
-
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/dolfin/dolfin_call_far.mp3",
-			identifier = "DolfinCallFar",
-			minDistance = 1250 * SlashCo.MapSize,
-			maxDistance = 2250 * SlashCo.MapSize,
-			looping = true,
-			entity = slasher,
-			volume = 0.8,
-			fadeIn = 0,
-		})
-
-		slasher.dolfin_final_antispam = 0
-	end
-
-	if slasher.dolfin_final_antispam then
-		slasher.dolfin_final_antispam = slasher.dolfin_final_antispam + FrameTime()
-	end
 end
 
 local function DolphinHunt(slasher)
@@ -144,14 +112,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if SlashCo.CurRound.EscapeHelicopterSummoned then
-		slasher:SetNWBool("DolphinFound", false)
-		slasher:SetNWBool("DolphinInHiding", false)
-		slasher:SetNWBool("DolphinHunting", true)
-		slasher:SetNWBool("DolphinFinal", true)
-		slasher:SetNWBool("CanKill", true)
+	if SlashCo.CurRound.EscapeHelicopterSummoned and slasher.dolfin_final == nil then
+		slasher.dolfin_final = true
+		slasher.HuntPower = HuntPower + 50
 
-		PlayCallSoundFinal(slasher)
+		DolphinHunt(slasher)
 	end
 
 	if slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
@@ -189,17 +154,23 @@ function SLASHER.OnTickBehaviour(slasher)
 			DolphinHunt(slasher)
 		end
 
+		local SurvivorAlert = false
 		for _, alert_surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			local alert_area = SLASHER.AlertDistance + ((2 * HuntPower) + 100)
 
 			if alert_surv:GetPos():Distance(slasher:GetPos()) > alert_area then
 				alert_surv:SetNWBool("SurvivorAlert", false)
-				--slasher:SetNWBool("DolphinCanActivate", false)
 				continue
 			end
 
 			alert_surv:SetNWBool("SurvivorAlert", true)
+			SurvivorAlert = true
+		end
+
+		if SurvivorAlert then
 			slasher:SetNWBool("DolphinCanActivate", true)
+		else
+			slasher:SetNWBool("DolphinCanActivate", false)
 		end
 
 		if slasher:GetNWBool("CanKill") then
@@ -210,8 +181,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("CanKill", true)
 		end
 
-		if slasher:GetNWBool("DolphinCanActivate") then
-			slasher:SetNWBool("DolphinCanActivate", false)
+		if SurvivorAlert then
+			SurvivorAlert = false
 		end
 
 		for _, surv in player.Iterator() do
@@ -242,9 +213,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			hunt_boost = 1
 
 			--oh fuck i'm losing my hunt!!
-			if not SlashCo.CurRound.EscapeHelicopterSummoned then
-				slasher.HuntPower = HuntPower - (FrameTime() / SLASHER.HuntPowerDiv)
-			end
+			slasher.HuntPower = HuntPower - (FrameTime() / SLASHER.HuntPowerDiv)
 
 			--damn shit
 			if HuntPower <= 0 then
@@ -320,8 +289,6 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("DolphinFinal") then return end
-
 	if not slasher:GetNWBool("DolphinHunting") and not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
 		if not SlashCo.IsPositionLegalForSlashers(slasher:GetPos()) then return end
 
@@ -341,7 +308,6 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if slasher:GetNWBool("DolphinFinal") then return end
 	if slasher:GetNWBool("DolphinFound") then return end
 	if slasher:GetNWBool("DolphinHunting") then return end
 	if not slasher:GetNWBool("DolphinCanActivate") then return end
@@ -464,11 +430,6 @@ function SLASHER.InitHud(_, hud)
 		if hud.prevHide ~= hide then
 			hud:SetControlEnabled("R", hide)
 			hud.prevHide = hide
-		end
-
-		if GameData.LocalPlayer:GetNWBool("DolphinFinal") then
-			hud:SetControlVisible("R", false)
-			hud:SetControlVisible("F", false)
 		end
 	end
 end
