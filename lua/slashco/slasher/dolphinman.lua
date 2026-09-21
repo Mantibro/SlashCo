@@ -96,6 +96,7 @@ end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local HuntPower = slasher.HuntPower or 0 --Hunt power
+	local AlertDistance = SLASHER.AlertDistance + ((2 * HuntPower) + 100)
 	local hunt_boost = 0
 
 	if not slasher:GetNWBool("DolphinInHiding") and not slasher:GetNWBool("DolphinFound") then
@@ -156,9 +157,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		local SurvivorAlert = false
 		for _, alert_surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			local alert_area = SLASHER.AlertDistance + ((2 * HuntPower) + 100)
-
-			if alert_surv:GetPos():Distance(slasher:GetPos()) > alert_area then
+			if alert_surv:GetPos():Distance(slasher:GetPos()) > AlertDistance then
 				alert_surv:SetNWBool("SurvivorAlert", false)
 				continue
 			end
@@ -226,6 +225,10 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if slasher:GetNWInt("DolphinHunt") ~= math.floor(HuntPower) then
 		slasher:SetNWInt("DolphinHunt", math.floor(HuntPower))
+	end
+
+	if slasher:GetNWInt("DolphinAlertDistance") ~= math.floor(AlertDistance) then
+		slasher:SetNWInt("DolphinAlertDistance", math.floor(AlertDistance))
 	end
 
 	slasher:SetEyeSight(SLASHER.Eyesight + (hunt_boost * 5))
@@ -455,6 +458,7 @@ if CLIENT then
 			GameData.LocalPlayer.dolf_f = nil
 		end
 	end)
+
 	hook.Add("Tick", "DolphinmanLight", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if v == GameData.LocalPlayer then return end
@@ -473,6 +477,25 @@ if CLIENT then
 				end
 			end
 		end
+	end)
+
+	hook.Add("PostDrawTranslucentRenderables", "DrawDolphinSphere", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
+		if isDraw3DSkybox then return end
+		local slasher = GameData.LocalPlayer
+
+		if not IsValid(slasher) then return end
+		if slasher:Team() ~= TEAM_SLASHER then return end
+		if not slasher:GetNWBool("DolphinInHiding") then return end
+
+		local slasherPos = slasher:GetPos()
+		local alertRadius = slasher:GetNWInt("DolphinAlertDistance")
+
+		render.SetColorMaterial()
+		render.SetBlend(1)
+
+		render.DrawSphere(slasherPos, -alertRadius, 32, 16, Color(249, 215, 10, 1))
+
+		render.SetBlend(0.1)
 	end)
 end
 
