@@ -111,20 +111,26 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_eyesight = 1
 	end
 
-	if not slasher:GetNWBool("BrenSnapState") then
-		if not slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetNWBool("BrenSnapState") then
+		slasher:SetRunSpeed(305)
+		slasher:SetWalkSpeed(305)
+		slasher:SetSlowWalkSpeed(305)
+	else
+		if slasher:GetNWBool("InSlasherChaseMode") then
+			if slasher:GetNWBool("BrenBoost") then
+				slasher:SetRunSpeed(SLASHER.ChaseSpeed + 15)
+				slasher:SetWalkSpeed(SLASHER.ChaseSpeed + 15)
+				slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed + 15)
+			else
+				slasher:SetRunSpeed(SLASHER.ChaseSpeed)
+				slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
+				slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
+			end
+		else
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		else
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
 		end
-	else
-		slasher:SetRunSpeed(350)
-		slasher:SetWalkSpeed(350)
-		slasher:SetSlowWalkSpeed(350)
 	end
 
 	if slasher:GetNWInt("BrenAnger") ~= math.floor(anger) then
@@ -182,7 +188,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			target:Freeze(false)
 
-			local rand_dmg = math.random(50, 60)
+			local rand_dmg = math.random(50, 65)
 			if target:Health() < 51 then
 				target:TakeDamage(99999, slasher, slasher)
 			else
@@ -235,7 +241,14 @@ end
 function SLASHER.OnSecondaryFire(slasher)
 	if slasher:GetNWBool("BrenStunned") then return end
 
-	SlashCo.StartChaseMode(slasher)
+	if SlashCo.StartChaseMode(slasher) then
+		slasher:SetNWBool("BrenBoost", true)
+
+		timer.Simple(3.0, function()
+			if not IsValid(slasher) then return end
+			slasher:SetNWBool("BrenBoost", false)
+		end)
+	end
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
@@ -321,6 +334,9 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	slasher:SetNWBool("CanChase", false)
 	slasher:Freeze(true)
 
+	slasher.MainCooldown = (SLASHER.FogIncreaseLength * 1) + 7
+	slasher.NoclipCooldown = (SLASHER.FogIncreaseLength * 1) + 7
+
 	timer.Simple(1.0, function()
 		if not IsValid(slasher) then return end
 
@@ -330,8 +346,6 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		slasher:DrawShadow(false)
 		slasher:SetVisible(false)
 
-		slasher.MainCooldown = SLASHER.FogIncreaseLength + 7
-		slasher.NoclipCooldown = SLASHER.FogIncreaseLength + 7
 		SlashCo.AddSlasherAnger(slasher, -15)
 
 		SlashCo.AudioSystem.PlaySound({

@@ -290,6 +290,10 @@ function PLAYER:SurvivorPing()
 				pingInfo.ExpiryTime = look.PingExpiryTime
 			end
 
+			if look:GetClass() == "sc_maleclone" then
+				pingInfo.Position = trace.HitPos
+			end
+
 			if look.OnPing then
 				-- RaphaelIT7: ToDo (Idea) - we can give a reward to the first survivor who found a generator
 				look:OnPing(self)

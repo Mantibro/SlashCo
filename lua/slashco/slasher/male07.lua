@@ -6,7 +6,7 @@ SLASHER.DangerLevel = SlashCo.DangerLevel.Devastating
 SLASHER.IsSelectable = true
 SLASHER.Model = "models/Humans/Group01/male_07.mdl"
 SLASHER.GasCanMod = 0
-SLASHER.KillDelay = 5
+SLASHER.KillDelay = 2
 SLASHER.ProwlSpeed = 100
 SLASHER.ChaseSpeed = 302
 SLASHER.Perception = 1.0
@@ -295,7 +295,7 @@ function SLASHER.OnSecondaryFire(slasher)
 	if slasher:GetNWBool("Male07Stunned") then return end
 
 	SlashCo.StartChaseMode(slasher)
-	slasher.SlashCooldown = 5
+	slasher.SlashCooldown = SLASHER.KillDelay
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)

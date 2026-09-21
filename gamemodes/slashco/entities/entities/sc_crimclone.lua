@@ -5,6 +5,7 @@ local SlashCo = SlashCo
 ENT.Base 			= "base_nextbot"
 ENT.Type			= "nextbot"
 ENT.ClassName 		= "sc_crimclone"
+ENT.PingType 		= "SLASHER"
 ENT.Spawnable		= true
 
 hook.Add("SlashCo:Precache", "SlashCo:PrecacheClone", function()
