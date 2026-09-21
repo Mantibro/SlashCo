@@ -12,7 +12,7 @@ SLASHER.IsSelectable = true
 SLASHER.Model = "models/slashco/slashers/postaldude/redux_dude.mdl"
 SLASHER.GasCanMod = 0
 SLASHER.KillDelay = 2
-SLASHER.ProwlSpeed = 305
+SLASHER.ProwlSpeed = 300
 SLASHER.ChaseSpeed = 305
 SLASHER.Perception = 1.0
 SLASHER.Eyesight = 6
@@ -602,7 +602,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		slasher:LagCompensation(false)
 
 		local target = tr.Entity
-		local damage = 33
+		local damage = 22
 
 		if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
 			local dmg = DamageInfo()
