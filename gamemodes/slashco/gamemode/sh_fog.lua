@@ -106,10 +106,10 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 	local targetFogStart = 200
 	local pos = GameData.LocalPlayer:GetPos()
 	local isVisible = util.IsSkyboxVisibleFromPoint(pos)
-	local targetFogEnd = 3000
+	local targetFogEnd = 2500
 
 	if not isVisible then
-		targetFogEnd = 1000 -- Were somewere hidden, like in a basement.
+		targetFogEnd = 1500 -- Were somewere hidden, like in a basement.
 	else
 		targetFogEnd = 2000 -- Were somewere like in a building but outside light still reaches the player
 	end
@@ -122,7 +122,7 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 	})
 
 	if tr.HitSky then
-		targetFogEnd = 3000
+		targetFogEnd = 2500
 	end
 
 	if SlashCo.IsGlobalFogDisabled() then
@@ -131,18 +131,18 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 	end
 
 	local col = render.GetLightColor(pos)
-	local brighness = (0.299 * col[1] + 0.587 * col[2] + 0.114 * col[3]) * 50
-	brighness = math.min(brighness, 1) - 0.5
+	local brightness = (0.299 * col[1] + 0.587 * col[2] + 0.114 * col[3]) * 50
+	brightness = math.min(brightness, 1) - 0.5
 
-	targetFogEnd = targetFogEnd + (targetFogEnd * brighness)
+	targetFogEnd = targetFogEnd + (targetFogEnd * brightness)
 
 	if (targetFogStart * 1.5) >= targetFogEnd then
 		targetFogEnd = targetFogStart * 1.5
 	end
 
 	local fogMult = worldInfo.multiplier
-	GameData.LastFogStart = Lerp(lerpTime, GameData.LastFogStart or 3000, targetFogStart * fogMult)
-	GameData.LastFogEnd = Lerp(lerpTime, GameData.LastFogEnd or 3000, targetFogEnd * fogMult)
+	GameData.LastFogStart = Lerp(lerpTime, GameData.LastFogStart or 200, targetFogStart * fogMult)
+	GameData.LastFogEnd = Lerp(lerpTime, GameData.LastFogEnd or 2500, targetFogEnd * fogMult)
 
 	render.FogStart(GameData.LastFogStart)
 	render.FogEnd(GameData.LastFogEnd)
