@@ -6,6 +6,7 @@ ENT.Base = "base_nextbot"
 ENT.Type = "nextbot"
 ENT.ClassName = "sc_maleclone"
 ENT.PingType = "SLASHER"
+ENT.PingExpiryTime = 5
 
 hook.Add("SlashCo:Precache", "SlashCo:PrecacheMaleClone", function()
 	SlashCo.PrecacheModel("models/Humans/Group01/male_07.mdl")

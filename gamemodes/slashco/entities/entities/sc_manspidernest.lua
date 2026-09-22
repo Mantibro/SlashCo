@@ -6,6 +6,7 @@ ENT.PrintName = "manspider nest"
 ENT.Author = "Xerk"
 ENT.Purpose	= "Slasher Ability."
 ENT.PingType = "NEST"
+ENT.PingExpiryTime = 10
 
 if CLIENT then return end
 

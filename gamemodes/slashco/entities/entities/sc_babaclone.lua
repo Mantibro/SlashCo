@@ -11,6 +11,7 @@ ENT.Contact			= ""
 ENT.Purpose			= "A Bababooey clone."
 ENT.Instructions	= ""
 ENT.PingType = "SLASHER"
+ENT.PingExpiryTime = 5
 
 ENT.AutomaticFrameAdvance = true
 

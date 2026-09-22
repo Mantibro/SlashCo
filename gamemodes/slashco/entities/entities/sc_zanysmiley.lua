@@ -7,6 +7,7 @@ ENT.Type = "nextbot"
 ENT.ClassName = "sc_zanysmiley"
 ENT.Spawnable = true
 ENT.PingType = "SLASHER"
+ENT.PingExpiryTime = 5
 ENT.Smiley = true
 
 function ENT:Initialize()

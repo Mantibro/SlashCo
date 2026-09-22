@@ -4,6 +4,7 @@ ENT.Type = "nextbot"
 ENT.PrintName = "Hat Man"
 ENT.ClassName = "sc_hatman"
 ENT.Base = "base_nextbot"
+ENT.PingExpiryTime = 5
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Target")

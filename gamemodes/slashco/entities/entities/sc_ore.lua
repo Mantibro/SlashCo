@@ -13,6 +13,7 @@ ENT.Purpose = "fortnite battlepass"
 ENT.Instructions = ""
 ENT.IsSelectable = true
 ENT.PingType = "ORE"
+ENT.PingExpiryTime = 10
 
 function ENT:Initialize()
 	if SERVER then
