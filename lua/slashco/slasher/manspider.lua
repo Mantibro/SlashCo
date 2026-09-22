@@ -410,9 +410,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	timer.Simple(0.3, function()
 		if not IsValid(slasher) then return end
 
-			--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
-			--		Vector(-35, -45, -60), Vector(35, 45, 60), damage, DMG_SLASH, 5, false)
-
 		slasher:LagCompensation(true)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
@@ -425,7 +422,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		slasher:LagCompensation(false)
 
 		local target = tr.Entity
-		local damage = 5 + (SlashCo.GetSlasherAnger(slasher) / 5)
+		local damage = 10 + (SlashCo.GetSlasherAnger(slasher) / 5)
 
 		if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
 			local dmg = DamageInfo()
