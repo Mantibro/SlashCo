@@ -904,6 +904,10 @@ local function targetPaint(ply)
 	cam.End3D()
 end
 
+function SLASHER.PreDrawHalos()
+	SlashCo.DrawHalo(ents.FindByClass("sc_manspidernest"), "red")
+end
+
 local nestTable = {
 	default = Material("slashco/ui/icons/slasher/manspider"),
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")

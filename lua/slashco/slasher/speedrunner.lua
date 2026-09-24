@@ -377,7 +377,7 @@ end
 
 function SLASHER.PreDrawHalos()
 	SlashCo.DrawHalo(ents.FindByClass("sc_ore"), "green")
-	SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "red")
+	SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "red", 2, false)
 end
 
 if CLIENT then
