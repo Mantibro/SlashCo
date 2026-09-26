@@ -191,6 +191,7 @@ if SERVER then
 				local coilPos = self:GetCoilOffset()
 				for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 					if slasher:GetPos():Distance(coilPos) > range then continue end
+					if slasher:GetNWBool("StunImmunity") then continue end
 
 					local rng = math.random(1, 9)
 					if rng == 4 then rng = 5 end -- The sound zap4 doesn't exist

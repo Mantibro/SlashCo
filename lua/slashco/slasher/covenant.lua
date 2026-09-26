@@ -87,26 +87,7 @@ function SLASHER.SummonRocks(vic)
 	SLASHER.PlayersToBecomePartOfCovenant[vic:SteamID64()] = true
 end
 
-function SLASHER.OnTickBehaviour(slasher, cloak)
-	for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		--Sync the chase for every slasher, meaning every covenant member
-		if not SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[cloak:SteamID64()] then
-			continue
-		end
-
-		if slasher:GetNWBool("InSlasherChaseMode") then
-			if not cloak:GetNWBool("InSlasherChaseMode") then
-				SlashCo.StartChaseMode(cloak, true)
-			end
-
-			cloak.CurrentChaseTick = 0
-		else
-			if cloak:GetNWBool("InSlasherChaseMode") then
-				SlashCo.StopChase(cloak)
-			end
-		end
-	end
-
+function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
@@ -218,6 +199,18 @@ end
 
 function SLASHER.OnSecondaryFire(slasher)
 	SlashCo.StartChaseMode(slasher)
+
+	for _, cloak in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+		--Sync the chase for every slasher, meaning every covenant member
+		if not SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[cloak:SteamID64()] then continue end
+
+		if not slasher:GetNWBool("InSlasherChaseMode") and not cloak:GetNWBool("InSlasherChaseMode") then
+			SlashCo.StartChaseMode(cloak, true)
+			cloak.CurrentChaseTick = 0
+		else
+			SlashCo.StopChase(cloak)
+		end
+	end
 end
 
 function SLASHER.Animator(ply)

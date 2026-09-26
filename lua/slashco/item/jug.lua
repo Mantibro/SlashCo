@@ -32,13 +32,9 @@ function ITEM.OnSwitchFrom(ply)
 end
 
 function ITEM.PrePickUp(ply)
-	if not ply:GetNWBool("CurseOfTheJug") then
-		return
-	end
+	if not ply:GetNWBool("CurseOfTheJug") then return end
 
-	if ply.JugDropTimer and CurTime() - ply.JugDropTimer < 1 then
-		return true
-	end
+	if ply.JugDropTimer and CurTime() - ply.JugDropTimer < 1 then return true end
 	ply.JugDropTimer = CurTime()
 
 	SlashCo.AudioSystem.PlaySound({
@@ -107,9 +103,8 @@ SlashCo.RegisterItem(ITEM, "Jug")
 
 if SERVER then
 	local function tele(ply, force)
-		if ply.JugTele and not force then
-			return
-		end
+		if ply.JugTele and not force then return end
+
 		ply.JugTele = true
 
 		timer.Create("JugTele_" .. ply:UserID(), 1, 1, function()
@@ -172,17 +167,9 @@ if SERVER then
 	end)
 
 	hook.Add("SlashCoItemPickUp", "JugCurse", function(ply, item, id)
-		if item ~= "GasCan" then
-			return
-		end
-
-		if not ply:GetNWBool("CurseOfTheJug") then
-			return
-		end
-
-		if math.random() < 0.5 then
-			return
-		end
+		if item ~= "GasCan" then return end
+		if not ply:GetNWBool("CurseOfTheJug") then return end
+		if math.random() < 0.5 then return end
 
 		local ent = Entity(id)
 		ent:RandomTeleport(Vector(0, 0, 50))

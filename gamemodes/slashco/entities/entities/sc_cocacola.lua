@@ -51,9 +51,9 @@ function ENT:Explode()
 				ply:AddEffect("Slowness", 9)
 			end
 		elseif team == TEAM_SLASHER then
-			if ply:GetNWBool("PainisRage") then return end
-
-			ply:Freeze(true)
+			if not ply:GetNWBool("StunImmunity") then
+				ply:Freeze(true)
+			end
 		end
 
 		timer.Simple(6, function()

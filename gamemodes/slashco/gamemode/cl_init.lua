@@ -106,6 +106,7 @@ include("cl_limitedzone.lua")
 
 CreateClientConVar("slashco_cl_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
 CreateClientConVar("slashco_cl_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel")
+CreateClientConVar("slashco_cl_disable_effects", 0, true, false, "Disable some effects for sensitive eyes", 0, 1)
 
 --[[
 cvars.AddChangeCallback("slashco_cl_playermodel", function(_, _, newVal)

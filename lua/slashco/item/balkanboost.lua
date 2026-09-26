@@ -124,20 +124,11 @@ if SERVER then
 end
 
 hook.Add("RenderScreenspaceEffects", "SlashCo:BalkanBoost", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
-		local tab = {
-			["$pp_colour_addr"] = 0.07,
-			["$pp_colour_addg"] = 0,
-			["$pp_colour_addb"] = 0,
-			["$pp_colour_brightness"] = 0,
-			["$pp_colour_contrast"] = 2,
-			["$pp_colour_colour"] = 4,
-			["$pp_colour_mulr"] = 0.07,
-			["$pp_colour_mulg"] = 0,
-			["$pp_colour_mulb"] = 0
-		}
-
-		DrawColorModify(tab)
+	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") and not GetConVar("slashco_cl_disable_effects"):GetBool() then
+		DrawSobel(0.13)
+		DrawSharpen(0.8, 0.8)
+		DrawMotionBlur(0.5, 0.6, 0.05)
+		DrawToyTown(4, ScrH() / 2)
 	end
 end)
 

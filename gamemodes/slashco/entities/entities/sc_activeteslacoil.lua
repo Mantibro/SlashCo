@@ -98,6 +98,8 @@ if SERVER then
 		if (curTime - startTime) > 29 and state == 5 then
 			self:SetChargeState(6)
 			for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+				if slasher:GetNWBool("StunImmunity") then continue end
+
 				slasher:SetNW2Float("TeslaStunned", curTime + stunTime)
 				slasher:SetNW2Float("LastTeslaStun", curTime)
 				slasher:ScreenFade(SCREENFADE.OUT, color_black, 0.5, stunTime)

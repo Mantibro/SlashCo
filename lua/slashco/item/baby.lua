@@ -55,7 +55,7 @@ function ITEM.OnUse(ply)
 				local slasher = team.GetPlayers(TEAM_SLASHER)
 				slasher = slasher[math.random(1, #slasher)] -- If there are multiple slasher's we need to be fair and pick a random one, the previous code always chose the second slasher.
 
-				if IsValid(slasher) then
+				if IsValid(slasher) and not slasher:GetNWBool("StunImmunity") then
 					slasher:RandomTeleport()
 
 					SlashCo.AudioSystem.PlaySound({

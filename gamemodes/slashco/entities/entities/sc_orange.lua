@@ -57,8 +57,10 @@ function ENT:Explode()
 		if team == TEAM_SURVIVOR then
 			ply:TakeDamage(90, self, self)
 		elseif team == TEAM_SLASHER then
-			ply:SlasherStunDeafen(5)
-			ply:SetNWBool("OrangeBlur", true)
+			if not ply:GetNWBool("StunImmunity") then
+				ply:SlasherStunDeafen(5)
+				ply:SetNWBool("OrangeBlur", true)
+			end
 		end
 
 		timer.Simple(5, function()
@@ -103,7 +105,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", "Orange", function()
-		if GameData.LocalPlayer:GetNWBool("OrangeBlur") then
+		if GameData.LocalPlayer:GetNWBool("OrangeBlur") and not GetConVar("slashco_cl_disable_effects"):GetBool() then
 			DrawSobel(0.3)
 			DrawToyTown(4, ScrH() / 2)
 		end

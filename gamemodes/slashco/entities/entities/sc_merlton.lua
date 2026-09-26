@@ -301,6 +301,8 @@ function ENT:Think()
 
 		for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
 			if v:IsPlayer() and v:Team() == TEAM_SLASHER and v:GetPos():Distance(self:GetPos()) < 100 then
+				if v:GetNWBool("StunImmunity") then continue end
+
 				self.AttackedPlayer = v
 				self.Enemy = nil
                 SlashCo.StopChase(v)

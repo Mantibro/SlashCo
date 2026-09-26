@@ -42,7 +42,7 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 		fadeIn = 0,
 	})
 
-	if math.random(1, 3) == 1 or dmg:GetDamage() > 100 then
+	if math.random(1, 3) == 1 or dmg:GetDamage() > 60 then
 		SlashCo.RemoveItem(owner, false)
 
 		SlashCo.AudioSystem.PlaySound({

@@ -85,8 +85,10 @@ function ENT:Explode()
 		if team == TEAM_SURVIVOR then
 			ply:TakeDamage(50, self, self)
 		elseif team == TEAM_SLASHER then
-			ply:SlasherStunDeafen(25 + (ply:GetPerception() * 2.5)) -- 25 seconds + 2.5 seconds for every perception level
-			ply:SlasherFunction("OnHitByBeerKeg")
+			if not ply:GetNWBool("StunImmunity") then
+				ply:SlasherStunDeafen(25 + (ply:GetPerception() * 2.5)) -- 25 seconds + 2.5 seconds for every perception level
+				ply:SlasherFunction("OnHitByBeerKeg")
+			end
 		end
 
 		if ply:Alive() then -- They survived the damage? Their ears won't >:3
