@@ -445,8 +445,10 @@ end
 -- Flips a table to have the given key as the actual key instead of the normal DB 1, 2, 3 stuff.
 function SlashCo.SQLTableToLuaTable(data, keyName)
 	local resultTable = {}
-	for _, tbl in ipairs(data) do
-		resultTable[tbl[keyName]] = tbl
+	if data then
+		for _, tbl in ipairs(data) do
+			resultTable[tbl[keyName]] = tbl
+		end
 	end
 
 	return resultTable
@@ -454,7 +456,7 @@ end
 
 ---Set up players for the round
 function SlashCo.SetupPlayers()
-	if not game.SinglePlayer() and ((cookie.GetString("slashco_table_basedata") == nil) or not sql.TableExists("slashco_table_survivordata") or not sql.TableExists("slashco_table_slasherdata")) then
+	if not SlashCo.IsDebugGame() and ((cookie.GetString("slashco_table_basedata") == nil) or not sql.TableExists("slashco_table_survivordata") or not sql.TableExists("slashco_table_slasherdata")) then
 		SlashCo.Abort("Missing SQL table data")
 		return
 	end

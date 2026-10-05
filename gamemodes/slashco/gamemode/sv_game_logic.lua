@@ -9,6 +9,8 @@ function SlashCo.SinglePlayerSetup()
 	hook.Add("PlayerInitialSpawn", "SinglePlayerSetup", function(ply)
 		table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = ply:SteamID64() })
 		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = ply:SteamID64() })
+
+		SlashCo.AwaitExpectedPlayers()
 	end)
 end
 
@@ -105,7 +107,7 @@ function SlashCo.LoadCurRoundData()
 
 		table.Empty(SlashCo.CurRound.DisconnectedPlayers) -- Not needed anymore
 	else
-		if game.SinglePlayer() then
+		if SlashCo.IsDebugGame() then
 			SlashCo.SinglePlayerSetup()
 			return
 		end
@@ -358,7 +360,9 @@ end
 function SlashCo.AwaitExpectedPlayers()
 	if GameData.IsLobby then return end
 	if SlashCo.CurRound.AntiLoopSpawn then return end
-	if not game.SinglePlayer() and #SlashCo.CurRound.ExpectedPlayers < 2 then
+
+	local debugGame = SlashCo.IsDebugGame()
+	if not debugGame and #SlashCo.CurRound.ExpectedPlayers < 2 then
 		return
 	end -- don't start with no data
 
@@ -380,8 +384,8 @@ function SlashCo.AwaitExpectedPlayers()
 	end
 
 	-- RaphaelIT7: We do >= as in some rare case it may somehow be more?
-	if expected_count >= #SlashCo.CurRound.ExpectedPlayers then
-		if player.GetCount() < 2 then
+	if expected_count >= #SlashCo.CurRound.ExpectedPlayers or debugGame then
+		if player.GetCount() < 2 and not debugGame then
 			SlashCo.Abort("Not enouth players to start a round")
 			return
 		end
@@ -398,7 +402,7 @@ end
 
 --				***Begin the round start timer***
 function SlashCo.RoundBeginTimer(instant)
-	local time = game.SinglePlayer() and 3 or 10
+	local time = SlashCo.IsDebugGame() and 3 or 10
 	SlashCo.CurRound.AntiLoopSpawn = true
 	if instant then
 		SlashCo.StartRound()

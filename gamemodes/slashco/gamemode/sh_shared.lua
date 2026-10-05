@@ -216,6 +216,15 @@ function SlashCo.MapTools.IsEnabled()
 	return slashco_enablemaptools and slashco_enablemaptools:GetBool()
 end
 
+--[[
+	If true then we change a lot of behavior as we aren't dealing with a real round
+	While with g_SlashCoDebug we expect the proper Lobby setup and so on
+	With these two, we don't expect anything as the lobby may not even have been loaded at all
+]]
+function SlashCo.IsDebugGame()
+	return GameData.IsSinglePlayer or SlashCo.MapTools.IsEnabled()
+end
+
 -- Helper networking functions
 function SlashCo.WriteOptional(value, writeFunc, ...)
 	local isNil = value == nil
