@@ -45,11 +45,7 @@ function ENT:Initialize()
 			vomit:SetPos(vomitPos)
 		end
 
-		timer.Simple(30.0, function()
-			if not IsValid(vomit) then return end
-
-			vomit:Remove()
-		end)
+		SafeRemoveEntityDelayed(vomit, 30)
 	end
 end
 
@@ -60,9 +56,7 @@ end
 if CLIENT then
 	function ENT:Draw() self:DrawModel() end
 	function ENT:IsTranslucent() return true end
-end
-
-if SERVER then
+else -- SERVER
 	function ENT:Think()
 		local vomitPos = self:GetVomitOffset()
 
@@ -71,11 +65,5 @@ if SERVER then
 
 			survivor:AddEffect("Slowness", 7)
 		end
-
-		timer.Simple(30.0, function()
-			if not IsValid(self) then return end
-
-			self:Remove()
-		end)
 	end
 end
