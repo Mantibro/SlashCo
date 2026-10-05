@@ -232,16 +232,7 @@ local function DoSlasherSelection(slashers, usingPotentialSlashers)
 			return
 		end
 
-		local selectionData = {
-			slashClass = SlashCo.CurRound.SlasherClass,
-			slashDanger = SlashCo.CurRound.SlasherDanger,
-			bannedSlashers = SlashCo.GetBannedSlashers(true),
-		}
-
-		net.Start("SlashCo:PickingSlasher")
-			net.WriteTable(selectionData)
-		net.Send(selectedPly)
-		SlashCo.AllowedPlayerSlasherSelection[selectedPly] = selectionData
+		SlashCo.SendPickingSlasher(selectedPly)
 		selectedPly:ChatText("slasher_replacement")
 
 		timer.Create("SlashCo:WaitingForPlayerToPickSlasher", 15, 1, function()

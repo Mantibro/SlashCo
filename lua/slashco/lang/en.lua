@@ -857,3 +857,10 @@ SlashCo.LangTable["keyboard_bind_voices"] = "Open Voice Selection"
 SlashCo.LangTable["keyboard_bind_keybinds"] = "OPEN KEYBINDS"
 SlashCo.LangTable["keyboard_bind_main_ability"] = "Use Main Ability"
 SlashCo.LangTable["keyboard_bind_special_ability"] = "Use Special Ability"
+
+-- Map tools
+
+SlashCo.LangTable["maptools_become_survivor"] = "Become Survivor"
+SlashCo.LangTable["maptools_become_slasher"] = "Become Slasher"
+SlashCo.LangTable["maptools_undo"] = "Undo"
+SlashCo.LangTable["maptools_redo"] = "Redo"

@@ -40,6 +40,9 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 end
 
 local function HoovyIdle(slasher)
+	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
+	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
+
 	if not slasher:GetNWBool("InSlasherChaseMode") then
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({

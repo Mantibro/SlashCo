@@ -284,3 +284,66 @@ concommand.Add("slashco_maptool_redo", function(ply)
 
 	SlashCo.MapTools.Redo()
 end, nil, "Applies the last reverted change again")
+
+local function OpenSlasherSelection(ply)
+	SlashCo.AwaitPlayerToSelectSlasher = function(ply, slasherID)
+		SlashCo.AwaitPlayerToSelectSlasher = nil
+
+		local pos = ply:GetPos()
+		local angle = ply:EyeAngles()
+
+		SlashCo.SpawnPlayerAsSlasher(ply, slasherID)
+
+		ply:SetPos(pos)
+		ply:SetEyeAngles(angle)
+	end
+
+	-- We allow free picking
+	SlashCo.CurRound.SlasherClass = SlashCo.SlasherClass.Unknown
+	SlashCo.CurRound.SlasherDanger = SlashCo.DangerLevel.Unknown
+
+	SlashCo.SendPickingSlasher(ply)
+end
+
+hook.Add("SlashCo:PlayerButtonDown", "SlashCo:MapTools", function(ply, button)
+	if not SlashCo.MapTools.IsEnabled() then return end
+
+	local isHost = ply:IsListenServerHost()
+	if isHost then
+		if SlashCo.IsKeyPressed("MAPTOOL_UNDO", ply, button) then
+			SlashCo.MapTools.Undo()
+			return
+		end
+
+		if SlashCo.IsKeyPressed("MAPTOOL_REDO", ply, button) then
+			SlashCo.MapTools.Redo()
+			return
+		end
+	end
+
+	--[[
+		RaphaelIT7:
+		These binds are available to every player not just the host
+		since I think it makes testing easier with others
+	]]
+
+	if SlashCo.IsKeyPressed("MAPTOOL_SWITCH_SURVIVOR", ply, button) then
+		if ply:Team() ~= TEAM_SURVIVOR then
+			ply:SetTeam(TEAM_SURVIVOR)
+
+			local pos = ply:GetPos()
+			local angle = ply:EyeAngles()
+
+			ply:Spawn()
+
+			ply:SetPos(pos)
+			ply:SetEyeAngles(angle)
+		end
+		return
+	end
+
+	if SlashCo.IsKeyPressed("MAPTOOL_SWITCH_SLASHER", ply, button) then
+		OpenSlasherSelection(ply)
+		return
+	end
+end)

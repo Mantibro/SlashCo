@@ -538,6 +538,20 @@ net.Receive("SlashCo:SelectSlasher", function(_, ply)
 	end
 end)
 
+function SlashCo.SendPickingSlasher(ply)
+	local selectionData = {
+		slashClass = SlashCo.CurRound.SlasherClass,
+		slashDanger = SlashCo.CurRound.SlasherDanger,
+		bannedSlashers = SlashCo.GetBannedSlashers(true),
+	}
+
+	net.Start("SlashCo:PickingSlasher")
+		net.WriteTable(selectionData)
+	net.Send(ply)
+
+	SlashCo.AllowedPlayerSlasherSelection[ply] = selectionData
+end
+
 function SlashCo.PlayerPickedLobbySlasher(ply, slasherID)
 	if not GameData.IsLobby then return end
 	

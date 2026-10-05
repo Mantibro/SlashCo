@@ -60,7 +60,8 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.DoSound(slasher)
-	if not IsValid(slasher) then return end
+	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
+	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
 
 	if slasher:GetNWBool("BababooeyInvisibility") then
 		local idx = math.random(2, 4)

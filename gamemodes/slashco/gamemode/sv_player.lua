@@ -9,6 +9,8 @@ function GM:PlayerInitialSpawn(ply)
 	end
 end
 
+local DEFAULT_VIEW_OFFSET = Vector(0, 0, 64)
+local DEFAULT_VIEW_OFFSET_DUCKED = Vector(0, 0, 28)
 function GM:PlayerSpawn(ply, transition)
 	if not IsValid(ply) then
 		return
@@ -39,6 +41,11 @@ function GM:PlayerSpawn(ply, transition)
 	if ply:Team() == TEAM_SURVIVOR then -- So that we have less entities & also less possible errors.
 		ply:SetupHands()
 	end
+
+	-- RaphaelIT7: We reset these two here too!
+	-- Thirsty for example changes these but GMod does not reset them on spawn
+	ply:SetViewOffset(DEFAULT_VIEW_OFFSET)
+	ply:SetViewOffsetDucked(DEFAULT_VIEW_OFFSET_DUCKED)
 
 	player_manager.OnPlayerSpawn(ply, transition)
 	player_manager.RunClass(ply, "Spawn")
