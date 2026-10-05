@@ -21,6 +21,7 @@ if SERVER then
 		end
 
 		self:EmitSound("weapons/smokegrenade/sg_explode.wav", 511, 100 )
+		SafeRemoveEntityDelayed(self, 30)
 	end
 
 	function ENT:SetBurgerVelocity(velocity)
@@ -60,12 +61,6 @@ if SERVER then
 
 			slasher:SlasherStunDeafen(1 + (slasher:GetPerception() * 1))
 		end
-
-		timer.Simple(30.0, function()
-			if not IsValid(self) then return end
-
-			self:Remove()
-		end)
 	end
 
 	function ENT:Use(activator)
@@ -83,17 +78,16 @@ if CLIENT then
 		self.Emitter = ParticleEmitter( pos , false )
 	end
 
-	function ENT:Think()
-		timer.Simple(29.9, function()
-			if not IsValid(self) then return end
-			if not self.Emitter:IsValid() then return end
-
+	function ENT:OnRemove()
+		if self.Emitter and self.Emitter:IsValid() then
 			self.Emitter:Finish()
-		end)
+		end
 	end
 
 	function ENT:Draw()
 		self:DrawModel()
+		if not self.Emitter or not self.Emitter:IsValid() then return end
+
 		local particle = self.Emitter:Add( "particle/smokesprites_000"..math.random(1,9), self:GetPos() )
 
 		if (particle) then

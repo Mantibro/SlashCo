@@ -179,6 +179,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher.DisguiseCooldown = 4
 
 		timer.Simple(2, function()
+			if not IsValid(slasher) then return end
+
 			slasher:Freeze(false)
 			slasher:SetNWBool("AmogusDisguising", false)
 
@@ -213,7 +215,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetNWBool("AmogusSurvivorDisguise", false)
 		slasher:SetNWBool("AmogusFuelDisguise", false)
 		slasher:SetNWBool("AmogusDisguised", false)
-		slasher:SetNWBool("DynamicFlashlight", false)
+		slasher:SetDynamicFlashlight(false)
 		
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/amogus/amogus_reveal.mp3",
@@ -242,6 +244,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 		end
 
 		timer.Simple(2 - (SO * 1.95), function()
+			if not IsValid(slasher) then return end
+
 			slasher:Freeze(false)
 			slasher.DisguiseCooldown = 2.5 - (SO * 2.4)
 		end)
@@ -267,6 +271,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher.DisguiseCooldown = 4
 
 		timer.Simple(2, function()
+			if not IsValid(slasher) then return end
+
 			slasher:Freeze(false)
 			slasher:SetNWBool("AmogusDisguising", false)
 			slasher:SetNWBool("AmogusFuelDisguise", true)

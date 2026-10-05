@@ -22,11 +22,12 @@ local pingType = {
 local FadeTime = 15 -- After this many seconds the transparency will be reduced
 
 GameData.ActivePings = GameData.ActivePings or {}
+GameData.PredictedActivePings = GameData.PredictedActivePings or {} -- A temporary list
 hook.Add("SlashCo:ServerEntityRemoved", "SlashCo:Pings", function(entIndex) -- Cleanup :3
-	for idx, pingInfo in ipairs(GameData.ActivePings) do
+	for idx = #GameData.ActivePings, 1, -1 do
+		local pingInfo = GameData.ActivePings[idx]
 		if (pingInfo.Entity and pingInfo.Entity == entIndex) or (pingInfo.Player and pingInfo.Player == entIndex) then
 			table.remove(GameData.ActivePings, idx)
-			continue
 		end
 	end
 end)
@@ -60,6 +61,14 @@ local function shouldRemovePing(idx, pingInfo, newPing)
 	return false
 end
 
+local function removePing(pingInfo, idx)
+	if pingInfo.Tick then
+		GameData.PredictedActivePings[pingInfo.Tick] = nil
+	end
+
+	table.remove(GameData.ActivePings, idx)
+end
+
 local function antiDupePings(newPing)
 	if not newPing.Player then
 		return
@@ -72,10 +81,51 @@ local function antiDupePings(newPing)
 		if not pingInfo then break end
 
 		if shouldRemovePing(idx, pingInfo, newPing) then
-			table.remove(GameData.ActivePings, idx)
+			removePing(pingInfo, idx)
 			idx = idx - 1 -- table.remove shifted all entries! so we must check the same index again!
 		end
 	end
+end
+
+local function RegisterPing(pingInfo)
+	if not pingInfo.ExpiryTime then
+		pingInfo.Permanent = true
+	end
+
+	antiDupePings(pingInfo)
+	if not fullUpdate then
+		local skipSound = hook.Run("SlashCo:OnPing", pingInfo)
+		if not skipSound and pingInfo.Team ~= TEAM_SLASHER then
+			if pingInfo.Type == "GENERATOR" then
+				GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
+			elseif pingInfo.Type ~= "LOOK HERE" and pingInfo.Type ~= "LOOK AT THIS" and pingInfo.Type ~= "GHOST" then
+				GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
+			end
+		end
+	end
+
+	pingInfo.FadeTime = CurTime() + FadeTime
+	table.insert(GameData.ActivePings, pingInfo)
+end
+
+-- RaphaelIT7: Should only be called by PLAYER:SurvivorPing
+function SlashCo.CreatePredictedPing(pingInfo, tickCount)
+	pingInfo.ID = -1 -- Unknown for now
+
+	-- Bring it into the same format as if we got it from the server!
+	-- (We sneakily convert it when networking since we read with ReadUInt and not ReadEntity)
+	if pingInfo.Player then
+		pingInfo.Player = IsValid(pingInfo.Player) and pingInfo.Player:EntIndex() or -1
+	end
+
+	if pingInfo.Entity then
+		pingInfo.Entity = IsValid(pingInfo.Entity) and pingInfo.Entity:EntIndex() or -1
+	end
+
+	-- Keep track so that when the server sends the real info we can update it!
+	GameData.PredictedActivePings[tickCount] = pingInfo
+
+	RegisterPing(pingInfo)
 end
 
 net.Receive("SlashCo:SurvivorPings", function()
@@ -95,26 +145,20 @@ net.Receive("SlashCo:SurvivorPings", function()
 			Player = SlashCo.ReadOptional(net.ReadUInt, MAX_EDICT_BITS),
 			Entity = SlashCo.ReadOptional(net.ReadUInt, MAX_EDICT_BITS),
 			Position = SlashCo.ReadOptional(net.ReadVector),
+			Tick = net.ReadUInt(32),
 		}
 
-		if not pingInfo.ExpiryTime then
-			pingInfo.Permanent = true
-		end
-
-		antiDupePings(pingInfo)
-		if not fullUpdate then
-			local skipSound = hook.Run("SlashCo:OnPing", pingInfo)
-			if not skipSound and pingInfo.Team ~= TEAM_SLASHER then
-				if pingInfo.Type == "GENERATOR" then
-					GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
-				elseif pingInfo.Type ~= "LOOK HERE" and pingInfo.Type ~= "LOOK AT THIS" and pingInfo.Type ~= "GHOST" then
-					GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
-				end
+		local predictedPing = GameData.PredictedActivePings[pingInfo.Tick]
+		if predictedPing then
+			for key, val in pairs(pingInfo) do
+				predictedPing[key] = val
 			end
+
+			-- RaphaelIT7: Since we already predicted the ping we only update all the data (in case of mismatch) and ski registering again
+			return
 		end
 
-		pingInfo.FadeTime = CurTime() + FadeTime
-		table.insert(GameData.ActivePings, pingInfo)
+		RegisterPing(pingInfo)
 	end
 end)
 
@@ -136,13 +180,13 @@ hook.Add("SlashCo:DrawHUD", "SlashCo:PingDisplay", function()
 		end
 
 		if not pingInfo.Entity and not pingInfo.Position then
-			table.remove(GameData.ActivePings, idx)
+			removePing(pingInfo, idx)
 			idx = idx - 1 -- table.remove shifted all entries! so we must check the same index again!
 			continue
 		end
 
 		if not pingInfo.Permanent and pingInfo.ExpiryTime and curTime > pingInfo.ExpiryTime then
-			table.remove(GameData.ActivePings, idx)
+			removePing(pingInfo, idx)
 			idx = idx - 1 -- table.remove shifted all entries! so we must check the same index again!
 			continue
 		end
@@ -204,7 +248,7 @@ hook.Add("SlashCo:DrawHUD", "SlashCo:PingDisplay", function()
 		draw.SimpleText(v:GetNWString("FlareDropperName"), "TVCD_small", fl_pos.x, fl_pos.y - 25,
 				transp,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, textColor, TEXT_ALIGN_CENTER,
+		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, color_white, TEXT_ALIGN_CENTER,
 				TEXT_ALIGN_CENTER)
 		draw.SimpleText(tostring(math.floor(GameData.LocalPlayer:GetPos():Distance(v:GetPos()) * 0.0254)) .. " m",
 				"TVCD_small", fl_pos.x, fl_pos.y + 25, transp,

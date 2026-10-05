@@ -89,7 +89,7 @@ function ENT:OnRemove()
 
 		-- RaphaelIT7: Cleanup after ourselves!
 		for _, seat in ipairs(self.Seats) do
-			if not IsValid(seat) then return end
+			if not IsValid(seat) then continue end
 
 			seat:Remove()
 		end
@@ -165,23 +165,26 @@ function sign(number)
 	return number > 0 and 1 or (number == 0 and 0 or -1)
 end
 
+local SEATS = {
+	{ pos = Vector(-34, 24.25, 44.5), ang = Angle(0, -90, 0) },
+	{ pos = Vector(-34, 0, 44.5), ang = Angle(0, -90, 0) },
+	{ pos = Vector(-34, -24.25, 44.5), ang = Angle(0, -90, 0) },
+	{ pos = Vector(24.5, 24.25, 44.5), ang = Angle(0, 90, 0) },
+	{ pos = Vector(24.5, 0, 44.5), ang = Angle(0, 90, 0) },
+	{ pos = Vector(24.5, -24.25, 44.5), ang = Angle(0, 90, 0) },
+}
+
 if SERVER then
 	function ENT:UpdateTransmitState()
 		return TRANSMIT_ALWAYS
 	end
 
 	function ENT:Use(activator)
-		--local availabilityHeli = false
-		local userEnteredAlready
 		local SatPlayers = SlashCo.CurRound.HelicopterRescuedPlayers
 
 		if not GameData.IsLobby and not SlashCo.CurRound.EscapeHelicopterSummoned then
 			return
 		end
-
-		--[[if SatPlayers[SlashCo.MAXPLAYERS - 1] == nil then
-			availabilityHeli = true
-		end]]
 
 		if activator:Team() ~= TEAM_SURVIVOR --[[or not availabilityHeli]] then
 			return
@@ -194,22 +197,13 @@ if SERVER then
 
 		--The Player is sat down in the helicopter
 
-		if activator:GetNW2Bool("DynamicFlashlight") then
-			activator:SetNW2Bool("DynamicFlashlight", false)
-		end
-
+		activator:SetDynamicFlashlight(false)
 		activator.CantBuy = true
 
-		for _, v in ipairs(SatPlayers) do
-			if v == activator then
-				--If the steamid in this entry matches the one we're looking for, that means the player is already in the copter.
-				userEnteredAlready = true
-				break
-			end
-		end
-
-		if not userEnteredAlready then
-			table.insert(SlashCo.CurRound.HelicopterRescuedPlayers, activator)
+		local seatIndex = table.KeyFromValue(SatPlayers, activator)
+		if not seatIndex then
+			table.insert(SatPlayers, activator)
+			seatIndex = #SatPlayers
 
 			if not GameData.IsLobby then
 				-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
@@ -219,47 +213,26 @@ if SERVER then
 			end
 		end
 
+		if not self:SeatPlayer(activator, seatIndex) then
+			return
+		end
+
+		if #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3
+				and SlashCo.LobbyData.LOBBYSTATE < 5 and SlashCo.State == SlashCo.States.LOBBY then
+			SlashCo.LobbyFinish()
+		end
+	end
+
+	function ENT:SeatPlayer(ply, seatIndex)
 		local vehicle = ents.Create("prop_vehicle_prisoner_pod")
 		if not IsValid(vehicle) then
 			ErrorNoHaltWithStack("[SlashCo] Failed to create helicopter seat! Why did we hit the entity limit!")
 			return
 		end
 
-		--local t = hook.Run("OnPlayerSit", ply, pos, ang, parent or NULL, parentbone, vehicle)
-
-		--if t == false then
-		--	SafeRemoveEntity(vehicle)
-		--	return false
-		--end
-
-
-		local ang = Angle(0, 0, 0)
-		local pos = Vector(0, 0, 0)
-		if SatPlayers[1] == activator then
-			pos = self:LocalToWorld(Vector(-34, 24.25, 44.5))
-			ang = self:LocalToWorldAngles(Angle(0, -90, 0))
-		elseif SatPlayers[2] == activator then
-			pos = self:LocalToWorld(Vector(-34, 0, 44.5))
-			ang = self:LocalToWorldAngles(Angle(0, -90, 0))
-		elseif SatPlayers[3] == activator then
-			pos = self:LocalToWorld(Vector(-34, -24.25, 44.5))
-			ang = self:LocalToWorldAngles(Angle(0, -90, 0))
-		elseif SatPlayers[4] == activator then
-			pos = self:LocalToWorld(Vector(24.5, 24.25, 44.5))
-			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
-		elseif SatPlayers[5] == activator then
-			pos = self:LocalToWorld(Vector(24.5, 0, 44.5))
-			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
-		elseif SatPlayers[6] == activator then
-			pos = self:LocalToWorld(Vector(24.5, -24.25, 44.5))
-			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
-		elseif #SatPlayers > 6 then -- wacky solution
-			pos = self:LocalToWorld(Vector(24.5, -24.25, 44.5))
-			ang = self:LocalToWorldAngles(Angle(0, 90, 0))
-		end
-
-		vehicle:SetPos(pos)
-		vehicle:SetAngles(ang)
+		local seat = SEATS[math.min(seatIndex, #SEATS)] -- wacky solution for everyone beyond the last seat
+		vehicle:SetPos(self:LocalToWorld(seat.pos))
+		vehicle:SetAngles(self:LocalToWorldAngles(seat.ang))
 		vehicle.playerdynseat = true
 		vehicle:SetNWBool("playerdynseat", true)
 		vehicle:SetModel("models/nova/airboat_seat.mdl") -- DO NOT CHANGE OR CRASHES WILL HAPPEN
@@ -270,7 +243,7 @@ if SERVER then
 
 		if not IsValid(vehicle) or not IsValid(vehicle:GetPhysicsObject()) then
 			SafeRemoveEntity(vehicle)
-			return false
+			return
 		end
 
 		local phys = vehicle:GetPhysicsObject()
@@ -297,14 +270,31 @@ if SERVER then
 		vehicle.ClassOverride = "prop_vehicle_prisoner_pod"
 		vehicle:SetParent(self)
 		vehicle.IsHelicopterSeat = true
+		vehicle.ReturnPos = ply:GetPos()
+		vehicle.ReturnAng = ply:EyeAngles()
 		table.insert(self.Seats, vehicle)
 
-		activator:EnterVehicle(vehicle)
+		ply:EnterVehicle(vehicle)
 
-		if #SatPlayers == team.NumPlayers(TEAM_SURVIVOR) and SlashCo.LobbyData.LOBBYSTATE >= 3
-				and SlashCo.LobbyData.LOBBYSTATE < 5 and SlashCo.State == SlashCo.States.LOBBY then
-			SlashCo.LobbyFinish()
+		return vehicle
+	end
+
+	function ENT:DumpSurvivors()
+		for _, seat in ipairs(self.Seats) do
+			if not IsValid(seat) then continue end
+
+			local ply = seat:GetDriver()
+			if IsValid(ply) then
+				seat.AllowExit = true
+				ply:ExitVehicle()
+				ply:SetPos(seat.ReturnPos)
+				ply:SetEyeAngles(seat.ReturnAng)
+			end
+
+			seat:Remove()
 		end
+
+		table.Empty(self.Seats)
 	end
 
 	function ENT:Think()
@@ -373,11 +363,13 @@ if SERVER then
 			local dir_length_sqr = Vector(self.targsmoothx - self.sway_x, self.targsmoothy - self.sway_y, 0):Length()
 
 			if dir_length > 2 then
-				local directional = Vector(self.targsmoothx, self.targsmoothy,
-						self.targsmoothz):Angle()[2] * sign(Vector(self.targsmoothx,
-						self.targsmoothy, self.targsmoothz):Length())
+				if not self.LockHeading then
+					local directional = Vector(self.targsmoothx, self.targsmoothy,
+							self.targsmoothz):Angle()[2] * sign(Vector(self.targsmoothx,
+							self.targsmoothy, self.targsmoothz):Length())
 
-				self.final_dir = self.final_dir + (sign(-self.final_dir + directional) * math.sqrt(self.acceleration * dir_length_sqr / 25) * self.acceleration * (math.abs(-self.final_dir + directional) / 130))
+					self.final_dir = self.final_dir + (sign(-self.final_dir + directional) * math.sqrt(self.acceleration * dir_length_sqr / 25) * self.acceleration * (math.abs(-self.final_dir + directional) / 130))
+				end
 
 				if self.acceleration == 1.1 then
 					self.acceleration = 0

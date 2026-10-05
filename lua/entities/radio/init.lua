@@ -21,7 +21,7 @@ end
 local NextPrintTime = 0
 
 function ENT:Use( activator, caller )
-
+	if not IsValid(activator) or not activator:IsPlayer() then return end
 
 	if (CurTime() >= NextPrintTime) then
 	   

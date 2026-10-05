@@ -24,7 +24,6 @@ hook.Add("SlashCo:Precache", "SlashCo:PrecacheGenerator", function()
 end)
 
 local DefaultTimeToFuel = 13
-local TimeToFuel = DefaultTimeToFuel
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Running")
@@ -166,7 +165,7 @@ end
 
 function ENT:SendData(ply)
 	net.Start("SlashCo:GasPourProgress")
-		net.WriteUInt(TimeToFuel, 8)
+		net.WriteUInt(self.TimeToFuel or DefaultTimeToFuel, 8)
 		net.WriteUInt(self.FuelingCan:EntIndex(), MAX_EDICT_BITS) -- NOTE: We require this since we might send this net message before the Entity was networked, so we need to accout for that.
 		net.WriteBool(self.IsFueling)
 		net.WriteFloat(self.TimeUntilFueled)
@@ -318,15 +317,15 @@ function ENT:Use(activator)
 		end
 
 		--shift TimeToFuel and TimeUntilFueled
-		local unShift = DefaultTimeToFuel / TimeToFuel
-		TimeToFuel = DefaultTimeToFuel / activator:ItemValue("FuelSpeed", 1) / activator:PerkValue("FuelSpeed", 1)
+		local oldTimeToFuel = self.TimeToFuel or DefaultTimeToFuel
+		self.TimeToFuel = DefaultTimeToFuel / activator:ItemValue("FuelSpeed", 1) / activator:PerkValue("FuelSpeed", 1)
 		if self.FuelProgress then
-			self.FuelProgress = self.FuelProgress * unShift * (TimeToFuel / DefaultTimeToFuel)
+			self.FuelProgress = self.FuelProgress * (self.TimeToFuel / oldTimeToFuel)
 		end
 
 		self.IsFueling = true
 		self.CurrentPourer = activator
-		self.TimeUntilFueled = CurTime() + (self.FuelProgress or TimeToFuel)
+		self.TimeUntilFueled = CurTime() + (self.FuelProgress or self.TimeToFuel)
 		self:SendData(activator)
 		self:EmitSound("slashco/generator_fill.mp3")
 	elseif not self.MakingItem then
@@ -369,7 +368,13 @@ end
 
 function ENT:SlasherHint()
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		timer.Create(self:GetCreationID() .. "_slasherHint_" .. v:UserID(), 15, 0, function()
+		local timerName = self:GetCreationID() .. "_slasherHint_" .. v:UserID()
+		timer.Create(timerName, 15, 0, function()
+			if not IsValid(self) or not IsValid(v) then
+				timer.Remove(timerName)
+				return
+			end
+
 			SlashCo.SendValue(v, "genHint", self)
 		end)
 	end
@@ -417,7 +422,8 @@ function ENT:Think()
 		return
 	end
 
-	local fuelprog = math.Clamp(TimeToFuel - (self.TimeUntilFueled - CurTime()), 0, TimeToFuel) / TimeToFuel
+	local timeToFuel = self.TimeToFuel or DefaultTimeToFuel
+	local fuelprog = math.Clamp(timeToFuel - (self.TimeUntilFueled - CurTime()), 0, timeToFuel) / timeToFuel
 	self.FuelingCan:SetAngles(self:LocalToWorldAngles(Angle(0, 0, 25 + fuelprog * 40)))
 	self.FuelingCan:SetPos(self:LocalToWorld(Vector(-52.65, 33.475, 51.035 + fuelprog * 10)))
 
@@ -434,7 +440,7 @@ function ENT:Think()
 
 		self.IsFueling = false
 		self.FuelProgress = nil
-		TimeToFuel = DefaultTimeToFuel
+		self.TimeToFuel = nil
 		self:SendData(self.CurrentPourer)
 		self.TimeUntilFueled = nil
 		self.CurrentPourer = nil

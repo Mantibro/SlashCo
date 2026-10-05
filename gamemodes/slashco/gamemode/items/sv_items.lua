@@ -74,6 +74,9 @@ function SlashCo.DropItem(ply, dropCallback, ignoreField)
 	end
 
 	if not SlashCoItems[item] then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
@@ -207,7 +210,7 @@ function SlashCo.ItemPickUp(ply, itemindex, item)
 	end
 	
 	local itemEnt = Entity(itemindex)
-	if itemEnt.DONTPICKUP then
+	if not IsValid(itemEnt) or itemEnt.DONTPICKUP then
 		return
 	end
 

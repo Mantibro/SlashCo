@@ -71,7 +71,7 @@ end
 
 hook.Add("PlayerNoClip", "SlashCo:PreventSpectators", function(ply)
 	if g_SlashCoDebug then
-		return true
+		return ply:Team() ~= TEAM_SPECTATOR
 	end
 
 	-- RaphaelIT7: If map tools are enabled, the server host is always allowed to noclip to make things easier.
@@ -112,8 +112,8 @@ function PLAYER:FindPlayersInView(dist, radius, notrace)
 	end
 
 	if areWeSlasher then
-		for idx, ply in ipairs(results) do
-			if self:SlasherFunction("Visibility", ply) == 0 then
+		for idx = #results, 1, -1 do
+			if self:SlasherFunction("Visibility", results[idx]) == 0 then
 				table.remove(results, idx)
 			end
 		end
@@ -241,6 +241,211 @@ function SlashCo.SetupLanOverrides() -- Called from sh_shared.lua -> GM:InitPost
 	end
 end
 
+function PLAYER:CanPing()
+	if self:Team() == TEAM_SPECTATOR and not SlashCo.CanSpectatorsPing() then
+		return false
+	end
+
+	local ucmd = self:GetCurrentCommand()
+	if not IsValid(ucmd) then return false end
+
+	-- RaphaelIT7: It's important to know that engine.TickCount() on the server would differ from the client!
+	-- But since PlayerButtonDown is called when the usercmd was received we can easily match up
+	local tickCount = ucmd:TickCount() - self:GetLastPinged()
+	return (tickCount * engine.TickInterval()) > SlashCo.GetPlayerPingDelay()
+end
+
+local function sayPrompt(ply, input)
+	if GameData.IsLobby and SlashCo.LobbyData.LOBBYSTATE == 2 then
+		return
+	end
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/voice/prompt_" .. input .. math.random(1, 3) .. ".mp3",
+		identifier = "Ping",
+		minDistance = 200,
+		maxDistance = 500,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		deleteWhenDone = true, -- RaphaelIT7: Must be explicitly set since this code runs clientside where deleteWhenDone is NOT default true!
+		excludeSendTo = ply, -- RaphaelIT7: We don't send it to the player itself since the sound is played clientside thanks to prediction!
+	})
+end
+
+local typeCheck = {
+	["LOOK HERE"] = "look",
+	["LOOK AT THIS"] = "look",
+	["HELICOPTER"] = "helicopter",
+	["GENERATOR"] = "generator",
+	["PLUSH DOG"] = "dogg",
+	["BASKETBALL"] = "ballin",
+	["DEAD BODY"] = "deadbody",
+	["SLASHER"] = "slasher"
+}
+
+function PLAYER:SurvivorPing()
+	if not self:CanPing() then return end
+
+	local ucmd = self:GetCurrentCommand()
+	if not IsValid(ucmd) then return end
+
+	-- RaphaelIT7: Same as in PLAYER:CanPing()
+	local tickCount = ucmd:TickCount()
+	self:SetLastPinged(tickCount)
+
+	-- We return here since prediction must set SetLastPinged
+	if CLIENT and not IsFirstTimePredicted() then return end
+
+	self:LagCompensation(true)
+	local trace = self:GetEyeTrace()
+	self:LagCompensation(false)
+
+	local pingInfo = {
+		ExpiryTime = 0, -- Time in seconds!
+		Team = self:Team(), -- Idea: Allow slasher's to ping too
+		Player = self,
+	}
+
+	if pingInfo.Team == TEAM_SPECTATOR then
+		pingInfo.Type = "GHOST"
+		pingInfo.Position = trace.HitPos
+		pingInfo.ExpiryTime = 5
+		pingInfo.Player = nil
+	elseif self:GetNWBool("SurvivorBenadrylFull") then
+		pingInfo.Type = "SLASHER"
+		pingInfo.Position = trace.HitPos
+		pingInfo.ExpiryTime = 5
+	elseif not IsValid(trace.Entity) then
+		pingInfo.Position = trace.HitPos
+		pingInfo.Type = "LOOK HERE"
+		pingInfo.ExpiryTime = 10
+	else
+		local look = trace.Entity
+		if look.PingType then
+			pingInfo.Entity = look
+			pingInfo.Type = look.PingType
+			if look.PingExpiryTime then
+				pingInfo.ExpiryTime = look.PingExpiryTime
+			end
+
+			if look:GetClass() == "sc_maleclone" then
+				pingInfo.Position = trace.HitPos
+			end
+
+			if look.OnPing then
+				-- RaphaelIT7: ToDo (Idea) - we can give a reward to the first survivor who found a generator
+				look:OnPing(self)
+			end
+		elseif look:GetModel() == "models/ldi/basketball.mdl" then
+			pingInfo.Type = "BASKETBALL"
+			pingInfo.ExpiryTime = 15
+		elseif look:IsPlayer() then
+			pingInfo.Position = trace.HitPos
+			pingInfo.ExpiryTime = 5
+			if look:Team() == TEAM_SURVIVOR then
+				pingInfo.Type = "SURVIVOR"
+				pingInfo.Name = string.upper(look:Nick())
+			elseif look:Team() == TEAM_SLASHER then
+				local survivors = team.GetPlayers(TEAM_SURVIVOR)
+				local disguiseSurvivor = look:GetNWBool("AmogusSurvivorDisguise") and survivors[1] and survivors[math.random(#survivors)]
+				if not IsValid(disguiseSurvivor) then
+					pingInfo.Type = "SLASHER"
+				else
+					pingInfo.Type = "SURVIVOR"
+					pingInfo.Name = string.upper(disguiseSurvivor:Nick())
+				end
+			else
+				pingInfo.Type = "PLAYER"
+				pingInfo.Position = trace.HitPos
+				pingInfo.Name = string.upper(look:Nick())
+			end
+		else
+			pingInfo.Type = "LOOK AT THIS"
+			pingInfo.ExpiryTime = 10
+		end
+	end
+
+	if pingInfo.ExpiryTime and pingInfo.ExpiryTime == -1 then
+		pingInfo.ExpiryTime = nil
+		pingInfo.Permanent = true -- Permanent pings always remain!
+	end
+
+	if pingInfo.Type == "DEAD BODY" and pingInfo.Entity then
+		local deadguy = player.GetBySteamID64(pingInfo.Entity.SurvivorSteamID)
+		if IsValid(deadguy) then
+			deadguy:SetNWBool("ConfirmedDead", true)
+		end
+	end
+
+	if pingInfo.ExpiryTime then
+		if pingInfo.ExpiryTime ~= 0 then
+			pingInfo.ExpiryTime = CurTime() + pingInfo.ExpiryTime
+		else
+			pingInfo.ExpiryTime = nil
+		end
+	end
+
+	local skipSound = hook.Run("SlashCo:OnPing", pingInfo)
+	if not skipSound and pingInfo.Team == TEAM_SURVIVOR then
+		if typeCheck[pingInfo.Type] then
+			sayPrompt(self, typeCheck[pingInfo.Type])
+		elseif pingInfo.Type == "ITEM" and pingInfo.Entity then
+			local class = pingInfo.Entity:GetClass()
+			for _, v in pairs(SlashCoItems) do
+				local input = v.EntClass
+				if not input then
+					continue
+				end
+
+				if v.EntClass == class then
+					sayPrompt(self, string.sub(input, 4))
+					pingInfo.Name = v.Name
+					break
+				end
+			end
+		end
+	end
+
+	if CLIENT then
+		-- RaphaelIT7: Just in case when some workshop addon messes up...
+		if self ~= GameData.LocalPlayer then return end
+
+		SlashCo.CreatePredictedPing(pingInfo, tickCount)
+	else
+		self:SurvivorPing_SV(pingInfo, tickCount)
+	end
+end
+
+hook.Add("SlashCo:PlayerSwitchFlashlight", "SlashCo:DynamicFlashlight", function(ply, state)
+	if ply:Team() ~= TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then
+		if not (GameData.IsLobby and GameData.IsBlackout) then
+			return false
+		end
+	end
+
+	local state = not ply:GetDynamicFlashlight()
+	ply:SetDynamicFlashlight(state)
+	
+	-- Else we sound spam, but prediction expects SetDynamicFlashlight to be called consistenly!
+	if CLIENT and not IsFirstTimePredicted() then
+		return
+	end
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = state and "slashco/survivor/flashlight-switchoff.mp3" or "slashco/survivor/flashlight-switchon.mp3",
+		identifier = "Flashlight",
+		minDistance = 200,
+		maxDistance = 500,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		deleteWhenDone = true, -- RaphaelIT7: Must be explicitly set since this code runs clientside where deleteWhenDone is NOT default true!
+		excludeSendTo = ply, -- RaphaelIT7: We don't send it to the player itself since the sound is played clientside thanks to prediction!
+	})
+
+	return false
+end)
 
 --[[
 	DTVar Networking (Since NW2 is broken / hasn't been fixed yet)
@@ -314,6 +519,7 @@ SetupSlashCoNetworkVar("Int", 1, "Points")
 SetupSlashCoNetworkVar("Int", 2, "SurvivorRoundsWon")
 SetupSlashCoNetworkVar("Int", 3, "SlasherRoundsWon")
 SetupSlashCoNetworkVar("Int", 4, "Perception")
+SetupSlashCoNetworkVar("Int", 5, "LastPinged") -- RaphaelIT7: The last tick in which they pinged (Ticks should be less of a mess than CurTime)
 
 SetupSlashCoNetworkVar("Float", 0, "EyeSight")
 SetupSlashCoNetworkVar("Float", 1, "DeafenTime")
@@ -322,6 +528,7 @@ SetupSlashCoNetworkVar("Bool", 0, "CanSeePlayers")
 SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")
 SetupSlashCoNetworkVar("Bool", 2, "Visible", true)
 SetupSlashCoNetworkVar("Bool", 3, "CanSeeFlashlights", true) -- RaphaelIT7: Deprecated? Does anyone even use it?
+SetupSlashCoNetworkVar("Bool", 4, "DynamicFlashlight")
 
 -- RaphaelIT7: I do not like this... a problem for later me... (Update) I hate myself.
 -- ToDo: Rework the entire perk networking, as in the future with more perks we may hit the networking limit of 511 characters!

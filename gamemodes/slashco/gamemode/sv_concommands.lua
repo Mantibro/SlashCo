@@ -47,7 +47,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 		if not IsValid(target) then
 			local targetSelect, tooMany
 			for _, v in player.Iterator() do
-				if string.find(v:Nick(), args[1]) then
+				if string.find(v:Nick(), args[1], 1, true) then
 					if targetSelect then
 						tooMany = true
 						break
@@ -75,7 +75,7 @@ concommand.Add("slashco_become_survivor", function(ply, _, args)
 	local id = target:SteamID64()
 	for k, v in ipairs(SlashCo.CurRound.SlasherData.AllSlashers) do
 		if v.steamid == id then
-			SlashCo.CurRound.SlasherData.AllSlashers[k] = nil
+			table.remove(SlashCo.CurRound.SlasherData.AllSlashers, k)
 			break
 		end
 	end
@@ -141,7 +141,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 		if not IsValid(target) then
 			local targetSelect, tooMany
 			for _, v in player.Iterator() do
-				if string.find(v:Nick(), args[2]) then
+				if string.find(v:Nick(), args[2], 1, true) then
 					if targetSelect then
 						tooMany = true
 						break
@@ -167,7 +167,7 @@ concommand.Add("slashco_become_slasher", function(ply, _, args)
 	local steamid = target:SteamID64()
 	for k, v in ipairs(SlashCo.CurRound.SlasherData.AllSurvivors) do
 		if v.steamid == steamid then
-			SlashCo.CurRound.SlasherData.AllSurvivors[k] = nil
+			table.remove(SlashCo.CurRound.SlasherData.AllSurvivors, k)
 			break
 		end
 	end
@@ -214,7 +214,7 @@ end, function(cmd, args)
 	local elem
 	for _, v in ipairs(tbl) do
 		--find every item that matches what's inputted
-		if string.find(string.lower(v), args) then
+		if string.find(string.lower(v), args, 1, true) then
 			table.insert(tbl1, cmd .. " " .. v)
 			elem = v
 		end
@@ -320,7 +320,7 @@ concommand.Add("slashco_debug_datatest_read", function(ply)
 	end
 
 	doPrint(ply, "basedata: ")
-	PrintTable(util.JSONToTable(cookie.Get("slashco_table_basedata") or "") or {})
+	PrintTable(util.JSONToTable(cookie.GetString("slashco_table_basedata", "")) or {})
 	doPrint(ply, "survivordata: ")
 	PrintTable(sql.Query("SELECT * FROM slashco_table_survivordata;") or "nil")
 	doPrint(ply, "slasherdata: ")
@@ -336,14 +336,24 @@ concommand.Add("slashco_debug_datatest_error", function(ply, _, _)
 	doPrint(ply, sql.LastError())
 end, nil, "Print the latest data error.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
-concommand.Add("slashco_debug_datatest_delete", function(_, _, _)
+concommand.Add("slashco_debug_datatest_delete", function(ply, _, _)
+	if not canExecute(ply) then
+		doPrint(ply, "Only admins can use debug commands!")
+		return
+	end
+
 	SlashCo.ClearDatabase()
 end, nil, "Delete the current data table.", FCVAR_CHEAT + FCVAR_PROTECTED)
 
 --//items//--
 
 concommand.Add("slashco_give_item", function(ply, _, args)
-	if ply:Team() ~= TEAM_SURVIVOR then
+	if not canExecute(ply) then
+		doPrint(ply, "Only admins can use debug commands!")
+		return
+	end
+
+	if not IsValid(ply) or ply:Team() ~= TEAM_SURVIVOR then
 		doPrint(ply, "Only survivors can have items")
 		return
 	end
@@ -362,7 +372,7 @@ end, function(cmd, args)
 	local tbl1 = {}
 	for _, v in ipairs(tbl) do
 		--find every item that matches what's inputted
-		if string.find(string.lower(v), args) then
+		if string.find(string.lower(v), args, 1, true) then
 			table.insert(tbl1, cmd .. " " .. v)
 		end
 	end
@@ -394,7 +404,7 @@ concommand.Add("slashco_give_points", function(ply, _, args)
 		if not IsValid(target) then
 			local targetSelect, tooMany
 			for _, v in player.Iterator() do
-				if string.find(v:Nick(), args[1]) then
+				if string.find(v:Nick(), args[1], 1, true) then
 					if targetSelect then
 						tooMany = true
 						break
@@ -419,7 +429,7 @@ concommand.Add("slashco_give_points", function(ply, _, args)
 
 	local steamid = target:SteamID64()
 	local name = target:Nick()
-	local number = "number" and args[2] or 0
+	local number = tonumber(args[2]) or 0
 
 	SlashCoDatabase.UpdateStats(steamid, "Points", number)
 	doPrint(ply, "Player " .. name .. " received " .. number.. " points")
@@ -526,6 +536,8 @@ concommand.Add("slashco_unstuck", function(ply, _, args)
 
 	ply:ChatPrint("Look at a free spot and wait 3 seconds")
 	timer.Simple(3, function()
+		if not IsValid(ply) then return end
+
 		local pos = ply:GetEyeTrace().HitPos
 		local tr = util.TraceEntityHull({
 			start = pos,
@@ -554,6 +566,8 @@ timer.Create("SlashCo:CheckStuck", 5, 0, function()
 end)
 
 concommand.Add("slashco_debug_lobbybot", function(ply)
+	if not canExecute(ply) then return end
+
 	if GameData.LobbyBot and GameData.LobbyBot:IsValid() then
 		GameData.LobbyBot:Kick("Bye")
 	end
@@ -570,12 +584,14 @@ concommand.Add("slashco_debug_lobbybot", function(ply)
 end)
 
 concommand.Add("slashco_debug_lobbybot_readysurvivor", function(ply)
+	if not canExecute(ply) then return end
 	if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
 
 	hook.Run("PlayerButtonDown", GameData.LobbyBot, SlashCo.GetDefaultKey("READY_SURVIVOR"))
 end)
 
 concommand.Add("slashco_debug_lobbybot_readyslasher", function(ply)
+	if not canExecute(ply) then return end
 	if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
 
 	hook.Run("PlayerButtonDown", GameData.LobbyBot, SlashCo.GetDefaultKey("READY_SLASHER"))
@@ -583,6 +599,7 @@ end)
 
 -- RaphaelIT7: The bot does not enter automatically with g_SlashCoDebug set!
 concommand.Add("slashco_debug_lobbybot_enterhelicopter", function(ply)
+	if not canExecute(ply) then return end
 	if not GameData.LobbyBot or not GameData.LobbyBot:IsValid() then return end
 
 	if not IsValid(SlashCo.Helicopter) then return end

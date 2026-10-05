@@ -38,7 +38,7 @@ SLASHER.AdditionalSpecialClones = 0 -- Additional clones on special ability
 function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	SLASHER.ChaseSpeedDecreaseDiv = 4 + SO
+	SLASHER.ChaseSpeedDecreaseInRageDiv = 4 + SO
 	SLASHER.ChaseSpeedDecreaseDiv = 5 + SO
 	-- Gets one more clone for every 4 survivors & math.max to not let it go below 0
 	SLASHER.AdditionalClones = math.max((3 * SO) + math.floor(additionalSurvivors / 4), 0)

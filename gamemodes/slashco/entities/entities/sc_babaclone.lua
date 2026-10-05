@@ -127,6 +127,8 @@ function ENT:Think()
 		SlashCo.CurRound.SlasherEntities[entIndex].PostActivation = true
 
 		timer.Simple(1.75, function()
+			if not IsValid(self) then return end
+
 			table.RemoveByValue(SlashCo.CurRound.SlasherEntities, entIndex)
 			self:Remove()
 		end)

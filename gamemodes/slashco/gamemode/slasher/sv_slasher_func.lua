@@ -262,8 +262,9 @@ function SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
+	local jumpscareName = "SurvivorJumpscare_" .. slasher:GetNWString("Slasher")
 	target:SetNWBool("SurvivorBeingJumpscared", true)
-	target:SetNWBool("SurvivorJumpscare_" .. slasher:GetNWString("Slasher"), true)
+	target:SetNWBool(jumpscareName, true)
 	target:Freeze(true)
 
 	slasher:SetNWBool("CanChase", false)
@@ -274,7 +275,7 @@ function SlashCo.Jumpscare(slasher, target)
 	timer.Simple(slasher:SlasherValue("JumpscareDuration", 1.5), function()
 		if IsValid(target) then
 			target:SetNWBool("SurvivorBeingJumpscared", false)
-			target:SetNWBool("SurvivorJumpscare_" .. slasher:GetNWString("Slasher"), false)
+			target:SetNWBool(jumpscareName, false)
 			target:EmitSound("slashco/survivor/effectexpire_breath.mp3")
 			target:Freeze(false)
 

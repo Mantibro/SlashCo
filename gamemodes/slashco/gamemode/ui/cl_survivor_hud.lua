@@ -187,11 +187,12 @@ local function selectCrosshair(hitPos)
 				local realDistance = hitPos:Distance(gasPos)
 				gasPos = gasPos:ToScreen()
 				local centerDistance = math.Distance(ScrW() / 2, ScrH() / 2, gasPos.x, gasPos.y)
+				local alpha = math.Clamp((100 - realDistance) * (300 - centerDistance) * 0.02, 0, 255)
 				draw.SimpleText("[", "Indicator", gasPos.x - centerDistance / 2 - 12, gasPos.y,
-						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
+						Color(255, 255, 255, alpha), TEXT_ALIGN_CENTER,
 						TEXT_ALIGN_CENTER)
 				draw.SimpleText("]", "Indicator", gasPos.x + centerDistance / 2 + 12, gasPos.y,
-						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
+						Color(255, 255, 255, alpha), TEXT_ALIGN_CENTER,
 						TEXT_ALIGN_CENTER)
 
 				if realDistance < 200 and centerDistance < 25 then
@@ -443,7 +444,7 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 					if animTime < 18 then
 						scale = 1 + ((animTime - 12) / 3)
 					else
-						scale = ((24 - animTime) / 4)
+						scale = math.max(0, (24 - animTime) / 4)
 					end
 
 					local strength = scale * shakeStrength
@@ -522,12 +523,23 @@ hook.Add("SlashCo:DrawHUD", "SurvivorStruggle", function()
 end)
 
 hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)
-	if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SURVIVOR then
+	if ply:Team() ~= TEAM_SURVIVOR then
+		return
+	end
+
+	if SlashCo.IsKeyPressed("PING", ply, button) then
+		ply:SurvivorPing()
+		return
+	end
+
+	-- the VOICE_SELECT does not work with prediction, but SurvivorPing() needs to be called in prediction
+	if not IsFirstTimePredicted() then
 		return
 	end
 
 	if SlashCo.IsKeyPressed("VOICE_SELECT", ply, button) then
 		vgui.Create("sc_voiceselect")
+		return
 	end
 end)
 
@@ -619,6 +631,10 @@ net.Receive("SlashCo:AskToBecomeSlasher", function()
 		local fadeOut = difference > timeToAsk
 		if fadeOut then
 			difference = difference - timeToAsk
+			if difference > fadeTime then
+				hook.Remove("PostDrawHUD", "SlashCo:AskToBecomeSlasher")
+				return
+			end
 		end
 
 		local alpha = fadeOut and (255 - (math.Clamp(difference / fadeTime, 0, 1) * 255)) or (math.Clamp(difference / fadeTime, 0, 1) * 255)
@@ -678,12 +694,16 @@ net.Receive("SlashCo:Announcement", function()
 	local startTime = CurTime()
 	local fadeTime = 0.5 -- in seconds
 	local textColor = Color(255, 255, 255)
-	hook.Add("PostDrawHUD", "SlashCo:AskToBecomeSlasher", function()
+	hook.Add("PostDrawHUD", "SlashCo:Announcement", function()
 		local curTime = CurTime()
 		local difference = curTime - startTime
 		local fadeOut = difference > timeToDisplay
 		if fadeOut then
 			difference = difference - timeToDisplay
+			if difference > fadeTime then
+				hook.Remove("PostDrawHUD", "SlashCo:Announcement")
+				return
+			end
 		end
 
 		local alpha = fadeOut and (255 - (math.Clamp(difference / fadeTime, 0, 1) * 255)) or (math.Clamp(difference / fadeTime, 0, 1) * 255)

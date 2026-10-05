@@ -696,6 +696,15 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		local seek = seek
 
 		if num < 2 then
+			if SlashCo.LobbyData.ReadyTimerStarted then
+				timer.Remove("SlashCo:AllReadyLobby")
+				SlashCo.LobbyData.ReadyTimerStarted = false
+
+				net.Start("SlashCo:LobbyTimerTime")
+					net.WriteUInt(62, 6)
+				net.Broadcast()
+			end
+
 			return
 		end
 

@@ -17,6 +17,8 @@ function ITEM.OnDie(ply)
 	SlashCo.ChangeSurvivorItem(ply, "item", "DeathWard (Used)", true)
 	local pos = ply:WorldSpaceCenter()
 	SlashCo.DropItem(ply, function(ply, item, droppedItem, phys)
+		if not IsValid(phys) then return end
+
 		phys:SetPos(pos, true)
 		phys:SetVelocityInstantaneous(vector_origin)
 	end)

@@ -275,7 +275,7 @@ hook.Add("CalcView", "LobbySpecCam", function(pl, pos, ang, fov)
 
 	if SlashCo.IsLobbyStarting() then
 		local helicopter = SlashCo.Helicopter
-		if not helicopter:IsValid() then return end
+		if not IsValid(helicopter) then return end
 
 		local helicopterPos = helicopter:GetPos()
 		local helicopterAng = helicopter:GetAngles()

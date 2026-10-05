@@ -306,7 +306,7 @@ local function OpenSlasherSelection(ply)
 end
 
 hook.Add("SlashCo:PlayerButtonDown", "SlashCo:MapTools", function(ply, button)
-	if not SlashCo.MapTools.IsEnabled() then return end
+	if not SlashCo.MapTools.IsEnabled(true) then return end
 
 	local isHost = ply:IsListenServerHost()
 	if isHost then

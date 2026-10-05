@@ -26,6 +26,8 @@ function ITEM.OnUse(ply)
 	if ply:GetNW2Float("InitialBenadrylTime", 0) == 0 then
 		ply:SetNW2Float("InitialBenadrylTime", CurTime())
 		timer.Simple(60, function()
+			if not IsValid(ply) then return end
+
 			GameData.TestHatMan = ents.Create("sc_hatman")
 			GameData.TestHatMan:SetTarget(ply)
 			GameData.TestHatMan:Spawn()

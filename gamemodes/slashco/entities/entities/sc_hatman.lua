@@ -252,12 +252,12 @@ function ENT:BehaveUpdate(interval)
 			entity = target,
 		})
 
-		timer.Create("HatManSoundReset", 1, 1, function()
+		timer.Create("HatManSoundReset" .. target:EntIndex(), 1, 1, function()
 			if not IsValid(target) then return end
 			SlashCo.AudioSystem.StopSound("HatManLookedAt", 4, nil, target)
 		end)
 
-		timer.Create("HatManFogReset", 6, 1, function()
+		timer.Create("HatManFogReset" .. target:EntIndex(), 6, 1, function()
 			if not IsValid(target) then return end
 			SlashCo.RemoveFog("HatMan", target)
 		end)

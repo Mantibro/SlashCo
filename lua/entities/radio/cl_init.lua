@@ -1,12 +1,10 @@
 include('shared.lua')
 
 function ENT:Initialize()
-
-
 end
 
 local code = 0
-net.Receive( "radio", function( len, ply )
+net.Receive( "radio", function( len, _ )
 	local ply = net.ReadEntity()
 
 	local DermaPanel = vgui.Create( "DFrame" )	-- Create a panel to parent it to
@@ -37,9 +35,9 @@ net.Receive( "radio", function( len, ply )
 			RunConsoleCommand( "cl_playerpaint" )
 		else
 			GameData.LocalPlayer:ChatPrint("All you get is static.")
-			ply:EmitSound( "npc/overwatch/radiovoice/die"..math.random( 1,3)..".wav", 75, 100, 1, CHAN_AUTO )
+			if IsValid(ply) then
+				ply:EmitSound( "npc/overwatch/radiovoice/die"..math.random( 1,3)..".wav", 75, 100, 1, CHAN_AUTO )
+			end
 		end
 	end
 end )
- 
-

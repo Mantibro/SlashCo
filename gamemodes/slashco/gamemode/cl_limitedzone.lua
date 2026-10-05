@@ -321,8 +321,13 @@ hook.Add("RenderScreenspaceEffects", "SlashCo:ZoneScreenSpace", function()
 		return
 	end
 
+	local settings = colorSettings[ply.ZoneEffect]
+	if not settings then
+		return
+	end
+
 	for k, v in pairs(ply.ColorTable) do
-		ply.ColorTable[k] = math.Clamp(Lerp(0.01, v, colorSettings[ply.ZoneEffect][k]), -10, 10)
+		ply.ColorTable[k] = math.Clamp(Lerp(0.01, v, settings[k]), -10, 10)
 	end
 
 	DrawColorModify(ply.ColorTable)

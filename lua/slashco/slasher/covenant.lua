@@ -101,6 +101,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	target:Kill()
 	timer.Simple(FrameTime(), function()
 		local ragdoll = target.DeadBody
+		if not IsValid(ragdoll) then return end
+
 		local physCount = ragdoll:GetPhysicsObjectCount()
 
 		timer.Simple(2, function()
@@ -136,8 +138,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			SLASHER.ProwlSpeed = SLASHER.ProwlSpeed + SLASHER.RockProwlIncrease
 			SLASHER.ChaseSpeed = SLASHER.ChaseSpeed - SLASHER.RockChaseDecrease
 		else
-			local slashPlys = team.GetPlayers(TEAM_SLASHER)
-			if slashPlys >= 6 then
+			if team.NumPlayers(TEAM_SLASHER) >= 6 then
 				return
 			else
 				timer.Simple(4, function() -- Next victims becomes Cloaks
@@ -147,6 +148,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					target:Freeze(true)
 
 					timer.Simple(3, function()
+						if not IsValid(target) then return end
+
 						target:Freeze(false)
 						target:SetNWBool("CloaksBeingSummoned", false)
 					end)
@@ -157,7 +160,16 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		end
 
 		timer.Simple(6, function()
+			if IsValid(slasher) then
+				slasher:SetNWBool("CovenantSummoning", false)
+				slasher:Freeze(false)
+			end
+
+			if not IsValid(ragdoll) then return end
+
 			local Dissolver = ents.Create("env_entity_dissolver")
+			if not IsValid(Dissolver) then return end
+
 			timer.Simple(1, function()
 				if not IsValid(Dissolver) then return end
 				Dissolver:Remove() -- backup edict save on error
@@ -176,10 +188,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			Dissolver:Fire("Dissolve", Dissolver.Target, 0)
 			Dissolver:Fire("Kill", "", 0.1)
-
-			if not IsValid(slasher) then return end
-			slasher:SetNWBool("CovenantSummoning", false)
-			slasher:Freeze(false)
 		end)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -204,10 +212,13 @@ function SLASHER.OnSecondaryFire(slasher)
 		--Sync the chase for every slasher, meaning every covenant member
 		if not SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[cloak:SteamID64()] then continue end
 
-		if not slasher:GetNWBool("InSlasherChaseMode") and not cloak:GetNWBool("InSlasherChaseMode") then
-			SlashCo.StartChaseMode(cloak, true)
+		if slasher:GetNWBool("InSlasherChaseMode") then
+			if not cloak:GetNWBool("InSlasherChaseMode") then
+				SlashCo.StartChaseMode(cloak, true)
+			end
+
 			cloak.CurrentChaseTick = 0
-		else
+		elseif cloak:GetNWBool("InSlasherChaseMode") then
 			SlashCo.StopChase(cloak)
 		end
 	end

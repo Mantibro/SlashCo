@@ -670,8 +670,8 @@ local function convertLegacyConfig(name, skip)
 			SlashCo.BaseCans = config.GasCans.Count
 		end
 
-		if isnumber(config.GasCans.NeededPerGenerator) then
-			SlashCo.GasCansPerGenerator(config.GasCans.NeededPerGenerator)
+		if isnumber(config.GasCans.NeededPerGenerator) and config.GasCans.NeededPerGenerator > 0 then
+			SlashCo.SetGasCansPerGenerator(config.GasCans.NeededPerGenerator)
 		end
 
 		if istable(config.GasCans.Spawnpoints) then
@@ -795,7 +795,6 @@ local function startRound(noSetup)
 
 	local survivors = team.GetPlayers(TEAM_SURVIVOR)
 	for _, ply in ipairs(survivors) do
-		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
 		ply:SetHealth(ply:GetMaxHealth())
 	end
 	GameData.RoundStartSurvivorCount = #survivors
@@ -813,8 +812,7 @@ local function startRound(noSetup)
 	SlashCo.SpawnItems()
 
 	SlashCo.SetHelicopterPositions()
-	SlashCo.UpdateHelicopterSeek(SlashCo.CurRound.HelicopterIntroPosition)
-	SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterTargetPosition, SlashCo.CurRound.HelicopterIntroAngle)
+	SlashCo.HelicopterLandIntro()
 	SlashCo.BroadcastCurrentRoundData(true)
 
 	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}
@@ -835,9 +833,6 @@ local function startRound(noSetup)
 	})
 
 	timer.Simple(8, function()
-		SlashCo.HelicopterTakeOffIntro()
-		SlashCo.EnableSoundScapes()
-
 		if not g_SlashCoDebug then
 			SlashCo.ClearDatabase()
 		end --Everything was loaded, clear the database.
@@ -941,7 +936,7 @@ function SlashCo.FindSpawn(ply)
 			return
 		end
 
-		spawnEnt.SpawnedEntity = ply
+		UpdateSpawnEntity(ply, spawnEnt)
 		if spawnEnt.SpawnEnt then -- info_player_start doesn't have this.
 			spawnEnt:SpawnEnt()
 		end
@@ -950,7 +945,7 @@ function SlashCo.FindSpawn(ply)
 	end
 end
 
-function GM:PlayerSelectSpawn(ply, transiton)
+function GM:PlayerSelectSpawn(ply, transition)
 	if transition then
 		return
 	end

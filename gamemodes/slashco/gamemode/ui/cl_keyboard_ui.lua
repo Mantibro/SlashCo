@@ -87,7 +87,14 @@ function SlashCo.OpenKeyboardUI()
 
 		ChangeKey.ConfirmKey = function(keyName, keyCode)
 			if ChangeKey.NewKey == keyCode then
-				GameData.KeyboardBinds[bindName] = ChangeKey.NewKey
+				local bindData = GameData.KeyboardBinds[bindName]
+				if istable(bindData) then
+					bindData.button = ChangeKey.NewKey
+				else
+					GameData.KeyboardBinds[bindName] = { button = ChangeKey.NewKey }
+				end
+
+				GameData.KeyboardBinds = SlashCo.ParseKeyboardBinds(SlashCo.KeyboardBindsToString(GameData.KeyboardBinds))
 				CurrentKey:SetText(SlashCo.Language("keyboard_currentkey", string.upper(input.GetKeyName(ChangeKey.NewKey))))
 				ChangeKey:SetText(SlashCo.Language("keyboard_changekey"))
 				pressedButton = nil

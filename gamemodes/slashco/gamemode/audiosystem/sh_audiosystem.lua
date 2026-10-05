@@ -68,7 +68,7 @@ function SlashCo.AudioSystem.SetBackgroundMusicPlaybackRate(playbackrate)
 end
 
 function SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate(fallBack)
-	return GetGlobal2Float("SlashCo:BackgroundMusicPlaybackRate", playbackrate or 1)
+	return GetGlobal2Float("SlashCo:BackgroundMusicPlaybackRate", fallBack or 1)
 end
 
 function SlashCo.AudioSystem.RegisterSound(registerName, soundTable)

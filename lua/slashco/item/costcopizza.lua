@@ -37,7 +37,7 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 		identifier = "CostcoPizzaImpact" .. rng,
 		minDistance = 400,
 		maxDistance = 600,
-		entity = self,
+		entity = owner,
 		volume = 0.9,
 		fadeIn = 0,
 	})
@@ -50,7 +50,7 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 			identifier = "CostcoShatter",
 			minDistance = 700,
 			maxDistance = 1000,
-			entity = self,
+			entity = owner,
 			volume = 0.9,
 			fadeIn = 0,
 		})

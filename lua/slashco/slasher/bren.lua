@@ -177,7 +177,13 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		slasher:SetNWBool("BrenKill", true)
 
 		timer.Simple(1.5, function()
-			if not IsValid(slasher) then return end
+			if not IsValid(slasher) then
+				if IsValid(target) then
+					target:Freeze(false)
+				end
+
+				return
+			end
 
 			slasher:Freeze(false)
 			slasher:SetNWBool("BrenKill", false)
@@ -380,6 +386,8 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 
 		timer.Simple(SLASHER.FogIncreaseLength, function()
 			SlashCo.RemoveFog("BrenSnap", TEAM_SURVIVOR)
+
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("BrenSnapState", false)
 			slasher:SetNWBool("CanChase", true)

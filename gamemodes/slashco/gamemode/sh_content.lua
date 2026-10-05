@@ -314,7 +314,7 @@ function SlashCo.PrecacheSound(soundName)
 	end
 
 	SlashCo.Content.PrecacheSounds[soundName] = true
-	util.PrecacheModel(soundName)
+	util.PrecacheSound(soundName)
 
 	DebugPrint("[Content] Precached sound \"" .. soundName .. "\"")
 end

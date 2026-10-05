@@ -132,7 +132,7 @@ if SERVER then
 			local total = getTotal(k)
 			GameData.RoundPoints[k] = nil
 			if total == 0 then
-				return
+				continue
 			end
 
 			SlashCoDatabase.UpdateStats(k, "Points", total)
@@ -149,14 +149,16 @@ if SERVER then
 	end)
 end
 
-hook.Add("scValue_addRoundPoints", "AddRoundPoints", function(key, amount)
-	GameData.LocalPlayer:AddRoundPoints(key, amount)
-end)
+if CLIENT then
+	hook.Add("scValue_addRoundPoints", "AddRoundPoints", function(key, amount)
+		GameData.LocalPlayer:AddRoundPoints(key, amount)
+	end)
 
-hook.Add("scValue_removeRoundPointsKey", "RemoveRoundPointsKey", function(key)
-	GameData.LocalPlayer:RemoveRoundPointsKey(key)
-end)
+	hook.Add("scValue_removeRoundPointsKey", "RemoveRoundPointsKey", function(key)
+		GameData.LocalPlayer:RemoveRoundPointsKey(key)
+	end)
 
-hook.Add("scValue_setRoundPoints", "SetRoundPoints", function(key, amount, num)
-	GameData.LocalPlayer:SetRoundPoints(key, amount, num)
-end)
+	hook.Add("scValue_setRoundPoints", "SetRoundPoints", function(key, amount, num)
+		GameData.LocalPlayer:SetRoundPoints(key, amount, num)
+	end)
+end

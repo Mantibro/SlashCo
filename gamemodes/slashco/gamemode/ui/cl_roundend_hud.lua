@@ -69,9 +69,9 @@ end
 
 local function printRescued(rescued)
 	local plysRescued = table.Copy(rescued)
-	for k, ply in pairs(plysRescued) do
-		if not IsValid(ply) then
-			table.remove(plysRescued, k)
+	for i = #plysRescued, 1, -1 do
+		if not IsValid(plysRescued[i]) then
+			table.remove(plysRescued, i)
 		end
 	end
 
@@ -291,11 +291,15 @@ local function nextLine(panel, lines)
 			local x2, y2 = surface.GetTextSize(split[1])
 			surface.SetTextColor(lineData[2])
 			surface.SetTextPos(pos1 + x2, 0)
-			surface.DrawText(split[2])
+			surface.DrawText(table.concat(split, ":", 2))
 		end
 	end
 
 	timer.Simple(0, function()
+		if not IsValid(line) then
+			return
+		end
+
 		local w = line:GetTextSize()
 		if w > ScrW() then
 			line:SetWrap(true)
@@ -358,7 +362,7 @@ hook.Add("scValue_RoundEnd", "SlashCoRoundEnd", function(state, survivors, rescu
 	local shows
 	timer.Create("SlashCoRoundEnd", 1, 0, function()
 		if not next(linesPlay) or not IsValid(panel) then
-			timer.Remove("SlashCoRoundEndThink")
+			timer.Remove("SlashCoRoundEnd")
 			return
 		end
 

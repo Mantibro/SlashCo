@@ -114,13 +114,13 @@ end
 local function WritePulseEffect(table)
 	WriteSoundField(table.entity, WriteEntIndex)
 	WriteSoundField(table.entityClass, net.WriteString)
-	WriteSoundField(table.frequency, net.ReadUInt, 16)
+	WriteSoundField(table.frequency, net.WriteUInt, 16)
 end
 
 local function WriteDeltaPulseEffect(table, deltaTable)
 	WriteDeltaSoundField(table.entity, (deltaTable and deltaTable.entity or nil), WriteEntIndex)
 	WriteDeltaSoundField(table.entityClass, (deltaTable and deltaTable.entityClass or nil), net.WriteString)
-	WriteDeltaSoundField(table.frequency, (deltaTable and deltaTable.frequency or nil), net.ReadUInt, 16)
+	WriteDeltaSoundField(table.frequency, (deltaTable and deltaTable.frequency or nil), net.WriteUInt, 16)
 end
 
 local function SendToPlayersWithDelta(soundData, deltaList)
@@ -166,11 +166,14 @@ local function SendToPlayersWithDelta(soundData, deltaList)
 	WriteDeltaSoundField(soundData.modifyGroup, deltaList.modifyGroup, net.WriteString)
 	WriteDeltaSoundField(soundData.modifyGroupVolumeMult, deltaList.modifyGroupVolumeMult, net.WriteFloat)
 	WriteDeltaSoundField(soundData.modifyGroupVolumeFadeTime, deltaList.modifyGroupVolumeFadeTime, net.WriteFloat)
+	WriteDeltaSoundField(soundData.doppler, deltaList.doppler, net.WriteFloat)
 	-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 end
 
 local function SendToPlayersWithNoDelta(soundData, manualSend)
-	net.WriteBool(false)
+	if not manualSend then
+		net.WriteBool(false)
+	end
 	WriteSoundField(soundData.soundPath, net.WriteString)
 	WriteSoundField(soundData.fallbackSoundPath, net.WriteString)
 	WriteSoundField(soundData.entity, WriteEntIndex)
@@ -203,6 +206,7 @@ local function SendToPlayersWithNoDelta(soundData, manualSend)
 	WriteSoundField(soundData.modifyGroup, net.WriteString)
 	WriteSoundField(soundData.modifyGroupVolumeMult, net.WriteFloat)
 	WriteSoundField(soundData.modifyGroupVolumeFadeTime, net.WriteFloat)
+	WriteSoundField(soundData.doppler, net.WriteFloat)
 	-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 end
 
@@ -227,6 +231,7 @@ deltaMerge = DeltaMerge
 		number sendToTeam - Sends the given sound only to the specific team
 		Entity/Table sendToEntity - Sends the given sound only to a specific player/table of players
 		table langPaths - A table where key is the language like "en", "de", "ru" and value is a path to a sound file. It overrides soundData.soundPath with the right language sound file!
+		Entity/table exlcudeSendTo - A table with all players to skip
 ]]
 util.AddNetworkString("slashCo_AudioSystem_PlaySound")
 function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for documentation of the table.
@@ -262,7 +267,40 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 			error("PlaySound: Tried to use an invalid Team in soundData.sendToTeam")
 		end
 
-		soundData.sendToEntity = team.GetPlayers(sendToEntity)
+		soundData.sendToEntity = team.GetPlayers(soundData.sendToTeam)
+	end
+
+	if soundData.excludeSendTo then
+		if not soundData.sendToEntity then
+			local tbl = {}
+			soundData.sendToEntity = tbl
+			for _, ply in player.Iterator() do
+				table.insert(tbl, ply)
+			end
+		end
+
+		if isentity(soundData.excludeSendTo) then
+			for idx, ply in ipairs(soundData.sendToEntity) do
+				if ply == soundData.excludeSendTo then
+					table.remove(soundData.sendToEntity, idx)
+					break
+				end
+			end
+		elseif istable(soundData.excludeSendTo) then
+			local revTbl = {}
+			for _, ply in ipairs(soundData.excludeSendTo) do
+				revTbl[ply] = true
+			end
+
+			local idx = 0
+			while idx <= #soundData.sendToEntity do
+				if revTbl[ply] then
+					table.remove(soundData.sendToEntity, idx)
+				else
+					idx = idx + 1
+				end
+			end
+		end
 	end
 
 	local identifier = soundData.identifier or soundData.soundPath
@@ -294,6 +332,8 @@ function NetworkSettings.PlaySound.ProcessFunc(data, ply)
 
 	if deltaTable and plyDeltaTable and plyDeltaTable[identifier] then
 		SendToPlayersWithDelta(soundData, deltaTable)
+
+		soundData.soundPath = originalSoundPath
 	else
 		SendToPlayersWithNoDelta(soundData)
 		deltaTable = {}
@@ -433,7 +473,7 @@ net.Receive("slashCo_AudioSystem_MissingDelta", function(_, ply)
 	net.Start("slashCo_AudioSystem_MissingDelta")
 		net.WriteString(identifier)
 		net.WriteUInt(missID, 32) -- The client needs this to keep track in case multiple delta misses happen
-		SendToPlayersWithNoDelta(ply, deltaTable, true)
+		SendToPlayersWithNoDelta(deltaTable, true)
 	net.Send(ply)
 	-- print("Sent delta recovery")
 end)
@@ -449,9 +489,10 @@ net.Receive("slashCo_AudioSystem_Acknowledge", function(_, ply)
 		transmitData._LAST_ACK = tickCount -- In case it somehow screwed up???
 	end
 
-	for idx, transmitEntry in ipairs(transmitData.pending) do
-		if transmitEntry.tick <= transmitData._LAST_ACK then
-			table.remove(transmitData.pending, idx)
+	local pending = transmitData.pending
+	for idx = #pending, 1, -1 do
+		if pending[idx].tick <= transmitData._LAST_ACK then
+			table.remove(pending, idx)
 		end
 	end
 end)

@@ -84,19 +84,20 @@ end
 local PLAYER = FindMetaTable("Player")
 
 local function RemoveEmptyEntires(perkTable)
-	for id, entry in ipairs(perkTable) do
+	for id = #perkTable, 1, -1 do
+		local entry = perkTable[id]
 		if entry == "" or entry == "," then
 			table.remove(perkTable, id)
 		end
 	end
 end
 
-local function HasEffect(ply, effectName)
-	return string.find(ply:GetActiveEffects(), effectName) ~= nil
-end
-
 local function GetEffects(ply)
 	return string.Split(ply:GetActiveEffects(), ",")
+end
+
+local function HasEffect(ply, effectName)
+	return table.HasValue(GetEffects(ply), effectName)
 end
 
 local function AddEffect(ply, effectName)
@@ -175,6 +176,7 @@ function PLAYER:ClearEffect(effectName)
 	for effectID, effName in pairs(self.ActiveEffects or {}) do
 		if effName == effectName then
 			timer.Remove("itemEffectExpire_" .. effectID)
+			self.ActiveEffects[effectID] = nil
 		end
 	end
 end
@@ -193,6 +195,7 @@ function PLAYER:ClearEffects()
 	for effectID, _ in pairs(self.ActiveEffects or {}) do
 		timer.Remove("itemEffectExpire_" .. effectID)
 	end
+	self.ActiveEffects = {}
 end
 
 -- Collects all things that have this value for a combined result. This sucks... ToDo: Finish/Rework this!

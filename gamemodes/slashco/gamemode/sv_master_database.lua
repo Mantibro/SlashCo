@@ -123,7 +123,7 @@ function SlashCoDatabase.EstablishDatabase()
 
 			if sql.LastError() then
 				print("ActivePerks migration failed! (" .. sql.LastError() .. ")")
-				sql.Query("ALTER DROP TABLE slashco_master_database_new;")
+				sql.Query("DROP TABLE slashco_master_database_new;")
 			else
 				-- RaphaelIT7: We DONT drop the old table! Just in case we somehow messed something up!
 				sql.Query("ALTER TABLE slashco_master_database RENAME TO slashco_master_database_migration_v1;")
@@ -175,7 +175,13 @@ function SlashCoDatabase.UpdateStats(steamid, statType, increase, forceSet)
 	end
 
 	local current_stat = SlashCoDatabase.GetStat(steamid, statType)
-	local name = sql.Query("SELECT PlayerName FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")[1].PlayerName
+	local nameRow = sql.Query("SELECT PlayerName FROM slashco_master_database WHERE PlayerID = " .. sql.SQLStr(steamid) .. ";")
+	if not nameRow or not nameRow[1] then
+		ErrorNoHaltWithStack("[SlashCo] Database Error. No entry for \"" .. tostring(steamid) .. "\". (" .. statType .. ")")
+		return
+	end
+
+	local name = nameRow[1].PlayerName
 	if not current_stat then
 		ErrorNoHaltWithStack("[SlashCo] Database Error. Bad read. (" .. statType .. ")")
 		return

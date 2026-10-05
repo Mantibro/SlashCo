@@ -181,7 +181,7 @@ local function DoGlobalSlasherSelection()
 
 	local becomeSlasher = {}
 	net.Receive("SlashCo:AskToBecomeSlasher", function(_, ply)
-		if net.ReadBool() then
+		if net.ReadBool() and not table.HasValue(becomeSlasher, ply) then
 			table.insert(becomeSlasher, ply)
 		end
 	end)
@@ -193,17 +193,16 @@ end
 
 local function DoSlasherSelection(slashers, usingPotentialSlashers)
 	if SlashCo.CurRound.AntiLoopSpawn then return end
-	for idx, ply in ipairs(slashers) do
-		if not IsValid(ply) then
+	for idx = #slashers, 1, -1 do
+		if not IsValid(slashers[idx]) then
 			table.remove(slashers, idx)
-			continue
 		end
 	end
-	
+
 	local slasherSelection
 	local function RunSlasherSelection()
-		local selectedPlyIndex = math.random(#slashers)
-		local selectedPly = slashers[math.random(#slashers)]
+		local selectedPlyIndex = #slashers > 0 and math.random(#slashers) or nil
+		local selectedPly = selectedPlyIndex and slashers[selectedPlyIndex]
 		if not IsValid(selectedPly) then
 			if SlashCo.CurRound.AntiLoopSpawn then return end
 			if usingPotentialSlashers then
@@ -428,8 +427,7 @@ function SlashCo.EndRound()
 	end
 
 	if #survivors == 0 and SlashCo.IsQuickEscape() then
-		local slashers = team.GetPlayers(TEAM_SLASHER)
-		for _, slasher in ipairs(survivors) do
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			slasher:SetRoundPoints("slasher_quick")
 		end
 	end
@@ -494,7 +492,7 @@ function SlashCo.EndRound()
 			winners[v:SteamID64()] = true
 		end
 
-		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
+		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 and IsValid(SlashCo.CurRound.HelicopterRescuedPlayers[1]) then
 			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetRoundPoints("last_survive")
 		end
 

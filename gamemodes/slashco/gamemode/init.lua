@@ -99,7 +99,7 @@ CreateConVar("slashco_force_difficulty", -1, FCVAR_NONE,
 
 hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
 	if ply:Team() == TEAM_SURVIVOR then
-		return veh.VehicleName ~= "Airboat Seat"
+		return veh.VehicleName ~= "Airboat Seat" or veh.AllowExit == true
 	end
 end)
 
@@ -291,6 +291,11 @@ local function spectatorButtons(ply, button)
 
 		return
 	end
+
+	if SlashCo.IsKeyPressed("PING", ply, button) then
+		ply:SurvivorPing()
+		return
+	end
 end
 
 local function slasherButtons(ply, button)
@@ -454,11 +459,8 @@ hook.Add("Think", "SlashCo:CoreThink", function()
 				totalCansRemaining = totalCansRemaining + (v.CansRemaining or gasPerGen)
 			end
 
-			if #gens <= totalCansRemaining then
-				return
-			end --Prevent draining if there is too few gas cans
-
-			if engine.TickCount() % math.floor(240 / engine.TickInterval()) == 0 then
+			--Prevent draining if there is too few gas cans
+			if #gens > totalCansRemaining and engine.TickCount() % math.floor(240 / engine.TickInterval()) == 0 then
 				local random = math.random(#gens)
 				gens[random]:ChangeCanProgress(-1)
 				--gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or gasPerGen) + 1, 0, gasPerGen)
@@ -591,7 +593,7 @@ hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, oldTeam
 	end
 
 	if oldTeam == TEAM_SURVIVOR then
-		ply:SetNW2Bool("DynamicFlashlight", false)
+		ply:SetDynamicFlashlight(false)
 	end
 
 	if GameData.IsLobby then
@@ -612,7 +614,7 @@ function GM:PlayerDeath(victim)
 		return
 	end
 
-	victim:SetNW2Bool("DynamicFlashlight", false)
+	victim:SetDynamicFlashlight(false)
 
 	local dontTickLife = victim:ItemFunction("OnDie")
 	if dontTickLife then
@@ -692,8 +694,6 @@ function GM:PlayerDeath(victim)
 		dripfx:SetColor(0)
 		dripfx:SetScale(6)
 		util.Effect("bloodspray", dripfx)
-
-		ang_offset = 180
 	end
 
 	if team.NumPlayers(TEAM_SURVIVOR) == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
@@ -738,26 +738,7 @@ end
 --https://github.com/RiggsMackay/Dynamic-Flashlight
 
 hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, state)
-	if ply:Team() ~= TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then
-		if not (GameData.IsLobby and GameData.IsBlackout) then
-			return false
-		end
-	end
-
-	if state == false then
-		return false
-	end
-
-	ply:SetNW2Bool("DynamicFlashlight", not ply:GetNW2Bool("DynamicFlashlight"))
-	if ply:GetNW2Bool("DynamicFlashlight") then
-		ply:EmitSound("slashco/survivor/flashlight-switchoff.mp3", 60, 100)
-	end
-
-	if not ply:GetNW2Bool("DynamicFlashlight") then
-		ply:EmitSound("slashco/survivor/flashlight-switchon.mp3", 60, 100)
-	end
-
-	return false
+	return hook.Run("SlashCo:PlayerSwitchFlashlight", ply, state)
 end)
 
 util.AddNetworkString("SlashCo:FlashWindows")
@@ -770,15 +751,6 @@ function SlashCo.FlashWindows(players)
 		net.Broadcast()
 	end
 end
-
-hook.Add("PlayerButtonDown", "SlashCo:SpectatorFunctions", function(ply, button)
-	if ply:Team() ~= TEAM_SPECTATOR then return end
-	if not SlashCo.CanSpectatorsPing() then return end
-	if button ~= MOUSE_MIDDLE then return end
-	if ply.LastPinged and (CurTime() - ply.LastPinged) < SlashCo.GetPlayerPingDelay() then return end
-
-	ply:SurvivorPing()
-end)
 
 util.AddNetworkString("SlashCo:UpdateLightMap")
 function SlashCo.SetLightStyle(lightStyle, lightPattern)

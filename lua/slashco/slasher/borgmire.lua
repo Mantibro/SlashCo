@@ -341,6 +341,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher.KickCooldown = 15 - (SlashCo.GetSlasherAnger(slasher) / 10)
 
 		timer.Simple(2.0, function()
+			if not IsValid(slasher) then return end
+
 			local idx = math.random(1, 2)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/borgmire/borgmire_swing" .. idx .. ".mp3",
@@ -418,6 +420,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 			slasher:SetNWBool("BorgmireKick", true)
 
 			timer.Create("BorgmireKickDecay", 2.1, 1, function()
+				if not IsValid(slasher) then return end
+
 				slasher:SetNWBool("BorgmireKick", false)
 				slasher.BorgKicking = false
 			end)
@@ -458,7 +462,12 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		end
 
 		timer.Simple(1.5, function()
-			if not IsValid(target) or not IsValid(slasher) then return end
+			if not IsValid(target) then return end
+
+			if not IsValid(slasher) then
+				target:Freeze(false)
+				return
+			end
 
 			target:SetPos(slasher:GetPos() + Vector(47, 0, 53))
 			target:SetVelocity((slasher:GetForward() * SLASHER.ThrowStrengthForward) + Vector(0, 0, SLASHER.ThrowStrengthUp))
@@ -473,7 +482,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		end)
 
 		timer.Simple(2, function()
-			if not IsValid(target) or not IsValid(slasher) then return end
+			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("BorgmireThrow", false)
 			slasher.ChaseActivationCooldown = 2

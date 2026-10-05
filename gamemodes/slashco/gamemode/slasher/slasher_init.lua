@@ -50,7 +50,7 @@ function SlashCo.RegisterSlasher(table, name)
 	if SERVER then
 		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
-			if slasherTbl.OnBalanceForPlayers then
+			if slasherTbl and slasherTbl.OnBalanceForPlayers then
 				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
 			end
 		end
@@ -159,6 +159,8 @@ function SlashCo.GetGlobalSlasherAnger()
 	for _, slasher in ipairs(slashers) do
 		totalAnger = totalAnger + SlashCo.GetSlasherAnger(slasher)
 	end
+
+	if count == 0 then return 0 end
 
 	return totalAnger / count
 end

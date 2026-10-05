@@ -860,7 +860,7 @@ end
 if CLIENT then
 	hook.Add("Tick", "PoLight", function()
 		for _, po in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if po == GameData.LocalPlayer then return end
+			if po == GameData.LocalPlayer then continue end
 
 			if SlashCoSlashers[po:GetNWString("Slasher")] == SLASHER then
 				if po:GetNWBool("AmericanpoFinal") then

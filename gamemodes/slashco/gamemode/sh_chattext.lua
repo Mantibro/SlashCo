@@ -21,9 +21,10 @@ function SlashCo.ChatText(...)
 	chat.AddText(unpack(toPrint))
 end
 
-hook.Add("scValue_ChatText", "SlashCo:ChatText", SlashCo.ChatText)
-
-if CLIENT then return end
+if CLIENT then
+	hook.Add("scValue_ChatText", "SlashCo:ChatText", SlashCo.ChatText)
+	return
+end
 -- Server only function
 
 ---print a translated message to a player's chat

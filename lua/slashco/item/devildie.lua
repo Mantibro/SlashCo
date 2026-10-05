@@ -34,6 +34,8 @@ function ITEM.OnUse(ply)
 	})
 
 	timer.Simple(2, function()
+		if not IsValid(ply) then return end
+
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/survivor/devildie_break.mp3",
 			identifier = "DevilDieBreak",
@@ -143,6 +145,8 @@ function ITEM.OnUse(ply)
 			})
 
 			timer.Simple(0.5, function()
+				if not IsValid(ply) then return end
+
 				local vPoint = ply:GetPos() + Vector(0, 0, 50)
 				local killfx = EffectData()
 				killfx:SetOrigin(vPoint)

@@ -58,7 +58,8 @@ function SlashCo.Language(key, ...)
 	elseif SlashCo.LangTableFallback[key] then
 		return #vars > 0 and string.format(SlashCo.LangTableFallback[key], unpack(vars)) or SlashCo.LangTableFallback[key]
 	else
-		return string.format(Localize("slashco." .. string.gsub(key, " ", "_"), key), unpack(vars))
+		local localized = Localize("slashco." .. string.gsub(key, " ", "_"), key)
+		return #vars > 0 and string.format(localized, unpack(vars)) or localized
 	end
 end
 
@@ -218,9 +219,10 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 		noZ = true
 	end
 
-	for k, v in pairs(_ents) do
+	for i = #_ents, 1, -1 do
+		local v = _ents[i]
 		if IsValid(v) and (v:IsPlayer() and not v:CanBeSeen() or v:IsDormant()) then
-			table.remove(_ents, k)
+			table.remove(_ents, i)
 		end
 	end
 
@@ -280,9 +282,16 @@ local function UpdateCache(entity, state)
 	end
 
 	if state then
-		table.insert(cache, entity)
+		if not table.HasValue(cache, entity) then
+			table.insert(cache, entity)
+		end
 	else
-		for i = 1, #cache do
+		if entity.DynamicFlashlight then
+			entity.DynamicFlashlight:Remove()
+			entity.DynamicFlashlight = nil
+		end
+
+		for i = #cache, 1, -1 do
 			if cache[i] == entity then
 				table.remove(cache, i)
 			end
@@ -298,6 +307,19 @@ hook.Add("EntityRemoved", "DynamicFlashlight.PVS_Cache", function(entity)
 	UpdateCache(entity, false)
 end)
 
+local FLASHLIGHT_SOUNDS = {
+	["slashco/survivor/flashlight-switchoff.mp3"] = true,
+	["slashco/survivor/flashlight-switchon.mp3"] = true,
+}
+
+hook.Add("PlayerButtonDown", "DynamicFlashlight.Predict", function(ply, button)
+	if input.LookupKeyBinding(button) ~= "impulse 100" or not ply:Alive() then
+		return
+	end
+
+	hook.Run("SlashCo:PlayerSwitchFlashlight", ply, not ply:GetDynamicFlashlight())
+end)
+
 hook.Add("Think", "DynamicFlashlight.Rendering", function()
 	local ply = GameData.LocalPlayer
 	if not ply:CanSeeFlashlights() then
@@ -311,8 +333,12 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 		return
 	end
 
+	if IsFirstTimePredicted() then
+		print(IsFirstTimePredicted(), ply:GetDynamicFlashlight())
+	end
+
 	for _, target in ipairs(cache) do
-		if target:GetNW2Bool("DynamicFlashlight") and (target:CanBeSeen() or target == ply) then
+		if target:GetDynamicFlashlight() and (target:CanBeSeen() or target == ply) then
 			if target.DynamicFlashlight then
 				local position = target:GetPos()
 				local newposition = Vector(position[1], position[2], position[3] + 40) + target:GetForward() * 20
@@ -528,14 +554,14 @@ local function GetBriefingScreenPos()
 end
 
 local b_tick = -500
-hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
+hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
 	if not GameData.IsLobby then
 		return
 	end
 
 	if bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then return end
 
-	local offerTable = table.Random(ents.FindByClass("sc_offertable"))
+	local offerTable = ents.FindByClass("sc_offertable")[1]
 	if IsValid(offerTable) then
 		local angle = offerTable:LocalToWorldAngles(Angle(0, 90, 90))
 		local pos = offerTable:LocalToWorld(Vector(5, 0, 110))

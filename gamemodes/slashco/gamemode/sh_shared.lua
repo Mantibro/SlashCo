@@ -116,9 +116,10 @@ function SlashCo.GetGeneratorsToSpawn()
 	return GetGlobal2Int("SlashCo:GeneratorsToSpawn", SlashCo.Generators)
 end
 
-function SlashCo.GasCansPerGenerator(amount)
-	SetGlobal2Int("SlashCo:GasCansToSpawn", amount)
+function SlashCo.SetGasCansPerGenerator(amount)
+	SetGlobal2Int("SlashCo:GasCansPerGenerator", amount)
 end
+SlashCo.GasCansPerGenerator = SlashCo.SetGasCansPerGenerator
 
 function SlashCo.GetGasCansPerGenerator()
 	return GetGlobal2Int("SlashCo:GasCansPerGenerator", SlashCo.GasPerGen)
@@ -161,7 +162,7 @@ function SlashCo.CanSpectatorsPing()
 	return GetGlobal2Bool("SlashCo:SpectatorsCanPing", false)
 end
 
--- Serevr settings
+-- Server settings
 function SlashCo.GetPlayerPingDelay()
 	return GetConVarNumber("slashco_playerpingdelay")
 end
@@ -199,7 +200,7 @@ function SlashCo.GetGlobalFogColor(type, object)
 			return r, g, b
 		end
 	else
-		if not asVector then
+		if not isvector(object) then
 			object.r = r
 			object.g = g
 			object.b = b
@@ -222,7 +223,7 @@ end
 	With these two, we don't expect anything as the lobby may not even have been loaded at all
 ]]
 function SlashCo.IsDebugGame()
-	return GameData.IsSinglePlayer or SlashCo.MapTools.IsEnabled()
+	return GameData.IsSinglePlayer or SlashCo.MapTools.IsEnabled(true)
 end
 
 -- Helper networking functions

@@ -159,7 +159,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			timer.Simple(2, function()
 				if not IsValid(slasher) then return end
 
-				if AntiSpam == 1 then
+				if slasher.LungeAntiSpam == 1 then
 					slasher.LungeAntiSpam = 2
 					slasher.LungeDuration = 0
 					slasher:SetNWBool("AbomignatLungeFinish", false)
@@ -487,6 +487,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				if slasher.LungeAntiSpam == 0 then
 					slasher:SetNWBool("AbomignatLungeFinish", true)
 					timer.Simple(0.6, function()
+						if not IsValid(slasher) then return end
+
 						AbomignatScream(slasher)
 					end)
 
@@ -498,6 +500,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				end
 
 				timer.Simple(2, function()
+					if not IsValid(slasher) then return end
+
 					if slasher.LungeAntiSpam == 1 then
 						slasher.LungeAntiSpam = 2
 						slasher.LungeDuration = 0
@@ -611,6 +615,7 @@ function SLASHER.Animator(ply)
 	end
 
 	if abomignat_crouch then
+		local CrouchAnim
 		local r = math.random(1, 2)
 		if r == 1 then
 			CrouchAnim = "idle_crouch"
