@@ -30,6 +30,8 @@ function ENT:Initialize()
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
+
+	self:PhysWake()
 	
 	local postInitialize = self.PostInitialize
 	if postInitialize then
