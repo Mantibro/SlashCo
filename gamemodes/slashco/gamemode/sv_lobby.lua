@@ -423,7 +423,15 @@ local function lobbyRoundSetup()
 			print("[SlashCo] Survivor failsafe hit for " .. ply:GetName())
 		end
 	end
-
+	--OUTFITTER AUTOWEAR CANCEL, idk maybe it's shitty code but on test this works
+	if outfitter then
+		for _, data in pairs(SlashCo.LobbyData.AssignedSlashers) do
+			local ply = player.GetBySteamID64(data.steamid)
+			print("[SlashCo] Delete outfitter autowear data for " .. ply:GetName())
+			ply:SendLua("util.RemovePData(\"0\",\"outfitter_autowear\")")
+		end
+	end
+		
 	SlashCo.LobbyRoundData()
 
 	--Assign the map randomly
