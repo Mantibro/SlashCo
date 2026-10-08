@@ -163,6 +163,8 @@ if CLIENT then
 			ply:ChatPrint("ENTITY SPAWNPOINT ID: " .. eyeTrace.Entity:GetNWInt("SpawnPoint_ID"))
 		end
 	end)
+local function playBlip()
+	SlashCo.AudioSystem.PlaySound({soundPath = "slashco/blip.mp3", volume = 0.5, fadeIn = 0})
 end
 
 hook.Add("KeyPress", "SlashCo:ToggleLight", function(ply, key)
@@ -172,26 +174,17 @@ hook.Add("KeyPress", "SlashCo:ToggleLight", function(ply, key)
 
 	if key == IN_RELOAD then
 		GameData.vision = not GameData.vision
-		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-		Sndd:Play()
-		Sndd:ChangeVolume(0.5, 0)
-		Sndd:ChangePitch(100, 0)
+		playBlip()
 	end
 
 	if key == IN_WALK then
 		GameData.showHalos = not GameData.showHalos
-		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-		Sndd:Play()
-		Sndd:ChangeVolume(0.5, 0)
-		Sndd:ChangePitch(100, 0)
+		playBlip()
 	end
 
 	if key == IN_USE then
 		GameData.showGasCanHalos = not GameData.showGasCanHalos
-		local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-		Sndd:Play()
-		Sndd:ChangeVolume(0.5, 0)
-		Sndd:ChangePitch(100, 0)
+		playBlip()
 	end
 end)
 

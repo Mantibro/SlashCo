@@ -91,9 +91,9 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 
 	if g_monitor < g then
 		if g < 1 then
-			surface.PlaySound("slashco/slashco_progress.mp3")
+			SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slashco_progress.mp3", fadeIn = 0})
 		else
-			surface.PlaySound("slashco/slashco_progress_full.mp3")
+			SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slashco_progress_full.mp3", fadeIn = 0})
 		end
 	end
 	local gp = g

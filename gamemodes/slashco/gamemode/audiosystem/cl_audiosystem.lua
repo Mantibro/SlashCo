@@ -775,6 +775,14 @@ function SlashCo.AudioSystem.FadeToPlaybackRate(channel, fadeTime, targetPlaybac
 	vol = UpdateFadeToVolume(targetPlaybackRate, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, false)
 end
 
+-- Sets the rate instantly, use it when you change it every frame since FadeToPlaybackRate creates a timer
+function SlashCo.AudioSystem.SetPlaybackRate(channel, playbackRate)
+	local channelData = SlashCo.AudioSystem.Channels[channel]
+	channelData.playbackRate = nil
+	channelData.baseRate = playbackRate
+	channel:SetPlaybackRate(playbackRate * (channelData.dopplerRatio or 1))
+end
+
 function SlashCo.AudioSystem.StopBackgroundMusic()
 	SlashCo.AudioSystem.DestroyChannel(SlashCo.AudioSystem.BackgroundChannel, 1)
 	SlashCo.AudioSystem.BackgroundChannel = nil
@@ -848,7 +856,7 @@ end
 -- Did you know? This was one too >:3
 local function OnBackgroundMusicVolumeChange(ent, name, old, new)
 	if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
-		SlashCo.AudioSystem.FadeToVolume(SlashCo.AudioSystem.BackgroundChannel, 3, new)
+		SlashCo.AudioSystem.FadeToVolume(SlashCo.AudioSystem.BackgroundChannel, 3, new * snd_musicvolume:GetFloat())
 	end
 end
 
@@ -889,7 +897,7 @@ function SlashCo.AudioSystem.Init()
 	OnBackgroundMusicStateChange(world, "SlashCo:ShouldPlayBackgroundMusic", nil, SlashCo.AudioSystem.ShouldPlayBackgroundMusic())
 
 	world:SetNW2VarProxy("SlashCo:BackgroundMusicVolume", OnBackgroundMusicVolumeChange)
-	OnBackgroundMusicVolumeChange(world, "SlashCo:BackgroundMusicVolume", nil, SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled())
+	OnBackgroundMusicVolumeChange(world, "SlashCo:BackgroundMusicVolume", nil, SlashCo.AudioSystem.GetBackgroundMusicVolume())
 
 	world:SetNW2VarProxy("SlashCo:BackgroundMusicPlaybackRate", OnBackgroundMusicPlaybackRateChange)
 	OnBackgroundMusicPlaybackRateChange(world, "SlashCo:BackgroundMusicPlaybackRate", nil, SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate())
@@ -1214,6 +1222,8 @@ end)
 		You can combine forceStereo and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in stereo/using multiple channels instead of the normal 3D that forces them into mono.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
+	if not IsFirstTimePredicted() then return end -- Lets help with predicted code
+
 	local soundPath = soundData.soundPath
 	if soundData.boundConVar and soundData.fallbackSoundPath then
 		local convar = GetConVar(soundData.boundConVar)
@@ -1229,6 +1239,11 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	soundData.volume = soundData.volume or 1
 	soundData.looping = soundData.looping or false
 	soundData.modes = soundData.modes or ""
+
+	-- RaphaelIT7: Let's mimic the server for predicted sounds
+	if soundData.excludeSendTo and not soundData.looping then
+		soundData.deleteWhenDone = true
+	end
 
 	local entIndex = 0
 	if isnumber(soundData.entity) then
@@ -1457,6 +1472,8 @@ end
 	If given no identifier and a entity, it will stop all sounds from the entity.
 ]]
 function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
+	if not IsFirstTimePredicted() then return end -- Lets help with predicted code
+
 	fadeOut = fadeOut or 1
 
 	if not isnumber(entIndex) and IsValid(entIndex) then

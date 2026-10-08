@@ -4,7 +4,6 @@ local weakMeta = {
 
 -- This table contains all tables that were played, this was done to support full updates properly later on. Currently Unused.
 SlashCo.AudioSystem.Sounds = SlashCo.AudioSystem.Sounds or {}
-SlashCo.AudioSystem.DeltaSoundCache = SlashCo.AudioSystem.DeltaSoundCache or {}
 SlashCo.AudioSystem.PlayerDeltaSoundCache = SlashCo.AudioSystem.PlayerDeltaSoundCache or {}
 SlashCo.AudioSystem.TransmitData = SlashCo.AudioSystem.TransmitData or {}
 
@@ -210,22 +209,6 @@ local function SendToPlayersWithNoDelta(soundData, manualSend)
 	-- NOTE: We don't network the field noplay since we expect networked sounds to always play instantly based on how we currently use it.
 end
 
-local deltaMerge
-local function DeltaMerge(deltaTable, baseTable) -- This one works differently than the clientside version as we always update only the deltaTable.
-	for key, val in pairs(baseTable) do
-		local deltaTableVal = deltaTable[key]
-		if deltaTableVal then
-			if istable(deltaTableVal) then
-				deltaMerge(deltaTableVal, baseTable[key])
-				continue -- We got nothing to change :3
-			end
-		end
-
-		deltaTable[key] = val
-	end
-end
-deltaMerge = DeltaMerge
-
 --[[
 	Serverside only fields:
 		number sendToTeam - Sends the given sound only to the specific team
@@ -254,7 +237,7 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 
 	-- Fallback code to ensure that if an entity wasn't networked to a client yet,
 	-- the sound would still have the right volume calculated when used with any of the fields that require a position to calculate the volume with.
-	if not soundData.position and (soundData.minDistance or soundData.maxDistance or soundData.startDistance or soundData.startEndDistance) and soundData.entity and (isnumber(soundData.entity) or IsValid(soundData.entity)) then
+	if not soundData.position and (soundData.soundLevel or soundData.minDistance or soundData.maxDistance or soundData.startDistance or soundData.startEndDistance) and soundData.entity and (isnumber(soundData.entity) or IsValid(soundData.entity)) then
 		soundData.position = (isnumber(soundData.entity) and Entity(soundData.entity) or soundData.entity):GetPos()
 	end
 
@@ -287,67 +270,49 @@ function SlashCo.AudioSystem.PlaySound(soundData) -- see cl_audiosystem.lua for 
 				end
 			end
 		elseif istable(soundData.excludeSendTo) then
-			local revTbl = {}
+			local excluded = {}
 			for _, ply in ipairs(soundData.excludeSendTo) do
-				revTbl[ply] = true
+				excluded[ply] = true
 			end
 
-			local idx = 0
-			while idx <= #soundData.sendToEntity do
-				if revTbl[ply] then
+			for idx = #soundData.sendToEntity, 1, -1 do
+				if excluded[soundData.sendToEntity[idx]] then
 					table.remove(soundData.sendToEntity, idx)
-				else
-					idx = idx + 1
 				end
 			end
 		end
 	end
 
-	local identifier = soundData.identifier or soundData.soundPath
-	local deltaTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
-
-	local data = {
-		identifier = identifier,
-		deltaTable = deltaTable,
+	AddToTransmits(soundData.sendToEntity, NetworkSettings.PlaySound, {
+		identifier = soundData.identifier or soundData.soundPath,
 		soundData = soundData,
-	}
-
-	AddToTransmits(soundData.sendToEntity, NetworkSettings.PlaySound, data)
+	})
 end
 
 function NetworkSettings.PlaySound.ProcessFunc(data, ply)
 	local identifier = data.identifier
 	local soundData = data.soundData
-	local deltaTable = data.deltaTable -- if we had no data when PlaySound was called we do not want to check here for delta.
 	local plyDeltaTable = SlashCo.AudioSystem.PlayerDeltaSoundCache[ply]
+	if not plyDeltaTable then
+		plyDeltaTable = {}
+		SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = plyDeltaTable
+	end
+
 	-- We must do this here since else delta sending will be messed up!
 	local originalSoundPath = soundData.soundPath
 	if soundData.langPaths then
-		local clientLang = ply:GetInfo("gmod_language")
-		local soundPath = soundData.langPaths[clientLang]
-		if soundPath then
-			soundData.soundPath = soundPath
-		end
+		soundData.soundPath = soundData.langPaths[ply:GetInfo("gmod_language")] or soundData.soundPath
 	end
 
-	if deltaTable and plyDeltaTable and plyDeltaTable[identifier] then
-		SendToPlayersWithDelta(soundData, deltaTable)
-
-		soundData.soundPath = originalSoundPath
+	local base = plyDeltaTable[identifier]
+	if base and base.acknowledged then
+		SendToPlayersWithDelta(soundData, base.data)
 	else
 		SendToPlayersWithNoDelta(soundData)
-		deltaTable = {}
-		-- print("We had no delta :sob:")
-
-		-- We restore it to not break delta later on!
-		soundData.soundPath = originalSoundPath
-
-		-- Yes, this is not the best way, we should probably ALWAYS update the delta though I don't like that idea really as then delta recover gets tricky.
-		-- Also really only position & entity fields should change.
-		DeltaMerge(deltaTable, soundData)
-	
-		SlashCo.AudioSystem.DeltaSoundCache[identifier] = deltaTable
+		plyDeltaTable[identifier] = { data = table.Copy(soundData) }
 	end
+
+	soundData.soundPath = originalSoundPath
 end
 
 -- We use SetupPlayerVisibility as it's called, ONCE per transmit / entity update
@@ -446,18 +411,10 @@ end
 
 util.AddNetworkString("slashCo_AudioSystem_AcknowledgeDelta")
 net.Receive("slashCo_AudioSystem_AcknowledgeDelta", function(_, ply)
-	local identifier = net.ReadString()
-	if SlashCo.AudioSystem.DeltaSoundCache[identifier] then
-		local plyTable = SlashCo.AudioSystem.PlayerDeltaSoundCache[ply]
-		if not plyTable then
-			plyTable = {}
-			SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = plyTable
-		end
-
-		plyTable[identifier] = true
-		-- print("Player " .. tostring(ply) .. "(" .. ply:Name() .. ")" .. " acknowledged delta!", identifier)
-	else
-		-- Player tried to acknowledge a sound for delta when we as the server don't even know it?!? How...
+	local plyDeltaTable = SlashCo.AudioSystem.PlayerDeltaSoundCache[ply]
+	local base = plyDeltaTable and plyDeltaTable[net.ReadString()]
+	if base then
+		base.acknowledged = true
 	end
 end)
 
@@ -465,15 +422,18 @@ util.AddNetworkString("slashCo_AudioSystem_MissingDelta")
 net.Receive("slashCo_AudioSystem_MissingDelta", function(_, ply)
 	local identifier = net.ReadString()
 	local missID = net.ReadUInt(32)
-	SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = nil -- Yeet, since you can't do anything :(
 
-	local deltaTable = SlashCo.AudioSystem.DeltaSoundCache[identifier]
-	if not deltaTable then return end -- GG
+	local plyDeltaTable = SlashCo.AudioSystem.PlayerDeltaSoundCache[ply]
+	local base = plyDeltaTable and plyDeltaTable[identifier]
+	if not base then return end -- GG
+
+	base.acknowledged = nil
+	SlashCo.AudioSystem.PlayerDeltaSoundCache[ply] = { [identifier] = base }
 
 	net.Start("slashCo_AudioSystem_MissingDelta")
 		net.WriteString(identifier)
 		net.WriteUInt(missID, 32) -- The client needs this to keep track in case multiple delta misses happen
-		SendToPlayersWithNoDelta(deltaTable, true)
+		SendToPlayersWithNoDelta(base.data, true)
 	net.Send(ply)
 	-- print("Sent delta recovery")
 end)

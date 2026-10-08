@@ -219,8 +219,8 @@ function ENT:MakeBattery(model)
 	battery:SetPos(self:LocalToWorld(Vector(-33.59, 13.2, 53.7)))
 	battery:SetAngles(self:LocalToWorldAngles(Angle(0, 90, 0)))
 	battery:SetParent(self)
-	battery:EmitSound("ambient/machines/zap1.wav", 125, 100, 0.5)
-	battery:EmitSound("slashco/battery_insert.mp3", 125, 100, 1)
+	SlashCo.AudioSystem.EmitSound(battery, "ambient/machines/zap1.wav", 125, 0.5)
+	SlashCo.AudioSystem.EmitSound(battery, "slashco/battery_insert.mp3", 125)
 	battery:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
 	self.Battery = battery
 
@@ -327,7 +327,14 @@ function ENT:Use(activator)
 		self.CurrentPourer = activator
 		self.TimeUntilFueled = CurTime() + (self.FuelProgress or self.TimeToFuel)
 		self:SendData(activator)
-		self:EmitSound("slashco/generator_fill.mp3")
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/generator_fill.mp3",
+			identifier = "GeneratorFill",
+			soundLevel = 75,
+			entity = self,
+			volume = 1,
+			fadeIn = 0,
+		})
 	elseif not self.MakingItem then
 		self:SlasherHint()
 		local gasPerGen = SlashCo.GetGasCansPerGenerator()
@@ -406,8 +413,8 @@ function ENT:Think()
 	end
 
 	if not IsValid(self.CurrentPourer) or not IsValid(self.FuelingCan) then
-		self:StopSound("slashco/generator_fill.mp3")
 		self.IsFueling = false
+		SlashCo.AudioSystem.StopSound("GeneratorFill", 0.2, self)
 		return
 	end
 
@@ -418,7 +425,7 @@ function ENT:Think()
 		self:SendData(self.CurrentPourer)
 		self.TimeUntilFueled = nil
 		self.CurrentPourer = nil
-		self:StopSound("slashco/generator_fill.mp3")
+		SlashCo.AudioSystem.StopSound("GeneratorFill", 0.2, self)
 		return
 	end
 
@@ -444,7 +451,7 @@ function ENT:Think()
 		self:SendData(self.CurrentPourer)
 		self.TimeUntilFueled = nil
 		self.CurrentPourer = nil
-		self:StopSound("slashco/generator_fill.mp3")
+		SlashCo.AudioSystem.StopSound("GeneratorFill", 0.2, self)
 		self:ChangeCanProgress(1)
 
 		--//discard gas can//--

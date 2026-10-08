@@ -73,7 +73,7 @@ function ENT:Think()
 
 	if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SURVIVOR and not self.activateWalk and SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook == false then
 		self.activateWalk = true
-		self:EmitSound("slashco/slasher/baba_reveal.mp3")
+		SlashCo.AudioSystem.EmitSound(self, "slashco/slasher/baba_reveal.mp3")
 	end
 
 	if self.activateWalk == true then
@@ -114,9 +114,8 @@ function ENT:Think()
 
 		self:SetCloneTripped(true)
 
-		self:EmitSound("slashco/slasher/baba_reveal.mp3")
-
-		self:EmitSound("slashco/slasher/baba_scare.mp3")
+		SlashCo.AudioSystem.EmitSound(self:GetPos(), "slashco/slasher/baba_reveal.mp3")
+		SlashCo.AudioSystem.EmitSound(self:GetPos(), "slashco/slasher/baba_scare.mp3")
 		self:DrawShadow(true)
 		self:SetColor(color_white)
 		self:SetRenderMode(RENDERMODE_TRANSCOLOR)

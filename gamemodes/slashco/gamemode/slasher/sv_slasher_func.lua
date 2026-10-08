@@ -268,7 +268,11 @@ function SlashCo.Jumpscare(slasher, target)
 	target:Freeze(true)
 
 	slasher:SetNWBool("CanChase", false)
-	slasher:EmitSound(slasher:SlasherValue("KillSound"))
+	local killSound = slasher:SlasherValue("KillSound")
+	if killSound ~= "" then
+		SlashCo.AudioSystem.EmitSound(slasher, killSound)
+	end
+
 	slasher:Freeze(true)
 	slasher.KillDelayTick = slasher:SlasherValue("KillDelay", 3)
 
@@ -276,7 +280,7 @@ function SlashCo.Jumpscare(slasher, target)
 		if IsValid(target) then
 			target:SetNWBool("SurvivorBeingJumpscared", false)
 			target:SetNWBool(jumpscareName, false)
-			target:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+			SlashCo.AudioSystem.EmitSound(target, "slashco/survivor/effectexpire_breath.mp3")
 			target:Freeze(false)
 
 			if IsValid(slasher) then
@@ -475,9 +479,9 @@ function SlashCo.BustDoor(slasher, target, force, callback, noRecursive)
 			local surf = IsValid(doorPhys) and doorPhys:GetMaterial() or nil
 			if surf then
 				if surf.name == "wood" then
-					door:EmitSound("physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
+					SlashCo.AudioSystem.EmitSound(door:GetPos(), "physics/wood/wood_crate_break" .. math.random(1, 5) .. ".wav")
 				elseif surf.name == "metal" then
-					door:EmitSound("physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
+					SlashCo.AudioSystem.EmitSound(door:GetPos(), "physics/metal/metal_box_break" .. math.random(1, 2) .. ".wav")
 				end
 			end
 

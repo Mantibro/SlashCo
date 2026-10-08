@@ -365,8 +365,8 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
 			if g_thirstySound == nil then
-				surface.PlaySound("slashco/slasher/thirsty/thirsty_rage1.mp3")
-				surface.PlaySound("slashco/slasher/thirsty/thirsty_rage2.mp3")
+				SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slasher/thirsty/thirsty_rage1.mp3", fadeIn = 0})
+				SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slasher/thirsty/thirsty_rage2.mp3", fadeIn = 0})
 				g_thirstySound = true
 			end
 		end

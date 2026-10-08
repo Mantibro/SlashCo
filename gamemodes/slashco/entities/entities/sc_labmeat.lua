@@ -40,7 +40,7 @@ if SERVER then
 
 		if SlashCo.ItemPickUp(activator, self:EntIndex(), "LabMeat") then
 			self.ragdoll:Remove()
-			activator:EmitSound("slashco/survivor/eat_mayo.mp3")
+			SlashCo.AudioSystem.EmitSound(activator, "slashco/survivor/eat_mayo.mp3")
 		end
 
 		if self:IsPlayerHolding() then
@@ -53,7 +53,7 @@ if SERVER then
 		self.SoundTick = self.SoundTick + math.random(0, 1)
 
 		if self.SoundTick > 60 then
-			self:EmitSound("npc/headcrab/idle" .. math.random(1, 3) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(self, "npc/headcrab/idle" .. math.random(1, 3) .. ".wav")
 			self.SoundTick = 0
 
 			--jerk it

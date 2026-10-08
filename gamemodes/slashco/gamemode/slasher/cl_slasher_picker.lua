@@ -53,7 +53,7 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 		function Slash.DoClick()
 			GameData.SelectedSlasher = slasherName
 			updateSelection()
-			GameData.LocalPlayer:EmitSound("slashco/slasher_preview.mp3")
+			SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slasher_preview.mp3", fadeIn = 0})
 		end
 		Slash:SetPos(30 + x, 30 + y)
 		Slash:SetSize(icon_size, icon_size)
@@ -112,7 +112,7 @@ function DrawTheSlasherSelectorBox(pickSlasherTbl)
 	function confirmselect.DoClick()
 		SlasherChosen(GameData.SelectedSlasher)
 		HideSelection()
-		GameData.LocalPlayer:EmitSound("slashco/slasher_select.mp3")
+		SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slasher_select.mp3", fadeIn = 0})
 	end
 	confirmselect:SetPos(ScrW() / 2, ScrH() / 1.1)
 	confirmselect:SetSize(ScrW() / 4, 40)
@@ -233,10 +233,10 @@ hook.Add("PlayerButtonDown", "FriendlyMatch", function(ply, key)
 	if IsValid(SlasherSelectFrame) then
 		if key == Death.Sequence[Death.CurInput] then
 			Death.CurInput = Death.CurInput + 1
-			ply:EmitSound("slashco/blip.wav")
+			SlashCo.AudioSystem.PlaySound({soundPath = "slashco/blip.wav", fadeIn = 0})
 			if Death.CurInput > 7 then
 				ply:ChatPrint("What have you done. . .")
-				ply:EmitSound("slashco/slasher/hoovydundy/kill.mp3")
+				SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slasher/hoovydundy/kill.mp3", fadeIn = 0})
 				SlashCoSlashers.Hoovydundy.IsSelectable = true
 				if (IsValid(SlasherSelectFrame)) then
 					SlasherSelectFrame:Remove()

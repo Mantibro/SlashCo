@@ -68,7 +68,7 @@ end
 function ENT:HandleStuck()
 	local justGo = SlashCo.RandomPosLocator()
 	if justGo then
-		self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
+		SlashCo.AudioSystem.EmitSound(self, "physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 0.1)
 		self.loco:ClearStuck()
 		self:SetPos(justGo)
 		return

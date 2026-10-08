@@ -621,17 +621,17 @@ function SlashCo.LobbyVendorVoice(ply, item)
 	if SlashCo.LobbyData.Offering == SCInfo.Offering.Nightmare then
 		if math.random(1, 5) == 1 then
 			-- He really hates you for what you've done.
-			vendor:EmitSound("slashco/itemvendor/itemvendor_generic4.mp3")
+			SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_generic4.mp3")
 		end
 		return
 	end
 
 	if item == "DeathWard" then
-		vendor:EmitSound("slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
+		SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
 	elseif item == "Brick" then
-		vendor:EmitSound("slashco/itemvendor/itemvendor_brick" .. math.random(1,5) .. ".mp3")
+		SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_brick" .. math.random(1,5) .. ".mp3")
 	else
-		vendor:EmitSound("slashco/itemvendor/itemvendor_generic" .. math.random(1,12) .. ".mp3")
+		SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_generic" .. math.random(1,12) .. ".mp3")
 	end
 end
 

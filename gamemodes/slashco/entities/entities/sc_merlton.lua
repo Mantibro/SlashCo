@@ -247,7 +247,7 @@ function ENT:HandleStuck()
 		lim = math.Clamp(lim + 0.5, 1, 120)
 	end
 
-	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
+	SlashCo.AudioSystem.EmitSound(self, "physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 0.1)
 	self.loco:ClearStuck()
 end
 

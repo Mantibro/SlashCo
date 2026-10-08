@@ -97,9 +97,9 @@ local function RegisterPing(pingInfo)
 		local skipSound = hook.Run("SlashCo:OnPing", pingInfo)
 		if not skipSound and pingInfo.Team ~= TEAM_SLASHER then
 			if pingInfo.Type == "GENERATOR" then
-				GameData.LocalPlayer:EmitSound("slashco/ping_generator.mp3")
+				SlashCo.AudioSystem.PlaySound({soundPath = "slashco/ping_generator.mp3", fadeIn = 0})
 			elseif pingInfo.Type ~= "LOOK HERE" and pingInfo.Type ~= "LOOK AT THIS" and pingInfo.Type ~= "GHOST" then
-				GameData.LocalPlayer:EmitSound("slashco/ping_item.mp3")
+				SlashCo.AudioSystem.PlaySound({soundPath = "slashco/ping_item.mp3", fadeIn = 0})
 			end
 		end
 	end

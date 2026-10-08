@@ -10,7 +10,7 @@ ITEM.IsSpawnable = false
 function ITEM.OnUse(ply)
 	local hp = ply:Health()
 
-	ply:EmitSound("slashco/survivor/eat_hotdog.mp3")
+	SlashCo.AudioSystem.EmitSound(ply, "slashco/survivor/eat_hotdog.mp3")
 	ply:AddEffect("Speed", 5)
 
 	if ply:Health() < 100 then

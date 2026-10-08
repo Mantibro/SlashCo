@@ -65,19 +65,19 @@ function SLASHER.OnTickBehaviour(slasher)
 			--sound
 
 			if math.floor(slasher.LeuonardRoid) == 25 and slasher.soundon == 0 then
-				slasher:EmitSound("slashco/slasher/leuonard/leuonard_25_" .. math.random(1, 3) .. ".mp3", 95)
+				SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_25_" .. math.random(1, 3) .. ".mp3", 95)
 				slasher.soundon = 1
 				slasher:SlasherHudFunc("FlashMeter", "r**e")
 			end
 
 			if math.floor(slasher.LeuonardRoid) == 50 and slasher.soundon == 1 then
-				slasher:EmitSound("slashco/slasher/leuonard/leuonard_50_" .. math.random(1, 3) .. ".mp3", 95)
+				SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_50_" .. math.random(1, 3) .. ".mp3", 95)
 				slasher.soundon = 2
 				slasher:SlasherHudFunc("FlashMeter", "r**e")
 			end
 
 			if math.floor(slasher.LeuonardRoid) == 90 and slasher.soundon == 2 then
-				slasher:EmitSound("slashco/slasher/leuonard/leuonard_90_" .. math.random(1, 3) .. ".mp3", 95)
+				SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_90_" .. math.random(1, 3) .. ".mp3", 95)
 				slasher.soundon = 3
 				slasher:SlasherHudFunc("FlashMeter", "r**e")
 			end
@@ -94,13 +94,20 @@ function SLASHER.OnTickBehaviour(slasher)
 					slasher.soundon = 0
 					ent:Remove()
 					slasher:SetNWBool("LeuonardRoiding", true)
-					slasher:EmitSound("slashco/slasher/leuonard/leuonard_yell1.mp3")
+					SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_yell1.mp3")
 					slasher:Freeze(true)
 					timer.Simple(4, function()
 						if not IsValid(slasher) or not slasher:GetNWBool("LeuonardRoiding", false) then
 							return
 						end
-						slasher:EmitSound("slashco/slasher/leuonard/leuonard_grunt_loop.mp3")
+						SlashCo.AudioSystem.PlaySound({
+							soundPath = "slashco/slasher/leuonard/leuonard_grunt_loop.mp3",
+							identifier = "LeuonardGrunt",
+							soundLevel = 75,
+							entity = slasher,
+							volume = 1,
+							fadeIn = 0,
+						})
 					end)
 				end
 			end
@@ -116,8 +123,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 
-				slasher:StopSound("slashco/slasher/leuonard/leuonard_grunt_loop.mp3")
-				slasher:EmitSound("slashco/slasher/leuonard/leuonard_grunt_finish.mp3")
+				SlashCo.AudioSystem.StopSound("LeuonardGrunt", 0.2, slasher)
+				SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_grunt_finish.mp3")
 			end
 		end
 	else
@@ -144,7 +151,14 @@ function SLASHER.OnTickBehaviour(slasher)
 				--I FOUND YOU........
 				ent:Remove()
 				slasher:SetNWBool("LeuonardRoiding", true)
-				slasher:EmitSound("slashco/slasher/leuonard/leuonard_grunt_loop.mp3")
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/leuonard/leuonard_grunt_loop.mp3",
+					identifier = "LeuonardGrunt",
+					soundLevel = 75,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
 				slasher:Freeze(true)
 				slasher:SetBodygroup(1, 1)
 
@@ -153,7 +167,7 @@ function SLASHER.OnTickBehaviour(slasher)
 						return
 					end
 
-					slasher:StopSound("slashco/slasher/leuonard/leuonard_grunt_loop.mp3")
+					SlashCo.AudioSystem.StopSound("LeuonardGrunt", 0.2, slasher)
 					slasher:Freeze(false)
 					slasher:SetNWBool("LeuonardRoiding", false)
 					slasher:SetBodygroup(1, 0)
@@ -162,9 +176,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		if not slasher.soundon == 0 then
-			slasher:PlayGlobalSound("slashco/slasher/leuonard/leuonard_yell7.mp3", 100)
-			slasher:PlayGlobalSound("slashco/slasher/leuonard/leuonard_full_close.mp3", 80)
-			slasher:PlayGlobalSound("slashco/slasher/leuonard/leuonard_full_far.mp3", 125)
+			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_yell7.mp3", 100)
+			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_full_close.mp3", 80)
+			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_full_far.mp3", 125)
 			slasher.soundon = 0
 		end
 
@@ -181,7 +195,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if MouseTick < 0 then
 				slasher.MouseDriftTick = 2 + (math.random() * 2)
 				slasher:SlasherHudFunc("GoblinShift")
-				slasher:EmitSound("slashco/slasher/leuonard/leuonard_yell" .. math.random(1, 7) .. ".mp3")
+				SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_yell" .. math.random(1, 7) .. ".mp3")
 			end
 			slasher.MouseDriftTick = slasher.MouseDriftTick - FrameTime()
 
@@ -196,7 +210,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				if ent:IsPlayer() and ent ~= slasher and ent:Team() == TEAM_SURVIVOR and ent.Devastate ~= true then
 					ent:SetVelocity(slasher:GetForward() * 500)
 					ent.Devastate = true
-					ent:EmitSound("slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".mp3")
+					SlashCo.AudioSystem.EmitSound(ent, "slashco/body_medium_impact_hard" .. math.random(1, 5) .. ".mp3")
 					for a = 1, 10 do
 						timer.Simple(a * 0.005, function()
 							local vPoint = ent:GetPos() + Vector(math.random(-25, 25), math.random(-25, 25),

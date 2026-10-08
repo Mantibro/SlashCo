@@ -205,6 +205,18 @@ function SlashCo.AudioSystem.ResolveSoundPath(soundPath)
 	return nil, false
 end
 
+function SlashCo.AudioSystem.EmitSound(source, soundPath, soundLevel, volume)
+	local isPosition = isvector(source)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = soundPath,
+		entity = not isPosition and source or nil,
+		position = isPosition and source or nil,
+		soundLevel = soundLevel or 75,
+		volume = volume or 1,
+		fadeIn = 0,
+	})
+end
+
 -- Server & client files are loaded at last
 if SERVER then
 	include("sv_audiosystem.lua")

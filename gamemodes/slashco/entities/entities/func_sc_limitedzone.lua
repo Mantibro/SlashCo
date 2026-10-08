@@ -140,39 +140,39 @@ local damageSounds = {
 	[1] = function(ent, damage)
 		--default
 		if damage <= 10 then
-			ent:EmitSound("physics/flesh/flesh_impact_bullet" .. math.random(1, 5) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_impact_bullet" .. math.random(1, 5) .. ".wav")
 		elseif damage >= ent:Health() then
-			ent:EmitSound("physics/flesh/flesh_bloody_break.wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_bloody_break.wav")
 		else
-			ent:EmitSound("physics/flesh/flesh_strider_impact_bullet" .. math.random(1, 3) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_strider_impact_bullet" .. math.random(1, 3) .. ".wav")
 		end
 	end,
 	[2] = function(ent, damage)
 		--blizzard
 		if damage >= ent:Health() and damage > 10 then
-			ent:EmitSound("physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
 		else
-			ent:EmitSound("physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
 		end
 	end,
 	[3] = function(ent)
 		--poison
-		ent:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
+		SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
 	end,
 	[4] = function(ent, damage)
 		--blood
 		if damage >= ent:Health() and damage > 10 then
-			ent:EmitSound("physics/flesh/flesh_bloody_break.wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_bloody_break.wav")
 		else
-			ent:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
 		end
 	end,
 	[6] = function(ent, damage)
 		--black snow
 		if damage >= ent:Health() and damage > 10 then
-			ent:EmitSound("physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
 		else
-			ent:EmitSound("physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
 		end
 	end
 }

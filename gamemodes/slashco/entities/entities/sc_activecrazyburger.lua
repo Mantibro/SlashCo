@@ -20,7 +20,7 @@ if SERVER then
 			self.PhysObj:Wake()
 		end
 
-		self:EmitSound("weapons/smokegrenade/sg_explode.wav", 511, 100 )
+		SlashCo.AudioSystem.EmitSound(self, "weapons/smokegrenade/sg_explode.wav", 511)
 		SafeRemoveEntityDelayed(self, 30)
 	end
 

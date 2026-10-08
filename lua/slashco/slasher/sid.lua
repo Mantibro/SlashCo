@@ -909,7 +909,7 @@ function SLASHER.InitHud(_, hud)
 			hud:SetTitle("Sid_gun_title")
 			hud:ShakeControl("F")
 			hud:FlashMeter("gun uses")
-			surface.PlaySound("slashco/slashco_progress.mp3")
+			SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slashco_progress.mp3", fadeIn = 0})
 			hud.gunMode = true
 		end
 	end
@@ -998,7 +998,7 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 
 			if c == nil then
-				surface.PlaySound("slashco/slasher/sid/sid_rage_drone.mp3")
+				SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slasher/sid/sid_rage_drone.mp3", fadeIn = 0})
 				c = true
 			end
 		end
