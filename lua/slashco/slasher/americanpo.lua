@@ -724,11 +724,27 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		local idx = math.random(1, 2)
-		local hunter = ply:GetNWInt("AmericanpoState") == 0
+	local idx = math.random(1, 2)
+	local hunter = ply:GetNWInt("AmericanpoState") == 0
 
-		if not hunter then
+	if not hunter then
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/screamer/screamer_step" .. idx .. ".mp3",
+			identifier = "AmericanpoFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
+	else
+		if ply.PoStepTick == nil or ply.PoStepTick > 1 then
+			ply.PoStepTick = 0
+		end
+
+		if ply.PoStepTick == 0 then
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/screamer/screamer_step" .. idx .. ".mp3",
 				identifier = "AmericanpoFootstep" .. idx,
@@ -736,29 +752,13 @@ function SLASHER.Footstep(ply)
 				minDistance = 200,
 				maxDistance = 400,
 				entity = ply,
-				volume = 1,
+				volume = 0.3,
 				fadeIn = 0,
+				excludeSendTo = ply,
 			})
-		else
-			if ply.PoStepTick == nil or ply.PoStepTick > 1 then
-				ply.PoStepTick = 0
-			end
-
-			if ply.PoStepTick == 0 then
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "slashco/slasher/screamer/screamer_step" .. idx .. ".mp3",
-					identifier = "AmericanpoFootstep" .. idx,
-					group = "SlasherFootstep",
-					minDistance = 200,
-					maxDistance = 400,
-					entity = ply,
-					volume = 0.3,
-					fadeIn = 0,
-				})
-			end
-
-			ply.PoStepTick = ply.PoStepTick + 1
 		end
+
+		ply.PoStepTick = ply.PoStepTick + 1
 	end
 
 	return true

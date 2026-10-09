@@ -461,20 +461,19 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if not ply:GetNWBool("BrenNoclip") then
-			local idx = math.random(1, 6)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
-				identifier = "BrenFootstep" .. idx,
-				group = "SlasherFootstep",
-				minDistance = 200,
-				maxDistance = 400,
-				entity = ply,
-				volume = 1,
-				fadeIn = 0,
-			})
-		end
+	if not ply:GetNWBool("BrenNoclip") then
+		local idx = math.random(1, 6)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
+			identifier = "BrenFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
 	end
 
 	return true

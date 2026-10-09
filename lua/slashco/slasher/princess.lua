@@ -744,7 +744,23 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
+		identifier = "PrincessFootstep1",
+		group = "SlasherFootstep",
+		minDistance = 300,
+		maxDistance = 700,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
+
+	timer.Simple(0.15, function()
+		if not IsValid(ply) then
+			return
+		end
+
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
 			identifier = "PrincessFootstep1",
@@ -754,21 +770,9 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			excludeSendTo = ply,
 		})
-
-		timer.Simple(0.15, function()
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
-				identifier = "PrincessFootstep2",
-				group = "SlasherFootstep",
-				minDistance = 300,
-				maxDistance = 700,
-				entity = ply,
-				volume = 1,
-				fadeIn = 0,
-			})
-		end)
-	end
+	end)
 
 	return true
 end

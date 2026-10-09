@@ -135,6 +135,17 @@ local function lagTrace(ply)
 	return tr.Entity, tr
 end
 
+local function playBlip(ply, pitch)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/blip.mp3",
+		entity = ply,
+		soundLevel = 75,
+		volume = 0.5,
+		playbackRate = pitch / 100,
+		fadeIn = 0,
+	})
+end
+
 local function lobbyButtons(ply, button)
 	local plyTeam = ply:Team()
 	if SlashCo.LobbyData.LOBBYSTATE == 0 and plyTeam == TEAM_LOBBY then
@@ -146,10 +157,7 @@ local function lobbyButtons(ply, button)
 				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.NotReady)
 				SlashCo.LobbyBroadcastInfo()
 			end
-			local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-			Sndd:Play()
-			Sndd:ChangeVolume(0.5, 0)
-			Sndd:ChangePitch(100, 0)
+			playBlip(ply, 100)
 		end
 
 		if SlashCo.IsKeyPressed("READY_SLASHER", ply, button) then
@@ -166,17 +174,11 @@ local function lobbyButtons(ply, button)
 
 				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.Slasher)
 				SlashCo.LobbyBroadcastInfo()
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(100, 0)
+				playBlip(ply, 100)
 			else
 				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.NotReady)
 				SlashCo.LobbyBroadcastInfo()
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(100, 0)
+				playBlip(ply, 100)
 			end
 		end
 
@@ -193,24 +195,15 @@ local function lobbyButtons(ply, button)
 			if (#team.GetPlayers(TEAM_LOBBY) < GameData.MaxPlayers) then
 				ply:SetTeam(TEAM_LOBBY)
 				ply:Spawn()
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(80, 0)
+				playBlip(ply, 80)
 			else
 				ply:ChatPrint("The Lobby is currently full.")
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(65, 0)
+				playBlip(ply, 65)
 			end
 		elseif plyTeam == TEAM_LOBBY then
 			ply:SetTeam(TEAM_SPECTATOR)
 			ply:Spawn()
-			local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-			Sndd:Play()
-			Sndd:ChangeVolume(0.5, 0)
-			Sndd:ChangePitch(80, 0)
+			playBlip(ply, 80)
 		end
 	end
 end

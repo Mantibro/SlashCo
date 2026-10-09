@@ -179,9 +179,9 @@ function SlashCo.ChangeSurvivorItem(ply, slot, id, noSound)
 		
 		if not noSound then
 			if SlashCoItems[id].EquipSound then
-				ply:EmitSound(SlashCoItems[id].EquipSound())
+				SlashCo.AudioSystem.EmitSound(ply, SlashCoItems[id].EquipSound())
 			else
-				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+				SlashCo.AudioSystem.EmitSound(ply, "slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
 			end
 		end
 	elseif id == "none" then

@@ -134,12 +134,12 @@ function SLASHER.OnSecondaryFire(slasher)
 			if clone.IsMain ~= true then
 				clone:Remove()
 			end
-			SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5, slasher)
-			SlashCo.AudioSystem.StopSound("CriminalRage", 0.5, slasher)
 		end
 
 		slasher:SetNWBool("CriminalCloning", false)
 		slasher:SetNWBool("CriminalRage", false)
+		SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5, slasher)
+		SlashCo.AudioSystem.StopSound("CriminalRage", 0.5, slasher)
 	else
 		for i = 1, math.random(4 + SLASHER.AdditionalClones, 6 + SLASHER.AdditionalClones) do
 			local clone = ents.Create("sc_crimclone")
@@ -186,26 +186,23 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply.CrimStepTick == nil or ply.CrimStepTick > 2 then
-			ply.CrimStepTick = 0
-		end
+	if ply.CrimStepTick == nil or ply.CrimStepTick > 2 then
+		ply.CrimStepTick = 0
+	end
 
-		if ply.CrimStepTick == 0 then
-			local idx = math.random(1, 6)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
-				identifier = "CriminalFootstep" .. idx,
-				group = "SlasherFootstep",
-				minDistance = 200,
-				maxDistance = 500,
-				entity = ply,
-				volume = 1,
-				fadeIn = 0,
-			})
-		end
-
-		ply.CrimStepTick = ply.CrimStepTick + 1
+	if ply.CrimStepTick == 0 then
+		local idx = math.random(1, 6)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
+			identifier = "CriminalFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 200,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
 	end
 
 	return true

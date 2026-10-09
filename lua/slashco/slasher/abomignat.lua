@@ -638,21 +638,20 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetNWBool("InSlasherChaseMode")
 
-		local idx = math.random(1, 3)
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/abomignat/abomignat_" .. (chase and "hardstep" or "step") .. idx .. ".ogg",
-			identifier = "AbomignatFootstep" .. idx,
-			group = "SlasherFootstep",
-			minDistance = 200,
-			maxDistance = 400,
-			entity = ply,
-			volume = 1,
-			fadeIn = 0,
-		})
-	end
+	local idx = math.random(1, 3)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/abomignat/abomignat_" .. (chase and "hardstep" or "step") .. idx .. ".ogg",
+		identifier = "AbomignatFootstep" .. idx,
+		group = "SlasherFootstep",
+		minDistance = 200,
+		maxDistance = 400,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
 
 	return true
 end

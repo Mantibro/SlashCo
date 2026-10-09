@@ -138,7 +138,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 	slasher:SetNWBool("ThirstyDrinking", true)
 	SlashCo.StopChase(slasher)
-	slasher:StopSound(SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseMusic)
 	slasher:SetRunSpeed(slasher.ThirstyProwlSpeed)
 	slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
 	slasher.Pacification = 99

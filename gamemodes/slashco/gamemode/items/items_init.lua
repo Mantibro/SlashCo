@@ -148,7 +148,7 @@ function PLAYER:AddEffect(effectName, duration)
 			if effName == effectName then return end
 		end
 
-		self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+		SlashCo.AudioSystem.EmitSound(self, "slashco/survivor/effectexpire_breath.mp3")
 		self:EffectFunction(effectName, "OnExpired")
 		RemoveEffect(self, effectName)
 	end)
@@ -170,7 +170,7 @@ function PLAYER:ClearEffect(effectName)
 		self:EffectFunction(effectName, "OnExpired")
 	end
 
-	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+	SlashCo.AudioSystem.EmitSound(self, "slashco/survivor/effectexpire_breath.mp3")
 
 	RemoveEffect(self, effectName)
 	for effectID, effName in pairs(self.ActiveEffects or {}) do
@@ -191,7 +191,7 @@ function PLAYER:ClearEffects()
 		RemoveEffect(self, effectName)
 	end
 
-	self:EmitSound("slashco/survivor/effectexpire_breath.mp3")
+	SlashCo.AudioSystem.EmitSound(self, "slashco/survivor/effectexpire_breath.mp3")
 	for effectID, _ in pairs(self.ActiveEffects or {}) do
 		timer.Remove("itemEffectExpire_" .. effectID)
 	end

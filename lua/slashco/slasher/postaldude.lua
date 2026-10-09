@@ -1195,19 +1195,18 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		local idx = math.random(1, 5)
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/postaldude/dude_footstep" .. idx .. ".ogg",
-			identifier = "PostalFootstep" .. idx,
-			group = "SlasherFootstep",
-			minDistance = 150,
-			maxDistance = 500,
-			entity = ply,
-			volume = 1,
-			fadeIn = 0,
-		})
-	end
+	local idx = math.random(1, 5)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/postaldude/dude_footstep" .. idx .. ".ogg",
+		identifier = "PostalFootstep" .. idx,
+		group = "SlasherFootstep",
+		minDistance = 150,
+		maxDistance = 500,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
 
 	return true
 end

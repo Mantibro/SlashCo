@@ -185,6 +185,12 @@ end)
 
 hook.Add("PlayerFootstep", "SlashCo:SlasherFootstep", function(ply)
 	if ply:Team() ~= TEAM_SLASHER then return end
+
+	-- RaphaelIT7: Can ply even not be the GameData.LocalPlayer?
+	if CLIENT and (ply ~= GameData.LocalPlayer or not IsFirstTimePredicted()) then
+		return true
+	end
+
 	return ply:SlasherFunction("Footstep")
 end)
 

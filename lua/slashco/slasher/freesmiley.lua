@@ -255,8 +255,25 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply:GetNWBool("InSlasherChaseMode") then
+	if ply:GetNWBool("InSlasherChaseMode") then
+		local idx = math.random(1, 6)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
+			identifier = "FreeSmileyFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 200,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
+	else
+		if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then
+			ply.SmileyStepTick = 0
+		end
+
+		if ply.SmileyStepTick == 0 then
 			local idx = math.random(1, 6)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
@@ -267,28 +284,11 @@ function SLASHER.Footstep(ply)
 				entity = ply,
 				volume = 1,
 				fadeIn = 0,
+				excludeSendTo = ply,
 			})
-		else
-			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then
-				ply.SmileyStepTick = 0
-			end
-
-			if ply.SmileyStepTick == 0 then
-				local idx = math.random(1, 6)
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
-					identifier = "FreeSmileyFootstep" .. idx,
-					group = "SlasherFootstep",
-					minDistance = 200,
-					maxDistance = 500,
-					entity = ply,
-					volume = 1,
-					fadeIn = 0,
-				})
-			end
-
-			ply.SmileyStepTick = ply.SmileyStepTick + 1
 		end
+
+		ply.SmileyStepTick = ply.SmileyStepTick + 1
 	end
 
 	return true

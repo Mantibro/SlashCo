@@ -515,19 +515,18 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		local idx = math.random(1, 4)
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/hotdogman/hdm_step" .. idx .. ".mp3",
-			identifier = "HDMFootstep" .. idx,
-			group = "SlasherFootstep",
-			minDistance = 300,
-			maxDistance = 600,
-			entity = ply,
-			volume = 1,
-			fadeIn = 0,
-		})
-	end
+	local idx = math.random(1, 4)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/hotdogman/hdm_step" .. idx .. ".mp3",
+		identifier = "HDMFootstep" .. idx,
+		group = "SlasherFootstep",
+		minDistance = 300,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
 
 	return true
 end

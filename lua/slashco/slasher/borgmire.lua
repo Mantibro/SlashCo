@@ -571,26 +571,23 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply.BorgStepTick == nil or ply.BorgStepTick > 1 then
-			ply.BorgStepTick = 0
-		end
+	if ply.BorgStepTick == nil or ply.BorgStepTick > 1 then
+		ply.BorgStepTick = 0
+	end
 
-		if ply.BorgStepTick == 0 then
-			local idx = math.random(1, 4)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/borgmire/borgmire_step" .. idx .. ".mp3",
-				identifier = "BorgmireFootstep" .. idx,
-				group = "SlasherFootstep",
-				minDistance = 400,
-				maxDistance = 700,
-				entity = ply,
-				volume = 1,
-				fadeIn = 0,
-			})
-		end
-
-		ply.BorgStepTick = ply.BorgStepTick + 1
+	if ply.BorgStepTick == 0 then
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/borgmire/borgmire_step" .. idx .. ".mp3",
+			identifier = "BorgmireFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 400,
+			maxDistance = 700,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
 	end
 
 	return true

@@ -398,41 +398,39 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply:GetNWBool("InSlasherChaseMode") then
-			local idx = math.random(1, 4)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/hoovydundy/step_".. idx ..".mp3",
-				identifier = "HoovydundyFootstep" .. idx,
-				group = "SlasherFootstep",
-				minDistance = 500,
-				maxDistance = 1075,
-				entity = ply,
-				volume = 1,
-				fadeIn = 0,
-			})
-			return true
-		end
+	if ply:GetNWBool("InSlasherChaseMode") then
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/hoovydundy/step_".. idx ..".mp3",
+			identifier = "HoovydundyFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 500,
+			maxDistance = 1075,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
+		return true
+	end
 
-		if ply.HoovyStepTick == nil or ply.HoovyStepTick > 1 then
-			ply.HoovyStepTick = 0
-		end
+	if ply.HoovyStepTick == nil or ply.HoovyStepTick > 1 then
+		ply.HoovyStepTick = 0
+	end
 
-		if ply.HoovyStepTick == 0 then
-			local idx = math.random(1, 4)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/hoovydundy/step_".. idx ..".mp3",
-				identifier = "HoovydundyFootstep" .. idx,
-				group = "SlasherFootstep",
-				minDistance = 400,
-				maxDistance = 875,
-				entity = ply,
-				volume = 1,
-				fadeIn = 0,
-			})
-		end
-
-		ply.HoovyStepTick = ply.HoovyStepTick + 1
+	if ply.HoovyStepTick == 0 then
+		local idx = math.random(1, 4)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/hoovydundy/step_".. idx ..".mp3",
+			identifier = "HoovydundyFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 400,
+			maxDistance = 875,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
 	end
 
 	return true

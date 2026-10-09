@@ -873,18 +873,17 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/manspider/manspider_step.mp3",
-			identifier = "ManspiderFootstep",
-			group = "SlasherFootstep",
-			minDistance = 250,
-			maxDistance = 550,
-			entity = ply,
-			volume = 1,
-			fadeIn = 0,
-		})
-	end
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/manspider/manspider_step.mp3",
+		identifier = "ManspiderFootstep",
+		group = "SlasherFootstep",
+		minDistance = 250,
+		maxDistance = 550,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
 
 	return true
 end
