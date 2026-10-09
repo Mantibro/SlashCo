@@ -110,6 +110,7 @@ function ENT:PlayHeliSounds()
 		volume = 0.7,
 		fadeIn = 1,
 		noWorldSpace = true,
+		doppler = 1,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
@@ -125,6 +126,7 @@ function ENT:PlayHeliSounds()
 		volume = 0.7,
 		fadeIn = 1,
 		noWorldSpace = true,
+		doppler = 1,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
@@ -138,6 +140,7 @@ function ENT:PlayHeliSounds()
 		volume = 0.7,
 		fadeIn = 1,
 		noWorldSpace = true,
+		doppler = 1,
 	})
 
 	SlashCo.AudioSystem.PlaySound({
@@ -151,6 +154,7 @@ function ENT:PlayHeliSounds()
 		volume = 0.7,
 		fadeIn = 1,
 		noWorldSpace = true,
+		doppler = 1,
 	})
 end
 

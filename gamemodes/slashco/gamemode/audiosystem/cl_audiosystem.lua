@@ -1225,7 +1225,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 	local soundPath = soundData.soundPath
 	if soundData.boundConVar and soundData.fallbackSoundPath then
 		local convar = GetConVar(soundData.boundConVar)
-		if IsValid(convar) and not convar:GetBool() then
+		if convar and not convar:GetBool() then
 			soundPath = soundData.fallbackSoundPath
 		end
 	end

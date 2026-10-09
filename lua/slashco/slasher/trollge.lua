@@ -607,6 +607,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		entity = slasher,
 		volume = 1,
 		fadeIn = 0,
+		doppler = 1,
 	})
 
 	slasher:Freeze(true)
