@@ -1222,8 +1222,6 @@ end)
 		You can combine forceStereo and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in stereo/using multiple channels instead of the normal 3D that forces them into mono.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
-	if not IsFirstTimePredicted() then return end -- Lets help with predicted code
-
 	local soundPath = soundData.soundPath
 	if soundData.boundConVar and soundData.fallbackSoundPath then
 		local convar = GetConVar(soundData.boundConVar)
@@ -1472,8 +1470,6 @@ end
 	If given no identifier and a entity, it will stop all sounds from the entity.
 ]]
 function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
-	if not IsFirstTimePredicted() then return end -- Lets help with predicted code
-
 	fadeOut = fadeOut or 1
 
 	if not isnumber(entIndex) and IsValid(entIndex) then

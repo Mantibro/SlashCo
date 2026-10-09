@@ -163,6 +163,8 @@ if CLIENT then
 			ply:ChatPrint("ENTITY SPAWNPOINT ID: " .. eyeTrace.Entity:GetNWInt("SpawnPoint_ID"))
 		end
 	end)
+end
+
 local function playBlip()
 	SlashCo.AudioSystem.PlaySound({soundPath = "slashco/blip.mp3", volume = 0.5, fadeIn = 0})
 end
