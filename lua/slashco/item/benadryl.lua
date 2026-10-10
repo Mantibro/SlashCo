@@ -172,16 +172,19 @@ hook.Add("Think", "Benadryl", function()
 	local benadrylTime = GetBenadrylTime(GameData.LocalPlayer)
 	if benadrylTime ~= 0 then
 		if not IsValid(GameData.BenadrylSound) then
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/benadryl/benadryl_mid" .. GameData.BenadrylSoundID .. ".ogg",
-				identifier = "Benadryl",
-				entity = 0, -- Play as Mono
-				volume = 0,
-				fadeIn = 0,
-				callback = function(channel)
-					GameData.BenadrylSound = channel
-				end,
-			})
+			if CurTime() >= (GameData.BenadrylNextSound or 0) then
+				GameData.BenadrylNextSound = CurTime() + 1
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/benadryl/benadryl_mid" .. GameData.BenadrylSoundID .. ".ogg",
+					identifier = "Benadryl",
+					entity = 0, -- Play as Mono
+					volume = 0,
+					fadeIn = 0,
+					callback = function(channel)
+						GameData.BenadrylSound = channel
+					end,
+				})
+			end
 		else
 			local vol = 0
 			if GameData.LocalPlayer.BenadrylIntensity then
