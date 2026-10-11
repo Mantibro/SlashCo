@@ -28,9 +28,7 @@ SLASHER.CustomBackgroundMusic = true
 SLASHER.PrimaryDamage = 50 -- How much damage he does with his primary attack.
 SLASHER.GameProgressMult = 1 -- Used to multiply the GameProgress when deciding if he should become a monster. Raising it will allow him to enter the monster form earlier.
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.GameProgressMult = math.max(1 + SO + (0.05 * additionalSurvivors), 0.5)
 	SLASHER.PrimaryDamage = 50 + (SO * 50) + (2 * additionalSurvivors)
 	SLASHER.ChaseDuration = 5.0 + (1 * additionalSurvivors)
@@ -565,7 +563,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Male07") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.male_f == nil then
 				GameData.LocalPlayer.male_f = 0
 			end

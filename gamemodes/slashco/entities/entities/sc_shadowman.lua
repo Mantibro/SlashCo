@@ -105,9 +105,12 @@ function ENT:Think()
 	
 		local up = self:GetUp()
 		up:Mul(-200)
+
+		local endPos = self:LocalToWorld(vector_origin)
+		endPos:Add(up)
 		local ground = util.TraceLine({
 			start = self:LocalToWorld(traceStartOffset),
-			endpos = self:LocalToWorld(vector_origin):Add(up)
+			endpos = endPos
 		})
 
 		if ground.Fraction > 0 then
@@ -129,7 +132,7 @@ function ENT:Think()
 		self.Cycle = CurTime()
 	end
 
-	if GameData.LocalPlayer:GetNW2Float("InitialBenadrylTime", 0) == 0 then
+	if GameData.LocalPlayer:GetInitialBenadrylTime() == 0 then
 		self:Remove()
 	end
 end

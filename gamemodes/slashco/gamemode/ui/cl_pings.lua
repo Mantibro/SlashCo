@@ -87,13 +87,13 @@ local function antiDupePings(newPing)
 	end
 end
 
-local function RegisterPing(pingInfo)
+local function RegisterPing(pingInfo, silent)
 	if not pingInfo.ExpiryTime then
 		pingInfo.Permanent = true
 	end
 
 	antiDupePings(pingInfo)
-	if not fullUpdate then
+	if not silent then
 		local skipSound = hook.Run("SlashCo:OnPing", pingInfo)
 		if not skipSound and pingInfo.Team ~= TEAM_SLASHER then
 			if pingInfo.Type == "GENERATOR" then
@@ -145,7 +145,7 @@ net.Receive("SlashCo:SurvivorPings", function()
 			Player = SlashCo.ReadOptional(net.ReadUInt, MAX_EDICT_BITS),
 			Entity = SlashCo.ReadOptional(net.ReadUInt, MAX_EDICT_BITS),
 			Position = SlashCo.ReadOptional(net.ReadVector),
-			Tick = net.ReadUInt(32),
+			Tick = not fullUpdate and net.ReadUInt(32) or nil,
 		}
 
 		local predictedPing = GameData.PredictedActivePings[pingInfo.Tick]
@@ -158,7 +158,7 @@ net.Receive("SlashCo:SurvivorPings", function()
 			return
 		end
 
-		RegisterPing(pingInfo)
+		RegisterPing(pingInfo, fullUpdate)
 	end
 end)
 
@@ -238,14 +238,14 @@ hook.Add("SlashCo:DrawHUD", "SlashCo:PingDisplay", function()
 		surface.SetAlphaMultiplier(1)
 	end
 
-	for _, v in ipairs(ents.FindByClass("sc_flare")) do
-		if not v:GetNWBool("FlareActive") then
+	for _, v in ipairs(SlashCo.FindByClass("sc_flare")) do
+		if not IsValid(v) or not v:GetFlareActive() then
 			continue
 		end
 
 		local fl_pos = v:WorldSpaceCenter():ToScreen()
 
-		draw.SimpleText(v:GetNWString("FlareDropperName"), "TVCD_small", fl_pos.x, fl_pos.y - 25,
+		draw.SimpleText(v:GetFlareDropperName(), "TVCD_small", fl_pos.x, fl_pos.y - 25,
 				transp,
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		draw.SimpleText("[ ☆ ]", "TVCD", fl_pos.x, fl_pos.y, color_white, TEXT_ALIGN_CENTER,

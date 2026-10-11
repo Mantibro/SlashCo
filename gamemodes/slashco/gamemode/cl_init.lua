@@ -67,6 +67,7 @@ include("ui/cl_scoreboard.lua")
 include("cl_headbob.lua")
 include("ui/cl_fonts.lua")
 
+include("sh_player.lua") -- Must be loaded before the slashers due to the datatable setup
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
 include("documents/cl_documents.lua")
@@ -92,7 +93,6 @@ include("sh_roundpoints.lua")
 include("sh_experience.lua")
 include("sh_perks.lua")
 include("ui/cl_documents.lua") -- Depends on sh_perks.lua
-include("sh_player.lua")
 include("sh_canbeseen.lua")
 include("sh_fog.lua")
 include("sh_keyboard.lua")
@@ -201,6 +201,27 @@ local colors = {
 	gray = Color(200, 200, 200)
 }
 
+-- RaphaelIT7: use this to avoid spam calling ents.FindByClass in paint code... (ToDo: Actually profile this)
+local classCache = {}
+function SlashCo.FindByClass(class)
+	local realTime = RealTime()
+	local entry = classCache[class]
+	if not entry or (entry.time + 0.2) < realTime then
+		entry = {
+			list = ents.FindByClass(class),
+			time = realTime,
+		}
+
+		classCache[class] = entry
+	end
+
+	return entry.list
+end
+
+local function IsHaloHidden(ent)
+	return not IsValid(ent) or (ent:IsPlayer() and not ent:CanBeSeen()) or ent:IsDormant()
+end
+
 ---draw halos; can only be used in the below function
 function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	if not g_SlashCoDrawingHalos then
@@ -219,10 +240,17 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 		noZ = true
 	end
 
-	for i = #_ents, 1, -1 do
-		local v = _ents[i]
-		if IsValid(v) and (v:IsPlayer() and not v:CanBeSeen() or v:IsDormant()) then
-			table.remove(_ents, i)
+	for i = 1, #_ents do
+		if IsHaloHidden(_ents[i]) then
+			local visible = {}
+			for j = 1, #_ents do
+				if not IsHaloHidden(_ents[j]) then
+					visible[#visible + 1] = _ents[j]
+				end
+			end
+
+			_ents = visible
+			break
 		end
 	end
 
@@ -235,9 +263,9 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 	local ply = GameData.LocalPlayer
 	local _team = ply:Team()
 	if _team == TEAM_SLASHER then
-		SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
-		SlashCo.DrawHalo(ents.FindByClass("sc_babaclone"))
-		SlashCo.DrawHalo(ents.FindByClass("sc_maleclone"))
+		SlashCo.DrawHalo(SlashCo.FindByClass("sc_generator"), "yellow")
+		SlashCo.DrawHalo(SlashCo.FindByClass("sc_babaclone"))
+		SlashCo.DrawHalo(SlashCo.FindByClass("sc_maleclone"))
 		ply:SlasherFunction("PreDrawHalos")
 
 		if SlashCo.IsSlowEscape() then
@@ -250,12 +278,12 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 
 	if _team == TEAM_SPECTATOR then
 		if GameData.showHalos and not GameData.IsLobby then
-			SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
+			SlashCo.DrawHalo(SlashCo.FindByClass("sc_generator"), "yellow")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER), "red")
 			if GameData.showGasCanHalos then
-				SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "gray")
-				SlashCo.DrawHalo(ents.FindByClass("sc_battery"), "green")
+				SlashCo.DrawHalo(SlashCo.FindByClass("sc_gascan"), "gray")
+				SlashCo.DrawHalo(SlashCo.FindByClass("sc_battery"), "green")
 			end
 		end
 

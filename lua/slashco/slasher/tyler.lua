@@ -107,12 +107,12 @@ function TylerSwitchForm(slasher, newForm)
 			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.max(math.Clamp(100 - anger, 0, 100) / 100), 0.1) -- Make the background music getting more silent the more anger he has.
 		end
 
-		slasher:SetNW2Bool("Slasher:NoFootsteps", false)
+		slasher:SetNoFootsteps(false)
 	else
 		slasher.WasDestroyerOnce = true
 		SlashCo.AudioSystem.DisableBackgroundMusic()
 		if EndlessChase() then
-			slasher:SetNW2Bool("Slasher:NoFootsteps", true)
+			slasher:SetNoFootsteps(true)
 		end
 	end
 end
@@ -195,7 +195,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanSeePlayers(false)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = 0
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		slasher:SetImpervious(true)
 		slasher.TimeAsTylerSpecter = (slasher.TimeAsTylerSpecter or 0) + FrameTime()
 		final_perception = 6.0
@@ -226,7 +226,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("TylerTheCreator", true)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		slasher:SetCanSeePlayers(false)
 		final_perception = 0.0
 
@@ -427,7 +427,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("TylerTheCreator", false)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = 0
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		final_perception = 0.0
 	elseif TylerState == TYLER_DESTROYER then
 		--Destroyer
@@ -438,7 +438,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("TylerTheCreator", false)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
-		slasher:SetNWBool("CanKill", true)
+		slasher:SetCanKill(true)
 		slasher:SetCanSeePlayers(true)
 		final_perception = 2.0
 
@@ -507,6 +507,8 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 local function DestroyItem(slasher, target)
+	if not IsValid(slasher) then return end
+
 	SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 	if not IsValid(target) then return end
 
@@ -558,7 +560,7 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher.TylerState ~= TYLER_DESTROYER then return end
-	if slasher:GetNWBool("CanKill") == false then return end
+	if slasher:GetCanKill() == false then return end
 	if slasher.KillDelayTick > 0 then return end
 	if not IsValid(target) then return end
 
@@ -811,7 +813,7 @@ if CLIENT then
 	local iconTL = 0
 
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Tyler") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.tyl_f == nil then
 				GameData.LocalPlayer.tyl_f = 0
 			end

@@ -66,25 +66,26 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 		return
 	end
 
-	if ply:GetNWBool("SurvivorTackled") then
+	if ply:GetSurvivorTackled() then
 		ply.CalcIdeal = ACT_DIESIMPLE
 		ply.CalcSeqOverride = ply:LookupSequence("zombie_slump_idle_01")
 
 		return ply.CalcIdeal, ply.CalcSeqOverride
 	end
 
-	if ply:GetNWBool("SurvivorGrabbed") then
+	if ply:GetSurvivorGrabbed() then
 		ply.CalcIdeal = ACT_DIESIMPLE
 		ply.CalcSeqOverride = ply:LookupSequence("idle_all_cower")
 
 		return ply.CalcIdeal, ply.CalcSeqOverride
 	end
 
-	if not ply:GetNWBool("SurvivorSidExecution") and not ply:GetNWBool("Taunt_MNR") then
+	local taunt = ply:GetTaunt()
+	if not ply:GetSurvivorSidExecution() and taunt ~= SlashCo.Taunt.MNR then
 		ply.surv_anim_antispam = false
 	end
 
-	if ply:GetNWBool("SurvivorSidExecution") then
+	if ply:GetSurvivorSidExecution() then
 		ply.CalcIdeal = ACT_DIESIMPLE
 		ply.CalcSeqOverride = ply:LookupSequence("sid_execution")
 		if ply.surv_anim_antispam == nil or ply.surv_anim_antispam == false then
@@ -93,12 +94,12 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 		end
 
 		return ply.CalcIdeal, ply.CalcSeqOverride
-	elseif ply:GetNWBool("Taunt_Cali") then
+	elseif taunt == SlashCo.Taunt.Cali then
 		ply.CalcIdeal = ACT_DIESIMPLE
 		ply.CalcSeqOverride = ply:LookupSequence("taunt_cali")
 
 		return ply.CalcIdeal, ply.CalcSeqOverride
-	elseif ply:GetNWBool("Taunt_MNR") then
+	elseif taunt == SlashCo.Taunt.MNR then
 		ply.CalcIdeal = ACT_DIESIMPLE
 		ply.CalcSeqOverride = ply:LookupSequence("taunt_mnr")
 		if ply.surv_anim_antispam == nil or ply.surv_anim_antispam == false then
@@ -107,7 +108,7 @@ hook.Add("CalcMainActivity", "SurvivorAnimator", function(ply, _)
 		end
 
 		return ply.CalcIdeal, ply.CalcSeqOverride
-	elseif ply:GetNWBool("Taunt_Griddy") then
+	elseif taunt == SlashCo.Taunt.Griddy then
 		ply.CalcIdeal = ACT_DIESIMPLE
 		ply.CalcSeqOverride = ply:LookupSequence("taunt_griddy")
 

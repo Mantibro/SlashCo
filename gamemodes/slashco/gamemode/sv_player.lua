@@ -9,6 +9,26 @@ function GM:PlayerInitialSpawn(ply)
 	end
 end
 
+local persistentDataTableVars = {
+	Experience = true,
+	Points = true,
+	SurvivorRoundsWon = true,
+	SlasherRoundsWon = true,
+	OwnedPerks = true,
+	PickedSlasher = true,
+	Items = true,
+}
+
+local function ResetDataTable(ply)
+	for name, info in pairs(SlashCo_DTNetworking) do
+		if info.set and not info.owner and not persistentDataTableVars[name] then
+			info.set(ply)
+		end
+	end
+
+	ply:ClearSlasherDataTable()
+end
+
 local DEFAULT_VIEW_OFFSET = Vector(0, 0, 64)
 local DEFAULT_VIEW_OFFSET_DUCKED = Vector(0, 0, 28)
 function GM:PlayerSpawn(ply, transition)
@@ -47,6 +67,7 @@ function GM:PlayerSpawn(ply, transition)
 	ply:SetViewOffset(DEFAULT_VIEW_OFFSET)
 	ply:SetViewOffsetDucked(DEFAULT_VIEW_OFFSET_DUCKED)
 
+	ResetDataTable(ply)
 	player_manager.OnPlayerSpawn(ply, transition)
 	player_manager.RunClass(ply, "Spawn")
 

@@ -58,6 +58,24 @@ net.Receive("SlashCo:GiveLobbyInfo", function(len)
 	UpdateLobbyState()
 end)
 
+-- RaphaelIT7: We know what we choose, and the server never refuses it anyways so we can easily predict it :3
+local readyKeys = {
+	READY_SURVIVOR = SlashCo.ReadyState.Survivor,
+	READY_SLASHER = SlashCo.ReadyState.Slasher,
+}
+
+hook.Add("PlayerButtonDown", "SlashCo:PredictLobbyReady", function(ply, button)
+	if not IsFirstTimePredicted() or not GameData.IsLobby or GameData.StateOfLobby ~= 0 or ply:Team() ~= TEAM_LOBBY then return end
+
+	for key, readyState in pairs(readyKeys) do
+		if SlashCo.IsKeyPressed(key, ply, button) then
+			GameData.LobbyInfoTable[ply] = GameData.LobbyInfoTable[ply] == readyState and SlashCo.ReadyState.NotReady or readyState
+			UpdateLobbyState()
+			return
+		end
+	end
+end)
+
 hook.Add("HUDDrawTargetID", "SlashCoLobbyNames", function()
 	if not GameData.IsLobby then return false end
 

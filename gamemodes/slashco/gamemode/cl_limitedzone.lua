@@ -7,9 +7,7 @@ local ambiences = {
 	[6] = "ambient/windwinter.wav",
 }
 
-hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
-	local ply = GameData.LocalPlayer
-
+local function switchZoneEffect(ply, effect)
 	if ambiences[effect] then
 		if GameData.LimitedZoneSound ~= ambiences[effect] then
 			if GameData.LimitedZoneAmbience then
@@ -37,7 +35,6 @@ hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
 		GameData.LimitedZoneAmbience = nil
 	end
 
-	ply.ZoneEffect = effect
 	if not ply.FogColor then
 		ply.ColorTable = {
 			["$pp_colour_addr"] = 0,
@@ -66,7 +63,7 @@ hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
 		ply.FogStart, ply.FogEnd = render.GetFogDistances()
 		ply.DefaultFogStart, ply.DefaultFogEnd = render.GetFogDistances()
 	end
-end)
+end
 
 local particleSettings = {
 	[1] = {
@@ -136,15 +133,22 @@ local particleSettings = {
 }
 
 local delta = 0
+local lastEffect = 0
 hook.Add("Think", "SlashCoZoneParticles", function()
 	local ply = GameData.LocalPlayer
-	if not ply.ZoneEffect or not particleSettings[ply.ZoneEffect] then
+	local effect = ply:GetZoneEffect()
+	if effect ~= lastEffect then
+		lastEffect = effect
+		switchZoneEffect(ply, effect)
+	end
+
+	local settings = particleSettings[effect]
+	if not settings then
 		delta = 0
 		return
 	end
 
 	delta = math.Clamp(Lerp(0.005, delta, 1), 0, 1)
-	local settings = particleSettings[ply.ZoneEffect]
 	local pos = ply:WorldSpaceCenter()
 	local emitter = ParticleEmitter(pos)
 	local part = emitter:Add(settings.texture, pos + VectorRand(-settings.distance, settings.distance))
@@ -192,10 +196,11 @@ local function renderFog(scale)
 	local ply = GameData.LocalPlayer
 
 	local targetColor, targetStart, targetEnd = ply.DefaultFogColor, ply.DefaultFogStart, ply.DefaultFogEnd
-	if fogSettings[ply.ZoneEffect] then
-		targetColor = fogSettings[ply.ZoneEffect].color
-		targetStart = fogSettings[ply.ZoneEffect]._start
-		targetEnd = fogSettings[ply.ZoneEffect]._end
+	local settings = fogSettings[ply:GetZoneEffect()]
+	if settings then
+		targetColor = settings.color
+		targetStart = settings._start
+		targetEnd = settings._end
 	end
 
 	ply.FogColor[1] = math.Clamp(Lerp(0.02, ply.FogColor[1], targetColor[1]), 0, 255)
@@ -220,7 +225,7 @@ local function renderFog(scale)
 end
 
 hook.Add("SetupWorldFog", "SlashCo:ZoneFog", function()
-	if not GameData.LocalPlayer.ZoneEffect then
+	if not GameData.LocalPlayer.FogColor then
 		return
 	end
 
@@ -228,7 +233,7 @@ hook.Add("SetupWorldFog", "SlashCo:ZoneFog", function()
 end)
 
 hook.Add("SetupSkyboxFog", "SlashCo:ZoneFog", function(scale)
-	if not GameData.LocalPlayer.ZoneEffect then
+	if not GameData.LocalPlayer.FogColor then
 		return
 	end
 
@@ -317,11 +322,11 @@ local colorSettings = {
 
 hook.Add("RenderScreenspaceEffects", "SlashCo:ZoneScreenSpace", function()
 	local ply = GameData.LocalPlayer
-	if not ply.ZoneEffect then
+	if not ply.ColorTable then
 		return
 	end
 
-	local settings = colorSettings[ply.ZoneEffect]
+	local settings = colorSettings[ply:GetZoneEffect()]
 	if not settings then
 		return
 	end

@@ -41,6 +41,8 @@ function ENT:Initialize()
 	self:SetCloneTripped(false)
 
 	timer.Simple(0.1, function()
+		if not IsValid(self) then return end
+
 		self:ResetSequence("prowl")
 		self:SetPoseParameter("move_x", 1)
 		self:SetPlaybackRate(2)
@@ -55,17 +57,17 @@ function ENT:Think()
 		return
 	end
 		
-	local endPosTr = self:LocalToWorld(offset)
-	endPosTr:Add(self:GetForward())
+	local endPosTr = self:GetForward()
 	endPosTr:Mul(1150)
+	endPosTr:Add(self:LocalToWorld(offset))
 	local tr = util.TraceLine({
 		start = self:LocalToWorld(offset),
 		endpos = endPosTr
 	})
 		
-	local endPosGround = self:LocalToWorld(offset)
-	endPosGround:Add(self:GetUp())
+	local endPosGround = self:GetUp()
 	endPosGround:Mul(-10000)
+	endPosGround:Add(self:LocalToWorld(offset))
 	local ground = util.TraceLine({
 		start = self:LocalToWorld(offset),
 		endpos = endPosGround

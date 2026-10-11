@@ -65,7 +65,7 @@ if SERVER then
 		for _, ply in ipairs(SlashCo.FindPlayersInRange(pos, 300, nil, self)) do
 			local team = ply:Team()
 			if team == TEAM_SURVIVOR then
-				ply:SetNWBool("SurvivorFueled", true)
+				ply:SetSurvivorFueled(true)
 				SlashCo.AudioSystem.PlaySound({
 					soundPath = "slashco/slasher/americanpo/negative_effect.mp3",
 					identifier = "SurvivorFueled",
@@ -79,7 +79,7 @@ if SERVER then
 				timer.Simple(8, function()
 					if not IsValid(ply) then return end
 
-					ply:SetNWBool("SurvivorFueled", false)
+					ply:SetSurvivorFueled(false)
 
 					if not IsValid(self) then return end
 
@@ -99,7 +99,7 @@ if SERVER then
 end
 
 hook.Add("RenderScreenspaceEffects", "SlashCo:AmericanBottle", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorFueled") then
+	if GameData.LocalPlayer:GetSurvivorFueled() then
 		local tab = {
 			["$pp_colour_addr"] = 0,
 			["$pp_colour_addg"] = 0,

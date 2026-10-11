@@ -41,9 +41,7 @@ SLASHER.ChaseDecreaseMult = 14 -- Multiplier used when decreasing the chase dura
 SLASHER.PunchSlowdownDiv = 2 -- Used to divide FrameTime making the PunchSlowdown last longer, the lower, the shorter the Slowdown becomes.
 SLASHER.ChaseSpeedReduction = 0
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.PunchDamage = 35 + (SO * 20) + (1.5 * additionalSurvivors)
 	SLASHER.KickDamage = 25 + (SO * 20) + (1.5 * additionalSurvivors)
 	SLASHER.ThrowStrengthForward = 1600 + (SO * 450)  + (30 * additionalSurvivors)
@@ -132,7 +130,7 @@ end
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 85))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 85))
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanChase(true)
 	PlayHeartbeat(slasher)
 
 	slasher.TimeChasing = 0
@@ -589,6 +587,8 @@ function SLASHER.Footstep(ply)
 			excludeSendTo = ply,
 		})
 	end
+
+	ply.BorgStepTick = ply.BorgStepTick + 1
 
 	return true
 end

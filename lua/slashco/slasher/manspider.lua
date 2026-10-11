@@ -66,9 +66,7 @@ local function StopIdle(slasher)
 	SlashCo.AudioSystem.StopSound("ManspiderIdle", 0.1, slasher)
 end
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.ChaseDuration = 9.0 + (1 * additionalSurvivors)
 	SLASHER.NestedRange = 1000 + (SO * 750) + (50 * additionalSurvivors)
 	SLASHER.AdditionalAngerMult = SO + (0.05 * additionalSurvivors)
@@ -904,7 +902,7 @@ local function targetPaint(ply)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_manspidernest"), "red")
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_manspidernest"), "red")
 end
 
 local nestTable = {
@@ -1004,7 +1002,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Manspider") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.mans_f == nil then
 				GameData.LocalPlayer.mans_f = 0
 			end

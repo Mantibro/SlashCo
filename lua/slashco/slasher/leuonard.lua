@@ -29,17 +29,15 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★☆"
 SLASHER.RoidMult = 0.3 -- Roid multiplier used to multiply FrameTime by. Higher means more Roid is gained.
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.RoidMult = 0.3 + (SO * 0.3)
 end
 
 function SLASHER.OnSpawn(slasher)
 	SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 	slasher.soundon = 0
-	slasher:SetNWBool("CanKill", true)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanKill(true)
+	slasher:SetCanChase(true)
 
 	slasher.LeuonardRoid = 0
 	slasher.MouseDriftTick = 0
@@ -175,7 +173,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 		end
 
-		if not slasher.soundon == 0 then
+		if slasher.soundon ~= 0 then
 			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_yell7.mp3", 100)
 			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_full_close.mp3", 80)
 			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_full_far.mp3", 125)
@@ -328,6 +326,11 @@ function SLASHER.InitHud(_, hud)
 	hud.MouseDrift = Angle(math.random() - 0.5, (math.random() - 0.5) * 2, 0)
 	function hud:Goblinize()
 		hook.Add("CreateMove", "SlashCoDisorient", function(cmd)
+			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
+				hook.Remove("CreateMove", "SlashCoDisorient")
+				return
+			end
+
 			local curtime = CurTime()
 			local frametime = FrameTime()
 			local power = 1
@@ -354,12 +357,12 @@ function SLASHER.InitHud(_, hud)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_dogg"), nil, 2, false)
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_dogg"), nil, 2, false)
 end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Leuonard") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.leuo_f == nil then
 				GameData.LocalPlayer.leuo_f = 0
 			end

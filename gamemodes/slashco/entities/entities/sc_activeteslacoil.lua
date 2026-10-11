@@ -10,6 +10,7 @@ ENT.Instructions	= ""
 ENT.PingType = "TESLACOIL"
 
 local stunTime = 15 -- How long the slashers get stunned
+local stunDelay = 29 -- Seconds after the coil was activated until it stuns
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "NoLight")
@@ -39,6 +40,34 @@ if SERVER then
 		self:SetBrightnessTime(CurTime())
 		self:SetNoLight(true)
 		self:SetChargeState(0)
+
+		-- RaphaelIT7: We can easily make it predictable :3
+		self.StunStart = CurTime() + stunDelay
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			if slasher.StunImmunity or slasher:GetTeslaStunned() > CurTime() then continue end
+
+			slasher:SetLastTeslaStun(self.StunStart)
+			slasher:SetTeslaStunned(self.StunStart + stunTime)
+		end
+	end
+
+	function ENT:HasPresetStun(slasher)
+		return math.abs(slasher:GetLastTeslaStun() - self.StunStart) < 0.1
+	end
+
+	function ENT:ClearStun(slasher)
+		if not self:HasPresetStun(slasher) then return end
+
+		slasher:SetLastTeslaStun(0)
+		slasher:SetTeslaStunned(0)
+	end
+
+	function ENT:OnRemove()
+		if CurTime() >= self.StunStart then return end
+
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
+			self:ClearStun(slasher)
+		end
 	end
 
 	function ENT:Think()
@@ -95,13 +124,19 @@ if SERVER then
 			end
 		end
 
-		if (curTime - startTime) > 29 and state == 5 then
+		if (curTime - startTime) > stunDelay and state == 5 then
 			self:SetChargeState(6)
 			for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-				if slasher:GetNWBool("StunImmunity") then continue end
+				if slasher.StunImmunity then
+					self:ClearStun(slasher)
+					continue
+				end
 
-				slasher:SetNW2Float("TeslaStunned", curTime + stunTime)
-				slasher:SetNW2Float("LastTeslaStun", curTime)
+				if not self:HasPresetStun(slasher) then
+					slasher:SetLastTeslaStun(curTime)
+					slasher:SetTeslaStunned(curTime + stunTime)
+				end
+
 				slasher:ScreenFade(SCREENFADE.OUT, color_black, 0.5, stunTime)
 				slasher:SlasherFunction("OnHitByTeslaCoil")
 			end
@@ -301,10 +336,9 @@ else
 	end
 
 	local function DrawPlayerStun(ply)
-		local stunTime = ply:GetNW2Float("TeslaStunned")
-		if stunTime == 0 or CurTime() > stunTime then return end
-
-		if (ply:GetNW2Float("LastTeslaStun") + 2) < CurTime() then return end
+		local curTime = CurTime()
+		local stunStart = ply:GetLastTeslaStun()
+		if curTime < stunStart or curTime > stunStart + 2 then return end
 
 		local pos = ply:GetPos()
 		local mins, maxs = ply:GetModelBounds()
@@ -314,7 +348,7 @@ else
 
 		render.SetColorMaterial()
 		render.StartBeam(segments)
-			render.AddBeam(centerPos, segmentsSize * (segments - 1), 0, fullWhiteCol)
+			render.AddBeam(centerPos, segmentsSize * (segments - 1), 0, color_white)
 			local segs = segments - 1
 			for k=1, segs do
 				renderColor.a = (segments * 2) - (k * 2) - 2
@@ -331,14 +365,14 @@ else
 		local lightningRnd = segmentsSize
 		for k=1, 10 do
 			render.StartBeam(lightningSegments + 1)
-				render.AddBeam(centerPos, segmentsSize, uv, fullWhiteCol)
+				render.AddBeam(centerPos, segmentsSize, uv, color_white)
 				local prevEnd = centerPos
 				for k=1, lightningSegments do
 					tempVec:SetUnpacked(math.Rand(-lightningRnd * k, lightningRnd * k), math.Rand(-lightningRnd * k, lightningRnd * k), 0)
 					tempVec:Add(centerPos)
 					prevEnd = LerpVector(0.5, prevEnd, tempVec)
 					prevEnd[3] = centerPos[3] + (segmentOffsets * k)
-					render.AddBeam(prevEnd, segmentsSize, uv * k, fullWhiteCol)
+					render.AddBeam(prevEnd, segmentsSize, uv * k, color_white)
 				end
 			render.EndBeam()
 		end
@@ -361,7 +395,8 @@ else
 end
 
 hook.Add("StartCommand", "TeslaCoilStun", function(ply, cmd)
-	if CurTime() < ply:GetNW2Float("TeslaStunned") then
+	local curTime = CurTime()
+	if curTime >= ply:GetLastTeslaStun() and curTime < ply:GetTeslaStunned() then
 		cmd:ClearButtons()
 		cmd:ClearMovement()
 	end

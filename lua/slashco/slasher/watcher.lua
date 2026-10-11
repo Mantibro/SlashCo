@@ -40,9 +40,7 @@ SLASHER.SurveyLength = 10 -- How long a survey goes
 SLASHER.SurveyCooldown = 100 -- How long the survey cooldown is.
 SLASHER.SurveyDisplayLength = 5 -- How long the survey texture is displayed on survivors screen.
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.SurveyLength = 10 + (SO * 10) + (1 * additionalSurvivors)
 	SLASHER.SurveyCooldown = 100 + (SO * 35) + (2.5 * additionalSurvivors)
 	SLASHER.SurveyDisplayLength = 5 + (SO * 5)
@@ -55,8 +53,8 @@ end
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 100))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 100))
-	slasher:SetNWBool("CanChase", true)
-	slasher:SetNWBool("CanKill", true)
+	slasher:SetCanChase(true)
+	slasher:SetCanKill(true)
 
 	slasher.SurveyLength = 0
 	slasher.SurveyCooldown = 0
@@ -392,7 +390,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Watcher") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			local Overlay = Material("slashco/ui/overlays/watcher_see")
 
 			Overlay:SetFloat("$alpha", 1)

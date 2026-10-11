@@ -166,6 +166,8 @@ end)
 
 if CLIENT then
 	-- RaphaelIT7 (ToDo): This is wacky, originally I wanted to use the tick count but predicting that properly sucked
+	-- We could try to predict rotation and position and all that but this is the simple way
+	-- The only downside is that if they try to run through the door itself they will be bounced back
 	GameData.PredictedDoorSlam = GameData.PredictedDoorSlam or {}
 	hook.Add("Tick", "SlashCo:DoorSlam", function()
 		local time = CurTime()

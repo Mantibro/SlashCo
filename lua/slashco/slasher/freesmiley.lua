@@ -30,9 +30,7 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.SummonCooldown = 50 -- Summon cooldown
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.SummonCooldown = 50 - (25 * SO)
 
 	if additionalSurvivors > 0 then
@@ -44,8 +42,8 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	SLASHER.SmileyIdle(slasher)
-	slasher:SetNWBool("CanKill", true)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanKill(true)
+	slasher:SetCanChase(true)
 
 	slasher.SummonCooldown = 0
 	slasher.SummonChoose = 0
@@ -255,7 +253,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if ply:GetNWBool("InSlasherChaseMode") then
+	if ply:GetInSlasherChaseMode() then
 		local idx = math.random(1, 6)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
@@ -391,7 +389,7 @@ function SLASHER.DrawHUD(localPly)
 			continue
 		end
 
-		if survivor:GetNWBool("MarkedBySmiley") then
+		if survivor:GetMarkedBySmiley() then
 			local pos = survivor:WorldSpaceCenter():ToScreen()
 
 			if pos.visible then
@@ -404,7 +402,9 @@ function SLASHER.DrawHUD(localPly)
 end
 
 function SLASHER.SmileyIdle(slasher)
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if not IsValid(slasher) then return end
+
+	if not slasher:GetInSlasherChaseMode() then
 		local idx = math.random(1, 7)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/freesmiley/freesmiley_idle" .. idx .. ".mp3",
@@ -424,7 +424,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_FreeSmiley") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			local Overlay = Material("slashco/ui/overlays/jumpscare_freesmiley")
 
 			Overlay:SetFloat("$alpha", 1)

@@ -93,14 +93,14 @@ function ENT:RunBehaviour()
 		self:StartActivity(ACT_IDLE)
 		if self:HaveEnemy() then
 			if not self.Enemy.BeenMarked then
-				self.Enemy:SetNWBool("MarkedBySmiley", true)
+				self.Enemy:SetMarkedBySmiley(true)
 				timer.Create("zanyMark_" .. self.Enemy:UserID(), 5, 1, function()
 					if not IsValid(self.Enemy) then
 						return
 					end
 
 					self.Enemy.BeenMarked = nil
-					self.Enemy:SetNWBool("MarkedBySmiley", false)
+					self.Enemy:SetMarkedBySmiley(false)
 				end)
 			end
 			self.Enemy.BeenMarked = true
@@ -309,7 +309,7 @@ function ENT:Think()
 	for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
 		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(self:GetPos()) < 50 then
 			v:TakeDamage(50, self, self)
-			v:SetNWBool("MarkedBySmiley", false)
+			v:SetMarkedBySmiley(false)
 			v.BeenMarked = nil
 			timer.Remove("zanyMark_" .. v:UserID())
 			SlashCo.AudioSystem.StopSound("ZanyAttack", 0, self)

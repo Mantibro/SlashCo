@@ -50,6 +50,7 @@ end
 
 function SWEP:RenderModel(v, model, owner, flipVM, xPos, item, flags)
 	if not IsValid(model) then
+		self:OnRemove() -- RaphaelIT7: Cleanup the old models
 		self:Initialize()
 		return
 	end

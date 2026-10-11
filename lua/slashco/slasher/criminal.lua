@@ -35,9 +35,7 @@ SLASHER.ChaseSpeedDecreaseDiv = 5
 SLASHER.AdditionalClones = 0 -- Additional clones on secondary attack
 SLASHER.AdditionalSpecialClones = 0 -- Additional clones on special ability
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.ChaseSpeedDecreaseInRageDiv = 4 + SO
 	SLASHER.ChaseSpeedDecreaseDiv = 5 + SO
 	-- Gets one more clone for every 4 survivors & math.max to not let it go below 0
@@ -205,6 +203,8 @@ function SLASHER.Footstep(ply)
 		})
 	end
 
+	ply.CrimStepTick = ply.CrimStepTick + 1
+
 	return true
 end
 
@@ -250,7 +250,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Criminal") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.crim_f == nil then
 				GameData.LocalPlayer.crim_f = 0
 			end

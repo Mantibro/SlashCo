@@ -34,9 +34,7 @@ SLASHER.CooldownReduction = 0 -- Additional number that is added to FrameTime to
 SLASHER.AppearCooldownReduction = 0 -- Appear Cooldown reduction, same as above but used when quitely appearing
 SLASHER.MaxClones = 1 -- How many clones he can have.
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 	SLASHER.MaxClones = 1 + SO
 
@@ -92,14 +90,14 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if KillCD > 0 then
-		slasher:SetNWBool("CanKill", false)
 	elseif not slasher:GetNWBool("BababooeyInvisibility") then
-		slasher:SetNWBool("CanKill", true)
+		slasher:SetCanKill(false)
+		slasher:SetCanKill(true)
 	else
 		slasher:SetNWBool("CanKill", false)
 	end
 
-	slasher:SetNWBool("CanChase", not slasher:GetNWBool("BababooeyInvisibility"))
+	slasher:SetCanChase(not slasher:GetNWBool("BababooeyInvisibility"))
 
 	if SpookCD < 0.01 then
 		slasher:SetNWBool("BababooeySpooking", false)
@@ -127,7 +125,7 @@ end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
 	if slasher.TriggerCooldown > 0 then return end
-	if slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher:GetInSlasherChaseMode() then return end
 
 	slasher:SetNWBool("BababooeyInvisibility", not slasher:GetNWBool("BababooeyInvisibility"))
 
@@ -267,7 +265,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER and not ply:GetNWBool("BababooeyInvisibility") then
+	if not ply:GetNWBool("BababooeyInvisibility") then
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
@@ -278,6 +276,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			excludeSendTo = ply,
 		})
 	end
 
@@ -285,7 +284,7 @@ function SLASHER.Footstep(ply)
 end
 
 hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Bababooey") == true then
+	if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 		if GameData.LocalPlayer.baba_f == nil then
 			GameData.LocalPlayer.baba_f = 0
 		end

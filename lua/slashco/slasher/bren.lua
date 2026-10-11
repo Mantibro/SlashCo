@@ -49,7 +49,6 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	slasher:DrawShadow(false)
-	slasher:SetNWBool("CanChase", true)
 
 	slasher.MainCooldown = 0
 	slasher.NoclipCooldown = 0
@@ -91,7 +90,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_perception = 2.0
 	end
 
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if not slasher:GetInSlasherChaseMode() then
 		slasher:SetBodygroup(0, 0)
 	else
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerChaseGain)
@@ -150,7 +149,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if target:Team() ~= TEAM_SURVIVOR then return end
 
 	local dist = SLASHER.KillDistance
-	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
 
 	slasher.MainCooldown = 5
 

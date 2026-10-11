@@ -294,7 +294,7 @@ function ENT:Think()
 	else
 		local attacked = self.AttackedPlayer
 		attacked:AddSpeedEffect("smiley", 50, 15)
-		attacked:SetNWBool("MarkedBySmiley", true)
+		attacked:SetMarkedBySmiley(true)
 
 		if self.AttackEngage == false then
 			local idx = math.random(1, 2)
@@ -315,7 +315,7 @@ function ENT:Think()
 				end
 
 				attacked:RemoveSpeedEffect("smiley")
-				attacked:SetNWBool("MarkedBySmiley", false)
+				attacked:SetMarkedBySmiley(false)
 
 				self:Remove()
 			end)

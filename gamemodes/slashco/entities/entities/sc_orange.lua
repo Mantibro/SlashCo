@@ -59,14 +59,14 @@ function ENT:Explode()
 		elseif team == TEAM_SLASHER then
 			if not ply:GetNWBool("StunImmunity") then
 				ply:SlasherStunDeafen(5)
-				ply:SetNWBool("OrangeBlur", true)
+				ply:SetOrangeBlur(true)
 			end
 		end
 
 		timer.Simple(5, function()
 			if not IsValid(ply) then return end
 
-			ply:SetNWBool("OrangeBlur", false)
+			ply:SetOrangeBlur(false)
 		end)
 
 		ply:SetVelocity((self:GetForward() * 600) + Vector(0, 0, 400))
@@ -105,7 +105,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", "Orange", function()
-		if GameData.LocalPlayer:GetNWBool("OrangeBlur") and not GetConVar("slashco_cl_disable_effects"):GetBool() then
+		if GameData.LocalPlayer:GetOrangeBlur() and not GetConVar("slashco_cl_disable_effects"):GetBool() then
 			DrawSobel(0.3)
 			DrawToyTown(4, ScrH() / 2)
 		end

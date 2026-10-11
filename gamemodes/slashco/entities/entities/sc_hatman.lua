@@ -6,9 +6,16 @@ ENT.ClassName = "sc_hatman"
 ENT.Base = "base_nextbot"
 ENT.PingExpiryTime = 5
 
+
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Target")
 	self:NetworkVar("Bool", 0, "LookedAt")
+	self:NetworkVar("Int", 0, "Teleports") -- Counts up with every teleport, the target's client starts the static when it changes
+end
+
+local MAX_NOISE_DISTANCE = 3000
+local function GetNoiseStrength(dist)
+	return math.Clamp(1 - dist / MAX_NOISE_DISTANCE, 0.15, 1)
 end
 
 if SERVER then
@@ -27,7 +34,8 @@ function ENT:Initialize()
 		self:SetCollisionGroup(COLLISION_GROUP_WORLD)
 
 		self.Path = Path("Follow")
-		self:FindRandomSpot()
+		self.startBeingLookedAt = -1
+		self:FindRandomSpot(true)
 
 		local target = self:GetTarget()
 		if IsValid(target) then
@@ -70,6 +78,32 @@ if CLIENT then
 		halo.Add(halos, color_white, 1, 1, 1, true, true)
 	end)
 
+	local staticMaterial = Material("slashco/ui/overlays/tyler_static")
+	local staticTime = 0.8
+	local staticEnd = 0
+	local staticStrength = 0
+	hook.Add("HUDPaint", "SlashCo:HatManStatic", function()
+		for _, hatMan in ipairs(ents.FindByClass("sc_hatman")) do
+			if hatMan:GetTarget() ~= GameData.LocalPlayer then continue end
+
+			local teleports = hatMan:GetTeleports()
+			if hatMan.LastTeleports and hatMan.LastTeleports ~= teleports and not GetConVar("slashco_cl_disable_effects"):GetBool() then
+				staticEnd = CurTime() + staticTime
+				staticStrength = GetNoiseStrength(hatMan:GetPos():Distance(GameData.LocalPlayer:GetPos()))
+			end
+
+			hatMan.LastTeleports = teleports
+		end
+
+		local left = (staticEnd - CurTime()) / staticTime
+		if left <= 0 then return end
+
+		staticMaterial:SetFloat("$alpha", math.Rand(0.3, 0.5) * left * staticStrength)
+		surface.SetDrawColor(255, 255, 255, 255)
+		surface.SetMaterial(staticMaterial)
+		surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
+	end)
+
 	return
 end
 
@@ -96,9 +130,11 @@ function ENT:OnRemove()
 	for idx, hatMan in ipairs(GameData.HatMans) do
 		if hatMan == self then
 			table.remove(GameData.HatMans, idx)
+			break
 		end
 	end
 
+	local target = self:GetTarget()
 	if IsValid(target) then
 		SlashCo.AudioSystem.StopSound("HatManLookedAt", 0.1, nil, target)
 	end
@@ -161,23 +197,142 @@ local function RequiresTeleport(path, targetPos, lastPos)
 	return true
 end
 
-function ENT:FindRandomSpot()
-	local targetPos = self:GetTarget():GetPos()
+local MIN_TELEPORT_DISTANCE = 500
+local MAX_TELEPORT_DISTANCE = 3000
+local OBJECTIVE_CHANCE = 0.5
+local SPOT_COUNT = 50
+local SPAWN_SAFE_DISTANCE = 1500
+local LOOKED_AT_SLOWDOWN = 0.25
+
+local function RandomOrNil(tbl)
+	if #tbl > 0 then
+		return tbl[math.random(#tbl)]
+	end
+end
+
+local function IsAwayFromSpawns(pos, spawns)
+	for _, spawn in ipairs(spawns) do
+		if spawn:GetPos():DistToSqr(pos) < SPAWN_SAFE_DISTANCE ^ 2 then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function GetHatManSpots()
+	local round = SlashCo.CurRound
+	if round.HatManSpots then
+		return round.HatManSpots
+	end
+
+	local spawns = ents.FindByClass("info_sc_player_employee")
+	table.Add(spawns, ents.FindByClass("info_sc_player_survivor"))
+
+	local spots = {}
+	local areas = navmesh.GetAllNavAreas()
+	for _ = 1, SPOT_COUNT * 10 do
+		if #spots >= SPOT_COUNT or #areas == 0 then break end
+
+		local area = areas[math.random(#areas)]
+		if area:IsUnderwater() then continue end
+
+		local pos = area:GetRandomPoint()
+		if IsAwayFromSpawns(pos, spawns) then
+			table.insert(spots, pos)
+		end
+	end
+
+	round.HatManSpots = spots
+	return spots
+end
+
+local function FindSharedSpot(targetPos)
+	local candidates = {}
+	for _, spot in ipairs(GetHatManSpots()) do
+		local dist = spot:Distance(targetPos)
+		if dist > MIN_TELEPORT_DISTANCE and dist < MAX_TELEPORT_DISTANCE then
+			table.insert(candidates, spot)
+		end
+	end
+
+	return RandomOrNil(candidates)
+end
+
+local function FindObjectiveSpot(target)
+	local targetPos = target:GetPos()
+	local aim = target:GetAimVector()
+	aim.z = 0
+	aim:Normalize()
+
+	local carriesFuel = target:ItemValue("IsFuel", false, true)
+	local candidates = {}
+	for _, ent in ipairs(ents.FindByClass(carriesFuel and "sc_generator" or "sc_gascan")) do
+		if carriesFuel and ent:GetCansRemaining() <= 0 then continue end
+
+		local dir = ent:GetPos() - targetPos
+		local dist = dir:Length()
+		dir.z = 0
+		dir:Normalize()
+
+		if dist > MIN_TELEPORT_DISTANCE and dist < MAX_TELEPORT_DISTANCE and dir:Dot(aim) > 0.3 then
+			table.insert(candidates, ent:GetPos())
+		end
+	end
+
+	return RandomOrNil(candidates)
+end
+
+local function FindFurthestSpot(targetPos)
 	local area = RecursiveFindFurthestArea(navmesh.GetNearestNavArea(targetPos), targetPos, 0, math.random(2, 5))
 	if not area then return end
 
-	if targetPos:Distance(area:GetCenter()) < 500 then
+	local pos = area:GetCenter()
+	if targetPos:Distance(pos) < MIN_TELEPORT_DISTANCE then
 		return -- We spawned too close!
 	end
 
-	--area:Draw()
+	return pos
+end
 
-	self:SetPos(area:GetCenter())
-	local path = self.Path
-	path:Compute(self, targetPos)
-	--path:Draw()
-	--path:Update(self)
-	self.LastTeleportHeight = self:GetPos()[3]
+function ENT:TeleportTo(pos, targetPos, silent)
+	self:SetPos(pos)
+	self.Path:Compute(self, targetPos)
+	self.LastTeleportHeight = pos[3]
+	if silent then return end
+
+	self:SetTeleports(self:GetTeleports() + 1)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/benadryl/benadryl_low" .. math.random(1, 2) .. ".ogg",
+		identifier = "HatManTeleport",
+		forceStereo = true,
+		entity = 0,
+		sendToEntity = self:GetTarget(),
+		volume = GetNoiseStrength(pos:Distance(targetPos)),
+		fadeIn = 0,
+		deleteWhenDone = true,
+	})
+end
+
+function ENT:FindRandomSpot(silent)
+	local target = self:GetTarget()
+	local targetPos = target:GetPos()
+
+	local pos = math.random() < OBJECTIVE_CHANCE and FindObjectiveSpot(target) or nil
+	pos = pos or FindSharedSpot(targetPos) or FindFurthestSpot(targetPos)
+	if not pos then return end
+
+	self:TeleportTo(pos, targetPos, silent)
+end
+
+function ENT:IsOtherLookedAt(target)
+	for _, hatMan in ipairs(GameData.HatMans) do
+		if hatMan ~= self and hatMan:GetTarget() == target and hatMan:GetLookedAt() then
+			return true
+		end
+	end
+
+	return false
 end
 
 function ENT:BehaveUpdate(interval)
@@ -192,6 +347,13 @@ function ENT:BehaveUpdate(interval)
 
 	local target = self:GetTarget()
 	if not IsValid(target) then return end
+
+	if (self.NextTransmitUpdate or 0) < CurTime() then
+		self.NextTransmitUpdate = CurTime() + 2
+		for _, ply in player.Iterator() do
+			self:SetPreventTransmit(ply, ply ~= target)
+		end
+	end
 
 	if path:GetAge() > 1 then
 		local targetPos = target:GetPos()
@@ -224,7 +386,7 @@ function ENT:BehaveUpdate(interval)
 				self:SetLookedAt(true)
 				self.startBeingLookedAt = CurTime()
 				freshlyBeingLookedAt = true
-				target:SetNW2Float("LookingAtHatMan", CurTime())
+				target:SetLookingAtHatMan(CurTime())
 			end
 
 			break
@@ -267,7 +429,7 @@ function ENT:BehaveUpdate(interval)
 		path:Invalidate()
 		self:FindRandomSpot()
 		self.startBeingLookedAt = -1
-		target:SetNW2Float("LookingAtHatMan", -1)
+		target:SetLookingAtHatMan(-1)
 		self:SetLookedAt(false)
 		return
 	end
@@ -275,7 +437,7 @@ function ENT:BehaveUpdate(interval)
 	if beingLookedAt then return end
 	if self.startBeingLookedAt ~= -1 then
 		self.startBeingLookedAt = -1
-		target:SetNW2Float("LookingAtHatMan", -1)
+		target:SetLookingAtHatMan(-1)
 		self:SetLookedAt(false)
 	end
 
@@ -301,7 +463,7 @@ function ENT:BehaveUpdate(interval)
 		end
 
 		local dist = delta:Length()
-		local moveDist = self.loco:GetDesiredSpeed() * FrameTime()
+		local moveDist = self.loco:GetDesiredSpeed() * FrameTime() * (self:IsOtherLookedAt(target) and LOOKED_AT_SLOWDOWN or 1)
 		local moveVec = delta:GetNormalized() * moveDist
 		local newPos = pos + moveVec
 		local tr = util.TraceLine({

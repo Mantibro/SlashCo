@@ -43,12 +43,12 @@ function EFFECT:Render()
 	
 	for i = 1, 12 do
 		// get point
-		local point = start_pos + dir
-		point:Mul(i * increment)
+		local point = dir * (i * increment)
+		point:Add(start_pos)
 
 		rng_vec:Random(-1, 1)
+		rng_vec:Mul(math.random(1, 8))
 		point:Add(rng_vec)
-		point:Mul(math.random(1, 8))
 
 		// texture coords
 		local tcoord = curTime + (1 / 12) * i

@@ -869,7 +869,7 @@ function SLASHER.ClientSideEffect()
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER and not ply:GetNWBool("TrollgeStage2") then
+	if not ply:GetNWBool("TrollgeStage2") then
 		local idx = math.random(1, 5)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/trollge/troll_step" .. idx .. ".mp3",
@@ -880,6 +880,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			excludeSendTo = ply,
 		})
 	end
 
@@ -892,6 +893,7 @@ if CLIENT then
 
 	timer.Create("TrollgeDetect", 0.5, 0, function()
 		if not IsValid(GameData.LocalPlayer) or not GameData.LocalPlayer.Team or GameData.LocalPlayer:Team() ~= TEAM_SURVIVOR then
+			drawIcon = false
 			return
 		end
 
@@ -927,7 +929,7 @@ if CLIENT then
 			surface.DrawTexturedRect(ScrW() / 2 - ScrW() / 32, ScrH() / 2 - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 		end
 
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Trollge") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.troll_f == nil then
 				GameData.LocalPlayer.troll_f = 0
 			end

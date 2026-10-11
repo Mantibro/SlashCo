@@ -41,9 +41,7 @@ SLASHER.GunRagePerception = 0 -- His Perception when he's in gun rage
 SLASHER.GunEyeSight = 0 -- His EyeSight when he has a gun but is NOT in rage
 SLASHER.GunPerception = 0 -- His Perception when he has a gun but is NOT in rage
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.PacificationAddition = 0.04 * SO
 	SLASHER.GunSpreadDecrease = 0.02 + (0.08 * SO)
 	SLASHER.GunCooldownAddition = 0.04 * SO
@@ -631,6 +629,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher.EatedCookies = slasher.EatedCookies - 1 --Deplete the uses
 
 		timer.Simple(0.5, function()
+			if not IsValid(slasher) then return end
+
 			--Show the gun model
 
 			slasher:SetBodygroup(1, 1)
@@ -646,6 +646,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			})
 		end)
 		timer.Simple(2.25, function()
+			if not IsValid(slasher) then return end
+
 			--sound
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/sid/sid_slideback.mp3",
@@ -661,6 +663,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		end)
 
 		timer.Simple(4.5, function()
+			if not IsValid(slasher) then return end
+
 			--Apply the state
 
 			slasher:SetNWBool("SidGunEquipping", false)
@@ -915,7 +919,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_cookie"), nil, 2, false)
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_cookie"), nil, 2, false)
 
 	local plyWithItem = {}
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -930,8 +934,8 @@ end
 function SLASHER.SidRage(ply)
 	local pos = ply:GetPos()
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
-		if slasher:GetPos():Distance(pos) > 1800 then return end
+		if SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then continue end
+		if slasher:GetPos():Distance(pos) > 1800 then continue end
 
 		slasher.EatedCookies = slasher.EatedCookies + 2
 
@@ -956,6 +960,8 @@ function SLASHER.SidRage(ply)
 				v:SetNWBool("SidFuck", false)
 			end
 
+			if not IsValid(slasher) then return end
+
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/sid/sid_sad_1.mp3",
 				identifier = "SidSad",
@@ -971,7 +977,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Sid") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.sid_f == nil then
 				GameData.LocalPlayer.sid_f = 0
 			end
