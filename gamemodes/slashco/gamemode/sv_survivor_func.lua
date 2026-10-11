@@ -71,35 +71,6 @@ hook.Add("PlayerButtonDown", "SlashCo:SurvivorFunctions", function(ply, button)
 	survivorButtons(ply, button)
 end)
 
---Door Ramming
-hook.Add("KeyPress", "SlashCo:SurvivorFunctions", function(ply, button)
-	local team = ply:Team()
-	if team ~= TEAM_SURVIVOR and team ~= TEAM_LOBBY then
-		return
-	end
-
-	local lookent = ply:GetEyeTrace().Entity
-
-	if button ~= IN_ATTACK or ply:GetVelocity():Length() <= 250 then
-		return
-	end
-
-	if not IsValid(lookent) or lookent:GetPos():Distance(ply:GetPos()) > 120 then
-		return
-	end
-
-	if ply:SlamDoor(lookent) then
-		ply:ViewPunch(Angle(7, 0, 0))
-		timer.Simple(0.2, function()
-			if not IsValid(ply) then
-				return
-			end
-
-			ply:ViewPunch(Angle(-15, 0, 0))
-		end)
-	end
-end)
-
 hook.Add("KeyPress", "SlashCo:SurvivorStruggles", function(ply, key)
 	local team = ply:Team()
 	if team ~= TEAM_SURVIVOR then
@@ -307,20 +278,11 @@ local function slamDoor(door_ent, pos)
 	end)
 end
 
-function PLAYER:SlamDoor(door_ent)
-	door_ent = SlashCo.GetValidDoor(door_ent)
+function PLAYER:SlamDoor(door_ent, predicted)
+	door_ent = SlashCo.GetSlammableDoor(door_ent)
 	if not door_ent then return end
 
-	if SlashCo.IsDoorOpen(door_ent) then
-		return
-	end
-
-	-- RaphaelIT7: We prevent door slam on locked doors due to them else completely breaking somehow
-	if door_ent:GetInternalVariable("m_bLocked") then
-		return
-	end
-
-	door_ent:EmitSound("ambient/materials/door_hit1.wav", 80)
+	SlashCo.PlayDoorSlamSound(door_ent, predicted and self)
 
 	local pos = self:GetPos()
 	local name = door_ent:GetName()

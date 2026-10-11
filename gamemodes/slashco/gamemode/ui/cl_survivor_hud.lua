@@ -221,6 +221,9 @@ local function slamIndicator()
 		return
 	end
 
+	-- RaphaelIT7: If we predicted it to slam open we don't render as else we get a funky flickering UI
+	if lookent.PredictedDoorSlam then return end
+
 	draw.SimpleText(SlashCo.Language("door_slam", "LMB"), "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
 
