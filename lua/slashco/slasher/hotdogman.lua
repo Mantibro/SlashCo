@@ -69,7 +69,7 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	slasher:SetNWBool("HotdoginHand", false)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanChase(true)
 
 	slasher.EatedHotdogs = 0
 	slasher.PunchCooldown = 0
@@ -581,7 +581,7 @@ function SLASHER.DrawHUD(localPly)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_hotdog"), nil, 2, false)
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_hotdog"), nil, 2, false)
 	
 	local plyWithItem = {}
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do

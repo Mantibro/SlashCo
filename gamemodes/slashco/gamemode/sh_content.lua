@@ -298,7 +298,7 @@ else
 end
 
 function SlashCo.PrecacheModel(modelName)
-	if SlashCo.Content.PrecacheModels[modelName] then
+	if GameData.IsLobby or SlashCo.Content.PrecacheModels[modelName] then
 		return
 	end
 
@@ -309,7 +309,7 @@ function SlashCo.PrecacheModel(modelName)
 end
 
 function SlashCo.PrecacheSound(soundName)
-	if SlashCo.Content.PrecacheSounds[soundName] then
+	if GameData.IsLobby or SlashCo.Content.PrecacheSounds[soundName] then
 		return
 	end
 

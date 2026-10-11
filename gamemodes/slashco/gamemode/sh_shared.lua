@@ -153,6 +153,23 @@ function SlashCo.IsLobbyStarting()
 	return GetGlobal2Bool("SlashCo:IsLobbyStarting", false)
 end
 
+-- The current price to guarantee a map & the map that was guaranteed
+function SlashCo.SetMapForceCost(cost)
+	SetGlobal2Int("SlashCo:MapForceCost", cost)
+end
+
+function SlashCo.GetMapForceCost()
+	return GetGlobal2Int("SlashCo:MapForceCost", SlashCo.MapForceCost)
+end
+
+function SlashCo.SetForcedMap(map)
+	SetGlobal2String("SlashCo:ForcedMap", map)
+end
+
+function SlashCo.GetForcedMap()
+	return GetGlobal2String("SlashCo:ForcedMap", "")
+end
+
 -- Spectator vars
 function SlashCo.AllowSpectatorsToPing(allowed)
 	SetGlobal2Bool("SlashCo:SpectatorsCanPing", allowed)
@@ -463,6 +480,8 @@ if CLIENT then
 		GameData.Using2DSkyBox = game.Get3DSkyboxInfo() == nil
 
 		GameData.CalledInitPostEntity = true
+
+		hook.Run("SlashCo:InitPostEntity")
 	end
 else
 	local maxplayers = CreateConVar("slashco_maxplayers", tostring(GameData.BaseMaxPlayers), FCVAR_ARCHIVE, "The number of maximum players, by default 7. 6 survivors - 1 slasher", 1, 255)
@@ -509,6 +528,8 @@ else
 		SlashCo.InitMapMesh()
 
 		GameData.CalledInitPostEntity = true
+
+		hook.Run("SlashCo:InitPostEntity")
 	end
 end
 

@@ -84,6 +84,14 @@ hook.Add("PlayerNoClip", "SlashCo:PreventSpectators", function(ply)
 	end
 end)
 
+-- "Outfitter" addon can add/modify slashers which we preferably do not want
+-- See https://github.com/Mantibro/SlashCo/pull/81
+hook.Add("CanOutfit", "SlashCo:NoSlasherOutfits", function(ply)
+	if IsValid(ply) and ply:Team() == TEAM_SLASHER then
+		return false
+	end
+end)
+
 -- This function is VERY expensive, BUT it shouldn't be called too frequent anyways.
 function PLAYER:FindPlayersInView(dist, radius, notrace)
 	local areWeSlasher = self:Team() == TEAM_SLASHER
@@ -95,7 +103,7 @@ function PLAYER:FindPlayersInView(dist, radius, notrace)
 	local foundEnts = ents.FindInCone(pos, self:GetAimVector(), dist, radius)
 	local results = {}
 	for _, ent in ipairs(foundEnts) do
-		if ent:IsPlayer() and ent:Team() == TEAM_SURVIVOR and ent:CanBeSeen() then
+		if ent:IsPlayer() and ent:Team() == TEAM_SURVIVOR and ent:CanBeSeen(not areWeSlasher) then
 			if not notrace then
 				local tr = util.TraceLine({
 					start = pos,
@@ -246,8 +254,8 @@ function PLAYER:CanPing()
 		return false
 	end
 
-	local ucmd = self:GetCurrentCommand()
-	if not IsValid(ucmd) then return false end
+	local ucmd = self:GetCurrentCommand() -- CUserCmd has no IsValid method (IsValid() would always be false), it returns nothing outside of a command
+	if not ucmd then return false end
 
 	-- RaphaelIT7: It's important to know that engine.TickCount() on the server would differ from the client!
 	-- But since PlayerButtonDown is called when the usercmd was received we can easily match up
@@ -288,7 +296,7 @@ function PLAYER:SurvivorPing()
 	if not self:CanPing() then return end
 
 	local ucmd = self:GetCurrentCommand()
-	if not IsValid(ucmd) then return end
+	if not ucmd then return end
 
 	-- RaphaelIT7: Same as in PLAYER:CanPing()
 	local tickCount = ucmd:TickCount()
@@ -312,10 +320,6 @@ function PLAYER:SurvivorPing()
 		pingInfo.Position = trace.HitPos
 		pingInfo.ExpiryTime = 5
 		pingInfo.Player = nil
-	elseif self:GetNWBool("SurvivorBenadrylFull") then
-		pingInfo.Type = "SLASHER"
-		pingInfo.Position = trace.HitPos
-		pingInfo.ExpiryTime = 5
 	elseif not IsValid(trace.Entity) then
 		pingInfo.Position = trace.HitPos
 		pingInfo.Type = "LOOK HERE"
@@ -348,7 +352,7 @@ function PLAYER:SurvivorPing()
 				pingInfo.Name = string.upper(look:Nick())
 			elseif look:Team() == TEAM_SLASHER then
 				local survivors = team.GetPlayers(TEAM_SURVIVOR)
-				local disguiseSurvivor = look:GetNWBool("AmogusSurvivorDisguise") and survivors[1] and survivors[math.random(#survivors)]
+				local disguiseSurvivor = look:GetAmogusSurvivorDisguise() and survivors[1] and survivors[math.random(#survivors)]
 				if not IsValid(disguiseSurvivor) then
 					pingInfo.Type = "SLASHER"
 				else
@@ -418,7 +422,7 @@ function PLAYER:SurvivorPing()
 end
 
 hook.Add("SlashCo:PlayerSwitchFlashlight", "SlashCo:DynamicFlashlight", function(ply, state)
-	if ply:Team() ~= TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then
+	if ply:Team() ~= TEAM_SURVIVOR and not ply:GetAmogusSurvivorDisguise() then
 		if not (GameData.IsLobby and GameData.IsBlackout) then
 			return false
 		end
@@ -447,6 +451,61 @@ hook.Add("SlashCo:PlayerSwitchFlashlight", "SlashCo:DynamicFlashlight", function
 	return false
 end)
 
+SlashCo.Taunt = {
+	None = 0,
+	MNR = 1,
+	Griddy = 2,
+	Cali = 3,
+}
+
+local TAUNT_DELAY = 2
+local tauntKeys = {
+	TAUNT_MN = SlashCo.Taunt.MNR,
+	TAUNT_HTG = SlashCo.Taunt.Griddy,
+	TAUNT_CG = SlashCo.Taunt.Cali,
+}
+
+function PLAYER:SurvivorTaunt(newTaunt)
+	local ucmd = self:GetCurrentCommand()
+	if not ucmd then return end
+
+	local tickCount = ucmd:TickCount()
+	if (tickCount - self:GetLastTaunted()) * engine.TickInterval() < TAUNT_DELAY then return end
+
+	self:SetLastTaunted(tickCount)
+	self:SetTaunt(newTaunt)
+
+	if CLIENT and not IsFirstTimePredicted() then return end
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/ping_item.mp3",
+		identifier = "Taunt",
+		entity = 0, -- Play as Mono
+		playbackRate = 0.8,
+		volume = 0.4,
+		fadeIn = 0,
+		deleteWhenDone = true,
+		excludeSendTo = self,
+	})
+end
+
+hook.Add("PlayerButtonDown", "SlashCo:SurvivorTaunts", function(ply, button)
+	local team = ply:Team()
+	if team ~= TEAM_SURVIVOR and team ~= TEAM_LOBBY then return end
+
+	local taunt = ply:GetTaunt()
+	if taunt ~= SlashCo.Taunt.None and (taunt == SlashCo.Taunt.MNR or button ~= KEY_W) then
+		ply:SetTaunt(SlashCo.Taunt.None)
+	end
+
+	for key, newTaunt in pairs(tauntKeys) do
+		if SlashCo.IsKeyPressed(key, ply, button) then
+			ply:SurvivorTaunt(newTaunt)
+			return
+		end
+	end
+end)
+
 --[[
 	DTVar Networking (Since NW2 is broken / hasn't been fixed yet)
 
@@ -457,20 +516,21 @@ end)
 SlashCo_DTNetworking = SlashCo_DTNetworking or {}
 local plyMeta = FindMetaTable("Player")
 local entMeta = FindMetaTable("Entity")
-local function SetupSlashCoNetworkVar(type, index, name, default) -- Same order as :NetworkVar
+
+local defaultFallbacks = {
+	["Int"] = 0,
+	["Float"] = 0,
+	["String"] = "",
+	["Entity"] = NULL,
+	["Bool"] = false,
+	["Vector"] = Vector(0, 0, 0),
+	["Angle"] = Angle(0, 0, 0),
+}
+
+local function SetupSlashCoNetworkVar(type, index, name, default, owner)
 	if not SlashCo_DTNetworking[type] then
 		SlashCo_DTNetworking[type] = {}
 	end
-
-	local defaultFallbacks = {
-		["Int"] = 0,
-		["Float"] = 0,
-		["String"] = "",
-		["Entity"] = nil,
-		["Bool"] = false,
-		["Vector"] = Vector(0, 0, 0),
-		["Angle"] = Angle(0, 0, 0),
-	}
 
 	local SetDTFunc = entMeta["SetDT" .. type]
 	local defaultFallback = defaultFallbacks[type]
@@ -507,9 +567,62 @@ local function SetupSlashCoNetworkVar(type, index, name, default) -- Same order 
 		callbackName = type .. "_" .. index,
 		type = type,
 		index = index,
+		owner = owner,
 		get = plyMeta["Get" .. name],
 		set = plyMeta["Set" .. name],
 	}
+
+	return plyMeta["Get" .. name], plyMeta["Set" .. name]
+end
+SlashCo.SetupNetworkVar = SetupSlashCoNetworkVar
+
+-- Up to 31 booleans share one Int slot, bit 31 stays unused since the Int is signed
+local function SetupSlashCoNetworkFlag(index, shift, name, default, owner)
+	local mask = bit.lshift(1, shift)
+	local inverse = bit.bnot(mask)
+	local getInt = entMeta.GetDTInt
+	local setInt = entMeta.SetDTInt
+	local defaultState = default or false
+
+	local function get(self)
+		return bit.band(getInt(self, index) or 0, mask) ~= 0
+	end
+
+	local function set(self, state)
+		if state == nil then
+			state = defaultState
+		end
+
+		local flags = getInt(self, index) or 0
+		local newFlags = state and bit.bor(flags, mask) or bit.band(flags, inverse)
+		if newFlags ~= flags then
+			setInt(self, index, newFlags)
+		end
+	end
+
+	plyMeta["Get" .. name] = get
+	plyMeta["Set" .. name] = set
+	SlashCo_DTNetworking[name] = {
+		type = "Flag",
+		index = index,
+		shift = shift,
+		owner = owner,
+		get = get,
+		set = set,
+	}
+
+	return get, set
+end
+SlashCo.SetupNetworkFlag = SetupSlashCoNetworkFlag
+
+-- Reads a registered data table var by its name
+function SlashCo.GetNetworkVar(ply, name)
+	local info = SlashCo_DTNetworking[name]
+	if not info then
+		error("Tried to read the unregistered network var \"" .. tostring(name) .. "\"!", 2)
+	end
+
+	return info.get(ply)
 end
 
 -- RaphaelIT7: There intentionally is no callback function due to the nature of DTs being possibly received more than once! If you really need it tell me - I got that code already done
@@ -520,9 +633,61 @@ SetupSlashCoNetworkVar("Int", 2, "SurvivorRoundsWon")
 SetupSlashCoNetworkVar("Int", 3, "SlasherRoundsWon")
 SetupSlashCoNetworkVar("Int", 4, "Perception")
 SetupSlashCoNetworkVar("Int", 5, "LastPinged") -- RaphaelIT7: The last tick in which they pinged (Ticks should be less of a mess than CurTime)
+SetupSlashCoNetworkVar("Int", 6, "Items")
+-- Int 7 holds the flags below
+SetupSlashCoNetworkVar("Int", 8, "SurvivorJumpscare") -- The ID of the slasher currently jumpscaring them
+SetupSlashCoNetworkVar("Int", 9, "Taunt")
+SetupSlashCoNetworkVar("Int", 15, "LastTaunted") -- The last tick in which they taunted, same idea as LastPinged
+SetupSlashCoNetworkVar("Int", 10, "GameProgressDisplay")
+SetupSlashCoNetworkVar("Int", 11, "ZoneEffect") -- The effect of the limited zone the player is inside of, 0 if none
+SetupSlashCoNetworkVar("Int", 12, "KeyedSpeed") -- The strongest speed effect only the server knows about (zone, attacks, ...), see PLAYER:AddSpeedEffect
 
 SetupSlashCoNetworkVar("Float", 0, "EyeSight")
 SetupSlashCoNetworkVar("Float", 1, "DeafenTime")
+SetupSlashCoNetworkVar("Float", 2, "DeathUITime")
+SetupSlashCoNetworkVar("Float", 3, "TeslaStunned")
+SetupSlashCoNetworkVar("Float", 4, "LastTeslaStun")
+SetupSlashCoNetworkVar("Float", 5, "LookingAtHatMan")
+SetupSlashCoNetworkVar("Float", 6, "InitialBenadrylTime")
+SetupSlashCoNetworkVar("Float", 7, "SlasherAnger")
+
+-- RaphaelIT7: We only support up to 32 flags here before we need to use a second int
+-- Doing it this way keeps all the Bool slots free for Slashers
+local coreFlags = {
+	"InSlasherChaseMode",
+	"CanChase",
+	"CanKill",
+	"SlasherBlinded",
+	"NoFootsteps",
+	"DemonPacified",
+	"SurvivorBeingJumpscared",
+	"SurvivorTackled",
+	"SurvivorGrabbed",
+	"SurvivorDragged",
+	"SurvivorSidExecution",
+	"SurvivorMining",
+	"SurvivorFueled",
+	"SurvivorBalkanFull",
+	"SurvivorAlert",
+	"SurvivorWatcherSurveyed",
+	"MarkedBySmiley",
+	"MarkedByCloaks",
+	"NightVision",
+	"CurseOfTheJug",
+	"JugCurseActivate",
+	"AmogusSurvivorDisguise",
+	"ShowDeathUI",
+	"DeathWardUI",
+	"DeathReviveUI",
+	"MerltonBlur",
+	"OrangeBlur",
+	"SurvivorBalkan",
+	"BenadrylHidden",
+}
+
+for shift, name in ipairs(coreFlags) do
+	SetupSlashCoNetworkFlag(7, shift - 1, name)
+end
 
 SetupSlashCoNetworkVar("Bool", 0, "CanSeePlayers")
 SetupSlashCoNetworkVar("Bool", 1, "WasSeenBySlasher")
@@ -535,3 +700,11 @@ SetupSlashCoNetworkVar("Bool", 4, "DynamicFlashlight")
 SetupSlashCoNetworkVar("String", 0, "OwnedPerks")
 SetupSlashCoNetworkVar("String", 1, "ActiveEffects")
 SetupSlashCoNetworkVar("String", 2, "PickedSlasher") -- RaphaelIT7: Only used to display which slasher they'll be. If we need more string lots this one is easy to remove!
+
+-- No.
+function PLAYER:InstallDataTable()
+end
+
+function PLAYER:NetworkVar(type, slot, name)
+	error("[SlashCo] This is not supported")
+end

@@ -80,7 +80,7 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	HoovyIdle(slasher)
-	slasher:SetNWBool("CanKill", true)
+	slasher:SetCanKill(true)
 
 	slasher.GeneratorBlockCooldown = 0
 	slasher.GeneratorBlockUses = 0
@@ -244,6 +244,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	local inv = -0.2
 	local eyeTrace = slasher:GetEyeTrace()
 	local find = ents.FindInCone(slasher:GetPos(), eyeTrace.Normal, dist * 2, slasher:SlasherValue("ChaseRadius", 0.91) + inv)
+	local find_p
 	for p = 1, #find do
 		if find[p]:IsPlayer() and find[p]:Team() == TEAM_SURVIVOR then
 			find_p = find[p]
@@ -284,6 +285,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			end)
 
 			slasher.RopeCooldown = 40
+			break
 		end
 	end
 end
@@ -320,7 +322,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		if not IsValid(slasher) then return end
 
 		slasher:SetNWBool("HoovyStunned", false)
-		slasher:SetNWBool("CanChase", true)
+		slasher:SetCanChase(true)
 		slasher:Freeze(false)
 	end)
 end
@@ -398,7 +400,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if ply:GetNWBool("InSlasherChaseMode") then
+	if ply:GetInSlasherChaseMode() then
 		local idx = math.random(1, 4)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/hoovydundy/step_".. idx ..".mp3",
@@ -432,6 +434,8 @@ function SLASHER.Footstep(ply)
 			excludeSendTo = ply,
 		})
 	end
+
+	ply.HoovyStepTick = ply.HoovyStepTick + 1
 
 	return true
 end
@@ -472,7 +476,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Hoovydundy") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.hoovy_f == nil then
 				GameData.LocalPlayer.hoovy_f = 0
 			end
@@ -493,7 +497,7 @@ if CLIENT then
 
 	hook.Add("Tick", "HoovyLight", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if v == GameData.LocalPlayer then return end
+			if v == GameData.LocalPlayer then continue end
 
 			if SlashCoSlashers[v:GetNWString("Slasher")] == SLASHER then
 				if not v:GetNWBool("InSlasherChaseMode") then

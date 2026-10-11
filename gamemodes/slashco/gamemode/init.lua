@@ -40,6 +40,7 @@ include("sh_shared.lua")
 include("sv_globals.lua")
 include("sv_spawning.lua")
 include("sv_teleporting.lua")
+include("sh_player.lua") -- Must be loaded before the slashers because of the datatable stuff
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
 include("documents/sv_documents.lua")
@@ -63,7 +64,6 @@ include("sv_objectives.lua")
 include("sh_roundpoints.lua")
 include("sh_experience.lua")
 include("sh_perks.lua")
-include("sh_player.lua")
 include("sh_canbeseen.lua")
 include("sh_fog.lua")
 include("sv_holylib.lua")
@@ -587,6 +587,12 @@ hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, oldTeam
 
 	if oldTeam == TEAM_SURVIVOR then
 		ply:SetDynamicFlashlight(false)
+	end
+
+	-- "Outfitter" addon can add/modify slashers which we preferably do not want
+	-- See https://github.com/Mantibro/SlashCo/pull/81
+	if ply.OutfitSuppress and (newTeam == TEAM_SLASHER) ~= (oldTeam == TEAM_SLASHER) then
+		ply:OutfitSuppress(newTeam == TEAM_SLASHER, "SlashCo")
 	end
 
 	if GameData.IsLobby then

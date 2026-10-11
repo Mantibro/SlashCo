@@ -311,7 +311,7 @@ function ENT:Think()
                 timer.Simple(1.55, function()      -- How long it takes to kill the entity
 					if not IsValid(self) or not IsValid(v) then return end
 
-					v:SetNWBool("MerltonBlur", true)
+					v:SetMerltonBlur(true)
 					v:Freeze(false)
                     self:Explode()                  -- Explode effect
 	            end)
@@ -319,7 +319,7 @@ function ENT:Think()
                 timer.Simple(12, function()      -- How long it takes to unfreeze the enemy
 					if not IsValid(v) then return end
 
-			        v:SetNWBool("MerltonBlur", false)
+			        v:SetMerltonBlur(false)
 	            end)
 			end
 		end
@@ -383,7 +383,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", "Merlton", function()
-		if GameData.LocalPlayer:GetNWBool("MerltonBlur") then
+		if GameData.LocalPlayer:GetMerltonBlur() then
 			DrawSobel(0.2)
 			DrawToyTown(5, ScrH() / 2)
 		end

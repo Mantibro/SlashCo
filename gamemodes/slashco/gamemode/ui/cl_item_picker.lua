@@ -1,8 +1,7 @@
 local selectedItem, selectedMap
-local itemSelectFrame, mapForce
+local itemSelectFrame
 local SlashCoItems = SlashCoItems
 local MGSelection = false
-local mapPrice = 50
 
 if GameData.IsLobby then
 	SlashCo.AudioSystem.PrecacheSound("slashco/ui/terminalbutton_1.mp3", "mono", "ItemPickerMenuClick") -- Used for all other ui sounds
@@ -20,7 +19,7 @@ local function BlockConfirm()
 end
 
 local function SetConfirm()
-	if MGSelection and (not selectedMap or selectedMap == mapForce) then
+	if MGSelection and (not selectedMap or selectedMap == SlashCo.GetForcedMap()) then
 		BlockConfirm()
 		return
 	end
@@ -41,12 +40,15 @@ local function SetConfirm()
 	end
 	function itemSelectFrame.Confirm.DoClick()
 		if MGSelection then
-			SlashCo.SendValue("pickMap", selectedMap)
-			SlashCo.AudioSystem.PlayPrecachedChannel("ItemPickerSelect")
+			net.Start("SlashCo:PickMap")
+				net.WriteString(selectedMap)
+			net.SendToServer()
 		else
-			SlashCo.SendValue("pickItem", selectedItem)
-			SlashCo.AudioSystem.PlayPrecachedChannel("ItemPickerSelect")
+			net.Start("SlashCo:PickItem")
+				net.WriteString(selectedItem)
+			net.SendToServer()
 		end
+		SlashCo.AudioSystem.PlayPrecachedChannel("ItemPickerSelect")
 		itemSelectFrame:Remove()
 	end
 	itemSelectFrame.Confirm:SetEnabled(true)
@@ -186,6 +188,21 @@ local function SetupBase()
 
 		confirmSelect:SetPos(itemSelectFrame:GetWide() - 160 - 5, itemSelectFrame:GetTall() - 30 - 5)
 		MapGuaranteeSelect:SetPos(itemSelectFrame:GetWide() - 550 - 5, itemSelectFrame:GetTall() - 30 - 5)
+	end
+
+	local lastCost, lastMap = SlashCo.GetMapForceCost(), SlashCo.GetForcedMap()
+	local baseThink = itemSelectFrame.Think
+	function itemSelectFrame:Think()
+		baseThink(self)
+
+		local cost, map = SlashCo.GetMapForceCost(), SlashCo.GetForcedMap()
+		if cost == lastCost and map == lastMap then return end
+
+		lastCost, lastMap = cost, map
+		if MGSelection then
+			SetConfirm()
+			setMapPrice()
+		end
 	end
 
 	itemSelectFrame:SetSize(800, 500)
@@ -328,7 +345,7 @@ local function SetupMaps()
 	SetConfirm()
 
 	itemSelectFrame.ModelHolder:Hide()
-	itemSelectFrame.ItemValues:SetText("[" .. mapPrice .. " " .. SlashCo.Language("PointCount") .. "]")
+	setMapPrice()
 	itemSelectFrame.ItemDescription:SetText(SlashCo.Language("MapGuaranteeDesc"))
 end
 

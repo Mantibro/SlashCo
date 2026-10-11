@@ -78,7 +78,7 @@ hook.Add("KeyPress", "SlashCo:SurvivorStruggles", function(ply, key)
 	end
 
 	--Covenant Tackle
-	if ply:GetNWBool("SurvivorTackled") then
+	if ply:GetSurvivorTackled() then
 		if key == 11 or key == 14 then
 			if ply.LastTackleStruggleKey ~= key then
 				ply.LastTackleStruggleKey = key
@@ -90,7 +90,7 @@ hook.Add("KeyPress", "SlashCo:SurvivorStruggles", function(ply, key)
 	end
 
 	--Hoovydundy RopeGrab
-	if ply:GetNWBool("SurvivorGrabbed") then
+	if ply:GetSurvivorGrabbed() then
 		if key == 11 or key == 14 then
 			if ply.LastRopeStruggleKey ~= key then
 				ply.LastRopeStruggleKey = key
@@ -102,7 +102,7 @@ hook.Add("KeyPress", "SlashCo:SurvivorStruggles", function(ply, key)
 	end
 
 	--Princess drag
-	if ply:GetNWBool("SurvivorDragged") then
+	if ply:GetSurvivorDragged() then
 		if key == 11 or key == 14 then
 			if ply.LastDragStruggleKey ~= key then
 				ply.LastDragStruggleKey = key

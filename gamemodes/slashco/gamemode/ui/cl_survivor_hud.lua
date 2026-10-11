@@ -1,6 +1,6 @@
-CreateClientConVar("slashco_cl_show_lowhealth", 1, true, false,
+local showLowHealth = CreateClientConVar("slashco_cl_show_lowhealth", 1, true, false,
 		"Whether to display the survivor's hud as blinking yellow when at low health.", 0, 1)
-CreateClientConVar("slashco_cl_show_healthvalue", 0, true, false,
+local showHealthValue = CreateClientConVar("slashco_cl_show_healthvalue", 0, true, false,
 		"Whether to display the value of the survivor's health on their hud.", 0, 1)
 
 local SlashCoItems = SlashCoItems
@@ -308,7 +308,7 @@ local function hpMeter()
 	aHp = Lerp(FrameTime() * 3, aHp or 100, hp)
 	local parsed
 
-	if hp >= 25 or not GetConVar("slashco_cl_show_lowhealth"):GetBool() then
+	if hp >= 25 or not showLowHealth:GetBool() then
 		local hpOver = math.Clamp(hp - maxHp, 0, maxHp)
 		local hpAdjust = math.Clamp(hp, 0, maxHp) - hpOver
 		local displayHpBar = math.Round(math.Clamp(hpAdjust / maxHp, 0, 1) * 27)
@@ -334,7 +334,7 @@ local function hpMeter()
 
 	local hpLength = markup.Parse("<font=TVCD>" .. SlashCo.Language("HP") .. "</font>"):GetWidth()
 
-	if not GetConVar("slashco_cl_show_healthvalue"):GetBool() then
+	if not showHealthValue:GetBool() then
 		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 376 + hpLength, 27)
 	else
 		local displayHp = math.Round(aHp)

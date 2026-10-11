@@ -72,7 +72,7 @@ function ENT:Enter(ent)
 		ent:AddSpeedEffect("limitedZone", self.SpeedEffect, priority)
 	end
 
-	SlashCo.SendValue(ent, "limitedZone", self.Effect or 1)
+	ent:SetZoneEffect(self.Effect or 1)
 
 	self:TriggerOutput("OnEnter", ent)
 	if table.IsEmpty(self.PlayersInside) then
@@ -90,7 +90,7 @@ function ENT:Leave(ent)
 		ent:RemoveSpeedEffect("limitedZone")
 	end
 
-	SlashCo.SendValue(ent, "limitedZone", 0)
+	ent:SetZoneEffect(0)
 
 	self:TriggerOutput("OnExit", ent)
 	if table.IsEmpty(self.PlayersInside) then
@@ -187,11 +187,12 @@ function ENT:Touch(ent)
 		self:Leave(ent)
 		return
 	end
+	-- TEAM 0 is Joining/Connecting
 	if self.Team == 0 and ent:Team() ~= TEAM_SURVIVOR then
 		self:Leave(ent)
 		return
 	end
-	if self.Team == 1 and ent:Team() ~= TEAM_SLASHER then
+	if self.Team == TEAM_SURVIVOR and ent:Team() ~= TEAM_SLASHER then
 		self:Leave(ent)
 		return
 	end
@@ -223,11 +224,12 @@ function ENT:StartTouch(ent)
 	if self.Disabled or not ent:IsPlayer() or not ent:Alive() or IsValid(ent.LimitBrush) then
 		return
 	end
-	if (self.Team == 2 or self.Team == 0) and ent:Team() == TEAM_SURVIVOR then
+	-- Team 0 is Joining/Connecting
+	if (self.Team == TEAM_SLASHER or self.Team == 0) and ent:Team() == TEAM_SURVIVOR then
 		self:Enter(ent)
 		return
 	end
-	if (self.Team == 2 or self.Team == 1) and ent:Team() == TEAM_SLASHER then
+	if (self.Team == TEAM_SLASHER or self.Team == TEAM_SURVIVOR) and ent:Team() == TEAM_SLASHER then
 		self:Enter(ent)
 		return
 	end

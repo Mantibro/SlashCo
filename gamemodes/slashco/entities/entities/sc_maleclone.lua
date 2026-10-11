@@ -90,10 +90,11 @@ end
 local startOffset = Vector(0, 0, 50)
 function ENT:Think()
 	local startPos = self:GetPos()
-	local endPos = startPos + self:GetForward()
+	local endPos = self:GetForward()
 	endPos:Mul(10000)
+	endPos:Add(startPos)
 
-	-- We change startPos AFTER we calculated endPos! 
+	-- We change startPos AFTER we calculated endPos!
 	startPos:Add(startOffset)
 
 	local tr = util.TraceLine({

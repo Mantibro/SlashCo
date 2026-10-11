@@ -112,10 +112,10 @@ function SLASHER.OnTickBehaviour(slasher)
 	local eyesight = SLASHER.Eyesight
 	local perception = SLASHER.Perception
 
-	if not slasher:GetNWBool("DemonPacified") then
-		slasher:SetNWBool("CanChase", true)
+	if not slasher:GetDemonPacified() then
+		slasher:SetCanChase(true)
 	else
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanChase(false)
 		eyesight = 0
 		perception = 0
 	end
@@ -166,6 +166,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			for i = 1, math.random(9, 12) do
 				timer.Simple((i / 3.5) * (0.7 + (math.random() * 0.3)), function()
+					if not IsValid(slasher) or not IsValid(mauled_child) then return end
+
 					local vPoint = mauled_child:GetPos()
 					local bloodfx = EffectData()
 					bloodfx:SetOrigin(vPoint)
@@ -216,16 +218,18 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				slasher:Freeze(false)
 				slasher:SetNWBool("PrincessMaulingChild", false)
-				slasher:SetNWBool("DemonPacified", true)
+				slasher:SetDemonPacified(true)
 
 				timer.Simple(math.random(10, 25), function()
-					slasher:SetNWBool("DemonPacified", false)
+					if not IsValid(slasher) then return end
+
+					slasher:SetDemonPacified(false)
 				end)
 			end)
 		end
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		--Get Aggro
 		if Aggression < AggressionTH then
 			slasher.Aggression = Aggression + FrameTime()
@@ -392,6 +396,7 @@ function SLASHER.Maul(slasher, target)
 				if not IsValid(slasher) then return end
 
 				slasher.victimragdoll = target and (target.DeadBody or NULL)
+				if not IsValid(slasher.victimragdoll) then return end
 
 				local phys = slasher.victimragdoll:GetPhysicsObject()
 				phys:Wake()
@@ -430,7 +435,7 @@ function SLASHER.Maul(slasher, target)
 
 			local vPoint1 = slasher.victimragdoll:GetPos()
 			local bloodfx1 = EffectData()
-			bloodfx:SetOrigin(vPoint1)
+			bloodfx1:SetOrigin(vPoint1)
 			util.Effect("BloodImpact", bloodfx1)
 
 			local idx = math.random(2, 4)
@@ -763,7 +768,7 @@ function SLASHER.Footstep(ply)
 
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/princess/prinstep_" .. math.random(1, 10) .. ".ogg",
-			identifier = "PrincessFootstep1",
+			identifier = "PrincessFootstep2",
 			group = "SlasherFootstep",
 			minDistance = 300,
 			maxDistance = 700,
@@ -833,7 +838,7 @@ function SLASHER.DrawHUD(localPly, hud)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_baby"), nil, 2, false)
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_baby"), nil, 2, false)
 
 	local plyWithItem = {}
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do

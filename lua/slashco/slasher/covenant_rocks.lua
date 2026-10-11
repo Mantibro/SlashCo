@@ -35,7 +35,7 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 end
 
 function SLASHER.OnSpawn(slasher)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanChase(true)
 	slasher.ShockCooldown = 0
 end
 
@@ -51,7 +51,7 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if not slasher:GetNWBool("InSlasherChaseMode") then return end
+	if not slasher:GetInSlasherChaseMode() then return end
 	if not IsValid(target) or not target:IsPlayer() then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	if slasher:GetPos():Distance(target:GetPos()) > 137 then return end
@@ -96,7 +96,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -136,7 +136,7 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/unknown"))
 	hud:UntieControl("LMB")
-	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
+	hud:TieControlVisible("LMB", "InSlasherChaseMode")
 end
 
 local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
@@ -146,7 +146,7 @@ function SLASHER.DrawHUD(localPly)
 			continue
 		end
 
-		if survivor:GetNWBool("MarkedByCloaks") then
+		if survivor:GetMarkedByCloaks() then
 			local pos = survivor:WorldSpaceCenter():ToScreen()
 
 		if pos.visible then

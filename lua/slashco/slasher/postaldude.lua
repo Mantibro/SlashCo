@@ -196,7 +196,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	--Clear chase music if chase ends on its own and not via player input
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if not slasher:GetInSlasherChaseMode() then
 		-- Passive Ambience emitting from Postal Dude if he's not in chase
 		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then	
 			if not slasher:GetNWBool("PostalAmbience") then
@@ -1518,7 +1518,7 @@ end
 if CLIENT then
 	hook.Add("Tick", "SlasherChaseLight", function()
 		for _, dude in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if dude == GameData.LocalPlayer then return end
+			if dude == GameData.LocalPlayer then continue end
 
 			if SlashCoSlashers[dude:GetNWString("Slasher")] == SLASHER then
 				if dude:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then
@@ -1541,7 +1541,7 @@ end
 
 -- Postal Dude's ammo should be outlined, he relies on it
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_postalammo"), nil)
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_postalammo"), nil)
 end
 
 -- Fun stuff

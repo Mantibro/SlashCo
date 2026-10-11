@@ -212,20 +212,20 @@ function SLASHER.OnSecondaryFire(slasher)
 		--Sync the chase for every slasher, meaning every covenant member
 		if not SlashCoSlashers.Covenant.PlayersToBecomePartOfCovenant[cloak:SteamID64()] then continue end
 
-		if slasher:GetNWBool("InSlasherChaseMode") then
-			if not cloak:GetNWBool("InSlasherChaseMode") then
+		if slasher:GetInSlasherChaseMode() then
+			if not cloak:GetInSlasherChaseMode() then
 				SlashCo.StartChaseMode(cloak, true)
 			end
 
 			cloak.CurrentChaseTick = 0
-		elseif cloak:GetNWBool("InSlasherChaseMode") then
+		elseif cloak:GetInSlasherChaseMode() then
 			SlashCo.StopChase(cloak)
 		end
 	end
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
 		if not chase then

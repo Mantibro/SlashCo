@@ -36,10 +36,10 @@ end
 if SERVER then
 	function ENT:Use(activator)
 		if activator:Team() ~= TEAM_SURVIVOR then return end
-		if activator:GetNWBool("SurvivorMining") then return end
+		if activator:GetSurvivorMining() then return end
 		if IsValid(self.MiningPlayer) and self.MiningPlayer == TEAM_SURVIVOR then return end
 
-		activator:SetNWBool("SurvivorMining", true)
+		activator:SetSurvivorMining(true)
 	    activator:Freeze(true)
 	    activator.MiningOre = self
 	    self.MiningPlayer = activator
@@ -57,7 +57,7 @@ if SERVER then
 		timer.Create("Mining-" .. activator:UserID(), 10, 1, function()
 			if not IsValid(activator) then return end
 
-			activator:SetNWBool("SurvivorMining", false)
+			activator:SetSurvivorMining(false)
 			activator:Freeze(false)
 			activator:AddEffect("Speed", 10)
 
@@ -79,11 +79,11 @@ if SERVER then
 	end
 
 	local function CancelMining(activator)
-		if not activator:GetNWBool("SurvivorMining") then return end
+		if not activator:GetSurvivorMining() then return end
 
 		timer.Remove("Mining-" .. activator:UserID())
 		activator:Freeze(false)
-		activator:SetNWBool("SurvivorMining", false)
+		activator:SetSurvivorMining(false)
 
 		if IsValid(activator.MiningOre) then
 			activator.MiningOre.MiningPlayer = nil

@@ -301,7 +301,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_milkjug"), "gray", 2, true)
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_milkjug"), "gray", 2, true)
 
 	local plyWithItem = {}
 	for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
@@ -337,7 +337,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Thirsty") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.thrs_f == nil then
 				GameData.LocalPlayer.thrs_f = 0
 			end

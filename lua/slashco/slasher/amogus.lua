@@ -345,7 +345,7 @@ function SLASHER.Footstep(ply)
 		return false
 	end
 
-	if SERVER and not ply:GetNWBool("AmogusFuelDisguise") then
+	if not ply:GetNWBool("AmogusFuelDisguise") then
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/amogus/amogus_step" .. idx .. ".mp3",
@@ -356,6 +356,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			excludeSendTo = ply,
 		})
 	end
 
@@ -363,7 +364,7 @@ function SLASHER.Footstep(ply)
 end
 
 hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Amogus") == true then
+	if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 		if GameData.LocalPlayer.amog_f == nil then
 			GameData.LocalPlayer.amog_f = 0
 		end

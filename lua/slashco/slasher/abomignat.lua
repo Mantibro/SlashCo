@@ -32,9 +32,7 @@ SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.CrawlSpeed = 400 -- SlowWalk,Walk,Run speed when he's crawling
 SLASHER.CooldownReduction = 0 -- Additional cooldown reduction applied to SlashCooldown
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	-- For every 5 additional or missing survivors we increase/decrease by 1 second.
 	SLASHER.CooldownReduction = math.max((SO * 4) + (0.2 * additionalSurvivors), 0) -- math.max so we don't go below 0
 	SLASHER.ChaseDuration = 7.0 + (1 * additionalSurvivors)
@@ -638,7 +636,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	local idx = math.random(1, 3)
 	SlashCo.AudioSystem.PlaySound({

@@ -376,13 +376,13 @@ function SLASHER.DrawHUD(localPly)
 end
 
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_ore"), "green")
-	SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "red", 2, false)
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_ore"), "green")
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_gascan"), "red", 2, false)
 end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Speedrunner") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.spd_f == nil then
 				GameData.LocalPlayer.spd_f = 0
 			end
@@ -401,7 +401,7 @@ if CLIENT then
 			GameData.LocalPlayer.spd_f = nil
 		end
 
-		if GameData.LocalPlayer:GetNWBool("SurvivorMining") then
+		if GameData.LocalPlayer:GetSurvivorMining() then
 			draw.SimpleText("MINING . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
 					Color(255, 0, 0, 255),
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
@@ -418,7 +418,7 @@ if CLIENT then
 						table.insert(v.AllBones, { Bone = v:GetBoneName(b), Offset = Vector(0, 0, 0) })
 					end
 
-					return
+					continue
 				end
 
 				local r_bone = math.random(1, v:GetBoneCount() - 1)

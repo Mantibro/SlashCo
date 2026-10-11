@@ -93,7 +93,9 @@ function SlashCo.OnSlasherSpawned(ply)
 
 	local slasherTbl = SlashCoSlashers[ply:GetNWString("Slasher")]
 	if slasherTbl.OnBalanceForPlayers then
-		slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+		SetGlobal2Int("SlashCo:BalanceSurvivors", GameData.RoundStartSurvivorCount)
+		SetGlobal2Int("SlashCo:BalanceSingularity", SlashCo.CurRound.OfferingData.Singularity)
+		SlashCo.OnBalanceForPlayers(SlashCoSlashers[ply:GetNWString("Slasher")])
 		--[[
 			Example:
 

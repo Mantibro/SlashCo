@@ -34,9 +34,7 @@ SLASHER.HuntPowerKill = 15 -- Used to give huntpower per kill based on survivor 
 SLASHER.HuntPowerDiv = 1 -- Used to divide FrameTime, raising it will make his hunt last longer.
 SLASHER.HuntPowerGainDiv = 2 -- Used to divide FrameTime, raising it will make him gain hunt power SLOWER
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	-- math.max so it cannot go below 0.5.
 	SLASHER.HuntPowerKill = math.max(15 + SO + (2 * additionalSurvivors), 5)
 	SLASHER.HuntPowerDiv = math.max(1 + SO + (0.1 * additionalSurvivors), 0.5)
@@ -153,6 +151,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 
 			DolphinHunt(slasher)
+			break
 		end
 
 		local SurvivorAlert = false
@@ -438,7 +437,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Dolphinman") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.dolf_f == nil then
 				GameData.LocalPlayer.dolf_f = 0
 			end
@@ -460,7 +459,7 @@ if CLIENT then
 
 	hook.Add("Tick", "DolphinmanLight", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if v == GameData.LocalPlayer then return end
+			if v == GameData.LocalPlayer then continue end
 
 			if v:GetNWBool("DolphinHunting") then
 				local tlight = DynamicLight(MAX_EDICT + v:EntIndex())

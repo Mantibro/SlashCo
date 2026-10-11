@@ -580,6 +580,10 @@ local function pickItem(ply, item)
 	end
 
 	local itemTbl = SlashCoItems[item]
+	if not itemTbl or not itemTbl.Price then
+		return
+	end
+
 	if itemTbl.Price > balance then
 		ply:ChatText("item_afford")
 		return
@@ -638,24 +642,27 @@ end
 local function pickMap(ply, map)
 	local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
+	if not SCInfo.Maps[map] then
+		return
+	end
+
 	if SlashCo.LobbyData.SelectedMap == map then
 		ply:ChatText("map_already_selected")
 		return
 	end
 
-	if balance < SlashCo.MapForceCost then
 		ply:ChatText("map_notenough")
 		return
 	end
 
 	for _, play in player.Iterator() do
-		play:ChatText({"map_guaranteed_to", ply:Nick(), SlashCo.MapForceCost, SCInfo.Maps[map].NAME})
+		play:ChatText({"map_guaranteed_to", ply:Nick(), cost, SCInfo.Maps[map].NAME})
 	end
 
-	SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -SlashCo.MapForceCost)
+	SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -cost)
 	SlashCo.LobbyData.SelectedMap = map
-	SlashCo.MapForceCost = SlashCo.MapForceCost + SlashCo.MapForceCostIncrease
-	SlashCo.SendValue(nil, "mapGuar", SlashCo.LobbyData.SelectedMap, SlashCo.MapForceCost)
+	SlashCo.SetForcedMap(map)
+	SlashCo.SetMapForceCost(cost + SlashCo.MapForceCostIncrease)
 	SlashCo.PrecacheNextMap()
 end
 
