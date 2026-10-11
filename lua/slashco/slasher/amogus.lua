@@ -65,8 +65,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if DisguiseCD > 0 then
 		slasher.DisguiseCooldown = DisguiseCD - FrameTime()
-		slasher:SetNWBool("CanKill", false)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanKill(false)
+		slasher:SetCanChase(false)
 	else
 		if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
 			slasher:SetNWBool("CanKill", true)
@@ -76,8 +76,8 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher.DisguiseEntity = nil
 			end
 		else
-			slasher:SetNWBool("CanKill", false)
-			slasher:SetNWBool("CanChase", false)
+			slasher:SetCanKill(false)
+			slasher:SetCanChase(false)
 		end
 	end
 
@@ -140,7 +140,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	timer.Simple(1.25, function()
 		if IsValid(target) then
-			target:SetNWBool("SurvivorBeingJumpscared", false)
+			target:SetSurvivorBeingJumpscared(false)
 			target:Freeze(false)
 			if IsValid(slasher) then
 				target:TakeDamage(99999, slasher, slasher)

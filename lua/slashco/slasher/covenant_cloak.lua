@@ -55,7 +55,7 @@ local function isTackling(slasher)
 end
 
 function SLASHER.OnSpawn(slasher)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanChase(true)
 end
 
 function SLASHER.TackleFail(slasher)

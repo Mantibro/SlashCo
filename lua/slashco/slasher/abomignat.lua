@@ -554,7 +554,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	local abomignat_mainslash = ply:GetNWBool("AbomignatSlashing")
 	local abomignat_lunge = ply:GetNWBool("AbomignatLungeShort")

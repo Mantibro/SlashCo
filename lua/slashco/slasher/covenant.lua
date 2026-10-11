@@ -56,8 +56,8 @@ function SLASHER.OnSpawn(slasher)
 		fadeIn = 0,
 	})
 
-	slasher:SetNWBool("CanChase", true)
 	slasher.RockSummoned = false
+	slasher:SetCanChase(true)
 end
 
 function SLASHER.SummonCovenantMembers(target)
@@ -274,7 +274,7 @@ function SLASHER.DrawHUD(localPly)
 			continue
 		end
 
-		if survivor:GetNWBool("MarkedByCloaks") then
+		if survivor:GetMarkedByCloaks() then
 			local pos = survivor:WorldSpaceCenter():ToScreen()
 
 			if pos.visible then

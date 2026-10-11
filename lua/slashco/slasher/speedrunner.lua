@@ -39,7 +39,7 @@ function SLASHER.OnSpawn(slasher)
 		volume = 1,
 		fadeIn = 0,
 	})
-	slasher:SetNWBool("CanKill", true)
+	slasher:SetCanKill(true)
 
 	timer.Simple(1, function()
 		if not IsValid(slasher) then return end
@@ -91,7 +91,11 @@ end
 function SLASHER.RandomTPCans()
 	for _, ent in ipairs(ents.FindByClass("sc_gascan")) do
 		ent:RandomTeleport(Vector(0, 0, 50))
-		ent:GetPhysicsObject():ApplyForceCenter(Vector((math.random() - 0.5) * 100,
+
+		local phys = ent:GetPhysicsObject()
+		if not IsValid(phys) then continue end
+
+		phys:ApplyForceCenter(Vector((math.random() - 0.5) * 100,
 				(math.random() - 0.5) * 100, (math.random() - 0.5) * 100))
 	end
 end

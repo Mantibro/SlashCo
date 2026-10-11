@@ -94,7 +94,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanKill(false)
 		slasher:SetCanKill(true)
 	else
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 	end
 
 	slasher:SetCanChase(not slasher:GetNWBool("BababooeyInvisibility"))
@@ -242,8 +242,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local spook = ply:GetNWBool("BababooeySpooking")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
 		if not spook then

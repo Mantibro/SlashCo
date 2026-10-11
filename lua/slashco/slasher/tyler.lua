@@ -605,10 +605,11 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		end
 	end
 
-	target:SetNWBool("SurvivorBeingJumpscared", true)
-	target:SetNWBool("SurvivorJumpscare_Tyler", true)
+	slasher:SetTylerJumpscareTarget(target)
 
 	if target:IsPlayer() then
+		target:SetSurvivorBeingJumpscared(true)
+		target:SetSurvivorJumpscare(SLASHER.ID)
 		target:Freeze(true)
 	end
 

@@ -43,7 +43,7 @@ local function HoovyIdle(slasher)
 	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
 	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
 
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if not slasher:GetInSlasherChaseMode() then
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/hoovydundy/idle_" .. idx .. ".mp3",
@@ -271,6 +271,11 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 			timer.Simple(1.0, function()
 				if not IsValid(slasher) then return end
+
+				if not IsValid(find_p) then
+					slasher:SetHoovyGrabStart(false)
+					return
+				end
 
 				slasher:SetNWBool("HoovyGrabLoop", true)
 				slasher:SetNWBool("HoovyGrabStart", false)
