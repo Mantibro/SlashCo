@@ -171,12 +171,12 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetNWBool("DolphinCanActivate", false)
 		end
 
-		if slasher:GetNWBool("CanKill") then
-			slasher:SetNWBool("CanKill", false)
+		if slasher:GetCanKill() then
+			slasher:SetCanKill(false)
 		end
 	elseif not slasher:GetNWBool("DolphinInHiding") then
-		if not slasher:GetNWBool("CanKill") then
-			slasher:SetNWBool("CanKill", true)
+		if not slasher:GetCanKill() then
+			slasher:SetCanKill(true)
 		end
 
 		if SurvivorAlert then
@@ -252,8 +252,8 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		slasher:Freeze(false)
 		slasher:SetNWBool("DolphinStunned", false)
 
-		if not slasher:GetNWBool("CanKill") then
-			slasher:SetNWBool("CanKill", true)
+		if not slasher:GetCanKill() then
+			slasher:SetCanKill(true)
 		end
 	end)
 end

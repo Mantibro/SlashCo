@@ -67,10 +67,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 0
 
 		slasher.Pacification = Pacification - (FrameTime() + (SO * 0.04))
-		slasher:SetNWBool("CanKill", false)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanKill(false)
+		slasher:SetCanChase(false)
 		slasher.Thirsty = 0
-		slasher:SetNWBool("DemonPacified", true)
+		slasher:SetDemonPacified(true)
 	else
 		--Thirsty is not pacified
 		if Thirst < 100 then
@@ -85,9 +85,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		--Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
 		--His chase speed is greatest at low milk drank, and the more he drinks, it is converted to prowl speed.
 
-		slasher:SetNWBool("CanKill", true)
-		slasher:SetNWBool("CanChase", true)
-		slasher:SetNWBool("DemonPacified", false)
 
 		if slasher:GetNWBool("InSlasherChaseMode") then
 			slasher:SetRunSpeed(slasher.ThirstyChaseSpeed)
@@ -96,6 +93,9 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetRunSpeed(slasher.ThirstyProwlSpeed)
 			slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
 		end
+		slasher:SetCanKill(true)
+		slasher:SetCanChase(true)
+		slasher:SetDemonPacified(false)
 	end
 
 	if Milks > 5 then
@@ -191,8 +191,11 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		local phys = emptyjug:GetPhysicsObject()
 		if phys:IsValid() then
 			phys:Wake()
+
+			if IsValid(slasher) then
+				phys:ApplyForceCenter(slasher:GetAimVector() * 450)
+			end
 		end
-		phys:ApplyForceCenter(slasher:GetAimVector() * 450)
 
 		timer.Simple(4.5, function()
 			if not IsValid(emptyjug) then return end
@@ -317,8 +320,9 @@ function SLASHER.ThirstyRage(ply)
 	local pos = ply:GetPos()
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if SlashCoSlashers[slasher:GetNWString("Slasher")].SlasherID ~= 5 then return end
-		if slasher:GetPos():Distance(pos) > 1600 then return end
+		-- Was `.SlasherID ~= 5`, a field slasher tables don't have, so the rage never triggered. And return skipped the other slashers
+		if SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then continue end
+		if slasher:GetPos():Distance(pos) > 1600 then continue end
 
 		slasher.MilkCount = 6
 		slasher:SetNWBool("ThirstyBigMlik", true)

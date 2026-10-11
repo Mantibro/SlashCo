@@ -167,6 +167,8 @@ local function DropItem(slasher, target)
 	slasher:SetNWBool("ManspiderStealing", false)
 	slasher.KillDelayTick = SLASHER.KillDelay
 	slasher.ItemStealed = nil
+
+	return true
 end
 
 function SLASHER.OnSpawn(slasher)
@@ -184,6 +186,10 @@ function SLASHER.OnSpawn(slasher)
 	slasher.LeapCooldown = 0
 	slasher.ItemStealCooldown = 0
 	slasher.TimeNested = 0
+
+	for _, survivor in ipairs(player.GetAll()) do
+		survivor.ManspiderPoison = nil
+	end
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -205,19 +211,19 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if not IsValid(Target) then
 		slasher.TargetPlayer = NULL
-		slasher:SetNWBool("CanChase", false)
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanChase(false)
+		slasher:SetCanKill(false)
 
 		local survivors = team.GetPlayers(TEAM_SURVIVOR)
 		if #survivors == 1 then
 			slasher.TargetPlayer = survivors[1]
 
-			slasher:SetNWBool("CanChase", true)
-			slasher:SetNWBool("CanKill", true)
+			slasher:SetCanChase(true)
+			slasher:SetCanKill(true)
 		end
 	else
-		slasher:SetNWBool("CanChase", true)
-		slasher:SetNWBool("CanKill", true)
+		slasher:SetCanChase(true)
+		slasher:SetCanKill(true)
 
 		if not IsValid(Target) or Target:Team() ~= TEAM_SURVIVOR then
 			slasher.TargetPlayer = NULL
@@ -696,9 +702,9 @@ function SLASHER.Move(ply, mv)
 			ply:SetRenderAngles(forced_angle)
 
 			ply:SetNWBool("ManspiderClimbing", true)
+			ply:SetMoveType(MOVETYPE_NONE)
 		end
 
-		ply:SetMoveType(MOVETYPE_NONE)
 		return
 	end
 
@@ -920,7 +926,7 @@ function SLASHER.InitHud(_, hud)
 	hud:TieControlText("LMB", "CanKill", "kill", "bite", true)
 	hud:TieControlVisible("RMB", "CanChase")
 	hud:AddControl("F", "leap", Material("slashco/ui/icons/slasher/punch"))
-	hud:TieControlVisible("F", "ManspiderNested", true, false, false)
+	hud:TieControlVisible("F", "ManspiderNested", true)
 	hud:TieControl("F", "CanLeap", false, true)
 
 	function hud.TitleCard.Label:PaintOver()

@@ -70,12 +70,12 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if slasher:GetVelocity():Length() > 5 then
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		timer.Remove("CriminalStandStill_" .. slasher:UserID())
 	elseif not timer.Exists("CriminalStandStill_" .. slasher:UserID()) then
 		timer.Create("CriminalStandStill_" .. slasher:UserID(), 0.7, 1, function()
 			if IsValid(slasher) then
-				slasher:SetNWBool("CanKill", true)
+				slasher:SetCanKill(true)
 			end
 		end)
 	end

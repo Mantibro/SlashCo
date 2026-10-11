@@ -49,6 +49,7 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	slasher:DrawShadow(false)
+	slasher:SetCanChase(true)
 
 	slasher.MainCooldown = 0
 	slasher.NoclipCooldown = 0
@@ -172,8 +173,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			fadeIn = 0,
 		})
 
-		slasher:SetNWBool("CanChase", false)
 		slasher:SetNWBool("BrenKill", true)
+		slasher:SetCanChase(false)
 
 		timer.Simple(1.5, function()
 			if not IsValid(slasher) then
@@ -186,7 +187,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			slasher:Freeze(false)
 			slasher:SetNWBool("BrenKill", false)
-			slasher:SetNWBool("CanChase", true)
+			slasher:SetCanChase(true)
 			SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 
 			if not IsValid(target) then return end
@@ -269,7 +270,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SlasherHudFunc("SetControlEnabled", "RMB", false)
 
 		slasher:SetNWBool("BrenNoclip", true)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanChase(false)
 
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bren/bren_noclip_start.mp3",
@@ -389,7 +390,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 			if not IsValid(slasher) then return end
 
 			slasher:SetNWBool("BrenSnapState", false)
-			slasher:SetNWBool("CanChase", true)
+			slasher:SetCanChase(true)
 			slasher:DrawShadow(true)
 			slasher:SetVisible(true)
 		end)

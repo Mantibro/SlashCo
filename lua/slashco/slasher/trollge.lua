@@ -189,6 +189,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 
 		timer.Simple(7, function()
+			if not IsValid(slasher) then return end
+
 			--transit
 			StopBreathing(slasher)
 			slasher.TrollgeStage = 1
@@ -208,7 +210,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			slasher:SetRunSpeed(280)
 			slasher:SetWalkSpeed(150)
-			slasher:SetNWBool("CanKill", true)
+			slasher:SetCanKill(true)
 
 			for _, ply in player.Iterator() do
 				ply:SetNWBool("DisplayTrollgeTransition", false)
@@ -298,6 +300,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			if Dashing == 0 then
 				timer.Simple(6, function()
+					if not IsValid(slasher) then return end
+
 					stopDash(slasher)
 				end)
 			end
@@ -392,7 +396,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetRunSpeed(450)
 				slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 				final_eyesight = 10
-				slasher:SetNWBool("CanKill", true)
+				slasher:SetCanKill(true)
 
 				for _, ply in player.Iterator() do
 					ply:SetNWBool("DisplayTrollgeTransition", false)
@@ -799,7 +803,7 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("R", "dash", dashTable)
 	hud:AddControl("LMB", "claw", killTable)
-	hud:TieControl("R", "TrollgeDashing", true, true, false)
+	hud:TieControl("R", "TrollgeDashing", true, true)
 
 	hud:AddMeter("blood", 8, "", nil, true)
 	hud:TieMeterInt("blood", "TrollgeBlood")

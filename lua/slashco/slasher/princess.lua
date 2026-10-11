@@ -793,7 +793,7 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("R", "sniff", Material("slashco/ui/icons/slasher/princess"))
 	hud:AddControl("LMB", "maul", maulTable)
-	hud:TieControl("LMB", "DemonPacified", true, false, false)
+	hud:TieControl("LMB", "DemonPacified", true)
 	hud:ChaseAndKill(nil, true)
 
 	hud:AddMeter("aggro", 50, "%", false, true)

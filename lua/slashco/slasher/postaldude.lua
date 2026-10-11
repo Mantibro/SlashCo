@@ -289,8 +289,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 3.0
 	elseif stage == POSTAL_RAGE_STAGE then
 		slasher:SetNWInt("PostalStage", POSTAL_RAGE_STAGE)
-		slasher:SetNWBool("CanChase", false)
 		if slasher:GetNWBool("InSlasherChaseMode") then
+		slasher:SetCanChase(false)
 			SlashCo.StopChase(slasher)
 		end
 
@@ -621,9 +621,9 @@ function SLASHER.OnPrimaryFire(slasher)
 			if target:Team() ~= TEAM_SURVIVOR then return end
 
 			if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
-				if not slasher:GetNWBool("InSlasherChaseMode") then
+				if not slasher:GetInSlasherChaseMode() then
 					SlashCo.StartChaseMode(slasher, true)
-					slasher:SetNWBool("InSlasherChaseMode", true)
+					slasher:SetInSlasherChaseMode(true)
 				end
 			end
 
@@ -735,8 +735,17 @@ function SLASHER.OnPrimaryFire(slasher)
 		end
 	end
 
+	local function isActivePostalDude()
+		return IsValid(slasher) and slasher:Team() == TEAM_SLASHER and slasher:GetNWString("Slasher") == "PostalDude"
+	end
+
 	-- The only way to make weapons automatic is by hooking a think function to them and setting their cooldown here
 	hook.Add("Think", "MGShoot", function()
+		if not isActivePostalDude() then
+			hook.Remove("Think", "MGShoot")
+			return
+		end
+
 		if slasher:KeyDown(IN_ATTACK) then
 			if slasher.M4Cooldown > CurTime() then return end
 
@@ -828,6 +837,11 @@ function SLASHER.OnPrimaryFire(slasher)
 	-- All of this is just that code from that one gas can swep, god bless whoever made that
 	-- We also make the gas can automatic, we don't want players to get frustrated over spamming m1
 	hook.Add("Think", "GasPour", function()
+		if not isActivePostalDude() then
+			hook.Remove("Think", "GasPour")
+			return
+		end
+
 		if slasher:KeyDown(IN_ATTACK) then
 			if slasher.GasCooldown > CurTime() then return end
 

@@ -47,8 +47,8 @@ local function AmericanpoIdle(slasher)
 	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
 	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
 
-	if not slasher:GetNWBool("InSlasherChaseMode") or not slasher:GetNWBool("AmericanpoFinal") then
 		local hunter = slasher:GetNWInt("AmericanpoState") == 0
+	if not slasher:GetInSlasherChaseMode() or not slasher:GetNWBool("AmericanpoFinal") then
 		local idx = math.random(1, 9)
 
 		if not slasher:GetNWBool("AmericanpoAiming") then

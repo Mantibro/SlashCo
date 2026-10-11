@@ -195,7 +195,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	:: FOUND ::
 
-	if IsValid(target) and isSeen == false and not slasher:GetNWBool("InSlasherChaseMode") then
+	if IsValid(target) and isSeen == false and not slasher:GetInSlasherChaseMode() then
 		slasher.StalkTime = Stalking + FrameTime()
 		if not slasher:GetNWBool("WatcherStalking") then
 			slasher:SetNWBool("WatcherStalking", true)
@@ -286,8 +286,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
 	local rage = ply:GetNWBool("WatcherRage")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
 		if not chase or rage then
