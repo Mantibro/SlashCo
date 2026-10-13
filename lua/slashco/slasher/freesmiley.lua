@@ -61,17 +61,17 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.SummonCooldown = SummonCD - FrameTime()
 	end
 
-	if slasher:GetNWInt("SmileySummonCooldown") ~= math.floor(SummonCD) then
-		slasher:SetNWInt("SmileySummonCooldown", math.floor(SummonCD))
+	if slasher:GetNW2Int("SmileySummonCooldown") ~= math.floor(SummonCD) then
+		slasher:SetNW2Int("SmileySummonCooldown", math.floor(SummonCD))
 	end
-	if slasher:GetNWInt("SmileySummonSelect") ~= SummonChoose then
-		slasher:SetNWInt("SmileySummonSelect", SummonChoose)
+	if slasher:GetNW2Int("SmileySummonSelect") ~= SummonChoose then
+		slasher:SetNW2Int("SmileySummonSelect", SummonChoose)
 	end
-	if slasher:GetNWInt("SmileyZanyAmount") ~= ZanyAmount then
-		slasher:SetNWInt("SmileyZanyAmount", ZanyAmount)
+	if slasher:GetNW2Int("SmileyZanyAmount") ~= ZanyAmount then
+		slasher:SetNW2Int("SmileyZanyAmount", ZanyAmount)
 	end
-	if slasher:GetNWInt("SmileyPensiveAmount") ~= PensiveAmount then
-		slasher:SetNWInt("SmileyPensiveAmount", PensiveAmount)
+	if slasher:GetNW2Int("SmileyPensiveAmount") ~= PensiveAmount then
+		slasher:SetNW2Int("SmileyPensiveAmount", PensiveAmount)
 	end
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
@@ -84,15 +84,15 @@ function SLASHER.OnKillPlayer(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("FreeSmileySummoning") then return end
-	if slasher:GetNWBool("FreeSmileyPocketSand") or slasher:GetNWBool("FreeSmileyTeslaCoil") then return end
+	if slasher:GetNW2Bool("FreeSmileySummoning") then return end
+	if slasher:GetNW2Bool("FreeSmileyPocketSand") or slasher:GetNW2Bool("FreeSmileyTeslaCoil") then return end
 
 	SlashCo.Jumpscare(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("FreeSmileySummoning") then return end
-	if slasher:GetNWBool("FreeSmileyPocketSand") or slasher:GetNWBool("FreeSmileyTeslaCoil") then return end
+	if slasher:GetNW2Bool("FreeSmileySummoning") then return end
+	if slasher:GetNW2Bool("FreeSmileyPocketSand") or slasher:GetNW2Bool("FreeSmileyTeslaCoil") then return end
 
 	if slasher:GetInSlasherChaseMode() then
 		SlashCo.StopChase(slasher)
@@ -103,7 +103,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("FreeSmileySummoning") then return end
+	if slasher:GetNW2Bool("FreeSmileySummoning") then return end
 	if slasher.SummonCooldown > 0 then return end
 
 	if slasher.SummonChoose == 0 then
@@ -140,7 +140,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 	slasher.SummonCooldown = SLASHER.SummonCooldown
 
-	slasher:SetNWBool("FreeSmileySummoning", true)
+	slasher:SetNW2Bool("FreeSmileySummoning", true)
 
 	slasher:Freeze(true)
 	timer.Simple(4, function()
@@ -168,23 +168,23 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		if not IsValid(slasher) then return end
 
 		slasher:Freeze(false)
-		slasher:SetNWBool("FreeSmileySummoning", false)
+		slasher:SetNW2Bool("FreeSmileySummoning", false)
 	end)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("FreeSmileySummoning") or ply:GetNWBool("FreeSmileyPocketSand") or ply:GetNWBool("FreeSmileyTeslaCoil")
+	return ply:GetNW2Bool("FreeSmileySummoning") or ply:GetNW2Bool("FreeSmileyPocketSand") or ply:GetNW2Bool("FreeSmileyTeslaCoil")
 end
 
 function SLASHER.OnHitByPocketSand(slasher, ply)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("FreeSmileyPocketSand", true)
+	slasher:SetNW2Bool("FreeSmileyPocketSand", true)
 	slasher:Freeze(true)
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("FreeSmileyPocketSand", false)
+		slasher:SetNW2Bool("FreeSmileyPocketSand", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -193,21 +193,21 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 function SLASHER.OnHitByTeslaCoil(slasher)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("FreeSmileyTeslaCoil", true)
+	slasher:SetNW2Bool("FreeSmileyTeslaCoil", true)
 	slasher:Freeze(true)
 	timer.Simple(16, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("FreeSmileyTeslaCoil", false)
+		slasher:SetNW2Bool("FreeSmileyTeslaCoil", false)
 		slasher:Freeze(false)
 	end)
 end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetInSlasherChaseMode()
-	local smiley_summon = ply:GetNWBool("FreeSmileySummoning")
-	local smiley_sand_stun = ply:GetNWBool("FreeSmileyPocketSand")
-	local smiley_tesla_stun = ply:GetNWBool("FreeSmileyTeslaCoil")
+	local smiley_summon = ply:GetNW2Bool("FreeSmileySummoning")
+	local smiley_sand_stun = ply:GetNW2Bool("FreeSmileyPocketSand")
+	local smiley_tesla_stun = ply:GetNW2Bool("FreeSmileyTeslaCoil")
 
 	if not smiley_summon and not smiley_sand_stun and not smiley_tesla_stun then
 		ply.anim_antispam = false
@@ -314,16 +314,16 @@ function SLASHER.InitHud(_, hud)
 	hud:AddControl("F", "deal a zany", dealTable)
 
 	function hud.TitleCard.Label:PaintOver()
-		draw.SimpleText("SMILEYS: " .. math.Round(GameData.LocalPlayer:GetNWInt("SmileyZanyAmount"), 0) .. "/4", "TVCD", 4, 18, red)
+		draw.SimpleText("SMILEYS: " .. math.Round(GameData.LocalPlayer:GetNW2Int("SmileyZanyAmount"), 0) .. "/4", "TVCD", 4, 18, red)
 	end
 
 	hud.prevDeal = -1
 	hud.prevDealAllow = -1
 	hud.prevNumSmiley = -1
 	function hud.AlsoThink()
-		local deal = GameData.LocalPlayer:GetNWInt("SmileySummonSelect")
-		local maxZanies = GameData.LocalPlayer:GetNWInt("SmileyZanyAmount")
-		local maxPensives = GameData.LocalPlayer:GetNWInt("SmileyPensiveAmount")
+		local deal = GameData.LocalPlayer:GetNW2Int("SmileySummonSelect")
+		local maxZanies = GameData.LocalPlayer:GetNW2Int("SmileyZanyAmount")
+		local maxPensives = GameData.LocalPlayer:GetNW2Int("SmileyPensiveAmount")
 
 		local numZanies
 		local numPensives
@@ -363,7 +363,7 @@ function SLASHER.InitHud(_, hud)
 			hud.prevCanDeal = canDeal
 		end
 
-		local cooldown = GameData.LocalPlayer:GetNWInt("SmileySummonCooldown")
+		local cooldown = GameData.LocalPlayer:GetNW2Int("SmileySummonCooldown")
 		if not hud.prevDealAllow and cooldown < 0.1 then
 			hud:SetControlEnabled("R", true)
 			hud:SetControlVisible("F", true)

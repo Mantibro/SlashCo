@@ -45,13 +45,13 @@ end
 
 local function AmericanpoIdle(slasher)
 	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
-	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
+	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNW2String("Slasher")] ~= SLASHER then return end
 
-	if not slasher:GetInSlasherChaseMode() or not slasher:GetNWBool("AmericanpoFinal") then
-		local hunter = slasher:GetNWInt("AmericanpoState") == 0
+	if not slasher:GetInSlasherChaseMode() or not slasher:GetNW2Bool("AmericanpoFinal") then
+		local hunter = slasher:GetNW2Int("AmericanpoState") == 0
 		local idx = math.random(1, 9)
 
-		if not slasher:GetNWBool("AmericanpoAiming") then
+		if not slasher:GetNW2Bool("AmericanpoAiming") then
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/americanpo/vo/po_idle" .. idx .. ".mp3",
 				identifier = "AmericanpoIdle" .. idx,
@@ -101,13 +101,13 @@ local function PoEndlessChase(slasher)
 		slasher.AmericanpoState = AMERICANPO_AGGRO
 
 		-- just in case we have some actions going on at the same time, let's prevent animations from breaking.
-		slasher:SetNWBool("AmericanpoShootingHip", false)
-		slasher:SetNWBool("AmericanpoShooting", false)
-		slasher:SetNWBool("AmericanpoAiming", false)
-		slasher:SetNWBool("AmericanpoAim", false)
-		slasher:SetNWBool("AmericanpoAttack", false)
-		slasher:SetNWBool("AmericanpoThrowingBottle", false)
-		slasher:SetNWBool("AmericanpoStun", false)
+		slasher:SetNW2Bool("AmericanpoShootingHip", false)
+		slasher:SetNW2Bool("AmericanpoShooting", false)
+		slasher:SetNW2Bool("AmericanpoAiming", false)
+		slasher:SetNW2Bool("AmericanpoAim", false)
+		slasher:SetNW2Bool("AmericanpoAttack", false)
+		slasher:SetNW2Bool("AmericanpoThrowingBottle", false)
+		slasher:SetNW2Bool("AmericanpoStun", false)
 		slasher:SetInSlasherChaseMode(false)
 		slasher:SetCanChase(false)
 		slasher:Freeze(false)
@@ -120,9 +120,9 @@ function SLASHER.OnSpawn(slasher)
 	slasher.AmericanpoState = AMERICANPO_HUNTER
 	AmericanpoIdle(slasher)
 	slasher:SetCanChase(true)
-	slasher:SetNWBool("AmericanpoFinal", false)
-	slasher:SetNWBool("AmericanpoAiming", false)
-	slasher:SetNWBool("AmericanpoAttack", false)
+	slasher:SetNW2Bool("AmericanpoFinal", false)
+	slasher:SetNW2Bool("AmericanpoAiming", false)
+	slasher:SetNW2Bool("AmericanpoAttack", false)
 	slasher.americanpo_final_antispam = nil
 
 	slasher.AmericanpoStateCooldown = 0
@@ -174,12 +174,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 		slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 	else
-		if slasher:GetNWBool("AmericanpoFinal") then
+		if slasher:GetNW2Bool("AmericanpoFinal") then
 			slasher:SetSlowWalkSpeed(SLASHER.FinalSpeed)
 			slasher:SetWalkSpeed(SLASHER.FinalSpeed)
 			slasher:SetRunSpeed(SLASHER.FinalSpeed)
 		else
-			if not slasher:GetNWBool("AmericanpoAiming") or slasher:GetNWBool("AmericanpoAttack") then
+			if not slasher:GetNW2Bool("AmericanpoAiming") or slasher:GetNW2Bool("AmericanpoAttack") then
 				if State == AMERICANPO_HUNTER then
 					slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 					slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
@@ -198,12 +198,12 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if SlashCo.CurRound.EscapeHelicopterSummoned then
-		slasher:SetNWBool("AmericanpoFinal", true)
+		slasher:SetNW2Bool("AmericanpoFinal", true)
 		PoEndlessChase(slasher)
 	end
 
-	if slasher:GetNWInt("AmericanpoState") ~= State then
-		slasher:SetNWInt("AmericanpoState", State)
+	if slasher:GetNW2Int("AmericanpoState") ~= State then
+		slasher:SetNW2Int("AmericanpoState", State)
 	end
 
 	slasher:SetEyeSight(eyesight_final)
@@ -219,7 +219,7 @@ local function BulletHit(attacker, tr, dmginfo)
 end
 
 local function PlayBullets(slasher)
-	if not slasher:GetNWBool("AmericanpoStun") then
+	if not slasher:GetNW2Bool("AmericanpoStun") then
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/americanpo/po_shotgunfire.mp3",
 			identifier = "AmericanpoShot",
@@ -292,25 +292,25 @@ local function PlayBullets(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("AmericanpoStun") then return end
-	if slasher:GetNWBool("AmericanpoThrowingBottle") then return end
+	if slasher:GetNW2Bool("AmericanpoStun") then return end
+	if slasher:GetNW2Bool("AmericanpoThrowingBottle") then return end
 
 	-- SHOTGUN SHOTS
 	if slasher.ShotgunCooldown < 0.01 then
-		if slasher:GetNWBool("AmericanpoAiming") then
-			slasher:SetNWBool("AmericanpoShooting", true)
+		if slasher:GetNW2Bool("AmericanpoAiming") then
+			slasher:SetNW2Bool("AmericanpoShooting", true)
 			PlayBullets(slasher)
 			slasher.ShotgunCooldown = 1
 
 			timer.Simple(0.9, function()
 				if not IsValid(slasher) then return end
 
-				slasher:SetNWBool("AmericanpoShooting", false)
+				slasher:SetNW2Bool("AmericanpoShooting", false)
 			end)
 
 			return
-		elseif slasher:GetInSlasherChaseMode() or slasher:GetNWBool("AmericanpoFinal") then
-			slasher:SetNWBool("AmericanpoShootingHip", true)
+		elseif slasher:GetInSlasherChaseMode() or slasher:GetNW2Bool("AmericanpoFinal") then
+			slasher:SetNW2Bool("AmericanpoShootingHip", true)
 			PlayBullets(slasher)
 			slasher.ShotgunCooldown = 2
 
@@ -318,7 +318,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			timer.Simple(1.0, function()
 				if not IsValid(slasher) then return end
 
-				slasher:SetNWBool("AmericanpoShootingHip", false)
+				slasher:SetNW2Bool("AmericanpoShootingHip", false)
 				slasher:Freeze(false)
 			end)
 
@@ -328,9 +328,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	-- BASE ATTACK
 	if slasher.AttackCooldown > 0.01 then return end
-	if slasher:GetNWBool("AmericanpoAim") then return end
-	if slasher:GetNWBool("AmericanpoAiming") then return end
-	if slasher:GetNWBool("AmericanpoFinal") then return end
+	if slasher:GetNW2Bool("AmericanpoAim") then return end
+	if slasher:GetNW2Bool("AmericanpoAiming") then return end
+	if slasher:GetNW2Bool("AmericanpoFinal") then return end
 	if slasher:GetInSlasherChaseMode() then return end
 
 	timer.Remove("AmericanpoAttackDecay")
@@ -409,18 +409,18 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	timer.Simple(0.05, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("AmericanpoAttack", true)
+		slasher:SetNW2Bool("AmericanpoAttack", true)
 
 		timer.Create("AmericanpoAttackDecay", 1.0, 1, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("AmericanpoAttack", false)
+			slasher:SetNW2Bool("AmericanpoAttack", false)
 		end)
 	end)
 end
 
 local function AimShotgun(slasher)
-	if not slasher:GetNWBool("AmericanpoAim") and not slasher:GetNWBool("AmericanpoAiming") and slasher.ShotgunCooldown < 0.01 then
+	if not slasher:GetNW2Bool("AmericanpoAim") and not slasher:GetNW2Bool("AmericanpoAiming") and slasher.ShotgunCooldown < 0.01 then
 		if slasher.AmericanpoState == AMERICANPO_HUNTER then
 			local idx = math.random(1, 4)
 			SlashCo.AudioSystem.PlaySound({
@@ -445,14 +445,14 @@ local function AimShotgun(slasher)
 			})
 		end
 
-		slasher:SetNWBool("AmericanpoAim", true)
+		slasher:SetNW2Bool("AmericanpoAim", true)
 		slasher.ShotgunCooldown = 1.5
 
 		timer.Simple(0.7, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("AmericanpoAim", false)
-			slasher:SetNWBool("AmericanpoAiming", true)
+			slasher:SetNW2Bool("AmericanpoAim", false)
+			slasher:SetNW2Bool("AmericanpoAiming", true)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/sid/sid_clipout.mp3",
 				identifier = "AmericanpoClipout",
@@ -465,18 +465,18 @@ local function AimShotgun(slasher)
 
 			slasher.BulletSpread = 2
 		end)
-	elseif slasher:GetNWBool("AmericanpoAiming") and slasher.ShotgunCooldown < 0.01 then
-		slasher:SetNWBool("AmericanpoAiming", false)
+	elseif slasher:GetNW2Bool("AmericanpoAiming") and slasher.ShotgunCooldown < 0.01 then
+		slasher:SetNW2Bool("AmericanpoAiming", false)
 		slasher.ShotgunCooldown = 1.5
 	end
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("AmericanpoThrowingBottle") then return end
-	if slasher:GetNWBool("AmericanpoAim") then return end
-	if slasher:GetNWBool("AmericanpoAttack") then return end
-	if slasher:GetNWBool("AmericanpoStun") then return end
-	if slasher:GetNWBool("AmericanpoFinal") then return end
+	if slasher:GetNW2Bool("AmericanpoThrowingBottle") then return end
+	if slasher:GetNW2Bool("AmericanpoAim") then return end
+	if slasher:GetNW2Bool("AmericanpoAttack") then return end
+	if slasher:GetNW2Bool("AmericanpoStun") then return end
+	if slasher:GetNW2Bool("AmericanpoFinal") then return end
 
 	if slasher.AmericanpoState == AMERICANPO_HUNTER then
 		AimShotgun(slasher)
@@ -489,11 +489,11 @@ end
 function SLASHER.OnMainAbilityFire(slasher)
 	if slasher.AmericanpoState == AMERICANPO_HUNTER then return end
 	if slasher.BottleCooldown > 0.01 then return end
-	if slasher:GetNWBool("AmericanpoStun") then return end
-	if slasher:GetNWBool("AmericanpoAim") then return end
-	if slasher:GetNWBool("AmericanpoAttack") then return end
+	if slasher:GetNW2Bool("AmericanpoStun") then return end
+	if slasher:GetNW2Bool("AmericanpoAim") then return end
+	if slasher:GetNW2Bool("AmericanpoAttack") then return end
 
-	slasher:SetNWBool("AmericanpoThrowingBottle", true)
+	slasher:SetNW2Bool("AmericanpoThrowingBottle", true)
 	slasher.BottleCooldown = 15
 
 	SlashCo.AudioSystem.PlaySound({
@@ -535,19 +535,19 @@ function SLASHER.OnMainAbilityFire(slasher)
 	timer.Simple(1.7, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("AmericanpoThrowingBottle", false)
+		slasher:SetNW2Bool("AmericanpoThrowingBottle", false)
 	end)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if slasher.AmericanpoStateCooldown > 0.01 then return end
 	if slasher:GetInSlasherChaseMode() then return end
-	if slasher:GetNWBool("AmericanpoAim") then return end
-	if slasher:GetNWBool("AmericanpoAiming") then return end
-	if slasher:GetNWBool("AmericanpoThrowingBottle") then return end
-	if slasher:GetNWBool("AmericanpoStun") then return end
-	if slasher:GetNWBool("AmericanpoAttack") then return end
-	if slasher:GetNWBool("AmericanpoFinal") then return end
+	if slasher:GetNW2Bool("AmericanpoAim") then return end
+	if slasher:GetNW2Bool("AmericanpoAiming") then return end
+	if slasher:GetNW2Bool("AmericanpoThrowingBottle") then return end
+	if slasher:GetNW2Bool("AmericanpoStun") then return end
+	if slasher:GetNW2Bool("AmericanpoAttack") then return end
+	if slasher:GetNW2Bool("AmericanpoFinal") then return end
 
 	slasher.AmericanpoStateCooldown = 10
 
@@ -595,13 +595,13 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		fadeIn = 0,
 	})
 
-	slasher:SetNWBool("AmericanpoThrowingBottle", false)
-	slasher:SetNWBool("AmericanpoAim", false)
-	slasher:SetNWBool("AmericanpoAiming", false)
-	slasher:SetNWBool("AmericanpoShooting", false)
-	slasher:SetNWBool("AmericanpoAttack", false)
+	slasher:SetNW2Bool("AmericanpoThrowingBottle", false)
+	slasher:SetNW2Bool("AmericanpoAim", false)
+	slasher:SetNW2Bool("AmericanpoAiming", false)
+	slasher:SetNW2Bool("AmericanpoShooting", false)
+	slasher:SetNW2Bool("AmericanpoAttack", false)
 
-	slasher:SetNWBool("AmericanpoStun", true)
+	slasher:SetNW2Bool("AmericanpoStun", true)
 	slasher:Freeze(true)
 
 	timer.Simple(4.5, function()
@@ -613,7 +613,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 	timer.Simple(14, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("AmericanpoStun", false)
+		slasher:SetNW2Bool("AmericanpoStun", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -621,19 +621,19 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("AmericanpoStun")
+	return ply:GetNW2Bool("AmericanpoStun")
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetInSlasherChaseMode() or ply:GetNWBool("AmericanpoFinal")
-	local aim_start = ply:GetNWBool("AmericanpoAim")
-	local aim_loop = ply:GetNWBool("AmericanpoAiming")
-	local shooting = ply:GetNWBool("AmericanpoShooting")
-	local hipfire = ply:GetNWBool("AmericanpoShootingHip")
-	local attack = ply:GetNWBool("AmericanpoAttack")
-	local throw_bottle = ply:GetNWBool("AmericanpoThrowingBottle")
-	local stunned = ply:GetNWBool("AmericanpoStun")
-	local hunter = ply:GetNWInt("AmericanpoState") == 0
+	local chase = ply:GetInSlasherChaseMode() or ply:GetNW2Bool("AmericanpoFinal")
+	local aim_start = ply:GetNW2Bool("AmericanpoAim")
+	local aim_loop = ply:GetNW2Bool("AmericanpoAiming")
+	local shooting = ply:GetNW2Bool("AmericanpoShooting")
+	local hipfire = ply:GetNW2Bool("AmericanpoShootingHip")
+	local attack = ply:GetNW2Bool("AmericanpoAttack")
+	local throw_bottle = ply:GetNW2Bool("AmericanpoThrowingBottle")
+	local stunned = ply:GetNW2Bool("AmericanpoStun")
+	local hunter = ply:GetNW2Int("AmericanpoState") == 0
 
 	if not aim_start and not aim_loop and not shooting and not hipfire and not throw_bottle and not attack and not stunned then
 		ply.anim_antispam = false
@@ -725,7 +725,7 @@ end
 
 function SLASHER.Footstep(ply)
 	local idx = math.random(1, 2)
-	local hunter = ply:GetNWInt("AmericanpoState") == 0
+	local hunter = ply:GetNW2Int("AmericanpoState") == 0
 
 	if not hunter then
 		SlashCo.AudioSystem.PlaySound({
@@ -807,7 +807,7 @@ function SLASHER.InitHud(_, hud)
 	hud:TieCrosshair("AmericanpoAiming")
 
 	function hud.TitleCard.Label:PaintOver()
-		local curState = GameData.LocalPlayer:GetNWInt("AmericanpoState")
+		local curState = GameData.LocalPlayer:GetNW2Int("AmericanpoState")
 		if curState == 0 then
 			draw.SimpleText("MODE: HUNTER", "TVCD", 4, 18, red)
 		else
@@ -816,8 +816,8 @@ function SLASHER.InitHud(_, hud)
 	end
 
 	function hud.AlsoThink()
-		local curState = GameData.LocalPlayer:GetNWInt("AmericanpoState")
-		local final = GameData.LocalPlayer:GetNWBool("AmericanpoFinal")
+		local curState = GameData.LocalPlayer:GetNW2Int("AmericanpoState")
+		local final = GameData.LocalPlayer:GetNW2Bool("AmericanpoFinal")
 		local stateIcon = "hunter"
 
 		if curState == 0 then
@@ -862,8 +862,8 @@ if CLIENT then
 		for _, po in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if po == GameData.LocalPlayer then continue end
 
-			if SlashCoSlashers[po:GetNWString("Slasher")] == SLASHER then
-				if po:GetNWBool("AmericanpoFinal") then
+			if SlashCoSlashers[po:GetNW2String("Slasher")] == SLASHER then
+				if po:GetNW2Bool("AmericanpoFinal") then
 					local tlight = DynamicLight(MAX_EDICT + po:EntIndex())
 					if tlight then
 						tlight.pos = po:LocalToWorld(Vector(0, 0, 20))
@@ -883,13 +883,13 @@ end
 
 local function SidIsHere()
     for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-        if s:GetNWString("Slasher") == "Sid" then return true end
+        if s:GetNW2String("Slasher") == "Sid" then return true end
     end
     return false
 end
 local function ScreamerIsHere()
     for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-        if s:GetNWString("Slasher") == "Screamer" then return true end
+        if s:GetNW2String("Slasher") == "Screamer" then return true end
     end
     return false
 end
@@ -907,7 +907,7 @@ hook.Add("SlashCo:OnPing", "AmericanPoSpecialInteraction", function(pingInfo)
 
 	if not IsValid(ply) then return end
 
-	if ply:GetNWString("Slasher") ~= "Americanpo" then return end
+	if ply:GetNW2String("Slasher") ~= "Americanpo" then return end
 
 	if pingInfo.Type == "SLASHER" then
 		if SidIsHere() then

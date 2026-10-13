@@ -62,14 +62,14 @@ function SLASHER.TackleFail(slasher)
 	if not IsValid(slasher) then return end
 	if slasher.TackledPlayer ~= nil then return end
 
-	slasher:SetNWBool("CloakTackleFail", true)
+	slasher:SetNW2Bool("CloakTackleFail", true)
 	slasher:SetNW2Float("CloakLockEnd", CurTime() + TACKLE_FAIL_TIME)
 
 	timer.Simple(TACKLE_FAIL_TIME, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("CloakTackle", false)
-		slasher:SetNWBool("CloakTackleFail", false)
+		slasher:SetNW2Bool("CloakTackle", false)
+		slasher:SetNW2Bool("CloakTackleFail", false)
 		slasher.KillDelayTick = SLASHER.KillDelay
 	end)
 end
@@ -112,13 +112,13 @@ function SLASHER.OnTickBehaviour(slasher, target)
 		end
 	end
 
-	if slasher:GetNWBool("CloakTackling") then
+	if slasher:GetNW2Bool("CloakTackling") then
 		if SERVER and not slasher.TackledPlayer then
 			for _, ply in ipairs(ents.FindInSphere(slasher:GetPos(), 60)) do
 				if ply:IsPlayer() and ply:Team() == TEAM_SURVIVOR and not ply:GetSurvivorTackled() then
 					slasher.TackledPlayer = ply
-					slasher:SetNWBool("CloakTackling", false)
-					slasher:SetNWBool("CloakTackle", false)
+					slasher:SetNW2Bool("CloakTackling", false)
+					slasher:SetNW2Bool("CloakTackle", false)
 					slasher:SetNW2Float("CloakTackleEnd", 0)
 
 					ply:SetSurvivorTackled(true)
@@ -168,11 +168,11 @@ function SLASHER.OnTickBehaviour(slasher, target)
 		if IsValid(target) and target:GetPos():Distance(slasher:GetPos()) < 120 then
 			slasher:SlamDoor(target)
 		end
-	elseif slasher:GetNWBool("CloakTackle") and slasher.TackledPlayer == nil and not slasher:GetNWBool("CloakTackleFail") then
+	elseif slasher:GetNW2Bool("CloakTackle") and slasher.TackledPlayer == nil and not slasher:GetNW2Bool("CloakTackleFail") then
 		SLASHER.TackleFail(slasher)
 	end
 
-	slasher:SetNW2Bool("CloakCanTackle", not IsValid(slasher.TackledPlayer) and not slasher:IsFrozen() and not isLocked(slasher) and slasher.KillDelayTick <= 0 and not slasher:GetNWBool("CloakTackle"))
+	slasher:SetNW2Bool("CloakCanTackle", not IsValid(slasher.TackledPlayer) and not slasher:IsFrozen() and not isLocked(slasher) and slasher.KillDelayTick <= 0 and not slasher:GetNW2Bool("CloakTackle"))
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
@@ -192,22 +192,22 @@ function SLASHER.OnPrimaryFire(slasher)
 	if IsValid(slasher.TackledPlayer) then return end
 	if slasher:IsFrozen() or isLocked(slasher) then return end
 	if slasher.KillDelayTick > 0 then return end
-	if slasher:GetNWBool("CloakTackle") then return end
+	if slasher:GetNW2Bool("CloakTackle") then return end
 
-	slasher:SetNWBool("CloakTackle", true)
-	slasher:SetNWBool("CloakTackling", true)
+	slasher:SetNW2Bool("CloakTackle", true)
+	slasher:SetNW2Bool("CloakTackling", true)
 	slasher:SetNW2Float("CloakTackleEnd", CurTime() + TACKLE_TIME)
 	slasher.TackledPlayer = nil
 
 	timer.Simple(TACKLE_TIME, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("CloakTackling", false)
+		slasher:SetNW2Bool("CloakTackling", false)
 	end)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("CloakTackle") or ply:GetNWBool("CloakTackling") or isTackling(ply)
+	return ply:GetNW2Bool("CloakTackle") or ply:GetNW2Bool("CloakTackling") or isTackling(ply)
 end
 
 function SLASHER.Animator(ply, veloc)
@@ -228,11 +228,11 @@ function SLASHER.Animator(ply, veloc)
 		ply.CalcSeqOverride = ply:LookupSequence("jump_slam")
 	end
 
-	if ply:GetNWBool("CloakTackling") or isTackling(ply) then
+	if ply:GetNW2Bool("CloakTackling") or isTackling(ply) then
 		ply.CalcSeqOverride = ply:LookupSequence("zombie_leap_mid")
 	end
 
-	if ply:GetNWBool("CloakTackleFail") then
+	if ply:GetNW2Bool("CloakTackleFail") then
 		ply.CalcSeqOverride = ply:LookupSequence("zombie_slump_rise_01")
 		if not ply.anim_antispam then
 			ply:SetCycle(0)

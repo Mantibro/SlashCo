@@ -177,7 +177,7 @@ function PANEL:TieFunc(netvar, func, doShake, fallback)
 			return
 		end
 
-		local state = GameData.LocalPlayer:GetNWBool(netvar, fallback)
+		local state = SlashCo.GetNetworkVar(GameData.LocalPlayer, netvar, fallback, "Bool")
 		func(self, state)
 		table.insert(self.Ties, {
 			netvar = netvar,
@@ -233,7 +233,7 @@ function PANEL:Think()
 	end
 
 	for _, v in ipairs(self.Ties) do
-		local state = GameData.LocalPlayer:GetNWBool(v.netvar, v.fallback)
+		local state = SlashCo.GetNetworkVar(GameData.LocalPlayer, v.netvar, v.fallback, "Bool")
 		if state ~= v.prevVal then
 			v.func(self, state)
 			v.prevVal = state

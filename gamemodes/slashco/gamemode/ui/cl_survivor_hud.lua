@@ -567,7 +567,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 	end
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if slasher:GetNWBool("TrollgeStage2") then
+		if slasher:GetNW2Bool("TrollgeStage2") then
 			local tlight = DynamicLight(slasher:EntIndex())
 			if tlight then
 				tlight.pos = slasher:LocalToWorld(chaseLightOffset)
@@ -582,7 +582,7 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 			continue
 		end
 
-		if slasher:GetNWBool("TylerFlash") then
+		if slasher:GetNW2Bool("TylerFlash") then
 			local dlight = DynamicLight(slasher:EntIndex())
 			if dlight then
 				dlight.pos = slasher:LocalToWorld(chaseLightOffset)
@@ -598,8 +598,8 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 			continue
 		end
 
-		if not slasher:GetInSlasherChaseMode() and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage")
-				or (slasher:GetInSlasherChaseMode() and slasher:GetNWBool("DisableChaseLight")) then
+		if not slasher:GetInSlasherChaseMode() and not slasher:GetNW2Bool("SidGunRage") and not slasher:GetNW2Bool("WatcherRage")
+				or (slasher:GetInSlasherChaseMode() and slasher:GetNW2Bool("DisableChaseLight")) then
 			continue
 		end
 

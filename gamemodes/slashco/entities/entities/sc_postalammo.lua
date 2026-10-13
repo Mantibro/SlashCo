@@ -49,7 +49,7 @@ end
 if SERVER then
 	function ENT:Use(activator)
 		if activator:Team() ~= TEAM_SLASHER then return end
-		if activator:GetNWString("Slasher") ~= "PostalDude" then return end
+		if activator:GetNW2String("Slasher") ~= "PostalDude" then return end
 
 		DeagleBulletsControl(activator, 2)
 		MGBulletsControl(activator, 5)

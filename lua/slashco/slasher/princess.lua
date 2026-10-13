@@ -87,7 +87,7 @@ end
 
 function SLASHER.DoSound(slasher)
 	if SlashCo.State ~= SlashCo.States.IN_GAME then return end -- RaphaelIT7: Before/After a game you should shut up! >:(
-	if not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessMaulingSurvivor") and not slasher:GetNWBool("PrincessSniffing") then
+	if not slasher:GetNW2Bool("PrincessMaulingChild") and not slasher:GetNW2Bool("PrincessMaulingBase") and not slasher:GetNW2Bool("PrincessMaulingSurvivor") and not slasher:GetNW2Bool("PrincessSniffing") then
 		if slasher:GetInSlasherChaseMode() then
 			PlayChase(slasher)
 		else
@@ -96,7 +96,7 @@ function SLASHER.DoSound(slasher)
 	end
 
 	timer.Create("PrincessSound", 2, 1, function()
-		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= "Princess" then
+		if not IsValid(slasher) or slasher:GetNW2String("Slasher") ~= "Princess" then
 			timer.Remove("PrincessSound")
 			return
 		end
@@ -122,10 +122,10 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	--find children to maul
 	for _, v in ipairs(ents.FindByClass("sc_baby")) do
-		if v:GetPos():Distance(slasher:GetPos()) < 100 and not slasher:GetNWBool("PrincessMaulingBase") and not slasher:GetNWBool("PrincessSniffing") and not slasher:GetNWBool("PrincessMaulingChild") and not slasher:GetNWBool("PrincessMaulingSurvivor") and not slasher:GetDemonPacified() then
+		if v:GetPos():Distance(slasher:GetPos()) < 100 and not slasher:GetNW2Bool("PrincessMaulingBase") and not slasher:GetNW2Bool("PrincessSniffing") and not slasher:GetNW2Bool("PrincessMaulingChild") and not slasher:GetNW2Bool("PrincessMaulingSurvivor") and not slasher:GetDemonPacified() then
 			--mauling child
 			SlashCo.StopChase(slasher)
-			slasher:SetNWBool("PrincessMaulingChild", true)
+			slasher:SetNW2Bool("PrincessMaulingChild", true)
 			slasher:Freeze(true)
 
 			SlashCo.AudioSystem.PlaySound({
@@ -217,7 +217,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				if not IsValid(slasher) then return end
 
 				slasher:Freeze(false)
-				slasher:SetNWBool("PrincessMaulingChild", false)
+				slasher:SetNW2Bool("PrincessMaulingChild", false)
 				slasher:SetDemonPacified(true)
 
 				timer.Simple(math.random(10, 25), function()
@@ -263,12 +263,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.Aggression = 0
 	end
 
-	if slasher:GetNWInt("PrincessAggression") ~= math.floor(slasher.Aggression) then
-		slasher:SetNWInt("PrincessAggression", math.floor(slasher.Aggression))
+	if slasher:GetNW2Int("PrincessAggression") ~= math.floor(slasher.Aggression) then
+		slasher:SetNW2Int("PrincessAggression", math.floor(slasher.Aggression))
 	end
 
-	if slasher:GetNWInt("PrincessAggressionThres") ~= math.floor(slasher.AggressionThreshold) then
-		slasher:SetNWInt("PrincessAggressionThres", math.floor(slasher.AggressionThreshold))
+	if slasher:GetNW2Int("PrincessAggressionThres") ~= math.floor(slasher.AggressionThreshold) then
+		slasher:SetNW2Int("PrincessAggressionThres", math.floor(slasher.AggressionThreshold))
 	end
 
 	if IsValid(slasher.victimragdoll) and IsValid(slasher.ref_child) then
@@ -295,7 +295,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.SurvivorRoped:SetSurvivorDragged(false)
 			slasher.SurvivorDragged = nil
 
-			slasher:SetNWBool("PrincessDraggingSurvivor", false)
+			slasher:SetNW2Bool("PrincessDraggingSurvivor", false)
 
 			timer.Simple(5, function()
 				if not IsValid(slasher) then return end
@@ -307,7 +307,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if not IsValid(slasher) then return end
 
 			slasher:SetCanChase(true)
-			slasher:SetNWBool("PrincessDraggingSurvivor", false)
+			slasher:SetNW2Bool("PrincessDraggingSurvivor", false)
 
 			timer.Simple(5, function()
 				if not IsValid(slasher) then return end
@@ -381,7 +381,7 @@ function SLASHER.Maul(slasher, target)
 	if slasher.Aggression <= 99 and not eatBabyFromPlayer then return end
 
 	SlashCo.StopChase(slasher)
-	slasher:SetNWBool("PrincessMaulingBase", false)
+	slasher:SetNW2Bool("PrincessMaulingBase", false)
 
 	slasher:Freeze(true)
 
@@ -389,7 +389,7 @@ function SLASHER.Maul(slasher, target)
 		timer.Simple(0, function() -- ToDo: Why do we even need a timer? Verify.
 			if not IsValid(slasher) or not IsValid(target) then return end
 
-			slasher:SetNWBool("PrincessMaulingSurvivor", true)
+			slasher:SetNW2Bool("PrincessMaulingSurvivor", true)
 			target:TakeDamage(99999, slasher, slasher)
 
 			timer.Simple(FrameTime() * 3, function()
@@ -426,7 +426,7 @@ function SLASHER.Maul(slasher, target)
 		slasher.ref_child:SetPos(pos)
 		slasher.ref_child:SetAngles(ang)
 		slasher.ref_child:FollowBone(slasher, slasher:LookupBone("head"))
-		slasher:SetNWBool("PrincessMaulingChild", true)
+		slasher:SetNW2Bool("PrincessMaulingChild", true)
 	end
 
 	for i = 1, math.random(9, 10) do
@@ -467,8 +467,8 @@ function SLASHER.Maul(slasher, target)
 
 		slasher:Freeze(false)
 
-		slasher:SetNWBool("PrincessMaulingSurvivor", false)
-		slasher:SetNWBool("PrincessMaulingBase", false)
+		slasher:SetNW2Bool("PrincessMaulingSurvivor", false)
+		slasher:SetNW2Bool("PrincessMaulingBase", false)
 
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 		SLASHER.MaulForward = SLASHER.MaulForward + SlashCo.GetSlasherAnger(slasher)
@@ -479,7 +479,7 @@ function SLASHER.Maul(slasher, target)
 
 			slasher.ref_child:Remove()
 		end
-		slasher:SetNWBool("PrincessMaulingChild", false) -- Just to be sure
+		slasher:SetNW2Bool("PrincessMaulingChild", false) -- Just to be sure
 
 		if not IsValid(slasher.victimragdoll) then return end
 
@@ -524,18 +524,18 @@ function SLASHER.OnKillPlayer(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
-	if slasher:GetNWBool("PrincessMaulingChild") then return end
-	if slasher:GetNWBool("PrincessSniffing") then return end
+	if slasher:GetNW2Bool("PrincessMaulingChild") then return end
+	if slasher:GetNW2Bool("PrincessSniffing") then return end
 	if slasher:GetDemonPacified() then return end
-	if slasher:GetNWBool("PrincessMaulingBase") then return end
-	if slasher:GetNWBool("PrincessStunned") then return end
-	if slasher:GetNWBool("PrincessDraggingSurvivor") then return end
+	if slasher:GetNW2Bool("PrincessMaulingBase") then return end
+	if slasher:GetNW2Bool("PrincessStunned") then return end
+	if slasher:GetNW2Bool("PrincessDraggingSurvivor") then return end
 	if not slasher.PrincessCanMaul then return end
 	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then return end
 
 	slasher.MaulTime = CurTime()
 
-	slasher:SetNWBool("PrincessMaulingBase", true)
+	slasher:SetNW2Bool("PrincessMaulingBase", true)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/princess/princess_attack.mp3",
 		identifier = "PrincessAttack",
@@ -601,7 +601,7 @@ function SLASHER.OnPrimaryFire(slasher)
 
 					slasher:SetCanChase(false)
 					slasher.PrincessCanMaul = false
-					slasher:SetNWBool("PrincessDraggingSurvivor", true)
+					slasher:SetNW2Bool("PrincessDraggingSurvivor", true)
 				end
 			end
 
@@ -612,29 +612,29 @@ function SLASHER.OnPrimaryFire(slasher)
 	timer.Simple(0.7, function()
 		if not IsValid(slasher) then return end
 
-		if not slasher:GetNWBool("PrincessMaulingSurvivor") then
-			slasher:SetNWBool("PrincessMaulingBase", false)
+		if not slasher:GetNW2Bool("PrincessMaulingSurvivor") then
+			slasher:SetNW2Bool("PrincessMaulingBase", false)
 		end
 	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("PrincessStunned") then return end
-	if slasher:GetNWBool("PrincessDraggingSurvivor") then return end
+	if slasher:GetNW2Bool("PrincessStunned") then return end
+	if slasher:GetNW2Bool("PrincessDraggingSurvivor") then return end
 
 	SlashCo.StartChaseMode(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("PrincessMaulingChild") then return end
-	if slasher:GetNWBool("PrincessMaulingSurvivor") then return end
-	if slasher:GetNWBool("PrincessMaulingBase") then return end
-	if slasher:GetNWBool("PrincessSniffing") then return end
-	if slasher:GetNWBool("PrincessStunned") then return end
-	if slasher:GetNWBool("PrincessDraggingSurvivor") then return end
+	if slasher:GetNW2Bool("PrincessMaulingChild") then return end
+	if slasher:GetNW2Bool("PrincessMaulingSurvivor") then return end
+	if slasher:GetNW2Bool("PrincessMaulingBase") then return end
+	if slasher:GetNW2Bool("PrincessSniffing") then return end
+	if slasher:GetNW2Bool("PrincessStunned") then return end
+	if slasher:GetNW2Bool("PrincessDraggingSurvivor") then return end
 	if slasher:GetInSlasherChaseMode() then return end
 
-	slasher:SetNWBool("PrincessSniffing", true)
+	slasher:SetNW2Bool("PrincessSniffing", true)
 	slasher:Freeze(true)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/princess/princess_sniff.mp3",
@@ -649,7 +649,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	timer.Simple(4, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("PrincessSniffing", false)
+		slasher:SetNW2Bool("PrincessSniffing", false)
 		slasher:Freeze(false)
 
 		slasher:SlasherHudFunc("Sniff")
@@ -662,12 +662,12 @@ end
 function SLASHER.OnHitByBeerKeg(slasher, ply)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("PrincessStunned", true)
+	slasher:SetNW2Bool("PrincessStunned", true)
 	slasher:Freeze(true)
 	timer.Simple(11, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("PrincessStunned", false)
+		slasher:SetNW2Bool("PrincessStunned", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -675,17 +675,17 @@ SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByBeerKeg
 SLASHER.OnHitByPocketSand = SLASHER.OnHitByBeerKeg
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("PrincessMaulingChild") or ply:GetNWBool("PrincessMaulingSurvivor") or ply:GetNWBool("PrincessSniffing")
+	return ply:GetNW2Bool("PrincessMaulingChild") or ply:GetNW2Bool("PrincessMaulingSurvivor") or ply:GetNW2Bool("PrincessSniffing")
 end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetInSlasherChaseMode()
-	local maul_child = ply:GetNWBool("PrincessMaulingChild")
-	local maul_normal = ply:GetNWBool("PrincessMaulingBase")
-	local maul_survivor = ply:GetNWBool("PrincessMaulingSurvivor")
-	local maul_grab = ply:GetNWBool("PrincessDraggingSurvivor")
-	local sniff = ply:GetNWBool("PrincessSniffing")
-	local stun = ply:GetNWBool("PrincessStunned")
+	local maul_child = ply:GetNW2Bool("PrincessMaulingChild")
+	local maul_normal = ply:GetNW2Bool("PrincessMaulingBase")
+	local maul_survivor = ply:GetNW2Bool("PrincessMaulingSurvivor")
+	local maul_grab = ply:GetNW2Bool("PrincessDraggingSurvivor")
+	local sniff = ply:GetNW2Bool("PrincessSniffing")
+	local stun = ply:GetNW2Bool("PrincessStunned")
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -814,7 +814,7 @@ function SLASHER.InitHud(_, hud)
 
 	hud.prevThresh = -1
 	function hud.AlsoThink()
-		local thresh = GameData.LocalPlayer:GetNWInt("PrincessAggressionThres")
+		local thresh = GameData.LocalPlayer:GetNW2Int("PrincessAggressionThres")
 		if thresh ~= hud.prevThresh then
 			hud:SetMeterMax("aggro", thresh)
 			hud.prevThresh = thresh

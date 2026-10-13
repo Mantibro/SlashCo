@@ -19,7 +19,7 @@ end
 
 function ITEM.OnUse(ply)
 	-- RaphaelIT7: Disallow balkan stacking
-	if ply:GetNWBool("SurvivorBalkan") then
+	if ply:GetSurvivorBalkan() then
 		return true
 	end
 
@@ -33,12 +33,12 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	ply:SetNWBool("SurvivorBalkan", true)
+	ply:SetSurvivorBalkan(true)
 	ply:AddEffect("Slowness", 31.5)
 
 	timer.Create("BalkanBoostStart:" .. ply:UserID(), 32, 1, function()
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-			ply:SetNWBool("SurvivorBalkanFull", true)
+			ply:SetSurvivorBalkanFull(true)
 			ply:SetMarkedBySmiley(true)
 
 			if SlashCo.IsActivePerk(ply, "BalkanWarrior") then
@@ -51,8 +51,8 @@ function ITEM.OnUse(ply)
 
 	timer.Create("BalkanBoostFinish:" .. ply:UserID(), 164, 1, function()
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-			ply:SetNWBool("SurvivorBalkanFull", false)
-			ply:SetNWBool("SurvivorBalkan", false)
+			ply:SetSurvivorBalkanFull(false)
+			ply:SetSurvivorBalkan(false)
 			ply:SetMarkedBySmiley(false)
 
 			if not SlashCo.IsActivePerk(ply, "BalkanWarrior") then
@@ -106,8 +106,8 @@ SlashCo.RegisterItem(ITEM, "BalkanBoost")
 
 if SERVER then
 	hook.Add("PlayerChangedTeam", "SlashCo:BalkanBoost", function(ply)
-		ply:SetNWBool("SurvivorBalkan", false)
-		ply:SetNWBool("SurvivorBalkanFull", false)
+		ply:SetSurvivorBalkan(false)
+		ply:SetSurvivorBalkanFull(false)
 		ply:SetMarkedBySmiley(false)
 	end)
 
@@ -115,8 +115,8 @@ if SERVER then
 		timer.Remove("BalkanBoostStart:" .. ply:UserID())
 		timer.Remove("BalkanBoostFinish:" .. ply:UserID())
 
-		ply:SetNWBool("SurvivorBalkan", false)
-		ply:SetNWBool("SurvivorBalkanFull", false)
+		ply:SetSurvivorBalkan(false)
+		ply:SetSurvivorBalkanFull(false)
 		ply:SetMarkedBySmiley(false)
 	end)
 
@@ -124,7 +124,7 @@ if SERVER then
 end
 
 hook.Add("RenderScreenspaceEffects", "SlashCo:BalkanBoost", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") and not GetConVar("slashco_cl_disable_effects"):GetBool() then
+	if GameData.LocalPlayer:GetSurvivorBalkanFull() and not GetConVar("slashco_cl_disable_effects"):GetBool() then
 		DrawSobel(0.13)
 		DrawSharpen(0.8, 0.8)
 		DrawMotionBlur(0.5, 0.6, 0.05)
@@ -133,7 +133,7 @@ hook.Add("RenderScreenspaceEffects", "SlashCo:BalkanBoost", function()
 end)
 
 hook.Add("Think", "SlashCo:BalkanBoost", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorBalkan") then
+	if GameData.LocalPlayer:GetSurvivorBalkan() then
 		if not IsValid(GameData.BalkanSound) and CurTime() > ((GameData.BalkanSoundLastCreation or 0) + 5) then
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/balkan_icantstopnow.mp3",

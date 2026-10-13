@@ -79,8 +79,8 @@ local function Male07Transform(slasher)
 
 	slasher:SetModel(monsterModelName)
 
-	slasher:SetNWBool("Male07Transforming", true)
-	slasher:SetNWBool("Male07Slashing", false)
+	slasher:SetNW2Bool("Male07Transforming", true)
+	slasher:SetNW2Bool("Male07Slashing", false)
 	slasher:Freeze(true)
 
 	local vPoint = slasher:GetPos() + Vector(0, 0, 50)
@@ -91,7 +91,7 @@ local function Male07Transform(slasher)
 	timer.Simple(3, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("Male07Transforming", false)
+		slasher:SetNW2Bool("Male07Transforming", false)
 		slasher:Freeze(false)
 	end)
 
@@ -191,8 +191,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/male07/male07_ambience.ogg", 0.5)
 	end
 
-	if slasher:GetNWInt("Male07State") ~= State then
-		slasher:SetNWInt("Male07State", State)
+	if slasher:GetNW2Int("Male07State") ~= State then
+		slasher:SetNW2Int("Male07State", State)
 	end
 
 	slasher:SetEyeSight(eyesight_final)
@@ -200,7 +200,7 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("Male07Stunned") then return end
+	if slasher:GetNW2Bool("Male07Stunned") then return end
 	if slasher.SlashCooldown > 0.01 then return end
 
 	if slasher.MaleState == MALE07_POSESSED then
@@ -210,7 +210,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	if slasher.MaleState == MALE07_GHOST then return end
 
-	slasher:SetNWBool("Male07Slashing", false)
+	slasher:SetNW2Bool("Male07Slashing", false)
 	timer.Remove("Male07SlashDecay")
 	slasher.SlashCooldown = 2
 
@@ -281,16 +281,16 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	timer.Simple(0.1, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("Male07Slashing", true)
+		slasher:SetNW2Bool("Male07Slashing", true)
 
 		timer.Create("Male07SlashDecay", 1.5, 1, function()
-			slasher:SetNWBool("Male07Slashing", false)
+			slasher:SetNW2Bool("Male07Slashing", false)
 		end)
 	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("Male07Stunned") then return end
+	if slasher:GetNW2Bool("Male07Stunned") then return end
 
 	SlashCo.StartChaseMode(slasher)
 	slasher.SlashCooldown = SLASHER.KillDelay
@@ -298,7 +298,7 @@ end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
 	if slasher.MaleCooldown > 0 or slasher:GetInSlasherChaseMode() then return end
-	if slasher:GetNWBool("Male07Stunned") then return end
+	if slasher:GetNW2Bool("Male07Stunned") then return end
 
 	if IsValid(target) and target:GetClass() == "sc_maleclone" and slasher:GetPos():Distance(target:GetPos()) < 150 then
 		SlashCo.AudioSystem.PlaySound({
@@ -376,7 +376,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 	else
 		SlashCo.StopChase(slasher)
 
-		slasher:SetNWBool("Male07Stunned", true)
+		slasher:SetNW2Bool("Male07Stunned", true)
 		slasher:Freeze(true)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -392,7 +392,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		timer.Simple(9, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("Male07Stunned", false)
+			slasher:SetNW2Bool("Male07Stunned", false)
 			slasher:Freeze(false)
 		end)
 	end
@@ -401,13 +401,13 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("Male07Stunned")
+	return ply:GetNW2Bool("Male07Stunned")
 end
 
 function SLASHER.Animator(ply)
-	local male_slashing = ply:GetNWBool("Male07Slashing")
-	local male_transforming = ply:GetNWBool("Male07Transforming")
-	local male_stunned = ply:GetNWBool("Male07Stunned")
+	local male_slashing = ply:GetNW2Bool("Male07Slashing")
+	local male_transforming = ply:GetNW2Bool("Male07Transforming")
+	local male_stunned = ply:GetNW2Bool("Male07Stunned")
 	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:GetModel() == "models/humans/group01/male_07.mdl" then
@@ -505,11 +505,11 @@ function SLASHER.InitHud(_, hud)
 	hud:AddControl("R", "possess vessel", possessTable)
 	hud:ChaseAndKill()
 
-	hud.prevState = not GameData.LocalPlayer:GetNWInt("Male07State")
+	hud.prevState = not GameData.LocalPlayer:GetNW2Int("Male07State")
 	hud.prevPossess = true
 	function hud.AlsoThink()
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
-		local curState = GameData.LocalPlayer:GetNWInt("Male07State")
+		local curState = GameData.LocalPlayer:GetNW2Int("Male07State")
 
 		if target:GetClass() == "sc_maleclone" and GameData.LocalPlayer:GetPos():Distance(target:GetPos()) < 150
 				or curState ~= 0 then

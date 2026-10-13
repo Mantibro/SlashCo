@@ -421,18 +421,14 @@ hook.Add("Think", "SlashCo:CoreThink", function()
 
 	if SlashCo.CurRound.GameProgress == -1 then
 		for _, v in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
-			if SlashCo.CurRound.Slashers[v:SteamID64()] and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
+			if SlashCo.CurRound.Slashers[v:SteamID64()] and v:GetNW2String("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
 				SlashCo.ApplySlasherToPlayer(v)
 			end
 		end
 	end
 
 	if SlashCo.CurRound.GameProgress >= 0 then
-		for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if ply:GetNWInt("GameProgressDisplay") ~= SlashCo.CurRound.GameProgress then
-				ply:SetNWInt("GameProgressDisplay", SlashCo.CurRound.GameProgress)
-			end
-		end
+		SlashCo.SetGameProgress(SlashCo.CurRound.GameProgress)
 	end
 
 	local gens = ents.FindByClass("sc_generator")

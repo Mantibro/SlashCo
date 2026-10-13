@@ -41,7 +41,7 @@ end
 
 local function HoovyIdle(slasher)
 	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
-	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
+	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNW2String("Slasher")] ~= SLASHER then return end
 
 	if not slasher:GetInSlasherChaseMode() then
 		local idx = math.random(1, 3)
@@ -106,7 +106,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if SlashCo.CurRound.GameProgress > 3 then
-		slasher:SetNWBool("HoovyCanBlock", true)
+		slasher:SetNW2Bool("HoovyCanBlock", true)
 		prowl_final = 200
 		chase_final = 280
 	end
@@ -139,8 +139,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			StopPanicMusic(slasher)
 
 			slasher:Freeze(true)
-			slasher:SetNWBool("HoovyGrabLoop", false)
-			slasher:SetNWBool("HoovyStunned", true)
+			slasher:SetNW2Bool("HoovyGrabLoop", false)
+			slasher:SetNW2Bool("HoovyStunned", true)
 
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/hoovydundy/rope_escape.mp3",
@@ -156,7 +156,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				if not IsValid(slasher) then return end
 
 				slasher:Freeze(false)
-				slasher:SetNWBool("HoovyStunned", false)
+				slasher:SetNW2Bool("HoovyStunned", false)
 				slasher:SetCanChase(true)
 			end)
 		end
@@ -165,7 +165,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if not IsValid(slasher.SurvivorRoped) then return end
 
 			slasher:SetCanChase(true)
-			slasher:SetNWBool("HoovyGrabLoop", false)
+			slasher:SetNW2Bool("HoovyGrabLoop", false)
 			slasher.SurvivorRoped:SetSurvivorGrabbed(false)
 			slasher.SurvivorRoped:Freeze(false)
 			slasher.SurvivorRoped.RopeStruggle = 0
@@ -187,12 +187,12 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.SurvivorRoped = nil
 	end
 
-	if slasher:GetNWInt("RopeCooldown") ~= math.floor(RopeCD) then
-		slasher:SetNWInt("RopeCooldown", math.floor(RopeCD))
+	if slasher:GetNW2Int("RopeCooldown") ~= math.floor(RopeCD) then
+		slasher:SetNW2Int("RopeCooldown", math.floor(RopeCD))
 	end
 
-	if slasher:GetNWInt("GenBlockCooldown") ~= math.floor(GenCD) then
-		slasher:SetNWInt("GenBlockCooldown", math.floor(GenCD))
+	if slasher:GetNW2Int("GenBlockCooldown") ~= math.floor(GenCD) then
+		slasher:SetNW2Int("GenBlockCooldown", math.floor(GenCD))
 	end
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
@@ -200,28 +200,28 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("HoovyStunned") then return end
-	if slasher:GetNWBool("HoovyGrabStart") then return end
+	if slasher:GetNW2Bool("HoovyStunned") then return end
+	if slasher:GetNW2Bool("HoovyGrabStart") then return end
 	if slasher.KillDelayTick > 0 then return end
 
 	SlashCo.Jumpscare(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("HoovyStunned") then return end
-	if slasher:GetNWBool("HoovyGrabStart") then return end
-	if slasher:GetNWBool("HoovyGrabLoop") then return end
+	if slasher:GetNW2Bool("HoovyStunned") then return end
+	if slasher:GetNW2Bool("HoovyGrabStart") then return end
+	if slasher:GetNW2Bool("HoovyGrabLoop") then return end
 
 	SlashCo.StartChaseMode(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	if not slasher:GetNWBool("HoovyCanBlock") then return end
+	if not slasher:GetNW2Bool("HoovyCanBlock") then return end
 	if not IsValid(target) or target:GetClass() ~= "sc_generator" then return end
-	if slasher:GetPos():Distance(target:GetPos()) >= 500 or target:GetNWBool("GeneratorMalfunction") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 500 or target:GetMalfunction() then return end
 	if slasher.GeneratorBlockCooldown > 0.01 then return end
 
-	target:SetNWBool("GeneratorMalfunction", true)
+	target:SetMalfunction(true)
 	target:DoSpark()
 	slasher.GeneratorBlockUses = slasher.GeneratorBlockUses + 15
 	slasher.GeneratorBlockCooldown = 90 + (1 * slasher.GeneratorBlockUses)
@@ -229,15 +229,15 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	timer.Simple(slasher.GeneratorBlockDuration, function()
 		if not IsValid(target) then return end
 
-		target:SetNWBool("GeneratorMalfunction", false)
+		target:SetMalfunction(false)
 	end)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if IsValid(slasher.SurvivorRoped) then return end
-	if slasher:GetNWBool("HoovyStunned") then return end
-	if slasher:GetNWBool("HoovyGrabLoop") then return end
-	if slasher:GetNWBool("HoovyGrabStart") then return end
+	if slasher:GetNW2Bool("HoovyStunned") then return end
+	if slasher:GetNW2Bool("HoovyGrabLoop") then return end
+	if slasher:GetNW2Bool("HoovyGrabStart") then return end
 	if slasher.RopeCooldown > 0.01 then return end
 
 	local dist = slasher:SlasherValue("ChaseRange", 1500)
@@ -256,7 +256,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher:SetRunSpeed(1)
 			slasher:SetWalkSpeed(1)
 			slasher:SetSlowWalkSpeed(1)
-			slasher:SetNWBool("HoovyGrabStart", true)
+			slasher:SetNW2Bool("HoovyGrabStart", true)
 
 			local idx = math.random(1, 2)
 			SlashCo.AudioSystem.PlaySound({
@@ -273,12 +273,12 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				if not IsValid(slasher) then return end
 
 				if not IsValid(find_p) then
-					slasher:SetNWBool("HoovyGrabStart", false)
+					slasher:SetNW2Bool("HoovyGrabStart", false)
 					return
 				end
 
-				slasher:SetNWBool("HoovyGrabLoop", true)
-				slasher:SetNWBool("HoovyGrabStart", false)
+				slasher:SetNW2Bool("HoovyGrabLoop", true)
+				slasher:SetNW2Bool("HoovyGrabStart", false)
 				slasher:SetCanChase(false)
 
 				slasher.SurvivorRoped = find_p
@@ -300,13 +300,13 @@ function SLASHER.OnKillPlayer(slasher, target)
 		slasher.SurvivorRoped = nil
 		target:SetSurvivorGrabbed(false)
 		slasher:SetCanChase(true)
-		slasher:SetNWBool("HoovyGrabLoop", false)
+		slasher:SetNW2Bool("HoovyGrabLoop", false)
 		StopPanicMusic(slasher)
 	end
 end
 
 function SLASHER.OnHitByPocketSand(slasher, ply)
-	slasher:SetNWBool("HoovyStunned", true)
+	slasher:SetNW2Bool("HoovyStunned", true)
 	slasher:Freeze(true)
 
 	local idx = math.random(1, 3)
@@ -320,13 +320,13 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		fadeIn = 0,
 	})
 
-	slasher:SetNWBool("HoovyGrabLoop", false)
+	slasher:SetNW2Bool("HoovyGrabLoop", false)
 	StopPanicMusic(slasher)
 
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("HoovyStunned", false)
+		slasher:SetNW2Bool("HoovyStunned", false)
 		slasher:SetCanChase(true)
 		slasher:Freeze(false)
 	end)
@@ -335,15 +335,15 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("HoovyStunned")
+	return ply:GetNW2Bool("HoovyStunned")
 end
 
 function SLASHER.Animator(ply)
 	local GrabAnim = ""
 	local chase = ply:GetInSlasherChaseMode()
-	local hoovy_grab = ply:GetNWBool("HoovyGrabStart")
-	local hoovy_grabloop = ply:GetNWBool("HoovyGrabLoop")
-	local hoovy_stun = ply:GetNWBool("HoovyStunned")
+	local hoovy_grab = ply:GetNW2Bool("HoovyGrabStart")
+	local hoovy_grabloop = ply:GetNW2Bool("HoovyGrabLoop")
+	local hoovy_stun = ply:GetNW2Bool("HoovyStunned")
 
 	if not hoovy_grab and not hoovy_grabloop and not hoovy_stun then
 		ply.anim_antispam = false
@@ -462,8 +462,8 @@ function SLASHER.InitHud(_, hud)
 	hud:SetCrosshairAlpha(255)
 
 	function hud.AlsoThink()
-		local HoovyRopeCooldown = GameData.LocalPlayer:GetNWInt("RopeCooldown")
-		local HoovyGenCooldown = GameData.LocalPlayer:GetNWInt("GenBlockCooldown")
+		local HoovyRopeCooldown = GameData.LocalPlayer:GetNW2Int("RopeCooldown")
+		local HoovyGenCooldown = GameData.LocalPlayer:GetNW2Int("GenBlockCooldown")
 
 		if HoovyRopeCooldown > 0 then
 			hud:SetControlEnabled("F", false)
@@ -504,7 +504,7 @@ if CLIENT then
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if v == GameData.LocalPlayer then continue end
 
-			if SlashCoSlashers[v:GetNWString("Slasher")] == SLASHER then
+			if SlashCoSlashers[v:GetNW2String("Slasher")] == SLASHER then
 				if not v:GetInSlasherChaseMode() then
 					local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
 					if tlight then

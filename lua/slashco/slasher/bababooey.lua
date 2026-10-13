@@ -59,9 +59,9 @@ end
 
 function SLASHER.DoSound(slasher)
 	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
-	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
+	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNW2String("Slasher")] ~= SLASHER then return end
 
-	if slasher:GetNWBool("BababooeyInvisibility") then
+	if slasher:GetNW2Bool("BababooeyInvisibility") then
 		local idx = math.random(2, 4)
 		local idx2 = math.random(0.1, 0.5)
 		SlashCo.AudioSystem.PlaySound({
@@ -91,16 +91,16 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if KillCD > 0 then
 		slasher:SetCanKill(false)
-	elseif not slasher:GetNWBool("BababooeyInvisibility") then
+	elseif not slasher:GetNW2Bool("BababooeyInvisibility") then
 		slasher:SetCanKill(true)
 	else
 		slasher:SetCanKill(false)
 	end
 
-	slasher:SetCanChase(not slasher:GetNWBool("BababooeyInvisibility"))
+	slasher:SetCanChase(not slasher:GetNW2Bool("BababooeyInvisibility"))
 
 	if SpookCD < 0.01 then
-		slasher:SetNWBool("BababooeySpooking", false)
+		slasher:SetNW2Bool("BababooeySpooking", false)
 	end
 
 	if KillCD > 0 then
@@ -127,9 +127,9 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 	if slasher.TriggerCooldown > 0 then return end
 	if slasher:GetInSlasherChaseMode() then return end
 
-	slasher:SetNWBool("BababooeyInvisibility", not slasher:GetNWBool("BababooeyInvisibility"))
+	slasher:SetNW2Bool("BababooeyInvisibility", not slasher:GetNW2Bool("BababooeyInvisibility"))
 
-	if slasher:GetNWBool("BababooeyInvisibility") then
+	if slasher:GetNW2Bool("BababooeyInvisibility") then
 		--Turning invisible
 
 		slasher:SlasherHudFunc("SetAvatar", "invisible")
@@ -188,7 +188,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 			end
 
 			if slasher:GetPos():Distance(target:GetPos()) < 150 then
-				slasher:SetNWBool("BababooeySpooking", true)
+				slasher:SetNW2Bool("BababooeySpooking", true)
 				slasher.KillCooldown = 2
 				slasher.SpookCooldown = 2
 				SlashCo.AudioSystem.PlaySound({
@@ -242,7 +242,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Animator(ply)
-	local spook = ply:GetNWBool("BababooeySpooking")
+	local spook = ply:GetNW2Bool("BababooeySpooking")
 	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
@@ -265,7 +265,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if not ply:GetNWBool("BababooeyInvisibility") then
+	if not ply:GetNW2Bool("BababooeyInvisibility") then
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",

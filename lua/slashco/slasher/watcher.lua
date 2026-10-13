@@ -63,7 +63,7 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.OnAngerTick(slasher)
-	if slasher:GetNWBool("WatcherStalking") then
+	if slasher:GetNW2Bool("WatcherStalking") then
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerWatchingGain)
 	end
 end
@@ -74,9 +74,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	local Watched = slasher.WatcherWatched or 0 --Watched
 	local Stalking = slasher.StalkTime or 0 --Stalk time
 
-	slasher.WatcherWatched = slasher:GetNWBool("WatcherWatched") and 1 or 0
+	slasher.WatcherWatched = slasher:GetNW2Bool("WatcherWatched") and 1 or 0
 
-	if not slasher:GetNWBool("WatcherRage") then
+	if not slasher:GetNW2Bool("WatcherRage") then
 		if SurveyLG > 0 then
 			slasher.SurveyLength = SurveyLG - FrameTime()
 		end
@@ -96,7 +96,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetRunSpeed(SLASHER.ProwlSpeed - (Watched * 120))
 	end
 
-	if slasher:GetNWBool("WatcherRage") then
+	if slasher:GetNW2Bool("WatcherRage") then
 		slasher:SetSlowWalkSpeed(300)
 		slasher:SetWalkSpeed(300)
 		slasher:SetRunSpeed(300)
@@ -110,12 +110,12 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 		if SurveyLG > 0 then
-			if not surv:GetNWBool("SurvivorWatcherSurveyed") then
-				surv:SetNWBool("SurvivorWatcherSurveyed", true)
+			if not surv:GetSurvivorWatcherSurveyed() then
+				surv:SetSurvivorWatcherSurveyed(true)
 			end
 		else
-			if surv:GetNWBool("SurvivorWatcherSurveyed") then
-				surv:SetNWBool("SurvivorWatcherSurveyed", false)
+			if surv:GetSurvivorWatcherSurveyed() then
+				surv:SetSurvivorWatcherSurveyed(false)
 			end
 
 			local trace = surv:GetEyeTrace()
@@ -150,17 +150,17 @@ function SLASHER.OnTickBehaviour(slasher)
 			:: FOUND ::
 
 			if IsValid(target) and target == slasher then
-				surv:SetNWBool("SurvivorWatcherSurveyed", true)
+				surv:SetSurvivorWatcherSurveyed(true)
 				isSeen = true
 			else
-				if surv:GetNWBool("SurvivorWatcherSurveyed") then
-					surv:SetNWBool("SurvivorWatcherSurveyed", false)
+				if surv:GetSurvivorWatcherSurveyed() then
+					surv:SetSurvivorWatcherSurveyed(false)
 				end
 			end
 		end
 	end
 
-	slasher:SetNWBool("WatcherWatched", isSeen)
+	slasher:SetNW2Bool("WatcherWatched", isSeen)
 
 	--Stalk Survivors
 
@@ -197,24 +197,17 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if IsValid(target) and isSeen == false and not slasher:GetInSlasherChaseMode() then
 		slasher.StalkTime = Stalking + FrameTime()
-		if not slasher:GetNWBool("WatcherStalking") then
-			slasher:SetNWBool("WatcherStalking", true)
+		if not slasher:GetNW2Bool("WatcherStalking") then
+			slasher:SetNW2Bool("WatcherStalking", true)
 		end
 	else
-		if slasher:GetNWBool("WatcherStalking") then
-			slasher:SetNWBool("WatcherStalking", false)
+		if slasher:GetNW2Bool("WatcherStalking") then
+			slasher:SetNW2Bool("WatcherStalking", false)
 		end
 	end
 
-	if SurveyCD < 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= true then
-		slasher:SetNWBool("WatcherCanSurvey", true)
-	end
-
-	if SurveyCD >= 0.1 and slasher:GetNWBool("WatcherCanSurvey") ~= false then
-		slasher:SetNWBool("WatcherCanSurvey", false)
-	end
-
-	slasher:SetNWInt("WatcherStalkTime", Stalking)
+	slasher:SetNW2Bool("WatcherCanSurvey", SurveyCD < 0.1)
+	slasher:SetNW2Int("WatcherStalkTime", Stalking)
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
@@ -229,7 +222,7 @@ end
 
 function SLASHER.OnMainAbilityFire(slasher)
 	if (slasher.SurveyCooldown or 0) > 0 then return end
-	if slasher:GetNWBool("WatcherRage") then return end
+	if slasher:GetNW2Bool("WatcherRage") then return end
 
 	slasher.SurveyLength = SLASHER.SurveyLength
 	slasher.SurveyCooldown = SLASHER.SurveyCooldown
@@ -245,7 +238,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 	})
 
 	for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		p:SetNWBool("WatcherSurveyed", true)
+		p:SetNW2Bool("WatcherSurveyed", true)
 
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/watcher/watcher_see.mp3",
@@ -260,17 +253,17 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 	timer.Simple(SLASHER.SurveyDisplayLength, function()
 		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			p:SetNWBool("WatcherSurveyed", false)
+			p:SetNW2Bool("WatcherSurveyed", false)
 		end
 	end)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if SlashCo.CurRound.GameProgress < (10 - (slasher.StalkTime / 25)) then return end
-	if slasher:GetNWBool("WatcherRage") then return end
+	if slasher:GetNW2Bool("WatcherRage") then return end
 	if team.NumPlayers(TEAM_SURVIVOR) < 2 then return end
 
-	slasher:SetNWBool("WatcherRage", true)
+	slasher:SetNW2Bool("WatcherRage", true)
 	SlashCo.AudioSystem.DisableBackgroundMusic()
 
 	SlashCo.AudioSystem.PlaySound({
@@ -286,7 +279,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Animator(ply)
-	local rage = ply:GetNWBool("WatcherRage")
+	local rage = ply:GetNW2Bool("WatcherRage")
 	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
@@ -327,8 +320,8 @@ local surveyTable = {
 }
 
 local function canSurveil()
-	return GameData.LocalPlayer:GetNWInt("GameProgressDisplay") > (10 - (GameData.LocalPlayer:GetNWInt("WatcherStalkTime") / 25))
-			and not GameData.LocalPlayer:GetNWBool("WatcherRage") and team.NumPlayers(TEAM_SURVIVOR) > 1
+	return SlashCo.GetGameProgress() > (10 - (GameData.LocalPlayer:GetNW2Int("WatcherStalkTime") / 25))
+			and not GameData.LocalPlayer:GetNW2Bool("WatcherRage") and team.NumPlayers(TEAM_SURVIVOR) > 1
 end
 
 local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
@@ -353,18 +346,18 @@ function SLASHER.InitHud(_, hud)
 	end
 
 	function hud.TitleCard.Label:PaintOver()
-		draw.SimpleText("STALK TIME: " .. math.Round(GameData.LocalPlayer:GetNWInt("WatcherStalkTime"), 1), "TVCD", 4, 18, red)
+		draw.SimpleText("STALK TIME: " .. math.Round(GameData.LocalPlayer:GetNW2Int("WatcherStalkTime"), 1), "TVCD", 4, 18, red)
 	end
 end
 
 function SLASHER.DrawHUD(localPly)
-	if localPly:GetNWBool("WatcherWatched") then
+	if localPly:GetNW2Bool("WatcherWatched") then
 		draw.SimpleText("YOU ARE BEING WATCHED. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
 				Color(255, 0, 0, 255),
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 
-	if localPly:GetNWBool("WatcherStalking") then
+	if localPly:GetNW2Bool("WatcherStalking") then
 		draw.SimpleText("OBSERVING A SURVIVOR. . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
 				Color(255, 0, 0, 255),
 				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
@@ -372,7 +365,7 @@ function SLASHER.DrawHUD(localPly)
 
 	surface.SetDrawColor(255, 255, 255, 255)
 	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		if not survivor:GetNWBool("SurvivorWatcherSurveyed") then
+		if not survivor:GetSurvivorWatcherSurveyed() then
 			continue
 		end
 
@@ -400,7 +393,7 @@ if CLIENT then
 			surface.DrawTexturedRect(0, 0, ScrW(), ScrH())
 		end
 
-		if GameData.LocalPlayer:GetNWBool("WatcherSurveyed") == true then
+		if GameData.LocalPlayer:GetNW2Bool("WatcherSurveyed") then
 			if GameData.LocalPlayer.al_watch == nil then
 				GameData.LocalPlayer.al_watch = 0
 			end

@@ -51,7 +51,7 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	end
 
 	--[[ kept for reference
-	if not SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].UserInterface then
+	if not SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].UserInterface then
 		return
 	end
 
@@ -64,12 +64,12 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	local mainiconposx = cx / 20
 	local mainiconposy = cy + (cy / 2)
 
-	if SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID ~= SlashID then
-		SlashID = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID
+	if SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].ID ~= SlashID then
+		SlashID = SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].ID
 		MainIcon = Material("slashco/ui/icons/slasher/" .. SlashID)
 	end
 
-	local GameProgress = GameData.LocalPlayer:GetNWInt("GameProgressDisplay")
+	local GameProgress = SlashCo.GetGameProgress()
 
 	local willdrawkill = true
 	local willdrawchase = true
@@ -146,10 +146,10 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	end
 
 	--Call for the HUD
-	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].UserInterface(cx,
+	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].UserInterface(cx,
 			cy, mainiconposx, mainiconposy)
 
-	local SlashName = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].Name
+	local SlashName = SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].Name
 
 	draw.SimpleText(SlashName, "LobbyFont2", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 4.25),
 			Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)
