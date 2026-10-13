@@ -103,7 +103,7 @@ function SLASHER.ShouldPlayAmbientSound(slasher)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local State = slasher.MaleState or MALE07_STATE_GHOST --State
+	local State = slasher.MaleState or MALE07_GHOST --State
 	local ChaseAsHuman = slasher.TimeChasingAsHuman or 0 --Time Spent Human Chasing
 	local MaleCD = slasher.MaleCooldown or 0 --Cooldown
 	local SlashCD = slasher.SlashCooldown or 0 --Slash Cooldown
@@ -284,6 +284,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		slasher:SetNW2Bool("Male07Slashing", true)
 
 		timer.Create("Male07SlashDecay", 1.5, 1, function()
+			if not IsValid(slasher) then return end
+
 			slasher:SetNW2Bool("Male07Slashing", false)
 		end)
 	end)

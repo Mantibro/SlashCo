@@ -556,7 +556,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				target:TakeDamageInfo(dmg)
 			end
 
-			if target:IsPlayer() then
+			if IsValid(target) and target:IsPlayer() then
 				if target:Team() ~= TEAM_SURVIVOR then return end
 
 				local vPoint = target:GetPos() + Vector(0, 0, 50)
@@ -589,6 +589,8 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		slasher:SetNW2Bool("TrollgeSlashing", true)
 
 		timer.Create("TrollgeSlashDecay", 0.6, 1, function()
+			if not IsValid(slasher) then return end
+
 			slasher:SetNW2Bool("TrollgeSlashing", false)
 		end)
 

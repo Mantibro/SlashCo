@@ -325,35 +325,31 @@ function SLASHER.InitHud(_, hud)
 		local maxZanies = GameData.LocalPlayer:GetNW2Int("SmileyZanyAmount")
 		local maxPensives = GameData.LocalPlayer:GetNW2Int("SmileyPensiveAmount")
 
-		local numZanies
-		local numPensives
+		local atMax
 		if deal == 0 then
-			numZanies = (#ents.FindByClass("sc_zanysmiley") >= maxZanies)
+			atMax = #ents.FindByClass("sc_zanysmiley") >= maxZanies
 		else
-			numPensives = (#ents.FindByClass("sc_zanysmiley") >= maxPensives)
+			atMax = #ents.FindByClass("sc_pensivesmiley") >= maxPensives
 		end
 
-		if (numZanies ~= hud.prevNumSmiley or numPensives ~= hud.prevNumSmiley) or deal ~= hud.prevDeal then
+		if atMax ~= hud.prevNumSmiley or deal ~= hud.prevDeal then
 			if deal == 0 then
-				if numZanies then
+				if atMax then
 					hud:SetControlText("F", "max zanies")
 				else
 					hud:ShakeControl("R")
 					hud:SetControlText("F", "deal a zany")
 				end
-
-				hud.prevNumSmiley = numZanies
 			else
-				if numPensives then
-					hud:SetControlText("F", "max pensive")
+				if atMax then
+					hud:SetControlText("F", "max pensives")
 				else
 					hud:ShakeControl("R")
 					hud:SetControlText("F", "deal a pensive")
 				end
-
-				hud.prevNumSmiley = numPensives
 			end
 
+			hud.prevNumSmiley = atMax
 			hud.prevDeal = deal
 		end
 

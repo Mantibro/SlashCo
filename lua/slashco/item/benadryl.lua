@@ -26,7 +26,7 @@ function ITEM.OnUse(ply)
 	if ply:GetInitialBenadrylTime() == 0 then
 		ply:SetInitialBenadrylTime(CurTime())
 		timer.Simple(60, function()
-			if not IsValid(ply) then return end
+			if not IsValid(ply) or ply:GetInitialBenadrylTime() == 0 then return end
 
 			GameData.TestHatMan = ents.Create("sc_hatman")
 			GameData.TestHatMan:SetTarget(ply)
@@ -79,9 +79,12 @@ ITEM.WorldModel = {
 SlashCo.RegisterItem(ITEM, "Benadryl")
 
 if SERVER then
-	hook.Add("PlayerChangedTeam", "SlashCo:RemoveBenadrylEffect", function(ply)
+	local function removeBenadrylEffect(ply)
 		ply:SetInitialBenadrylTime(0) -- Reset the benadryl time for its effects to stop.
-	end)
+	end
+
+	hook.Add("PlayerChangedTeam", "SlashCo:RemoveBenadrylEffect", removeBenadrylEffect)
+	hook.Add("PostPlayerDeath", "SlashCo:RemoveBenadrylEffect", removeBenadrylEffect)
 
 	function TestHatMan()
 		if IsValid(GameData.TestHatMan) then
@@ -155,7 +158,7 @@ local function CreateShadowPerson(pos, ang)
 
 	local ent = ents.CreateClientside("sc_shadowman")
 	if not IsValid(ent) then
-		MsgC(Color(255, 50, 50), "[SlashCo] Something went wrong when trying to create a " .. class .. " at (" .. tostring(pos) .. "), entity was NULL.\n")
+		MsgC(Color(255, 50, 50), "[SlashCo] Something went wrong when trying to create a sc_shadowman at (" .. tostring(pos) .. "), entity was NULL.\n")
 		return nil
 	end
 

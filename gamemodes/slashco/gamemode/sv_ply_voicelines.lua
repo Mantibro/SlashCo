@@ -119,6 +119,7 @@ net.Receive("SlashCo:SurvivorVoicePrompt", function(_, ply)
 	end
 	ply.VoicePromptCooldown = CurTime()
 
+	-- RaphaelIT7 (ToDo): We should network an ID that we keep shared and never just allow to take anything...
 	local prompt = net.ReadString()
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/voice/prompt_" .. prompt .. math.random(1, 5) .. ".mp3",

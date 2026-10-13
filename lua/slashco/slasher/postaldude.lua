@@ -215,7 +215,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				})
 			end
 		end
-	else
+	elseif slasher.PostalAmbience then
 		slasher.PostalAmbience = false
 		SlashCo.AudioSystem.StopSound("PostalAmbience", 1, slasher)
 	end
@@ -289,8 +289,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 3.0
 	elseif stage == POSTAL_RAGE_STAGE then
 		slasher:SetNW2Int("PostalStage", POSTAL_RAGE_STAGE)
-		if slasher:GetInSlasherChaseMode() then
 		slasher:SetCanChase(false)
+		if slasher:GetInSlasherChaseMode() then
 			SlashCo.StopChase(slasher)
 		end
 

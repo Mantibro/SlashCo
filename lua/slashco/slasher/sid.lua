@@ -292,9 +292,13 @@ local function EatCookie(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if not slasher:GetNW2Bool("SidGun") and (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
+	local dist = SLASHER.KillDistance
+
+	if not slasher:GetNW2Bool("SidGun") and (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, false)) then
 		if slasher:GetNW2Bool("SidEatingSurvCookie") then return end
 		if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
+
+		IsPlayerHoldingCookie(target, true)
 
 		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
 		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
@@ -323,6 +327,12 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		})
 
 		timer.Simple(3.55, function()
+			if cookie:IsValid() then
+				cookie:Remove()
+			end
+
+			if not IsValid(slasher) then return end
+
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/sid/sid_eating.mp3",
 				identifier = "SidEating",
@@ -332,11 +342,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				volume = 1,
 				fadeIn = 0,
 			})
-			cookie:Remove()
 		end)
 
 		timer.Simple(10, function()
-			if not IsValid(slasher) and not IsValid(target) then return end
+			if not IsValid(slasher) then return end
 
 			slasher:SetNW2Bool("SidEatingSurvCookie", false)
 			slasher:SetDemonPacified(true)
@@ -356,7 +365,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	end
 
 	local spread = slasher.GunSpread
-	local dist = SLASHER.KillDistance
 
 	if slasher:GetNW2Bool("SidGunAimed") and spread < 2.4 then
 		timer.Simple(0.05, function()

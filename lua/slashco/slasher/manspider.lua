@@ -101,7 +101,7 @@ local function GrabItem(slasher, target)
 	if not slasher:GetNW2Bool("ManspiderNestActive") then return end
 
 	local corpse = target:IsPlayer() and target.DeadBody or target
-	if (not target == corpse) or target.PingType ~= "ITEM" then return end
+	if target ~= corpse or target.PingType ~= "ITEM" then return end
 
 	local class = target:GetClass()
 	if grabBlacklist[class] then return end
@@ -338,9 +338,13 @@ function SLASHER.OnTickBehaviour(slasher)
 				continue
 			end
 
-			DropItem(slasher, target)
+			if not DropItem(slasher, target) then
+				continue
+			end
+
 			SlashCo.AddSlasherAnger(slasher, 30)
 			PlayScream(slasher)
+			break
 		end
 	end
 
@@ -935,43 +939,34 @@ function SLASHER.InitHud(_, hud)
 
 	hud.prevNested = -1
 	hud.prevHide = -1
+	hud.prevText = ""
 	function hud.AlsoThink()
 		local nested = GameData.LocalPlayer:GetNW2Bool("ManspiderNested")
 		local active_nest = GameData.LocalPlayer:GetNW2Bool("ManspiderNestActive")
 		local holding_item = GameData.LocalPlayer:GetNW2Bool("ManspiderStealing")
-		if nested ~= hud.prevNested or active_nest ~= hud.prevNested or holding_item ~= hud.prevNested then
-			if nested ~= hud.prevNested then
-				hud:SetControlText("R", "nesting")
+
+		local text = "nest"
+		if nested then
+			text = "nesting"
+		elseif holding_item then
+			text = "drop in nest"
+		elseif active_nest then
+			text = "steal item"
+		end
+
+		if text ~= hud.prevText then
+			hud:SetControlText("R", text)
+			hud.prevText = text
+		end
+
+		if nested ~= hud.prevNested then
+			if nested then
 				hud:SetControlEnabled("R", false)
-
-				hud.prevNested = nested
 			else
-				hud:SetControlText("R", "nest")
-
-				hud.prevNested = nested
+				hud.prevHide = -1
 			end
 
-			if active_nest ~= hud.prevNested then
-				hud:SetControlText("R", "steal item")
-
-				hud.prevNested = active_nest
-			else
-				hud:SetControlText("R", "nest")
-
-				hud.prevNested = active_nest
-			end
-
-			if holding_item ~= hud.prevNested then
-				if holding_item then
-					hud:SetControlText("R", "drop in nest")
-
-					hud.prevNested = holding_item
-				else
-					hud:SetControlText("R", "steal item")
-
-					hud.prevNested = holding_item
-				end
-			end
+			hud.prevNested = nested
 		end
 
 		local climbing = GameData.LocalPlayer:GetNW2Bool("ManspiderClimbing")

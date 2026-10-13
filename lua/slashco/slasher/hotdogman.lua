@@ -146,20 +146,19 @@ function SLASHER.OnTickBehaviour(slasher)
 			PlayNausea(slasher)
 			slasher.NauseaSound = true
 		end
-	else
+	elseif slasher.NauseaSound then
 		StopNausea(slasher)
 		slasher.NauseaSound = nil
 	end
 
-	local find2 = ents.FindInSphere(slasher:GetPos(), 120)
-	for f = 1, #find2 do
-		local ent = find2[f]
-
-		if ent:GetClass() == "sc_hotdog" then
-			if slasher:GetNW2Bool("HotdoginHand") then return end
-
-			ent:Remove()
-			slasher:SetNW2Bool("HotdoginHand", true)
+	if not slasher:GetNW2Bool("HotdoginHand") then
+		local find2 = ents.FindInSphere(slasher:GetPos(), 120)
+		for _, ent in ipairs(find2) do
+			if ent:GetClass() == "sc_hotdog" then
+				ent:Remove()
+				slasher:SetNW2Bool("HotdoginHand", true)
+				break
+			end
 		end
 	end
 
