@@ -80,7 +80,7 @@ function SLASHER.OnSpawn(slasher)
 
 	slasher.AggressionThreshold = 50
 	slasher.Aggression = 0
-	slasher:SetNWBool("PrincessCanMaul", true)
+	slasher.PrincessCanMaul = true
 
 	SLASHER.DoSound(slasher)
 end
@@ -299,7 +299,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			timer.Simple(5, function()
 				if not IsValid(slasher) then return end
-				slasher:SetNWBool("PrincessCanMaul", true)
+				slasher.PrincessCanMaul = true
 			end)
 		end
 
@@ -311,7 +311,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			timer.Simple(5, function()
 				if not IsValid(slasher) then return end
-				slasher:SetNWBool("PrincessCanMaul", true)
+				slasher.PrincessCanMaul = true
 			end)
 
 			if not IsValid(slasher.SurvivorDragged) then return end
@@ -519,7 +519,7 @@ end
 function SLASHER.OnKillPlayer(slasher, target)
 	if target == slasher.SurvivorDragged then
 		slasher.SurvivorDragged = nil
-		slasher:SetNWBool("PrincessCanMaul", true)
+		slasher.PrincessCanMaul = true
 	end
 end
 
@@ -530,7 +530,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	if slasher:GetNWBool("PrincessMaulingBase") then return end
 	if slasher:GetNWBool("PrincessStunned") then return end
 	if slasher:GetNWBool("PrincessDraggingSurvivor") then return end
-	if not slasher:GetNWBool("PrincessCanMaul") then return end
+	if not slasher.PrincessCanMaul then return end
 	if slasher.MaulTime and CurTime() - slasher.MaulTime < 3 then return end
 
 	slasher.MaulTime = CurTime()
@@ -600,7 +600,7 @@ function SLASHER.OnPrimaryFire(slasher)
 					end
 
 					slasher:SetCanChase(false)
-					slasher:SetNWBool("PrincessCanMaul", false)
+					slasher.PrincessCanMaul = false
 					slasher:SetNWBool("PrincessDraggingSurvivor", true)
 				end
 			end

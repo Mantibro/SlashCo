@@ -13,19 +13,19 @@ ENT.IsSelectable = false
 ENT.PingType = "AMMO"
 
 local function DeagleBulletsAmount(slasher)
-	return slasher:GetNW2Float("DeagleBulletsAmount", 0)
+	return slasher.DeagleBulletsAmount or 0
 end
 
 local function DeagleBulletsControl(slasher, bullets)
-	slasher:SetNW2Float("DeagleBulletsAmount", math.Clamp(DeagleBulletsAmount(slasher) + bullets, 0, 6))
+	slasher.DeagleBulletsAmount = math.Clamp(DeagleBulletsAmount(slasher) + bullets, 0, 6)
 end
 
 local function MGBulletsAmount(slasher)
-	return slasher:GetNW2Float("MGBulletsAmount", 0)
+	return slasher.MGBulletsAmount or 0
 end
 
 local function MGBulletsControl(slasher, bullets)
-	slasher:SetNW2Float("MGBulletsAmount", math.Clamp(MGBulletsAmount(slasher) + bullets, 0, 20))
+	slasher.MGBulletsAmount = math.Clamp(MGBulletsAmount(slasher) + bullets, 0, 20)
 end
 
 local modelList = {

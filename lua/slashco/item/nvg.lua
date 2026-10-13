@@ -25,7 +25,6 @@ function ITEM.OnPickUp(ply)
 	ply:SetNWBool("NightVision", true)
 	ply:ScreenFade(1, color_white, 0.5, 0.2)
 	ply.Eyesight = 8
-	ply:SetNWFloat("Ply_Eyesight", ply.Eyesight)
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/nvg_on.mp3",

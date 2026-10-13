@@ -53,7 +53,7 @@ function ENT:PhysicsCollide(data)
 	local velocity = self.InitialVelocity or self:GetPhysicsObject():GetVelocity()
 	if IsValid(data.HitEntity) then
 		if data.HitEntity:IsPlayer() and data.HitEntity:Team() == TEAM_SLASHER then
-			if not data.HitEntity:GetNWBool("StunImmunity") then
+			if not data.HitEntity.StunImmunity then
 				data.HitEntity.SlashCoBrickFriction = data.HitEntity.SlashCoBrickFriction or data.HitEntity:GetFriction()
 				data.HitEntity:SetFriction(0)
 				data.HitEntity:SetVelocity(velocity * 4)

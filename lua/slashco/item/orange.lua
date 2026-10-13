@@ -22,7 +22,7 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	ply:SetNWBool("HoldingOrange", false)
+	ply.HoldingOrange = false
 	ply:ViewPunch(Angle(-10, 0, 0))
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	droppeditem:SetOrangeVelocity(ply:GetAimVector() * 150)
@@ -31,16 +31,16 @@ function ITEM.OnUse(ply)
 end
 
 function ITEM.OnDie(ply)
-	ply:SetNWBool("HoldingOrange", false)
+	ply.HoldingOrange = false
 end
 
 function ITEM.OnDrop(ply)
-	ply:SetNWBool("HoldingOrange", false)
+	ply.HoldingOrange = false
 end
 
 function ITEM.OnPickUp(ply)
 	ITEM.Orange(ply)
-	ply:SetNWBool("HoldingOrange", true)
+	ply.HoldingOrange = true
 end
 
 function ITEM.Orange(ply)
@@ -57,7 +57,7 @@ function ITEM.Orange(ply)
 
 	timer.Simple(math.random(7, 15), function()
 		if not IsValid(ply) then return end
-		if not ply:GetNWBool("HoldingOrange") then return end
+		if not ply.HoldingOrange then return end
 
 		ITEM.Orange(ply)
 	end)

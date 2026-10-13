@@ -678,7 +678,7 @@ function GM:PlayerDeath(victim)
 
 	table.insert(SlashCo.DeadBodies, ragdoll)
 
-	if victim:GetNWBool("SurvivorDecapitate") then
+	if victim.SurvivorDecapitate then
 		ragdoll:ManipulateBoneScale(ragdoll:LookupBone("ValveBiped.Bip01_Head1"), Vector(0, 0, 0))
 
 		local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone("ValveBiped.Bip01_Head1"))

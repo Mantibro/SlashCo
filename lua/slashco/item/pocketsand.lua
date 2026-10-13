@@ -44,7 +44,7 @@ function ITEM.OnUse(ply)
 	end)
 
 	for _, slasher in ipairs(found) do
-		if slasher:GetNWBool("StunImmunity") then continue end
+		if slasher.StunImmunity then continue end
 		slasher:SetSlasherBlinded(true)
 		slasher:SlasherFunction("OnHitByPocketSand", ply)
 	end

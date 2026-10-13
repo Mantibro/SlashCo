@@ -97,10 +97,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.VomitCooldown = VomitCD - FrameTime()
 	end
 
-	if slasher:GetNWBool("HotdogLeaping") then
+	if slasher.HotdogLeaping then
 		if slasher:IsOnGround() then
 			slasher:SetNWBool("HotdogLeap", false)
-			slasher:SetNWBool("HotdogLeaping", false)
+			slasher.HotdogLeaping = false
 			slasher:SetNWBool("LeapFall", true)
 
 			local vPoint = slasher:GetPos()
@@ -326,7 +326,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		if slasher.LeapCooldown > 0.01 then return end
 
 		slasher:SetNWBool("HotdogLeap", false)
-		slasher:SetNWBool("HotdogLeaping", false)
+		slasher.HotdogLeaping = false
 		timer.Remove("HotdogLeapDelay")
 		slasher.LeapCooldown = 7
 
@@ -345,7 +345,7 @@ function SLASHER.OnSecondaryFire(slasher)
 			end
 
 			slasher:Freeze(true)
-			slasher:SetNWBool("HotdogLeaping", true)
+			slasher.HotdogLeaping = true
 		end)
 
 		return
