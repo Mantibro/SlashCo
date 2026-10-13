@@ -213,7 +213,6 @@ if SERVER then
 				-- To be a bit more generous, we stop the time as soon as they enter the helicopter instead of waiting until SlashCo.EndRound() is executed.
 				activator.QuickEscape = SlashCo.GetRoundTime() < SlashCo.QuickEscapeTime
 				activator.SlowEscape = SlashCo.GetRoundTime() > SlashCo.SlowEscapeTime
-				activator:SetNW2Float("EscapeTime", SlashCo.GetRoundTime())
 			end
 		end
 
@@ -238,7 +237,6 @@ if SERVER then
 		vehicle:SetPos(self:LocalToWorld(seat.pos))
 		vehicle:SetAngles(self:LocalToWorldAngles(seat.ang))
 		vehicle.playerdynseat = true
-		vehicle:SetNWBool("playerdynseat", true)
 		vehicle:SetModel("models/nova/airboat_seat.mdl") -- DO NOT CHANGE OR CRASHES WILL HAPPEN
 		vehicle:SetKeyValue("vehiclescript", "scripts/vehicles/prisoner_pod.txt")
 		vehicle:SetKeyValue("limitview", "1")

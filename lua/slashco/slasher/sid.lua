@@ -168,8 +168,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("SidGunLetterC") and slasher:GetNWBool("SidGunEquipped") then
-		slasher:SetNWBool("SidGunLetterC", true)
+	if slasher:GetNWBool("SidGunRage") and not slasher.SidGunLetterC and slasher:GetNWBool("SidGunEquipped") then
+		slasher.SidGunLetterC = true
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/sid/sid_THE_LETTER_C.ogg",
 			identifier = "SidLetterC",
@@ -257,7 +257,6 @@ local function EatCookie(slasher, target)
 		fadeIn = 0,
 	})
 
-	target:SetNWBool("BeingEaten", true)
 	local beingEatenFunc = target.BeingEaten
 	if beingEatenFunc then
 		beingEatenFunc(target)
@@ -430,7 +429,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 				slasher:SetNWBool("SidExecuting", true)
 
-				target:SetNWBool("SurvivorDecapitate", true)
+				target.SurvivorDecapitate = true
 				target:SetSurvivorSidExecution(true)
 
 				target:SetPos(slasher:GetPos())
@@ -542,7 +541,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 					slasher:Freeze(false)
 					slasher:SetNWBool("SidExecuting", false)
-					target:SetNWBool("SurvivorDecapitate", false)
+					target.SurvivorDecapitate = false
 				end)
 			end)
 		end
@@ -681,7 +680,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher:SetNWBool("SidGunEquipped", false)
 		slasher:SetNWBool("SidGun", false)
 		slasher:SetBodygroup(1, 0)
-		slasher:SetNWBool("SidGunLetterC", false)
+		slasher.SidGunLetterC = false
 		SlashCo.AudioSystem.StopSound("SidLetterC", 0.5, slasher)
 		slasher.Pacification = math.random(5, 15)
 	end

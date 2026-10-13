@@ -42,7 +42,7 @@ end
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
-	slasher:SetNWBool("FullMilks", false)
+	slasher.FullMilks = false
 
 	slasher.MilkCount = 0
 	slasher.Pacification = 0
@@ -99,10 +99,10 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if Milks > 5 then
-		slasher:SetNWBool("FullMilks", true)
+		slasher.FullMilks = true
 	end
 
-	if slasher:GetNWBool("FullMilks") and not slasher:GetDemonPacified() then
+	if slasher.FullMilks and not slasher:GetDemonPacified() then
 		slasher.Thirsty = 0
 		eyesight_final = 4
 		perception_final = 2.0

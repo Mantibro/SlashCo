@@ -57,7 +57,7 @@ function ENT:Explode()
 		if team == TEAM_SURVIVOR then
 			ply:TakeDamage(90, self, self)
 		elseif team == TEAM_SLASHER then
-			if not ply:GetNWBool("StunImmunity") then
+			if not ply.StunImmunity then
 				ply:SlasherStunDeafen(5)
 				ply:SetOrangeBlur(true)
 			end

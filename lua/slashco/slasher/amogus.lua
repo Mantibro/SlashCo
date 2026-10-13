@@ -68,7 +68,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanKill(false)
 		slasher:SetCanChase(false)
 	else
-		if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
+		if not slasher:GetNWBool("AmogusDisguised") and not slasher.AmogusDisguising then
 			slasher:SetCanKill(true)
 			slasher:SetCanChase(true)
 			if IsValid(Entity) then
@@ -162,8 +162,8 @@ end
 function SLASHER.OnMainAbilityFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	if not slasher:GetNWBool("AmogusDisguising") and slasher.DisguiseCooldown < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
-		slasher:SetNWBool("AmogusDisguising", true)
+	if not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
+		slasher.AmogusDisguising = true
 		slasher:Freeze(true)
 
 		local idx = math.random(1, 2)
@@ -182,7 +182,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 			if not IsValid(slasher) then return end
 
 			slasher:Freeze(false)
-			slasher:SetNWBool("AmogusDisguising", false)
+			slasher.AmogusDisguising = false
 
 			slasher:SetNWBool("AmogusSurvivorDisguise", true)
 			slasher:SetNWBool("AmogusDisguised", true)
@@ -210,7 +210,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 			slasher:SetRunSpeed(300)
 			slasher:SetWalkSpeed(200)
 		end)
-	elseif not slasher:GetNWBool("AmogusDisguising") and slasher.DisguiseCooldown < 0.01 and slasher:GetNWBool("AmogusDisguised") then
+	elseif not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and slasher:GetNWBool("AmogusDisguised") then
 		slasher:Freeze(true)
 		slasher:SetNWBool("AmogusSurvivorDisguise", false)
 		slasher:SetNWBool("AmogusFuelDisguise", false)
@@ -253,8 +253,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if not slasher:GetNWBool("AmogusDisguising") and slasher.DisguiseCooldown < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
-		slasher:SetNWBool("AmogusDisguising", true)
+	if not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
+		slasher.AmogusDisguising = true
 		slasher:Freeze(true)
 
 		local idx = math.random(1, 2)
@@ -274,7 +274,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			if not IsValid(slasher) then return end
 
 			slasher:Freeze(false)
-			slasher:SetNWBool("AmogusDisguising", false)
+			slasher.AmogusDisguising = false
 			slasher:SetNWBool("AmogusFuelDisguise", true)
 			slasher:SetNWBool("AmogusDisguised", true)
 

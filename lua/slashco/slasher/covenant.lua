@@ -96,7 +96,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if not IsValid(target) or not target:IsPlayer() then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	if slasher:GetPos():Distance(target:GetPos()) > SLASHER.KillDistance then return end
-	if slasher:GetNWBool("CovenantSummoning") then return end
+	if slasher.CovenantSummoning then return end
 
 	target:Kill()
 	timer.Simple(FrameTime(), function()
@@ -127,12 +127,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					if not IsValid(target) then return end
 
 					target:Freeze(false)
-					target:SetNWBool("RocksBeingSummoned", false)
 				end)
 			end)
 
 			slasher.PlayerToBecomeRocks = target
-			target:SetNWBool("RocksBeingSummoned", true)
 			slasher.RockSummoned = true
 
 			SLASHER.ProwlSpeed = SLASHER.ProwlSpeed + SLASHER.RockProwlIncrease
@@ -151,17 +149,14 @@ function SLASHER.OnPrimaryFire(slasher, target)
 						if not IsValid(target) then return end
 
 						target:Freeze(false)
-						target:SetNWBool("CloaksBeingSummoned", false)
 					end)
 				end)
-
-				target:SetNWBool("CloaksBeingSummoned", true)
 			end
 		end
 
 		timer.Simple(6, function()
 			if IsValid(slasher) then
-				slasher:SetNWBool("CovenantSummoning", false)
+				slasher.CovenantSummoning = false
 				slasher:Freeze(false)
 			end
 
@@ -200,7 +195,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			fadeIn = 0,
 		})
 
-		slasher:SetNWBool("CovenantSummoning", true)
+		slasher.CovenantSummoning = true
 		slasher:Freeze(true)
 	end)
 end

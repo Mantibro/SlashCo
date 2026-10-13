@@ -179,8 +179,8 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 				find_p = eyeTrace.Entity
 			end
 
-			if IsValid(find_p) and not IsValid(find_p:GetNWEntity("SurvivorChased")) then
-				find_p:SetNWEntity("SurvivorChased", slasher)
+			if IsValid(find_p) and not IsValid(find_p.SurvivorChased) then
+				find_p.SurvivorChased = slasher
 			end
 
 			if slasher.CurrentChaseTick > slasher:SlasherValue("ChaseDuration", 10) then
@@ -304,7 +304,6 @@ end
 
 function SlashCo.StopChase(slasher)
 	slasher:SetInSlasherChaseMode(false)
-	slasher:SetNWFloat("SlasherChaseBegin", 0)
 	slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	SlashCo.AudioSystem.StopSound("ChaseMusic", 5, slasher)
@@ -320,8 +319,8 @@ function SlashCo.StopChase(slasher)
 	end)
 
 	for _, ply in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		if ply:GetNWEntity("SurvivorChased") == slasher then
-			ply:SetNWEntity("SurvivorChased", NULL)
+		if ply.SurvivorChased == slasher then
+			ply.SurvivorChased = NULL
 		end
 	end
 
@@ -394,7 +393,6 @@ function SlashCo.StartChaseMode(slasher, forceChase)
 	end)
 
 	slasher:SetInSlasherChaseMode(true)
-	slasher:SetNWFloat("SlasherChaseBegin", CurTime())
 	slasher.CurrentChaseTick = 0
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 	slasher:SetRunSpeed(slasher:SlasherValue("ChaseSpeed"))
