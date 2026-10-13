@@ -3,27 +3,19 @@ SlashCo = SlashCo or {}
 SlashCo.CurConfig = {}
 
 function GetRandomMap(ply_count)
-	local keys = table.GetKeys(SCInfo.Maps)
-	if #keys == 0 then -- if we have no maps, we return early as else we enter a infinite loop that would crash the game.
-		return "error"
-	end
-
-	local tries = #keys * 4
-	for k=1, tries do -- This formerly was a repeat until loop, that loved to crash the game.
-		local rand = math.random(1, #keys)
-		local rand_name = keys[rand]
-		if rand_name ~= "error" and SCInfo.Maps[rand_name].MIN_PLAYERS <= (ply_count + (SCInfo.MinimumMapPlayers - 1)) then
-			return rand_name
+	local fittingMaps = {}
+	for name, map in pairs(SCInfo.Maps) do
+		if name ~= "error" and map.MIN_PLAYERS <= (ply_count + (SCInfo.MinimumMapPlayers - 1)) then
+			table.insert(fittingMaps, name)
 		end
 	end
 
-	--[[local key, val = next( SCInfo.Maps )
-	if val then
-		return val
-	end]]
+	if #fittingMaps == 0 then
+		print("[SlashCo] No map fits " .. ply_count .. " players, this should usualy never happen.")
+		return "error"
+	end
 
-	print("[SlashCo] Ran out of tries to select map to stop a game crash, this should usualy never happen.")
-	return "error"
+	return fittingMaps[math.random(#fittingMaps)]
 end
 
 function SlashCo.ResetLobbyData()

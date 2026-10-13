@@ -86,6 +86,8 @@ local function DolphinHunt(slasher)
 	PlayCallSound(slasher)
 
 	timer.Simple(10, function()
+		if not IsValid(slasher) then return end
+
 		slasher:SetNW2Bool("DolphinFound", false)
 		slasher:SetNW2Bool("DolphinInHiding", false)
 		slasher:SetNW2Bool("DolphinHunting", true)

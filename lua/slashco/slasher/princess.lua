@@ -81,6 +81,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher.AggressionThreshold = 50
 	slasher.Aggression = 0
 	slasher.PrincessCanMaul = true
+	slasher.MaulBonus = 0
 
 	SLASHER.DoSound(slasher)
 end
@@ -292,7 +293,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if slasher.SurvivorDragged.DragStruggle ~= nil and slasher.SurvivorDragged.DragStruggle > 50 then
 			slasher.SurvivorDragged:RemoveSpeedEffect("princessmaul")
 			slasher.SurvivorDragged.DragStruggle = 0
-			slasher.SurvivorRoped:SetSurvivorDragged(false)
+			slasher.SurvivorDragged:SetSurvivorDragged(false)
 			slasher.SurvivorDragged = nil
 
 			slasher:SetNW2Bool("PrincessDraggingSurvivor", false)
@@ -303,9 +304,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			end)
 		end
 
-		timer.Simple(10, function()
-			if not IsValid(slasher) then return end
-
+		slasher.DragEnd = slasher.DragEnd or CurTime() + 10
+		if IsValid(slasher.SurvivorDragged) and CurTime() >= slasher.DragEnd then
 			slasher:SetCanChase(true)
 			slasher:SetNW2Bool("PrincessDraggingSurvivor", false)
 
@@ -314,14 +314,13 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher.PrincessCanMaul = true
 			end)
 
-			if not IsValid(slasher.SurvivorDragged) then return end
-
 			slasher.SurvivorDragged:RemoveSpeedEffect("princessmaul")
 			slasher.SurvivorDragged.DragStruggle = 0
 			slasher.SurvivorDragged:SetSurvivorDragged(false)
 			slasher.SurvivorDragged = nil
-		end)
+		end
 	else
+		slasher.DragEnd = nil
 		if not slasher:GetInSlasherChaseMode() then
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
@@ -332,6 +331,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
 		end
 
+		slasher:SetNW2Bool("PrincessDraggingSurvivor", false)
 		slasher:SetCanChase(true)
 		slasher.SurvivorDragged = nil
 	end
@@ -471,7 +471,7 @@ function SLASHER.Maul(slasher, target)
 		slasher:SetNW2Bool("PrincessMaulingBase", false)
 
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
-		SLASHER.MaulForward = SLASHER.MaulForward + SlashCo.GetSlasherAnger(slasher)
+		slasher.MaulBonus = slasher.MaulBonus + SlashCo.GetSlasherAnger(slasher)
 
 		if IsValid(slasher.ref_child) then
 			slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
@@ -547,7 +547,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	})
 
 	if slasher:IsOnGround() then
-		slasher:SetVelocity(slasher:GetForward() * SLASHER.MaulForward)
+		slasher:SetVelocity(slasher:GetForward() * (SLASHER.MaulForward + slasher.MaulBonus))
 	end
 
 	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()

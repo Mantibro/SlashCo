@@ -361,10 +361,6 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 		return
 	end
 
-	if IsFirstTimePredicted() then
-		print(IsFirstTimePredicted(), ply:GetDynamicFlashlight())
-	end
-
 	for _, target in ipairs(cache) do
 		if target:GetDynamicFlashlight() and (target:CanBeSeen() or target == ply) then
 			if target.DynamicFlashlight then

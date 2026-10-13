@@ -161,9 +161,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			end)
 		end
 
-		timer.Simple(RopeTime, function()
-			if not IsValid(slasher.SurvivorRoped) then return end
-
+		slasher.RopeEnd = slasher.RopeEnd or CurTime() + RopeTime
+		if IsValid(slasher.SurvivorRoped) and CurTime() >= slasher.RopeEnd then
 			slasher:SetCanChase(true)
 			slasher:SetNW2Bool("HoovyGrabLoop", false)
 			slasher.SurvivorRoped:SetSurvivorGrabbed(false)
@@ -171,8 +170,9 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.SurvivorRoped.RopeStruggle = 0
 			slasher.SurvivorRoped = nil
 			StopPanicMusic(slasher)
-		end)
+		end
 	else
+		slasher.RopeEnd = nil
 		if not slasher:GetInSlasherChaseMode() then
 			slasher:SetRunSpeed(prowl_final)
 			slasher:SetWalkSpeed(prowl_final)
@@ -185,6 +185,11 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		slasher:SetCanChase(true)
 		slasher.SurvivorRoped = nil
+
+		if slasher:GetNW2Bool("HoovyGrabLoop") then
+			slasher:SetNW2Bool("HoovyGrabLoop", false)
+			StopPanicMusic(slasher)
+		end
 	end
 
 	if slasher:GetNW2Int("RopeCooldown") ~= math.floor(RopeCD) then

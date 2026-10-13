@@ -104,7 +104,7 @@ function TylerSwitchForm(slasher, newForm)
 		SLASHER.HideTime(slasher)
 		if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and slasher.WasDestroyerOnce then -- If its already playing, we don't need to start it again.
 			SlashCo.AudioSystem.EnableBackgroundMusic()
-			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.max(math.Clamp(100 - anger, 0, 100) / 100), 0.1) -- Make the background music getting more silent the more anger he has.
+			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.max(math.Clamp(100 - anger, 0, 100) / 100, 0.1)) -- Make the background music getting more silent the more anger he has.
 		end
 
 		slasher:SetNoFootsteps(false)
@@ -255,7 +255,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCo.AudioSystem.SetBackgroundMusicVolume(math.Round(math.max(math.Clamp(100 - anger, 0, 100) / 100, 0.1) * math.Clamp(1 - (TimeAsTylerForm / slasher.TylerTime), 0, 1), 3))
 
 		--Time ran out
-		if not isCreating and (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
+		if not isCreating and ((SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime) then
 			slasher.TylerSongPickedID = nil
 			TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
@@ -452,9 +452,13 @@ function SLASHER.OnTickBehaviour(slasher)
 					ent:TakeDamage(100, slasher, slasher)
 				elseif SlashCo.IsValidDoor(ent) then
 					SlashCo.BustDoor(slasher, ent, 50000)
-				elseif ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer" then
+				elseif (ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer") and not ent.TylerPushing then
+					ent.TylerPushing = true
 					timer.Simple(1.0, function()
-						if not IsValid(slasher) or not IsValid(ent) then return end
+						if not IsValid(ent) then return end
+
+						ent.TylerPushing = nil
+						if not IsValid(slasher) then return end
 
 						ent:SetVelocity(slasher:GetForward() * 500)
 					end)
@@ -625,7 +629,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				target:Freeze(false)
 				target:TakeDamage(99999, slasher, slasher)
 
-				slasher.TimeAsTylerForm = slasher.TimeAsTylerForm + SLASHER.TimeAddedForPlayerKill
+				if IsValid(slasher) then
+					slasher.TimeAsTylerForm = slasher.TimeAsTylerForm + SLASHER.TimeAddedForPlayerKill
+				end
 			end
 
 			timer.Simple(FrameTime(), function()
@@ -767,8 +773,8 @@ function SLASHER.InitHud(_, hud)
 
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
 		local class = IsValid(target) and target:GetClass()
-		if IsValid(target) and target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon")
-				and class ~= "sc_battery" and GameData.LocalPlayer:GetNW2Entity("TylerJumpscareTarget") ~= target and
+		if IsValid(target) and (target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon" and class ~= "sc_battery"))
+				and GameData.LocalPlayer:GetNW2Entity("TylerJumpscareTarget") ~= target and
 				GameData.LocalPlayer:GetPos():Distance(target:GetPos()) < SLASHER.KillDistance then
 
 			if not hud.destroyEnabled then
