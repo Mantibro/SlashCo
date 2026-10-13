@@ -902,19 +902,21 @@ end
 
 -- RaphaelIT7: Finds a free spawn, if there is none, it'll just spawn them in each other.
 local function FindFreeSpawn(ply, entities)
-	local oldestSpawn = {}
+	local oldestSpawn, oldestTime
 	for _, spawnEnt in ipairs(entities) do
 		if hook.Run("IsSpawnpointSuitable", ply, spawnEnt, false) then
 			return spawnEnt
 		end
 
-		oldestSpawn[CurTime() - (spawnEnt.LastSpawnedEntity or 0)] = spawnEnt
+		local lastSpawned = spawnEnt.LastSpawnedEntity or 0
+		if not oldestTime or lastSpawned < oldestTime then
+			oldestSpawn = spawnEnt
+			oldestTime = lastSpawned
+		end
 	end
 
 	-- Just take the oldest one.
-	for _, spawnEnt in SortedPairs(oldestSpawn, true) do
-		return spawnEnt
-	end
+	return oldestSpawn
 end
 
 function SlashCo.FindSpawn(ply)

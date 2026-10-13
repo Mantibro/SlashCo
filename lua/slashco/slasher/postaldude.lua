@@ -355,32 +355,14 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	-- patience stuff
 	local patience = SlashCo.GetSlasherAnger(slasher)
-	if slasher:GetNW2Int("PostalDudePatience") ~= math.floor(patience) then
-		slasher:SetNW2Int("PostalDudePatience", math.floor(patience))
-	end
+	slasher:SetNW2Int("PostalDudePatience", math.floor(patience))
 
-	-- fuel stuff
-	local fuelamount = PostalDudeFuelAmount(slasher)
-	if slasher:GetNW2Int("PostalDudeFuelAmount") ~= math.floor(fuelamount) then
-		slasher:SetNW2Int("PostalDudeFuelAmount", math.floor(fuelamount))
-	end
-
-	-- We use this to keep a track of the player's Deagle ammo
-	local DeagleAmmo = DeagleBulletsAmount(slasher)
-	if slasher:GetNW2Int("DeagleBulletsAmount") ~= math.floor(DeagleAmmo) then
-		slasher:SetNW2Int("DeagleBulletsAmount", math.floor(DeagleAmmo))
-	end
-
-	-- We use this to keep a track of the player's M4 ammo
-	local MGAmmo = MGBulletsAmount(slasher)
-	if slasher:GetNW2Int("MGBulletsAmount") ~= math.floor(MGAmmo) then
-		slasher:SetNW2Int("MGBulletsAmount", math.floor(MGAmmo))
-	end
+	slasher:SetNW2Int("PostalDudeFuelAmount", math.floor(PostalDudeFuelAmount(slasher)))
+	slasher:SetNW2Int("DeagleBulletsAmount", math.floor(DeagleBulletsAmount(slasher)))
+	slasher:SetNW2Int("MGBulletsAmount", math.floor(MGBulletsAmount(slasher)))
 
 	-- Very important otherwise everything shits the bed
-	if slasher:GetNW2Int("PostalState") ~= PostalState then
-		slasher:SetNW2Int("PostalState", PostalState)
-	end
+	slasher:SetNW2Int("PostalState", PostalState)
 
 	slasher:SetEyeSight(eyesight_final)
 	slasher:SetPerception(perception_final)
@@ -1429,11 +1411,9 @@ function SLASHER.InitHud(_, hud)
 	hud:AddMeter("patience", 100, "", nil, true)
 	hud:TieMeterInt("patience", "PostalDudePatience")
 
-	GameData.LocalPlayer:GetNW2Int("PostalState", -1) -- Raphael my goat once again
-
-	hud.prevState = not GameData.LocalPlayer:GetNW2Int("PostalState")
+	hud.prevState = not GameData.LocalPlayer:GetNW2Int("PostalState", -1)
 	function hud.AlsoThink()
-		local curState = GameData.LocalPlayer:GetNW2Int("PostalState")
+		local curState = GameData.LocalPlayer:GetNW2Int("PostalState", -1)
 
 		if curState == hud.prevState then return end
 

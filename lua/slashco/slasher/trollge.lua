@@ -90,6 +90,7 @@ function SLASHER.GetSpeed(slasher)
 	end
 end
 
+local DASH_SLOW_TICKS = 4
 local function stopDash(slasher)
 	if not slasher:GetNW2Bool("TrollgeDashFinish") then
 		SlashCo.AudioSystem.StopSound("TrollgeScreech", 0.5, slasher)
@@ -345,12 +346,16 @@ function SLASHER.OnTickBehaviour(slasher)
 				end
 			end
 
-			if slasher.TrollgeDashing > 50 and slasher:GetVelocity():Length() < 450 then
+			local speed = slasher:GetVelocity():Length()
+			local slow = (slasher.TrollgeDashing > 50 and speed < 450) or (slasher.TrollgeDashing < 50 and speed < 250)
+			slasher.TrollgeDashSlowTicks = slow and ((slasher.TrollgeDashSlowTicks or 0) + 1) or 0
+
+			-- RaphaelIT7: We delay the slow by a few ticks to avoid cases where you may hit a small edge while dashing
+			if slasher.TrollgeDashSlowTicks >= DASH_SLOW_TICKS then
+				local noHit = slasher.TrollgeDashing > 50
+				slasher.TrollgeDashSlowTicks = 0
 				stopDash(slasher)
-				slasher:SetNW2Bool("TrollgeDashNoHit", true)
-			elseif slasher.TrollgeDashing < 50 and slasher:GetVelocity():Length() < 250 then
-				stopDash(slasher)
-				slasher:SetNW2Bool("TrollgeDashHitWall", true)
+				slasher:SetNW2Bool(noHit and "TrollgeDashNoHit" or "TrollgeDashHitWall", true)
 			end
 		end
 	end
@@ -621,7 +626,14 @@ function SLASHER.OnMainAbilityFire(slasher)
 	slasher:Freeze(true)
 	slasher.ClawCooldown = 3
 	slasher.TrollgeDashing = 0
+	slasher.TrollgeDashSlowTicks = 0
 	slasher:SetVelocity(slasher:GetForward() * 1000)
+end
+
+function SLASHER.ChaseLight(slasher)
+	if slasher:GetNW2Bool("TrollgeStage2") then
+		return 255, 0, 0, 5, 2500
+	end
 end
 
 function SLASHER.Thirdperson(ply)

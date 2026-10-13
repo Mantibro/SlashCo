@@ -557,8 +557,8 @@ end)
 local chaseLightOffset = Vector(0, 0, 20)
 hook.Add("Think", "Slasher_Chasing_Light", function()
 	local curTime = CurTime()
-	for _, clone in ipairs(ents.FindByClass("sc_crimclone")) do
-		if clone:GetMainRageClone() then
+	for _, clone in ipairs(SlashCo.FindByClass("sc_crimclone")) do
+		if IsValid(clone) and clone:GetMainRageClone() then
 			local tlight = DynamicLight(clone:EntIndex())
 			if tlight then
 				tlight.pos = clone:LocalToWorld(chaseLightOffset)
@@ -575,56 +575,34 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 	end
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if slasher:GetNW2Bool("TrollgeStage2") then
-			local tlight = DynamicLight(slasher:EntIndex())
-			if tlight then
-				tlight.pos = slasher:LocalToWorld(chaseLightOffset)
-				tlight.r = 255
-				tlight.g = 0
-				tlight.b = 0
-				tlight.brightness = 5
-				tlight.Decay = 1000
-				tlight.Size = 2500
-				tlight.DieTime = curTime + 1
-			end
+		if slasher:IsDormant() then
 			continue
 		end
 
-		if slasher:GetNW2Bool("TylerFlash") then
+		local r, g, b, brightness, size, decay = slasher:SlasherFunction("ChaseLight")
+		if not r and slasher:GetInSlasherChaseMode() then
+			r, g, b, brightness, size, decay = SlashCo.DefaultChaseLight()
+		end
+
+		if r then
 			local dlight = DynamicLight(slasher:EntIndex())
 			if dlight then
 				dlight.pos = slasher:LocalToWorld(chaseLightOffset)
-				dlight.r = 255
-				dlight.g = 0
-				dlight.b = 0
-				dlight.brightness = 10
-				local size = 400
-				dlight.Decay = size * 3
+				dlight.r = r
+				dlight.g = g
+				dlight.b = b
+				dlight.brightness = brightness
+				dlight.Decay = decay
 				dlight.Size = size
 				dlight.DieTime = curTime + 1
 			end
-			continue
-		end
-
-		if not slasher:GetInSlasherChaseMode() and not slasher:GetNW2Bool("SidGunRage") and not slasher:GetNW2Bool("WatcherRage")
-				or (slasher:GetInSlasherChaseMode() and slasher:GetNW2Bool("DisableChaseLight")) then
-			continue
-		end
-
-		local dlight = DynamicLight(slasher:EntIndex())
-		if dlight then
-			dlight.pos = slasher:LocalToWorld(chaseLightOffset)
-			dlight.r = 255
-			dlight.g = 0
-			dlight.b = 0
-			dlight.brightness = 6
-			local size = 250
-			dlight.Decay = size * 4
-			dlight.Size = size
-			dlight.DieTime = curTime + 1
 		end
 	end
 end)
+
+function SlashCo.DefaultChaseLight()
+	return 255, 0, 0, 6, 250, 1000
+end
 
 net.Receive("SlashCo:AskToBecomeSlasher", function()
 	system.FlashWindow() -- Flash it to notify them if their tabbed out.

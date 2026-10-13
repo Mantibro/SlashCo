@@ -171,7 +171,7 @@ if CLIENT then
 			if time < doors._time then continue end
 
 			-- RaphaelIT7: Since we got no idea if our time even is right, we always check the door state to know the truth
-			if IsValid(doors._hitdoor) and not SlashCo.IsDoorOpen(doors._hitdoor) then return end
+			if IsValid(doors._hitdoor) and not SlashCo.IsDoorOpen(doors._hitdoor) then continue end
 
 			for _, door in ipairs(doors) do
 				if IsValid(door) then

@@ -649,6 +649,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 	slasher:SetVisible(true)
 end
 
+function SLASHER.ChaseLight(slasher)
+	if slasher:GetNW2Bool("TylerFlash") then
+		return 255, 0, 0, 10, 400, 1200
+	end
+end
+
 function SLASHER.Animator(ply)
 	local tyler_creator = ply:GetNW2Bool("TylerTheCreator")
 	local tyler_creating = ply:GetNW2Bool("TylerCreating")

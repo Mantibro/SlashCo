@@ -121,10 +121,9 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if SlashCD > 0 then
 		slasher.SlashCooldown = SlashCD - FrameTime()
-		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
-	else
-		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
 	end
+
+	slasher:SlasherHudControlEnabled("LMB", SlashCD <= 0)
 
 	if State == 0 then
 		--Specter mode

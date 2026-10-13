@@ -84,25 +84,22 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if MainCD > 0 then
-		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
 		slasher.MainCooldown = MainCD - FrameTime()
-	else
-		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
 	end
 
 	if NoclipCD > 0 then
-		slasher:SlasherHudFunc("SetControlEnabled", "R", false)
 		slasher.NoclipCooldown = NoclipCD - FrameTime()
-	else
-		slasher:SlasherHudFunc("SetControlEnabled", "R", true)
 	end
 
 	if SnapCD > 0 then
-		slasher:SlasherHudFunc("SetControlEnabled", "F", false)
 		slasher.SnapCooldown = SnapCD - FrameTime()
-	else
-		slasher:SlasherHudFunc("SetControlEnabled", "F", true)
 	end
+
+	local noclip = slasher:GetNW2Bool("BrenNoclip")
+	slasher:SlasherHudControlEnabled("LMB", MainCD <= 0 and not noclip)
+	slasher:SlasherHudControlEnabled("RMB", not noclip)
+	slasher:SlasherHudControlEnabled("R", NoclipCD <= 0)
+	slasher:SlasherHudControlEnabled("F", SnapCD <= 0)
 
 	if SlashCo.CurRound.GameProgress > 4 then
 		slasher:SetImpervious(true)
