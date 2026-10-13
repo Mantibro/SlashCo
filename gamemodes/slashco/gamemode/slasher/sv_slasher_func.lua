@@ -11,7 +11,7 @@ function SlashCo.ApplySlasherToPlayer(ply)
 	if SlashCo.CurRound.Slashers[ply:SteamID64()] then
 		--Set the correct Slasher
 		print("[SlashCo] Assigning the correct Slasher to the player.")
-		ply:SetNWString("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
+		ply:SetNW2String("Slasher", SlashCo.CurRound.Slashers[ply:SteamID64()].SlasherID)
 	end
 end
 
@@ -41,7 +41,7 @@ function SlashCo.SpawnPlayerAsSlasher(ply, slasherName)
 	end
 
 	SlashCo.AudioSystem.StopSound(nil, 1, ply) -- Stop any sounds that were playing from the player in case we switched from one slasher to another.
-	ply:SetNWString("Slasher", foundSlasherName)
+	ply:SetNW2String("Slasher", foundSlasherName)
 	ply:SetTeam(TEAM_SLASHER)
 	ply:Spawn()
 	SlashCo.OnSlasherSpawned(ply)
@@ -91,7 +91,7 @@ function SlashCo.OnSlasherSpawned(ply)
 	ply.SlasherValue4 = 0
 	ply.SlasherValue5 = 0
 
-	local slasherTbl = SlashCoSlashers[ply:GetNWString("Slasher")]
+	local slasherTbl = SlashCoSlashers[ply:GetNW2String("Slasher")]
 	if slasherTbl.OnBalanceForPlayers then
 		SetGlobal2Int("SlashCo:BalanceSurvivors", GameData.RoundStartSurvivorCount)
 		SetGlobal2Int("SlashCo:BalanceSingularity", SlashCo.CurRound.OfferingData.Singularity)
@@ -110,7 +110,7 @@ function SlashCo.OnSlasherSpawned(ply)
 
 	ply:SetRunSpeed(slasherTbl.ProwlSpeed)
 	ply:SetWalkSpeed(slasherTbl.ProwlSpeed)
-	ply:SetNW2Float("SlasherAnger", 0)
+	ply:SetSlasherAnger(0)
 
 	ply:SlasherFunction("OnSpawn")
 
@@ -136,7 +136,7 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 			local succ, err = pcall(SlashCo.OnSlasherSpawned, slasher) -- if succ == false then we had an error in spawning. We also need pcall to be sure.
 			if not slasher.SuccessfulSpawn and not succ then
 				slasher:SetTeam(TEAM_SPECTATOR)
-				print("[SlashCo] Player \"" .. slasher:Name() .. "\" was set to spectator because we were unable to properly spawn them! (Error: \"" .. err .. "\" Slasher:\"" .. slasher:GetNWString("Slasher", "") .. "\"")
+				print("[SlashCo] Player \"" .. slasher:Name() .. "\" was set to spectator because we were unable to properly spawn them! (Error: \"" .. err .. "\" Slasher:\"" .. slasher:GetNW2String("Slasher", "") .. "\"")
 				continue -- Skip the loop.
 			end
 		end
@@ -145,7 +145,7 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 		local inv = -0.2
 
 		--Handle The Chase Functions \/ \/ \/
-		--SlashCoSlashers[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
+		--SlashCoSlashers[slasher:GetNW2String("Slasher")].IsChasing = slasher:GetInSlasherChaseMode()
 		if slasher:GetCanChase() == false then
 			slasher.CurrentChaseTick = 99
 		end
@@ -161,7 +161,7 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 		if slasher:GetInSlasherChaseMode() then
 			slasher.CurrentChaseTick = slasher.CurrentChaseTick + FrameTime()
 
-			--local inv = (1 - SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseRadius) / 2
+			--local inv = (1 - SlashCoSlashers[slasher:GetNW2String("Slasher")].ChaseRadius) / 2
 
 			local eyeTrace = slasher:GetEyeTrace()
 			local find = ents.FindInCone(slasher:GetPos(), eyeTrace.Normal, dist * 2, slasher:SlasherValue("ChaseRadius", 0.91) + inv)
@@ -385,9 +385,9 @@ function SlashCo.StartChaseMode(slasher, forceChase)
 	end
 
 	local duration = slasher:SlasherValue("ChaseDuration", 10) * 10 + 45
-	local curSlasher = slasher:GetNWString("Slasher")
+	local curSlasher = slasher:GetNW2String("Slasher")
 	timer.Create("SlashCoEndChase_" .. slasher:UserID(), duration, 1, function()
-		if not IsValid(slasher) or slasher:GetNWString("Slasher") ~= curSlasher then return end
+		if not IsValid(slasher) or slasher:GetNW2String("Slasher") ~= curSlasher then return end
 
 		SlashCo.StopChase(slasher)
 	end)
@@ -497,7 +497,7 @@ end
 
 -- RaphaelIT7: This is intentionally server only to avoid desync!
 function SlashCo.AddSlasherAnger(slasher, anger)
-	slasher:SetNW2Float("SlasherAnger", math.Clamp(SlashCo.GetSlasherAnger(slasher) + anger, 0, 100))
+	slasher:SetSlasherAnger(math.Clamp(SlashCo.GetSlasherAnger(slasher) + anger, 0, 100))
 end
 
 --[[

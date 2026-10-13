@@ -48,7 +48,7 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.PickUpAttempt(ply)
-	return ply:GetNWBool("AmogusSurvivorDisguise")
+	return ply:GetAmogusSurvivorDisguise()
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -68,7 +68,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanKill(false)
 		slasher:SetCanChase(false)
 	else
-		if not slasher:GetNWBool("AmogusDisguised") and not slasher.AmogusDisguising then
+		if not slasher:GetNW2Bool("AmogusDisguised") and not slasher.AmogusDisguising then
 			slasher:SetCanKill(true)
 			slasher:SetCanChase(true)
 			if IsValid(Entity) then
@@ -81,7 +81,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if slasher:GetNWBool("AmogusSurvivorDisguise") then
+	if slasher:GetAmogusSurvivorDisguise() then
 		for k, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if v:GetPos():Distance(slasher:GetPos()) < 500 then
 				slasher.AmogusSpeech = slasher.DisguiseTimer + FrameTime()
@@ -113,7 +113,7 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 
-	if not slasher:GetNWBool("AmogusSurvivorDisguise") or not slasher:GetNWBool("AmogusFuelDisguise") then
+	if not slasher:GetAmogusSurvivorDisguise() or not slasher:GetNW2Bool("AmogusFuelDisguise") then
 		SlashCo.Jumpscare(slasher, target)
 	end
 
@@ -162,7 +162,7 @@ end
 function SLASHER.OnMainAbilityFire(slasher)
 	local SO = SlashCo.CurRound.OfferingData.Singularity
 
-	if not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and not slasher:GetNWBool("AmogusSurvivorDisguise") and not slasher:GetNWBool("AmogusDisguised") then
+	if not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and not slasher:GetAmogusSurvivorDisguise() and not slasher:GetNW2Bool("AmogusDisguised") then
 		slasher.AmogusDisguising = true
 		slasher:Freeze(true)
 
@@ -184,8 +184,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 			slasher:Freeze(false)
 			slasher.AmogusDisguising = false
 
-			slasher:SetNWBool("AmogusSurvivorDisguise", true)
-			slasher:SetNWBool("AmogusDisguised", true)
+			slasher:SetAmogusSurvivorDisguise(true)
+			slasher:SetNW2Bool("AmogusDisguised", true)
 
 			slasher:SlasherHudFunc("SetAvatar", "survivor")
 			slasher:SlasherHudFunc("SetTitle", "Amogus_survivor_disguised_title")
@@ -210,11 +210,11 @@ function SLASHER.OnMainAbilityFire(slasher)
 			slasher:SetRunSpeed(300)
 			slasher:SetWalkSpeed(200)
 		end)
-	elseif not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and slasher:GetNWBool("AmogusDisguised") then
+	elseif not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and slasher:GetNW2Bool("AmogusDisguised") then
 		slasher:Freeze(true)
-		slasher:SetNWBool("AmogusSurvivorDisguise", false)
-		slasher:SetNWBool("AmogusFuelDisguise", false)
-		slasher:SetNWBool("AmogusDisguised", false)
+		slasher:SetAmogusSurvivorDisguise(false)
+		slasher:SetNW2Bool("AmogusFuelDisguise", false)
+		slasher:SetNW2Bool("AmogusDisguised", false)
 		slasher:SetDynamicFlashlight(false)
 		
 		SlashCo.AudioSystem.PlaySound({
@@ -253,7 +253,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and not slasher:GetNWBool("AmogusFuelDisguise") and not slasher:GetNWBool("AmogusDisguised") then
+	if not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and not slasher:GetNW2Bool("AmogusFuelDisguise") and not slasher:GetNW2Bool("AmogusDisguised") then
 		slasher.AmogusDisguising = true
 		slasher:Freeze(true)
 
@@ -275,8 +275,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 			slasher:Freeze(false)
 			slasher.AmogusDisguising = false
-			slasher:SetNWBool("AmogusFuelDisguise", true)
-			slasher:SetNWBool("AmogusDisguised", true)
+			slasher:SetNW2Bool("AmogusFuelDisguise", true)
+			slasher:SetNW2Bool("AmogusDisguised", true)
 
 			slasher:SlasherHudFunc("SetAvatar", "fuel")
 			slasher:SlasherHudFunc("SetTitle", "Amogus_gas_disguised_title")
@@ -315,13 +315,13 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("AmogusFuelDisguise")
+	return ply:GetNW2Bool("AmogusFuelDisguise")
 end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetInSlasherChaseMode()
 
-	if ply:GetNWBool("AmogusSurvivorDisguise") then
+	if ply:GetAmogusSurvivorDisguise() then
 		return
 	end
 
@@ -341,11 +341,11 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if ply:GetNWBool("AmogusSurvivorDisguise") then
+	if ply:GetAmogusSurvivorDisguise() then
 		return false
 	end
 
-	if not ply:GetNWBool("AmogusFuelDisguise") then
+	if not ply:GetNW2Bool("AmogusFuelDisguise") then
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/amogus/amogus_step" .. idx .. ".mp3",
@@ -418,8 +418,8 @@ function SLASHER.InitHud(_, hud)
 	control.prevSurvivor = -1
 	control.prevGas = -1
 	function control.AlsoThink()
-		local survivor = GameData.LocalPlayer:GetNWBool("AmogusSurvivorDisguise")
-		local gascan = GameData.LocalPlayer:GetNWBool("AmogusFuelDisguise")
+		local survivor = GameData.LocalPlayer:GetAmogusSurvivorDisguise()
+		local gascan = GameData.LocalPlayer:GetNW2Bool("AmogusFuelDisguise")
 		if gascan ~= control.prevGas then
 			if gascan then
 				control:SetText("sneak kill")

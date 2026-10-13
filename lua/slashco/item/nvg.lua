@@ -22,7 +22,7 @@ end
 function ITEM.OnPickUp(ply)
 	if GameData.IsLobby then return end
 
-	ply:SetNWBool("NightVision", true)
+	ply:SetNightVision(true)
 	ply:ScreenFade(1, color_white, 0.5, 0.2)
 	ply.Eyesight = 8
 
@@ -38,7 +38,7 @@ function ITEM.OnPickUp(ply)
 end
 
 function ITEM.ItemDropped(ply, droppeditem)
-	ply:SetNWBool("NightVision", false)
+	ply:SetNightVision(false)
 	ply:ScreenFade(1, color_black, 0.5, 0.2)
 
 	SlashCo.AudioSystem.PlaySound({
@@ -53,7 +53,7 @@ function ITEM.ItemDropped(ply, droppeditem)
 end
 
 function ITEM.OnDie(ply)
-	ply:SetNWBool("NightVision", false)
+	ply:SetNightVision(false)
 	ply:ScreenFade(1, color_black, 0.5, 0.2)
 end
 
@@ -96,7 +96,7 @@ ITEM.WorldModel = {
 
 hook.Add("RenderScreenspaceEffects", "NightVision", function()
 	local ply = GameData.LocalPlayer
-	if GameData.LocalPlayer:GetNWBool("NightVision") then
+	if GameData.LocalPlayer:GetNightVision() then
 		local tr = ply:GetEyeTraceNoCursor()
 		local dlight = GenDynLight(ply:EntIndex())
 

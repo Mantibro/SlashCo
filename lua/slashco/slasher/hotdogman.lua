@@ -68,7 +68,7 @@ local function PlayFall(slasher)
 end
 
 function SLASHER.OnSpawn(slasher)
-	slasher:SetNWBool("HotdoginHand", false)
+	slasher:SetNW2Bool("HotdoginHand", false)
 	slasher:SetCanChase(true)
 
 	slasher.EatedHotdogs = 0
@@ -99,9 +99,9 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if slasher.HotdogLeaping then
 		if slasher:IsOnGround() then
-			slasher:SetNWBool("HotdogLeap", false)
+			slasher:SetNW2Bool("HotdogLeap", false)
 			slasher.HotdogLeaping = false
-			slasher:SetNWBool("LeapFall", true)
+			slasher:SetNW2Bool("LeapFall", true)
 
 			local vPoint = slasher:GetPos()
 			local dust = EffectData()
@@ -129,13 +129,13 @@ function SLASHER.OnTickBehaviour(slasher)
 			timer.Simple(3.0, function()
 				if not IsValid(slasher) then return end
 
-				slasher:SetNWBool("LeapFall", false)
+				slasher:SetNW2Bool("LeapFall", false)
 				slasher:Freeze(false)
 			end)
 		end
 	end
 
-	if slasher:GetNWBool("HotdoginHand") then
+	if slasher:GetNW2Bool("HotdoginHand") then
 		slasher:SetBodygroup(1, 1)
 	else
 		slasher:SetBodygroup(1, 0)
@@ -156,15 +156,15 @@ function SLASHER.OnTickBehaviour(slasher)
 		local ent = find2[f]
 
 		if ent:GetClass() == "sc_hotdog" then
-			if slasher:GetNWBool("HotdoginHand") then return end
+			if slasher:GetNW2Bool("HotdoginHand") then return end
 
 			ent:Remove()
-			slasher:SetNWBool("HotdoginHand", true)
+			slasher:SetNW2Bool("HotdoginHand", true)
 		end
 	end
 
-	if slasher:GetNWInt("VomitAmount") ~= Hotdogs then
-		slasher:SetNWInt("VomitAmount", Hotdogs)
+	if slasher:GetNW2Int("VomitAmount") ~= Hotdogs then
+		slasher:SetNW2Int("VomitAmount", Hotdogs)
 	end
 
 	slasher:SetViewOffset(slasher_viewoffset)
@@ -175,7 +175,7 @@ end
 
 local function EatHotdog(slasher)
 	SlashCo.StopChase(slasher)
-	slasher:SetNWBool("HotdogEating", true)
+	slasher:SetNW2Bool("HotdogEating", true)
 	slasher:Freeze(true)
 
 	local rand = math.random()
@@ -228,17 +228,17 @@ local function EatHotdog(slasher)
 		if not IsValid(slasher) then return end
 
 		slasher:Freeze(false)
-		slasher:SetNWBool("HotdoginHand", false)
-		slasher:SetNWBool("HotdogEating", false)
+		slasher:SetNW2Bool("HotdoginHand", false)
+		slasher:SetNW2Bool("HotdogEating", false)
 		slasher.EatedHotdogs = slasher.EatedHotdogs + 1
 	end)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("HotdoginHand") then return end
+	if slasher:GetNW2Bool("HotdoginHand") then return end
 	if slasher.PunchCooldown > 0.01 then return end
 
-	slasher:SetNWBool("HotdogPunch", false)
+	slasher:SetNW2Bool("HotdogPunch", false)
 	timer.Remove("HotdogPunchDelay")
 	slasher.PunchCooldown = 1.5
 
@@ -308,24 +308,24 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	timer.Simple(0.05, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("HotdogPunch", true)
+		slasher:SetNW2Bool("HotdogPunch", true)
 
 		timer.Create("HotdogPunchDelay", 1.5, 1, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("HotdogPunch", false)
+			slasher:SetNW2Bool("HotdogPunch", false)
 		end)
 	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("HotdoginHand") then return end
-	if slasher:GetNWBool("HotdogLeap") then return end
+	if slasher:GetNW2Bool("HotdoginHand") then return end
+	if slasher:GetNW2Bool("HotdogLeap") then return end
 
 	if slasher:GetInSlasherChaseMode() then
 		if slasher.LeapCooldown > 0.01 then return end
 
-		slasher:SetNWBool("HotdogLeap", false)
+		slasher:SetNW2Bool("HotdogLeap", false)
 		slasher.HotdogLeaping = false
 		timer.Remove("HotdogLeapDelay")
 		slasher.LeapCooldown = 7
@@ -333,14 +333,14 @@ function SLASHER.OnSecondaryFire(slasher)
 		timer.Simple(0.1, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("HotdogLeap", true)
+			slasher:SetNW2Bool("HotdogLeap", true)
 			slasher:SetVelocity((slasher:EyeAngles():Forward() * 300) + Vector(0, 0, 300))
 		end)
 
 		timer.Simple(0.7, function()
 			if not IsValid(slasher) then return end
 			if slasher:IsOnGround() then
-				slasher:SetNWBool("HotdogLeap", false)
+				slasher:SetNW2Bool("HotdogLeap", false)
 				return
 			end
 
@@ -356,20 +356,20 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if not slasher:GetNWBool("HotdoginHand") then return end
-	if slasher:GetNWBool("HotdogEating") then return end
+	if not slasher:GetNW2Bool("HotdoginHand") then return end
+	if slasher:GetNW2Bool("HotdogEating") then return end
 
 	EatHotdog(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if slasher:GetNWBool("HotdoginHand") then return end
-	if slasher:GetNWBool("HotdogLeap") then return end
+	if slasher:GetNW2Bool("HotdoginHand") then return end
+	if slasher:GetNW2Bool("HotdogLeap") then return end
 	if slasher.VomitCooldown > 0.01 then return end
 	if slasher.EatedHotdogs < 1 then return end
 
 	SlashCo.StopChase(slasher)
-	slasher:SetNWBool("HotdogVomiting", true)
+	slasher:SetNW2Bool("HotdogVomiting", true)
 	slasher:Freeze(true)
 	slasher.VomitCooldown = 15
 	slasher.EatedHotdogs = slasher.EatedHotdogs - 1
@@ -400,7 +400,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	timer.Simple(4.5, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("HotdogVomiting", false)
+		slasher:SetNW2Bool("HotdogVomiting", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -408,12 +408,12 @@ end
 function SLASHER.OnHitByPocketSand(slasher, ply)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("HotdogStun", true)
+	slasher:SetNW2Bool("HotdogStun", true)
 	slasher:Freeze(true)
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("HotdogStun", false)
+		slasher:SetNW2Bool("HotdogStun", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -421,18 +421,18 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("HotdogVomiting") or ply:GetNWBool("HotdogEating") or ply:GetNWBool("HotdogStun") or ply:GetNWBool("LeapFall")
+	return ply:GetNW2Bool("HotdogVomiting") or ply:GetNW2Bool("HotdogEating") or ply:GetNW2Bool("HotdogStun") or ply:GetNW2Bool("LeapFall")
 end
 
 function SLASHER.Animator(ply)
-	local punch = ply:GetNWBool("HotdogPunch")
+	local punch = ply:GetNW2Bool("HotdogPunch")
 	local chase = ply:GetInSlasherChaseMode()
-	local holdingFood = ply:GetNWBool("HotdoginHand")
-	local eatingFood = ply:GetNWBool("HotdogEating")
-	local vomitingFood = ply:GetNWBool("HotdogVomiting")
-	local leapStart = ply:GetNWBool("HotdogLeap")
-	local leapFall = ply:GetNWBool("LeapFall")
-	local stunLoop = ply:GetNWBool("HotdogStun")
+	local holdingFood = ply:GetNW2Bool("HotdoginHand")
+	local eatingFood = ply:GetNW2Bool("HotdogEating")
+	local vomitingFood = ply:GetNW2Bool("HotdogVomiting")
+	local leapStart = ply:GetNW2Bool("HotdogLeap")
+	local leapFall = ply:GetNW2Bool("LeapFall")
+	local stunLoop = ply:GetNW2Bool("HotdogStun")
 
 	if not punch and not eatingFood and not vomitingFood and not leapStart and not leapFall then
 		ply.anim_antispam = false
@@ -555,8 +555,8 @@ function SLASHER.InitHud(_, hud)
 
 	local EatColor = Color(255, 0, 0, 255)
 	function hud.AlsoThink()
-		local hotdog = GameData.LocalPlayer:GetNWBool("HotdoginHand")
-		local vomit = GameData.LocalPlayer:GetNWInt("VomitAmount")
+		local hotdog = GameData.LocalPlayer:GetNW2Bool("HotdoginHand")
+		local vomit = GameData.LocalPlayer:GetNW2Int("VomitAmount")
 
 		if vomit ~= 0 then
 			hud:ShakeControl("F")
@@ -575,7 +575,7 @@ function SLASHER.InitHud(_, hud)
 end
 
 function SLASHER.DrawHUD(localPly)
-	if localPly:GetNWBool("HotdoginHand") then
+	if localPly:GetNW2Bool("HotdoginHand") then
 		draw.SimpleText("EAT THE HOTDOG! ! !", "TVCD", ScrW() / 2, 750, EatColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 	end
 end

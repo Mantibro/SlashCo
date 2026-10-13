@@ -46,7 +46,7 @@ function ENT:Think()
 
 	if self:Health() < 1 then
 		self:SetOwner(NULL)
-		slasher:SetNWBool("ManspiderNestActive", false)
+		slasher:SetNW2Bool("ManspiderNestActive", false)
 
 		SafeRemoveEntityDelayed(self, 0.1)
 	end

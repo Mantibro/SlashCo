@@ -49,7 +49,7 @@ function SlashCo.RegisterSlasher(table, name)
 
 	if SERVER then
 		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
+			local slasherTbl = SlashCoSlashers[slasher:GetNW2String("Slasher")]
 			if slasherTbl and slasherTbl.OnBalanceForPlayers then
 				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors, SlashCo.CurRound.OfferingData.Singularity)
 			end
@@ -88,7 +88,7 @@ local PLAYER = FindMetaTable("Player")
 
 --this doesn't include a team check because we assume that it's in a slasher-only context
 function PLAYER:SlasherValue(value, fallback)
-	local slasher = self:GetNWString("Slasher", "none")
+	local slasher = self:GetNW2String("Slasher", "none")
 
 	if SlashCoSlashers[slasher] and SlashCoSlashers[slasher][value] then
 		return SlashCoSlashers[slasher][value]
@@ -98,7 +98,7 @@ function PLAYER:SlasherValue(value, fallback)
 end
 
 function PLAYER:SlasherFunction(value, ...)
-	local slasher = self:GetNWString("Slasher", "none")
+	local slasher = self:GetNW2String("Slasher", "none")
 
 	if SlashCoSlashers[slasher] and SlashCoSlashers[slasher][value] then
 		return SlashCoSlashers[slasher][value](self, ...)
@@ -148,7 +148,7 @@ end
 -- RaphaelIT7: No AddSlasherAnger for client!
 
 function SlashCo.GetSlasherAnger(slasher)
-	return slasher:GetNW2Float("SlasherAnger", 0)
+	return slasher:GetSlasherAnger()
 end
 
 function SlashCo.GetGlobalSlasherAnger()
@@ -252,7 +252,7 @@ if CLIENT then
 
 		GameData.LocalPlayer:SlasherFunction("ClientSideEffect")
 
-		if GameData.LocalPlayer:GetNW2Bool("Slasher:NoFootsteps") or GameData.LocalPlayer:SlasherIsStunDeaf() then
+		if GameData.LocalPlayer:GetNoFootsteps() or GameData.LocalPlayer:SlasherIsStunDeaf() then
 			return
 		end
 

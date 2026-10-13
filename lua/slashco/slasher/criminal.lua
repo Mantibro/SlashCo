@@ -80,10 +80,10 @@ function SLASHER.OnTickBehaviour(slasher)
 		end)
 	end
 
-	if slasher:GetNWBool("CriminalCloning") then
+	if slasher:GetNW2Bool("CriminalCloning") then
 		slasher.ClonDuration = ClonTimer + FrameTime()
 
-		if not slasher:GetNWBool("CriminalRage") then
+		if not slasher:GetNW2Bool("CriminalRage") then
 			local speed = SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseDiv)
 
 			slasher:SetSlowWalkSpeed(speed)
@@ -127,15 +127,15 @@ function SLASHER.OnSecondaryFire(slasher)
 
 	slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
 
-	if slasher:GetNWBool("CriminalCloning") then
+	if slasher:GetNW2Bool("CriminalCloning") then
 		for _, clone in ipairs(ents.FindByClass("sc_crimclone")) do
 			if clone.IsMain ~= true then
 				clone:Remove()
 			end
 		end
 
-		slasher:SetNWBool("CriminalCloning", false)
-		slasher:SetNWBool("CriminalRage", false)
+		slasher:SetNW2Bool("CriminalCloning", false)
+		slasher:SetNW2Bool("CriminalRage", false)
 		SlashCo.AudioSystem.StopSound("CriminalLoop", 0.5, slasher)
 		SlashCo.AudioSystem.StopSound("CriminalRage", 0.5, slasher)
 	else
@@ -150,7 +150,7 @@ function SLASHER.OnSecondaryFire(slasher)
 			clone:Activate()
 		end
 
-		slasher:SetNWBool("CriminalCloning", true)
+		slasher:SetNW2Bool("CriminalCloning", true)
 	end
 end
 
@@ -158,8 +158,8 @@ function SLASHER.OnMainAbilityFire()
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if not slasher:GetNWBool("CriminalCloning") then return end
-	if slasher:GetNWBool("CriminalRage") then return end
+	if not slasher:GetNW2Bool("CriminalCloning") then return end
+	if slasher:GetNW2Bool("CriminalRage") then return end
 	if SlashCo.CurRound.GameProgress < 6 then return end
 
 	for i = 1, math.random(2 + SLASHER.AdditionalSpecialClones, 4 + SLASHER.AdditionalSpecialClones) do
@@ -174,7 +174,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	end
 
 	slasher.ClonDuration = 0
-	slasher:SetNWBool("CriminalRage", true)
+	slasher:SetNW2Bool("CriminalRage", true)
 end
 
 function SLASHER.Animator(ply)
@@ -223,16 +223,16 @@ function SLASHER.InitHud(_, hud)
 	hud:AddControl("F", "rage", Material("slashco/ui/icons/slasher/criminal_1"))
 	hud:SetControlVisible("F", false)
 
-	hud.prevRage = GameData.LocalPlayer:GetNWBool("CriminalRage")
+	hud.prevRage = GameData.LocalPlayer:GetNW2Bool("CriminalRage")
 	function hud.AlsoThink()
-		local rage = GameData.LocalPlayer:GetNWBool("CriminalRage")
+		local rage = GameData.LocalPlayer:GetNW2Bool("CriminalRage")
 		if rage ~= hud.prevRage then
 			hud:SetAvatar(rage and "rage" or "default")
 			hud:SetControlEnabled("F", not rage)
 			hud.prevRage = rage
 		end
 
-		local progress = GameData.LocalPlayer:GetNWInt("GameProgressDisplay")
+		local progress = SlashCo.GetGameProgress()
 		if progress > 5 then
 			if not hud.RageEnabled then
 				hud:SetControlVisible("F", true)

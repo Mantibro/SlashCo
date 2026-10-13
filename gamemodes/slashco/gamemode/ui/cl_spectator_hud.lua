@@ -105,7 +105,7 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 	local show_slasher_anticipation = false
 
 	if SlasherTeam then
-		local localSlasher = GameData.LocalPlayer:GetNWString("Slasher")
+		local localSlasher = GameData.LocalPlayer:GetNW2String("Slasher")
 		for _, slasherData in ipairs(SlasherTeam) do
 			if slasherData.steamid == GameData.LocalSteamID64 then
 				if localSlasher and localSlasher ~= show_slasher_anticipation then
@@ -145,25 +145,6 @@ hook.Add("SlashCo:DrawHUD", "Spectator_Vision", function()
 	draw.SimpleText(SlashCo.Language("switch_view", SlashCo.GetKeyButtonName("SPECTATE_PLAYER")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 80, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 	draw.SimpleText(SlashCo.Language("toggle_light", string.upper(input.LookupBinding("+reload") or "R")), "TVCD", ScrW() * 0.975, (ScrH() * 0.95) - 50, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM)
 end)
-
-if CLIENT then
-	hook.Add("PlayerButtonDown", "TestConfig_ID", function(ply, button)
-		if ply ~= GameData.LocalPlayer then
-			return
-		end
-		if not IsFirstTimePredicted() then
-			return
-		end
-		if button ~= KEY_COUNT or not SlashCoTestConfig then
-			return
-		end
-		
-		local eyeTrace = ply:GetEyeTrace()
-		if IsValid(eyeTrace.Entity) then
-			ply:ChatPrint("ENTITY SPAWNPOINT ID: " .. eyeTrace.Entity:GetNWInt("SpawnPoint_ID"))
-		end
-	end)
-end
 
 local function playBlip()
 	SlashCo.AudioSystem.PlaySound({soundPath = "slashco/blip.mp3", volume = 0.5, fadeIn = 0})

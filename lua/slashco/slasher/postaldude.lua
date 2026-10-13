@@ -80,7 +80,7 @@ end
 
 local function PrincessBestDog()
     for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-        if s:GetNWString("Slasher") == "Princess" then return true end
+        if s:GetNW2String("Slasher") == "Princess" then return true end
     end
     return false
 end
@@ -98,12 +98,12 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetBodygroup(4, 0)
 
 	slasher:SetCanChase(true)
-	slasher:SetNWBool("SwitchToShovel", true)
-	slasher:SetNWBool("SwitchToDeagle", false)
-	slasher:SetNWBool("SwitchToMG", false)
-	slasher:SetNWBool("SwitchToGas", false)
-	slasher:SetNWBool("SwitchToBaby", false)
-	slasher:SetNWInt("PostalStage", POSTAL_SHOVEL_STAGE)
+	slasher:SetNW2Bool("SwitchToShovel", true)
+	slasher:SetNW2Bool("SwitchToDeagle", false)
+	slasher:SetNW2Bool("SwitchToMG", false)
+	slasher:SetNW2Bool("SwitchToGas", false)
+	slasher:SetNW2Bool("SwitchToBaby", false)
+	slasher:SetNW2Int("PostalStage", POSTAL_SHOVEL_STAGE)
 	slasher.DeagleUnlocked = false
 	slasher.MGUnlocked = false
 
@@ -175,30 +175,30 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.SlashCooldown = SlashCooldown - FrameTime()
 	end
 
-	if SlashCooldown > 0 and slasher:GetNWBool("PostalDudeCanMainSlash") then
-		slasher:SetNWBool("PostalDudeCanMainSlash", false)
+	if SlashCooldown > 0 and slasher:GetNW2Bool("PostalDudeCanMainSlash") then
+		slasher:SetNW2Bool("PostalDudeCanMainSlash", false)
 	end
 
-	if SlashCooldown <= 0 and not slasher:GetNWBool("PostalDudeCanMainSlash") then
-		slasher:SetNWBool("PostalDudeCanMainSlash", true)
+	if SlashCooldown <= 0 and not slasher:GetNW2Bool("PostalDudeCanMainSlash") then
+		slasher:SetNW2Bool("PostalDudeCanMainSlash", true)
 	end
 
 	if KickCooldown > 0 then
 		slasher.KickCooldown = KickCooldown - FrameTime()
 	end
 
-	if KickCooldown > 0 and slasher:GetNWBool("PostalDudeCanMainKick") then
-		slasher:SetNWBool("PostalDudeCanMainKick", false)
+	if KickCooldown > 0 and slasher:GetNW2Bool("PostalDudeCanMainKick") then
+		slasher:SetNW2Bool("PostalDudeCanMainKick", false)
 	end
 
-	if KickCooldown <= 0 and not slasher:GetNWBool("PostalDudeCanMainKick") then
-		slasher:SetNWBool("PostalDudeCanMainKick", true)
+	if KickCooldown <= 0 and not slasher:GetNW2Bool("PostalDudeCanMainKick") then
+		slasher:SetNW2Bool("PostalDudeCanMainKick", true)
 	end
 
 	--Clear chase music if chase ends on its own and not via player input
 	if not slasher:GetInSlasherChaseMode() then
 		-- Passive Ambience emitting from Postal Dude if he's not in chase
-		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then	
+		if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then	
 			if not slasher.PostalAmbience then
 				slasher.PostalAmbience = true
 				SlashCo.AudioSystem.PlaySound({
@@ -222,13 +222,13 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if not SlashCo.CurRound.EscapeHelicopterSummoned then
 		-- Check for game progress for Stage 1
-		if SlashCo.CurRound.GameProgress < 3 and slasher:GetNWInt("PostalStage") ~= POSTAL_SHOVEL_STAGE then
+		if SlashCo.CurRound.GameProgress < 3 and slasher:GetNW2Int("PostalStage") ~= POSTAL_SHOVEL_STAGE then
 			stage = POSTAL_SHOVEL_STAGE
 		end
 		-- Check for game progress for Stage 2
-		if SlashCo.CurRound.GameProgress >= 3 and SlashCo.CurRound.GameProgress < 6 and slasher:GetNWInt("PostalStage") ~= POSTAL_DEAGLE_STAGE then
+		if SlashCo.CurRound.GameProgress >= 3 and SlashCo.CurRound.GameProgress < 6 and slasher:GetNW2Int("PostalStage") ~= POSTAL_DEAGLE_STAGE then
 			SLASHER.PatienceChaseIncrease = 0.02
-			if not slasher:GetNWBool("SwitchToGas") and not slasher:GetNWBool("SwitchToBaby") and slasher.PostalState ~= POSTAL_SHOVEL_EQUIPPED then
+			if not slasher:GetNW2Bool("SwitchToGas") and not slasher:GetNW2Bool("SwitchToBaby") and slasher.PostalState ~= POSTAL_SHOVEL_EQUIPPED then
 				slasher.PostalState = POSTAL_SHOVEL_EQUIPPED -- Update HUD to show the deagle
 				slasher:SetBodygroup(1, 1)
 				slasher:SetBodygroup(2, 0)
@@ -248,10 +248,10 @@ function SLASHER.OnTickBehaviour(slasher)
 			})
 		end
 		-- Check for game progress for Stage 3
-		if SlashCo.CurRound.GameProgress >= 6 and SlashCo.CurRound.GameProgress < 10 and slasher:GetNWInt("PostalStage") ~= POSTAL_MG_STAGE then
+		if SlashCo.CurRound.GameProgress >= 6 and SlashCo.CurRound.GameProgress < 10 and slasher:GetNW2Int("PostalStage") ~= POSTAL_MG_STAGE then
 			-- This is to switch the player to a "new" deagle state that has the updated hud for the M4, so it isn't buggy, and it's smooth
 			SLASHER.PatienceChaseIncrease = 0.03
-			if slasher.PostalState == POSTAL_DEAGLE_UNEQUIPPED and not slasher:GetNWBool("SwitchToGas") then
+			if slasher.PostalState == POSTAL_DEAGLE_UNEQUIPPED and not slasher:GetNW2Bool("SwitchToGas") then
 				slasher.PostalState = POSTAL_DEAGLE_EQUIPPED
 				slasher:SetBodygroup(1, 0)
 				slasher:SetBodygroup(2, 1)
@@ -274,21 +274,21 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	-- Basically functions almost the same as Trollge's stages, code-wise
 	if stage == POSTAL_SHOVEL_STAGE then
-		slasher:SetNWInt("PostalStage", POSTAL_SHOVEL_STAGE)
+		slasher:SetNW2Int("PostalStage", POSTAL_SHOVEL_STAGE)
 		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase1.ogg"
 		perception_final = 1.5
 	elseif stage == POSTAL_DEAGLE_STAGE then
 		slasher.DeagleUnlocked = true
-		slasher:SetNWInt("PostalStage", POSTAL_DEAGLE_STAGE)
+		slasher:SetNW2Int("PostalStage", POSTAL_DEAGLE_STAGE)
 		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase2.ogg"
 		perception_final = 2.0
 	elseif stage == POSTAL_MG_STAGE then
 		slasher.MGUnlocked = true
-		slasher:SetNWInt("PostalStage", POSTAL_MG_STAGE)
+		slasher:SetNW2Int("PostalStage", POSTAL_MG_STAGE)
 		SLASHER.ChaseMusic = "slashco/slasher/postaldude/dude_phase3.ogg"
 		perception_final = 3.0
 	elseif stage == POSTAL_RAGE_STAGE then
-		slasher:SetNWInt("PostalStage", POSTAL_RAGE_STAGE)
+		slasher:SetNW2Int("PostalStage", POSTAL_RAGE_STAGE)
 		if slasher:GetInSlasherChaseMode() then
 		slasher:SetCanChase(false)
 			SlashCo.StopChase(slasher)
@@ -300,17 +300,17 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	-- Mainly used for HUD control
 	if PostalState == POSTAL_SHOVEL_EQUIPPED then -- Is In Shovel State
-		slasher:SetNWBool("SwitchToShovel", true)
-		slasher:SetNWBool("SwitchToDeagle", false)
-		slasher:SetNWBool("SwitchToMG", false)
+		slasher:SetNW2Bool("SwitchToShovel", true)
+		slasher:SetNW2Bool("SwitchToDeagle", false)
+		slasher:SetNW2Bool("SwitchToMG", false)
 	elseif PostalState == POSTAL_DEAGLE_UNEQUIPPED or PostalState == POSTAL_DEAGLE_EQUIPPED then -- Is In Deagle State
-		slasher:SetNWBool("SwitchToDeagle", true)
-		slasher:SetNWBool("SwitchToShovel", false)
-		slasher:SetNWBool("SwitchToMG", false)
+		slasher:SetNW2Bool("SwitchToDeagle", true)
+		slasher:SetNW2Bool("SwitchToShovel", false)
+		slasher:SetNW2Bool("SwitchToMG", false)
 	elseif PostalState == POSTAL_MG_EQUIPPED then -- Is In MG State
-		slasher:SetNWBool("SwitchToShovel", false)
-		slasher:SetNWBool("SwitchToDeagle", false)
-		slasher:SetNWBool("SwitchToMG", true)
+		slasher:SetNW2Bool("SwitchToShovel", false)
+		slasher:SetNW2Bool("SwitchToDeagle", false)
+		slasher:SetNW2Bool("SwitchToMG", true)
 	end
 
 	-- Passively regenerate fuel
@@ -320,13 +320,13 @@ function SLASHER.OnTickBehaviour(slasher)
 	local PostalMinSpeed = 0.9
 	local PostalMaxSpeed = 1.0
 
-	if slasher:GetNWBool("SwitchToGas") then
-		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+	if slasher:GetNW2Bool("SwitchToGas") then
+		if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
 			slasher:SetRunSpeed(SLASHER.ChaseSpeed - 100)	-- Nerf his speed a bit when carrying a gas can
 			slasher:SetWalkSpeed(SLASHER.ChaseSpeed - 100)
 		end
 	else
-		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+		if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
 			slasher:SetRunSpeed(310)
 			slasher:SetWalkSpeed(310)
 		end
@@ -362,31 +362,31 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	-- patience stuff
 	local patience = SlashCo.GetSlasherAnger(slasher)
-	if slasher:GetNWInt("PostalDudePatience") ~= math.floor(patience) then
-		slasher:SetNWInt("PostalDudePatience", math.floor(patience))
+	if slasher:GetNW2Int("PostalDudePatience") ~= math.floor(patience) then
+		slasher:SetNW2Int("PostalDudePatience", math.floor(patience))
 	end
 
 	-- fuel stuff
 	local fuelamount = PostalDudeFuelAmount(slasher)
-	if slasher:GetNWInt("PostalDudeFuelAmount") ~= math.floor(fuelamount) then
-		slasher:SetNWInt("PostalDudeFuelAmount", math.floor(fuelamount))
+	if slasher:GetNW2Int("PostalDudeFuelAmount") ~= math.floor(fuelamount) then
+		slasher:SetNW2Int("PostalDudeFuelAmount", math.floor(fuelamount))
 	end
 
 	-- We use this to keep a track of the player's Deagle ammo
 	local DeagleAmmo = DeagleBulletsAmount(slasher)
-	if slasher:GetNWInt("DeagleBulletsAmount") ~= math.floor(DeagleAmmo) then
-		slasher:SetNWInt("DeagleBulletsAmount", math.floor(DeagleAmmo))
+	if slasher:GetNW2Int("DeagleBulletsAmount") ~= math.floor(DeagleAmmo) then
+		slasher:SetNW2Int("DeagleBulletsAmount", math.floor(DeagleAmmo))
 	end
 
 	-- We use this to keep a track of the player's M4 ammo
 	local MGAmmo = MGBulletsAmount(slasher)
-	if slasher:GetNWInt("MGBulletsAmount") ~= math.floor(MGAmmo) then
-		slasher:SetNWInt("MGBulletsAmount", math.floor(MGAmmo))
+	if slasher:GetNW2Int("MGBulletsAmount") ~= math.floor(MGAmmo) then
+		slasher:SetNW2Int("MGBulletsAmount", math.floor(MGAmmo))
 	end
 
 	-- Very important otherwise everything shits the bed
-	if slasher:GetNWInt("PostalState") ~= PostalState then
-		slasher:SetNWInt("PostalState", PostalState)
+	if slasher:GetNW2Int("PostalState") ~= PostalState then
+		slasher:SetNW2Int("PostalState", PostalState)
 	end
 
 	slasher:SetEyeSight(eyesight_final)
@@ -397,7 +397,7 @@ hook.Add("PlayerDeath", "PostalDudeCountKills", function(victim, _, attacker)
 	timer.Remove("PostalDudeHit_" .. victim:UserID())
 	if not IsValid(attacker) then return end
 
-	if victim:Team() ~= TEAM_SLASHER and attacker:GetNWString("Slasher") == "PostalDude" then
+	if victim:Team() ~= TEAM_SLASHER and attacker:GetNW2String("Slasher") == "PostalDude" then
 		local idx = math.random(1, 7)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/postaldude/dude_kill" .. idx .. ".ogg",
@@ -414,11 +414,11 @@ end)
 -- The code responsible for doing a fake Gas Can pick up for Postal Dude
 hook.Add("PlayerUse", "PostalGasCanPickUp", function(ply, ent)
     if ply:Team() ~= TEAM_SLASHER then return end -- If client isn't a slasher, don't do it
-	if ply:GetNWString("Slasher") ~= "PostalDude" then return end
+	if ply:GetNW2String("Slasher") ~= "PostalDude" then return end
     if ent:GetClass() ~= "sc_gascan" then return end -- If entity isn't a gas can, don't do it
 	if ply:GetPos():Distance(ent:GetPos()) >= 100 then return end -- If the distance isn't (X), don't do it
-	if ply:GetNWBool("SwitchToGas") then return end -- If Postal Dude is already carrying a Gas Can, don't delete another one
-	if ply:GetNWBool("SwitchToBaby") then return end
+	if ply:GetNW2Bool("SwitchToGas") then return end -- If Postal Dude is already carrying a Gas Can, don't delete another one
+	if ply:GetNW2Bool("SwitchToBaby") then return end
 
 	SlashCo.StopChase(ply)	-- Stop chase if we pick up a Gas Can
 
@@ -451,11 +451,11 @@ hook.Add("PlayerUse", "PostalGasCanPickUp", function(ply, ent)
 	})
 
 	-- Self-explanatory I think
-	ply:SetNWBool("SwitchToShovel", false)
-	ply:SetNWBool("SwitchToDeagle", false)
-	ply:SetNWBool("SwitchToMG", false)
-	ply:SetNWBool("SwitchToBaby", false)
-	ply:SetNWBool("SwitchToGas", true)
+	ply:SetNW2Bool("SwitchToShovel", false)
+	ply:SetNW2Bool("SwitchToDeagle", false)
+	ply:SetNW2Bool("SwitchToMG", false)
+	ply:SetNW2Bool("SwitchToBaby", false)
+	ply:SetNW2Bool("SwitchToGas", true)
 
 	ply:SetBodygroup(1, 0)
 	ply:SetBodygroup(2, 0)
@@ -469,7 +469,7 @@ end)
 ----    if ply:Team() ~= TEAM_SLASHER then return end
 ----    if ent:GetClass() ~= "sc_baby" then return end
 ----	if ply:GetPos():Distance(ent:GetPos()) >= 100 then return end
-----	if ply:GetNWBool("SwitchToGas") then return end
+----	if ply:GetNW2Bool("SwitchToGas") then return end
 ----	if not PrincessBestDog() then return end
 ----
 ----	if IsValid(ent) then
@@ -488,11 +488,11 @@ end)
 ----	})
 ----
 ----	-- Self-explanatory I think
-----	ply:SetNWBool("SwitchToShovel", false)
-----	ply:SetNWBool("SwitchToDeagle", false)
-----	ply:SetNWBool("SwitchToMG", false)
-----	ply:SetNWBool("SwitchToGas", false)
-----	ply:SetNWBool("SwitchToBaby", true)
+----	ply:SetNW2Bool("SwitchToShovel", false)
+----	ply:SetNW2Bool("SwitchToDeagle", false)
+----	ply:SetNW2Bool("SwitchToMG", false)
+----	ply:SetNW2Bool("SwitchToGas", false)
+----	ply:SetNW2Bool("SwitchToBaby", true)
 ----
 ----
 ----	ply:SetBodygroup(1, 0)
@@ -511,8 +511,8 @@ if SERVER then
 		-- Same stuff as above in the previous hook
 		if not SlashCo.IsKeyPressed("DROP_ITEM", ply, button) then return end
 	    if ply:Team() ~= TEAM_SLASHER then return end
-		if ply:GetNWString("Slasher") ~= "PostalDude" then return end
-		if not ply:GetNWBool("SwitchToGas") then return end
+		if ply:GetNW2String("Slasher") ~= "PostalDude" then return end
+		if not ply:GetNW2Bool("SwitchToGas") then return end
 
 		local startPos = ply:WorldSpaceCenter()
 		local goodPos = startPos + (ply:GetAimVector() * 1)
@@ -527,15 +527,15 @@ if SERVER then
 			phys:SetAngleVelocity(randomvec)
 		end
 
-		ply:SetNWBool("SwitchToGas", false)
-		ply:SetNWBool("SwitchToShovel", true)
+		ply:SetNW2Bool("SwitchToGas", false)
+		ply:SetNW2Bool("SwitchToShovel", true)
 
 		ply:SetBodygroup(1, 1)
 		ply:SetBodygroup(2, 0)
 		ply:SetBodygroup(3, 0)
 		ply:SetBodygroup(4, 0)	-- Clear every bodygroup and use the right one
 
-		if ply:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then
+		if ply:GetNW2Int("PostalStage") == POSTAL_RAGE_STAGE then
 			ply:SetRunSpeed(310)
 			ply:SetWalkSpeed(310)
 		else
@@ -553,29 +553,29 @@ if SERVER then
 end
 
 function SLASHER.OnPrimaryFire(slasher)
-	if slasher:GetNWBool("PostalDudeStunned") then return end
+	if slasher:GetNW2Bool("PostalDudeStunned") then return end
 	if slasher.SlashCooldown > 0 then return end
 
 	-- In hindsight this could've been done cleaner but...it's readable for me, so it works good enough
-	if slasher:GetNWBool("SwitchToShovel") then
+	if slasher:GetNW2Bool("SwitchToShovel") then
 		slasher.SlashCooldown = 1
-		slasher:SetNWBool("PostalDudeSlashing", true)
+		slasher:SetNW2Bool("PostalDudeSlashing", true)
 	end
 
-	if slasher:GetNWBool("SwitchToDeagle") then
+	if slasher:GetNW2Bool("SwitchToDeagle") then
 		slasher.SlashCooldown = 0.5
 	end
 
-	if slasher:GetNWBool("SwitchToMG") then
+	if slasher:GetNW2Bool("SwitchToMG") then
 		slasher.SlashCooldown = 0
 	end
 
 	local function SlashFinish()
 		if not IsValid(slasher) then return end
-		if slasher:GetNWBool("SwitchToDeagle") then return end
-		if slasher:GetNWBool("SwitchToMG") then return end
-		if slasher:GetNWBool("SwitchToGas") then return end
-		if slasher:GetNWBool("SwitchToBaby") then return end
+		if slasher:GetNW2Bool("SwitchToDeagle") then return end
+		if slasher:GetNW2Bool("SwitchToMG") then return end
+		if slasher:GetNW2Bool("SwitchToGas") then return end
+		if slasher:GetNW2Bool("SwitchToBaby") then return end
 
 		slasher:SlasherHudFunc("ShakeControl", "LMB")
 
@@ -615,12 +615,12 @@ function SLASHER.OnPrimaryFire(slasher)
 			target:TakeDamageInfo(dmg)
 		end
 
-		slasher:SetNWBool("PostalDudeSlashing", false)
+		slasher:SetNW2Bool("PostalDudeSlashing", false)
 
 		if target:IsPlayer() then
 			if target:Team() ~= TEAM_SURVIVOR then return end
 
-			if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+			if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
 				if not slasher:GetInSlasherChaseMode() then
 					SlashCo.StartChaseMode(slasher, true)
 					slasher:SetInSlasherChaseMode(true)
@@ -642,7 +642,7 @@ function SLASHER.OnPrimaryFire(slasher)
 				fadeIn = 0,
 			})
 			
-			if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+			if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
 				if target:IsPlayer() then
 					SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
 				end
@@ -652,10 +652,10 @@ function SLASHER.OnPrimaryFire(slasher)
 
 	timer.Create(slasher:EntIndex() .. "_PostalDudeSlash", 0.1, 1, SlashFinish)
 
-	if slasher:GetNWBool("SwitchToDeagle") then
-		if slasher:GetNWBool("SwitchToGas") then return end
-		if slasher:GetNWBool("SwitchToBaby") then return end
-		if slasher:GetNWInt("DeagleBulletsAmount") > 0 then -- Allows the players to fire their gun if they have enough bullets
+	if slasher:GetNW2Bool("SwitchToDeagle") then
+		if slasher:GetNW2Bool("SwitchToGas") then return end
+		if slasher:GetNW2Bool("SwitchToBaby") then return end
+		if slasher:GetNW2Int("DeagleBulletsAmount") > 0 then -- Allows the players to fire their gun if they have enough bullets
 			slasher:SlasherHudFunc("ShakeControl", "LMB")
 
 			local spread = slasher.GunSpread
@@ -663,7 +663,7 @@ function SLASHER.OnPrimaryFire(slasher)
 			timer.Simple(0.05, function()
 				if not IsValid(slasher) then return end
 
-				slasher:SetNWFloat("PostalDeagleShoot", CurTime())
+				slasher:SetNW2Float("PostalDeagleShoot", CurTime())
 
 				SlashCo.AudioSystem.PlaySound({
 					soundPath = "slashco/slasher/postaldude/dude_deagleshoot.ogg",
@@ -679,7 +679,7 @@ function SLASHER.OnPrimaryFire(slasher)
 					Callback = function(attacker, tr, dmginfo)
 						local target = tr.Entity
 						if not IsValid(target) or not target:IsPlayer() then return end
-						if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
+						if slasher:GetNW2Int("PostalStage") == POSTAL_RAGE_STAGE then return end
 
 						SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
 						if not slasher:GetInSlasherChaseMode() then
@@ -736,7 +736,7 @@ function SLASHER.OnPrimaryFire(slasher)
 	end
 
 	local function isActivePostalDude()
-		return IsValid(slasher) and slasher:Team() == TEAM_SLASHER and slasher:GetNWString("Slasher") == "PostalDude"
+		return IsValid(slasher) and slasher:Team() == TEAM_SLASHER and slasher:GetNW2String("Slasher") == "PostalDude"
 	end
 
 	-- The only way to make weapons automatic is by hooking a think function to them and setting their cooldown here
@@ -751,11 +751,11 @@ function SLASHER.OnPrimaryFire(slasher)
 
 			slasher.M4Cooldown = CurTime() + 0.1
 
-			if slasher:GetNWBool("SwitchToMG") then
-				if slasher:GetNWBool("SwitchToGas") then return end
-				if slasher:GetNWBool("SwitchToBaby") then return end
+			if slasher:GetNW2Bool("SwitchToMG") then
+				if slasher:GetNW2Bool("SwitchToGas") then return end
+				if slasher:GetNW2Bool("SwitchToBaby") then return end
 
-				if slasher:GetNWInt("MGBulletsAmount") > 0 then -- Same thing as the Deagle
+				if slasher:GetNW2Int("MGBulletsAmount") > 0 then -- Same thing as the Deagle
 					slasher:SlasherHudFunc("ShakeControl", "LMB")
 
 					local spread = slasher.GunSpread
@@ -763,7 +763,7 @@ function SLASHER.OnPrimaryFire(slasher)
 					timer.Simple(0.05, function()
 						if not IsValid(slasher) then return end
 
-						slasher:SetNWFloat("PostalMGShoot", CurTime())
+						slasher:SetNW2Float("PostalMGShoot", CurTime())
 						SlashCo.AudioSystem.PlaySound({
 							soundPath = "slashco/slasher/postaldude/dude_m4shoot.ogg",
 							identifier = "PostalM4",
@@ -778,7 +778,7 @@ function SLASHER.OnPrimaryFire(slasher)
 							Callback = function(attacker, tr, dmginfo)
 								local target = tr.Entity
 								if not IsValid(target) or not target:IsPlayer() then return end
-								if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
+								if slasher:GetNW2Int("PostalStage") == POSTAL_RAGE_STAGE then return end
 
 								SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
 								if not slasher:GetInSlasherChaseMode() then
@@ -847,8 +847,8 @@ function SLASHER.OnPrimaryFire(slasher)
 
 			slasher.GasCooldown = CurTime() + 0.08
 
-			if slasher:GetNWBool("SwitchToGas") then
-				if slasher:GetNWInt("PostalDudeFuelAmount") > 0 then -- Same thing as the guns
+			if slasher:GetNW2Bool("SwitchToGas") then
+				if slasher:GetNW2Int("PostalDudeFuelAmount") > 0 then -- Same thing as the guns
 					local fire, tr
 						tr = util.TraceLine{
 					  start = slasher:GetShootPos(),
@@ -916,7 +916,7 @@ end
 
 function SLASHER.OnSecondaryFire(slasher)
 	-- We have to do the Gas Can first
-	if slasher:GetNWBool("SwitchToGas") then
+	if slasher:GetNW2Bool("SwitchToGas") then
 		local match = ents.Create("prop_physics")
 		local heat = ents.Create("env_firesource")
 		local att = slasher.Hand or slasher:LookupAttachment("anim_attachment_lh")
@@ -1036,7 +1036,7 @@ local function KickFinish(slasher)
 	end
 
 	local lookent = slasher:GetEyeTrace().Entity
-	if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then
+	if slasher:GetNW2Int("PostalStage") == POSTAL_RAGE_STAGE then
 		SlashCo.BustDoor(slasher, lookent, 50000)
 	else
 		slasher:SlamDoor(lookent)
@@ -1066,14 +1066,14 @@ local function KickFinish(slasher)
 		end
 	end
 
-	slasher:SetNWBool("PostalDudeKicking", false)
+	slasher:SetNW2Bool("PostalDudeKicking", false)
 
 	if target:IsPlayer() then
 		if target:Team() ~= TEAM_SURVIVOR then return end
 
-		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+		if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
 			if not slasher:GetInSlasherChaseMode() then
-				if not slasher:GetNWBool("SwitchToGas") then
+				if not slasher:GetNW2Bool("SwitchToGas") then
 					SlashCo.StartChaseMode(slasher, true)
 					slasher:SetInSlasherChaseMode(true)
 				end
@@ -1085,7 +1085,7 @@ local function KickFinish(slasher)
 		bloodfx:SetOrigin(vPoint)
 		util.Effect("BloodImpact", bloodfx)
 
-		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+		if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
 			if target:IsPlayer() then
 				SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
 			end
@@ -1094,13 +1094,13 @@ local function KickFinish(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("PostalDudeStunned") then return end
-	if slasher:GetNWBool("PostalDudeSlashing") then return end
+	if slasher:GetNW2Bool("PostalDudeStunned") then return end
+	if slasher:GetNW2Bool("PostalDudeSlashing") then return end
 	if slasher.KickCooldown > 0 then return end
 
-	slasher:SetNWBool("PostalDudeKicking", true)
+	slasher:SetNW2Bool("PostalDudeKicking", true)
 
-	if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
+	if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
 		slasher.KickCooldown = 5
 	else
 		slasher.KickCooldown = 2.5
@@ -1112,18 +1112,18 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
-	if slasher:GetNWBool("PostalDudeStunned") then return end
-	if slasher:GetNWBool("PostalDudeSlashing") then return end
-	if slasher:GetNWBool("SwitchToGas") then return end
-	if slasher:GetNWBool("SwitchToBaby") then return end
+	if slasher:GetNW2Bool("PostalDudeStunned") then return end
+	if slasher:GetNW2Bool("PostalDudeSlashing") then return end
+	if slasher:GetNW2Bool("SwitchToGas") then return end
+	if slasher:GetNW2Bool("SwitchToBaby") then return end
 
-	if slasher:GetNWBool("SwitchToShovel") then
+	if slasher:GetNW2Bool("SwitchToShovel") then
 		if not slasher.DeagleUnlocked then return end
-		slasher:SetNWBool("SwitchToShovel", false)
-		slasher:SetNWBool("SwitchToDeagle", true)
+		slasher:SetNW2Bool("SwitchToShovel", false)
+		slasher:SetNW2Bool("SwitchToDeagle", true)
 		slasher.PostalState = POSTAL_SHOVEL_EQUIPPED
 
-		if slasher:GetNWBool("SwitchToDeagle") then
+		if slasher:GetNW2Bool("SwitchToDeagle") then
 			slasher:SetBodygroup(1, 0)
 			slasher:SetBodygroup(2, 1)
 			slasher:SetBodygroup(3, 0)
@@ -1149,17 +1149,17 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		end
 	end
 
-	if slasher:GetNWBool("SwitchToDeagle") then
+	if slasher:GetNW2Bool("SwitchToDeagle") then
 		if not slasher.DeagleUnlocked then return end
-		slasher:SetNWBool("SwitchToDeagle", false)
-		slasher:SetNWBool("SwitchToShovel", false)
+		slasher:SetNW2Bool("SwitchToDeagle", false)
+		slasher:SetNW2Bool("SwitchToShovel", false)
 		if not slasher.MGUnlocked then
 			slasher.PostalState = POSTAL_DEAGLE_UNEQUIPPED
 		elseif slasher.MGUnlocked then
 			slasher.PostalState = POSTAL_DEAGLE_EQUIPPED
 		end
 		if slasher.MGUnlocked then
-			slasher:SetNWBool("SwitchToMG", true)
+			slasher:SetNW2Bool("SwitchToMG", true)
 
 			local idx = math.random(1, 3)
 			SlashCo.AudioSystem.PlaySound({
@@ -1172,7 +1172,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				fadeIn = 0,
 			})
 		else
-			slasher:SetNWBool("SwitchToShovel", true)
+			slasher:SetNW2Bool("SwitchToShovel", true)
 			slasher.PostalState = POSTAL_SHOVEL_EQUIPPED
 			slasher:SetBodygroup(1, 1)
 			slasher:SetBodygroup(2, 0)
@@ -1180,7 +1180,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher:SetBodygroup(4, 0)
 		end
 
-		if slasher:GetNWBool("SwitchToMG") then
+		if slasher:GetNW2Bool("SwitchToMG") then
 			slasher.PostalState = POSTAL_MG_EQUIPPED
 			slasher:SetBodygroup(1, 0)
 			slasher:SetBodygroup(2, 0)
@@ -1191,13 +1191,13 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		end
 	end
 
-	if slasher:GetNWBool("SwitchToMG") then
-		slasher:SetNWBool("SwitchToDeagle", false)
-		slasher:SetNWBool("SwitchToMG", false)
-		slasher:SetNWBool("SwitchToShovel", true)
+	if slasher:GetNW2Bool("SwitchToMG") then
+		slasher:SetNW2Bool("SwitchToDeagle", false)
+		slasher:SetNW2Bool("SwitchToMG", false)
+		slasher:SetNW2Bool("SwitchToShovel", true)
 		slasher.PostalState = POSTAL_MG_EQUIPPED
 
-		if slasher:GetNWBool("SwitchToShovel") then
+		if slasher:GetNW2Bool("SwitchToShovel") then
 			slasher.PostalState = POSTAL_SHOVEL_EQUIPPED
 			slasher:SetBodygroup(1, 1)
 			slasher:SetBodygroup(2, 0)
@@ -1226,17 +1226,17 @@ function SLASHER.Footstep(ply)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("PostalDudeStunned")
+	return ply:GetNW2Bool("PostalDudeStunned")
 end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetInSlasherChaseMode()
-	local PostalDude_swing = ply:GetNWBool("PostalDudeSlashing")
-	local PostalDude_kick = ply:GetNWBool("PostalDudeKicking")
-	local PostalDude_stun = ply:GetNWBool("PostalDudeStunned")
-	local PostalDude_finger = ply:GetNWBool("PostalFinger")
-	local PostalDude_deagleshooting = (CurTime() - ply:GetNWFloat("PostalDeagleShoot", 0)) < SLASHER.GunShotDecay
-	local PostalDude_machinegunshooting = (CurTime() - ply:GetNWFloat("PostalMGShoot", 0)) < SLASHER.GunShotDecay
+	local PostalDude_swing = ply:GetNW2Bool("PostalDudeSlashing")
+	local PostalDude_kick = ply:GetNW2Bool("PostalDudeKicking")
+	local PostalDude_stun = ply:GetNW2Bool("PostalDudeStunned")
+	local PostalDude_finger = ply:GetNW2Bool("PostalFinger")
+	local PostalDude_deagleshooting = (CurTime() - ply:GetNW2Float("PostalDeagleShoot")) < SLASHER.GunShotDecay
+	local PostalDude_machinegunshooting = (CurTime() - ply:GetNW2Float("PostalMGShoot")) < SLASHER.GunShotDecay
 
 	if not PostalDude_swing and not PostalDude_stun and not PostalDude_deagleshooting and not PostalDude_kick and not PostalDude_finger then
 		ply.anim_antispam = false
@@ -1247,47 +1247,47 @@ function SLASHER.Animator(ply)
 
 	if ply:IsOnGround() then
 		if not chase then
-			if ply:GetNWBool("SwitchToShovel") then
+			if ply:GetNW2Bool("SwitchToShovel") then
 				ply.CalcIdeal = ACT_HL2MP_WALK_MELEE
 				ply.CalcSeqOverride = ply:LookupSequence("prowl")
-			elseif ply:GetNWBool("SwitchToDeagle") then
+			elseif ply:GetNW2Bool("SwitchToDeagle") then
 				ply.CalcIdeal = ACT_HL2MP_WALK_PISTOL
 				ply.CalcSeqOverride = ply:LookupSequence("prowl")
-			elseif ply:GetNWBool("SwitchToMG") then
+			elseif ply:GetNW2Bool("SwitchToMG") then
 				ply.CalcIdeal = ACT_HL2MP_WALK_SMG1
 				ply.CalcSeqOverride = ply:LookupSequence("prowl")
-			elseif ply:GetNWBool("SwitchToGas") then
+			elseif ply:GetNW2Bool("SwitchToGas") then
 				ply.CalcIdeal = ACT_HL2MP_WALK_SLAM
 				ply.CalcSeqOverride = ply:LookupSequence("prowl")
 			end
 		else
-			if ply:GetNWBool("SwitchToShovel") then
+			if ply:GetNW2Bool("SwitchToShovel") then
 				ply.CalcIdeal = ACT_HL2MP_RUN_MELEE
 				ply.CalcSeqOverride = ply:LookupSequence("chase")
-			elseif ply:GetNWBool("SwitchToDeagle") then
+			elseif ply:GetNW2Bool("SwitchToDeagle") then
 				ply.CalcIdeal = ACT_HL2MP_RUN_PISTOL
 				ply.CalcSeqOverride = ply:LookupSequence("chase")
-			elseif ply:GetNWBool("SwitchToMG") then
+			elseif ply:GetNW2Bool("SwitchToMG") then
 				ply.CalcIdeal = ACT_HL2MP_RUN_SMG1
 				ply.CalcSeqOverride = ply:LookupSequence("chase")
-			elseif ply:GetNWBool("SwitchToGas") then
+			elseif ply:GetNW2Bool("SwitchToGas") then
 				ply.CalcIdeal = ACT_HL2MP_RUN_SLAM
 				ply.CalcSeqOverride = ply:LookupSequence("chase")
 			end
 		end
 	else
-		if ply:GetNWBool("SwitchToShovel") then
+		if ply:GetNW2Bool("SwitchToShovel") then
 			ply.CalcSeqOverride = ply:LookupSequence("shovel_glide")
-		elseif ply:GetNWBool("SwitchToDeagle") then
+		elseif ply:GetNW2Bool("SwitchToDeagle") then
 			ply.CalcSeqOverride = ply:LookupSequence("deagle_glide")
-		elseif ply:GetNWBool("SwitchToMG") then
+		elseif ply:GetNW2Bool("SwitchToMG") then
 			ply.CalcSeqOverride = ply:LookupSequence("m4_airwalk_MELEE")
-		elseif ply:GetNWBool("SwitchToGas") then
+		elseif ply:GetNW2Bool("SwitchToGas") then
 			ply.CalcSeqOverride = ply:LookupSequence("gas_glide")
 		end
 	end
 
-	if ply:GetNWBool("SwitchToShovel") then
+	if ply:GetNW2Bool("SwitchToShovel") then
 		if PostalDude_swing and (not ply.anim_antispam) then
 			local randomswing = math.random(1, 2)
 			local SwingAnim = ""
@@ -1302,30 +1302,30 @@ function SLASHER.Animator(ply)
 		end
 	end
 
-	if ply:GetNWBool("SwitchToDeagle") then
+	if ply:GetNW2Bool("SwitchToDeagle") then
 		if PostalDude_deagleshooting then
 			ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("deagle_attack"), 0, true)
 		end
 	end
 
-	if ply:GetNWBool("SwitchToMG") then
+	if ply:GetNW2Bool("SwitchToMG") then
 		if PostalDude_machinegunshooting then
 			ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("m4_attack"), 0, true)
 		end
 	end
 
 	-- Secret Emote, the code has to be like this...for some reason, I don't know why, but if it works, it works
-	if ply:GetNWBool("PostalFinger") then
+	if ply:GetNW2Bool("PostalFinger") then
 		timer.Simple(0.01, function()
 			if not IsValid(ply) then return end
 
-			if ply:GetNWBool("SwitchToShovel") then
+			if ply:GetNW2Bool("SwitchToShovel") then
 				ply.CalcSeqOverride = ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("fuckyou_1"), 0, true)
-			elseif ply:GetNWBool("SwitchToDeagle") then
+			elseif ply:GetNW2Bool("SwitchToDeagle") then
 				ply.CalcSeqOverride = ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("fuckyou_2"), 0, true)
-			elseif ply:GetNWBool("SwitchToMG") then
+			elseif ply:GetNW2Bool("SwitchToMG") then
 				ply.CalcSeqOverride = ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("fuckyou_3"), 0, true)
-			elseif ply:GetNWBool("SwitchToGas") then
+			elseif ply:GetNW2Bool("SwitchToGas") then
 				ply.CalcSeqOverride = ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence("fuckyou_4"), 0, true)
 			end
 		end)
@@ -1333,7 +1333,7 @@ function SLASHER.Animator(ply)
 		timer.Simple(0.05, function()
 			if not IsValid(ply) then return end
 
-			ply:SetNWBool("PostalFinger", false)
+			ply:SetNW2Bool("PostalFinger", false)
 		end)
 	end
 
@@ -1357,12 +1357,12 @@ function SLASHER.Animator(ply)
 		if CLIENT then return end
 
 		if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SLASHER then return end
-		if ply:GetNWString("Slasher") ~= "PostalDude" then return end
+		if ply:GetNW2String("Slasher") ~= "PostalDude" then return end
 
 		timer.Simple(0.01, function()
 			if not IsValid(ply) then return end
 
-			ply:SetNWBool("PostalFinger", true)
+			ply:SetNW2Bool("PostalFinger", true)
 		end)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -1407,7 +1407,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
 		fadeIn = 0,
 	})
 
-	slasher:SetNWBool("PostalDudeStunned", true)
+	slasher:SetNW2Bool("PostalDudeStunned", true)
 	slasher:Freeze(true)
 
 	SlashCo.AddSlasherAnger(slasher, 5) -- We did not like that
@@ -1415,16 +1415,16 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
 		if not IsValid(slasher) then return end
 
 		-- Re-enable the respective bodygroups
-		if slasher:GetNWBool("SwitchToShovel") then
+		if slasher:GetNW2Bool("SwitchToShovel") then
 			slasher:SetBodygroup(1, 1)
-		elseif slasher:GetNWBool("SwitchToDeagle") then
+		elseif slasher:GetNW2Bool("SwitchToDeagle") then
 			slasher:SetBodygroup(2, 1)
-		elseif slasher:GetNWBool("SwitchToMG") then
+		elseif slasher:GetNW2Bool("SwitchToMG") then
 			slasher:SetBodygroup(3, 1)
-		elseif slasher:GetNWBool("SwitchToGas") then
+		elseif slasher:GetNW2Bool("SwitchToGas") then
 			slasher:SetBodygroup(4, 1)
 		end
-		slasher:SetNWBool("PostalDudeStunned", false)
+		slasher:SetNW2Bool("PostalDudeStunned", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -1444,11 +1444,11 @@ function SLASHER.InitHud(_, hud)
 	hud:AddMeter("patience", 100, "", nil, true)
 	hud:TieMeterInt("patience", "PostalDudePatience")
 
-	GameData.LocalPlayer:GetNWInt("PostalState", -1) -- Raphael my goat once again
+	GameData.LocalPlayer:GetNW2Int("PostalState", -1) -- Raphael my goat once again
 
-	hud.prevState = not GameData.LocalPlayer:GetNWInt("PostalState")
+	hud.prevState = not GameData.LocalPlayer:GetNW2Int("PostalState")
 	function hud.AlsoThink()
-		local curState = GameData.LocalPlayer:GetNWInt("PostalState")
+		local curState = GameData.LocalPlayer:GetNW2Int("PostalState")
 
 		if curState == hud.prevState then return end
 
@@ -1523,8 +1523,8 @@ if CLIENT then
 		for _, dude in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if dude == GameData.LocalPlayer then continue end
 
-			if SlashCoSlashers[dude:GetNWString("Slasher")] == SLASHER then
-				if dude:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then
+			if SlashCoSlashers[dude:GetNW2String("Slasher")] == SLASHER then
+				if dude:GetNW2Int("PostalStage") == POSTAL_RAGE_STAGE then
 					local tlight = DynamicLight(MAX_EDICT + dude:EntIndex())
 					if tlight then
 						tlight.pos = dude:LocalToWorld(Vector(0, 0, 20))
@@ -1567,7 +1567,7 @@ hook.Add("SlashCo:OnPing", "PostalDudeSayStuff", function(pingInfo)
 	if not IsValid(ply) then return end
 
 	-- Can be any slasher ID
-	if ply:GetNWString("Slasher") ~= "PostalDude" then return end
+	if ply:GetNW2String("Slasher") ~= "PostalDude" then return end
 
 	--It's our slasher so play a sound
 	if pingInfo.Type == "GENERATOR" or pingInfo.Type == "ITEM" or pingInfo.Type == "AMMO" then

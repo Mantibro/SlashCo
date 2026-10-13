@@ -27,7 +27,11 @@ local DefaultTimeToFuel = 13
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Running")
+	self:NetworkVar("Bool", 1, "Malfunction")
+	self:NetworkVar("Bool", 2, "HasBattery")
+	self:NetworkVar("Bool", 3, "Fueling")
 	self:NetworkVar("Int", 0, "CansRemaining")
+	self:NetworkVar("Entity", 0, "Can")
 end
 
 function ENT:OnPing(ply)
@@ -74,7 +78,7 @@ if CLIENT then
 
 		local curTime = CurTime()
 		local dlight = DynamicLight(cacheData.entindex)
-		if not self:GetNWBool("GeneratorMalfunction") then
+		if not self:GetMalfunction() then
 			if dlight then
 				dlight.pos = cacheData.pos
 				dlight.r = not running and 255 or 0
@@ -150,7 +154,7 @@ function ENT:ChangeCanProgress(amount)
 	local gasPerGen = SlashCo.GetGasCansPerGenerator()
 	self.CansRemaining = math.Clamp((self.CansRemaining or gasPerGen) - amount, 0, gasPerGen)
 	self:SetCansRemaining(self.CansRemaining)
-	self.Progress = math.Clamp((gasPerGen - self.CansRemaining) * (4 / gasPerGen), 0, 4) + (self.HasBattery and 1 or 0)
+	self.Progress = math.Clamp((gasPerGen - self.CansRemaining) * (4 / gasPerGen), 0, 4) + (self:GetHasBattery() and 1 or 0)
 
 	if self.CansRemaining == 0 then
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
@@ -167,7 +171,7 @@ function ENT:SendData(ply)
 	net.Start("SlashCo:GasPourProgress")
 		net.WriteUInt(self.TimeToFuel or DefaultTimeToFuel, 8)
 		net.WriteUInt(self.FuelingCan:EntIndex(), MAX_EDICT_BITS) -- NOTE: We require this since we might send this net message before the Entity was networked, so we need to accout for that.
-		net.WriteBool(self.IsFueling)
+		net.WriteBool(self:GetFueling())
 		net.WriteFloat(self.TimeUntilFueled)
 	net.Send(ply)
 end
@@ -180,7 +184,7 @@ function ENT:Touch(otherEnt)
 
 		self:MakeGasCan(otherEnt:GetModel())
 		otherEnt:Remove()
-	elseif not self.MakingItem and not self.HasBattery and class == "sc_battery"
+	elseif not self.MakingItem and not self:GetHasBattery() and class == "sc_battery"
 			and otherEnt:GetPos():Distance(self:LocalToWorld(Vector(-33.59, 13.2, 53.7))) < 26 then
 
 		self:MakeBattery(otherEnt:GetModel())
@@ -209,7 +213,7 @@ function ENT:MakeBattery(model)
 	end
 
 	local battery = ents.Create("prop_physics")
-	self.HasBattery = IsValid(battery)
+	self:SetHasBattery(IsValid(battery))
 	self.Progress = self.Progress + 1
 	self:CheckProgress()
 
@@ -236,6 +240,7 @@ function ENT:MakeGasCan(model)
 
 	local gasCan = ents.Create("prop_physics")
 	self.FuelingCan = gasCan
+	self:SetCan(gasCan)
 
 	gasCan:SetModel(model)
 	gasCan:SetMoveType(MOVETYPE_NONE)
@@ -250,7 +255,7 @@ end
 
 function ENT:CheckProgress(dontFailStart)
 	local gasPerGen = SlashCo.GetGasCansPerGenerator()
-	if (self.CansRemaining or gasPerGen) <= 0 and self.HasBattery and not self:GetRunning() then
+	if (self.CansRemaining or gasPerGen) <= 0 and self:GetHasBattery() and not self:GetRunning() then
 		if IsValid(self.SpawnedAt) then
 			self.SpawnedAt:TriggerOutput("OnComplete", self.CurrentPourer)
 		end
@@ -285,7 +290,7 @@ function ENT:CheckProgress(dontFailStart)
 				looping = true,
 			})
 		end)
-	elseif not dontFailStart and self.HasBattery and (self.CansRemaining or gasPerGen) > 0 then
+	elseif not dontFailStart and self:GetHasBattery() and (self.CansRemaining or gasPerGen) > 0 then
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/generator_failstart.mp3",
 			identifier = "GeneratorFailedStart",
@@ -304,14 +309,14 @@ function ENT:Use(activator)
 		return
 	end
 
-	if self:GetNWBool("GeneratorMalfunction") then
+	if self:GetMalfunction() then
 		activator:ChatText("Generator_Blocked")
 		self:DoSpark()
 		return
 	end
 
 	if IsValid(self.FuelingCan) then
-		if self.IsFueling then
+		if self:GetFueling() then
 			--if the can is already being poured, don't override them
 			return
 		end
@@ -323,7 +328,7 @@ function ENT:Use(activator)
 			self.FuelProgress = self.FuelProgress * (self.TimeToFuel / oldTimeToFuel)
 		end
 
-		self.IsFueling = true
+		self:SetFueling(true)
 		self.CurrentPourer = activator
 		self.TimeUntilFueled = CurTime() + (self.FuelProgress or self.TimeToFuel)
 		self:SendData(activator)
@@ -356,7 +361,7 @@ function ENT:Use(activator)
 			activator:SecondaryItemFunction("OnFuel", self)
 			SlashCo.RemoveItem(activator, true)
 		elseif activator:ItemValue("IsBattery", false, true) then
-			if self.HasBattery then
+			if self:GetHasBattery() then
 				SlashCo.SendValue(activator, "cantPower")
 				return
 			end
@@ -393,7 +398,7 @@ function ENT:SlasherObserve()
 	for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if v:GetEyeTrace().Entity == self and (not v.GenCooldown or CurTime() - v.GenCooldown > 3) then
 			timer.Remove(self:GetCreationID() .. "_slasherHint_" .. v:UserID())
-			SlashCo.SendValue(v, "genProg", self, self.HasBattery, self.CansRemaining or gasPerGen)
+			SlashCo.SendValue(v, "genProg", self, self:GetHasBattery(), self.CansRemaining or gasPerGen)
 			v.GenCooldown = CurTime()
 
 			observed = true
@@ -408,18 +413,18 @@ end
 function ENT:Think()
 	self:SlasherObserve()
 
-	if not self.IsFueling then
+	if not self:GetFueling() then
 		return
 	end
 
 	if not IsValid(self.CurrentPourer) or not IsValid(self.FuelingCan) then
-		self.IsFueling = false
+		self:SetFueling(false)
 		SlashCo.AudioSystem.StopSound("GeneratorFill", 0.2, self)
 		return
 	end
 
 	if self.CurrentPourer:GetPos():Distance(self:GetPos()) > 100 or not self.CurrentPourer:KeyDown(IN_USE) then
-		self.IsFueling = false
+		self:SetFueling(false)
 
 		self.FuelProgress = self.TimeUntilFueled - CurTime()
 		self:SendData(self.CurrentPourer)
@@ -445,7 +450,7 @@ function ENT:Think()
 			self.SpawnedAt:TriggerOutput("OnFueled", self.CurrentPourer)
 		end
 
-		self.IsFueling = false
+		self:SetFueling(false)
 		self.FuelProgress = nil
 		self.TimeToFuel = nil
 		self:SendData(self.CurrentPourer)
@@ -476,6 +481,7 @@ function ENT:Think()
 
 		self:CheckProgress()
 		self.FuelingCan = nil
+		self:SetCan(NULL)
 	end
 
 	self:NextThink(CurTime()) -- Set the next think to run as soon as possible, i.e. the next frame.

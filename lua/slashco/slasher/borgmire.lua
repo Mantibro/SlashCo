@@ -170,7 +170,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	if not slasher:GetInSlasherChaseMode() then
 		slasher.TimeChasing = 0
 
-		if slasher:GetNWBool("BorgmireKick") then
+		if slasher:GetNW2Bool("BorgmireKick") then
 			slasher:SetRunSpeed(SLASHER.ProwlSpeed + 200)
 			slasher:SetWalkSpeed(SLASHER.ProwlSpeed + 200)
 		else
@@ -191,7 +191,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		slasher.TimeChasing = ChaseTime + FrameTime()
 
-		if slasher:GetNWBool("BorgmireKick") then
+		if slasher:GetNW2Bool("BorgmireKick") then
 			slasher:SetRunSpeed(SLASHER.ChaseSpeed + 200)
 			slasher:SetWalkSpeed(SLASHER.ChaseSpeed + 200)
 		else
@@ -215,8 +215,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	local anger = SlashCo.GetSlasherAnger(slasher)
-	if slasher:GetNWInt("BorgmireAnger") ~= math.floor(anger) then
-		slasher:SetNWInt("BorgmireAnger", math.floor(anger))
+	if slasher:GetNW2Int("BorgmireAnger") ~= math.floor(anger) then
+		slasher:SetNW2Int("BorgmireAnger", math.floor(anger))
 	end
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
@@ -224,12 +224,12 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher)
-	if slasher:GetNWBool("BorgmireStunned") then return end
-	if slasher:GetNWBool("BorgmireThrow") then return end
+	if slasher:GetNW2Bool("BorgmireStunned") then return end
+	if slasher:GetNW2Bool("BorgmireThrow") then return end
 	if slasher.BorgKicking then return end
 
 	if slasher.PunchCooldown < 0.01 then
-		slasher:SetNWBool("BorgmirePunch", false)
+		slasher:SetNW2Bool("BorgmirePunch", false)
 		slasher.BorgPunching = true
 		timer.Remove("BorgmirePunchDecay")
 		slasher.PunchCooldown = 2
@@ -311,12 +311,12 @@ function SLASHER.OnPrimaryFire(slasher)
 		timer.Simple(0.05, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("BorgmirePunch", true)
+			slasher:SetNW2Bool("BorgmirePunch", true)
 
 			timer.Create("BorgmirePunchDecay", 1.5, 1, function()
 				if not IsValid(slasher) then return end
 
-				slasher:SetNWBool("BorgmirePunch", false)
+				slasher:SetNW2Bool("BorgmirePunch", false)
 				slasher.BorgPunching = false
 			end)
 		end)
@@ -328,12 +328,12 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("BorgmireStunned") then return end
-	if slasher:GetNWBool("BorgmireThrow") then return end
+	if slasher:GetNW2Bool("BorgmireStunned") then return end
+	if slasher:GetNW2Bool("BorgmireThrow") then return end
 	if slasher.BorgPunching then return end
 
 	if slasher.KickCooldown < 0.01 then
-		slasher:SetNWBool("BorgmireKick", false)
+		slasher:SetNW2Bool("BorgmireKick", false)
 		slasher.BorgKicking = true
 		timer.Remove("BorgmireKickDecay")
 		slasher.KickCooldown = 15 - (SlashCo.GetSlasherAnger(slasher) / 10)
@@ -415,12 +415,12 @@ function SLASHER.OnMainAbilityFire(slasher)
 		timer.Simple(0.1, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("BorgmireKick", true)
+			slasher:SetNW2Bool("BorgmireKick", true)
 
 			timer.Create("BorgmireKickDecay", 2.1, 1, function()
 				if not IsValid(slasher) then return end
 
-				slasher:SetNWBool("BorgmireKick", false)
+				slasher:SetNW2Bool("BorgmireKick", false)
 				slasher.BorgKicking = false
 			end)
 		end)
@@ -428,15 +428,15 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
-	if slasher:GetNWBool("BorgmireStunned") then return end
+	if slasher:GetNW2Bool("BorgmireStunned") then return end
 	if slasher.BorgPunching then return end
 	if slasher.BorgKicking then return end
-	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then return end
+	if not IsValid(target) or not target:IsPlayer() or slasher:GetNW2Bool("BorgmireThrow") then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	if slasher:GetPos():Distance(target:GetPos()) >= 140 or target:GetSurvivorBeingJumpscared() then return end
 
 	if slasher.ThrowCooldown < 0.01 then
-		slasher:SetNWBool("BorgmireThrow", true)
+		slasher:SetNW2Bool("BorgmireThrow", true)
 		slasher.ChaseActivationCooldown = 99
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/borgmire/borgmire_throw.mp3",
@@ -482,7 +482,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		timer.Simple(2, function()
 			if not IsValid(slasher) then return end
 
-			slasher:SetNWBool("BorgmireThrow", false)
+			slasher:SetNW2Bool("BorgmireThrow", false)
 			slasher.ChaseActivationCooldown = 2
 		end)
 	end
@@ -491,12 +491,12 @@ end
 function SLASHER.OnHitByPocketSand(slasher, ply)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("BorgmireStunned", true)
+	slasher:SetNW2Bool("BorgmireStunned", true)
 	slasher:Freeze(true)
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("BorgmireStunned", false)
+		slasher:SetNW2Bool("BorgmireStunned", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -504,15 +504,15 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("BorgmireStunned")
+	return ply:GetNW2Bool("BorgmireStunned")
 end
 
 function SLASHER.Animator(ply)
 	local chase = ply:GetInSlasherChaseMode()
-	local borg_punch = ply:GetNWBool("BorgmirePunch")
-	local borg_throw = ply:GetNWBool("BorgmireThrow")
-	local borg_kick = ply:GetNWBool("BorgmireKick")
-	local borg_stun = ply:GetNWBool("BorgmireStunned")
+	local borg_punch = ply:GetNW2Bool("BorgmirePunch")
+	local borg_throw = ply:GetNW2Bool("BorgmireThrow")
+	local borg_kick = ply:GetNW2Bool("BorgmireKick")
+	local borg_stun = ply:GetNW2Bool("BorgmireStunned")
 
 	if not borg_punch and not borg_throw and not borg_kick then
 		ply.anim_antispam = false

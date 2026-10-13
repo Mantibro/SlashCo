@@ -819,7 +819,7 @@ local function startRound(noSetup)
 	local dangerLevel = SlashCo.DangerLevel.Unknown
 	for _, slasher in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		if not IsValid(slasher) then continue end
-		local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
+		local slasherTbl = SlashCoSlashers[slasher:GetNW2String("Slasher")]
 		if slasherTbl and ((slasherTbl.DangerLevel or 0) > dangerLevel) then
 			dangerLevel = slasherTbl.DangerLevel
 		end

@@ -32,7 +32,7 @@ function ITEM.OnSwitchFrom(ply)
 end
 
 function ITEM.PrePickUp(ply)
-	if not ply:GetNWBool("CurseOfTheJug") then return end
+	if not ply:GetCurseOfTheJug() then return end
 
 	if ply.JugDropTimer and CurTime() - ply.JugDropTimer < 1 then return true end
 	ply.JugDropTimer = CurTime()
@@ -51,7 +51,7 @@ function ITEM.PrePickUp(ply)
 end
 
 function ITEM.OnPickUp(ply)
-	if ply:GetNWBool("CurseOfTheJug") then
+	if ply:GetCurseOfTheJug() then
 		timer.Simple(0, function()
 			SlashCo.DropItem(ply)
 		end)
@@ -119,7 +119,7 @@ if SERVER then
 			SlashCo.RemoveItem(ply)
 			ply:RandomTeleport()
 			ply:AddSpeedEffect("jugCurse", 290, 1)
-			ply:SetNWBool("CurseOfTheJug", true)
+			ply:SetCurseOfTheJug(true)
 
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/jug_curse.mp3",
@@ -155,7 +155,7 @@ if SERVER then
 	hook.Add("Think", "JugFunc", function()
 		for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if surv:GetItem("item") ~= "Jug" then continue end
-			if surv:GetNWBool("CurseOfTheJug") then continue end
+			if surv:GetCurseOfTheJug() then continue end
 
 			for _, ent in ipairs(ents.FindInSphere(surv:GetPos(), 250)) do
 				if ent:IsPlayer() and ent:Team() == TEAM_SLASHER and ent:CanBeSeen() then
@@ -168,16 +168,16 @@ if SERVER then
 
 	hook.Add("SlashCoItemPickUp", "JugCurse", function(ply, item, id)
 		if item ~= "GasCan" then return end
-		if not ply:GetNWBool("CurseOfTheJug") then return end
+		if not ply:GetCurseOfTheJug() then return end
 		if math.random() < 0.5 then return end
 
 		local ent = Entity(id)
 		ent:RandomTeleport(Vector(0, 0, 50))
-		ply:SetNWBool("JugCurseActivate", true)
+		ply:SetJugCurseActivate(true)
 
 		timer.Create("jugCurse_" .. ply:UserID(), 6, 1, function()
 			if IsValid(ply) then
-				ply:SetNWBool("JugCurseActivate", false)
+				ply:SetJugCurseActivate(false)
 			end
 		end)
 
@@ -188,7 +188,7 @@ if SERVER then
 end
 
 hook.Add("SlashCo:DrawHUD", "JugVisions", function()
-	if GameData.LocalPlayer:GetNWBool("JugCurseActivate") then
+	if GameData.LocalPlayer:GetJugCurseActivate() then
 		local Overlay = Material("slashco/ui/overlays/jug_freeze")
 
 		if GameData.LocalPlayer.JugFrame < 61 then

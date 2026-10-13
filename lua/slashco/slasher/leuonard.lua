@@ -57,7 +57,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.MoveHooks = false
 		end
 
-		if not slasher:GetNWBool("LeuonardRoiding") then
+		if not slasher:GetNW2Bool("LeuonardRoiding") then
 			slasher.LeuonardRoid = Roid + (FrameTime() * SLASHER.RoidMult)
 
 			--sound
@@ -91,11 +91,11 @@ function SLASHER.OnTickBehaviour(slasher)
 					--I FOUND YOU........
 					slasher.soundon = 0
 					ent:Remove()
-					slasher:SetNWBool("LeuonardRoiding", true)
+					slasher:SetNW2Bool("LeuonardRoiding", true)
 					SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_yell1.mp3")
 					slasher:Freeze(true)
 					timer.Simple(4, function()
-						if not IsValid(slasher) or not slasher:GetNWBool("LeuonardRoiding", false) then
+						if not IsValid(slasher) or not slasher:GetNW2Bool("LeuonardRoiding") then
 							return
 						end
 						SlashCo.AudioSystem.PlaySound({
@@ -115,7 +115,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher:SetBodygroup(1, 1)
 				SlashCo.StopChase(slasher)
 			else
-				slasher:SetNWBool("LeuonardRoiding", false)
+				slasher:SetNW2Bool("LeuonardRoiding", false)
 				slasher:SetBodygroup(1, 0)
 				slasher:Freeze(false)
 
@@ -127,7 +127,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	else
 		slasher.LeuonardRoid = 100.25
-		slasher:SetNWBool("LeuonardFullRoid", true)
+		slasher:SetNW2Bool("LeuonardFullRoid", true)
 
 		SlashCo.StopChase(slasher)
 
@@ -148,7 +148,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if ent:GetClass() == "sc_dogg" then
 				--I FOUND YOU........
 				ent:Remove()
-				slasher:SetNWBool("LeuonardRoiding", true)
+				slasher:SetNW2Bool("LeuonardRoiding", true)
 				SlashCo.AudioSystem.PlaySound({
 					soundPath = "slashco/slasher/leuonard/leuonard_grunt_loop.mp3",
 					identifier = "LeuonardGrunt",
@@ -167,7 +167,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 					SlashCo.AudioSystem.StopSound("LeuonardGrunt", 0.2, slasher)
 					slasher:Freeze(false)
-					slasher:SetNWBool("LeuonardRoiding", false)
+					slasher:SetNW2Bool("LeuonardRoiding", false)
 					slasher:SetBodygroup(1, 0)
 				end)
 			end
@@ -183,7 +183,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetWalkSpeed(450)
 		slasher:SetRunSpeed(450)
 
-		if not slasher:GetNWBool("LeuonardRoiding") then
+		if not slasher:GetNW2Bool("LeuonardRoiding") then
 			if not slasher.MoveHooks then
 				slasher:SlasherHudFunc("Goblinize")
 
@@ -243,7 +243,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	slasher:SetNWInt("LeuonardRoid", math.floor(Roid))
+	slasher:SetNW2Int("LeuonardRoid", math.floor(Roid))
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
@@ -257,7 +257,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("LeuonardRoiding")
+	return ply:GetNW2Bool("LeuonardRoiding")
 end
 
 function SLASHER.Animator(ply)
@@ -271,7 +271,7 @@ function SLASHER.Animator(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("chase")
 	end
 
-	if ply:GetNWBool("LeuonardFullRoid") then
+	if ply:GetNW2Bool("LeuonardFullRoid") then
 		ply.CalcIdeal = ACT_HL2MP_RUN
 		ply.CalcSeqOverride = ply:LookupSequence("specialrun")
 	end
@@ -281,11 +281,11 @@ function SLASHER.Animator(ply)
 		ply.CalcSeqOverride = ply:LookupSequence("ragdoll")
 	end
 
-	if ply:GetNWBool("LeuonardRoiding") then
+	if ply:GetNW2Bool("LeuonardRoiding") then
 		ply.CalcSeqOverride = ply:LookupSequence("mondaynightraw")
 		ply.CalcIdeal = 0
 
-		if not ply:GetNWBool("LeuonardFullRoid") then
+		if not ply:GetNW2Bool("LeuonardFullRoid") then
 			ply:SetPlaybackRate(2)
 		else
 			ply:SetPlaybackRate(8)
@@ -384,7 +384,7 @@ if CLIENT then
 
 	hook.Add("Think", "LeuonardLight", function()
 		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if slasher:GetNWBool("LeuonardFullRoid") then
+			if slasher:GetNW2Bool("LeuonardFullRoid") then
 				local tlight = DynamicLight(MAX_EDICT + slasher:EntIndex())
 				if (tlight) then
 					tlight.pos = slasher:LocalToWorld(Vector(0, 0, 20))

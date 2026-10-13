@@ -132,7 +132,7 @@ SlashCo.CreateDocumentsDB()
 hook.Add("SlashCo:EndRound", "SlashCo:HandoutDocuments", function(winners)
 	local slashers = {}
 	for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		slashers[ply:GetNWString("Slasher")] = true
+		slashers[ply:GetNW2String("Slasher")] = true
 	end
 
 	for _, ply in player.Iterator() do

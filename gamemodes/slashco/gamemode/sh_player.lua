@@ -377,6 +377,7 @@ function PLAYER:SurvivorPing()
 	if pingInfo.Type == "DEAD BODY" and pingInfo.Entity then
 		local deadguy = player.GetBySteamID64(pingInfo.Entity.SurvivorSteamID)
 		if IsValid(deadguy) then
+			-- RaphaelIT7: NW on purpose as dead players are spectators and may no longer be networked to survivors!
 			deadguy:SetNWBool("ConfirmedDead", true)
 		end
 	end
@@ -619,13 +620,30 @@ end
 SlashCo.SetupNetworkFlag = SetupSlashCoNetworkFlag
 
 -- Reads a registered data table var by its name
-function SlashCo.GetNetworkVar(ply, name)
+function SlashCo.GetNetworkVar(ply, name, fallback, nwType)
 	local info = SlashCo_DTNetworking[name]
-	if not info then
-		error("Tried to read the unregistered network var \"" .. tostring(name) .. "\"!", 2)
+	if info then
+		return info.get(ply)
 	end
 
-	return info.get(ply)
+	return ply["GetNW2" .. nwType](ply, name, fallback)
+end
+
+-- RaphaelIT7: I am like 99% that me moving to NW2 will break workshop addons
+-- So preferably, let's try to keep them functional for now
+entMeta.OrigGetNWString = entMeta.OrigGetNWString or entMeta.GetNWString
+local getNWString = entMeta.OrigGetNWString
+function plyMeta:GetNWString(key, ...)
+	if key ~= "Slasher" then
+		return getNWString(self, key, ...)
+	end
+
+	if not GameData.warnedSlasherNWUse then
+		GameData.warnedSlasherNWUse = true
+		ErrorNoHalt("[SlashCo] Player:GetNWString(\"Slasher\") is deprecated, use Player:GetNW2String(\"Slasher\") instead!\n")
+	end
+
+	return self:GetNW2String(key, ...)
 end
 
 -- RaphaelIT7: There intentionally is no callback function due to the nature of DTs being possibly received more than once! If you really need it tell me - I got that code already done
@@ -641,7 +659,6 @@ SetupSlashCoNetworkVar("Int", 6, "Items")
 SetupSlashCoNetworkVar("Int", 8, "SurvivorJumpscare") -- The ID of the slasher currently jumpscaring them
 SetupSlashCoNetworkVar("Int", 9, "Taunt")
 SetupSlashCoNetworkVar("Int", 15, "LastTaunted") -- The last tick in which they taunted, same idea as LastPinged
-SetupSlashCoNetworkVar("Int", 10, "GameProgressDisplay")
 SetupSlashCoNetworkVar("Int", 11, "ZoneEffect") -- The effect of the limited zone the player is inside of, 0 if none
 SetupSlashCoNetworkVar("Int", 12, "KeyedSpeed") -- The strongest speed effect only the server knows about (zone, attacks, ...), see PLAYER:AddSpeedEffect
 

@@ -143,6 +143,15 @@ function SlashCo.GetMapSize()
 	return SlashCo.MapSize or GetGlobal2Int("SlashCo:MapSize", 1)
 end
 
+-- Round info
+function SlashCo.SetGameProgress(progress)
+	SetGlobal2Int("SlashCo:GameProgress", progress)
+end
+
+function SlashCo.GetGameProgress()
+	return GetGlobal2Int("SlashCo:GameProgress", 0)
+end
+
 -- Lobby info
 -- This var controlls when the spectators camera is bound to the helicopter and suicide will be disallowed.
 function SlashCo.MarkLobbyStarting()
