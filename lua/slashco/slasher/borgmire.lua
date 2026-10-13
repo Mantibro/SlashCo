@@ -56,6 +56,24 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	local kick = slasher:GetNW2Bool("BorgmireKick") and 200 or 0
+	if not slasher:GetInSlasherChaseMode() then
+		return SLASHER.ProwlSpeed + kick
+	end
+
+	if kick > 0 then
+		return SLASHER.ChaseSpeed + kick
+	end
+
+	local tick = SlashCo.GetTick()
+	local chaseStart = slasher:GetNW2Int("BorgmireChaseStart")
+	local chaseTime = chaseStart > 0 and (tick - chaseStart) * engine.TickInterval() or 0
+	local punchSlowdown = math.max(2 - (tick - slasher:GetNW2Int("BorgmirePunchStart")) * engine.TickInterval() / SLASHER.PunchSlowdownDiv, 1)
+
+	return (SLASHER.ChaseSpeed - math.sqrt(chaseTime * (14 - SLASHER.ChaseSpeedReduction))) / punchSlowdown
+end
+
 local function PlayHeartbeat(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/borgmire/borgmire_heartbeat.mp3",
@@ -133,17 +151,13 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetCanChase(true)
 	PlayHeartbeat(slasher)
 
-	slasher.TimeChasing = 0
 	slasher.PunchCooldown = 0
-	slasher.PunchSlowdown = 0
 	slasher.ThrowCooldown = 0
 	slasher.KickCooldown = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local ChaseTime = slasher.TimeChasing or 0 --Time Spent chasing
 	local PunchCD = slasher.PunchCooldown or 0 --Punch Cooldown
-	local PunchSD = slasher.PunchSlowdown or 0 --Punch Slowdown
 	local ThrowCD = slasher.ThrowCooldown or 0 -- Throw Cooldown
 	local KickCD = slasher.KickCooldown or 0 -- Kick Cooldown
 
@@ -159,23 +173,9 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.KickCooldown = KickCD - FrameTime()
 	end
 
-	if PunchSD > 1 then
-		slasher.PunchSlowdown = PunchSD - (FrameTime() / SLASHER.PunchSlowdownDiv)
-	end
-
-	if PunchSD < 1 then
-		slasher.PunchSlowdown = 1
-	end
-
 	if not slasher:GetInSlasherChaseMode() then
-		slasher.TimeChasing = 0
-
-		if slasher:GetNW2Bool("BorgmireKick") then
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed + 200)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed + 200)
-		else
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
+		if slasher:GetNW2Int("BorgmireChaseStart") ~= 0 then
+			slasher:SetNW2Int("BorgmireChaseStart", 0)
 		end
 
 		slasher.ChaseSound = nil
@@ -189,14 +189,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	else
 		slasher.IdleSound = nil
 
-		slasher.TimeChasing = ChaseTime + FrameTime()
-
-		if slasher:GetNW2Bool("BorgmireKick") then
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed + 200)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed + 200)
-		else
-			slasher:SetRunSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - SLASHER.ChaseSpeedReduction))) / PunchSD)
-			slasher:SetWalkSpeed((SLASHER.ChaseSpeed - math.sqrt(ChaseTime * (14 - SLASHER.ChaseSpeedReduction))) / PunchSD)
+		if slasher:GetNW2Int("BorgmireChaseStart") == 0 then
+			slasher:SetNW2Int("BorgmireChaseStart", SlashCo.GetTick())
 		end
 
 		if slasher.ChaseSound == nil then
@@ -248,7 +242,7 @@ function SLASHER.OnPrimaryFire(slasher)
 				fadeIn = 0,
 			})
 
-			slasher.PunchSlowdown = 2
+			slasher:SetNW2Int("BorgmirePunchStart", SlashCo.GetTick())
 
 			--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(50, 0, 50)),
 			--		Vector(-35, -45, -60), Vector(35, 45, 60), SLASHER.PunchDamage, DMG_SLASH, 5, false)

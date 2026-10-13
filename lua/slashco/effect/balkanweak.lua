@@ -1,14 +1,9 @@
 local EFFECT = {}
 
 EFFECT.Name = "BalkanTripWeak"
-EFFECT.ChangesSpeed = true
+EFFECT.Speed = 600
+EFFECT.SpeedPriority = 20
 EFFECT.FuelSpeed = 1.75
-function EFFECT.OnApplied(ply)
-	ply:AddSpeedEffect("balkantripweak", 600, 20)
-end
-function EFFECT.OnExpired(ply)
-	ply:RemoveSpeedEffect("balkantripweak")
-end
 
 local colors = {
 	["$pp_colour_addr"] = 0.07,

@@ -29,6 +29,11 @@ SlashCo.PlayerPingDelay = 30 -- Default time in seconds to wait before a player 
 SlashCo.MapForceCost = 50 -- Default cost to force a map
 SlashCo.MapForceCostIncrease = 50 -- Default amount of points that the cost to force a map is increased by every time someone tires to force it
 
+-- The allowed "slashco/survivor/voice/prompt_" [NAME] [RNG 1-5] ".mp3" files
+-- A client could request to play ANY of them so we define which we allow
+-- (also avoids issues like clients requesting to play ../../someHL2 sounds which was possible before...)
+SlashCo.VoicePrompts = { "no", "follow", "spot", "yes", "run", "help" }
+
 SlashCo.HelicopterVoices = {
 	INTRO = 1,
 	APPROACH = 2,
@@ -250,6 +255,11 @@ end
 ]]
 function SlashCo.IsDebugGame()
 	return GameData.IsSinglePlayer or SlashCo.MapTools.IsEnabled(true)
+end
+
+-- Timestamps that the client has to compare while predicting are stored as ticks, CurTime can't be stored in a float without prediction errors
+function SlashCo.GetTick()
+	return math.floor(CurTime() / engine.TickInterval() + 0.5)
 end
 
 -- Helper networking functions

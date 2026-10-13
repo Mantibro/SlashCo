@@ -108,6 +108,7 @@ local function AddEffect(ply, effectName)
 	RemoveEmptyEntires(effects)
 
 	ply:SetActiveEffects(table.concat(effects, ","))
+	ply:UpdateSpeed()
 end
 
 local function RemoveEffect(ply, effectName)
@@ -123,6 +124,7 @@ local function RemoveEffect(ply, effectName)
 	RemoveEmptyEntires(effects)
 
 	ply:SetActiveEffects(table.concat(effects, ","))
+	ply:UpdateSpeed()
 end
 
 ---gives a player an effect
@@ -198,8 +200,87 @@ function PLAYER:ClearEffects()
 	self.ActiveEffects = {}
 end
 
--- Collects all things that have this value for a combined result. This sucks... ToDo: Finish/Rework this!
+-- RaphaelIT7: speed effects of items & effects are known shared so that the client can predict them
+-- ToDo: Look into making a few tirggers predictable to further avoid server-only effects
+local BASE_RUN_SPEED = 300
+local BASE_WALK_SPEED = 200
+local BASE_SLOW_WALK_SPEED = 100
+-- RaphaelIT7: We use KeyedSpeed to network both speed and priority as 16 bits each (saves a delta change & using up another slot)
+local MAX_SHORT = 0x7FFF
 local itemSlots = {"item", "item2"}
+local function UpdateKeyedSpeed(ply)
+	local speed, priority
+	for _, effect in pairs(ply.SpeedEffects or {}) do
+		if not priority or effect[2] > priority then
+			speed, priority = effect[1], effect[2]
+		end
+	end
+
+	ply:SetKeyedSpeed(speed and bit.bor(bit.lshift(priority, 16), math.Clamp(math.floor(speed), 0, MAX_SHORT)) or 0)
+	ply:UpdateSpeed()
+end
+
+function PLAYER:AddSpeedEffect(key, speed, priority)
+	self.SpeedEffects = self.SpeedEffects or {}
+	self.SpeedEffects[key] = { speed, priority }
+	UpdateKeyedSpeed(self)
+end
+
+function PLAYER:RemoveSpeedEffect(key)
+	if not self.SpeedEffects then return end
+
+	self.SpeedEffects[key] = nil
+	UpdateKeyedSpeed(self)
+end
+
+function PLAYER:UpdateSpeed()
+	if self:Team() ~= TEAM_SURVIVOR then return end
+
+	local speed, priority
+	local function CheckNewSpeed(newSpeed, newPriority)
+		if not priority or newPriority > priority then
+			speed, priority = newSpeed, newPriority
+		end
+	end
+
+	local keyedSpeed = self:GetKeyedSpeed()
+	if keyedSpeed ~= 0 then
+		CheckNewSpeed(bit.band(keyedSpeed, 0xFFFF), bit.arshift(keyedSpeed, 16))
+	end
+
+	for _, effectName in ipairs(GetEffects(self)) do
+		local effect = SlashCoEffects[effectName]
+		if effect and effect.Speed then
+			CheckNewSpeed(effect.Speed, effect.SpeedPriority)
+		end
+	end
+
+	for _, slot in ipairs(itemSlots) do
+		local item = SlashCoItems[self:GetItem(slot)]
+		if item and item.Speed then
+			local itemSpeed = item.Speed
+			if isfunction(itemSpeed) then
+				itemSpeed = itemSpeed(self)
+			end
+
+			CheckNewSpeed(itemSpeed, item.SpeedPriority)
+		end
+	end
+
+	speed = speed or BASE_RUN_SPEED
+	self:SetRunSpeed(speed)
+	self:SetWalkSpeed(math.min(speed, BASE_WALK_SPEED))
+	self:SetSlowWalkSpeed(math.min(speed, BASE_SLOW_WALK_SPEED))
+end
+
+if SERVER then
+	hook.Add("SlashCo:PlayerDeath", "SlashCo:ResetSpeedEffects", function(ply)
+		ply.SpeedEffects = nil
+		UpdateKeyedSpeed(ply)
+	end)
+end
+
+-- Collects all things that have this value for a combined result. This sucks... ToDo: Finish/Rework this!
 function PLAYER:StackedItemValue(valueName, initialValue)
 	local value = 0
 	local activePerks = SlashCo.GetActivePerks(self)
@@ -360,6 +441,7 @@ if SERVER then
 		end
 
 		self:SetNW2String(slot, item)
+		self:UpdateSpeed()
 	end
 end
 

@@ -3,14 +3,9 @@ local EFFECT = {}
 --slow down slightly; this speed change overrides every other item effect (including gas can slowness)
 
 EFFECT.Name = "Buzzed"
-EFFECT.ChangesSpeed = true
+EFFECT.Speed = 275
+EFFECT.SpeedPriority = 20
 EFFECT.FuelSpeed = 0.75
-function EFFECT.OnApplied(ply)
-	ply:AddSpeedEffect("buzzEffect", 275, 20)
-end
-function EFFECT.OnExpired(ply)
-	ply:RemoveSpeedEffect("buzzEffect")
-end
 
 local colors = {
 	["$pp_colour_addr"] = 0.01,

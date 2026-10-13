@@ -83,6 +83,26 @@ end
 local AMERICANPO_HUNTER = 0
 local AMERICANPO_AGGRO = 1
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.ChaseSpeed
+	end
+
+	if slasher:GetNW2Bool("AmericanpoFinal") then
+		return SLASHER.FinalSpeed
+	end
+
+	if slasher:GetNW2Bool("AmericanpoAiming") and not slasher:GetNW2Bool("AmericanpoAttack") then
+		return 1
+	end
+
+	if slasher:GetNW2Int("AmericanpoState") == AMERICANPO_HUNTER then
+		return SLASHER.ProwlSpeed
+	end
+
+	return SLASHER.ProwlSpeedAggro
+end
+
 local function PoEndlessChase(slasher)
 	if slasher.americanpo_final_antispam == nil then
 		SlashCo.AudioSystem.PlaySound({
@@ -167,34 +187,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		-- Aggro Mode
 		eyesight_final = 3
 		perception_final = 0.5
-	end
-
-	if slasher:GetInSlasherChaseMode() then
-		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-	else
-		if slasher:GetNW2Bool("AmericanpoFinal") then
-			slasher:SetSlowWalkSpeed(SLASHER.FinalSpeed)
-			slasher:SetWalkSpeed(SLASHER.FinalSpeed)
-			slasher:SetRunSpeed(SLASHER.FinalSpeed)
-		else
-			if not slasher:GetNW2Bool("AmericanpoAiming") or slasher:GetNW2Bool("AmericanpoAttack") then
-				if State == AMERICANPO_HUNTER then
-					slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-					slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-					slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-				else
-					slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeedAggro)
-					slasher:SetWalkSpeed(SLASHER.ProwlSpeedAggro)
-					slasher:SetRunSpeed(SLASHER.ProwlSpeedAggro)
-				end
-			else
-				slasher:SetSlowWalkSpeed(1)
-				slasher:SetWalkSpeed(1)
-				slasher:SetRunSpeed(1)
-			end
-		end
 	end
 
 	if SlashCo.CurRound.EscapeHelicopterSummoned then

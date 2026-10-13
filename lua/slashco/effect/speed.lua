@@ -3,13 +3,8 @@ local EFFECT = {}
 --gain a massive speed boost
 
 EFFECT.Name = "Speed"
-EFFECT.ChangesSpeed = true
-function EFFECT.OnApplied(ply)
-	ply:AddSpeedEffect("speedEffect", 400, 4)
-end
-function EFFECT.OnExpired(ply)
-	ply:RemoveSpeedEffect("speedEffect")
-end
+EFFECT.Speed = 400
+EFFECT.SpeedPriority = 4
 
 local colors = {
 	["$pp_colour_addr"] = 0,

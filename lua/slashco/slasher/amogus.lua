@@ -40,6 +40,16 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetAmogusSurvivorDisguise() then
+		return 300, 200
+	end
+
+	if slasher:GetNW2Bool("AmogusFuelDisguise") then
+		return 200
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher.DisguiseTimer = 0
 	slasher.DisguiseCooldown = 0
@@ -206,9 +216,6 @@ function SLASHER.OnMainAbilityFire(slasher)
 				modelname = survivors[math.random(1, #survivors)]:GetModel()
 			end
 			slasher:SetModel(modelname)
-
-			slasher:SetRunSpeed(300)
-			slasher:SetWalkSpeed(200)
 		end)
 	elseif not slasher.AmogusDisguising and slasher.DisguiseCooldown < 0.01 and slasher:GetNW2Bool("AmogusDisguised") then
 		slasher:Freeze(true)
@@ -233,9 +240,6 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher:SetModel(SLASHER.Model)
 
 		slasher:SetVisible(true)
-
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 
 		slasher.KillDelayTick = 2 - (SO * 1.95)
 
@@ -307,9 +311,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 			local id = prop:EntIndex()
 			slasher.DisguiseEntity = prop
-
-			slasher:SetRunSpeed(200)
-			slasher:SetWalkSpeed(200)
 		end)
 	end
 end

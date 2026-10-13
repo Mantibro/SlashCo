@@ -6,7 +6,8 @@ ITEM.EntClass = "sc_jug"
 ITEM.Price = 10
 ITEM.Description = "Jug_desc"
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.ChangesSpeed = true
+ITEM.Speed = 310
+ITEM.SpeedPriority = 1
 ITEM.IsSpawnable = true
 
 function ITEM.ItemDropped(ply, droppeditem)
@@ -25,10 +26,6 @@ function ITEM.ItemDropped(ply, droppeditem)
 
 		ply.JugTele = false
 	end
-end
-
-function ITEM.OnSwitchFrom(ply)
-	ply:RemoveSpeedEffect("jug")
 end
 
 function ITEM.PrePickUp(ply)
@@ -55,11 +52,7 @@ function ITEM.OnPickUp(ply)
 		timer.Simple(0, function()
 			SlashCo.DropItem(ply)
 		end)
-
-		return
 	end
-
-	ply:AddSpeedEffect("jug", 310, 1)
 end
 
 ITEM.ViewModel = {

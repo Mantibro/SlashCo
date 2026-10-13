@@ -91,25 +91,10 @@ function SlashCo.OnSlasherSpawned(ply)
 	ply.SlasherValue4 = 0
 	ply.SlasherValue5 = 0
 
-	local slasherTbl = SlashCoSlashers[ply:GetNW2String("Slasher")]
-	if slasherTbl.OnBalanceForPlayers then
-		SetGlobal2Int("SlashCo:BalanceSurvivors", GameData.RoundStartSurvivorCount)
-		SetGlobal2Int("SlashCo:BalanceSingularity", SlashCo.CurRound.OfferingData.Singularity)
-		slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors, SlashCo.CurRound.OfferingData.Singularity)
-		--[[
-			Example:
+	SetGlobal2Int("SlashCo:BalanceSurvivors", GameData.RoundStartSurvivorCount)
+	SetGlobal2Int("SlashCo:BalanceSingularity", SlashCo.CurRound.OfferingData.Singularity)
+	SlashCo.BalanceSlasher(SlashCoSlashers[ply:GetNW2String("Slasher")])
 
-			totalSurvivors = How many survivors existed when they got spawned in using the helicopter
-			additionalSurvivors = How many survivors above or below the base max survivor count exist. If 2 total survivors exist them this would be -4 since 2 - 6(the base max survivors) = -4
-				
-			function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-				SLASHER.ProwlSpeed = 140 + (5 * totalSurvivors)
-			end
-		]]
-	end
-
-	ply:SetRunSpeed(slasherTbl.ProwlSpeed)
-	ply:SetWalkSpeed(slasherTbl.ProwlSpeed)
 	ply:SetSlasherAnger(0)
 
 	ply:SlasherFunction("OnSpawn")
@@ -120,6 +105,8 @@ function SlashCo.OnSlasherSpawned(ply)
 	ply.SuccessfulSpawn = true
 end
 
+
+local KILL_DELAY_SPEED = 0.66
 
 --On-Tick Behaviour
 hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
@@ -193,7 +180,7 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 		--Other Shared Functionality:
 
 		if slasher.KillDelayTick > 0 then
-			slasher.KillDelayTick = slasher.KillDelayTick - 0.01
+			slasher.KillDelayTick = slasher.KillDelayTick - FrameTime() * KILL_DELAY_SPEED
 		end
 
 		slasher:SlasherFunction("OnTickBehaviour")
@@ -304,8 +291,6 @@ end
 
 function SlashCo.StopChase(slasher)
 	slasher:SetInSlasherChaseMode(false)
-	slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
-	slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	SlashCo.AudioSystem.StopSound("ChaseMusic", 5, slasher)
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
 
@@ -395,8 +380,6 @@ function SlashCo.StartChaseMode(slasher, forceChase)
 	slasher:SetInSlasherChaseMode(true)
 	slasher.CurrentChaseTick = 0
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)
-	slasher:SetRunSpeed(slasher:SlasherValue("ChaseSpeed"))
-	slasher:SetWalkSpeed(slasher:SlasherValue("ChaseSpeed"))
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = slasher:SlasherValue("ChaseMusic"),
 		identifier = "ChaseMusic",
@@ -526,9 +509,6 @@ timer.Create("SlashCo:SlasherAnger", 1, 0, function()
 	local hasCustomBackgroundMusic = false
 	local backgroundMusic = nil -- change the file later.
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		local addAnger = slasher:SlasherValue("AngerPassiveGain", 0)
-		SlashCo.AddSlasherAnger(slasher, addAnger)
-
 		slasher:SlasherFunction("OnAngerTick")
 		hook.Run("SlashCo:OnAngerTick", slasher)
 

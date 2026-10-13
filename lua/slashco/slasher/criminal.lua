@@ -48,6 +48,19 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if not slasher:GetNW2Bool("CriminalCloning") then
+		return SLASHER.ProwlSpeed
+	end
+
+	local cloneTime = (SlashCo.GetTick() - slasher:GetNW2Int("CriminalCloneStart")) * engine.TickInterval()
+	if slasher:GetNW2Bool("CriminalRage") then
+		return 25 + SLASHER.ChaseSpeed - (cloneTime / SLASHER.ChaseSpeedDecreaseInRageDiv)
+	end
+
+	return SLASHER.ChaseSpeed - (cloneTime / SLASHER.ChaseSpeedDecreaseDiv)
+end
+
 function SLASHER.OnSpawn(slasher)
 	local clone = ents.Create("sc_crimclone")
 
@@ -60,12 +73,9 @@ function SLASHER.OnSpawn(slasher)
 
 	slasher:SetVisible(false)
 	slasher:DrawShadow(false)
-
-	slasher.ClonDuration = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local ClonTimer = slasher.ClonDuration or 0 --Cloning Duration
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
 
@@ -81,30 +91,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNW2Bool("CriminalCloning") then
-		slasher.ClonDuration = ClonTimer + FrameTime()
-
-		if not slasher:GetNW2Bool("CriminalRage") then
-			local speed = SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseDiv)
-
-			slasher:SetSlowWalkSpeed(speed)
-			slasher:SetWalkSpeed(speed)
-			slasher:SetRunSpeed(speed)
-		else
-			local speed = 25 + SLASHER.ChaseSpeed - (ClonTimer / SLASHER.ChaseSpeedDecreaseInRageDiv)
-
-			slasher:SetSlowWalkSpeed(speed)
-			slasher:SetWalkSpeed(speed)
-			slasher:SetRunSpeed(speed)
-		end
-
 		final_perception = 0
 		final_eyesight = 3
 	else
-		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-		slasher.ClonDuration = 0
-
 		final_perception = 1
 		final_eyesight = 6
 	end
@@ -150,6 +139,7 @@ function SLASHER.OnSecondaryFire(slasher)
 			clone:Activate()
 		end
 
+		slasher:SetNW2Int("CriminalCloneStart", SlashCo.GetTick())
 		slasher:SetNW2Bool("CriminalCloning", true)
 	end
 end
@@ -173,7 +163,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		clone:Activate()
 	end
 
-	slasher.ClonDuration = 0
+	slasher:SetNW2Int("CriminalCloneStart", SlashCo.GetTick())
 	slasher:SetNW2Bool("CriminalRage", true)
 end
 

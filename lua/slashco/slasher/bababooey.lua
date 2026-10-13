@@ -49,6 +49,12 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if not slasher:GetVisible() then
+		return 200
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	SLASHER.DoSound(slasher)
 
@@ -162,9 +168,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 				volume = 1,
 				fadeIn = 0,
 			})
-
-			slasher:SetRunSpeed(200)
-			slasher:SetWalkSpeed(200)
 		end)
 	else
 		SlashCo.AudioSystem.PlaySound({
@@ -222,9 +225,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		:: SPOOKAPPEAR ::
 
 		slasher:SetVisible(true)
-
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
 	end
 end
 
