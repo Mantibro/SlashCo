@@ -95,7 +95,7 @@ function SlashCo.OnSlasherSpawned(ply)
 	if slasherTbl.OnBalanceForPlayers then
 		SetGlobal2Int("SlashCo:BalanceSurvivors", GameData.RoundStartSurvivorCount)
 		SetGlobal2Int("SlashCo:BalanceSingularity", SlashCo.CurRound.OfferingData.Singularity)
-		SlashCo.OnBalanceForPlayers(SlashCoSlashers[ply:GetNWString("Slasher")])
+		slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors, SlashCo.CurRound.OfferingData.Singularity)
 		--[[
 			Example:
 
@@ -146,7 +146,7 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 
 		--Handle The Chase Functions \/ \/ \/
 		--SlashCoSlashers[slasher:GetNWString("Slasher")].IsChasing = slasher:GetNWBool("InSlasherChaseMode")
-		if slasher:GetNWBool("CanChase") == false then
+		if slasher:GetCanChase() == false then
 			slasher.CurrentChaseTick = 99
 		end
 
@@ -158,7 +158,7 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 			ply:SetWasSeenBySlasher(true) -- They were seen.
 		end
 
-		if slasher:GetNWBool("InSlasherChaseMode") then
+		if slasher:GetInSlasherChaseMode() then
 			slasher.CurrentChaseTick = slasher.CurrentChaseTick + FrameTime()
 
 			--local inv = (1 - SlashCoSlashers[slasher:GetNWString("Slasher")].ChaseRadius) / 2
@@ -239,7 +239,7 @@ hook.Add("Tick", "SlashCo:HandleSlasherAbilities", function()
 end)
 
 function SlashCo.Jumpscare(slasher, target)
-	if not slasher:GetNWBool("CanKill") then
+	if not slasher:GetCanKill() then
 		return
 	end
 
@@ -256,7 +256,7 @@ function SlashCo.Jumpscare(slasher, target)
 	end
 
 	if slasher:GetPos():Distance(target:GetPos()) > slasher:SlasherValue("KillDistance",
-			135) and not target:GetNWBool("SurvivorBeingJumpscared") then
+			135) and not target:GetSurvivorBeingJumpscared() then
 		return
 	end
 	
@@ -264,12 +264,11 @@ function SlashCo.Jumpscare(slasher, target)
 		return
 	end
 
-	local jumpscareName = "SurvivorJumpscare_" .. slasher:GetNWString("Slasher")
-	target:SetNWBool("SurvivorBeingJumpscared", true)
-	target:SetNWBool(jumpscareName, true)
+	target:SetSurvivorBeingJumpscared(true)
+	target:SetSurvivorJumpscare(slasher:SlasherValue("ID", 0))
 	target:Freeze(true)
 
-	slasher:SetNWBool("CanChase", false)
+	slasher:SetCanChase(false)
 	local killSound = slasher:SlasherValue("KillSound")
 	if killSound ~= "" then
 		SlashCo.AudioSystem.EmitSound(slasher, killSound)
@@ -280,8 +279,8 @@ function SlashCo.Jumpscare(slasher, target)
 
 	timer.Simple(slasher:SlasherValue("JumpscareDuration", 1.5), function()
 		if IsValid(target) then
-			target:SetNWBool("SurvivorBeingJumpscared", false)
-			target:SetNWBool(jumpscareName, false)
+			target:SetSurvivorBeingJumpscared(false)
+			target:SetSurvivorJumpscare(0)
 			SlashCo.AudioSystem.EmitSound(target, "slashco/survivor/effectexpire_breath.mp3")
 			target:Freeze(false)
 
@@ -295,7 +294,7 @@ function SlashCo.Jumpscare(slasher, target)
 		if IsValid(slasher) then
 			slasher:Freeze(false)
 			slasher.CurrentChaseTick = 0
-			slasher:SetNWBool("CanChase", true)
+			slasher:SetCanChase(true)
 			slasher:SlasherFunction("OnKillPlayer", target)
 		end
 	end)
@@ -304,7 +303,7 @@ function SlashCo.Jumpscare(slasher, target)
 end
 
 function SlashCo.StopChase(slasher)
-	slasher:SetNWBool("InSlasherChaseMode", false)
+	slasher:SetInSlasherChaseMode(false)
 	slasher:SetNWFloat("SlasherChaseBegin", 0)
 	slasher:SetRunSpeed(slasher:SlasherValue("ProwlSpeed", 150))
 	slasher:SetWalkSpeed(slasher:SlasherValue("ProwlSpeed", 150))
@@ -328,7 +327,7 @@ function SlashCo.StopChase(slasher)
 
 	local anyChasing = false
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if slasher:GetNWBool("InSlasherChaseMode") then
+		if slasher:GetInSlasherChaseMode() then
 			anyChasing = true
 			break
 		end
@@ -343,7 +342,7 @@ function SlashCo.StartChaseMode(slasher, forceChase)
 	if not forceChase then
 		if (slasher.ChaseActivationCooldown or 0) > 0 then return end
 
-		if not slasher:GetNWBool("CanChase") then return end
+		if not slasher:GetCanChase() then return end
 
 		slasher:LagCompensation(true)
 		local trace = slasher:GetEyeTrace()
@@ -381,7 +380,7 @@ function SlashCo.StartChaseMode(slasher, forceChase)
 	end
 
 	-- Even if you use forceChase, you should never start a chase while being in a case!
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		SlashCo.StopChase(slasher)
 		return
 	end
@@ -394,7 +393,7 @@ function SlashCo.StartChaseMode(slasher, forceChase)
 		SlashCo.StopChase(slasher)
 	end)
 
-	slasher:SetNWBool("InSlasherChaseMode", true)
+	slasher:SetInSlasherChaseMode(true)
 	slasher:SetNWFloat("SlasherChaseBegin", CurTime())
 	slasher.CurrentChaseTick = 0
 	slasher.ChaseActivationCooldown = slasher:SlasherValue("ChaseCooldown", 3)

@@ -651,6 +651,8 @@ local function pickMap(ply, map)
 		return
 	end
 
+	local cost = SlashCo.GetMapForceCost()
+	if balance < cost then
 		ply:ChatText("map_notenough")
 		return
 	end

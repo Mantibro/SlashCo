@@ -50,7 +50,7 @@ if CLIENT then
 				dlight.b = 20
 				dlight.brightness = 1
 				dlight.Decay = 1000
-				dlight.Size = 180 + math.sin(intensity) * 20
+				dlight.Size = 180 + math.sin(self.Intensity) * 20
 				dlight.DieTime = CurTime() + 0.1
 			end
 		end

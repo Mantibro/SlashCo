@@ -39,7 +39,7 @@ function ITEM.OnUse(ply)
 	timer.Create("BalkanBoostStart:" .. ply:UserID(), 32, 1, function()
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
 			ply:SetNWBool("SurvivorBalkanFull", true)
-			ply:SetNWBool("MarkedBySmiley", true)
+			ply:SetMarkedBySmiley(true)
 
 			if SlashCo.IsActivePerk(ply, "BalkanWarrior") then
 				ply:AddEffect("BalkanTripWeak", 132)
@@ -53,7 +53,7 @@ function ITEM.OnUse(ply)
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
 			ply:SetNWBool("SurvivorBalkanFull", false)
 			ply:SetNWBool("SurvivorBalkan", false)
-			ply:SetNWBool("MarkedBySmiley", false)
+			ply:SetMarkedBySmiley(false)
 
 			if not SlashCo.IsActivePerk(ply, "BalkanWarrior") then
 				ply:AddEffect("Slowness", 9999)
@@ -108,7 +108,7 @@ if SERVER then
 	hook.Add("PlayerChangedTeam", "SlashCo:BalkanBoost", function(ply)
 		ply:SetNWBool("SurvivorBalkan", false)
 		ply:SetNWBool("SurvivorBalkanFull", false)
-		ply:SetNWBool("MarkedBySmiley", false)
+		ply:SetMarkedBySmiley(false)
 	end)
 
 	hook.Add("SlashCo:OnDeathWardUsed", "SlashCo:CancelBalkanBoost", function(ply)
@@ -117,7 +117,7 @@ if SERVER then
 
 		ply:SetNWBool("SurvivorBalkan", false)
 		ply:SetNWBool("SurvivorBalkanFull", false)
-		ply:SetNWBool("MarkedBySmiley", false)
+		ply:SetMarkedBySmiley(false)
 	end)
 
 	return

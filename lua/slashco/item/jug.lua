@@ -114,7 +114,7 @@ if SERVER then
 
 			if ply:GetItem("item") ~= "Jug" then return end
 			if ply:Team() ~= TEAM_SURVIVOR then return end
-			if ply:GetNWBool("SurvivorBeingJumpscared") then return end
+			if ply:GetSurvivorBeingJumpscared() then return end
 
 			SlashCo.RemoveItem(ply)
 			ply:RandomTeleport()

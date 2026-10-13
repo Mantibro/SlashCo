@@ -86,7 +86,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		--His chase speed is greatest at low milk drank, and the more he drinks, it is converted to prowl speed.
 
 
-		if slasher:GetNWBool("InSlasherChaseMode") then
+		if slasher:GetInSlasherChaseMode() then
 			slasher:SetRunSpeed(slasher.ThirstyChaseSpeed)
 			slasher:SetWalkSpeed(slasher.ThirstyChaseSpeed)
 		else
@@ -102,7 +102,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetNWBool("FullMilks", true)
 	end
 
-	if slasher:GetNWBool("FullMilks") and not slasher:GetNWBool("DemonPacified") then
+	if slasher:GetNWBool("FullMilks") and not slasher:GetDemonPacified() then
 		slasher.Thirsty = 0
 		eyesight_final = 4
 		perception_final = 2.0
@@ -209,7 +209,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 		slasher:Freeze(false)
 		slasher:SetNWBool("ThirstyDrinking", false)
-		slasher:SetNWBool("DemonPacified", true)
+		slasher:SetDemonPacified(true)
 
 		if slasher.MilkCount < (6 + SatO) then
 			slasher.MilkCount = slasher.MilkCount + 1 + SatO
@@ -224,8 +224,8 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
-	local pac = ply:GetNWBool("DemonPacified")
+	local chase = ply:GetInSlasherChaseMode()
+	local pac = ply:GetDemonPacified()
 	local drink = ply:GetNWBool("ThirstyDrinking")
 
 	if not drink then

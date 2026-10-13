@@ -45,14 +45,14 @@ function ITEM.OnUse(ply)
 
 	for _, slasher in ipairs(found) do
 		if slasher:GetNWBool("StunImmunity") then continue end
-		slasher:SetNWBool("SlasherBlinded", true)
+		slasher:SetSlasherBlinded(true)
 		slasher:SlasherFunction("OnHitByPocketSand", ply)
 	end
 
 	timer.Simple(8, function()
 		for _, slasher in ipairs(found) do
 			if not IsValid(slasher) then continue end
-			slasher:SetNWBool("SlasherBlinded", false)
+			slasher:SetSlasherBlinded(false)
 		end
 	end)
 end

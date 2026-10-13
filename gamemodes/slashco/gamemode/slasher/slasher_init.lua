@@ -51,7 +51,7 @@ function SlashCo.RegisterSlasher(table, name)
 		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
 			if slasherTbl and slasherTbl.OnBalanceForPlayers then
-				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
+				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors, SlashCo.CurRound.OfferingData.Singularity)
 			end
 		end
 
@@ -237,7 +237,7 @@ if CLIENT then
 
 		local slasherpos = GameData.LocalPlayer:GetPos()
 		local PerceptionReal = 0
-		if not GameData.LocalPlayer:GetNWBool("InSlasherChaseMode") then
+		if not GameData.LocalPlayer:GetInSlasherChaseMode() then
 			PerceptionReal = GameData.LocalPlayer:GetPerception()
 		end
 

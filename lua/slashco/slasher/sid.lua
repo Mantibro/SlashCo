@@ -113,16 +113,16 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if Pacification > 0 then
 		slasher.Pacification = Pacification - (FrameTime() + SLASHER.PacificationAddition)
-		slasher:SetNWBool("CanKill", false)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanKill(false)
+		slasher:SetCanChase(false)
 	elseif slasher:GetNWBool("SidGun", false) then
-		slasher:SetNWBool("CanKill", false)
-		slasher:SetNWBool("CanChase", false)
-		slasher:SetNWBool("DemonPacified", false)
+		slasher:SetCanKill(false)
+		slasher:SetCanChase(false)
+		slasher:SetDemonPacified(false)
 	else
-		slasher:SetNWBool("CanKill", true)
-		slasher:SetNWBool("CanChase", true)
-		slasher:SetNWBool("DemonPacified", false)
+		slasher:SetCanKill(true)
+		slasher:SetCanChase(true)
+		slasher:SetDemonPacified(false)
 	end
 
 	if GunCD > 0 then
@@ -132,7 +132,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.GunSpread = math.max(GunSP - SLASHER.GunSpreadDecrease, 0)
 	end
 
-	if ChaseIN < 160 and slasher:GetNWBool("InSlasherChaseMode") then
+	if ChaseIN < 160 and slasher:GetInSlasherChaseMode() then
 		slasher.ChaseIncrease = ChaseIN + (FrameTime() + SLASHER.ChaseIncreaseAddition) + (Cookies * FrameTime() * 0.5)
 		slasher:SetRunSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
 		slasher:SetWalkSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
@@ -140,7 +140,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.ChaseIncrease = 0
 	end
 
-	if not slasher:GetNWBool("DemonPacified") then
+	if not slasher:GetDemonPacified() then
 		if not slasher:GetNWBool("SidGun") then
 			final_eyesight = SLASHER.Eyesight
 			final_perception = SLASHER.Perception
@@ -282,7 +282,7 @@ local function EatCookie(slasher, target)
 
 		slasher:Freeze(false)
 		slasher:SetNWBool("SidEating", false)
-		slasher:SetNWBool("DemonPacified", true)
+		slasher:SetDemonPacified(true)
 		slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
 		slasher.Pacification = math.random(15, 25)
 
@@ -295,7 +295,7 @@ end
 function SLASHER.OnPrimaryFire(slasher, target)
 	if not slasher:GetNWBool("SidGun") and (IsValid(target) and target:IsPlayer() and IsPlayerHoldingCookie(target, true)) then
 		if slasher:GetNWBool("SidEatingSurvCookie") then return end
-		if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
+		if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
 
 		local pos = slasher:LocalToWorld(Vector(0, 5, 5))
 		local ang = slasher:LocalToWorldAngles(Angle(-80, 90, 0))
@@ -340,7 +340,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			if not IsValid(slasher) and not IsValid(target) then return end
 
 			slasher:SetNWBool("SidEatingSurvCookie", false)
-			slasher:SetNWBool("DemonPacified", true)
+			slasher:SetDemonPacified(true)
 			slasher:Freeze(false)
 			slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
 			slasher.Pacification = math.random(15, 25)
@@ -399,7 +399,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 		if IsValid(target) and target:IsPlayer() then
 			if target:Team() ~= TEAM_SURVIVOR then return end
-			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
+			if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
 
 			local pick_ang = SlashCo.RadialTester(slasher, 600, target)
 
@@ -412,9 +412,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 				target:SetPos(slasher:GetPos())
 				target:Freeze(true)
-				target:SetNWBool("SurvivorBeingJumpscared", true)
+				target:SetSurvivorBeingJumpscared(true)
 
-				slasher:SetNWBool("CanChase", false)
+				slasher:SetCanChase(false)
 
 				local idx = math.random(1,4)
 				SlashCo.AudioSystem.PlaySound({
@@ -431,7 +431,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				slasher:SetNWBool("SidExecuting", true)
 
 				target:SetNWBool("SurvivorDecapitate", true)
-				target:SetNWBool("SurvivorSidExecution", true)
+				target:SetSurvivorSidExecution(true)
 
 				target:SetPos(slasher:GetPos())
 				target:SetEyeAngles(Angle(0, pick_ang, 0))
@@ -475,7 +475,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				timer.Simple(4.1, function()
 					if not IsValid(slasher) or not IsValid(target) then return end
 
-					target:SetNWBool("SurvivorBeingJumpscared", false)
+					target:SetSurvivorBeingJumpscared(false)
 
 					SlashCo.AudioSystem.PlaySound({
 						soundPath = "slashco/slasher/sid/sid_shot_farthest.mp3",
@@ -520,7 +520,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 					shell:SetAngles(ang)
 					util.Effect("ShellEject", shell)
 
-					target:SetNWBool("SurvivorSidExecution", false)
+					target:SetSurvivorSidExecution(false)
 					target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
 
 					target:Freeze(false)
@@ -550,7 +550,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 hook.Add("ShouldDrawLocalPlayer", "SlashCo:SidExecution", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorSidExecution") then
+	if GameData.LocalPlayer:GetSurvivorSidExecution() then
 		return true
 	end
 end)
@@ -1012,7 +1012,7 @@ if CLIENT then
 	hook.Add("CalcView", "SidExecution", function(ply, pos, angles, fov)
 		if ply:Team() ~= TEAM_SURVIVOR then return end
 
-		if ply:GetNWBool("SurvivorSidExecution") then
+		if ply:GetSurvivorSidExecution() then
 			pos = ply:LocalToWorld(Vector(120, 120, 60))
 			angles = ply:LocalToWorldAngles(Angle(0, -135, 0))
 

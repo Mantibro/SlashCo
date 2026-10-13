@@ -94,7 +94,7 @@ function SLASHER.OnSecondaryFire(slasher)
 	if slasher:GetNWBool("FreeSmileySummoning") then return end
 	if slasher:GetNWBool("FreeSmileyPocketSand") or slasher:GetNWBool("FreeSmileyTeslaCoil") then return end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		SlashCo.StopChase(slasher)
 		return
 	end
@@ -204,7 +204,7 @@ function SLASHER.OnHitByTeslaCoil(slasher)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 	local smiley_summon = ply:GetNWBool("FreeSmileySummoning")
 	local smiley_sand_stun = ply:GetNWBool("FreeSmileyPocketSand")
 	local smiley_tesla_stun = ply:GetNWBool("FreeSmileyTeslaCoil")

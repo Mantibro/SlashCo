@@ -131,8 +131,8 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		SlashCo.StopChase(slasher)
 
-		slasher:SetNWBool("CanKill", false)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanKill(false)
+		slasher:SetCanChase(false)
 	end
 
 	if Roid == 100.25 then
@@ -261,7 +261,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if not chase then
 		ply.CalcIdeal = ACT_HL2MP_WALK

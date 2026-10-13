@@ -566,7 +566,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	local class = target:GetClass()
 	if (not target:IsPlayer() and target.PingType ~= "ITEM") or class == "sc_beacon" or class == "sc_battery" then return end
-	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance or slasher:GetNWEntity("TylerJumpscareTarget") == target then return end
 	if target:IsPlayer() and target:Team() == TEAM_SLASHER then return end
 
 	SlashCo.AudioSystem.PlaySound({
@@ -605,7 +605,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		end
 	end
 
-	slasher:SetTylerJumpscareTarget(target)
+	slasher:SetNWEntity("TylerJumpscareTarget", target)
 
 	if target:IsPlayer() then
 		target:SetSurvivorBeingJumpscared(true)
@@ -616,11 +616,14 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	timer.Simple(SLASHER.JumpscareDuration, function()
 		StopTylerChase(slasher, IsValid(target) and target:GetClass() == "sc_gascan") -- Only stop instantly, if he destoryed a fuelcan
 
-		if IsValid(target) then
-			target:SetNWBool("SurvivorBeingJumpscared", false)
-			target:SetNWBool("SurvivorJumpscare_Tyler", false)
+		if IsValid(slasher) then
+			slasher:SetNWEntity("TylerJumpscareTarget", NULL)
+		end
 
+		if IsValid(target) then
 			if target:IsPlayer() then
+				target:SetSurvivorBeingJumpscared(false)
+				target:SetSurvivorJumpscare(0)
 				target:Freeze(false)
 				target:TakeDamage(99999, slasher, slasher)
 
@@ -767,7 +770,7 @@ function SLASHER.InitHud(_, hud)
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
 		local class = IsValid(target) and target:GetClass()
 		if IsValid(target) and target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon")
-				and class ~= "sc_battery" and not target:GetNWBool("SurvivorBeingJumpscared") and
+				and class ~= "sc_battery" and GameData.LocalPlayer:GetNWEntity("TylerJumpscareTarget") ~= target and
 				GameData.LocalPlayer:GetPos():Distance(target:GetPos()) < SLASHER.KillDistance then
 
 			if not hud.destroyEnabled then

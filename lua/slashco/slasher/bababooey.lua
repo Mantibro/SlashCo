@@ -90,8 +90,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if KillCD > 0 then
-	elseif not slasher:GetNWBool("BababooeyInvisibility") then
 		slasher:SetCanKill(false)
+	elseif not slasher:GetNWBool("BababooeyInvisibility") then
 		slasher:SetCanKill(true)
 	else
 		slasher:SetCanKill(false)

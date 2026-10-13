@@ -353,9 +353,9 @@ local skullBroken = Material("slashco/ui/slashco_skull_broken", "noclamp")
 local deathward = Material("slashco/ui/deathward", "noclamp")
 local deathwardBroken = Material("slashco/ui/deathward_broken", "noclamp")
 hook.Add("PreRender", "SlashCo:DeathUI", function()
-	if not GameData.LocalPlayer:GetNW2Bool("ShowDeathUI", false) then return end
+	if not GameData.LocalPlayer:GetShowDeathUI() then return end
 
-	local curTime = GameData.LocalPlayer:GetNW2Float("DeathUITime", 0)
+	local curTime = GameData.LocalPlayer:GetDeathUITime()
 	if curTime == 0 then return end
 
 	if lastDeathTime ~= curTime then
@@ -367,8 +367,8 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 	--GameData.LocalPlayer:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")
 
 	local animTime = (CurTime() - curTime) * 2
-	local isDeathWard = GameData.LocalPlayer:GetNW2Bool("DeathWardUI", false)
-	local isRevive = GameData.LocalPlayer:GetNW2Bool("DeathReviveUI", false)
+	local isDeathWard = GameData.LocalPlayer:GetDeathWardUI()
+	local isRevive = GameData.LocalPlayer:GetDeathReviveUI()
 	if lastDeathSecond ~= math.floor(animTime) then
 		lastDeathSecond = math.floor(animTime)
 
@@ -501,7 +501,7 @@ hook.Add("SlashCo:DrawHUD", "SurvivorStruggle", function()
 	if team == TEAM_SPECTATOR then return end
 	if team ~= TEAM_SURVIVOR then return end
 
-	if (ply:GetNWBool("SurvivorTackled") == true) or (ply:GetNWBool("SurvivorGrabbed") == true) or (ply:GetNWBool("SurvivorDragged") == true) then
+	if ply:GetSurvivorTackled() or ply:GetSurvivorGrabbed() or ply:GetSurvivorDragged() then
 		if GameData.LocalPlayer.struggle_key == nil then
 			GameData.LocalPlayer.struggle_key = 0
 		end
@@ -598,8 +598,8 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 			continue
 		end
 
-		if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage")
-				or (slasher:GetNWBool("InSlasherChaseMode") and slasher:GetNWBool("DisableChaseLight")) then
+		if not slasher:GetInSlasherChaseMode() and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage")
+				or (slasher:GetInSlasherChaseMode() and slasher:GetNWBool("DisableChaseLight")) then
 			continue
 		end
 

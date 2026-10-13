@@ -132,8 +132,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 0.0
 		eyesight_final = 10
 
-		slasher:SetNWBool("CanKill", false)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanKill(false)
+		slasher:SetCanChase(false)
 		slasher:SetImpervious(true)
 	elseif State == 1 then
 		--Human mode
@@ -143,8 +143,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 1.0
 		eyesight_final = 2
 
-		slasher:SetNWBool("CanKill", true)
-		slasher:SetNWBool("CanChase", true)
+		slasher:SetCanKill(true)
+		slasher:SetCanChase(true)
 		slasher:SetImpervious(false)
 
 		if slasher.CurrentChaseTick == 99 then
@@ -158,11 +158,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 1.5
 		eyesight_final = 5
 
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		slasher:SetImpervious(false)
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		if State == 1 then
 			slasher.TimeChasingAsHuman = ChaseAsHuman + FrameTime()
 
@@ -175,7 +175,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				timer.Simple(3, function()
 					if not IsValid(slasher) then return end
 
-					if slasher:GetNWBool("InSlasherChaseMode") then
+					if slasher:GetInSlasherChaseMode() then
 						slasher:SetRunSpeed(chase_final)
 						slasher:SetWalkSpeed(chase_final)
 					end
@@ -297,7 +297,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
-	if slasher.MaleCooldown > 0 or slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher.MaleCooldown > 0 or slasher:GetInSlasherChaseMode() then return end
 	if slasher:GetNWBool("Male07Stunned") then return end
 
 	if IsValid(target) and target:GetClass() == "sc_maleclone" and slasher:GetPos():Distance(target:GetPos()) < 150 then
@@ -372,7 +372,7 @@ function SLASHER.OnHitByPocketSand(slasher, ply)
 		slasher.MaleCooldown = 3
 
 		Male07Transform(slasher)
-		slasher:SetNWBool("CanChase", true)
+		slasher:SetCanChase(true)
 	else
 		SlashCo.StopChase(slasher)
 
@@ -408,7 +408,7 @@ function SLASHER.Animator(ply)
 	local male_slashing = ply:GetNWBool("Male07Slashing")
 	local male_transforming = ply:GetNWBool("Male07Transforming")
 	local male_stunned = ply:GetNWBool("Male07Stunned")
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:GetModel() == "models/humans/group01/male_07.mdl" then
 		if ply:IsOnGround() then

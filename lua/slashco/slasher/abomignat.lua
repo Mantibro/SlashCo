@@ -211,7 +211,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNWBool("AbomignatCrawling") then
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanChase(false)
 
 		slasher:SetSlowWalkSpeed(SLASHER.CrawlSpeed)
 		slasher:SetWalkSpeed(SLASHER.CrawlSpeed)
@@ -233,7 +233,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetViewOffset(crawling_viewoffset)
 		slasher:SetCurrentViewOffset(crawling_viewoffset)
 	else
-		slasher:SetNWBool("CanChase", slasher:GetNWBool("AbomignatCanMainSlash"))
+		slasher:SetCanChase(slasher:GetNWBool("AbomignatCanMainSlash"))
 
 		if slasher:GetNWBool("AbomignatCrouch") then
 			eyesight_final = 0
@@ -253,7 +253,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetCurrentViewOffset(standing_viewoffset)
 		end
 
-		if not slasher:GetNWBool("InSlasherChaseMode") then
+		if not slasher:GetInSlasherChaseMode() then
 			if slasher:GetNWBool("AbomignatCrouch") or slasher:GetNWBool("AbomignatLungeFinish") then
 				slasher:SetSlowWalkSpeed(1)
 				slasher:SetWalkSpeed(1)
@@ -441,7 +441,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		return
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher:GetInSlasherChaseMode() then return end
 	if slasher:GetNWBool("AbomignatSlashing") then return end
 	if slasher:GetNWBool("AbomignatLungeShort") or slasher:GetNWBool("AbomignatLungeLarge") then return end
 	if slasher:GetNWBool("AbomignatLungeFinish") then return end
