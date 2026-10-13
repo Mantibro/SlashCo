@@ -39,6 +39,14 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("HoovyGrabLoop") then return 100 end
+
+	if SlashCo.GetGameProgress() > 3 then
+		return slasher:GetInSlasherChaseMode() and 280 or 200
+	end
+end
+
 local function HoovyIdle(slasher)
 	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
 	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNW2String("Slasher")] ~= SLASHER then return end
@@ -95,8 +103,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	local GenBlocked = slasher.GeneratorBlockDuration or 0 -- Generator Block Duration
 	local RopeCD = slasher.RopeCooldown or 0 -- Rope Grab Cooldown
 	local RopeTime = slasher.RopeDuration or 0 -- Rope Grab Duration
-	local prowl_final = SLASHER.ProwlSpeed
-	local chase_final = SLASHER.ChaseSpeed
 
 	if GenCD > 0 then
 		slasher.GeneratorBlockCooldown = GenCD - FrameTime()
@@ -107,8 +113,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if SlashCo.CurRound.GameProgress > 3 then
 		slasher:SetNW2Bool("HoovyCanBlock", true)
-		prowl_final = 200
-		chase_final = 280
 	end
 
 	if SlashCo.CurRound.GameProgress > 4 then
@@ -123,10 +127,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if IsValid(slasher.SurvivorRoped) then
-		slasher:SetRunSpeed(100)
-		slasher:SetWalkSpeed(100)
-		slasher:SetSlowWalkSpeed(100)
-
 		if not slasher.SurvivorRoped:IsFrozen() then
 			slasher.SurvivorRoped:Freeze(true)
 		end
@@ -173,16 +173,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	else
 		slasher.RopeEnd = nil
-		if not slasher:GetInSlasherChaseMode() then
-			slasher:SetRunSpeed(prowl_final)
-			slasher:SetWalkSpeed(prowl_final)
-			slasher:SetSlowWalkSpeed(prowl_final)
-		else
-			slasher:SetRunSpeed(chase_final)
-			slasher:SetWalkSpeed(chase_final)
-			slasher:SetSlowWalkSpeed(chase_final)
-		end
-
 		slasher:SetCanChase(true)
 		slasher.SurvivorRoped = nil
 
@@ -258,9 +248,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		if eyeTrace.Entity:IsPlayer() and eyeTrace.Entity:Team() == TEAM_SURVIVOR and slasher:GetPos():Distance(eyeTrace.Entity:GetPos()) < dist * 2 then
 			find_p = eyeTrace.Entity
 
-			slasher:SetRunSpeed(1)
-			slasher:SetWalkSpeed(1)
-			slasher:SetSlowWalkSpeed(1)
 			slasher:SetNW2Bool("HoovyGrabStart", true)
 
 			local idx = math.random(1, 2)

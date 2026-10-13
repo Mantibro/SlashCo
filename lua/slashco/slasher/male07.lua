@@ -39,6 +39,10 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if not slasher:GetVisible() then return 300 end
+end
+
 local MALE07_GHOST = 0
 local MALE07_POSESSED = 1
 local MALE07_MONSTER = 2
@@ -108,8 +112,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	local MaleCD = slasher.MaleCooldown or 0 --Cooldown
 	local SlashCD = slasher.SlashCooldown or 0 --Slash Cooldown
 
-	local prowl_final = SLASHER.ProwlSpeed
-	local chase_final = SLASHER.ChaseSpeed
 	local eyesight_final = SLASHER.Eyesight
 	local perception_final = SLASHER.Perception
 
@@ -127,8 +129,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	if State == 0 then
 		--Specter mode
 
-		prowl_final = 300
-		chase_final = 300
 		perception_final = 0.0
 		eyesight_final = 10
 
@@ -138,8 +138,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	elseif State == 1 then
 		--Human mode
 
-		prowl_final = 100
-		chase_final = 302
 		perception_final = 1.0
 		eyesight_final = 2
 
@@ -153,8 +151,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	elseif State == 2 then
 		--Monster mode
 
-		prowl_final = 150
-		chase_final = 285
 		perception_final = 1.5
 		eyesight_final = 5
 
@@ -172,14 +168,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				--Become Monster
 
 				Male07Transform(slasher)
-				timer.Simple(3, function()
-					if not IsValid(slasher) then return end
-
-					if slasher:GetInSlasherChaseMode() then
-						slasher:SetRunSpeed(chase_final)
-						slasher:SetWalkSpeed(chase_final)
-					end
-				end)
 			end
 		end
 	else
@@ -330,9 +318,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		slasher.MaleCooldown = 3
 		slasher.SlashCooldown = 5
 
-		slasher:SetWalkSpeed(100)
-		slasher:SetRunSpeed(100)
-
 		return
 	end
 
@@ -356,9 +341,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 			volume = 1,
 			fadeIn = 0,
 		})
-
-		slasher:SetWalkSpeed(300)
-		slasher:SetRunSpeed(300)
 
 		return
 	end

@@ -44,6 +44,22 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("AbomignatCrawling") then
+		return SLASHER.CrawlSpeed
+	end
+
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.ChaseSpeed
+	end
+
+	if slasher:GetNW2Bool("AbomignatCrouch") or slasher:GetNW2Bool("AbomignatLungeFinish") then
+		return 1
+	end
+
+	return SLASHER.ProwlSpeed
+end
+
 local function PlayBreathing(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/abomignat/abomignat_breathing.mp3",
@@ -213,10 +229,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	if slasher:GetNW2Bool("AbomignatCrawling") then
 		slasher:SetCanChase(false)
 
-		slasher:SetSlowWalkSpeed(SLASHER.CrawlSpeed)
-		slasher:SetWalkSpeed(SLASHER.CrawlSpeed)
-		slasher:SetRunSpeed(SLASHER.CrawlSpeed)
-
 		eyesight_final = 0
 		perception_final = 0
 
@@ -251,22 +263,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			slasher:SetViewOffset(standing_viewoffset)
 			slasher:SetCurrentViewOffset(standing_viewoffset)
-		end
-
-		if not slasher:GetInSlasherChaseMode() then
-			if slasher:GetNW2Bool("AbomignatCrouch") or slasher:GetNW2Bool("AbomignatLungeFinish") then
-				slasher:SetSlowWalkSpeed(1)
-				slasher:SetWalkSpeed(1)
-				slasher:SetRunSpeed(1)
-			else
-				slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-				slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-				slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			end
-		else
-			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
 		end
 	end
 
@@ -505,20 +501,12 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 						slasher.LungeDuration = 0
 						slasher:SetNW2Bool("AbomignatLungeFinish", false)
 						slasher:Freeze(false)
-
-						slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-						slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-						slasher:SetRunSpeed(SLASHER.ProwlSpeed)
 					end
 				end)
 			end)
 
 			return
 		else
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-
 			slasher:SetNW2Bool("AbomignatCrouch", false)
 			slasher:SetNW2Bool("AbomignatLungeLarge", true)
 

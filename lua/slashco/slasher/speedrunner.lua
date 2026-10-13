@@ -28,6 +28,10 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★★"
 
+function SLASHER.GetSpeed(slasher)
+	return slasher:GetNW2Int("SpeedrunnerSpeed")
+end
+
 function SLASHER.OnSpawn(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/speedrunner/speedrunner_1.ogg",
@@ -47,6 +51,7 @@ function SLASHER.OnSpawn(slasher)
 	end)
 
 	slasher.Speedrun = 100
+	slasher:SetNW2Int("SpeedrunnerSpeed", slasher.Speedrun)
 	slasher.Speedrunning = 1
 	slasher.Speedrunned = 285
 end
@@ -64,12 +69,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.Speedrun = Speed + engine.TickInterval() * mapSizeMod * SpeedGain * (1 + SO) * 0.66 * gasMod
 	end
 
-	slasher:SetRunSpeed(math.floor(slasher.Speedrun))
-	slasher:SetWalkSpeed(math.floor(slasher.Speedrun))
-	slasher:SetSlowWalkSpeed(math.floor(slasher.Speedrun))
-
-	if slasher:GetNW2Int("SpeedrunnerSpeed") ~= math.floor(Speed) then
-		slasher:SetNW2Int("SpeedrunnerSpeed", math.floor(Speed))
+	if slasher:GetNW2Int("SpeedrunnerSpeed") ~= math.floor(slasher.Speedrun) then
+		slasher:SetNW2Int("SpeedrunnerSpeed", math.floor(slasher.Speedrun))
 	end
 
 	slasher:SetEyeSight(SLASHER.Eyesight)

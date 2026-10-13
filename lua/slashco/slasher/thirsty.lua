@@ -39,6 +39,21 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetDemonPacified() then
+		return 100
+	end
+
+	local milks = slasher:GetNW2Int("ThirstyMilkDrank")
+	if slasher:GetInSlasherChaseMode() then
+		return 290 - (milks * 10)
+	end
+
+	local thirst = slasher:GetNW2Int("ThirstyThirst")
+	local SO = GetGlobal2Int("SlashCo:BalanceSingularity")
+	return 100 - ((thirst / math.max(7 - milks, 1)) - (milks * 40)) * (0.8 + (SO * 0.5))
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
@@ -61,8 +76,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if Pacification > 0 then
 		--Thirsty is pacified
-		slasher.ThirstyProwlSpeed = 100
-		slasher.ThirstyChaseSpeed = 100
 		eyesight_final = 0
 		perception_final = 0
 
@@ -78,21 +91,11 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 		--Deplete thirst
 
-		slasher.ThirstyChaseSpeed = 290 - (Milks * 10)
-		slasher.ThirstyProwlSpeed = 100 - ((Thirst / (7 - Milks)) - (Milks * 40)) * (0.8 + (SO * 0.5))
 		eyesight_final = 2 + (Thirst / (28.5 - (Milks * 4)))
 		perception_final = 1.0 + (Thirst / (44.5 - (Milks * 8)))
 		--Thirsty's basic stats raise the thirstier he is, and are also multiplied by how much milk he has drunk.
 		--His chase speed is greatest at low milk drank, and the more he drinks, it is converted to prowl speed.
 
-
-		if slasher:GetInSlasherChaseMode() then
-			slasher:SetRunSpeed(slasher.ThirstyChaseSpeed)
-			slasher:SetWalkSpeed(slasher.ThirstyChaseSpeed)
-		else
-			slasher:SetRunSpeed(slasher.ThirstyProwlSpeed)
-			slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
-		end
 		slasher:SetCanKill(true)
 		slasher:SetCanChase(true)
 		slasher:SetDemonPacified(false)
@@ -138,8 +141,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 
 	slasher:SetNW2Bool("ThirstyDrinking", true)
 	SlashCo.StopChase(slasher)
-	slasher:SetRunSpeed(slasher.ThirstyProwlSpeed)
-	slasher:SetWalkSpeed(slasher.ThirstyProwlSpeed)
 	slasher.Pacification = 99
 	slasher:Freeze(true)
 

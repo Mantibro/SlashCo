@@ -74,6 +74,12 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("PrincessDraggingSurvivor") then
+		return SLASHER.MaulingSpeed
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 50))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 50))
@@ -236,11 +242,6 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher.Aggression = Aggression + FrameTime()
 		end
 
-		local speed = SLASHER.ChaseSpeed + (Aggression / 5)
-
-		slasher:SetRunSpeed(speed)
-		slasher:SetWalkSpeed(speed)
-
 		local lookent = slasher:GetEyeTrace().Entity
 
 		if lookent:GetPos():Distance(slasher:GetPos()) < 100 then
@@ -282,10 +283,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if IsValid(slasher.SurvivorDragged) then
-		slasher:SetRunSpeed(SLASHER.MaulingSpeed)
-		slasher:SetWalkSpeed(SLASHER.MaulingSpeed)
-		slasher:SetSlowWalkSpeed(SLASHER.MaulingSpeed)
-
 		slasher:SetCollisionBounds(Vector(-70, 0 , 0), Vector(70, 0 , 0))
 
 		slasher.SurvivorDragged:SetPos(slasher:LocalToWorld(Vector(60, 0, 0)))
@@ -321,16 +318,6 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	else
 		slasher.DragEnd = nil
-		if not slasher:GetInSlasherChaseMode() then
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		else
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-		end
-
 		slasher:SetNW2Bool("PrincessDraggingSurvivor", false)
 		slasher:SetCanChase(true)
 		slasher.SurvivorDragged = nil

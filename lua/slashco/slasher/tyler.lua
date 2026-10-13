@@ -68,6 +68,18 @@ local TYLER_SPECTER = 0
 local TYLER_CREATOR = 1
 local TYLER_PRE_DESTROYER = 2
 local TYLER_DESTROYER = 3
+
+function SLASHER.GetSpeed(slasher)
+	local state = slasher:GetNW2Int("TylerState")
+	if state == TYLER_SPECTER then
+		return SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher))
+	elseif state == TYLER_DESTROYER then
+		return SLASHER.ChaseSpeed
+	end
+
+	return 1
+end
+
 function TylerSwitchForm(slasher, newForm)
 	local anger = SlashCo.GetSlasherAnger(slasher)
 	if newForm == TYLER_CREATOR and anger > 50 and math.random(1, 200 - anger) == 1 then
@@ -188,9 +200,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		slasher.TylerSongPickedID = nil
 		slasher:SetNW2Bool("TylerFlash", false)
-		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
 		slasher:SetNW2Bool("TylerTheCreator", false)
 		slasher:SetCanSeePlayers(false)
 		slasher:SetBodygroup(0, 0)
@@ -219,9 +228,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		slasher:SetImpervious(false)
 		slasher:SetNW2Bool("TylerFlash", false)
-		slasher:SetSlowWalkSpeed(1)
-		slasher:SetRunSpeed(1)
-		slasher:SetWalkSpeed(1)
 		slasher:Freeze(true)
 		slasher:SetNW2Bool("TylerTheCreator", true)
 		slasher:SetBodygroup(0, 0)
@@ -421,9 +427,6 @@ function SLASHER.OnTickBehaviour(slasher)
 			SetGlobal2Bool("DisplayTylerTheDestroyerEffects", true)
 		end
 
-		slasher:SetSlowWalkSpeed(1)
-		slasher:SetRunSpeed(1)
-		slasher:SetWalkSpeed(1)
 		slasher:SetNW2Bool("TylerTheCreator", false)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = 0
@@ -432,9 +435,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	elseif TylerState == TYLER_DESTROYER then
 		--Destroyer
 
-		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 		slasher:SetNW2Bool("TylerTheCreator", false)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()

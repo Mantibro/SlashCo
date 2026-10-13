@@ -81,6 +81,10 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("ManspiderClimbing") or slasher:GetNW2Bool("ManspiderNested") then return 1 end
+end
+
 local grabBlacklist = {
 	["sc_manspidernest"] = true,
 	["sc_activebeacon"] = true,
@@ -174,7 +178,6 @@ end
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 20))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 20))
-	slasher.Jump = slasher:GetJumpPower()
 
 	slasher:SetNW2Bool("ManspiderClimbing", false)
 	slasher:SetNW2Bool("ManspiderStealing", false)
@@ -240,7 +243,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if slasher.NestSound ~= slasher:GetNW2Bool("ManspiderNested") then
 			StopIdle(slasher)
-			slasher:SetJumpPower(0)
 			slasher.NestSound = slasher:GetNW2Bool("ManspiderNested")
 		end
 
@@ -266,10 +268,6 @@ function SLASHER.OnTickBehaviour(slasher)
 			PlayScream(slasher)
 			slasher.TargetPlayer = survivor
 			slasher:SetNW2Bool("ManspiderNested", false)
-
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 		end
 
 		slasher.Anger = 0
@@ -279,7 +277,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if slasher.NestSound ~= slasher:GetNW2Bool("ManspiderNested") then
 			PlayIdle(slasher)
-			slasher:SetJumpPower(slasher.Jump)
 			slasher.NestSound = slasher:GetNW2Bool("ManspiderNested")
 		end
 
@@ -623,22 +620,9 @@ local vectorAddNormal = Vector(0, 0, 0)
 local vectorAddHigh = Vector(0, 0, 64)
 function SLASHER.Move(ply, mv)
 	if ply:GetNW2Bool("ManspiderClimbing") or ply:GetNW2Bool("ManspiderNested") then
-		ply:SetRunSpeed(1)
-		ply:SetWalkSpeed(1)
-		ply:SetSlowWalkSpeed(1)
 		ply:SetVelocity(-ply:GetVelocity())
 
 		return true
-	end
-
-	if ply:GetInSlasherChaseMode() then
-		ply:SetRunSpeed(SLASHER.ChaseSpeed)
-		ply:SetWalkSpeed(SLASHER.ChaseSpeed)
-		ply:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-	else
-		ply:SetRunSpeed(SLASHER.ProwlSpeed)
-		ply:SetWalkSpeed(SLASHER.ProwlSpeed)
-		ply:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
 	end
 
 	if ply:OnGround() or ply:WaterLevel() > 0 then

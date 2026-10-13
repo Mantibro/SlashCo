@@ -50,6 +50,19 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("WatcherRage") then
+		return 300
+	end
+
+	local watched = slasher:GetNW2Bool("WatcherWatched") and 1 or 0
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.ChaseSpeed - (watched * 80)
+	end
+
+	return SLASHER.ProwlSpeed - (watched * 120)
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 100))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 100))
@@ -58,7 +71,6 @@ function SLASHER.OnSpawn(slasher)
 
 	slasher.SurveyLength = 0
 	slasher.SurveyCooldown = 0
-	slasher.WatcherWatched = 0
 	slasher.StalkTime = 0
 end
 
@@ -71,10 +83,7 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local SurveyLG = slasher.SurveyLength or 0 --Survey Length
 	local SurveyCD = slasher.SurveyCooldown or 0 --Survey Cooldown
-	local Watched = slasher.WatcherWatched or 0 --Watched
 	local Stalking = slasher.StalkTime or 0 --Stalk time
-
-	slasher.WatcherWatched = slasher:GetNW2Bool("WatcherWatched") and 1 or 0
 
 	if not slasher:GetNW2Bool("WatcherRage") then
 		if SurveyLG > 0 then
@@ -82,24 +91,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	else
 		slasher.SurveyLength = 1
-		slasher.WatcherWatched = 0.65
 		slasher:SetCanChase(false)
-	end
-
-	if slasher:GetInSlasherChaseMode() then
-		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed - (Watched * 80))
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed - (Watched * 80))
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed - (Watched * 80))
-	else
-		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed - (Watched * 120))
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed - (Watched * 120))
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed - (Watched * 120))
-	end
-
-	if slasher:GetNW2Bool("WatcherRage") then
-		slasher:SetSlowWalkSpeed(300)
-		slasher:SetWalkSpeed(300)
-		slasher:SetRunSpeed(300)
 	end
 
 	if SurveyCD > 0 then

@@ -49,8 +49,21 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("DolphinInHiding") then
+		return 1
+	end
+
+	return slasher:GetNW2Bool("DolphinHunting") and SLASHER.ChaseSpeed or SLASHER.ProwlSpeed
+end
+
+function SLASHER.Move(ply, mv)
+	if ply:GetNW2Bool("DolphinInHiding") then
+		mv:SetButtons(bit.band(mv:GetButtons(), bit.bnot(IN_JUMP)))
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
-	slasher.Jump = slasher:GetJumpPower()
 	slasher:SetNW2Bool("DolphinCanActivate", false)
 
 	slasher.HuntPower = 0
@@ -121,11 +134,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNW2Bool("DolphinInHiding") and not slasher:GetNW2Bool("DolphinFound") then
-		slasher:SetJumpPower(0)
-		slasher:SetRunSpeed(1)
-		slasher:SetWalkSpeed(1)
-		slasher:SetSlowWalkSpeed(1)
-
 		--get hunt yes.....
 		if HuntPower < 100 then
 			slasher.HuntPower = HuntPower + (FrameTime() / SLASHER.HuntPowerGainDiv)
@@ -193,22 +201,8 @@ function SLASHER.OnTickBehaviour(slasher)
 			end
 		end
 
-		slasher:SetJumpPower(slasher.Jump)
-
-		--urgh i can move yes lmao
-
-		if not slasher:GetNW2Bool("DolphinHunting") then
-			--auggh im slow :((
-
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		else
+		if slasher:GetNW2Bool("DolphinHunting") then
 			--you're fucking dead
-
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
 
 			hunt_boost = 1
 

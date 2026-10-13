@@ -82,6 +82,14 @@ function SLASHER.OnSpawn(slasher)
 	slasher.TrollgeDashing = 0
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("TrollgeStage2") then
+		return 450, SLASHER.ChaseSpeed
+	elseif slasher:GetNW2Bool("TrollgeStage1") then
+		return 280, 150
+	end
+end
+
 local function stopDash(slasher)
 	if not slasher:GetNW2Bool("TrollgeDashFinish") then
 		SlashCo.AudioSystem.StopSound("TrollgeScreech", 0.5, slasher)
@@ -208,8 +216,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				fadeIn = 0,
 			})
 
-			slasher:SetRunSpeed(280)
-			slasher:SetWalkSpeed(150)
 			slasher:SetCanKill(true)
 
 			for _, ply in player.Iterator() do
@@ -252,8 +258,6 @@ function SLASHER.OnTickBehaviour(slasher)
 				fadeIn = 0,
 			})
 
-			slasher:SetRunSpeed(450)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 			final_eyesight = 10
 
 			for _, ply in player.Iterator() do
@@ -393,8 +397,6 @@ function SLASHER.OnTickBehaviour(slasher)
 					fadeIn = 0,
 				})
 
-				slasher:SetRunSpeed(450)
-				slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 				final_eyesight = 10
 				slasher:SetCanKill(true)
 

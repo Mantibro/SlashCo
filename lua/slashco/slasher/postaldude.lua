@@ -78,6 +78,19 @@ local function MGBulletsControl(slasher, bullets)
 	slasher.MGBulletsAmount = math.Clamp(MGBulletsAmount(slasher) + bullets, 0, 20)
 end
 
+-- Postal Dude loses his patience during chase, which slows him down, tl;dr, longer chase = less patience || less patience = slower movement speed
+local POSTAL_MIN_SPEED = 0.9
+local POSTAL_MAX_SPEED = 1.0
+
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("SwitchToGas") and slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
+		return SLASHER.ChaseSpeed - 100 -- Nerf his speed a bit when carrying a gas can
+	end
+
+	local patience = Lerp(SlashCo.GetSlasherAnger(slasher) / 100, POSTAL_MIN_SPEED, POSTAL_MAX_SPEED)
+	return (slasher:GetInSlasherChaseMode() and SLASHER.ChaseSpeed or SLASHER.ProwlSpeed) * patience
+end
+
 local function PrincessBestDog()
     for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
         if s:GetNW2String("Slasher") == "Princess" then return true end
@@ -316,23 +329,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	-- Passively regenerate fuel
 	PostalDudeFuelControl(slasher, SLASHER.FuelRegen)
 
-	-- Postal Dude loses his patience during chase, which slows him down, tl;dr, longer chase = less patience || less patience = slower movement speed
-	local PostalMinSpeed = 0.9
-	local PostalMaxSpeed = 1.0
-
-	if slasher:GetNW2Bool("SwitchToGas") then
-		if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed - 100)	-- Nerf his speed a bit when carrying a gas can
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed - 100)
-		end
-	else
-		if slasher:GetNW2Int("PostalStage") ~= POSTAL_RAGE_STAGE then
-			slasher:SetRunSpeed(310)
-			slasher:SetWalkSpeed(310)
-		end
-
-		local PostalPatience = Lerp(SlashCo.GetSlasherAnger(slasher) / 100, PostalMinSpeed,	PostalMaxSpeed)
-
+	if not slasher:GetNW2Bool("SwitchToGas") then
 		if slasher:GetInSlasherChaseMode() then
 			if SlashCo.GetSlasherAnger(slasher) == 0 and not slasher.BoredAlready then
 				slasher.BoredAlready = true
@@ -351,12 +348,8 @@ function SLASHER.OnTickBehaviour(slasher)
 				slasher.BoredAlready = false
 			end
 			SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceChaseDecrease)
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed * PostalPatience)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed * PostalPatience)
 		else
 			SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceChaseIncrease)
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed * PostalPatience)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed * PostalPatience)
 		end
 	end
 
@@ -534,14 +527,6 @@ if SERVER then
 		ply:SetBodygroup(2, 0)
 		ply:SetBodygroup(3, 0)
 		ply:SetBodygroup(4, 0)	-- Clear every bodygroup and use the right one
-
-		if ply:GetNW2Int("PostalStage") == POSTAL_RAGE_STAGE then
-			ply:SetRunSpeed(310)
-			ply:SetWalkSpeed(310)
-		else
-			ply:SetRunSpeed(SLASHER.ChaseSpeed)
-			ply:SetWalkSpeed(SLASHER.ChaseSpeed)
-		end
 
 		-- More hud stuff
 		if ply.DeagleUnlocked then 

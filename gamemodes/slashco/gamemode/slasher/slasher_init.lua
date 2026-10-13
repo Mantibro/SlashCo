@@ -47,17 +47,8 @@ function SlashCo.RegisterSlasher(table, name)
 	SlashCoSlashers[name] = table
 	SlashCoSlashersByID[ID] = table
 
-	if SERVER then
-		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			local slasherTbl = SlashCoSlashers[slasher:GetNW2String("Slasher")]
-			if slasherTbl and slasherTbl.OnBalanceForPlayers then
-				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors, SlashCo.CurRound.OfferingData.Singularity)
-			end
-		end
-
-		if SC_CURRENT_SLASHER_FILE then
-			SlashCo.PrecacheSlasherAddon(SC_CURRENT_SLASHER_FILE)
-		end
+	if SERVER and SC_CURRENT_SLASHER_FILE then
+		SlashCo.PrecacheSlasherAddon(SC_CURRENT_SLASHER_FILE)
 	end
 end
 
@@ -103,6 +94,65 @@ function PLAYER:SlasherFunction(value, ...)
 	if SlashCoSlashers[slasher] and SlashCoSlashers[slasher][value] then
 		return SlashCoSlashers[slasher][value](self, ...)
 	end
+end
+
+local function GetBaseValues(slasherTbl)
+	if not slasherTbl.BaseValues then
+		local base = {}
+		for key, value in pairs(slasherTbl) do
+			if isnumber(value) then
+				base[key] = value
+			end
+		end
+
+		slasherTbl.BaseValues = base
+	end
+
+	return slasherTbl.BaseValues
+end
+
+--[[
+	Example:
+
+	totalSurvivors = How many survivors existed when they got spawned in using the helicopter
+	additionalSurvivors = How many survivors above or below the base max survivor count exist. If 2 total survivors exist them this would be -4 since 2 - 6(the base max survivors) = -4
+
+	function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+		SLASHER.ProwlSpeed = 140 + (5 * totalSurvivors)
+	end
+]]
+function SlashCo.BalanceSlasher(slasherTbl)
+	if not slasherTbl or not slasherTbl.OnBalanceForPlayers then return end
+
+	local survivors = GetGlobal2Int("SlashCo:BalanceSurvivors")
+	local singularity = GetGlobal2Int("SlashCo:BalanceSingularity")
+	if slasherTbl.BalancedSurvivors == survivors and slasherTbl.BalancedSingularity == singularity then return end
+
+	for key, value in pairs(GetBaseValues(slasherTbl)) do
+		slasherTbl[key] = value
+	end
+
+	slasherTbl.BalancedSurvivors = survivors
+	slasherTbl.BalancedSingularity = singularity
+	slasherTbl.OnBalanceForPlayers(survivors, survivors - GameData.BaseMaxSurvivors, singularity)
+end
+
+function PLAYER:SetSlasherSpeed(run, walk)
+	walk = walk or run
+	if self:GetRunSpeed() == run and self:GetWalkSpeed() == walk then return end
+
+	self:SetRunSpeed(run)
+	self:SetWalkSpeed(walk)
+	self:SetSlowWalkSpeed(walk)
+end
+
+function PLAYER:UpdateSlasherSpeed()
+	local run, walk = self:SlasherFunction("GetSpeed")
+	if not run then
+		run = self:SlasherValue(self:GetInSlasherChaseMode() and "ChaseSpeed" or "ProwlSpeed", 150)
+	end
+
+	self:SetSlasherSpeed(run, walk)
 end
 
 function PLAYER:SlasherStunDeafen(duration)
@@ -194,8 +244,20 @@ hook.Add("PlayerFootstep", "SlashCo:SlasherFootstep", function(ply)
 	return ply:SlasherFunction("Footstep")
 end)
 
+local function GainPassiveAnger(slasher)
+	local gain = slasher:SlasherValue("AngerPassiveGain", 0)
+	if gain == 0 or GameData.IsLobby then return end
+
+	slasher:SetSlasherAnger(math.Clamp(slasher:GetSlasherAnger() + gain * engine.TickInterval(), 0, 100))
+end
+
 hook.Add("Move", "SlashCo:SlasherMove", function(ply, mv)
 	if ply:Team() ~= TEAM_SLASHER then return end
+
+	SlashCo.BalanceSlasher(SlashCoSlashers[ply:GetNW2String("Slasher")])
+	ply:UpdateSlasherSpeed()
+	GainPassiveAnger(ply)
+
 	return ply:SlasherFunction("Move", mv)
 end)
 

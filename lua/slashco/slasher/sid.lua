@@ -60,6 +60,20 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("SidGunAiming") or slasher:GetNW2Bool("SidGunAimed") then
+		return 1
+	end
+
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.ChaseSpeed + (slasher:GetNW2Float("SidChaseIncrease") / 3.5)
+	end
+
+	if slasher:GetNW2Bool("SidGunEquipped") and slasher:GetNW2Bool("SidGunRage") then
+		return SLASHER.ChaseSpeed, SLASHER.ProwlSpeed
+	end
+end
+
 local function PlayShots(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/sid/sid_shot.mp3",
@@ -97,7 +111,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher.Pacification = 0
 	slasher.GunCooldown = 0
 	slasher.GunSpread = 0
-	slasher.ChaseIncrease = 0
+	slasher:SetNW2Float("SidChaseIncrease", 0)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
@@ -106,7 +120,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	local Pacification = slasher.Pacification or 0
 	local GunCD = slasher.GunCooldown or 0 --Gun use cooldown
 	local GunSP = slasher.GunSpread or 0 --bullet spread
-	local ChaseIN = slasher.ChaseIncrease or 0 --chase speed increase
+	local ChaseIN = slasher:GetNW2Float("SidChaseIncrease") --chase speed increase
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
@@ -133,11 +147,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if ChaseIN < 160 and slasher:GetInSlasherChaseMode() then
-		slasher.ChaseIncrease = ChaseIN + (FrameTime() + SLASHER.ChaseIncreaseAddition) + (Cookies * FrameTime() * 0.5)
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed + (ChaseIN / 3.5))
-	else
-		slasher.ChaseIncrease = 0
+		slasher:SetNW2Float("SidChaseIncrease", ChaseIN + (FrameTime() + SLASHER.ChaseIncreaseAddition) + (Cookies * FrameTime() * 0.5))
+	elseif ChaseIN ~= 0 then
+		slasher:SetNW2Float("SidChaseIncrease", 0)
 	end
 
 	if not slasher:GetDemonPacified() then
@@ -160,12 +172,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if SlashCo.CurRound.GameProgress > 9 and not slasher:GetNW2Bool("SidGunRage") then
 		slasher:SetNW2Bool("SidGunRage", true)
-
-		if slasher:GetNW2Bool("SidGunEquipped") then
-			if not slasher:GetNW2Bool("SidGunAimed") and not slasher:GetNW2Bool("SidGunAiming") then
-				slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-			end
-		end
 	end
 
 	if slasher:GetNW2Bool("SidGunRage") and not slasher.SidGunLetterC and slasher:GetNW2Bool("SidGunEquipped") then
@@ -207,12 +213,6 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if not slasher:GetNW2Bool("SidGunRage") then
 			slasher:SetNW2Bool("SidGunRage", true)
-
-			if slasher:GetNW2Bool("SidGunEquipped") then
-				if not slasher:GetNW2Bool("SidGunAimed") and not slasher:GetNW2Bool("SidGunAiming") then
-					slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-				end
-			end
 		end
 	end
 
@@ -568,14 +568,9 @@ function SLASHER.OnSecondaryFire(slasher)
 		return
 	end
 
-	local gunrage = slasher:GetNW2Bool("SidGunRage")
-
 	if not slasher:GetNW2Bool("SidGunAimed") and not slasher:GetNW2Bool("SidGunAiming") and slasher.GunCooldown < 0.01 then
 		slasher:SetNW2Bool("SidGunAiming", true)
 		slasher.GunCooldown = 2
-		slasher:SetSlowWalkSpeed(1)
-		slasher:SetWalkSpeed(1)
-		slasher:SetRunSpeed(1)
 
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/sid/sid_draw.mp3",
@@ -607,9 +602,6 @@ function SLASHER.OnSecondaryFire(slasher)
 		slasher.GunCooldown = 2
 		slasher:SetNW2Bool("SidGunAiming", false)
 		slasher:SetNW2Bool("SidGunAimed", false)
-		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-		slasher:SetRunSpeed(gunrage and SLASHER.ChaseSpeed or SLASHER.ProwlSpeed)
 	end
 end
 
@@ -679,10 +671,6 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			slasher:Freeze(false)
 
 			slasher.GunCooldown = 2
-
-			if slasher:GetNW2Bool("SidGunRage") then
-				slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-			end
 		end)
 	elseif slasher:GetNW2Bool("SidGun") and slasher.GunCooldown < 0.01 and not slasher:GetNW2Bool("SidGunAiming") and not slasher:GetNW2Bool("SidGunAimed") then
 		slasher:SetNW2Bool("SidGunEquipped", false)

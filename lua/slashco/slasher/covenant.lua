@@ -44,6 +44,16 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if not slasher:GetNW2Bool("CovenantRockSummoned") then return end
+
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.ChaseSpeed - SLASHER.RockChaseDecrease
+	end
+
+	return SLASHER.ProwlSpeed + SLASHER.RockProwlIncrease
+end
+
 function SLASHER.OnSpawn(slasher)
 	local idx = math.random(1, 6)
 	SlashCo.AudioSystem.PlaySound({
@@ -56,7 +66,7 @@ function SLASHER.OnSpawn(slasher)
 		fadeIn = 0,
 	})
 
-	slasher.RockSummoned = false
+	slasher:SetNW2Bool("CovenantRockSummoned", false)
 	slasher:SetCanChase(true)
 end
 
@@ -117,7 +127,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end
 		end)
 
-		if not slasher.RockSummoned then
+		if not slasher:GetNW2Bool("CovenantRockSummoned") then
 			timer.Simple(4, function() -- First victim becomes Rocks
 				if not IsValid(target) then return end
 				SLASHER.SummonRocks(target)
@@ -131,10 +141,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end)
 
 			slasher.PlayerToBecomeRocks = target
-			slasher.RockSummoned = true
-
-			SLASHER.ProwlSpeed = SLASHER.ProwlSpeed + SLASHER.RockProwlIncrease
-			SLASHER.ChaseSpeed = SLASHER.ChaseSpeed - SLASHER.RockChaseDecrease
+			slasher:SetNW2Bool("CovenantRockSummoned", true)
 		else
 			if team.NumPlayers(TEAM_SLASHER) >= 6 then
 				return

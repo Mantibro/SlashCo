@@ -47,6 +47,25 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("BrenSnapState") then
+		return 305
+	end
+
+	if not slasher:GetInSlasherChaseMode() then
+		return SLASHER.ProwlSpeed
+	end
+
+	return slasher:GetNW2Bool("BrenBoost") and SLASHER.ChaseSpeed + 15 or SLASHER.ChaseSpeed
+end
+
+function SLASHER.Move(ply)
+	local moveType = ply:GetNW2Bool("BrenNoclip") and MOVETYPE_NOCLIP or MOVETYPE_WALK
+	if ply:GetMoveType() ~= moveType then
+		ply:SetMoveType(moveType)
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:DrawShadow(false)
 	slasher:SetCanChase(true)
@@ -102,35 +121,9 @@ function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetNW2Bool("CanNoclip", anger > 50)
 
 	if not slasher:GetNW2Bool("BrenNoclip") then
-		slasher:SetMoveType(MOVETYPE_WALK)
-
 		final_eyesight = SLASHER.Eyesight
 	else
-		slasher:SetMoveType(MOVETYPE_NOCLIP)
-
 		final_eyesight = 1
-	end
-
-	if slasher:GetNW2Bool("BrenSnapState") then
-		slasher:SetRunSpeed(305)
-		slasher:SetWalkSpeed(305)
-		slasher:SetSlowWalkSpeed(305)
-	else
-		if slasher:GetInSlasherChaseMode() then
-			if slasher:GetNW2Bool("BrenBoost") then
-				slasher:SetRunSpeed(SLASHER.ChaseSpeed + 15)
-				slasher:SetWalkSpeed(SLASHER.ChaseSpeed + 15)
-				slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed + 15)
-			else
-				slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-				slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-				slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-			end
-		else
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		end
 	end
 
 	if slasher:GetNW2Int("BrenAnger") ~= math.floor(anger) then

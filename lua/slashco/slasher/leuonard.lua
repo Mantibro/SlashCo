@@ -33,6 +33,10 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.RoidMult = 0.3 + (SO * 0.3)
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("LeuonardFullRoid") then return 450 end
+end
+
 function SLASHER.OnSpawn(slasher)
 	SlashCo.CreateItem("sc_dogg", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
 	slasher.soundon = 0
@@ -179,9 +183,6 @@ function SLASHER.OnTickBehaviour(slasher)
 			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/leuonard/leuonard_full_far.mp3", 125)
 			slasher.soundon = 0
 		end
-
-		slasher:SetWalkSpeed(450)
-		slasher:SetRunSpeed(450)
 
 		if not slasher:GetNW2Bool("LeuonardRoiding") then
 			if not slasher.MoveHooks then
