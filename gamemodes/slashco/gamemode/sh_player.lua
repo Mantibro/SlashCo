@@ -507,7 +507,11 @@ hook.Add("PlayerButtonDown", "SlashCo:SurvivorTaunts", function(ply, button)
 end)
 
 --[[
-	DTVar Networking (Since NW2 is broken / hasn't been fixed yet)
+	DTVar Networking
+
+	UPDATE:
+	NW2 is basically fine on players BUT it is broken on entities!
+	DTVars are more efficient than NW2
 
 	Unlike the whole SetupDataTables shit, our function exist in the metatable and are always available.
 	So we don't have to worry about shit like Player:SetSlasher not existing for like 1 tick until SetupDataTables was called
@@ -641,6 +645,11 @@ SetupSlashCoNetworkVar("Int", 15, "LastTaunted") -- The last tick in which they 
 SetupSlashCoNetworkVar("Int", 10, "GameProgressDisplay")
 SetupSlashCoNetworkVar("Int", 11, "ZoneEffect") -- The effect of the limited zone the player is inside of, 0 if none
 SetupSlashCoNetworkVar("Int", 12, "KeyedSpeed") -- The strongest speed effect only the server knows about (zone, attacks, ...), see PLAYER:AddSpeedEffect
+
+-- RaphaelIT7: IMPORTANT!
+-- Avoid storing CurTime inside a float!
+-- This is since CurTime is a double, not float, so you'd always encounter prediction errors!
+-- Prefer to store a tick count when working with prediction or you'll have a bad time...
 
 SetupSlashCoNetworkVar("Float", 0, "EyeSight")
 SetupSlashCoNetworkVar("Float", 1, "DeafenTime")

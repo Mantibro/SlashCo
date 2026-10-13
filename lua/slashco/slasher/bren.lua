@@ -116,7 +116,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetWalkSpeed(305)
 		slasher:SetSlowWalkSpeed(305)
 	else
-		if slasher:GetNWBool("InSlasherChaseMode") then
+		if slasher:GetInSlasherChaseMode() then
 			if slasher:GetNWBool("BrenBoost") then
 				slasher:SetRunSpeed(SLASHER.ChaseSpeed + 15)
 				slasher:SetWalkSpeed(SLASHER.ChaseSpeed + 15)
@@ -320,7 +320,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		local anger = SlashCo.GetSlasherAnger(slasher) / 8
 
 		slasher:SetNWBool("BrenNoclip", false)
-		slasher:SetNWBool("CanChase", true)
+		slasher:SetCanChase(true)
 
 		slasher.NoclipCooldown = math.Round((SLASHER.NoclipCooldownLength - anger), 0)
 		slasher.MainCooldown = 5
@@ -337,7 +337,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 
 	slasher.SnapCooldown = 60
 	slasher:SetNWBool("BrenSnapAnim", true)
-	slasher:SetNWBool("CanChase", false)
+	slasher:SetCanChase(false)
 	slasher:Freeze(true)
 
 	slasher.MainCooldown = (SLASHER.FogIncreaseLength * 1) + 7

@@ -167,7 +167,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.PunchSlowdown = 1
 	end
 
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if not slasher:GetInSlasherChaseMode() then
 		slasher.TimeChasing = 0
 
 		if slasher:GetNWBool("BorgmireKick") then
@@ -433,7 +433,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if slasher.BorgKicking then return end
 	if not IsValid(target) or not target:IsPlayer() or slasher:GetNWBool("BorgmireThrow") then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
-	if slasher:GetPos():Distance(target:GetPos()) >= 140 or target:GetNWBool("SurvivorBeingJumpscared") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 140 or target:GetSurvivorBeingJumpscared() then return end
 
 	if slasher.ThrowCooldown < 0.01 then
 		slasher:SetNWBool("BorgmireThrow", true)
@@ -508,7 +508,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 	local borg_punch = ply:GetNWBool("BorgmirePunch")
 	local borg_throw = ply:GetNWBool("BorgmireThrow")
 	local borg_kick = ply:GetNWBool("BorgmireKick")

@@ -1,12 +1,4 @@
 local function survivorButtons(ply, button)
-	if ply:GetNWBool("Taunt_MNR") or ply:GetNWBool("Taunt_Griddy") or ply:GetNWBool("Taunt_Cali") then
-		ply:SetNWBool("Taunt_MNR", false)
-		if button ~= KEY_W then
-			ply:SetNWBool("Taunt_Griddy", false)
-			ply:SetNWBool("Taunt_Cali", false)
-		end
-	end
-
 	if SlashCo.IsKeyPressed("USE_ITEM", ply, button) then
 		SlashCo.UseItem(ply)
 		return
@@ -19,45 +11,6 @@ local function survivorButtons(ply, button)
 
 	if SlashCo.IsKeyPressed("PING", ply, button) then
 		ply:SurvivorPing()
-		return
-	end
-
-	if SlashCo.IsKeyPressed("TAUNT_MN", ply, button) then
-		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
-			return
-		end
-		ply.LastTaunt = CurTime()
-
-		ply:SetNWBool("Taunt_MNR", true) --Monday Night
-		ply:SetNWBool("Taunt_Griddy", false)
-		ply:SetNWBool("Taunt_Cali", false)
-		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
-		return
-	end
-
-	if SlashCo.IsKeyPressed("TAUNT_HTG", ply, button) then
-		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
-			return
-		end
-		ply.LastTaunt = CurTime()
-
-		ply:SetNWBool("Taunt_Griddy", true) --Hittin the griddy
-		ply:SetNWBool("Taunt_MNR", false)
-		ply:SetNWBool("Taunt_Cali", false)
-		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
-		return
-	end
-
-	if SlashCo.IsKeyPressed("TAUNT_CG", ply, button) then
-		if ply.LastTaunt and CurTime() - ply.LastTaunt < 2 then
-			return
-		end
-		ply.LastTaunt = CurTime()
-
-		ply:SetNWBool("Taunt_Cali", true) --California girls
-		ply:SetNWBool("Taunt_Griddy", false)
-		ply:SetNWBool("Taunt_MNR", false)
-		ply:EmitSound("slashco/ping_item.mp3", 0, 80, 0.4)
 		return
 	end
 end

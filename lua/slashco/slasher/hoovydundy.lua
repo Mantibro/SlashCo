@@ -134,7 +134,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		if slasher.SurvivorRoped.RopeStruggle ~= nil and slasher.SurvivorRoped.RopeStruggle > 25 then
 			slasher.SurvivorRoped.RopeStruggle = 0
 			slasher.SurvivorRoped:Freeze(false)
-			slasher.SurvivorRoped:SetNWBool("SurvivorGrabbed", false)
+			slasher.SurvivorRoped:SetSurvivorGrabbed(false)
 			slasher.SurvivorRoped = nil
 			StopPanicMusic(slasher)
 
@@ -157,23 +157,23 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				slasher:Freeze(false)
 				slasher:SetNWBool("HoovyStunned", false)
-				slasher:SetNWBool("CanChase", true)
+				slasher:SetCanChase(true)
 			end)
 		end
 
 		timer.Simple(RopeTime, function()
 			if not IsValid(slasher.SurvivorRoped) then return end
 
-			slasher:SetNWBool("CanChase", true)
+			slasher:SetCanChase(true)
 			slasher:SetNWBool("HoovyGrabLoop", false)
-			slasher.SurvivorRoped:SetNWBool("SurvivorGrabbed", false)
+			slasher.SurvivorRoped:SetSurvivorGrabbed(false)
 			slasher.SurvivorRoped:Freeze(false)
 			slasher.SurvivorRoped.RopeStruggle = 0
 			slasher.SurvivorRoped = nil
 			StopPanicMusic(slasher)
 		end)
 	else
-		if not slasher:GetNWBool("InSlasherChaseMode") then
+		if not slasher:GetInSlasherChaseMode() then
 			slasher:SetRunSpeed(prowl_final)
 			slasher:SetWalkSpeed(prowl_final)
 			slasher:SetSlowWalkSpeed(prowl_final)
@@ -183,7 +183,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			slasher:SetSlowWalkSpeed(chase_final)
 		end
 
-		slasher:SetNWBool("CanChase", true)
+		slasher:SetCanChase(true)
 		slasher.SurvivorRoped = nil
 	end
 
@@ -273,17 +273,17 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 				if not IsValid(slasher) then return end
 
 				if not IsValid(find_p) then
-					slasher:SetHoovyGrabStart(false)
+					slasher:SetNWBool("HoovyGrabStart", false)
 					return
 				end
 
 				slasher:SetNWBool("HoovyGrabLoop", true)
 				slasher:SetNWBool("HoovyGrabStart", false)
-				slasher:SetNWBool("CanChase", false)
+				slasher:SetCanChase(false)
 
 				slasher.SurvivorRoped = find_p
 				slasher.SurvivorRoped.RopeStruggle = 0
-				slasher.SurvivorRoped:SetNWBool("SurvivorGrabbed", true)
+				slasher.SurvivorRoped:SetSurvivorGrabbed(true)
 
 				SlashCo.StopChase(slasher)
 				PlayPanicMusic(slasher)
@@ -298,8 +298,8 @@ end
 function SLASHER.OnKillPlayer(slasher, target)
 	if target == slasher.SurvivorRoped then
 		slasher.SurvivorRoped = nil
-		target:SetNWBool("SurvivorGrabbed", false)
-		slasher:SetNWBool("CanChase", true)
+		target:SetSurvivorGrabbed(false)
+		slasher:SetCanChase(true)
 		slasher:SetNWBool("HoovyGrabLoop", false)
 		StopPanicMusic(slasher)
 	end
@@ -340,7 +340,7 @@ end
 
 function SLASHER.Animator(ply)
 	local GrabAnim = ""
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 	local hoovy_grab = ply:GetNWBool("HoovyGrabStart")
 	local hoovy_grabloop = ply:GetNWBool("HoovyGrabLoop")
 	local hoovy_stun = ply:GetNWBool("HoovyStunned")
@@ -505,7 +505,7 @@ if CLIENT then
 			if v == GameData.LocalPlayer then continue end
 
 			if SlashCoSlashers[v:GetNWString("Slasher")] == SLASHER then
-				if not v:GetNWBool("InSlasherChaseMode") then
+				if not v:GetInSlasherChaseMode() then
 					local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
 					if tlight then
 						tlight.pos = v:LocalToWorld(Vector(0, 0, 20))
@@ -534,7 +534,7 @@ if CLIENT then
 		end
 
 		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if survivor:GetNWBool("SurvivorGrabbed") then
+			if survivor:GetSurvivorGrabbed() then
 				local tlight = DynamicLight(MAX_EDICT + survivor:EntIndex())
 				if tlight then
 					tlight.pos = survivor:LocalToWorld(Vector(0, 0, 20))

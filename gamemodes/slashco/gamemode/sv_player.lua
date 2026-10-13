@@ -25,8 +25,6 @@ local function ResetDataTable(ply)
 			info.set(ply)
 		end
 	end
-
-	ply:ClearSlasherDataTable()
 end
 
 local DEFAULT_VIEW_OFFSET = Vector(0, 0, 64)

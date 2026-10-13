@@ -627,7 +627,7 @@ function SLASHER.Move(ply, mv)
 		return true
 	end
 
-	if ply:GetNWBool("InSlasherChaseMode") then
+	if ply:GetInSlasherChaseMode() then
 		ply:SetRunSpeed(SLASHER.ChaseSpeed)
 		ply:SetWalkSpeed(SLASHER.ChaseSpeed)
 		ply:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
@@ -826,7 +826,7 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 	local manspider_nest = ply:GetNWBool("ManspiderNested")
 	local manspider_climbing = ply:GetNWBool("ManspiderClimbing")
 	local manspider_bite = ply:GetNWBool("ManspiderBite")

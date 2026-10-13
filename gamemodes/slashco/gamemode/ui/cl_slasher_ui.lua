@@ -56,7 +56,7 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	end
 
 	local slasherpos = ply:GetPos()
-	local inchase = GameData.LocalPlayer:GetNWBool("InSlasherChaseMode")
+	local inchase = GameData.LocalPlayer:GetInSlasherChaseMode()
 
 	local cx = ScrW() / 2
 	local cy = ScrH() / 2
@@ -75,8 +75,8 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	local willdrawchase = true
 	local willdrawmain = true
 
-	local CanKill = GameData.LocalPlayer:GetNWBool("CanKill")
-	local CanChase = GameData.LocalPlayer:GetNWBool("CanChase")
+	local CanKill = GameData.LocalPlayer:GetCanKill()
+	local CanChase = GameData.LocalPlayer:GetCanChase()
 
 	surface.SetDrawColor(255, 255, 255, 255)
 

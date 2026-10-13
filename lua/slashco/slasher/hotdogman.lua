@@ -322,7 +322,7 @@ function SLASHER.OnSecondaryFire(slasher)
 	if slasher:GetNWBool("HotdoginHand") then return end
 	if slasher:GetNWBool("HotdogLeap") then return end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		if slasher.LeapCooldown > 0.01 then return end
 
 		slasher:SetNWBool("HotdogLeap", false)
@@ -426,7 +426,7 @@ end
 
 function SLASHER.Animator(ply)
 	local punch = ply:GetNWBool("HotdogPunch")
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 	local holdingFood = ply:GetNWBool("HotdoginHand")
 	local eatingFood = ply:GetNWBool("HotdogEating")
 	local vomitingFood = ply:GetNWBool("HotdogVomiting")

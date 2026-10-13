@@ -83,10 +83,10 @@ function SLASHER.OnTickBehaviour(slasher)
 	else
 		slasher.SurveyLength = 1
 		slasher.WatcherWatched = 0.65
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanChase(false)
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed - (Watched * 80))
 		slasher:SetWalkSpeed(SLASHER.ChaseSpeed - (Watched * 80))
 		slasher:SetRunSpeed(SLASHER.ChaseSpeed - (Watched * 80))

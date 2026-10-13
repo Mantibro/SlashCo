@@ -64,8 +64,6 @@ function SLASHER.TackleFail(slasher)
 
 	slasher:SetNWBool("CloakTackleFail", true)
 	slasher:SetNW2Float("CloakLockEnd", CurTime() + TACKLE_FAIL_TIME)
-	slasher:SetCloakTackleFail(true)
-	slasher:SetCloakLockEnd(CurTime() + TACKLE_FAIL_TIME)
 
 	timer.Simple(TACKLE_FAIL_TIME, function()
 		if not IsValid(slasher) then return end
@@ -98,7 +96,7 @@ end
 
 function SLASHER.OnTickBehaviour(slasher, target)
 	if IsValid(slasher.TackledPlayer) then
-		if slasher.TackledPlayer:GetNWBool("SurvivorTackled") and not slasher.TackledPlayer:IsFrozen() then
+		if slasher.TackledPlayer:GetSurvivorTackled() and not slasher.TackledPlayer:IsFrozen() then
 			slasher.TackledPlayer:Freeze(true)
 		end
 
@@ -107,7 +105,6 @@ function SLASHER.OnTickBehaviour(slasher, target)
 		if slasher.TackledPlayer.TackleStruggle ~= nil and slasher.TackledPlayer.TackleStruggle > 50 then
 			slasher.TackledPlayer.TackleStruggle = 0
 			slasher.TackledPlayer:Freeze(false)
-			slasher.TackledPlayer:SetNWBool("SurvivorTackled", false)
 			slasher.TackledPlayer:SetSurvivorTackled(false)
 			slasher:SetPos(slasher.TackledPlayer:GetPos() + Vector(0, 0, 80))
 			slasher.TackledPlayer = nil
@@ -116,23 +113,21 @@ function SLASHER.OnTickBehaviour(slasher, target)
 	end
 
 	if slasher:GetNWBool("CloakTackling") then
-	if slasher:GetCloakTackling() then
 		if SERVER and not slasher.TackledPlayer then
 			for _, ply in ipairs(ents.FindInSphere(slasher:GetPos(), 60)) do
-				if ply:IsPlayer() and ply:Team() == TEAM_SURVIVOR and not ply:GetNWBool("SurvivorTackled") then
+				if ply:IsPlayer() and ply:Team() == TEAM_SURVIVOR and not ply:GetSurvivorTackled() then
 					slasher.TackledPlayer = ply
 					slasher:SetNWBool("CloakTackling", false)
 					slasher:SetNWBool("CloakTackle", false)
 					slasher:SetNW2Float("CloakTackleEnd", 0)
 
-					ply:SetNWBool("SurvivorTackled", true)
-					ply:SetNWBool("MarkedByCloaks", true)
+					ply:SetSurvivorTackled(true)
+					ply:SetMarkedByCloaks(true)
 					ply.SlashCo_PushDir = (ply:GetPos() - slasher:GetPos()):GetNormalized()
 					ply:SetImpervious(true)
 					timer.Simple(SURVIVOR_STUN_TIME, function()
 						if not IsValid(ply) then return end
 
-						ply:SetNWBool("SurvivorTackled", false)
 						ply:SetSurvivorTackled(false)
 						ply:Freeze(false)
 						ply:SetImpervious(false)
@@ -154,7 +149,6 @@ function SLASHER.OnTickBehaviour(slasher, target)
 
 					-- Stun slasher
 					slasher:SetNW2Float("CloakLockEnd", CurTime() + SLASHER_STUN_TIME)
-					slasher:SetCloakLockEnd(CurTime() + SLASHER_STUN_TIME)
 					slasher:SetImpervious(true)
 					timer.Simple(SLASHER_STUN_TIME, function()
 						if not IsValid(slasher) then return end
@@ -163,7 +157,7 @@ function SLASHER.OnTickBehaviour(slasher, target)
 						slasher.KillDelayTick = SLASHER.KillDelay
 
 						if not IsValid(ply) then return end
-						ply:SetNWBool("MarkedByCloaks", false)
+						ply:SetMarkedByCloaks(false)
 					end)
 
 					break
@@ -175,7 +169,6 @@ function SLASHER.OnTickBehaviour(slasher, target)
 			slasher:SlamDoor(target)
 		end
 	elseif slasher:GetNWBool("CloakTackle") and slasher.TackledPlayer == nil and not slasher:GetNWBool("CloakTackleFail") then
-	elseif slasher:GetCloakTackle() and slasher.TackledPlayer == nil and not slasher:GetCloakTackleFail() then
 		SLASHER.TackleFail(slasher)
 	end
 
@@ -188,8 +181,8 @@ function SLASHER.OnPlayerDeath(slasher, victim)
 	if slasher.TackledPlayer ~= victim then return end
 
 	slasher.TackledPlayer = nil
-	victim:SetNWBool("SurvivorTackled", false)
-	victim:SetNWBool("MarkedByCloaks", false)
+	victim:SetSurvivorTackled(false)
+	victim:SetMarkedByCloaks(false)
 
 	slasher:SetNW2Float("CloakLockEnd", 0)
 	slasher:SetImpervious(false)
@@ -218,7 +211,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Animator(ply, veloc)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
 		if ply:GetVelocity():Length() > 0 then
@@ -236,7 +229,6 @@ function SLASHER.Animator(ply, veloc)
 	end
 
 	if ply:GetNWBool("CloakTackling") or isTackling(ply) then
-	if ply:GetCloakTackling() or isTackling(ply) then
 		ply.CalcSeqOverride = ply:LookupSequence("zombie_leap_mid")
 	end
 
@@ -289,7 +281,7 @@ function SLASHER.DrawHUD(localPly)
 			continue
 		end
 
-		if survivor:GetNWBool("MarkedByCloaks") then
+		if survivor:GetMarkedByCloaks() then
 			local pos = survivor:WorldSpaceCenter():ToScreen()
 
 			if pos.visible then

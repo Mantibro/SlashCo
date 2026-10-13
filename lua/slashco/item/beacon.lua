@@ -28,7 +28,7 @@ function ITEM.OnUse(ply)
 	end
 
 	for k, v in ipairs(ents.FindByClass("sc_activebeacon")) do
-		if not v:GetNWBool("BeaconBroken") then
+		if not v:GetBeaconBroken() then
 			ply:ChatText("Beacon_already_active")
 			return true
 		end

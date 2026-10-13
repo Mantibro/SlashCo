@@ -97,7 +97,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetBodygroup(3, 0)
 	slasher:SetBodygroup(4, 0)
 
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanChase(true)
 	slasher:SetNWBool("SwitchToShovel", true)
 	slasher:SetNWBool("SwitchToDeagle", false)
 	slasher:SetNWBool("SwitchToMG", false)
@@ -289,7 +289,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 3.0
 	elseif stage == POSTAL_RAGE_STAGE then
 		slasher:SetNWInt("PostalStage", POSTAL_RAGE_STAGE)
-		if slasher:GetNWBool("InSlasherChaseMode") then
+		if slasher:GetInSlasherChaseMode() then
 		slasher:SetCanChase(false)
 			SlashCo.StopChase(slasher)
 		end
@@ -333,7 +333,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		local PostalPatience = Lerp(SlashCo.GetSlasherAnger(slasher) / 100, PostalMinSpeed,	PostalMaxSpeed)
 
-		if slasher:GetNWBool("InSlasherChaseMode") then
+		if slasher:GetInSlasherChaseMode() then
 			if SlashCo.GetSlasherAnger(slasher) == 0 and not slasher:GetNWBool("BoredAlready") then
 				slasher:SetNWBool("BoredAlready", true)
 
@@ -682,7 +682,7 @@ function SLASHER.OnPrimaryFire(slasher)
 						if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
 
 						SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
-						if not slasher:GetNWBool("InSlasherChaseMode") then
+						if not slasher:GetInSlasherChaseMode() then
 							SlashCo.StartChaseMode(slasher, true)
 						end
 
@@ -781,7 +781,7 @@ function SLASHER.OnPrimaryFire(slasher)
 								if slasher:GetNWInt("PostalStage") == POSTAL_RAGE_STAGE then return end
 
 								SlashCo.AddSlasherAnger(slasher, SLASHER.PatienceDecrease)
-								if not slasher:GetNWBool("InSlasherChaseMode") then
+								if not slasher:GetInSlasherChaseMode() then
 									SlashCo.StartChaseMode(slasher, true)
 								end
 
@@ -988,7 +988,7 @@ function SLASHER.OnSecondaryFire(slasher)
 		return
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		SlashCo.AddSlasherAnger(slasher, -5)
 		SlashCo.StopChase(slasher)
 		return
@@ -1072,10 +1072,10 @@ local function KickFinish(slasher)
 		if target:Team() ~= TEAM_SURVIVOR then return end
 
 		if slasher:GetNWInt("PostalStage") ~= POSTAL_RAGE_STAGE then
-			if not slasher:GetNWBool("InSlasherChaseMode") then
+			if not slasher:GetInSlasherChaseMode() then
 				if not slasher:GetNWBool("SwitchToGas") then
 					SlashCo.StartChaseMode(slasher, true)
-					slasher:SetNWBool("InSlasherChaseMode", true)
+					slasher:SetInSlasherChaseMode(true)
 				end
 			end
 		end
@@ -1230,7 +1230,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 	local PostalDude_swing = ply:GetNWBool("PostalDudeSlashing")
 	local PostalDude_kick = ply:GetNWBool("PostalDudeKicking")
 	local PostalDude_crouch = ply:GetNWBool("PostalDudeCrouch")

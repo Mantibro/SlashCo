@@ -69,8 +69,8 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher:SetCanChase(false)
 	else
 		if not slasher:GetNWBool("AmogusDisguised") and not slasher:GetNWBool("AmogusDisguising") then
-			slasher:SetNWBool("CanKill", true)
-			slasher:SetNWBool("CanChase", true)
+			slasher:SetCanKill(true)
+			slasher:SetCanChase(true)
 			if IsValid(Entity) then
 				Entity:Remove() -- Don't possibly leak entities.
 				slasher.DisguiseEntity = nil
@@ -121,9 +121,9 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	if slasher.KillDelayTick > 0 then return end
 	if slasher:GetVelocity():Length() > 1 then return end
-	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlashers.Amogus.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= SlashCoSlashers.Amogus.KillDistance or target:GetSurvivorBeingJumpscared() then return end
 
-	target:SetNWBool("SurvivorBeingJumpscared", true)
+	target:SetSurvivorBeingJumpscared(true)
 	target:Freeze(true)
 
 	SlashCo.AudioSystem.PlaySound({
@@ -319,7 +319,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:GetNWBool("AmogusSurvivorDisguise") then
 		return

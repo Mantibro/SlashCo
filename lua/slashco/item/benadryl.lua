@@ -23,8 +23,8 @@ function ITEM.OnUse(ply)
 		fadeIn = 0,
 	})
 
-	if ply:GetNW2Float("InitialBenadrylTime", 0) == 0 then
-		ply:SetNW2Float("InitialBenadrylTime", CurTime())
+	if ply:GetInitialBenadrylTime() == 0 then
+		ply:SetInitialBenadrylTime(CurTime())
 		timer.Simple(60, function()
 			if not IsValid(ply) then return end
 
@@ -80,7 +80,7 @@ SlashCo.RegisterItem(ITEM, "Benadryl")
 
 if SERVER then
 	hook.Add("PlayerChangedTeam", "SlashCo:RemoveBenadrylEffect", function(ply)
-		ply:SetNW2Float("InitialBenadrylTime", 0) -- Reset the benadryl time for its effects to stop.
+		ply:SetInitialBenadrylTime(0) -- Reset the benadryl time for its effects to stop.
 	end)
 
 	function TestHatMan()
@@ -98,7 +98,7 @@ end
 
 local fullBenadrylTime = 60 -- Time in seconds after which the benadryl is in full effect.
 local function GetBenadrylTime(ply)
-	return ply:GetNW2Float("InitialBenadrylTime", 0) -- if 0 benadryl isn't active.
+	return ply:GetInitialBenadrylTime() -- if 0 benadryl isn't active.
 end
 
 local rand = 0
@@ -120,7 +120,7 @@ hook.Add("RenderScreenspaceEffects", "Benadryl", function()
 	local bloom2 = 3 + math.sin((CurTime() + rand) / 4) * 1
 	local bokeh = -3 + math.sin((CurTime() + rand) / 20) * 4
 
-	local lookingTime = GameData.LocalPlayer:GetNW2Float("LookingAtHatMan", 0)
+	local lookingTime = GameData.LocalPlayer:GetLookingAtHatMan()
 	if lookingTime > 0 then
 		lookingTime = 1 + CurTime() - lookingTime
 	else

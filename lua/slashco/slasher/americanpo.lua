@@ -47,8 +47,8 @@ local function AmericanpoIdle(slasher)
 	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
 	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNWString("Slasher")] ~= SLASHER then return end
 
-		local hunter = slasher:GetNWInt("AmericanpoState") == 0
 	if not slasher:GetInSlasherChaseMode() or not slasher:GetNWBool("AmericanpoFinal") then
+		local hunter = slasher:GetNWInt("AmericanpoState") == 0
 		local idx = math.random(1, 9)
 
 		if not slasher:GetNWBool("AmericanpoAiming") then
@@ -108,8 +108,8 @@ local function PoEndlessChase(slasher)
 		slasher:SetNWBool("AmericanpoAttack", false)
 		slasher:SetNWBool("AmericanpoThrowingBottle", false)
 		slasher:SetNWBool("AmericanpoStun", false)
-		slasher:SetNWBool("InSlasherChaseMode", false)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetInSlasherChaseMode(false)
+		slasher:SetCanChase(false)
 		slasher:Freeze(false)
 
 		slasher.americanpo_final_antispam = 0
@@ -119,7 +119,7 @@ end
 function SLASHER.OnSpawn(slasher)
 	slasher.AmericanpoState = AMERICANPO_HUNTER
 	AmericanpoIdle(slasher)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanChase(true)
 	slasher:SetNWBool("AmericanpoFinal", false)
 	slasher:SetNWBool("AmericanpoAiming", false)
 	slasher:SetNWBool("AmericanpoAttack", false)
@@ -169,7 +169,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		perception_final = 0.5
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
 		slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 		slasher:SetRunSpeed(SLASHER.ChaseSpeed)
@@ -212,7 +212,7 @@ end
 
 local function BulletHit(attacker, tr, dmginfo)
 	if IsValid(tr.Entity) and (tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SURVIVOR) then
-		if tr.Entity:GetNWBool("SurvivorFueled") then
+		if tr.Entity:GetSurvivorFueled() then
 			tr.Entity:Ignite(5)
 		end
 	end
@@ -309,7 +309,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end)
 
 			return
-		elseif slasher:GetNWBool("InSlasherChaseMode") or slasher:GetNWBool("AmericanpoFinal") then
+		elseif slasher:GetInSlasherChaseMode() or slasher:GetNWBool("AmericanpoFinal") then
 			slasher:SetNWBool("AmericanpoShootingHip", true)
 			PlayBullets(slasher)
 			slasher.ShotgunCooldown = 2
@@ -331,7 +331,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetNWBool("AmericanpoAim") then return end
 	if slasher:GetNWBool("AmericanpoAiming") then return end
 	if slasher:GetNWBool("AmericanpoFinal") then return end
-	if slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher:GetInSlasherChaseMode() then return end
 
 	timer.Remove("AmericanpoAttackDecay")
 	slasher.AttackCooldown = 3
@@ -541,7 +541,7 @@ end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if slasher.AmericanpoStateCooldown > 0.01 then return end
-	if slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher:GetInSlasherChaseMode() then return end
 	if slasher:GetNWBool("AmericanpoAim") then return end
 	if slasher:GetNWBool("AmericanpoAiming") then return end
 	if slasher:GetNWBool("AmericanpoThrowingBottle") then return end
@@ -625,7 +625,7 @@ function SLASHER.Thirdperson(ply)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode") or ply:GetNWBool("AmericanpoFinal")
+	local chase = ply:GetInSlasherChaseMode() or ply:GetNWBool("AmericanpoFinal")
 	local aim_start = ply:GetNWBool("AmericanpoAim")
 	local aim_loop = ply:GetNWBool("AmericanpoAiming")
 	local shooting = ply:GetNWBool("AmericanpoShooting")
@@ -845,7 +845,7 @@ end
 
 function SLASHER.DrawHUD(localPly)
 	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-		if not survivor:GetNWBool("SurvivorFueled") then
+		if not survivor:GetSurvivorFueled() then
 			continue
 		end
 
