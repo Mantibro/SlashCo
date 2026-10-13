@@ -263,6 +263,8 @@ local function EatCookie(slasher, target)
 	end
 
 	timer.Simple(1.3, function()
+		if not IsValid(slasher) then return end
+
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/sid/sid_eating.mp3",
 			identifier = "SidEating",
@@ -679,6 +681,12 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher.SidGunLetterC = false
 		SlashCo.AudioSystem.StopSound("SidLetterC", 0.5, slasher)
 		slasher.Pacification = math.random(5, 15)
+	end
+end
+
+function SLASHER.ChaseLight(slasher)
+	if slasher:GetNW2Bool("SidGunRage") then
+		return SlashCo.DefaultChaseLight()
 	end
 end
 

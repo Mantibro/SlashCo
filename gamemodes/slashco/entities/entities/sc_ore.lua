@@ -96,7 +96,7 @@ else
 	function ENT:Draw()
 	    local curTime = CurTime()
 	    local tr = self:GetPos()
-		local dlight = DynamicLight(963001)
+		local dlight = DynamicLight(self:EntIndex())
 		if dlight then
 		    dlight.pos = tr
 			dlight.r = 0

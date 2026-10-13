@@ -585,7 +585,7 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function(bDrawingDepth, bD
 
 	if bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then return end
 
-	local offerTable = ents.FindByClass("sc_offertable")[1]
+	local offerTable = SlashCo.FindByClass("sc_offertable")[1]
 	if IsValid(offerTable) then
 		local angle = offerTable:LocalToWorldAngles(Angle(0, 90, 90))
 		local pos = offerTable:LocalToWorld(Vector(5, 0, 110))

@@ -434,6 +434,30 @@ function SlashCo.EndRound()
 
 	local SurvivorCount = #survivors
 	local heliCount = #SlashCo.CurRound.HelicopterRescuedPlayers
+
+	local winners = {}
+	if heliCount > 0 then
+		--Add to stats of the remaining survivors' wins
+		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
+			if not IsValid(v) then continue end
+
+			SlashCoDatabase.UpdateStats(v:SteamID64(), "SurvivorRoundsWon", 1)
+
+			v:SetRoundPoints("survive")
+			winners[v:SteamID64()] = true
+		end
+
+		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 and IsValid(SlashCo.CurRound.HelicopterRescuedPlayers[1]) then
+			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetRoundPoints("last_survive")
+		end
+
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not winners[v:SteamID64()] then
+				v:SetRoundPoints("left_behind")
+			end
+		end
+	end
+
 	if SurvivorCount == 0 then
 		--All survivors are dead
 
@@ -478,29 +502,6 @@ function SlashCo.EndRound()
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		SlashCo.AudioSystem.StopSound(nil, 1, slasher) -- Stop all sounds playing by the slasher.
-	end
-
-	local winners = {}
-	if heliCount > 0 then
-		--Add to stats of the remaining survivors' wins
-		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
-			if not IsValid(v) then continue end
-
-			SlashCoDatabase.UpdateStats(v:SteamID64(), "SurvivorRoundsWon", 1)
-
-			v:SetRoundPoints("survive")
-			winners[v:SteamID64()] = true
-		end
-
-		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 and IsValid(SlashCo.CurRound.HelicopterRescuedPlayers[1]) then
-			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetRoundPoints("last_survive")
-		end
-
-		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not winners[v:SteamID64()] then
-				v:SetRoundPoints("left_behind")
-			end
-		end
 	end
 
 	SlashCo.State = SlashCo.States.ENDING

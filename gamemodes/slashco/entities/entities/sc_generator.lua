@@ -77,8 +77,8 @@ if CLIENT then
 		GameData.GeneratorLight:DrawModel()
 
 		local curTime = CurTime()
-		local dlight = DynamicLight(cacheData.entindex)
 		if not self:GetMalfunction() then
+			local dlight = DynamicLight(cacheData.entindex)
 			if dlight then
 				dlight.pos = cacheData.pos
 				dlight.r = not running and 255 or 0

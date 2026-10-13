@@ -544,7 +544,7 @@ local defaultFallbacks = {
 	["Angle"] = Angle(0, 0, 0),
 }
 
-local function SetupSlashCoNetworkVar(type, index, name, default, owner)
+local function SetupSlashCoNetworkVar(type, index, name, default)
 	if not SlashCo_DTNetworking[type] then
 		SlashCo_DTNetworking[type] = {}
 	end
@@ -556,7 +556,7 @@ local function SetupSlashCoNetworkVar(type, index, name, default, owner)
 		defaultFallback = default
 	end
 
-	plyMeta["Set" .. name] = function(self, value)
+	local function set(self, value)
 		if value == nil then
 			value = defaultFallback
 		end
@@ -565,7 +565,7 @@ local function SetupSlashCoNetworkVar(type, index, name, default, owner)
 	end
 
 	local GetDTFunc = entMeta["GetDT" .. type]
-	plyMeta["Get" .. name] = function(self, fallback)
+	local function get(self, fallback)
 		local value = GetDTFunc(self, index)
 		-- RaphaelIT7: This is so ugly because of the sam reason as above! false is such a weird case to work with
 		if value == nil then
@@ -579,22 +579,24 @@ local function SetupSlashCoNetworkVar(type, index, name, default, owner)
 		return value
 	end
 
+	plyMeta["Get" .. name] = get
+	plyMeta["Set" .. name] = set
+
 	SlashCo_DTNetworking[type][index] = name
 	SlashCo_DTNetworking[name] = {
 		callbackName = type .. "_" .. index,
 		type = type,
 		index = index,
-		owner = owner,
-		get = plyMeta["Get" .. name],
-		set = plyMeta["Set" .. name],
+		get = get,
+		set = set,
 	}
 
-	return plyMeta["Get" .. name], plyMeta["Set" .. name]
+	return get, set
 end
 SlashCo.SetupNetworkVar = SetupSlashCoNetworkVar
 
 -- Up to 31 booleans share one Int slot, bit 31 stays unused since the Int is signed
-local function SetupSlashCoNetworkFlag(index, shift, name, default, owner)
+local function SetupSlashCoNetworkFlag(index, shift, name, default)
 	local mask = bit.lshift(1, shift)
 	local inverse = bit.bnot(mask)
 	local getInt = entMeta.GetDTInt
@@ -623,7 +625,6 @@ local function SetupSlashCoNetworkFlag(index, shift, name, default, owner)
 		type = "Flag",
 		index = index,
 		shift = shift,
-		owner = owner,
 		get = get,
 		set = set,
 	}

@@ -616,6 +616,9 @@ local function ManspiderClimbing(tr)
 	return false
 end
 
+local CLIMB_TYPE_NONE = 0
+local CLIMB_TYPE_WALL = 1
+local CLIMB_TYPE_CEILING = 2
 local vectorAddNormal = Vector(0, 0, 0)
 local vectorAddHigh = Vector(0, 0, 64)
 function SLASHER.Move(ply, mv)
@@ -626,7 +629,7 @@ function SLASHER.Move(ply, mv)
 	end
 
 	if ply:OnGround() or ply:WaterLevel() > 0 then
-		ply:SetNW2String("ManspiderClimbEntity", "")
+		ply:SetNW2Int("ManspiderClimbType", CLIMB_TYPE_NONE)
 		ply:SetNW2Bool("ManspiderLeaping", false)
 		ply.leap_damage_anti_spam = false
 		return
@@ -666,13 +669,13 @@ function SLASHER.Move(ply, mv)
 				local trr2 = util.TraceEntity(trace2, ply) 
 				if (trr2.Hit) then return end
 
-				ply:SetNW2String("ManspiderClimbEntity", "wall")
+				ply:SetNW2Int("ManspiderClimbType", CLIMB_TYPE_WALL)
 				ply:SetNW2Bool("ManspiderLeaping", false)
 				mv:SetOrigin(vectoradd + tr.HitPos + -ply:GetViewOffset() + tr.HitNormal * 28)
 			else
-				if ply:GetNW2String("ManspiderClimbEntity", "wall") == "ceiling" then return end
+				if ply:GetNW2Int("ManspiderClimbType") == CLIMB_TYPE_CEILING then return end
 
-				ply:SetNW2String("ManspiderClimbEntity", "ceiling")
+				ply:SetNW2Int("ManspiderClimbType", CLIMB_TYPE_CEILING)
 				ply:SetNW2Bool("ManspiderLeaping", false)
 
 				local trace = { start = ply:GetPos(), endpos = ply:GetPos() + Vector(0,0,80), filter = ply }
@@ -698,7 +701,8 @@ function SLASHER.Move(ply, mv)
 
 	if CLIENT then return end
 
-	local climbEntity = ply:GetNW2String("ManspiderClimbEntity")
+	-- RaphaelIT7 (ToDo): Go back here later and see if we can get rid of it completely, doesn't seem to be used by anything other? Could be just a bool if needed?
+	local climbEntity = ply:GetNW2Int("ManspiderClimbType")
 	if climbEntity ~= "" then return end
 	
 	local tr = ManspiderKillCheck(ply, mv)
@@ -730,13 +734,13 @@ function SLASHER.Move(ply, mv)
 		volume = 1,
 		fadeIn = 0,
 	})
-	ply:SetNW2String("ManspiderClimbEntity", "")
+	ply:SetNW2Int("ManspiderClimbType", CLIMB_TYPE_NONE)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if slasher:GetNW2Bool("ManspiderClimbing") then 
 		slasher:SetNW2Bool("ManspiderClimbing", false)
-		slasher:SetNW2String("ManspiderClimbEntity", "")
+		slasher:SetNW2Int("ManspiderClimbType", CLIMB_TYPE_NONE)
 		slasher:SetRenderAngles(slasher:GetAngles())
 		slasher:SetMoveType(MOVETYPE_WALK)
 

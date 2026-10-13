@@ -270,6 +270,12 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 	})
 end
 
+function SLASHER.ChaseLight(slasher)
+	if slasher:GetNW2Bool("WatcherRage") then
+		return SlashCo.DefaultChaseLight()
+	end
+end
+
 function SLASHER.Animator(ply)
 	local rage = ply:GetNW2Bool("WatcherRage")
 	local chase = ply:GetInSlasherChaseMode()

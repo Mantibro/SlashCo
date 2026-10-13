@@ -21,7 +21,7 @@ local persistentDataTableVars = {
 
 local function ResetDataTable(ply)
 	for name, info in pairs(SlashCo_DTNetworking) do
-		if info.set and not info.owner and not persistentDataTableVars[name] then
+		if info.set and not persistentDataTableVars[name] then
 			info.set(ply)
 		end
 	end

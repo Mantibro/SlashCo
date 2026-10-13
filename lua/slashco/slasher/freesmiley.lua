@@ -327,9 +327,9 @@ function SLASHER.InitHud(_, hud)
 
 		local atMax
 		if deal == 0 then
-			atMax = #ents.FindByClass("sc_zanysmiley") >= maxZanies
+			atMax = #SlashCo.FindByClass("sc_zanysmiley") >= maxZanies
 		else
-			atMax = #ents.FindByClass("sc_pensivesmiley") >= maxPensives
+			atMax = #SlashCo.FindByClass("sc_pensivesmiley") >= maxPensives
 		end
 
 		if atMax ~= hud.prevNumSmiley or deal ~= hud.prevDeal then
