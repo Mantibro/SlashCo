@@ -7,6 +7,7 @@ ITEM.Price = 35
 ITEM.Description = "LabMeat_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = true
+ITEM.UseEffect = "Awareness"
 
 function ITEM.OnDrop()
 	return nil, nil, true
@@ -24,7 +25,7 @@ function ITEM.ItemDropped(ply, ent)
 	end
 end
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/benadryl_eat.mp3",
 		identifier = "LabMeatUse",
@@ -33,6 +34,7 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
 
 	local idx = math.random(1, 2)
@@ -44,9 +46,14 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
 
-	ply:AddEffect("Awareness", SlashCo.GetConsumableEffectDuration(ply, 120))
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
+
+	ply:AddEffect(ITEM.UseEffect, SlashCo.GetConsumableEffectDuration(ply, 120))
 end
 
 function ITEM.OnSetModel(model)

@@ -8,10 +8,9 @@ ITEM.Price = 10
 ITEM.Description = "MilkJug_desc"
 ITEM.CamPos = Vector(60,0,10)
 ITEM.IsSpawnable = true
+ITEM.UseEffect = "Speed"
 
-function ITEM.OnUse(ply)
-	--While the item is stored, a survivor can press R to consume it. It will set their sprint speed to 400 for 15 seconds.
-
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/drink_milk.mp3",
 		identifier = "MilkUse",
@@ -20,11 +19,17 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
+
+function ITEM.OnUse(ply)
+	--While the item is stored, a survivor can press R to consume it. It will set their sprint speed to 400 for 15 seconds.
+	ITEM.OnUsePredicted(ply)
 
 	SlashCoSlashers.Thirsty.ThirstyRage(ply)
 
-	ply:AddEffect("Speed", SlashCo.GetConsumableEffectDuration(ply, 15))
+	ply:AddEffect(ITEM.UseEffect, SlashCo.GetConsumableEffectDuration(ply, 15))
 end
 
 ITEM.ViewModel = {

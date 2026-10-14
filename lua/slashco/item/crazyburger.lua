@@ -9,7 +9,7 @@ ITEM.Description = "Burger_desc"
 ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Single"),
 		identifier = "BurgerUse",
@@ -18,9 +18,15 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
 
-	ply:ViewPunch(Angle(-10, 0, 0))
+	ply:PredictedViewPunch(Angle(-10, 0, 0))
+end
+
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
+
 	local droppeditem = SlashCo.CreateItem("sc_activecrazyburger", ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	droppeditem:SetBurgerVelocity(ply:GetAimVector() * 500)
 	droppeditem:SetOwner(ply)

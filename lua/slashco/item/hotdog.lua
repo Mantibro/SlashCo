@@ -7,11 +7,25 @@ ITEM.Icon = "slashco/ui/icons/items/item_1"
 ITEM.Description = "Hotdog_desc"
 ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = false
+ITEM.UseEffect = "Speed"
+
+function ITEM.OnUsePredicted(ply)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/eat_hotdog.mp3",
+		identifier = "HotdogEat",
+		soundLevel = 75,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
+end
+
 function ITEM.OnUse(ply)
 	local hp = ply:Health()
 
-	SlashCo.AudioSystem.EmitSound(ply, "slashco/survivor/eat_hotdog.mp3")
-	ply:AddEffect("Speed", 5)
+	ITEM.OnUsePredicted(ply)
+	ply:AddEffect(ITEM.UseEffect, 5)
 
 	if ply:Health() < 100 then
 		ply:SetHealth(hp + 40)

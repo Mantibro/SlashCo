@@ -7,8 +7,9 @@ ITEM.Description = "Unfortunate."
 ITEM.CamPos = Vector(30, 0, 0)
 ITEM.ReplacesWorldProps = true
 ITEM.IsSpawnable = true
+ITEM.UseEffect = "Buzzed"
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	local idx = math.random(1, 2)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/soda_drink" .. idx .. ".mp3",
@@ -18,9 +19,14 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
 
-	ply:AddEffect("Buzzed", SlashCo.GetConsumableEffectDuration(ply, 45))
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
+
+	ply:AddEffect(ITEM.UseEffect, SlashCo.GetConsumableEffectDuration(ply, 45))
 end
 
 ITEM.ViewModel = {

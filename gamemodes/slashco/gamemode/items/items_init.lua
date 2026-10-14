@@ -4,6 +4,39 @@ SlashCo = SlashCo or {}
 SlashCoItems = SlashCoItems or {}
 SlashCoEffects = SlashCoEffects or {}
 
+-- RaphaelIT7 (ToDo): Needs more testing about possibly desyncing IDs (Could possibly happen on mounting/unmounting of workshop items?)
+local ITEM_ID_BITS = 16
+local ITEM_ID_MASK = 0xFFFF
+local itemIDs, itemNames
+local function BuildItemIDs()
+	itemIDs, itemNames = {}, {}
+
+	local names = table.GetKeys(SlashCoItems)
+	table.Add(names, table.GetKeys(SlashCoEffects))
+	table.sort(names)
+
+	for id, name in ipairs(names) do
+		itemIDs[name] = id
+		itemNames[id] = name
+	end
+end
+
+function SlashCo.GetItemID(name)
+	if not itemIDs then
+		BuildItemIDs()
+	end
+
+	return itemIDs[name] or 0
+end
+
+function SlashCo.GetItemName(id)
+	if not itemNames then
+		BuildItemIDs()
+	end
+
+	return itemNames[id] or "none"
+end
+
 ---load items and effects
 
 function SlashCo.RegisterItem(table, name)
@@ -14,6 +47,7 @@ function SlashCo.RegisterItem(table, name)
 
 	name = name or table.Name
 	SlashCoItems[name] = table
+	itemIDs, itemNames = nil, nil
 	SlashCo.PrecacheItem(name)
 end
 
@@ -25,6 +59,7 @@ function SlashCo.RegisterEffect(table, name)
 
 	name = name or table.Name
 	SlashCoEffects[name] = table
+	itemIDs, itemNames = nil, nil
 end
 
 function SlashCo.GetItemByEntity(class)
@@ -271,6 +306,7 @@ function PLAYER:UpdateSpeed()
 	self:SetRunSpeed(speed)
 	self:SetWalkSpeed(math.min(speed, BASE_WALK_SPEED))
 	self:SetSlowWalkSpeed(math.min(speed, BASE_SLOW_WALK_SPEED))
+	self:SetMaxSpeed(speed) -- RaphaelIT7: While "This is called automatically by the engine" is true, it does not apply to prediction which is why were setting it ourselves
 end
 
 if SERVER then
@@ -410,39 +446,44 @@ function PLAYER:ItemFunction2OrElse(funcName, item, fallback, ...)
 end
 
 function PLAYER:GetItem(slot)
-	return self:GetNW2String(slot, "none")
+	local items = self:GetItems()
+	if slot == "item2" then
+		items = bit.rshift(items, ITEM_ID_BITS)
+	end
+
+	return SlashCo.GetItemName(bit.band(items, ITEM_ID_MASK))
 end
 
-if SERVER then
-	-- slot can be omitted if desired
-	local validSlots = {
-		item2 = true,
-		"item2", -- added for table.concat to work as it needs a sequential table.
-		item = true,
-		"item",
-	}
-	function PLAYER:SetItem(slot, item)
-		if not slot then
-			if SlashCoItems[item] then
-				slot = SlashCoItems[item].IsSecondary and "item2" or "item"
-			else
-				return
-			end
-		end
-
-		if not validSlots[slot] then
-			error("Tried to use an invalid item slot! (Got: " .. tostring(slot) .. ", Expected one of: " .. table.concat(validSlots, ", ") .. ")")
+-- slot can be omitted if desired
+function PLAYER:SetItem(slot, item)
+	if not slot then
+		if SlashCoItems[item] then
+			slot = SlashCoItems[item].IsSecondary and "item2" or "item"
+		else
 			return
 		end
-
-		if item ~= "none" and not SlashCoItems[item] and not SlashCoEffects[item] then
-			error("Tried to set an invalid item! (Item: " .. (tostring(item) or "") .. ")")
-			return
-		end
-
-		self:SetNW2String(slot, item)
-		self:UpdateSpeed()
 	end
+
+	if slot ~= "item" and slot ~= "item2" then
+		error("Tried to use an invalid item slot! (Got: " .. tostring(slot) .. ", Expected one of: item, item2)")
+		return
+	end
+
+	if item ~= "none" and not SlashCoItems[item] and not SlashCoEffects[item] then
+		error("Tried to set an invalid item! (Item: " .. (tostring(item) or "") .. ")")
+		return
+	end
+
+	local id = SlashCo.GetItemID(item)
+	local items = self:GetItems()
+	if slot == "item2" then
+		items = bit.bor(bit.band(items, ITEM_ID_MASK), bit.lshift(id, ITEM_ID_BITS))
+	else
+		items = bit.bor(bit.band(items, bit.lshift(ITEM_ID_MASK, ITEM_ID_BITS)), id)
+	end
+
+	self:SetItems(items)
+	self:UpdateSpeed()
 end
 
 ---internal: checks effect function first before checking the specified slot
@@ -484,4 +525,115 @@ SlashCo.LoadItemPatches()
 hook.Add("SlashCo:GameContentChanged", "SlashCo:RefreshItems", function()
 	SlashCo.LoadItems()
 	SlashCo.LoadItemPatches()
+end)
+
+if SERVER then
+	return
+end
+
+local function CanHandleItems(ply)
+	return not GameData.IsLobby and ply:Team() == TEAM_SURVIVOR and not ply:IsFrozen()
+end
+
+local function GetUsedItem(ply)
+	local item = ply:GetItem("item2")
+	if item == "none" then
+		return ply:GetItem("item")
+	end
+
+	return item
+end
+
+local function PredictUse(ply)
+	local itemTable = SlashCoItems[GetUsedItem(ply)]
+	if not itemTable or not itemTable.OnUsePredicted then return end
+
+	if itemTable.OnUsePredicted(ply) then return end
+
+	if itemTable.UseEffect then
+		AddEffect(ply, itemTable.UseEffect)
+	end
+
+	ply:SetItem("item", "none")
+end
+
+local lastDropTime = 0
+local function PredictDrop(ply)
+	local item = GetUsedItem(ply)
+	local itemTable = SlashCoItems[item]
+	if not itemTable or ply:ItemFunction2("PreDrop", item) then return end
+
+	if itemTable.IsSecondary then
+		if ply:ItemFunction("PreDropSecondary", item) then return end
+
+		ply:PredictedViewPunch(Angle(-6, 0, 0))
+		ply:SetItem("item2", "none")
+	else
+		ply:PredictedViewPunch(Angle(-2, 0, 0))
+		ply:SetItem("item", "none")
+	end
+
+	lastDropTime = CurTime()
+end
+
+local PICKUP_COOLDOWN = 1
+local function PredictPickUp(ply, ent)
+	if ply:GetCurseOfTheJug() or CurTime() - lastDropTime < PICKUP_COOLDOWN or ent:GetDontPickup() then return end
+
+	local item = ent.PrintName
+	local itemTable = SlashCoItems[item]
+	if not itemTable or itemTable.PrePickUp then return end
+
+	local slot = itemTable.IsSecondary and "item2" or "item"
+	if ply:GetItem(slot) ~= "none" then return end
+
+	ply:SetItem(slot, item)
+end
+
+hook.Add("PlayerButtonDown", "SlashCo:PredictItems", function(ply, button)
+	if not CanHandleItems(ply) then return end
+
+	if SlashCo.IsKeyPressed("USE_ITEM", ply, button) then
+		PredictUse(ply)
+	elseif SlashCo.IsKeyPressed("DROP_ITEM", ply, button) then
+		PredictDrop(ply)
+	end
+end)
+
+local function CallPredictedUse(ply, ent)
+	if ent.PredictUse then
+		ent:PredictUse(ply)
+	elseif ent.PredictPickUp then
+		PredictPickUp(ply, ent)
+	end
+end
+
+GameData.PredictedUse = GameData.PredictedUse or {}
+local function TriggerPredictedUse(ply)
+	local serverCurTime = UnPredictedCurTime()
+	for curTime, ent in SortedPairs(GameData.PredictedUse) do
+		if not IsValid(ent) or serverCurTime > curTime then
+			GameData.PredictedUse[curTime] = nil
+			continue
+		end
+
+		CallPredictedUse(ply, ent)
+	end
+end
+
+hook.Add("KeyPress", "SlashCo:PredictEntityUse", function(ply, key)
+	if key ~= IN_USE or not CanHandleItems(ply) then return end
+
+	-- RaphaelIT7: After the first use prediction will replay the input yet the player may have moved so traces may no longer hit anymore!
+	-- So to compensate for that we simply kept track of which were hit and call the functions
+	if not IsFirstTimePredicted() then
+		TriggerPredictedUse(ply)
+		return
+	end
+
+	local ent = ply:GetUseEntity()
+	if not ent then return end
+
+	GameData.PredictedUse[CurTime()] = ent
+	CallPredictedUse(ply, ent)
 end)

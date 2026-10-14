@@ -16,12 +16,7 @@ function ITEM.DisplayColor(ply)
 	return color.r, color.g, color.b, color.a
 end
 
-function ITEM.OnUse(ply)
-	--When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
-	--Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
-	--(50 - 10%, 25 - 60% ,1 - 100%).
-	--Using it will spawn a spent baby in the position the survivor used it.
-
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/baby_use.mp3",
 		identifier = "BabyUse",
@@ -30,7 +25,17 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
+
+function ITEM.OnUse(ply)
+	--When used, half of the survivors health is consumed, and the survivor is teleported to a random location which is at least 2000u away from their currect position.
+	--Activation takes 1 second. If the survivors health is lower than 51, the chance that the survivor will die upon use of the item will start increasing the lower their health.
+	--(50 - 10%, 25 - 60% ,1 - 100%).
+	--Using it will spawn a spent baby in the position the survivor used it.
+
+	ITEM.OnUsePredicted(ply)
 
 	local deathchance = math.random(0, math.floor(ply:Health() / 5))
 	local hpafter = ply:Health() / 2

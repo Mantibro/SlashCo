@@ -4,13 +4,6 @@ local EFFECT = {}
 
 EFFECT.Name = "Awareness"
 
-function EFFECT.OnApplied(ply)
-	SlashCo.SendValue(ply, "Awareness", true)
-end
-function EFFECT.OnExpired(ply)
-	SlashCo.SendValue(ply, "Awareness", false)
-end
-
 local colors = {
 	["$pp_colour_addr"] = 0,
 	["$pp_colour_addg"] = 0,
@@ -61,7 +54,7 @@ end
 if CLIENT then
 	local mat = Material("lights/white")
 
-	local function showSurvivors()
+	function EFFECT.DrawHUD()
 		cam.Start3D()
 		render.MaterialOverride(mat)
 
@@ -90,13 +83,8 @@ if CLIENT then
 		cam.End3D()
 	end
 
-	hook.Add("scValue_Awareness", "SlashCoAwareness", function(state)
-		if state then
-			hook.Add("SlashCo:DrawHUD", "SlashCoAwareness", showSurvivors)
-			return
-		end
-
-		hook.Remove("SlashCo:DrawHUD", "SlashCoAwareness")
+	hook.Add("SlashCo:DrawHUD", "SlashCoAwareness", function()
+		GameData.LocalPlayer:EffectFunction("Awareness", "DrawHUD")
 	end)
 end
 

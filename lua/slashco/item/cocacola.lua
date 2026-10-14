@@ -8,7 +8,7 @@ ITEM.Description = "CocaCola_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	local idx = math.random(1, 2)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/items/coca/cocacolaopen" .. idx .. ".mp3",
@@ -18,7 +18,12 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
+
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
 
 	timer.Simple(1, function()
 		if not IsValid(ply) then return end

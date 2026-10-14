@@ -4,6 +4,7 @@ ENT.Type = "anim"
 ENT.Base = "sc_baseitem"
 ENT.PrintName = "LabMeat"
 ENT.ClassName = "sc_labmeat"
+ENT.PredictPickUp = false
 
 hook.Add("SlashCo:Precache", "SlashCo:PrecacheLabMeat", function()
 	SlashCo.PrecacheModel("models/slashco/items/labmeat.mdl")

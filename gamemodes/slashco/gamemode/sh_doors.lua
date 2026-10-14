@@ -132,6 +132,7 @@ hook.Add("KeyPress", "SlashCo:DoorRamming", function(ply, button)
 			local doorInfo = GameData.PredictedDoorSlam[name]
 			if doorInfo then
 				doorInfo._time = UnPredictedCurTime() + 0.5
+				ply:SetViewPunchAngles(Angle(7, 0, 0)) -- For correctness sake we must predict it properly
 			end
 
 			return
@@ -155,19 +156,14 @@ hook.Add("KeyPress", "SlashCo:DoorRamming", function(ply, button)
 		GameData.PredictedDoorSlam[name] = modifiedDoors
 	end
 	
-	-- RaphaelIT7: They cause prediction errors since we got no good way of predicting them yet (they do nothing clientside)
-	--[[ply:SetViewPunchAngles(Angle(7, 0, 0))
-	timer.Simple(0.2, function()
-		if not IsValid(ply) then return end
-
-		ply:SetViewPunchAngles(Angle(-15, 0, 0))
-	end)]]
+	ply:SetViewPunchAngles(Angle(7, 0, 0))
 end)
 
 if CLIENT then
 	-- RaphaelIT7 (ToDo): This is wacky, originally I wanted to use the tick count but predicting that properly sucked
 	-- We could try to predict rotation and position and all that but this is the simple way
 	-- The only downside is that if they try to run through the door itself they will be bounced back
+	-- ToDo2: We should probably move this into a predicted hook where CurTime() will be predicted / in the future and not the server time!
 	GameData.PredictedDoorSlam = GameData.PredictedDoorSlam or {}
 	hook.Add("Tick", "SlashCo:DoorSlam", function()
 		local time = CurTime()

@@ -249,17 +249,36 @@ function SlashCo.SetupLanOverrides() -- Called from sh_shared.lua -> GM:InitPost
 	end
 end
 
+-- RaphaelIT7: It should be noted that it returns the tick in which the action was done
+-- So don't be stupid like me and don't try to use it as a means to know when the server catched up (use CurTime() against UnPredictedCurTime() for that)
+function PLAYER:GetPredictedTick()
+	local ucmd = self:GetCurrentCommand()
+	if not ucmd then -- Should probably never happen... anyways
+		return engine.TickCount()
+	end
+
+	-- RaphaelIT7: It's important to know that engine.TickCount() on the server would differ from the client!
+	-- But since PlayerButtonDown is called when the usercmd was received we can easily match up
+	return ucmd:TickCount()
+end
+
+function PLAYER:PredictedViewPunch(angle)
+	if SERVER then -- RaphaelIT7 (ToDo): The wiki is lying? In a quick test it seems like ViewPunch worked just fine in prediction... needs further testing!
+		self:ViewPunch(angle)
+	else -- RaphaelIT7: See https://github.com/RaphaelIT7/obsolete-source-engine/blob/48416f1a3b1ab318c79d513117056a708eda6eee/game/shared/baseplayer_shared.cpp#L1418
+		--if sv_suppress_viewpunch and sv_suppress_viewpunch:GetBool() then return end
+		if self:InVehicle() then return end
+
+		self:SetViewPunchVelocity(self:GetViewPunchVelocity() + angle * 20)
+	end
+end
+
 function PLAYER:CanPing()
 	if self:Team() == TEAM_SPECTATOR and not SlashCo.CanSpectatorsPing() then
 		return false
 	end
 
-	local ucmd = self:GetCurrentCommand() -- CUserCmd has no IsValid method (IsValid() would always be false), it returns nothing outside of a command
-	if not ucmd then return false end
-
-	-- RaphaelIT7: It's important to know that engine.TickCount() on the server would differ from the client!
-	-- But since PlayerButtonDown is called when the usercmd was received we can easily match up
-	local tickCount = ucmd:TickCount() - self:GetLastPinged()
+	local tickCount = self:GetPredictedTick() - self:GetLastPinged()
 	return (tickCount * engine.TickInterval()) > SlashCo.GetPlayerPingDelay()
 end
 
@@ -295,11 +314,7 @@ local typeCheck = {
 function PLAYER:SurvivorPing()
 	if not self:CanPing() then return end
 
-	local ucmd = self:GetCurrentCommand()
-	if not ucmd then return end
-
-	-- RaphaelIT7: Same as in PLAYER:CanPing()
-	local tickCount = ucmd:TickCount()
+	local tickCount = self:GetPredictedTick()
 	self:SetLastPinged(tickCount)
 
 	-- We return here since prediction must set SetLastPinged
@@ -467,10 +482,7 @@ local tauntKeys = {
 }
 
 function PLAYER:SurvivorTaunt(newTaunt)
-	local ucmd = self:GetCurrentCommand()
-	if not ucmd then return end
-
-	local tickCount = ucmd:TickCount()
+	local tickCount = self:GetPredictedTick()
 	if (tickCount - self:GetLastTaunted()) * engine.TickInterval() < TAUNT_DELAY then return end
 
 	self:SetLastTaunted(tickCount)

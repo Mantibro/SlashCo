@@ -9,6 +9,19 @@ ITEM.Description = "DevilDie_desc"
 ITEM.CamPos = Vector(30,0,10)
 ITEM.IsSpawnable = true
 
+function ITEM.OnUsePredicted(ply)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/survivor/devildie_roll.mp3",
+		identifier = "DevilDieRoll",
+		minDistance = 400,
+		maxDistance = 600,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
+end
+
 function ITEM.OnUse(ply)
 	--[[
 
@@ -23,15 +36,7 @@ function ITEM.OnUse(ply)
 
 	]]
 
-	SlashCo.AudioSystem.PlaySound({
-		soundPath = "slashco/survivor/devildie_roll.mp3",
-		identifier = "DevilDieRoll",
-		minDistance = 400,
-		maxDistance = 600,
-		entity = ply,
-		volume = 1,
-		fadeIn = 0,
-	})
+	ITEM.OnUsePredicted(ply)
 
 	timer.Simple(2, function()
 		if not IsValid(ply) then return end

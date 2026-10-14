@@ -23,7 +23,7 @@ function ENT:SetOrangeVelocity(velocity)
 	self:SetSkin(1)
 
 	self.EnableExposion = true
-	self.DONTPICKUP = true -- Block being picked up again
+	self:SetDontPickup(true) -- Block being picked up again
 end
 
 function ENT:Explode()

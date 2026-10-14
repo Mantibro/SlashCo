@@ -13,8 +13,10 @@ ENT.Purpose = "the essential item"
 ENT.Instructions = ""
 ENT.IsSelectable = true
 ENT.PingType = "ITEM"
+ENT.PredictPickUp = true
 
 function ENT:Initialize()
+	self.PredictPickUp = true
 	if SERVER then
 		self:SetUseType(SIMPLE_USE)
 	end
@@ -37,6 +39,15 @@ function ENT:Initialize()
 	if postInitialize then
 		postInitialize(self)
 	end
+end
+
+-- RaphaelIT7: For all items we use slot 31 for the DontPickup flag
+function ENT:SetDontPickup(state)
+	self:SetDTBool(31, state)
+end
+
+function ENT:GetDontPickup()
+	return self:GetDTBool(31)
 end
 
 if SERVER then

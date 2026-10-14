@@ -22,7 +22,7 @@ function ENT:SetBeerKegVelocity(velocity)
 		self.DisableGravity = CurTime() + 1
 	end
 	self.EnableExposion = true
-	self.DONTPICKUP = true -- Block being picked up again
+	self:SetDontPickup(true) -- Block being picked up again
 end
 
 local gravity = GetConVar("sv_gravity")
