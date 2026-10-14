@@ -350,9 +350,10 @@ local function SetupMaps()
 end
 
 function DrawItemSelectorBox()
-	if not IsValid(itemSelectFrame) then
-		SetupBase()
-	end
+	-- RaphaelIT7: We predict the open call so preferably once the server sent scValue_openItemPicker we don't want to close & re-open
+	if IsValid(itemSelectFrame) then return end
+
+	SetupBase()
 
 	itemSelectFrame.MapGuaranteeSelect:SetText(MGSelection and SlashCo.Language("ItemSelection") or SlashCo.Language("MapGuarantee"))
 

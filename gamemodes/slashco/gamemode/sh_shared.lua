@@ -257,6 +257,15 @@ function SlashCo.IsDebugGame()
 	return GameData.IsSinglePlayer or SlashCo.MapTools.IsEnabled(true)
 end
 
+function SlashCo.SetDebug(enabled)
+	g_SlashCoDebug = enabled
+	SetGlobal2Bool("SlashCo:InDebug", enabled)
+end
+
+function SlashCo.InDebug() -- Networked to avoid issues like prediction issues with noclip
+	return GetGlobal2Bool("SlashCo:InDebug", false)
+end
+
 -- Timestamps that the client has to compare while predicting are stored as ticks, CurTime can't be stored in a float without prediction errors
 function SlashCo.GetTick()
 	return math.floor(CurTime() / engine.TickInterval() + 0.5)
