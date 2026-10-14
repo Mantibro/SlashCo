@@ -60,20 +60,6 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	end
 end
 
-function SLASHER.GetSpeed(slasher)
-	if slasher:GetNW2Bool("SidGunAiming") or slasher:GetNW2Bool("SidGunAimed") then
-		return 1
-	end
-
-	if slasher:GetInSlasherChaseMode() then
-		return SLASHER.ChaseSpeed + (slasher:GetNW2Float("SidChaseIncrease") / 3.5)
-	end
-
-	if slasher:GetNW2Bool("SidGunEquipped") and slasher:GetNW2Bool("SidGunRage") then
-		return SLASHER.ChaseSpeed, SLASHER.ProwlSpeed
-	end
-end
-
 local function PlayShots(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/sid/sid_shot.mp3",
@@ -107,23 +93,48 @@ local function PlayShots(slasher)
 end
 
 function SLASHER.OnSpawn(slasher)
-	slasher.EatedCookies = 0
+	slasher:SetNW2Int("EatedCookies", 0)
 	slasher.Pacification = 0
 	slasher.GunCooldown = 0
 	slasher.GunSpread = 0
 	slasher:SetNW2Float("SidChaseIncrease", 0)
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("SidGunAiming") or slasher:GetNW2Bool("SidGunAimed") then
+		return 1
+	end
+
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.ChaseSpeed + (slasher:GetNW2Float("SidChaseIncrease") / 3.5)
+	end
+
+	if slasher:GetNW2Bool("SidGunEquipped") and slasher:GetNW2Bool("SidGunRage") then
+		return SLASHER.ChaseSpeed, SLASHER.ProwlSpeed
+	end
+end
+
+function SLASHER.OnPredictedTick(slasher)
+	-- RaphaelIT7: We predict SidChaseIncrease since its required for proper speed prediction
+	local ChaseIN = slasher:GetNW2Float("SidChaseIncrease") --chase speed increase
+
+	if ChaseIN < 160 and slasher:GetInSlasherChaseMode() then
+		slasher:SetNW2Float("SidChaseIncrease", ChaseIN + (FrameTime() + SLASHER.ChaseIncreaseAddition) + (slasher:GetNW2Int("EatedCookies") * FrameTime() * 0.5))
+	elseif ChaseIN ~= 0 then
+		slasher:SetNW2Float("SidChaseIncrease", 0)
+	end
+end
+
 function SLASHER.OnTickBehaviour(slasher)
-	local Cookies = math.Clamp(slasher.EatedCookies, 0, 5) --Cookies Eaten
-	slasher.EatedCookies = Cookies
 	local Pacification = slasher.Pacification or 0
 	local GunCD = slasher.GunCooldown or 0 --Gun use cooldown
 	local GunSP = slasher.GunSpread or 0 --bullet spread
-	local ChaseIN = slasher:GetNW2Float("SidChaseIncrease") --chase speed increase
 
 	local final_eyesight = SLASHER.Eyesight
 	local final_perception = SLASHER.Perception
+
+	local Cookies = math.Clamp(slasher:GetNW2Int("EatedCookies"), 0, 5) --Cookies Eaten
+	slasher:SetNW2Int("EatedCookies", Cookies)
 
 	if Pacification > 0 then
 		slasher.Pacification = Pacification - (FrameTime() + SLASHER.PacificationAddition)
@@ -144,12 +155,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 	if GunSP > 0 then
 		slasher.GunSpread = math.max(GunSP - SLASHER.GunSpreadDecrease, 0)
-	end
-
-	if ChaseIN < 160 and slasher:GetInSlasherChaseMode() then
-		slasher:SetNW2Float("SidChaseIncrease", ChaseIN + (FrameTime() + SLASHER.ChaseIncreaseAddition) + (Cookies * FrameTime() * 0.5))
-	elseif ChaseIN ~= 0 then
-		slasher:SetNW2Float("SidChaseIncrease", 0)
 	end
 
 	if not slasher:GetDemonPacified() then
@@ -186,10 +191,6 @@ function SLASHER.OnTickBehaviour(slasher)
 			volume = 1,
 			fadeIn = 0,
 		})
-	end
-
-	if slasher:GetNW2Int("SidGunUses") ~= Cookies then
-		slasher:SetNW2Int("SidGunUses", Cookies)
 	end
 
 	if not slasher.CanUseGun and SlashCo.CurRound.GameProgress > 5 then
@@ -284,7 +285,7 @@ local function EatCookie(slasher, target)
 		slasher:Freeze(false)
 		slasher:SetNW2Bool("SidEating", false)
 		slasher:SetDemonPacified(true)
-		slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
+		slasher:SetNW2Int("EatedCookies", slasher:GetNW2Int("EatedCookies") + 1 + SlashCo.CurRound.OfferingData.Satiation)
 		slasher.Pacification = math.random(15, 25)
 
 		if IsValid(target) then
@@ -352,7 +353,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			slasher:SetNW2Bool("SidEatingSurvCookie", false)
 			slasher:SetDemonPacified(true)
 			slasher:Freeze(false)
-			slasher.EatedCookies = slasher.EatedCookies + 1 + SlashCo.CurRound.OfferingData.Satiation
+			slasher:SetNW2Int("EatedCookies", slasher:SetNW2Int("EatedCookies") + 1 + SlashCo.CurRound.OfferingData.Satiation)
 			slasher.Pacification = math.random(15, 25)
 		end)
 
@@ -619,7 +620,7 @@ end
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if not slasher.CanUseGun then return end
 
-	if not slasher:GetNW2Bool("SidGun") and slasher.GunCooldown < 0.01 and slasher.EatedCookies > 0 then
+	if not slasher:GetNW2Bool("SidGun") and slasher.GunCooldown < 0.01 and slasher:GetNW2Int("EatedCookies") > 0 then
 		--Equip the gun
 		slasher:SetNW2Bool("SidGun", true)
 		slasher:SetNW2Bool("SidGunEquipping", true)
@@ -627,7 +628,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		slasher.GunCooldown = 4 - SLASHER.EquipGunCooldownDecrease
 		slasher.Pacification = 4 - SLASHER.EquipGunCooldownDecrease
 
-		slasher.EatedCookies = slasher.EatedCookies - 1 --Deplete the uses
+		slasher:SetNW2Int("EatedCookies", slasher:GetNW2Int("EatedCookies") - 1) --Deplete the uses
 
 		timer.Simple(0.5, function()
 			if not IsValid(slasher) then return end
@@ -846,14 +847,14 @@ function SLASHER.InitHud(_, hud)
 	end)
 
 	hud:AddMeter("satiation", 5, "", nil, true)
-	hud:TieMeterInt("satiation", "SidGunUses", true)
+	hud:TieMeterInt("satiation", "EatedCookies", true)
 
 	hud.prevGun = not GameData.LocalPlayer:GetNW2Bool("SidGun")
 	hud.prevGunEquipped = not GameData.LocalPlayer:GetNW2Bool("SidGunEquipped")
 	hud.prevGunUses = -1
 	function hud.AlsoThink()
 		local gun = GameData.LocalPlayer:GetNW2Bool("SidGun")
-		local gunUses = GameData.LocalPlayer:GetNW2Int("SidGunUses")
+		local gunUses = GameData.LocalPlayer:GetNW2Int("EatedCookies")
 		if gun ~= hud.prevGun then
 			if gun then
 				hud:UntieControl("LMB")
@@ -940,7 +941,7 @@ function SLASHER.SidRage(ply)
 		if SlashCoSlashers[slasher:GetNW2String("Slasher")] ~= SLASHER then continue end
 		if slasher:GetPos():Distance(pos) > 1800 then continue end
 
-		slasher.EatedCookies = slasher.EatedCookies + 2
+		slasher:SetNW2Int("EatedCookies", slasher:GetNW2Int("EatedCookies") + 2)
 
 		local idx = math.random(1,4)
 		SlashCo.AudioSystem.PlaySound({

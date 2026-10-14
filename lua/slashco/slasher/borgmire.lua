@@ -209,9 +209,7 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	local anger = SlashCo.GetSlasherAnger(slasher)
-	if slasher:GetNW2Int("BorgmireAnger") ~= math.floor(anger) then
-		slasher:SetNW2Int("BorgmireAnger", math.floor(anger))
-	end
+	slasher:SetNW2Int("BorgmireAnger", math.floor(anger))
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)

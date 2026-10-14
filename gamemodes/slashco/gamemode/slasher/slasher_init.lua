@@ -272,6 +272,12 @@ hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
 	return localPly:SlasherFunction("DrawHUD", localPly.SlasherHud)
 end)
 
+hook.Add("PlayerTick", "SlashCo:PredictedSlasherTick", function(ply)
+	if ply:Team() ~= TEAM_SLASHER then return end
+
+	ply:SlasherFunction("OnPredictedTick")
+end)
+
 if CLIENT then
 	local StepNotice = Material("slashco/ui/particle/step_notice")
 	local timeSinceLast = 0

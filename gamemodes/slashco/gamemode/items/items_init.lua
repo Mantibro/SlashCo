@@ -622,7 +622,7 @@ local function TriggerPredictedUse(ply)
 end
 
 hook.Add("KeyPress", "SlashCo:PredictEntityUse", function(ply, key)
-	if key ~= IN_USE or not CanHandleItems(ply) then return end
+	if key ~= IN_USE then return end
 
 	-- RaphaelIT7: After the first use prediction will replay the input yet the player may have moved so traces may no longer hit anymore!
 	-- So to compensate for that we simply kept track of which were hit and call the functions

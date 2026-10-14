@@ -69,9 +69,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.Speedrun = Speed + engine.TickInterval() * mapSizeMod * SpeedGain * (1 + SO) * 0.66 * gasMod
 	end
 
-	if slasher:GetNW2Int("SpeedrunnerSpeed") ~= math.floor(slasher.Speedrun) then
-		slasher:SetNW2Int("SpeedrunnerSpeed", math.floor(slasher.Speedrun))
-	end
+	slasher:SetNW2Int("SpeedrunnerSpeed", math.floor(slasher.Speedrun))
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)

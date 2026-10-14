@@ -70,7 +70,7 @@ function GM:PlayerSpawnAsSpectator(ply)
 end
 
 hook.Add("PlayerNoClip", "SlashCo:PreventSpectators", function(ply)
-	if g_SlashCoDebug then
+	if SlashCo.InDebug() then
 		return ply:Team() ~= TEAM_SPECTATOR
 	end
 
