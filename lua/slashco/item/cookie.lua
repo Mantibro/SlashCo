@@ -8,8 +8,9 @@ ITEM.Price = 15
 ITEM.Description = "Cookie_desc"
 ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = true
+ITEM.UseEffect = "FuelSpeed"
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/eat_cookie.mp3",
 		identifier = "CookieEat",
@@ -18,10 +19,15 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
+
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
 
 	SlashCoSlashers.Sid.SidRage(ply)
-	ply:AddEffect("FuelSpeed", SlashCo.GetConsumableEffectDuration(ply, 30))
+	ply:AddEffect(ITEM.UseEffect, SlashCo.GetConsumableEffectDuration(ply, 30))
 end
 
 ITEM.ViewModel = {

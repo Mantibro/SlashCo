@@ -17,7 +17,7 @@ ENT.PingExpiryTime = 10
 
 function ENT:Initialize()
 	if SERVER then
-		self.DONTPICKUP = true
+		self:SetDontPickup(true)
 		self:SetModel("models/slashco/slashers/dream/ore.mdl")
 		self:SetSkin(1)
 		self:SetSolid(SOLID_VPHYSICS)

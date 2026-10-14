@@ -274,6 +274,14 @@ local function gasFuelMeter(hitPos)
 	end
 end
 
+function SlashCo.StartFuelMeter(can, timeToFuel)
+	FuelingCan = can
+	FuelingCanIndex = can:EntIndex()
+	TimeToFuel = math.floor(timeToFuel)
+	TimeUntilFueled = CurTime() + timeToFuel
+	IsFueling = true
+end
+
 local function hpMeter()
 	local hp = GameData.LocalPlayer:Health()
 

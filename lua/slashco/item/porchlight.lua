@@ -7,7 +7,7 @@ ITEM.Price = 90
 ITEM.Description = "PorchLight_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Single"),
 		identifier = "PorchLightUse",
@@ -16,9 +16,15 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
 
-	ply:ViewPunch(Angle(-10, 0, 0))
+	ply:PredictedViewPunch(Angle(-10, 0, 0))
+end
+
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
+
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
 	droppeditem:SetOwner(ply)

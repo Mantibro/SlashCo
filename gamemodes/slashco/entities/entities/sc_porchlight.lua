@@ -11,7 +11,7 @@ function ENT:SetupDataTables()
 end
 
 function ENT:BecomeTheSun()
-	self.DONTPICKUP = true
+	self:SetDontPickup(true)
 	self.Active = CurTime()
 	self:Stage0()
 end

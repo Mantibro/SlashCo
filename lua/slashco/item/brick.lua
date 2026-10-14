@@ -12,7 +12,7 @@ function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Single"),
 		identifier = "BrickThrow",
@@ -21,9 +21,15 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
 
-	ply:ViewPunch(Angle(-10, 0, 0))
+	ply:PredictedViewPunch(Angle(-10, 0, 0))
+end
+
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
+
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)), ply)
 	droppeditem:SetBrickVelocity(ply:GetAimVector() * 1500)
 	SlashCo.CurRound.Items[droppeditem:EntIndex()] = true

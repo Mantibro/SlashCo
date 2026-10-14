@@ -13,7 +13,7 @@ function ENT:GetVomitOffset()
 end
 
 function ENT:Initialize()
-	self.DONTPICKUP = true
+	self:SetDontPickup(true)
 	self:SetModel("models/alyx_emptool_prop.mdl")
 	self:SetMaterial("models/effects/vol_light001")
 	self:PhysicsInitSphere(10)

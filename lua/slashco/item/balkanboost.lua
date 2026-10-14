@@ -8,6 +8,7 @@ ITEM.Price = 100
 ITEM.Description = "BalkanBoost_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = false
+ITEM.UseEffect = "Slowness"
 
 function ITEM.DisplayColor()
 	return 232, 23, 55, 255
@@ -17,11 +18,13 @@ function ITEM.MaxAllowed()
 	return 4
 end
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	-- RaphaelIT7: Disallow balkan stacking
 	if ply:GetSurvivorBalkan() then
 		return true
 	end
+
+	ply:SetSurvivorBalkan(true)
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/balkan_eat.wav",
@@ -31,10 +34,16 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
 
-	ply:SetSurvivorBalkan(true)
-	ply:AddEffect("Slowness", 31.5)
+function ITEM.OnUse(ply)
+	if ITEM.OnUsePredicted(ply) then
+		return true
+	end
+
+	ply:AddEffect(ITEM.UseEffect, 31.5)
 
 	timer.Create("BalkanBoostStart:" .. ply:UserID(), 32, 1, function()
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then

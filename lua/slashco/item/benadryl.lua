@@ -7,12 +7,17 @@ ITEM.Price = 30
 ITEM.Description = "Benadryl_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 
+local fullBenadrylTime = 60 -- Time in seconds after which the benadryl is in full effect.
+local function HasFullBenadryl(ply)
+	local benadrylTime = ply:GetInitialBenadrylTime() -- if 0 benadryl isn't active.
+	return benadrylTime ~= 0 and CurTime() - benadrylTime >= fullBenadrylTime
+end
+
 function ITEM.DisplayColor()
 	return 128, 48, 0, 255
 end
 
-function ITEM.OnUse(ply)
-	ply:AddRoundPoints("benadryl")
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/benadryl/benadryl_cornstarch.ogg",
 		identifier = "BenadrylEat",
@@ -21,11 +26,17 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
+
+function ITEM.OnUse(ply)
+	ply:AddRoundPoints("benadryl")
+	ITEM.OnUsePredicted(ply)
 
 	if ply:GetInitialBenadrylTime() == 0 then
 		ply:SetInitialBenadrylTime(CurTime())
-		timer.Simple(60, function()
+		timer.Simple(fullBenadrylTime, function()
 			if not IsValid(ply) or ply:GetInitialBenadrylTime() == 0 then return end
 
 			GameData.TestHatMan = ents.Create("sc_hatman")
@@ -81,10 +92,26 @@ SlashCo.RegisterItem(ITEM, "Benadryl")
 if SERVER then
 	local function removeBenadrylEffect(ply)
 		ply:SetInitialBenadrylTime(0) -- Reset the benadryl time for its effects to stop.
+		ply:SetBenadrylHidden(false)
 	end
 
 	hook.Add("PlayerChangedTeam", "SlashCo:RemoveBenadrylEffect", removeBenadrylEffect)
 	hook.Add("PostPlayerDeath", "SlashCo:RemoveBenadrylEffect", removeBenadrylEffect)
+
+	timer.Create("SlashCo:BenadrylHiding", 0.5, 0, function()
+		local survivors = team.GetPlayers(TEAM_SURVIVOR)
+		local alive = 0
+		for _, ply in ipairs(survivors) do
+			if ply:Alive() then
+				alive = alive + 1
+			end
+		end
+
+		local canHide = alive > 1 or SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Nightmare
+		for _, ply in ipairs(survivors) do
+			ply:SetBenadrylHidden(canHide and ply:Alive() and HasFullBenadryl(ply))
+		end
+	end)
 
 	function TestHatMan()
 		if IsValid(GameData.TestHatMan) then
@@ -99,7 +126,6 @@ if SERVER then
 	return
 end
 
-local fullBenadrylTime = 60 -- Time in seconds after which the benadryl is in full effect.
 local function GetBenadrylTime(ply)
 	return ply:GetInitialBenadrylTime() -- if 0 benadryl isn't active.
 end
@@ -151,8 +177,7 @@ hook.Add("RenderScreenspaceEffects", "Benadryl", function()
 end)
 
 local function CreateShadowPerson(pos, ang)
-	local benadrylTime = GetBenadrylTime(GameData.LocalPlayer)
-	if benadrylTime == 0 or benadrylTime < fullBenadrylTime then
+	if not HasFullBenadryl(GameData.LocalPlayer) then
 		return
 	end
 

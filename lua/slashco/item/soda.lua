@@ -8,8 +8,9 @@ ITEM.Price = 20
 ITEM.Description = "Soda_desc"
 ITEM.CamPos = Vector(30,0,0)
 ITEM.IsSpawnable = true
+ITEM.UseEffect = "Invisibility"
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	local idx = math.random(1, 2)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/soda_drink" .. idx .. ".mp3",
@@ -19,9 +20,14 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
 
-	ply:AddEffect("Invisibility", SlashCo.GetConsumableEffectDuration(ply, 30))
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
+
+	ply:AddEffect(ITEM.UseEffect, SlashCo.GetConsumableEffectDuration(ply, 30))
 end
 
 ITEM.ViewModel = {

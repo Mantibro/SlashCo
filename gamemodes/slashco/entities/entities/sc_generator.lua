@@ -117,6 +117,24 @@ if CLIENT then
 		cam.End3D2D()
 	end
 
+	-- RaphaelIT7: The actual gascan rotating we do in ENT:Think isn't predicted so its delayed when pressing use... though thats more of a tiny detail
+	function ENT:PredictUse(ply)
+		if self:GetMalfunction() or self:GetFueling() or ply:GetPos():Distance(self:GetPos()) > 100 then return end
+
+		local can = self:GetCan()
+		if IsValid(can) then
+			if IsFirstTimePredicted() then
+				SlashCo.StartFuelMeter(can, DefaultTimeToFuel / ply:ItemValue("FuelSpeed", 1) / ply:PerkValue("FuelSpeed", 1))
+			end
+		elseif ply:ItemValue("IsFuel", false, true) then
+			if self:GetCansRemaining() > 0 then
+				ply:SetItem("item2", "none")
+			end
+		elseif ply:ItemValue("IsBattery", false, true) and not self:GetHasBattery() then
+			ply:SetItem("item2", "none")
+		end
+	end
+
 	return
 end
 
