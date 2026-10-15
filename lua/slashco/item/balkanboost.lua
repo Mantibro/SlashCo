@@ -150,6 +150,7 @@ hook.Add("Think", "SlashCo:BalkanBoost", function()
 				entity = GameData.LocalPlayer,
 				volume = 3,
 				fadeIn = 0,
+				isMusic = true,
 				forceStereo = true,
 				modifyGroup = "BackgroundMusic",
 				modifyGroupVolumeMult = 0, -- Silence background music while were playing
