@@ -124,9 +124,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNW2Bool("AbomignatLungeShort") then
-		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 30)),
-		--		Vector(-15, -15, -60), Vector(15, 15, 60), 60, DMG_SLASH, 5, false)
-
 		slasher:LagCompensation(true)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
@@ -184,9 +181,6 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if slasher:GetNW2Bool("AbomignatLungeLarge") then
-		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 30)),
-		--		Vector(-15, -15, -60), Vector(15, 15, 60), 100, DMG_SLASH, 5, false)
-
 		slasher:LagCompensation(true)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
@@ -361,9 +355,6 @@ function SLASHER.OnPrimaryFire(slasher)
 		slasher:Freeze(true)
 		slasher.ForwardCharge = 0
 
-		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(55, 0, 0)),
-		--		Vector(-40, -40, -60), Vector(40, 40, 60), damage, DMG_SLASH, 5, false)
-
 		slasher:LagCompensation(true)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
@@ -522,7 +513,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 			slasher:SlasherHudFunc("ShakeControl", "F")
 
-			slasher:SetVelocity((slasher:EyeAngles():Forward() * 500) + Vector(0, 0, 300))
+			slasher:SetVelocity((slasher:EyeAngles():Forward() * 500) + Vector(0, 0, 150))
 
 			return
 		end
