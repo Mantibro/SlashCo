@@ -98,9 +98,8 @@ function SLASHER.GetSpeed(slasher)
 end
 
 function SLASHER.OnPredictedTick(slasher)
-	local AggressionFloat = slasher:GetNW2Float("PrincessAggressionChase") --chase speed increase
 	local AggressionAmount = slasher:GetNW2Int("PrincessAggression")
-	slasher:SetNW2Float("PrincessAggressionChase", AggressionFloat + (1 * AggressionAmount))
+	slasher:SetNW2Float("PrincessAggressionChase", AggressionAmount) --chase speed increase
 end
 
 function SLASHER.DoSound(slasher)
