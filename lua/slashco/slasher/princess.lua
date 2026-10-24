@@ -74,12 +74,6 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
-function SLASHER.GetSpeed(slasher)
-	if slasher:GetNW2Bool("PrincessDraggingSurvivor") then
-		return SLASHER.MaulingSpeed
-	end
-end
-
 function SLASHER.OnSpawn(slasher)
 	slasher:SetViewOffset(Vector(0, 0, 50))
 	slasher:SetCurrentViewOffset(Vector(0, 0, 50))
@@ -88,8 +82,25 @@ function SLASHER.OnSpawn(slasher)
 	slasher.Aggression = 0
 	slasher.PrincessCanMaul = true
 	slasher.MaulBonus = 0
+	slasher:SetNW2Float("PrincessAggressionChase", 0)
 
 	SLASHER.DoSound(slasher)
+end
+
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("PrincessDraggingSurvivor") then
+		return SLASHER.MaulingSpeed
+	end
+
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.ChaseSpeed + (slasher:GetNW2Float("PrincessAggressionChase") / 5)
+	end
+end
+
+function SLASHER.OnPredictedTick(slasher)
+	local AggressionFloat = slasher:GetNW2Float("PrincessAggressionChase") --chase speed increase
+	local AggressionAmount = slasher:GetNW2Int("PrincessAggression")
+	slasher:SetNW2Float("PrincessAggressionChase", AggressionFloat + (1 * AggressionAmount))
 end
 
 function SLASHER.DoSound(slasher)
@@ -540,10 +551,6 @@ function SLASHER.OnPrimaryFire(slasher)
 	timer.Create("princessMaul_" .. slasher:UserID(), 0.05, 8, function()
 		if not IsValid(slasher) then return end
 
-		--local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-		--		Vector(-40, -40, -60), Vector(40, 40, 60),
-		--		damage, DMG_SLASH, 5, false)
-
 		slasher:LagCompensation(true)
 		local tr = util.TraceHull({
 			start = slasher:EyePos(),
@@ -570,7 +577,7 @@ function SLASHER.OnPrimaryFire(slasher)
 		end
 
 		if target:IsValid() and target:IsPlayer() and target:Team() == TEAM_SURVIVOR then
-			if slasher.Aggression >= 50 and slasher.Aggression <= 99 then
+			if slasher.Aggression >= 30 and slasher.Aggression <= 99 then
 				if math.random(1, 100) > 59 then -- 40% chance to grab a surv
 					SlashCo.StopChase(slasher)
 
