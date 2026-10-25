@@ -93,7 +93,7 @@ function SLASHER.GetSpeed(slasher)
 	end
 
 	if slasher:GetInSlasherChaseMode() then
-		return SLASHER.ChaseSpeed + (slasher:GetNW2Float("PrincessAggressionChase") / 5)
+		return SLASHER.ChaseSpeed + (slasher:GetNW2Float("PrincessAggressionChase") / 4)
 	end
 end
 
@@ -225,7 +225,7 @@ function SLASHER.OnTickBehaviour(slasher)
 				mauled_child:Remove()
 
 				slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
-				slasher.Aggression = Aggression - math.random(25, Aggression + 26)
+				slasher.Aggression = math.Clamp(Aggression - math.random(30, 50), 0, AggressionTH)
 			end)
 
 			---yeah
@@ -472,7 +472,7 @@ function SLASHER.Maul(slasher, target)
 
 		if IsValid(slasher.ref_child) then
 			slasher.AggressionThreshold = slasher.AggressionThreshold + math.random(15, 20)
-			slasher.Aggression = slasher.Aggression - math.random(25, slasher.Aggression + 26)
+			slasher.Aggression = math.Clamp(slasher.Aggression - math.random(30, 50), 0, slasher.AggressionThreshold)
 
 			slasher.ref_child:Remove()
 		end
