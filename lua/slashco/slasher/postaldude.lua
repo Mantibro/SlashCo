@@ -21,7 +21,7 @@ SLASHER.ChaseRange = 1000
 SLASHER.ChaseRadius = 0.75
 SLASHER.ChaseDuration = 15.0
 SLASHER.ChaseCooldown = 1
-SLASHER.PatienceDecrease = -5	-- How fast Patience should decrease by damaging
+SLASHER.PatienceDecrease = -10	-- How fast Patience should decrease by damaging
 SLASHER.PatienceChaseIncrease = 0.01	-- How fast Patience should increase out of chase
 SLASHER.PatienceChaseDecrease = -0.01	-- How fast Patience should decrease in chase
 SLASHER.FuelAmount = 30		-- Max amount of fuel
@@ -240,7 +240,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 		-- Check for game progress for Stage 2
 		if SlashCo.CurRound.GameProgress >= 3 and SlashCo.CurRound.GameProgress < 6 and slasher:GetNW2Int("PostalStage") ~= POSTAL_DEAGLE_STAGE then
-			SLASHER.PatienceChaseIncrease = 0.02
+			SLASHER.PatienceChaseIncrease = 0.015
 			if not slasher:GetNW2Bool("SwitchToGas") and not slasher:GetNW2Bool("SwitchToBaby") and slasher.PostalState ~= POSTAL_SHOVEL_EQUIPPED then
 				slasher.PostalState = POSTAL_SHOVEL_EQUIPPED -- Update HUD to show the deagle
 				slasher:SetBodygroup(1, 1)
@@ -263,7 +263,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		-- Check for game progress for Stage 3
 		if SlashCo.CurRound.GameProgress >= 6 and SlashCo.CurRound.GameProgress < 10 and slasher:GetNW2Int("PostalStage") ~= POSTAL_MG_STAGE then
 			-- This is to switch the player to a "new" deagle state that has the updated hud for the M4, so it isn't buggy, and it's smooth
-			SLASHER.PatienceChaseIncrease = 0.03
+			SLASHER.PatienceChaseIncrease = 0.02
 			if slasher.PostalState == POSTAL_DEAGLE_UNEQUIPPED and not slasher:GetNW2Bool("SwitchToGas") then
 				slasher.PostalState = POSTAL_DEAGLE_EQUIPPED
 				slasher:SetBodygroup(1, 0)
