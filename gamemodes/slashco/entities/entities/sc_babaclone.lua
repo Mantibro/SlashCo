@@ -11,6 +11,7 @@ ENT.Contact			= ""
 ENT.Purpose			= "A Bababooey clone."
 ENT.Instructions	= ""
 ENT.PingType = "SLASHER"
+ENT.PingExpiryTime = 5
 
 ENT.AutomaticFrameAdvance = true
 
@@ -40,6 +41,8 @@ function ENT:Initialize()
 	self:SetCloneTripped(false)
 
 	timer.Simple(0.1, function()
+		if not IsValid(self) then return end
+
 		self:ResetSequence("prowl")
 		self:SetPoseParameter("move_x", 1)
 		self:SetPlaybackRate(2)
@@ -54,17 +57,17 @@ function ENT:Think()
 		return
 	end
 		
-	local endPosTr = self:LocalToWorld(offset)
-	endPosTr:Add(self:GetForward())
+	local endPosTr = self:GetForward()
 	endPosTr:Mul(1150)
+	endPosTr:Add(self:LocalToWorld(offset))
 	local tr = util.TraceLine({
 		start = self:LocalToWorld(offset),
 		endpos = endPosTr
 	})
 		
-	local endPosGround = self:LocalToWorld(offset)
-	endPosGround:Add(self:GetUp())
+	local endPosGround = self:GetUp()
 	endPosGround:Mul(-10000)
+	endPosGround:Add(self:LocalToWorld(offset))
 	local ground = util.TraceLine({
 		start = self:LocalToWorld(offset),
 		endpos = endPosGround
@@ -72,7 +75,7 @@ function ENT:Think()
 
 	if tr.Entity:IsPlayer() and tr.Entity:Team() == TEAM_SURVIVOR and not self.activateWalk and SlashCo.CurRound.SlasherEntities[self:EntIndex()].activateSpook == false then
 		self.activateWalk = true
-		self:EmitSound("slashco/slasher/baba_reveal.mp3")
+		SlashCo.AudioSystem.EmitSound(self, "slashco/slasher/baba_reveal.mp3")
 	end
 
 	if self.activateWalk == true then
@@ -113,9 +116,8 @@ function ENT:Think()
 
 		self:SetCloneTripped(true)
 
-		self:EmitSound("slashco/slasher/baba_reveal.mp3")
-
-		self:EmitSound("slashco/slasher/baba_scare.mp3")
+		SlashCo.AudioSystem.EmitSound(self:GetPos(), "slashco/slasher/baba_reveal.mp3")
+		SlashCo.AudioSystem.EmitSound(self:GetPos(), "slashco/slasher/baba_scare.mp3")
 		self:DrawShadow(true)
 		self:SetColor(color_white)
 		self:SetRenderMode(RENDERMODE_TRANSCOLOR)
@@ -126,6 +128,8 @@ function ENT:Think()
 		SlashCo.CurRound.SlasherEntities[entIndex].PostActivation = true
 
 		timer.Simple(1.75, function()
+			if not IsValid(self) then return end
+
 			table.RemoveByValue(SlashCo.CurRound.SlasherEntities, entIndex)
 			self:Remove()
 		end)

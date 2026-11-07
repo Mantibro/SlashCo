@@ -24,11 +24,11 @@ function ITEM.OnUse(ply)
 	local gens = ents.FindByClass("sc_generator")
 	local runningCount = 0
 	for _, v in ipairs(gens) do
-		if v.IsRunning then runningCount = runningCount + 1 end
+		if v:GetRunning() then runningCount = runningCount + 1 end
 	end
 
 	for k, v in ipairs(ents.FindByClass("sc_activebeacon")) do
-		if not v:GetNWBool("BeaconBroken") then
+		if not v:GetBeaconBroken() then
 			ply:ChatText("Beacon_already_active")
 			return true
 		end

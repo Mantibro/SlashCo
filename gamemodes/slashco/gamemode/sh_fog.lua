@@ -14,10 +14,17 @@ SlashCo.FogType = {
 }]]
 
 local skyBoxVec = Vector(0, 0, 100000)
+local matchingFogs = {}
+
+local function SortFogByPriority(fogInfo1, fogInfo2)
+	if fogInfo1.priority ~= fogInfo2.priority then
+		return fogInfo1.priority < fogInfo2.priority
+	end
+
+	return (fogInfo1.name or "") < (fogInfo2.name or "")
+end
+
 function SlashCo.GetCurrentFogMultiplier(ply, infoTbl)
-	local highest = -999999
-	local highestFogInfo = nil
-	
 	-- RaphaelIT7: Spectators use the Fog settings of the player their spectating
 	local plyTeam = ply:Team()
 	local plyIndex = ply:EntIndex()
@@ -32,13 +39,19 @@ function SlashCo.GetCurrentFogMultiplier(ply, infoTbl)
 		end
 	end
 
+	table.Empty(matchingFogs)
 	for _, fogInfo in pairs(GameData.FogData) do
-		if fogInfo.priority < highest then continue end
 		if fogInfo.fogType == SlashCo.FogType.PLAYER and fogInfo.entIndex ~= plyIndex then continue end
 		if fogInfo.fogType == SlashCo.FogType.TEAM and fogInfo.team ~= plyTeam then continue end
 
-		highest = fogInfo.priority
-		highestFogInfo = fogInfo
+		matchingFogs[#matchingFogs + 1] = fogInfo
+	end
+
+	table.sort(matchingFogs, SortFogByPriority)
+
+	local multiplier
+	for _, fogInfo in ipairs(matchingFogs) do
+		multiplier = fogInfo.multiplier or multiplier
 
 		-- Merge info info
 		-- The info is built upon all existing infos
@@ -53,7 +66,7 @@ function SlashCo.GetCurrentFogMultiplier(ply, infoTbl)
 		end
 	end
 
-	return highestFogInfo and highestFogInfo.multiplier or 1, highestFogInfo
+	return multiplier or 1, matchingFogs[#matchingFogs]
 end
 
 function SlashCo.FillTableWithFogInfo(infoTbl, ply)
@@ -150,17 +163,11 @@ function GM:SetupWorldFog() -- A basic world fog that dynamicly changes dependin
 	return true
 end
 
-net.Receive("SlashCo:UpdateFog", function()
-	local isRemoval = net.ReadBool()
-	local name = net.ReadString()
-	if isRemoval then
-		GameData.FogData[name] = nil
-		return
-	end
-
+function SlashCo.ReadFogInfo(name)
 	local fogInfo = {
+		name = name,
 		fogType = net.ReadUInt(2),
-		priority = net.ReadUInt(32),
+		priority = net.ReadInt(32),
 		multiplier = SlashCo.ReadOptional(net.ReadFloat),
 		worldColorR = SlashCo.ReadOptional(net.ReadFloat),
 		worldColorG = SlashCo.ReadOptional(net.ReadFloat),
@@ -170,13 +177,24 @@ net.Receive("SlashCo:UpdateFog", function()
 		worldColorScaleB = SlashCo.ReadOptional(net.ReadFloat),
 	}
 
-	if fogType == SlashCo.FogType.PLAYER then
+	if fogInfo.fogType == SlashCo.FogType.PLAYER then
 		fogInfo.entIndex = net.ReadUInt(13)
-	elseif fogType == SlashCo.FogType.TEAM then
+	elseif fogInfo.fogType == SlashCo.FogType.TEAM then
 		fogInfo.team = net.ReadUInt(10)
 	end
 
-	GameData.FogData[name] = fogInfo
+	return fogInfo
+end
+
+net.Receive("SlashCo:UpdateFog", function()
+	local isRemoval = net.ReadBool()
+	local name = net.ReadString()
+	if isRemoval then
+		GameData.FogData[name] = nil
+		return
+	end
+
+	GameData.FogData[name] = SlashCo.ReadFogInfo(name)
 end)
 
 net.Receive("SlashCo:InitialFog", function()
@@ -184,30 +202,8 @@ net.Receive("SlashCo:InitialFog", function()
 	local infoCount = net.ReadUInt(9)
 	for k=1, infoCount do
 		local name = net.ReadString()
-		if isRemoval then
-			GameData.FogData[name] = nil
-			return
-		end
 
-		local fogInfo = {
-			fogType = net.ReadUInt(2),
-			priority = net.ReadUInt(32),
-			multiplier = SlashCo.ReadOptional(net.ReadFloat),
-			worldColorR = SlashCo.ReadOptional(net.ReadFloat),
-			worldColorG = SlashCo.ReadOptional(net.ReadFloat),
-			worldColorB = SlashCo.ReadOptional(net.ReadFloat),
-			worldColorScaleR = SlashCo.ReadOptional(net.ReadFloat),
-			worldColorScaleG = SlashCo.ReadOptional(net.ReadFloat),
-			worldColorScaleB = SlashCo.ReadOptional(net.ReadFloat),
-		}
-
-		if fogType == SlashCo.FogType.PLAYER then
-			fogInfo.entIndex = net.ReadUInt(13)
-		elseif fogType == SlashCo.FogType.TEAM then
-			fogInfo.team = net.ReadUInt(10)
-		end
-
-		GameData.FogData[name] = fogInfo
+		GameData.FogData[name] = SlashCo.ReadFogInfo(name)
 	end
 end)
 
@@ -215,33 +211,41 @@ if CLIENT then return end
 
 ::serverside::
 
+local function IsNearlyEqualOptional(value1, value2)
+	if value1 == nil or value2 == nil then
+		return value1 == value2
+	end
+
+	return math.IsNearlyEqual(value1, value2, 0.05)
+end
+
 -- RaphaelIT7: Checks the needed fields for a change
 local function CompareFogInfo(fogInfo1, fogInfo2)
-	if fogInfo1.multiplier and math.IsNearlyEqual(fogInfo1.multiplier, fogInfo2.multiplier, 0.05) then
+	if not IsNearlyEqualOptional(fogInfo1.multiplier, fogInfo2.multiplier) then
 		return false
 	end
 
-	if fogInfo1.worldColorR and math.IsNearlyEqual(fogInfo1.worldColorR, fogInfo2.worldColorR, 0.05) then
+	if not IsNearlyEqualOptional(fogInfo1.worldColorR, fogInfo2.worldColorR) then
 		return false
 	end
 
-	if fogInfo1.worldColorG and math.IsNearlyEqual(fogInfo1.worldColorG, fogInfo2.worldColorG, 0.05) then
+	if not IsNearlyEqualOptional(fogInfo1.worldColorG, fogInfo2.worldColorG) then
 		return false
 	end
 
-	if fogInfo1.worldColorB and math.IsNearlyEqual(fogInfo1.worldColorB, fogInfo2.worldColorB, 0.05) then
+	if not IsNearlyEqualOptional(fogInfo1.worldColorB, fogInfo2.worldColorB) then
 		return false
 	end
 
-	if fogInfo1.worldColorScaleR and math.IsNearlyEqual(fogInfo1.worldColorScaleR, fogInfo2.worldColorScaleR, 0.05) then
+	if not IsNearlyEqualOptional(fogInfo1.worldColorScaleR, fogInfo2.worldColorScaleR) then
 		return false
 	end
 
-	if fogInfo1.worldColorScaleG and math.IsNearlyEqual(fogInfo1.worldColorScaleG, fogInfo2.worldColorScaleG, 0.05) then
+	if not IsNearlyEqualOptional(fogInfo1.worldColorScaleG, fogInfo2.worldColorScaleG) then
 		return false
 	end
 
-	if fogInfo1.worldColorScaleB and math.IsNearlyEqual(fogInfo1.worldColorScaleB, fogInfo2.worldColorScaleB, 0.05) then
+	if not IsNearlyEqualOptional(fogInfo1.worldColorScaleB, fogInfo2.worldColorScaleB) then
 		return false
 	end
 
@@ -264,6 +268,23 @@ local function CompareFogInfo(fogInfo1, fogInfo2)
 	return true
 end
 
+local function WriteFogInfo(fogInfo)
+	net.WriteUInt(fogInfo.fogType, 2)
+	net.WriteInt(fogInfo.priority, 32)
+	SlashCo.WriteOptional(fogInfo.multiplier, net.WriteFloat)
+	SlashCo.WriteOptional(fogInfo.worldColorR, net.WriteFloat)
+	SlashCo.WriteOptional(fogInfo.worldColorG, net.WriteFloat)
+	SlashCo.WriteOptional(fogInfo.worldColorB, net.WriteFloat)
+	SlashCo.WriteOptional(fogInfo.worldColorScaleR, net.WriteFloat)
+	SlashCo.WriteOptional(fogInfo.worldColorScaleG, net.WriteFloat)
+	SlashCo.WriteOptional(fogInfo.worldColorScaleB, net.WriteFloat)
+	if fogInfo.fogType == SlashCo.FogType.PLAYER then
+		net.WriteUInt(fogInfo.entIndex, 13)
+	elseif fogInfo.fogType == SlashCo.FogType.TEAM then
+		net.WriteUInt(fogInfo.team, 10) -- RaphaelIT7: Teams only need to go up to 1024 due to TEAM_SPECTATOR being 1002
+	end
+end
+
 util.AddNetworkString("SlashCo:UpdateFog")
 util.AddNetworkString("SlashCo:InitialFog")
 function SlashCo.AddFog(info)
@@ -271,6 +292,7 @@ function SlashCo.AddFog(info)
 
 	local fogInfo = {
 		name = info.name,
+		baseName = info.name,
 		fogType = info.fogType,
 		priority = info.priority or 0,
 		multiplier = info.multiplier,
@@ -309,30 +331,11 @@ function SlashCo.AddFog(info)
 	net.Start("SlashCo:UpdateFog")
 		net.WriteBool(false)
 		net.WriteString(fogInfo.name)
-		net.WriteUInt(fogInfo.fogType, 2)
-		net.WriteInt(fogInfo.priority, 32)
-		SlashCo.WriteOptional(fogInfo.multiplier, net.WriteFloat)
-		SlashCo.WriteOptional(fogInfo.worldColorR, net.WriteFloat)
-		SlashCo.WriteOptional(fogInfo.worldColorG, net.WriteFloat)
-		SlashCo.WriteOptional(fogInfo.worldColorB, net.WriteFloat)
-		SlashCo.WriteOptional(fogInfo.worldColorScaleR, net.WriteFloat)
-		SlashCo.WriteOptional(fogInfo.worldColorScaleG, net.WriteFloat)
-		SlashCo.WriteOptional(fogInfo.worldColorScaleB, net.WriteFloat)
-		if fogInfo.fogType == SlashCo.FogType.PLAYER then
-			net.WriteUInt(fogInfo.entIndex, 13)
-		elseif fogInfo.fogType == SlashCo.FogType.TEAM then
-			net.WriteUInt(fogInfo.team, 10) -- RaphaelIT7: Teams only need to go up to 1024 due to TEAM_SPECTATOR being 1002
-		end
+		WriteFogInfo(fogInfo)
 	net.Broadcast()
 end
 
-function SlashCo.RemoveFog(name, value)
-	if team.Valid(value) then
-		name = name .. "_T" .. value
-	elseif IsEntity(value) then
-		name = name .. "_P" .. value:EntIndex()
-	end
-
+local function RemoveFogByName(name)
 	if not GameData.FogData[name] then return end
 
 	GameData.FogData[name] = nil
@@ -342,6 +345,60 @@ function SlashCo.RemoveFog(name, value)
 	net.Broadcast()
 end
 
+function SlashCo.RemoveFog(name, value)
+	if isnumber(value) and team.Valid(value) then
+		name = name .. "_T" .. value
+	elseif IsEntity(value) then
+		name = name .. "_P" .. value:EntIndex()
+	end
+
+	RemoveFogByName(name)
+end
+
+function SlashCo.ClearFog(baseName)
+	for name, fogInfo in pairs(GameData.FogData) do
+		if fogInfo.baseName == baseName then
+			RemoveFogByName(name)
+		end
+	end
+end
+
+local generatorFogProgress = 0
+local generatorFogClear = false
+function SlashCo.UpdateGeneratorFog(progress)
+	generatorFogProgress = progress or generatorFogProgress
+
+	SlashCo.AddFog({
+		name = "GeneratorFog",
+		fogType = SlashCo.FogType.GLOBAL,
+		priority = -1,
+		multiplier = generatorFogClear and 1 or 1 - generatorFogProgress * 0.04,
+	})
+end
+
+hook.Add("SlashCo:HelicopterLanded", "SlashCo:GeneratorFogClear", function()
+	generatorFogClear = true
+	SlashCo.UpdateGeneratorFog()
+
+	timer.Create("SlashCo:GeneratorFogClear", 15, 1, function()
+		generatorFogClear = false
+		SlashCo.UpdateGeneratorFog()
+	end)
+end)
+
+function SlashCo.RemoveAllPlayerFog(ply)
+	local entIndex = ply:EntIndex()
+	for name, fogInfo in pairs(GameData.FogData) do
+		if fogInfo.fogType == SlashCo.FogType.PLAYER and fogInfo.entIndex == entIndex then
+			RemoveFogByName(name)
+		end
+	end
+end
+
+hook.Add("PlayerDisconnected", "SlashCo:RemovePlayerFog", SlashCo.RemoveAllPlayerFog)
+hook.Add("SlashCo:PlayerDeath", "SlashCo:RemovePlayerFog", SlashCo.RemoveAllPlayerFog)
+
+-- Only the joining player needs the current fogs
 hook.Add("PlayerInitialSpawn", "SlashCo:NetworkFog", function(ply)
 	local fogCount = 0
 	for _, _2 in pairs(GameData.FogData) do
@@ -352,20 +409,81 @@ hook.Add("PlayerInitialSpawn", "SlashCo:NetworkFog", function(ply)
 		net.WriteUInt(fogCount, 9)
 		for name, fogInfo in pairs(GameData.FogData) do
 			net.WriteString(name)
-			net.WriteUInt(fogInfo.fogType, 2)
-			net.WriteInt(fogInfo.priority, 32)
-			SlashCo.WriteOptional(fogInfo.multiplier, net.WriteFloat)
-			SlashCo.WriteOptional(fogInfo.worldColorR, net.WriteFloat)
-			SlashCo.WriteOptional(fogInfo.worldColorG, net.WriteFloat)
-			SlashCo.WriteOptional(fogInfo.worldColorB, net.WriteFloat)
-			SlashCo.WriteOptional(fogInfo.worldColorScaleR, net.WriteFloat)
-			SlashCo.WriteOptional(fogInfo.worldColorScaleG, net.WriteFloat)
-			SlashCo.WriteOptional(fogInfo.worldColorScaleB, net.WriteFloat)
-			if fogInfo.fogType == SlashCo.FogType.PLAYER then
-				net.WriteUInt(fogInfo.entIndex, 13)
-			elseif fogInfo.fogType == SlashCo.FogType.TEAM then
-				net.WriteUInt(fogInfo.team, 10) -- RaphaelIT7: Teams only need to go up to 1024 due to TEAM_SPECTATOR being 1002
-			end
+			WriteFogInfo(fogInfo)
 		end
-	net.Broadcast()
+	net.Send(ply)
 end)
+
+
+local function ParseNumbers(value)
+	local numbers = {}
+	for part in string.gmatch(value, "%S+") do
+		numbers[#numbers + 1] = tonumber(part) or 0
+	end
+
+	return numbers
+end
+
+function SlashCo.ParseFogKeyValue(ent, key, value)
+	local key1 = string.lower(key)
+	if key1 == "priority" then
+		ent.FogPriority = math.floor(tonumber(value) or 0)
+		return true
+	end
+
+	if key1 == "multiplier" then
+		local multiplier = tonumber(value) or 0
+		ent.FogMultiplier = multiplier > 0 and multiplier or nil
+		return true
+	end
+
+	if key1 == "override_color" then
+		ent.FogOverrideColor = tonumber(value) == 1
+		return true
+	end
+
+	if key1 == "color" then
+		local color = ParseNumbers(value)
+		ent.FogColorValue = {
+			math.Clamp(color[1] or 0, 0, 255),
+			math.Clamp(color[2] or 0, 0, 255),
+			math.Clamp(color[3] or 0, 0, 255),
+		}
+		return true
+	end
+
+	if key1 == "color_scale" then
+		local scale = ParseNumbers(value)
+		ent.FogColorScaleValue = {
+			math.max(scale[1] or 1, 0),
+			math.max(scale[2] or 1, 0),
+			math.max(scale[3] or 1, 0),
+		}
+		return true
+	end
+
+	return false
+end
+
+function SlashCo.BuildMapFogInfo(ent)
+	local info = {
+		priority = ent.FogPriority or 5,
+		multiplier = ent.FogMultiplier,
+	}
+
+	local color = ent.FogColorValue
+	if ent.FogOverrideColor and color then
+		info.worldColorR, info.worldColorG, info.worldColorB = color[1], color[2], color[3]
+	end
+
+	local scale = ent.FogColorScaleValue
+	if scale and (scale[1] ~= 1 or scale[2] ~= 1 or scale[3] ~= 1) then
+		info.worldColorScaleR, info.worldColorScaleG, info.worldColorScaleB = scale[1], scale[2], scale[3]
+	end
+
+	return info
+end
+
+function SlashCo.GetMapFogName(targetName)
+	return "MapFog_" .. targetName
+end

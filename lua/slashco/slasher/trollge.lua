@@ -57,6 +57,10 @@ local function StopBreathing(slasher)
 	SlashCo.AudioSystem.StopSound("TrollgeBreath", 0.5, slasher)
 end
 
+local function StopStage1(slasher)
+	SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
+end
+
 local function PlayTransition(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/trollge/trollge_transition.mp3",
@@ -78,8 +82,17 @@ function SLASHER.OnSpawn(slasher)
 	slasher.TrollgeDashing = 0
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("TrollgeStage2") then
+		return 450, SLASHER.ChaseSpeed
+	elseif slasher:GetNW2Bool("TrollgeStage1") then
+		return 280, 150
+	end
+end
+
+local DASH_SLOW_TICKS = 4
 local function stopDash(slasher)
-	if not slasher:GetNWBool("TrollgeDashFinish") then
+	if not slasher:GetNW2Bool("TrollgeDashFinish") then
 		SlashCo.AudioSystem.StopSound("TrollgeScreech", 0.5, slasher)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -93,17 +106,33 @@ local function stopDash(slasher)
 		})
 
 		slasher.TrollgeDashing = 0
-		slasher:SetNWBool("TrollgeDashFinish", true)
+		slasher:SetNW2Bool("TrollgeDashFinish", true)
+
+		timer.Simple(1.8, function()
+			if not IsValid(slasher) then return end
+
+			if slasher:GetNW2Bool("TrollgeDashNoHit") then
+				slasher:SetNW2Bool("TrollgeDashFinish_NoHit", true)
+			elseif slasher:GetNW2Bool("TrollgeDashHitPlayer") then
+				slasher:SetNW2Bool("TrollgeDashFinish_HitPlayer", true)
+			elseif slasher:GetNW2Bool("TrollgeDashHitWall") then
+				slasher:SetNW2Bool("TrollgeDashFinish_HitWall", true)
+			end
+		end)
 
 		timer.Simple(8, function()
-			if not IsValid(slasher) then
-				return
-			end
+			if not IsValid(slasher) then return end
 
 			slasher.TrollgeDashing = 0
 			slasher:Freeze(false)
-			slasher:SetNWBool("TrollgeDashFinish", false)
-			slasher:SetNWBool("TrollgeDashing", false)
+			slasher:SetNW2Bool("TrollgeDashFinish", false)
+			slasher:SetNW2Bool("TrollgeDashing", false)
+			slasher:SetNW2Bool("TrollgeDashNoHit", false)
+			slasher:SetNW2Bool("TrollgeDashHitPlayer", false)
+			slasher:SetNW2Bool("TrollgeDashHitWall", false)
+			slasher:SetNW2Bool("TrollgeDashFinish_NoHit", false)
+			slasher:SetNW2Bool("TrollgeDashFinish_HitPlayer", false)
+			slasher:SetNW2Bool("TrollgeDashFinish_HitWall", false)
 			slasher.ClawCooldown = 1.99
 		end)
 	end
@@ -136,35 +165,46 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if stage == 0 then
-		slasher:SetNWBool("TrollgeStage1", false)
-		slasher:SetNWBool("TrollgeStage2", false)
+		slasher:SetNW2Bool("TrollgeStage1", false)
+		slasher:SetNW2Bool("TrollgeStage2", false)
 	end
 
 	if stage == 1 then
-		slasher:SetNWBool("TrollgeStage1", true)
-		slasher:SetNWBool("TrollgeStage2", false)
+		slasher:SetNW2Bool("TrollgeStage1", true)
+		slasher:SetNW2Bool("TrollgeStage2", false)
+
+		local movement = slasher:GetVelocity():Length()
+		final_eyesight = math.Clamp(10 - (movement / 35), 2, 10)
+		final_perception = math.Clamp(5 - (movement / 60), 1, 5)
 	end
 
 	if stage == 2 then
-		slasher:SetNWBool("TrollgeStage1", false)
-		slasher:SetNWBool("TrollgeStage2", true)
+		slasher:SetNW2Bool("TrollgeStage1", false)
+		slasher:SetNW2Bool("TrollgeStage2", true)
+
+		SlashCo.AudioSystem.DisableBackgroundMusic()
+		SlashCo.AudioSystem.SetBackgroundMusicVolume(0)
 	end
 
-	if not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage1") and SlashCo.CurRound.GameProgress > 4 and stage < 1 then
-		slasher:SetNWBool("TrollgeTransition", true)
+	if not slasher:GetNW2Bool("TrollgeTransition") and not slasher:GetNW2Bool("TrollgeStage1") and SlashCo.CurRound.GameProgress > 4 and stage < 1 then
+		slasher:SetNW2Bool("TrollgeTransition", true)
+		slasher:SetNW2Bool("TrollgePhase1Swap", true)
 		slasher:Freeze(true)
 		StopBreathing(slasher)
 		PlayTransition(slasher)
 
 		for _, ply in player.Iterator() do
-			ply:SetNWBool("DisplayTrollgeTransition", true)
+			ply:SetNW2Bool("DisplayTrollgeTransition", true)
 		end
 
 		timer.Simple(7, function()
+			if not IsValid(slasher) then return end
+
 			--transit
 			StopBreathing(slasher)
 			slasher.TrollgeStage = 1
-			slasher:SetNWBool("TrollgeTransition", false)
+			slasher:SetNW2Bool("TrollgeTransition", false)
+			slasher:SetNW2Bool("TrollgePhase1Swap", false)
 			slasher:Freeze(false)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/trollge/trollge_stage1.ogg",
@@ -177,74 +217,64 @@ function SLASHER.OnTickBehaviour(slasher)
 				fadeIn = 0,
 			})
 
-			slasher:SetRunSpeed(280)
-			slasher:SetWalkSpeed(150)
-			slasher:SetNWBool("CanKill", true)
+			slasher:SetCanKill(true)
 
 			for _, ply in player.Iterator() do
-				ply:SetNWBool("DisplayTrollgeTransition", false)
+				ply:SetNW2Bool("DisplayTrollgeTransition", false)
 			end
 		end)
 	end
 
-	if not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage2") and SlashCo.CurRound.GameProgress > (10 - (Blood / 2)) and stage == 1 
-		or not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeStage2") and slasher.TrollgeBlood == 8 and SlashCo.CurRound.DistressBeaconUsed then
+	if not slasher:GetNW2Bool("TrollgeTransition") and not slasher:GetNW2Bool("TrollgeStage2") and SlashCo.CurRound.GameProgress > (10 - (Blood / 2)) and stage == 1 
+		or not slasher:GetNW2Bool("TrollgeTransition") and not slasher:GetNW2Bool("TrollgeStage2") and slasher.TrollgeBlood == 8 and SlashCo.CurRound.DistressBeaconUsed then
 
-		slasher:SetNWBool("TrollgeTransition", true)
+		slasher:SetNW2Bool("TrollgeTransition", true)
+		slasher:SetNW2Bool("TrollgePhase2Swap", true)
 		slasher:Freeze(true)
-		SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
+		StopStage1(slasher)
 		PlayTransition(slasher)
 
 		for _, ply in player.Iterator() do
-			ply:SetNWBool("DisplayTrollgeTransition", true)
+			ply:SetNW2Bool("DisplayTrollgeTransition", true)
 		end
 
 		timer.Simple(7, function()
 			if not IsValid(slasher) then return end
 
 			--transit
-			SlashCo.AudioSystem.StopSound("TrollgeStage1", 0.5, slasher)
+			StopStage1(slasher)
 			slasher.TrollgeStage = 2
-			slasher:SetNWBool("TrollgeTransition", false)
+			slasher:SetNW2Bool("TrollgeTransition", false)
+			slasher:SetNW2Bool("TrollgePhase2Swap", false)
 			slasher:Freeze(false)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/trollge/trollge_stage6.ogg",
 				identifier = "TrollgeStage2",
-				minDistance = 1100,
-				maxDistance = 2200,
+				minDistance = 1100 * SlashCo.MapSize,
+				maxDistance = 2200 * SlashCo.MapSize,
 				looping = true,
+				isMusic = true,
 				entity = slasher,
 				volume = 0.7,
 				fadeIn = 0,
 			})
 
-			slasher:SetRunSpeed(450)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 			final_eyesight = 10
 
 			for _, ply in player.Iterator() do
-				ply:SetNWBool("DisplayTrollgeTransition", false)
+				ply:SetNW2Bool("DisplayTrollgeTransition", false)
 			end
 		end)
 	end
 
-	if stage == 1 then
-		local movement = slasher:GetVelocity():Length()
-		final_eyesight = math.Clamp(10 - (movement / 35), 2, 10)
-		final_perception = math.Clamp(5 - (movement / 60), 1, 5)
+	if slasher:GetNW2Int("TrollgeStage") ~= stage then
+		slasher:SetNW2Int("TrollgeStage", stage)
 	end
 
-	if slasher:GetNWInt("TrollgeStage") ~= stage then
-		slasher:SetNWInt("TrollgeStage", stage)
-	end
-
-	if slasher:GetNWBool("TrollgeDashing") then
+	if slasher:GetNW2Bool("TrollgeDashing") then
 		local target = nil
 
-		if not slasher:GetNWBool("TrollgeDashFinish") then
-			--target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 30)),
-			--		Vector(-15, -15, -60), Vector(15, 15, 60), 50, DMG_SLASH, 5, false)
-
+		if not slasher:GetNW2Bool("TrollgeDashFinish") then
 			slasher:LagCompensation(true)
 			local tr = util.TraceHull({
 				start = slasher:EyePos(),
@@ -275,14 +305,22 @@ function SLASHER.OnTickBehaviour(slasher)
 
 			if Dashing == 0 then
 				timer.Simple(6, function()
+					if not IsValid(slasher) then return end
+
 					stopDash(slasher)
 				end)
 			end
 
 			slasher.TrollgeDashing = Dashing + 1
 
+			if target:IsValid() and not (target:GetClass() == "prop_ragdoll" or target:IsPlayer()) then
+				stopDash(slasher)
+				slasher:SetNW2Bool("TrollgeDashHitWall", true)
+			end
+
 			if target:IsValid() and target:IsPlayer() then
 				stopDash(slasher)
+				slasher:SetNW2Bool("TrollgeDashHitPlayer", true)
 
 				if target:Team() ~= TEAM_SURVIVOR then return end
 
@@ -303,13 +341,21 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				if slasher.TrollgeStage == 0 then
 					slasher.TrollgeBlood = slasher.TrollgeBlood + 1 + SlashCo.CurRound.OfferingData.Singularity
-					slasher:SetNWInt("TrollgeBlood", slasher.TrollgeBlood)
+					slasher:SetNW2Int("TrollgeBlood", slasher.TrollgeBlood)
 					SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 				end
 			end
 
-			if slasher.TrollgeDashing > 50 and slasher:GetVelocity():Length() < 450 then
+			local speed = slasher:GetVelocity():Length()
+			local slow = (slasher.TrollgeDashing > 50 and speed < 450) or (slasher.TrollgeDashing < 50 and speed < 250)
+			slasher.TrollgeDashSlowTicks = slow and ((slasher.TrollgeDashSlowTicks or 0) + 1) or 0
+
+			-- RaphaelIT7: We delay the slow by a few ticks to avoid cases where you may hit a small edge while dashing
+			if slasher.TrollgeDashSlowTicks >= DASH_SLOW_TICKS then
+				local noHit = slasher.TrollgeDashing > 50
+				slasher.TrollgeDashSlowTicks = 0
 				stopDash(slasher)
+				slasher:SetNW2Bool(noHit and "TrollgeDashNoHit" or "TrollgeDashHitWall", true)
 			end
 		end
 	end
@@ -318,17 +364,19 @@ function SLASHER.OnTickBehaviour(slasher)
 	for f = 1, #find do
 		local ent = find[f]
 
-		if ent:GetClass() == "sc_balkanboost" then
+		if ent:GetClass() == "sc_balkanboost" and not slasher:GetNW2Bool("TrollgeStage2") and not slasher:GetNW2Bool("TrollgeBalkanSwap") then
 			--WHAT HAVE YOU DONE...
 			ent:Remove()
 			slasher.TrollgeBlood = 8
-			slasher:SetNWBool("TrollgeTransition", true)
+			slasher:SetNW2Bool("TrollgeTransition", true)
+			slasher:SetNW2Bool("TrollgeBalkanSwap", true)
 			slasher:Freeze(true)
 			StopBreathing(slasher)
+			StopStage1(slasher)
 	 		PlayTransition(slasher)
 
 			for _, ply in player.Iterator() do
-				ply:SetNWBool("DisplayTrollgeTransition", true)
+				ply:SetNW2Bool("DisplayTrollgeTransition", true)
 			end
 
 			timer.Simple(7, function()
@@ -336,28 +384,29 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				--transit
 				StopBreathing(slasher)
+				StopStage1(slasher)
 				slasher.TrollgeStage = 2
-				slasher:SetNWBool("TrollgeTransition", false)
+				slasher:SetNW2Bool("TrollgeTransition", false)
+				slasher:SetNW2Bool("TrollgeBalkanSwap", false)
 				slasher:Freeze(false)
 				SlashCo.AddSlasherAnger(slasher, 100)
 				SlashCo.AudioSystem.PlaySound({
 					soundPath = "slashco/slasher/trollge/trollge_stage6.ogg",
-					identifier = "TrollgeStage2",
-					minDistance = 1100,
-					maxDistance = 2200,
+					identifier = "TrollgeStage2Balkan",
+					minDistance = 1100 * SlashCo.MapSize,
+					maxDistance = 2200 * SlashCo.MapSize,
 					looping = true,
+					isMusic = true,
 					entity = slasher,
-					volume = 1,
+					volume = 0.7,
 					fadeIn = 0,
 				})
 
-				slasher:SetRunSpeed(450)
-				slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
 				final_eyesight = 10
-				slasher:SetNWBool("CanKill", true)
+				slasher:SetCanKill(true)
 
 				for _, ply in player.Iterator() do
-					ply:SetNWBool("DisplayTrollgeTransition", false)
+					ply:SetNW2Bool("DisplayTrollgeTransition", false)
 				end
 			end)
 		end
@@ -368,7 +417,7 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.Move(ply, mv)
-	if not ply:GetNWBool("TrollgeStage2") then
+	if not ply:GetNW2Bool("TrollgeStage2") then
 		if ply.TrollgeMoveSet then
 			ply:SetGravity(ply.TrollgeGravity)
 			ply:SetHullDuck(ply.TrollgeDuckMin, ply.TrollgeDuckMax)
@@ -467,156 +516,135 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		return
 	end
 
-	if slasher.ClawCooldown < 0.01 and not slasher:GetNWBool("TrollgeTransition") and not slasher:GetNWBool("TrollgeDashFinish") then
-		slasher:SetNWBool("TrollgeSlashing", false)
-		timer.Remove("TrollgeSlashDecay")
+	if slasher.ClawCooldown > 0.01 then return end
+	if slasher:GetNW2Bool("TrollgeTransition") then return end
+	if slasher:GetNW2Bool("TrollgeDashing") then return end
+	if slasher:GetNW2Bool("TrollgeDashFinish") then return end
 
-		timer.Simple(0.3, function()
-			if not IsValid(slasher) then return end
+	slasher:SetNW2Bool("TrollgeSlashing", false)
+	timer.Remove("TrollgeSlashDecay")
 
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/trollge/trollge_swing.mp3",
-				identifier = "TrollgeSwing",
-				minDistance = 600,
-				maxDistance = 800,
-				entity = slasher,
-				volume = 1,
-				fadeIn = 0,
-			})
-
-			if SERVER then
-				--local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
-				--		Vector(-30, -30, -60), Vector(30, 30, 60), 10, DMG_SLASH, 5, false)
-
-				slasher:LagCompensation(true)
-				local tr = util.TraceHull({
-					start = slasher:EyePos(),
-					endpos = slasher:LocalToWorld(Vector(45, 0, 0)),
-					maxs = Vector(30, 30, 60),
-					mins = Vector(-30, -30, -60),
-					filter = slasher,
-					ignoreworld = true,
-				})
-				slasher:LagCompensation(false)
-
-				local target = tr.Entity
-				local damage = 10
-
-				if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
-					local dmg = DamageInfo()
-					dmg:SetDamageType(DMG_SLASH)
-					dmg:SetAttacker(slasher)
-					dmg:SetInflictor(slasher)
-					dmg:SetDamage(damage)
-					dmg:SetDamageForce(Vector(1, 1, 1))
-					dmg:SetDamagePosition(tr.HitPos)
-					target:TakeDamageInfo(dmg)
-				end
-
-				if target:IsPlayer() then
-					if target:Team() ~= TEAM_SURVIVOR then return end
-
-					local vPoint = target:GetPos() + Vector(0, 0, 50)
-					local bloodfx = EffectData()
-					bloodfx:SetOrigin(vPoint)
-					util.Effect("BloodImpact", bloodfx)
-
-					SlashCo.AudioSystem.PlaySound({
-						soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
-						identifier = "TrollgeHit1",
-						minDistance = 600,
-						maxDistance = 800,
-						entity = target,
-						volume = 1,
-						fadeIn = 0,
-					})
-
-					if slasher.TrollgeStage == 0 then
-						slasher.TrollgeBlood = slasher.TrollgeBlood + 1 + SlashCo.CurRound.OfferingData.Singularity
-						slasher:SetNWInt("TrollgeBlood", slasher.TrollgeBlood)
-						SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
-					end
-				end
-			end
-		end)
-
-		timer.Simple(0.1, function()
-			if not IsValid(slasher) then return end
-
-			slasher:SetNWBool("TrollgeSlashing", true)
-
-			timer.Create("TrollgeSlashDecay", 0.6, 1, function()
-				slasher:SetNWBool("TrollgeSlashing", false)
-			end)
-
-			slasher.ClawCooldown = slasher.ClawCooldown + 0.5
-		end)
-	end
-end
-
-function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.TrollgeStage ~= 2 and not slasher:GetNWBool("TrollgeDashing") and slasher.ClawCooldown == 0 then
-		slasher:SetNWBool("TrollgeDashing", true)
+	timer.Simple(0.3, function()
+		if not IsValid(slasher) then return end
 
 		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/trollge/trollge_screech.mp3",
-			identifier = "TrollgeScreech",
-			minDistance = 400,
-			maxDistance = 1200,
+			soundPath = "slashco/slasher/trollge/trollge_swing.mp3",
+			identifier = "TrollgeSwing",
+			minDistance = 600,
+			maxDistance = 800,
 			entity = slasher,
 			volume = 1,
 			fadeIn = 0,
 		})
 
-		slasher:Freeze(true)
-		slasher.ClawCooldown = 3
-		slasher.TrollgeDashing = 0
-		slasher:SetVelocity(slasher:GetForward() * 1000)
+		if SERVER then
+			slasher:LagCompensation(true)
+			local tr = util.TraceHull({
+				start = slasher:EyePos(),
+				endpos = slasher:LocalToWorld(Vector(45, 0, 0)),
+				maxs = Vector(30, 30, 60),
+				mins = Vector(-30, -30, -60),
+				filter = slasher,
+				ignoreworld = true,
+			})
+			slasher:LagCompensation(false)
+
+			local target = tr.Entity
+			local damage = 10
+
+			if target:IsValid() and (not target:IsPlayer() or target:Team() == TEAM_SURVIVOR) then
+				local dmg = DamageInfo()
+				dmg:SetDamageType(DMG_SLASH)
+				dmg:SetAttacker(slasher)
+				dmg:SetInflictor(slasher)
+				dmg:SetDamage(damage)
+				dmg:SetDamageForce(Vector(1, 1, 1))
+				dmg:SetDamagePosition(tr.HitPos)
+				target:TakeDamageInfo(dmg)
+			end
+
+			if IsValid(target) and target:IsPlayer() then
+				if target:Team() ~= TEAM_SURVIVOR then return end
+
+				local vPoint = target:GetPos() + Vector(0, 0, 50)
+				local bloodfx = EffectData()
+				bloodfx:SetOrigin(vPoint)
+				util.Effect("BloodImpact", bloodfx)
+
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/trollge/trollge_hit.mp3",
+					identifier = "TrollgeHit1",
+					minDistance = 600,
+					maxDistance = 800,
+					entity = target,
+					volume = 1,
+					fadeIn = 0,
+				})
+
+				if slasher.TrollgeStage == 0 then
+					slasher.TrollgeBlood = slasher.TrollgeBlood + 1 + SlashCo.CurRound.OfferingData.Singularity
+					slasher:SetNW2Int("TrollgeBlood", slasher.TrollgeBlood)
+					SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
+				end
+			end
+		end
+	end)
+
+	timer.Simple(0.1, function()
+		if not IsValid(slasher) then return end
+
+		slasher:SetNW2Bool("TrollgeSlashing", true)
+
+		timer.Create("TrollgeSlashDecay", 0.6, 1, function()
+			if not IsValid(slasher) then return end
+
+			slasher:SetNW2Bool("TrollgeSlashing", false)
+		end)
+
+		slasher.ClawCooldown = slasher.ClawCooldown + 0.5
+	end)
+end
+
+function SLASHER.OnMainAbilityFire(slasher)
+	if slasher.TrollgeStage == 2 then return end
+	if slasher:GetNW2Bool("TrollgeDashing") then return end
+	if slasher.ClawCooldown > 0.01 then return end
+
+	slasher:SetNW2Bool("TrollgeDashing", true)
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/trollge/trollge_screech.mp3",
+		identifier = "TrollgeScreech",
+		minDistance = 400,
+		maxDistance = 1200,
+		entity = slasher,
+		volume = 1,
+		fadeIn = 0,
+		doppler = 1,
+	})
+
+	slasher:Freeze(true)
+	slasher.ClawCooldown = 3
+	slasher.TrollgeDashing = 0
+	slasher.TrollgeDashSlowTicks = 0
+	slasher:SetVelocity(slasher:GetForward() * 1000)
+end
+
+function SLASHER.ChaseLight(slasher)
+	if slasher:GetNW2Bool("TrollgeStage2") then
+		return 255, 0, 0, 5, 2500
 	end
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("TrollgeDashing") or ply:GetNWBool("TrollgeDashFinish")
-end
-
-function SLASHER.Animator(ply)
-	local trollge_stage1 = ply:GetNWBool("TrollgeStage1")
-	local trollge_stage2 = ply:GetNWBool("TrollgeStage2")
-	local trollge_slashing = ply:GetNWBool("TrollgeSlashing")
-
-	if not trollge_slashing then
-		ply.anim_antispam = false
-	end
-
-	if not trollge_stage1 and not trollge_stage2 then
-		if ply:IsOnGround() then
-			if not trollge_slashing then
-				ply.CalcIdeal = ACT_HL2MP_WALK
-				ply.CalcSeqOverride = ply:LookupSequence("walk")
-			else
-				ply.CalcSeqOverride = ply:LookupSequence("walk")
-
-				if not ply.anim_antispam then
-					ply:AddVCDSequenceToGestureSlot(1, 2, 0, true)
-					ply.anim_antispam = true
-				end
-			end
-		end
-	elseif trollge_stage2 then
-		ply.CalcSeqOverride = ply:LookupSequence("fly")
-	else
-		ply.CalcSeqOverride = ply:LookupSequence("glide")
-	end
-
-	if ply:GetNWBool("TrollgeDashing") and not ply:GetNWBool("TrollgeDashFinish") then
-		ply.CalcSeqOverride = ply:LookupSequence("dash")
-	end
-
-	return ply.CalcIdeal, ply.CalcSeqOverride
+	return ply:GetNW2Bool("TrollgeDashing") or ply:GetNW2Bool("TrollgeDashFinish") or ply:GetNW2Bool("TrollgeStun") or ply:GetNW2Bool("TrollgeTransition")
 end
 
 function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage) -- additionalRage is used by OnHitByBeerKeg
 	StopBreathing(slasher)
+	slasher:SetNW2Bool("TrollgeStun", true)
+	slasher:Freeze(true)
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/trollge/troll_blind_" .. math.random(1, 2) .. ".mp3",
 		identifier = "TrollgeBlinded",
@@ -631,11 +659,138 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage) -- additionalRa
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		PlayBreathing(slasher)
+		if slasher.TrollgeStage == 0 then
+			PlayBreathing(slasher)
+		end
+
+		slasher:Freeze(false)
+		slasher:SetNW2Bool("TrollgeStun", false)
 	end)
 end
 SLASHER.OnHitByBeerKeg = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end -- When hit by a BeerKeg we in total add +15 anger.
 SLASHER.OnHitByTeslaCoil = function(slasher) SLASHER.OnHitByPocketSand(slasher, nil, 10) end
+
+function SLASHER.Animator(ply)
+	local trollge_stage1 = ply:GetNW2Bool("TrollgeStage1")
+	local trollge_stage2 = ply:GetNW2Bool("TrollgeStage2")
+	local trollge_slashing = ply:GetNW2Bool("TrollgeSlashing")
+	local trollge_dashing = ply:GetNW2Bool("TrollgeDashing")
+	local trollge_dashing_nohit = ply:GetNW2Bool("TrollgeDashNoHit")
+	local trollge_dashing_hitply = ply:GetNW2Bool("TrollgeDashHitPlayer")
+	local trollge_dashing_hitwall = ply:GetNW2Bool("TrollgeDashHitWall")
+	local trollge_dashend = ply:GetNW2Bool("TrollgeDashFinish")
+	local trollge_dashend_nohit = ply:GetNW2Bool("TrollgeDashFinish_NoHit")
+	local trollge_dashend_hitply = ply:GetNW2Bool("TrollgeDashFinish_HitPlayer")
+	local trollge_dashend_hitwall = ply:GetNW2Bool("TrollgeDashFinish_HitWall")
+	local trollge_swap1 = ply:GetNW2Bool("TrollgePhase1Swap")
+	local trollge_swap2 = ply:GetNW2Bool("TrollgePhase2Swap")
+	local trollge_swap_balkan = ply:GetNW2Bool("TrollgeBalkanSwap")
+	local trollge_stun = ply:GetNW2Bool("TrollgeStun")
+
+	if not trollge_slashing and not trollge_swap1 and not trollge_swap2 and not trollge_swap_balkan then
+		ply.anim_antispam = false
+	end
+
+	ply:SetPoseParameter("body_pitch", -ply:EyeAngles().pitch)
+	ply:SetPoseParameter("body_yaw", -(math.AngleDifference(ply:EyeAngles().y, select(2, ply:GetBonePosition(0)).y) + 90))
+	ply:SetPoseParameter("move_x", ply:GetVelocity():Length() / 100)
+
+	if not trollge_stage1 and not trollge_stage2 then
+		if ply:IsOnGround() then
+			ply.CalcIdeal = ACT_HL2MP_WALK
+			ply.CalcSeqOverride = ply:LookupSequence("phase0_walk")
+		else
+			ply.CalcSeqOverride = ply:LookupSequence("phase0_airwalk")
+		end
+
+		if ply:GetVelocity():Length() < 30 then
+			ply.CalcIdeal = ACT_IDLE
+			ply.CalcSeqOverride = ply:LookupSequence("phase0_idle")
+		end
+
+		if trollge_slashing and (not ply.anim_antispam) then
+			local r = math.random(1, 2)
+			local SlashAnim = ""
+			if r == 1 then
+				SlashAnim = "phase0_attack_left"
+			else
+				SlashAnim = "phase0_attack_right"
+			end
+
+			ply:AddVCDSequenceToGestureSlot(1, ply:LookupSequence(SlashAnim), 0, true)
+			ply.anim_antispam = true
+		end
+	elseif trollge_stage2 then
+		ply.CalcSeqOverride = ply:LookupSequence("phase2_fly")
+
+		if ply:GetVelocity():Length() < 30 then
+			ply.CalcIdeal = ACT_IDLE
+			ply.CalcSeqOverride = ply:LookupSequence("phase2_idle")
+		end
+	else
+		if ply:IsOnGround() then
+			if ply:IsSprinting() then
+				ply.CalcIdeal = ACT_HL2MP_RUN
+				ply.CalcSeqOverride = ply:LookupSequence("phase1_run")
+			else
+				ply.CalcIdeal = ACT_HL2MP_WALK
+				ply.CalcSeqOverride = ply:LookupSequence("phase1_walk")
+			end
+		else
+			ply.CalcSeqOverride = ply:LookupSequence("phase1_airwalk")
+		end
+
+		if ply:GetVelocity():Length() < 30 then
+			ply.CalcIdeal = ACT_IDLE
+			ply.CalcSeqOverride = ply:LookupSequence("phase1_idle")
+		end
+	end
+
+	if trollge_swap1 and (not ply.anim_antispam) then
+		ply.CalcSeqOverride = ply:LookupSequence("phase_swap_1")
+		ply.anim_antispam = true
+	end
+
+	if trollge_swap2 and (not ply.anim_antispam) then
+		ply.CalcSeqOverride = ply:LookupSequence("phase_swap_2")
+		ply.anim_antispam = true
+	end
+
+	if trollge_swap_balkan and (not ply.anim_antispam) then
+		ply.CalcSeqOverride = ply:LookupSequence("phase_swap_balkan")
+		ply.anim_antispam = true
+	end
+
+	if trollge_dashing and not trollge_dashend then
+		ply.CalcSeqOverride = ply:LookupSequence("dash_all_loop")
+	end
+
+	if trollge_dashend then
+		if trollge_dashing_hitply and not trollge_dashend_hitply then
+			ply.CalcSeqOverride = ply:LookupSequence("dash_all_hit")
+		elseif trollge_dashend_hitply then
+			ply.CalcSeqOverride = ply:LookupSequence("dash_all_loop_hit")
+		end
+
+		if trollge_dashing_hitwall and not trollge_dashend_hitwall then
+			ply.CalcSeqOverride = ply:LookupSequence("dash_all_hitwall")
+		elseif trollge_dashend_hitwall then
+			ply.CalcSeqOverride = ply:LookupSequence("dash_all_loop_stun")
+		end
+
+		if trollge_dashing_nohit and not trollge_dashend_nohit then
+			ply.CalcSeqOverride = ply:LookupSequence("dash_all_hitair")
+		elseif trollge_dashend_nohit then
+			ply.CalcSeqOverride = ply:LookupSequence("dash_all_loop_stun")
+		end
+	end
+
+	if trollge_stun then
+		ply.CalcSeqOverride = ply:LookupSequence("stun_generic")
+	end
+
+	return ply.CalcIdeal, ply.CalcSeqOverride
+end
 
 function SLASHER.CanSeeFlashlights(ply)
 	return false
@@ -664,14 +819,14 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddControl("R", "dash", dashTable)
 	hud:AddControl("LMB", "claw", killTable)
-	hud:TieControl("R", "TrollgeDashing", true, true, false)
+	hud:TieControl("R", "TrollgeDashing", true, true)
 
 	hud:AddMeter("blood", 8, "", nil, true)
 	hud:TieMeterInt("blood", "TrollgeBlood")
 
 	hud.prevStage = -1
 	function hud.AlsoThink()
-		local stage = GameData.LocalPlayer:GetNWInt("TrollgeStage")
+		local stage = GameData.LocalPlayer:GetNW2Int("TrollgeStage")
 		if stage ~= hud.prevStage then
 			if stage == 0 then
 				hud:SetControlVisible("R", true)
@@ -734,7 +889,7 @@ function SLASHER.ClientSideEffect()
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
+	if not ply:GetNW2Bool("TrollgeStage2") then
 		local idx = math.random(1, 5)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/trollge/troll_step" .. idx .. ".mp3",
@@ -745,6 +900,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			excludeSendTo = ply,
 		})
 	end
 
@@ -757,12 +913,13 @@ if CLIENT then
 
 	timer.Create("TrollgeDetect", 0.5, 0, function()
 		if not IsValid(GameData.LocalPlayer) or not GameData.LocalPlayer.Team or GameData.LocalPlayer:Team() ~= TEAM_SURVIVOR then
+			drawIcon = false
 			return
 		end
 
 		drawIcon = false
 		for _, s in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if s:GetNWString("Slasher") ~= "Trollge" or not s:CanBeSeen() then
+			if s:GetNW2String("Slasher") ~= "Trollge" or not s:CanBeSeen() then
 				continue
 			end
 
@@ -792,7 +949,7 @@ if CLIENT then
 			surface.DrawTexturedRect(ScrW() / 2 - ScrW() / 32, ScrH() / 2 - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 		end
 
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Trollge") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.troll_f == nil then
 				GameData.LocalPlayer.troll_f = 0
 			end
@@ -811,7 +968,7 @@ if CLIENT then
 			GameData.LocalPlayer.troll_f = nil
 		end
 
-		if GameData.LocalPlayer:GetNWBool("DisplayTrollgeTransition") == true then
+		if GameData.LocalPlayer:GetNW2Bool("DisplayTrollgeTransition") then
 			local Overlay = Material("slashco/ui/overlays/trollge_overlays")
 			Overlay:SetInt("$frame", 0)
 

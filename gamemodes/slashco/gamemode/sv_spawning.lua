@@ -148,10 +148,11 @@ function SlashCo.Spawn(elements, spawnFunc)
 end
 
 local function genCondForced(ent)
-	return SlashCo.DefaultConditionsForced(ent) and SlashCo.BatterySpawns[ent:GetName()]
+	return SlashCo.DefaultConditionsForced(ent) and (ent.Legacy or SlashCo.BatterySpawns[ent:GetName()])
 end
+
 local function genCondNonForced(ent)
-	return SlashCo.DefaultConditionsNonForced(ent) and SlashCo.BatterySpawns[ent:GetName()]
+	return SlashCo.DefaultConditionsNonForced(ent) and (ent.Legacy or SlashCo.BatterySpawns[ent:GetName()])
 end
 
 ---Spawn generators for the round
@@ -169,11 +170,38 @@ function SlashCo.SpawnGenerators()
 		return
 	end
 
-	for _, v in pairs(gensToSpawn) do
-		local spawn = SlashCo.SelectSpawns(SlashCo.BatterySpawns[v:GetName()])
-		spawn:SpawnEnt()
+	for _, v in ipairs(gensToSpawn) do
+		-- Legacy maps:
+		-- convertLegacyConfig() stores the battery spawn points
+		-- directly on the generator entity.
+		if v.Legacy then
+			local batterySpawns = v.BatterySpawns
+
+			if batterySpawns and not table.IsEmpty(batterySpawns) then
+				local spawn = SlashCo.SelectSpawns(batterySpawns)
+
+				if IsValid(spawn) then
+					spawn:SpawnEnt()
+				end
+			end
+
+			continue
+		end
+
+		-- New maps:
+		-- BatterySpawns uses the generator's Name as the key.
+		local batterySpawns = SlashCo.BatterySpawns[v:GetName()]
+
+		if batterySpawns and not table.IsEmpty(batterySpawns) then
+			local spawn = SlashCo.SelectSpawns(batterySpawns)
+
+			if IsValid(spawn) then
+				spawn:SpawnEnt()
+			end
+		end
 	end
 
+	-- Finally spawn the generators.
 	SlashCo.Spawn(gensToSpawn)
 end
 
@@ -210,22 +238,18 @@ function SlashCo.SpawnGasCans()
 	local cansPerGen = SlashCo.GetGasCansPerGenerator()
 	local gens = SlashCo.GetGeneratorsToSpawn()
 
-	-- base count is for compatibility with older configs
-	local baseCount = SlashCo.BaseCans or (cansPerGen * gens)
-	if baseCount < 0 then
-		baseCount = cansPerGen * gens
-	end
+	local baseCount = cansPerGen * gens
 
-	-- auto-determine unmodified can count
 	if gasCanCount < 0 then
 		gasCanCount = baseCount + SlashCo.MapSize
 	end
 
 	local forceGasCanCount = -1
+
 	for _, p in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		if not IsValid(p) then continue end
+
 		gasCanCount = gasCanCount + p:SlasherValue("GasCanMod", 0)
-		
 		forceGasCanCount = forceGasCanCount + p:SlasherValue("ForceGasCanCount", 0)
 	end
 
@@ -233,6 +257,7 @@ function SlashCo.SpawnGasCans()
 	local offeringMod = SlashCo.CurRound.OfferingData.GasCanMod
 	local headStartMod = -(SlashCo.HeadStartCans or 0)
 	local survivorMod = -SlashCo.CurRound.SurvivorData.GasCanMod
+
 	gasCanCount = math.max(gasCanCount + offeringMod + headStartMod + survivorMod + diffMod, SlashCo.MapSize)
 
 	if forceGasCanCount >= 0 then
@@ -240,11 +265,13 @@ function SlashCo.SpawnGasCans()
 	end
 
 	local gasCanSpawns
+
 	if SlashCo.CurRound.OfferingData.CurrentOffering == SCInfo.Offering.Exposure then
 		gasCanCount = math.min(gasCanCount, baseCount)
 		gasCanSpawns = ents.FindByClass("info_sc_gascanexposed")
 	else
 		gasCanSpawns = ents.FindByClass("info_sc_gascan")
+
 		for _, v in ipairs(ents.FindByClass("info_sc_item")) do
 			if v.IsGasCanSpawn then
 				table.insert(gasCanSpawns, v)
@@ -252,7 +279,7 @@ function SlashCo.SpawnGasCans()
 		end
 	end
 
-	local gasCansToSpawn = SlashCo.SelectSpawns(gasCanSpawns, gasCanCount, nil, nil, true)
+	local gasCansToSpawn, missed = SlashCo.SelectSpawns(gasCanSpawns,gasCanCount,nil,nil,true)
 
 	if table.IsEmpty(gasCansToSpawn) then
 		SlashCo.Abort("Missing gas can spawn entities")
@@ -361,21 +388,35 @@ function SlashCo.SetHelicopterPositions()
 		SlashCo.Abort("Missing helicopter intro entity")
 		return
 	end
+
 	if not IsValid(spawn) then
 		SlashCo.Abort("Missing helicopter start entity")
 		return
 	end
 
-	--vectors are dropped a little to make the hammer model more accurate
-	SlashCo.CurRound.HelicopterIntroPosition = intro:GetPos() - Vector(0, 0, 70)
-	SlashCo.CurRound.HelicopterIntroAngle = intro:GetAngles()
-	SlashCo.CurRound.HelicopterSpawnPosition = spawn:GetPos() - Vector(0, 0, 70)
+	if intro.Legacy then
+		SlashCo.CurRound.HelicopterIntroPosition =
+			intro:GetPos() - Vector(0, 0, 70)
+	else
+		SlashCo.CurRound.HelicopterIntroPosition =
+			intro:GetPos()
+	end
+
+	SlashCo.CurRound.HelicopterIntroAngle =
+		intro:GetAngles()
+
+	if spawn.Legacy then
+		SlashCo.CurRound.HelicopterSpawnPosition =
+			spawn:GetPos() - Vector(0, 0, 70)
+	else
+		SlashCo.CurRound.HelicopterSpawnPosition =
+			spawn:GetPos()
+	end
 end
 
 function SlashCo.SpawnSlasher()
-	if GameData.SlasherSpawned then
-		return
-	end
+	if GameData.IsLobby then return end
+	if GameData.SlasherSpawned then return end
 
 	for _, ply in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		if not IsValid(ply) then continue end
@@ -404,8 +445,10 @@ end
 -- Flips a table to have the given key as the actual key instead of the normal DB 1, 2, 3 stuff.
 function SlashCo.SQLTableToLuaTable(data, keyName)
 	local resultTable = {}
-	for _, tbl in ipairs(data) do
-		resultTable[tbl[keyName]] = tbl
+	if data then
+		for _, tbl in ipairs(data) do
+			resultTable[tbl[keyName]] = tbl
+		end
 	end
 
 	return resultTable
@@ -413,7 +456,7 @@ end
 
 ---Set up players for the round
 function SlashCo.SetupPlayers()
-	if not game.SinglePlayer() and ((cookie.GetString("slashco_table_basedata") == nil) or not sql.TableExists("slashco_table_survivordata") or not sql.TableExists("slashco_table_slasherdata")) then
+	if not SlashCo.IsDebugGame() and ((cookie.GetString("slashco_table_basedata") == nil) or not sql.TableExists("slashco_table_survivordata") or not sql.TableExists("slashco_table_slasherdata")) then
 		SlashCo.Abort("Missing SQL table data")
 		return
 	end
@@ -473,6 +516,15 @@ function SlashCo.SetupPlayers()
 			continue
 		end
 
+		--Players who have died are not resurrected.
+		if SlashCo.CurRound.DeadPlayers and SlashCo.CurRound.DeadPlayers[steamid] then
+			ply:SetTeam(TEAM_SPECTATOR)
+			ply:Spawn()
+
+			print(ply:Name() .. " was already dead, spectator")
+			continue
+		end
+
 		if survivors[steamid] or SlashCo.AllowLateJoin then
 			ply:SetTeam(TEAM_SURVIVOR)
 			ply:Spawn()
@@ -504,7 +556,7 @@ function SlashCo.SetupPlayers()
 	GameData.SurvivorData = survivors -- Save the data so that when players join late we can still give them their items.
 end
 
-local function makeEnt(class, config)
+local function makeEnt(class, config, legacy)
 	if not istable(config.pos) then
 		return
 	end
@@ -527,6 +579,10 @@ local function makeEnt(class, config)
 
 	if config.Forced then
 		ent.Forced = true
+	end
+
+	if legacy then
+		ent.Legacy = true
 	end
 
 	ent:Spawn()
@@ -583,6 +639,8 @@ local function convertLegacyConfig(name, skip)
 				local ent = makeEnt("info_sc_generator", v)
 
 				if IsValid(ent) then
+					ent.Legacy = true
+					ent.LegacyID = k
 					gens[k] = ent
 				end
 			end
@@ -612,8 +670,8 @@ local function convertLegacyConfig(name, skip)
 			SlashCo.BaseCans = config.GasCans.Count
 		end
 
-		if isnumber(config.GasCans.NeededPerGenerator) then
-			SlashCo.GasCansPerGenerator(config.GasCans.NeededPerGenerator)
+		if isnumber(config.GasCans.NeededPerGenerator) and config.GasCans.NeededPerGenerator > 0 then
+			SlashCo.SetGasCansPerGenerator(config.GasCans.NeededPerGenerator)
 		end
 
 		if istable(config.GasCans.Spawnpoints) then
@@ -637,10 +695,23 @@ local function convertLegacyConfig(name, skip)
 				continue
 			end
 
-			for _, v1 in ipairs(v) do
-				local ent = makeEnt("info_sc_battery", v1)
-				ent.Legacy = true
+			local generator = gens[k]
+
+			if not IsValid(generator) then
+				continue
 			end
+
+			local batterySpawns = {}
+
+			for _, v1 in ipairs(v) do
+				local ent = makeEnt("info_sc_battery", v1, true)
+
+				if IsValid(ent) then
+					table.insert(batterySpawns, ent)
+				end
+			end
+
+			generator.BatterySpawns = batterySpawns
 		end
 	end
 	if istable(config.Offerings) and istable(config.Offerings.Exposure) and istable(config.Offerings.Exposure.Spawnpoints) then
@@ -724,7 +795,6 @@ local function startRound(noSetup)
 
 	local survivors = team.GetPlayers(TEAM_SURVIVOR)
 	for _, ply in ipairs(survivors) do
-		ply:ScreenFade(SCREENFADE.IN, color_black, 1, 0)
 		ply:SetHealth(ply:GetMaxHealth())
 	end
 	GameData.RoundStartSurvivorCount = #survivors
@@ -742,15 +812,14 @@ local function startRound(noSetup)
 	SlashCo.SpawnItems()
 
 	SlashCo.SetHelicopterPositions()
-	SlashCo.UpdateHelicopterSeek(SlashCo.CurRound.HelicopterIntroPosition)
-	SlashCo.CreateHelicopter(SlashCo.CurRound.HelicopterTargetPosition, SlashCo.CurRound.HelicopterIntroAngle)
+	SlashCo.HelicopterLandIntro()
 	SlashCo.BroadcastCurrentRoundData(true)
 
 	local slashers = sql.Query("SELECT * FROM slashco_table_slasherdata;") or {}
 	local dangerLevel = SlashCo.DangerLevel.Unknown
 	for _, slasher in ipairs(SlashCo.CurRound.SlashersToBeSpawned) do
 		if not IsValid(slasher) then continue end
-		local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
+		local slasherTbl = SlashCoSlashers[slasher:GetNW2String("Slasher")]
 		if slasherTbl and ((slasherTbl.DangerLevel or 0) > dangerLevel) then
 			dangerLevel = slasherTbl.DangerLevel
 		end
@@ -764,9 +833,6 @@ local function startRound(noSetup)
 	})
 
 	timer.Simple(8, function()
-		SlashCo.HelicopterTakeOffIntro()
-		SlashCo.EnableSoundScapes()
-
 		if not g_SlashCoDebug then
 			SlashCo.ClearDatabase()
 		end --Everything was loaded, clear the database.
@@ -836,19 +902,21 @@ end
 
 -- RaphaelIT7: Finds a free spawn, if there is none, it'll just spawn them in each other.
 local function FindFreeSpawn(ply, entities)
-	local oldestSpawn = {}
+	local oldestSpawn, oldestTime
 	for _, spawnEnt in ipairs(entities) do
 		if hook.Run("IsSpawnpointSuitable", ply, spawnEnt, false) then
 			return spawnEnt
 		end
 
-		oldestSpawn[CurTime() - (spawnEnt.LastSpawnedEntity or 0)] = spawnEnt
+		local lastSpawned = spawnEnt.LastSpawnedEntity or 0
+		if not oldestTime or lastSpawned < oldestTime then
+			oldestSpawn = spawnEnt
+			oldestTime = lastSpawned
+		end
 	end
 
 	-- Just take the oldest one.
-	for _, spawnEnt in SortedPairs(oldestSpawn, true) do
-		return spawnEnt
-	end
+	return oldestSpawn
 end
 
 function SlashCo.FindSpawn(ply)
@@ -870,7 +938,7 @@ function SlashCo.FindSpawn(ply)
 			return
 		end
 
-		spawnEnt.SpawnedEntity = ply
+		UpdateSpawnEntity(ply, spawnEnt)
 		if spawnEnt.SpawnEnt then -- info_player_start doesn't have this.
 			spawnEnt:SpawnEnt()
 		end
@@ -879,7 +947,7 @@ function SlashCo.FindSpawn(ply)
 	end
 end
 
-function GM:PlayerSelectSpawn(ply, transiton)
+function GM:PlayerSelectSpawn(ply, transition)
 	if transition then
 		return
 	end

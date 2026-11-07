@@ -1,0 +1,15 @@
+VertexLitGeneric
+{
+$baseTexture "models\slashco\slashers\americanpo\v_shotgun_a"
+$phong 1
+$phongboost 60
+
+$phongfresnelranges "[.4 .6 1]"
+$phongexponenttexture "models\slashco\slashers\americanpo\v_shotgun_a_exp"
+$basemapalphaphongmask 1
+$envmap env_cubemap
+$envmapfresnel 1
+$envmapFresnelMinMaxExp "[.4 1 .4]"
+$halflambert 0
+$phongalbedotint 1
+}

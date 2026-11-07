@@ -247,7 +247,7 @@ function ENT:HandleStuck()
 		lim = math.Clamp(lim + 0.5, 1, 120)
 	end
 
-	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
+	SlashCo.AudioSystem.EmitSound(self, "physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 0.1)
 	self.loco:ClearStuck()
 end
 
@@ -287,7 +287,7 @@ function ENT:Think()
 		filter = self
 	})
 
-	if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+	if IsValid(tr.Entity) and SlashCo.IsValidDoor(tr.Entity) and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
 			not SlashCo.IsDoorOpen(tr.Entity) and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
 		tr.Entity:Use(self)
@@ -301,6 +301,8 @@ function ENT:Think()
 
 		for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
 			if v:IsPlayer() and v:Team() == TEAM_SLASHER and v:GetPos():Distance(self:GetPos()) < 100 then
+				if v.StunImmunity then continue end
+
 				self.AttackedPlayer = v
 				self.Enemy = nil
                 SlashCo.StopChase(v)
@@ -309,7 +311,7 @@ function ENT:Think()
                 timer.Simple(1.55, function()      -- How long it takes to kill the entity
 					if not IsValid(self) or not IsValid(v) then return end
 
-					v:SetNWBool("MerltonBlur", true)
+					v:SetMerltonBlur(true)
 					v:Freeze(false)
                     self:Explode()                  -- Explode effect
 	            end)
@@ -317,7 +319,7 @@ function ENT:Think()
                 timer.Simple(12, function()      -- How long it takes to unfreeze the enemy
 					if not IsValid(v) then return end
 
-			        v:SetNWBool("MerltonBlur", false)
+			        v:SetMerltonBlur(false)
 	            end)
 			end
 		end
@@ -381,7 +383,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", "Merlton", function()
-		if GameData.LocalPlayer:GetNWBool("MerltonBlur") then
+		if GameData.LocalPlayer:GetMerltonBlur() then
 			DrawSobel(0.2)
 			DrawToyTown(5, ScrH() / 2)
 		end

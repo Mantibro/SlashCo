@@ -3,13 +3,8 @@ local EFFECT = {}
 --slow down significantly
 
 EFFECT.Name = "Slowness"
-EFFECT.ChangesSpeed = true
-function EFFECT.OnApplied(ply)
-	ply:AddSpeedEffect("slowEffect", 200, 12)
-end
-function EFFECT.OnExpired(ply)
-	ply:RemoveSpeedEffect("slowEffect")
-end
+EFFECT.Speed = 200
+EFFECT.SpeedPriority = 12
 
 local colors = {
 	["$pp_colour_addr"] = 0,

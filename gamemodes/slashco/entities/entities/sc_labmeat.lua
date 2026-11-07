@@ -4,6 +4,7 @@ ENT.Type = "anim"
 ENT.Base = "sc_baseitem"
 ENT.PrintName = "LabMeat"
 ENT.ClassName = "sc_labmeat"
+ENT.PredictPickUp = false
 
 hook.Add("SlashCo:Precache", "SlashCo:PrecacheLabMeat", function()
 	SlashCo.PrecacheModel("models/slashco/items/labmeat.mdl")
@@ -14,7 +15,7 @@ hook.Add("SlashCo:Precache", "SlashCo:PrecacheLabMeat", function()
 	end
 end)
 
-function ENT:Initialize()
+function ENT:PostInitialize()
 	if SERVER then
 		self.ragdoll = ents.Create("prop_ragdoll")
 		self.ragdoll:SetModel("models/slashco/items/labmeat.mdl")
@@ -24,22 +25,11 @@ function ENT:Initialize()
 		self.ragdoll:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 		self.ragdoll:Spawn()
 		self.ragdoll:AddEFlags(EFL_KEEP_ON_RECREATE_ENTITIES)
-
-		self:SetModel("models/slashco/items/labmeat.mdl")
-		self:SetSolid(SOLID_VPHYSICS)
-		self:PhysicsInit(SOLID_BBOX)
-		self:SetUseType(SIMPLE_USE)
-		self:SetCollisionGroup(COLLISION_GROUP_DISSOLVING) --Collide with nothing
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-		self:SetNoDraw(true)
 	end
 
-	local phys = self:GetPhysicsObject()
-
-	if phys:IsValid() then
-		phys:Wake()
-	end
-
+	self:PhysicsInit(SOLID_BBOX)
+	self:SetCollisionGroup(COLLISION_GROUP_DISSOLVING) --Collide with nothing
+	self:SetNoDraw(true)
 	self.SoundTick = 0
 end
 
@@ -51,7 +41,7 @@ if SERVER then
 
 		if SlashCo.ItemPickUp(activator, self:EntIndex(), "LabMeat") then
 			self.ragdoll:Remove()
-			activator:EmitSound("slashco/survivor/eat_mayo.mp3")
+			SlashCo.AudioSystem.EmitSound(activator, "slashco/survivor/eat_mayo.mp3")
 		end
 
 		if self:IsPlayerHolding() then
@@ -64,7 +54,7 @@ if SERVER then
 		self.SoundTick = self.SoundTick + math.random(0, 1)
 
 		if self.SoundTick > 60 then
-			self:EmitSound("npc/headcrab/idle" .. math.random(1, 3) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(self, "npc/headcrab/idle" .. math.random(1, 3) .. ".wav")
 			self.SoundTick = 0
 
 			--jerk it

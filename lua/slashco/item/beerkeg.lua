@@ -8,7 +8,9 @@ ITEM.Description = "BeerKeg_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
+	ply:PredictedViewPunch(Angle(-10, 0, 0))
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Single"),
 		identifier = "BeerKegThrow",
@@ -17,9 +19,13 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
 
-	ply:ViewPunch(Angle(-10, 0, 0))
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
+
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	droppeditem:SetBeerKegVelocity(ply:GetAimVector() * 150)
 	SlashCo.CurRound.Items[droppeditem:EntIndex()] = true

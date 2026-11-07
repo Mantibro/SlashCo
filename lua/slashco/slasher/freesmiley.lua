@@ -30,9 +30,7 @@ SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★☆☆☆"
 SLASHER.SummonCooldown = 50 -- Summon cooldown
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.SummonCooldown = 50 - (25 * SO)
 
 	if additionalSurvivors > 0 then
@@ -44,8 +42,8 @@ end
 
 function SLASHER.OnSpawn(slasher)
 	SLASHER.SmileyIdle(slasher)
-	slasher:SetNWBool("CanKill", true)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanKill(true)
+	slasher:SetCanChase(true)
 
 	slasher.SummonCooldown = 0
 	slasher.SummonChoose = 0
@@ -63,17 +61,17 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.SummonCooldown = SummonCD - FrameTime()
 	end
 
-	if slasher:GetNWInt("SmileySummonCooldown") ~= math.floor(SummonCD) then
-		slasher:SetNWInt("SmileySummonCooldown", math.floor(SummonCD))
+	if slasher:GetNW2Int("SmileySummonCooldown") ~= math.floor(SummonCD) then
+		slasher:SetNW2Int("SmileySummonCooldown", math.floor(SummonCD))
 	end
-	if slasher:GetNWInt("SmileySummonSelect") ~= SummonChoose then
-		slasher:SetNWInt("SmileySummonSelect", SummonChoose)
+	if slasher:GetNW2Int("SmileySummonSelect") ~= SummonChoose then
+		slasher:SetNW2Int("SmileySummonSelect", SummonChoose)
 	end
-	if slasher:GetNWInt("SmileyZanyAmount") ~= ZanyAmount then
-		slasher:SetNWInt("SmileyZanyAmount", ZanyAmount)
+	if slasher:GetNW2Int("SmileyZanyAmount") ~= ZanyAmount then
+		slasher:SetNW2Int("SmileyZanyAmount", ZanyAmount)
 	end
-	if slasher:GetNWInt("SmileyPensiveAmount") ~= PensiveAmount then
-		slasher:SetNWInt("SmileyPensiveAmount", PensiveAmount)
+	if slasher:GetNW2Int("SmileyPensiveAmount") ~= PensiveAmount then
+		slasher:SetNW2Int("SmileyPensiveAmount", PensiveAmount)
 	end
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
@@ -86,17 +84,17 @@ function SLASHER.OnKillPlayer(slasher, target)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("FreeSmileySummoning") then return end
-	if slasher:GetNWBool("FreeSmileyPocketSand") or slasher:GetNWBool("FreeSmileyTeslaCoil") then return end
+	if slasher:GetNW2Bool("FreeSmileySummoning") then return end
+	if slasher:GetNW2Bool("FreeSmileyPocketSand") or slasher:GetNW2Bool("FreeSmileyTeslaCoil") then return end
 
 	SlashCo.Jumpscare(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("FreeSmileySummoning") then return end
-	if slasher:GetNWBool("FreeSmileyPocketSand") or slasher:GetNWBool("FreeSmileyTeslaCoil") then return end
+	if slasher:GetNW2Bool("FreeSmileySummoning") then return end
+	if slasher:GetNW2Bool("FreeSmileyPocketSand") or slasher:GetNW2Bool("FreeSmileyTeslaCoil") then return end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then
+	if slasher:GetInSlasherChaseMode() then
 		SlashCo.StopChase(slasher)
 		return
 	end
@@ -105,7 +103,7 @@ function SLASHER.OnSecondaryFire(slasher)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("FreeSmileySummoning") then return end
+	if slasher:GetNW2Bool("FreeSmileySummoning") then return end
 	if slasher.SummonCooldown > 0 then return end
 
 	if slasher.SummonChoose == 0 then
@@ -142,7 +140,7 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 
 	slasher.SummonCooldown = SLASHER.SummonCooldown
 
-	slasher:SetNWBool("FreeSmileySummoning", true)
+	slasher:SetNW2Bool("FreeSmileySummoning", true)
 
 	slasher:Freeze(true)
 	timer.Simple(4, function()
@@ -170,23 +168,23 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 		if not IsValid(slasher) then return end
 
 		slasher:Freeze(false)
-		slasher:SetNWBool("FreeSmileySummoning", false)
+		slasher:SetNW2Bool("FreeSmileySummoning", false)
 	end)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("FreeSmileySummoning") or ply:GetNWBool("FreeSmileyPocketSand") or ply:GetNWBool("FreeSmileyTeslaCoil")
+	return ply:GetNW2Bool("FreeSmileySummoning") or ply:GetNW2Bool("FreeSmileyPocketSand") or ply:GetNW2Bool("FreeSmileyTeslaCoil")
 end
 
 function SLASHER.OnHitByPocketSand(slasher, ply)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("FreeSmileyPocketSand", true)
+	slasher:SetNW2Bool("FreeSmileyPocketSand", true)
 	slasher:Freeze(true)
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("FreeSmileyPocketSand", false)
+		slasher:SetNW2Bool("FreeSmileyPocketSand", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -195,21 +193,21 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 function SLASHER.OnHitByTeslaCoil(slasher)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("FreeSmileyTeslaCoil", true)
+	slasher:SetNW2Bool("FreeSmileyTeslaCoil", true)
 	slasher:Freeze(true)
 	timer.Simple(16, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("FreeSmileyTeslaCoil", false)
+		slasher:SetNW2Bool("FreeSmileyTeslaCoil", false)
 		slasher:Freeze(false)
 	end)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
-	local smiley_summon = ply:GetNWBool("FreeSmileySummoning")
-	local smiley_sand_stun = ply:GetNWBool("FreeSmileyPocketSand")
-	local smiley_tesla_stun = ply:GetNWBool("FreeSmileyTeslaCoil")
+	local chase = ply:GetInSlasherChaseMode()
+	local smiley_summon = ply:GetNW2Bool("FreeSmileySummoning")
+	local smiley_sand_stun = ply:GetNW2Bool("FreeSmileyPocketSand")
+	local smiley_tesla_stun = ply:GetNW2Bool("FreeSmileyTeslaCoil")
 
 	if not smiley_summon and not smiley_sand_stun and not smiley_tesla_stun then
 		ply.anim_antispam = false
@@ -255,8 +253,25 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if ply:GetNWBool("InSlasherChaseMode") then
+	if ply:GetInSlasherChaseMode() then
+		local idx = math.random(1, 6)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
+			identifier = "FreeSmileyFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 200,
+			maxDistance = 500,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
+	else
+		if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then
+			ply.SmileyStepTick = 0
+		end
+
+		if ply.SmileyStepTick == 0 then
 			local idx = math.random(1, 6)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
@@ -267,28 +282,11 @@ function SLASHER.Footstep(ply)
 				entity = ply,
 				volume = 1,
 				fadeIn = 0,
+				excludeSendTo = ply,
 			})
-		else
-			if ply.SmileyStepTick == nil or ply.SmileyStepTick > 1 then
-				ply.SmileyStepTick = 0
-			end
-
-			if ply.SmileyStepTick == 0 then
-				local idx = math.random(1, 6)
-				SlashCo.AudioSystem.PlaySound({
-					soundPath = "npc/footsteps/hardboot_generic" .. idx .. ".wav",
-					identifier = "FreeSmileyFootstep" .. idx,
-					group = "SlasherFootstep",
-					minDistance = 200,
-					maxDistance = 500,
-					entity = ply,
-					volume = 1,
-					fadeIn = 0,
-				})
-			end
-
-			ply.SmileyStepTick = ply.SmileyStepTick + 1
 		end
+
+		ply.SmileyStepTick = ply.SmileyStepTick + 1
 	end
 
 	return true
@@ -316,46 +314,42 @@ function SLASHER.InitHud(_, hud)
 	hud:AddControl("F", "deal a zany", dealTable)
 
 	function hud.TitleCard.Label:PaintOver()
-		draw.SimpleText("SMILEYS: " .. math.Round(GameData.LocalPlayer:GetNWInt("SmileyZanyAmount"), 0) .. "/4", "TVCD", 4, 18, red)
+		draw.SimpleText("SMILEYS: " .. math.Round(GameData.LocalPlayer:GetNW2Int("SmileyZanyAmount"), 0) .. "/4", "TVCD", 4, 18, red)
 	end
 
 	hud.prevDeal = -1
 	hud.prevDealAllow = -1
 	hud.prevNumSmiley = -1
 	function hud.AlsoThink()
-		local deal = GameData.LocalPlayer:GetNWInt("SmileySummonSelect")
-		local maxZanies = GameData.LocalPlayer:GetNWInt("SmileyZanyAmount")
-		local maxPensives = GameData.LocalPlayer:GetNWInt("SmileyPensiveAmount")
+		local deal = GameData.LocalPlayer:GetNW2Int("SmileySummonSelect")
+		local maxZanies = GameData.LocalPlayer:GetNW2Int("SmileyZanyAmount")
+		local maxPensives = GameData.LocalPlayer:GetNW2Int("SmileyPensiveAmount")
 
-		local numZanies
-		local numPensives
+		local atMax
 		if deal == 0 then
-			numZanies = (#ents.FindByClass("sc_zanysmiley") >= maxZanies)
+			atMax = #SlashCo.FindByClass("sc_zanysmiley") >= maxZanies
 		else
-			numPensives = (#ents.FindByClass("sc_zanysmiley") >= maxPensives)
+			atMax = #SlashCo.FindByClass("sc_pensivesmiley") >= maxPensives
 		end
 
-		if (numZanies ~= hud.prevNumSmiley or numPensives ~= hud.prevNumSmiley) or deal ~= hud.prevDeal then
+		if atMax ~= hud.prevNumSmiley or deal ~= hud.prevDeal then
 			if deal == 0 then
-				if numZanies then
+				if atMax then
 					hud:SetControlText("F", "max zanies")
 				else
 					hud:ShakeControl("R")
 					hud:SetControlText("F", "deal a zany")
 				end
-
-				hud.prevNumSmiley = numZanies
 			else
-				if numPensives then
-					hud:SetControlText("F", "max pensive")
+				if atMax then
+					hud:SetControlText("F", "max pensives")
 				else
 					hud:ShakeControl("R")
 					hud:SetControlText("F", "deal a pensive")
 				end
-
-				hud.prevNumSmiley = numPensives
 			end
 
+			hud.prevNumSmiley = atMax
 			hud.prevDeal = deal
 		end
 
@@ -365,7 +359,7 @@ function SLASHER.InitHud(_, hud)
 			hud.prevCanDeal = canDeal
 		end
 
-		local cooldown = GameData.LocalPlayer:GetNWInt("SmileySummonCooldown")
+		local cooldown = GameData.LocalPlayer:GetNW2Int("SmileySummonCooldown")
 		if not hud.prevDealAllow and cooldown < 0.1 then
 			hud:SetControlEnabled("R", true)
 			hud:SetControlVisible("F", true)
@@ -381,34 +375,32 @@ function SLASHER.InitHud(_, hud)
 			hud.prevDealAllow = false
 		end
 	end
+end
 
-	local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
+local surveyNoticeIcon = Material("slashco/ui/particle/icon_survey")
+function SLASHER.DrawHUD(localPly)
+	local scrW = ScrW()
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not survivor:CanBeSeen() then
+			continue
 		end
 
-		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not survivor:CanBeSeen() then
-				continue
-			end
+		if survivor:GetMarkedBySmiley() then
+			local pos = survivor:WorldSpaceCenter():ToScreen()
 
-			if survivor:GetNWBool("MarkedBySmiley") then
-				local pos = survivor:WorldSpaceCenter():ToScreen()
-
-				if pos.visible then
-					surface.SetDrawColor(255, 255, 255, 60)
-					surface.SetMaterial(surveyNoticeIcon)
-					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
-				end
+			if pos.visible then
+				surface.SetDrawColor(255, 255, 255, 60)
+				surface.SetMaterial(surveyNoticeIcon)
+				surface.DrawTexturedRect(pos.x - scrW / 32, pos.y - scrW / 32, scrW / 16, scrW / 16)
 			end
 		end
-	end)
+	end
 end
 
 function SLASHER.SmileyIdle(slasher)
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if not IsValid(slasher) then return end
+
+	if not slasher:GetInSlasherChaseMode() then
 		local idx = math.random(1, 7)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/freesmiley/freesmiley_idle" .. idx .. ".mp3",
@@ -428,7 +420,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_FreeSmiley") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			local Overlay = Material("slashco/ui/overlays/jumpscare_freesmiley")
 
 			Overlay:SetFloat("$alpha", 1)

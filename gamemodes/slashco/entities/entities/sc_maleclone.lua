@@ -6,6 +6,7 @@ ENT.Base = "base_nextbot"
 ENT.Type = "nextbot"
 ENT.ClassName = "sc_maleclone"
 ENT.PingType = "SLASHER"
+ENT.PingExpiryTime = 5
 
 hook.Add("SlashCo:Precache", "SlashCo:PrecacheMaleClone", function()
 	SlashCo.PrecacheModel("models/Humans/Group01/male_07.mdl")
@@ -67,7 +68,7 @@ end
 function ENT:HandleStuck()
 	local justGo = SlashCo.RandomPosLocator()
 	if justGo then
-		self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
+		SlashCo.AudioSystem.EmitSound(self, "physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 0.1)
 		self.loco:ClearStuck()
 		self:SetPos(justGo)
 		return
@@ -89,10 +90,11 @@ end
 local startOffset = Vector(0, 0, 50)
 function ENT:Think()
 	local startPos = self:GetPos()
-	local endPos = startPos + self:GetForward()
+	local endPos = self:GetForward()
 	endPos:Mul(10000)
+	endPos:Add(startPos)
 
-	-- We change startPos AFTER we calculated endPos! 
+	-- We change startPos AFTER we calculated endPos!
 	startPos:Add(startOffset)
 
 	local tr = util.TraceLine({
@@ -101,7 +103,7 @@ function ENT:Think()
 		filter = self
 	})
 
-	if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+	if IsValid(tr.Entity) and SlashCo.IsValidDoor(tr.Entity) and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
 			not SlashCo.IsDoorOpen(tr.Entity) and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
 		tr.Entity:Use(self)

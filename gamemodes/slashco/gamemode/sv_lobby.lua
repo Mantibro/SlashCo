@@ -8,6 +8,12 @@ hook.Add("InitPostEntity", "SlashCo:LobbyBackgroundMusic", function()
 	SlashCo.AudioSystem.SetBackgroundMusic("slashco/music/slashco_lobby.wav", 0.4)
 
 	SlashCo.SpawnGenerators()
+
+	for _, ent in ipairs(ents.FindByClass("sc_generator")) do
+		ent:SetCansRemaining(0)
+		ent:SetRunning(true)
+		-- RaphaelIT7: No battery needed... yet :)
+	end
 end)
 
 local function lobbySaveCurData()
@@ -184,7 +190,7 @@ local function lobbyReadyTimer(count)
 	end)
 end
 
-local lobbyLeaveTimer = CreateConVar("slashco_lobbyleavedelay", "120", FCVAR_ARCHIVE, "The time in seconds player have to equip items and enter the helicopter before it just forces that", 1, 255)
+local lobbyLeaveTimer = CreateConVar("slashco_lobbyleavedelay", "210", FCVAR_ARCHIVE, "The time in seconds player have to equip items and enter the helicopter before it just forces that", 1, 255)
 local function lobbyBriefingLeaveTimer()
 	timer.Create("SlashCo:LobbyBriefingLeaveTimer", lobbyLeaveTimer:GetInt(), 1, function()
 		SlashCo.LobbyFinish()
@@ -532,6 +538,20 @@ net.Receive("SlashCo:SelectSlasher", function(_, ply)
 	end
 end)
 
+function SlashCo.SendPickingSlasher(ply)
+	local selectionData = {
+		slashClass = SlashCo.CurRound.SlasherClass,
+		slashDanger = SlashCo.CurRound.SlasherDanger,
+		bannedSlashers = SlashCo.GetBannedSlashers(true),
+	}
+
+	net.Start("SlashCo:PickingSlasher")
+		net.WriteTable(selectionData)
+	net.Send(ply)
+
+	SlashCo.AllowedPlayerSlasherSelection[ply] = selectionData
+end
+
 function SlashCo.PlayerPickedLobbySlasher(ply, slasherID)
 	if not GameData.IsLobby then return end
 	
@@ -560,6 +580,10 @@ local function pickItem(ply, item)
 	end
 
 	local itemTbl = SlashCoItems[item]
+	if not itemTbl or not itemTbl.Price then
+		return
+	end
+
 	if itemTbl.Price > balance then
 		ply:ChatText("item_afford")
 		return
@@ -601,41 +625,46 @@ function SlashCo.LobbyVendorVoice(ply, item)
 	if SlashCo.LobbyData.Offering == SCInfo.Offering.Nightmare then
 		if math.random(1, 5) == 1 then
 			-- He really hates you for what you've done.
-			vendor:EmitSound("slashco/itemvendor/itemvendor_generic4.mp3")
+			SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_generic4.mp3")
 		end
 		return
 	end
 
 	if item == "DeathWard" then
-		vendor:EmitSound("slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
+		SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_deathward" .. math.random(1,5) .. ".mp3")
 	elseif item == "Brick" then
-		vendor:EmitSound("slashco/itemvendor/itemvendor_brick" .. math.random(1,5) .. ".mp3")
+		SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_brick" .. math.random(1,5) .. ".mp3")
 	else
-		vendor:EmitSound("slashco/itemvendor/itemvendor_generic" .. math.random(1,12) .. ".mp3")
+		SlashCo.AudioSystem.EmitSound(vendor, "slashco/itemvendor/itemvendor_generic" .. math.random(1,12) .. ".mp3")
 	end
 end
 
 local function pickMap(ply, map)
 	local balance = tonumber(SlashCoDatabase.GetStat(ply:SteamID64(), "Points"))
 
+	if not SCInfo.Maps[map] then
+		return
+	end
+
 	if SlashCo.LobbyData.SelectedMap == map then
 		ply:ChatText("map_already_selected")
 		return
 	end
 
-	if balance < SlashCo.MapForceCost then
+	local cost = SlashCo.GetMapForceCost()
+	if balance < cost then
 		ply:ChatText("map_notenough")
 		return
 	end
 
 	for _, play in player.Iterator() do
-		play:ChatText({"map_guaranteed_to", ply:Nick(), SlashCo.MapForceCost, SCInfo.Maps[map].NAME})
+		play:ChatText({"map_guaranteed_to", ply:Nick(), cost, SCInfo.Maps[map].NAME})
 	end
 
-	SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -SlashCo.MapForceCost)
+	SlashCoDatabase.UpdateStats(ply:SteamID64(), "Points", -cost)
 	SlashCo.LobbyData.SelectedMap = map
-	SlashCo.MapForceCost = SlashCo.MapForceCost + SlashCo.MapForceCostIncrease
-	SlashCo.SendValue(nil, "mapGuar", SlashCo.LobbyData.SelectedMap, SlashCo.MapForceCost)
+	SlashCo.SetForcedMap(map)
+	SlashCo.SetMapForceCost(cost + SlashCo.MapForceCostIncrease)
 	SlashCo.PrecacheNextMap()
 end
 
@@ -676,6 +705,15 @@ hook.Add("Tick", "LobbyTickEvent", function()
 		local seek = seek
 
 		if num < 2 then
+			if SlashCo.LobbyData.ReadyTimerStarted then
+				timer.Remove("SlashCo:AllReadyLobby")
+				SlashCo.LobbyData.ReadyTimerStarted = false
+
+				net.Start("SlashCo:LobbyTimerTime")
+					net.WriteUInt(62, 6)
+				net.Broadcast()
+			end
+
 			return
 		end
 

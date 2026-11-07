@@ -5,11 +5,7 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "BeerKeg"
 ENT.ClassName = "sc_beerkeg"
 
-function ENT:Initialize()
-	self:SetModel("models/slashco/beerkeg.mdl")
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-	
+function ENT:PostInitialize()
 	local phys = self:GetPhysicsObject()
 	if IsValid(phys) then
 		phys:EnableDrag(false)
@@ -26,7 +22,7 @@ function ENT:SetBeerKegVelocity(velocity)
 		self.DisableGravity = CurTime() + 1
 	end
 	self.EnableExposion = true
-	self.DONTPICKUP = true -- Block being picked up again
+	self:SetDontPickup(true) -- Block being picked up again
 end
 
 local gravity = GetConVar("sv_gravity")
@@ -89,8 +85,10 @@ function ENT:Explode()
 		if team == TEAM_SURVIVOR then
 			ply:TakeDamage(50, self, self)
 		elseif team == TEAM_SLASHER then
-			ply:SlasherStunDeafen(25 + (ply:GetPerception() * 2.5)) -- 25 seconds + 2.5 seconds for every perception level
-			ply:SlasherFunction("OnHitByBeerKeg")
+			if not ply.StunImmunity then
+				ply:SlasherStunDeafen(25 + (ply:GetPerception() * 2.5)) -- 25 seconds + 2.5 seconds for every perception level
+				ply:SlasherFunction("OnHitByBeerKeg")
+			end
 		end
 
 		if ply:Alive() then -- They survived the damage? Their ears won't >:3

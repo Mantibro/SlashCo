@@ -5,7 +5,6 @@ util.AddNetworkString("SlashCo:GiveLobbyInfo")
 util.AddNetworkString("SlashCo:GiveLobbyStatus")
 util.AddNetworkString("SlashCo:RequestInfo")
 util.AddNetworkString("SlashCo:LobbyTimerTime")
-util.AddNetworkString("SlashCo:LobbyHelicopterReady")
 util.AddNetworkString("SlashCo:GasPourProgress")
 util.AddNetworkString("SlashCo:GiveSlasherData")
 util.AddNetworkString("SlashCo:SlasherChaseMode")
@@ -120,7 +119,7 @@ function SlashCo.OfferingVoteFinished(rarity) -- rarity can range from 1 to 3.
 end
 
 hook.Add("scValue_sendOffer", "slashCo_StartOfferingVote", function(ply, offerID)
-	table.insert(SlashCo.LobbyData.Offerors, ply:SteamID64())
+	table.insert(SlashCo.LobbyData.Offerors, { steamid = ply:SteamID64() })
 	SlashCo.BroadcastOfferingVote(ply, offerID)
 	SlashCo.LobbyData.VotedOffering = offerID
 
@@ -254,7 +253,7 @@ end
 
 -- All types are defined in sh_shared.lua -> SlashCo.HelicopterVoices
 function SlashCo.HelicopterRadioVoice(type)
-	local id = math.random(1, type == SlashCo.HelicopterVoices.INTRO and 8 or 5), 4
+	local id = math.random(1, type == SlashCo.HelicopterVoices.INTRO and 8 or 5)
 	if type == SlashCo.HelicopterVoices.INTRO then
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/helipilot/helipilot_intro" .. id .. ".mp3",

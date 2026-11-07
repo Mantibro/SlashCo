@@ -8,7 +8,7 @@ ITEM.Description = "Newports_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fog.
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/newports_eat.ogg",
 		identifier = "NewportsEat",
@@ -17,8 +17,13 @@ function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fo
 		entity = ply,
 		volume = 0.8,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
-	
+end
+
+function ITEM.OnUse(ply) -- Unlike in SlashCo VR, this item will decrease the fog.
+	ITEM.OnUsePredicted(ply)
+
 	SlashCo.AddFog({
 		name = "Newports",
 		multiplier = 3,

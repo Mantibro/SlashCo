@@ -19,8 +19,8 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 		return
 	end
 
-	local pacified = GameData.LocalPlayer:GetNWBool("DemonPacified")
-	local blinded = GameData.LocalPlayer:GetNWBool("SlasherBlinded")
+	local pacified = GameData.LocalPlayer:GetDemonPacified()
+	local blinded = GameData.LocalPlayer:GetSlasherBlinded()
 
 	surface.SetDrawColor(255, 255, 255, 255)
 	if blinded then
@@ -35,8 +35,8 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	end
 
 	--Activating the Beacon
-	for _, v in ipairs(ents.FindByClass("sc_activebeacon")) do
-		if v:GetArmingBeacon() then
+	for _, v in ipairs(SlashCo.FindByClass("sc_activebeacon")) do
+		if IsValid(v) and v:GetArmingBeacon() then
 			local pos = v:GetPos():ToScreen()
 			if pos.visible then
 				surface.SetMaterial(BeaconIcon)
@@ -51,12 +51,12 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	end
 
 	--[[ kept for reference
-	if not SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].UserInterface then
+	if not SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].UserInterface then
 		return
 	end
 
 	local slasherpos = ply:GetPos()
-	local inchase = GameData.LocalPlayer:GetNWBool("InSlasherChaseMode")
+	local inchase = GameData.LocalPlayer:GetInSlasherChaseMode()
 
 	local cx = ScrW() / 2
 	local cy = ScrH() / 2
@@ -64,19 +64,19 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	local mainiconposx = cx / 20
 	local mainiconposy = cy + (cy / 2)
 
-	if SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID ~= SlashID then
-		SlashID = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].ID
+	if SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].ID ~= SlashID then
+		SlashID = SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].ID
 		MainIcon = Material("slashco/ui/icons/slasher/" .. SlashID)
 	end
 
-	local GameProgress = GameData.LocalPlayer:GetNWInt("GameProgressDisplay")
+	local GameProgress = SlashCo.GetGameProgress()
 
 	local willdrawkill = true
 	local willdrawchase = true
 	local willdrawmain = true
 
-	local CanKill = GameData.LocalPlayer:GetNWBool("CanKill")
-	local CanChase = GameData.LocalPlayer:GetNWBool("CanChase")
+	local CanKill = GameData.LocalPlayer:GetCanKill()
+	local CanChase = GameData.LocalPlayer:GetCanChase()
 
 	surface.SetDrawColor(255, 255, 255, 255)
 
@@ -91,9 +91,9 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 
 	if g_monitor < g then
 		if g < 1 then
-			surface.PlaySound("slashco/slashco_progress.mp3")
+			SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slashco_progress.mp3", fadeIn = 0})
 		else
-			surface.PlaySound("slashco/slashco_progress_full.mp3")
+			SlashCo.AudioSystem.PlaySound({soundPath = "slashco/slashco_progress_full.mp3", fadeIn = 0})
 		end
 	end
 	local gp = g
@@ -146,10 +146,10 @@ hook.Add("SlashCo:DrawHUD", "BaseSlasherHUD", function()
 	end
 
 	--Call for the HUD
-	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].UserInterface(cx,
+	local willdrawkill, willdrawchase, willdrawmain = SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].UserInterface(cx,
 			cy, mainiconposx, mainiconposy)
 
-	local SlashName = SlashCoSlashers[GameData.LocalPlayer:GetNWString("Slasher")].Name
+	local SlashName = SlashCoSlashers[GameData.LocalPlayer:GetNW2String("Slasher")].Name
 
 	draw.SimpleText(SlashName, "LobbyFont2", mainiconposx + (cx / 4), mainiconposy + (mainiconposy / 4.25),
 			Color(255, 0, 0, 255), TEXT_ALIGN_BOTTOM, TEXT_ALIGN_LEFT)

@@ -24,7 +24,6 @@ function SlashCo.RegisterPerk(perkTbl, perkID)
 		for _, conflictID in ipairs(perkTbl.Conflicts) do
 			perkTbl.Conflicts[conflictID] = true
 		end
-		PrintTable(perkTbl.Conflicts)
 	end
 end
 
@@ -50,7 +49,7 @@ function SlashCo.GetPerks()
 	return perks
 end
 
-local function GetPerks(team, perks)
+local function GetPerks(team, perks, activeOnly)
 	local results = {}
 	local perks = string.Split(perks, ",")
 	if team ~= TEAM_LOBBY and team ~= TEAM_SURVIVOR and team ~= TEAM_SLASHER then return {} end -- No valid team - GG
@@ -58,6 +57,8 @@ local function GetPerks(team, perks)
 	for _, perk in ipairs(perks) do
 		if perk:StartsWith("!") then
 			perk = perk:sub(2)
+		elseif activeOnly then
+			continue
 		end
 
 		local perkTbl
@@ -77,23 +78,8 @@ local function GetPerks(team, perks)
 	return results
 end
 
-local function GetActivePerks(team, perks)
-	local results = GetPerks(team, perks)
-
-	local idx = 1
-	while idx <= #results do
-		if not string.StartsWith(results[idx], "!") then
-			table.remove(results, idx)
-		else
-			idx = idx + 1
-		end
-	end
-
-	return results
-end
-
 function SlashCo.GetActivePerks(ply)
-	return GetActivePerks(ply:Team(), ply:GetOwnedPerks())
+	return GetPerks(ply:Team(), ply:GetOwnedPerks(), true)
 end
 
 function SlashCo.GetOwnedPerks(ply)
@@ -101,11 +87,12 @@ function SlashCo.GetOwnedPerks(ply)
 end
 
 function SlashCo.OwnsPerk(ply, perkID)
-	return string.find(ply:GetOwnedPerks(), perkID) ~= nil
+	local perks = "," .. ply:GetOwnedPerks() .. ","
+	return string.find(perks, "," .. perkID .. ",", 1, true) ~= nil or string.find(perks, ",!" .. perkID .. ",", 1, true) ~= nil
 end
 
 function SlashCo.IsActivePerk(ply, perkID)
-	return string.find(ply:GetOwnedPerks(), "!" .. perkID) ~= nil
+	return string.find("," .. ply:GetOwnedPerks() .. ",", ",!" .. perkID .. ",", 1, true) ~= nil
 end
 
 -- A bit expensive!
@@ -125,7 +112,8 @@ function SlashCo.CanEquipPerk(ply, checkPerkID)
 	end
 
 	local perks = SlashCo.GetActivePerks(ply)
-	for perkID, perkTbl in pairs(perks) do
+	for _, perkID in ipairs(perks) do
+		local perkTbl = perks[perkID]
 		if (not perkTbl.Conflicts or not perkTbl.Conflicts[checkPerkID])
 			and (not checkPerkTbl.Conflicts or not checkPerkTbl.Conflicts[perkID]) then continue end
 
@@ -138,8 +126,8 @@ end
 local plyMeta = FindMetaTable("Player")
 function plyMeta:PerkValue(valueName, fallback)
 	local activePerks = SlashCo.GetActivePerks(self)
-	for _, perkTbl in pairs(activePerks) do
-		local perkValue = perkTbl[valueName]
+	for _, perkID in ipairs(activePerks) do
+		local perkValue = activePerks[perkID][valueName]
 		if perkValue ~= nil then
 			return perkValue
 		end

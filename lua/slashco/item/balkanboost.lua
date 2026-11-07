@@ -8,6 +8,7 @@ ITEM.Price = 100
 ITEM.Description = "BalkanBoost_desc"
 ITEM.CamPos = Vector(50, 0, 0)
 ITEM.IsSpawnable = false
+ITEM.UseEffect = "Slowness"
 
 function ITEM.DisplayColor()
 	return 232, 23, 55, 255
@@ -17,11 +18,13 @@ function ITEM.MaxAllowed()
 	return 4
 end
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	-- RaphaelIT7: Disallow balkan stacking
-	if ply:GetNWBool("SurvivorBalkan") then
+	if ply:GetSurvivorBalkan() then
 		return true
 	end
+
+	ply:SetSurvivorBalkan(true)
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/balkan_eat.wav",
@@ -31,15 +34,21 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
 
-	ply:SetNWBool("SurvivorBalkan", true)
-	ply:AddEffect("Slowness", 31.5)
+function ITEM.OnUse(ply)
+	if ITEM.OnUsePredicted(ply) then
+		return true
+	end
+
+	ply:AddEffect(ITEM.UseEffect, 31.5)
 
 	timer.Create("BalkanBoostStart:" .. ply:UserID(), 32, 1, function()
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-			ply:SetNWBool("SurvivorBalkanFull", true)
-			ply:SetNWBool("MarkedBySmiley", true)
+			ply:SetSurvivorBalkanFull(true)
+			ply:SetMarkedBySmiley(true)
 
 			if SlashCo.IsActivePerk(ply, "BalkanWarrior") then
 				ply:AddEffect("BalkanTripWeak", 132)
@@ -51,9 +60,9 @@ function ITEM.OnUse(ply)
 
 	timer.Create("BalkanBoostFinish:" .. ply:UserID(), 164, 1, function()
 		if IsValid(ply) and ply:Team() == TEAM_SURVIVOR then
-			ply:SetNWBool("SurvivorBalkanFull", false)
-			ply:SetNWBool("SurvivorBalkan", false)
-			ply:SetNWBool("MarkedBySmiley", false)
+			ply:SetSurvivorBalkanFull(false)
+			ply:SetSurvivorBalkan(false)
+			ply:SetMarkedBySmiley(false)
 
 			if not SlashCo.IsActivePerk(ply, "BalkanWarrior") then
 				ply:AddEffect("Slowness", 9999)
@@ -106,43 +115,34 @@ SlashCo.RegisterItem(ITEM, "BalkanBoost")
 
 if SERVER then
 	hook.Add("PlayerChangedTeam", "SlashCo:BalkanBoost", function(ply)
-		ply:SetNWBool("SurvivorBalkan", false)
-		ply:SetNWBool("SurvivorBalkanFull", false)
-		ply:SetNWBool("MarkedBySmiley", false)
+		ply:SetSurvivorBalkan(false)
+		ply:SetSurvivorBalkanFull(false)
+		ply:SetMarkedBySmiley(false)
 	end)
 
 	hook.Add("SlashCo:OnDeathWardUsed", "SlashCo:CancelBalkanBoost", function(ply)
 		timer.Remove("BalkanBoostStart:" .. ply:UserID())
 		timer.Remove("BalkanBoostFinish:" .. ply:UserID())
 
-		ply:SetNWBool("SurvivorBalkan", false)
-		ply:SetNWBool("SurvivorBalkanFull", false)
-		ply:SetNWBool("MarkedBySmiley", false)
+		ply:SetSurvivorBalkan(false)
+		ply:SetSurvivorBalkanFull(false)
+		ply:SetMarkedBySmiley(false)
 	end)
 
 	return
 end
 
 hook.Add("RenderScreenspaceEffects", "SlashCo:BalkanBoost", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorBalkanFull") then
-		local tab = {
-			["$pp_colour_addr"] = 0.07,
-			["$pp_colour_addg"] = 0,
-			["$pp_colour_addb"] = 0,
-			["$pp_colour_brightness"] = 0,
-			["$pp_colour_contrast"] = 2,
-			["$pp_colour_colour"] = 4,
-			["$pp_colour_mulr"] = 0.07,
-			["$pp_colour_mulg"] = 0,
-			["$pp_colour_mulb"] = 0
-		}
-
-		DrawColorModify(tab)
+	if GameData.LocalPlayer:GetSurvivorBalkanFull() and not GetConVar("slashco_cl_disable_effects"):GetBool() then
+		DrawSobel(0.13)
+		DrawSharpen(0.8, 0.8)
+		DrawMotionBlur(0.5, 0.6, 0.05)
+		DrawToyTown(4, ScrH() / 2)
 	end
 end)
 
 hook.Add("Think", "SlashCo:BalkanBoost", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorBalkan") then
+	if GameData.LocalPlayer:GetSurvivorBalkan() then
 		if not IsValid(GameData.BalkanSound) and CurTime() > ((GameData.BalkanSoundLastCreation or 0) + 5) then
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/balkan_icantstopnow.mp3",
@@ -150,6 +150,7 @@ hook.Add("Think", "SlashCo:BalkanBoost", function()
 				entity = GameData.LocalPlayer,
 				volume = 3,
 				fadeIn = 0,
+				isMusic = true,
 				forceStereo = true,
 				modifyGroup = "BackgroundMusic",
 				modifyGroupVolumeMult = 0, -- Silence background music while were playing

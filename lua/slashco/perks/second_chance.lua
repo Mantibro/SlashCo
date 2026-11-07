@@ -24,15 +24,15 @@ hook.Add("SlashCo:PrePlayerDeath", "SlashCo:SecondChance", function(ply)
 	ply:GodEnable()
 	ply:Freeze(true)
 
-	ply:SetNW2Bool("ShowDeathUI", true)
-	ply:SetNW2Bool("DeathReviveUI", true)
-	ply:SetNW2Float("DeathUITime", CurTime())
+	ply:SetShowDeathUI(true)
+	ply:SetDeathReviveUI(true)
+	ply:SetDeathUITime(CurTime())
 
 	timer.Simple(10, function()
 		if not IsValid(ply) then return end
 
-		ply:SetNW2Bool("ShowDeathUI", false)
-		ply:SetNW2Bool("DeathReviveUI", false)
+		ply:SetShowDeathUI(false)
+		ply:SetDeathReviveUI(false)
 
 		ply:SetVisible(true)
 		ply:SetImpervious(false)

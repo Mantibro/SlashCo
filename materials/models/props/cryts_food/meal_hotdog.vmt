@@ -1,0 +1,10 @@
+"vertexlitgeneric"
+{
+	"$basetexture" "models/props/cryts_food/meal_hotdog"
+	"$surfaceprop" "alienflesh"
+	"$bumpmap" "models/props/cryts_food/meal_hotdog_n"
+	"$phong" "1"
+	"$phongexponent" "15"
+	"$phongboost" "2"	
+	"$phongfresnelranges"	"[0.05 0.7 1]"
+}

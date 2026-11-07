@@ -13,6 +13,7 @@ ENT.Purpose = "I'm so sorry"
 ENT.Instructions = ""
 ENT.IsSelectable = true
 ENT.PingType = "PLUSH DOG"
+ENT.PingExpiryTime = 10
 
 function ENT:Initialize()
 	if SERVER then

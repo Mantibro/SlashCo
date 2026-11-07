@@ -31,6 +31,10 @@ function PLAYER:SetModel()
 	self.Player:SetModel(modelname)
 end
 
+function PLAYER:Init()
+	self.Player:SetVisible(true)
+end
+
 function PLAYER:SetupDataTables()
 	if SERVER then
 		--PLAYER.Achievements = data.Stats.Achievements or {}

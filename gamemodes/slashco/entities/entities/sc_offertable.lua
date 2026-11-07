@@ -60,8 +60,13 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
-	if SlashCo.LobbyData.Offering > 0 then
-		self.Offer:SetModel("models/slashco/other/offerings/o_" .. SlashCo.LobbyData.Offering .. ".mdl")
+	local offering = SlashCo.LobbyData.Offering
+	if offering == (self.LastOffering or 0) then return end
+
+	self.LastOffering = offering
+
+	if offering > 0 then
+		self.Offer:SetModel("models/slashco/other/offerings/o_" .. offering .. ".mdl")
 		self.Offer:SetColor(color_white)
 		self.Offer:SetNoDraw(false)
 	else

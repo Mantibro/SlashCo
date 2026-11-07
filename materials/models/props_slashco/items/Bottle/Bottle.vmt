@@ -1,0 +1,10 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/props_slashco/items/Bottle/Bottle"
+	"$bumpmap" 	"effects/flat_normal"
+	"$phong" 	"1"
+	"$phongboost" 	"0.1"
+	"$phongexponent" 	"20"
+	"$phongfresnelranges"	"[5 5 10]"
+	"$halflambert"  	"1"
+}

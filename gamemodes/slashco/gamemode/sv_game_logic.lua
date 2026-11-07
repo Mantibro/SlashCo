@@ -9,6 +9,8 @@ function SlashCo.SinglePlayerSetup()
 	hook.Add("PlayerInitialSpawn", "SinglePlayerSetup", function(ply)
 		table.insert(SlashCo.CurRound.ExpectedPlayers, { steamid = ply:SteamID64() })
 		table.insert(SlashCo.CurRound.SlasherData.AllSurvivors, { steamid = ply:SteamID64() })
+
+		SlashCo.AwaitExpectedPlayers()
 	end)
 end
 
@@ -105,7 +107,7 @@ function SlashCo.LoadCurRoundData()
 
 		table.Empty(SlashCo.CurRound.DisconnectedPlayers) -- Not needed anymore
 	else
-		if game.SinglePlayer() then
+		if SlashCo.IsDebugGame() then
 			SlashCo.SinglePlayerSetup()
 			return
 		end
@@ -179,7 +181,7 @@ local function DoGlobalSlasherSelection()
 
 	local becomeSlasher = {}
 	net.Receive("SlashCo:AskToBecomeSlasher", function(_, ply)
-		if net.ReadBool() then
+		if net.ReadBool() and not table.HasValue(becomeSlasher, ply) then
 			table.insert(becomeSlasher, ply)
 		end
 	end)
@@ -191,17 +193,16 @@ end
 
 local function DoSlasherSelection(slashers, usingPotentialSlashers)
 	if SlashCo.CurRound.AntiLoopSpawn then return end
-	for idx, ply in ipairs(slashers) do
-		if not IsValid(ply) then
+	for idx = #slashers, 1, -1 do
+		if not IsValid(slashers[idx]) then
 			table.remove(slashers, idx)
-			continue
 		end
 	end
-	
+
 	local slasherSelection
 	local function RunSlasherSelection()
-		local selectedPlyIndex = math.random(#slashers)
-		local selectedPly = slashers[math.random(#slashers)]
+		local selectedPlyIndex = #slashers > 0 and math.random(#slashers) or nil
+		local selectedPly = selectedPlyIndex and slashers[selectedPlyIndex]
 		if not IsValid(selectedPly) then
 			if SlashCo.CurRound.AntiLoopSpawn then return end
 			if usingPotentialSlashers then
@@ -230,16 +231,7 @@ local function DoSlasherSelection(slashers, usingPotentialSlashers)
 			return
 		end
 
-		local selectionData = {
-			slashClass = SlashCo.CurRound.SlasherClass,
-			slashDanger = SlashCo.CurRound.SlasherDanger,
-			bannedSlashers = SlashCo.GetBannedSlashers(true),
-		}
-
-		net.Start("SlashCo:PickingSlasher")
-			net.WriteTable(selectionData)
-		net.Send(selectedPly)
-		SlashCo.AllowedPlayerSlasherSelection[selectedPly] = selectionData
+		SlashCo.SendPickingSlasher(selectedPly)
 		selectedPly:ChatText("slasher_replacement")
 
 		timer.Create("SlashCo:WaitingForPlayerToPickSlasher", 15, 1, function()
@@ -358,7 +350,9 @@ end
 function SlashCo.AwaitExpectedPlayers()
 	if GameData.IsLobby then return end
 	if SlashCo.CurRound.AntiLoopSpawn then return end
-	if not game.SinglePlayer() and #SlashCo.CurRound.ExpectedPlayers < 2 then
+
+	local debugGame = SlashCo.IsDebugGame()
+	if not debugGame and #SlashCo.CurRound.ExpectedPlayers < 2 then
 		return
 	end -- don't start with no data
 
@@ -379,8 +373,9 @@ function SlashCo.AwaitExpectedPlayers()
 		end
 	end
 
-	if expected_count == #SlashCo.CurRound.ExpectedPlayers then
-		if player.GetCount() < 2 then
+	-- RaphaelIT7: We do >= as in some rare case it may somehow be more?
+	if expected_count >= #SlashCo.CurRound.ExpectedPlayers or debugGame then
+		if player.GetCount() < 2 and not debugGame then
 			SlashCo.Abort("Not enouth players to start a round")
 			return
 		end
@@ -397,7 +392,7 @@ end
 
 --				***Begin the round start timer***
 function SlashCo.RoundBeginTimer(instant)
-	local time = game.SinglePlayer() and 3 or 10
+	local time = SlashCo.IsDebugGame() and 3 or 10
 	SlashCo.CurRound.AntiLoopSpawn = true
 	if instant then
 		SlashCo.StartRound()
@@ -432,14 +427,37 @@ function SlashCo.EndRound()
 	end
 
 	if #survivors == 0 and SlashCo.IsQuickEscape() then
-		local slashers = team.GetPlayers(TEAM_SLASHER)
-		for _, slasher in ipairs(survivors) do
+		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			slasher:SetRoundPoints("slasher_quick")
 		end
 	end
 
 	local SurvivorCount = #survivors
 	local heliCount = #SlashCo.CurRound.HelicopterRescuedPlayers
+
+	local winners = {}
+	if heliCount > 0 then
+		--Add to stats of the remaining survivors' wins
+		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
+			if not IsValid(v) then continue end
+
+			SlashCoDatabase.UpdateStats(v:SteamID64(), "SurvivorRoundsWon", 1)
+
+			v:SetRoundPoints("survive")
+			winners[v:SteamID64()] = true
+		end
+
+		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 and IsValid(SlashCo.CurRound.HelicopterRescuedPlayers[1]) then
+			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetRoundPoints("last_survive")
+		end
+
+		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+			if not winners[v:SteamID64()] then
+				v:SetRoundPoints("left_behind")
+			end
+		end
+	end
+
 	if SurvivorCount == 0 then
 		--All survivors are dead
 
@@ -484,29 +502,6 @@ function SlashCo.EndRound()
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		SlashCo.AudioSystem.StopSound(nil, 1, slasher) -- Stop all sounds playing by the slasher.
-	end
-
-	local winners = {}
-	if heliCount > 0 then
-		--Add to stats of the remaining survivors' wins
-		for _, v in ipairs(SlashCo.CurRound.HelicopterRescuedPlayers) do
-			if not IsValid(v) then continue end
-
-			SlashCoDatabase.UpdateStats(v:SteamID64(), "SurvivorRoundsWon", 1)
-
-			v:SetRoundPoints("survive")
-			winners[v:SteamID64()] = true
-		end
-
-		if heliCount == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
-			SlashCo.CurRound.HelicopterRescuedPlayers[1]:SetRoundPoints("last_survive")
-		end
-
-		for _, v in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not winners[v:SteamID64()] then
-				v:SetRoundPoints("left_behind")
-			end
-		end
 	end
 
 	SlashCo.State = SlashCo.States.ENDING

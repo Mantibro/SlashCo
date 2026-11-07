@@ -35,14 +35,13 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 end
 
 function SLASHER.OnSpawn(slasher)
-	slasher:SetNWBool("CanChase", true)
-
+	slasher:SetCanChase(true)
 	slasher.ShockCooldown = 0
 end
 
 function SLASHER.OnTickBehaviour(slasher)
 	local ShockCD = slasher.ShockCooldown or 0 --Shock cooldown
-	
+
 	if ShockCD > 0 then
 		slasher.ShockCooldown = ShockCD - FrameTime()
 	end
@@ -52,22 +51,22 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if not slasher:GetNWBool("InSlasherChaseMode") then return end
+	if not slasher:GetInSlasherChaseMode() then return end
 	if not IsValid(target) or not target:IsPlayer() then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	if slasher:GetPos():Distance(target:GetPos()) > 137 then return end
 	if slasher.ShockCooldown > 0.01 then return end
 
-	slasher:SetNWBool("RockPunching", false)
-	timer.Remove("RockPunchDecay")
 	slasher.ShockCooldown = 2
 
 	timer.Simple(0.3, function()
 		if not IsValid(slasher) then return end
 
 		if SERVER then
+			slasher:LagCompensation(true)
 			local target1 = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(137, 0, 0)),
 				Vector(-30, -30, -60), Vector(30, 30, 60), 25, DMG_SLASH, 5, false)
+			slasher:LagCompensation(false)
 
 			if target1:IsPlayer() then
 				if target1:Team() ~= TEAM_SURVIVOR then return end
@@ -94,21 +93,10 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end
 		end
 	end)
-
-	timer.Simple(0.1, function()
-		if not IsValid(slasher) then return end
-
-		slasher:SetNWBool("RockPunching", true)
-		timer.Create("RockPunchDecay", 0.6, 1, function()
-			if not IsValid(slasher) then return end
-
-			slasher:SetNWBool("RockPunching", false)
-		end)
-	end)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
 		if not chase then
@@ -126,19 +114,18 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		local idx = math.random(1, 3)
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
-			identifier = "CovenantRocksFootstep" .. idx,
-			group = "SlasherFootstep",
-			minDistance = 200,
-			maxDistance = 500,
-			entity = ply,
-			volume = 1,
-			fadeIn = 0,
-		})
-	end
+	local idx = math.random(1, 3)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
+		identifier = "CovenantRocksFootstep" .. idx,
+		group = "SlasherFootstep",
+		minDistance = 200,
+		maxDistance = 500,
+		entity = ply,
+		volume = 1,
+		fadeIn = 0,
+		excludeSendTo = ply,
+	})
 
 	return true
 end
@@ -146,34 +133,29 @@ end
 function SLASHER.InitHud(_, hud)
 	hud:SetAvatar(Material("slashco/ui/icons/slasher/rocks"))
 	hud:SetTitle("CovenantRocks")
-	
+
 	hud:AddControl("LMB", "shock", Material("slashco/ui/icons/slasher/unknown"))
 	hud:UntieControl("LMB")
-	hud:TieControlVisible("LMB", "InSlasherChaseMode", false, false, true)
-	
-	local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
+	hud:TieControlVisible("LMB", "InSlasherChaseMode")
+end
+
+local cloakNoticeIcon = Material("slashco/ui/particle/icon_survey")
+function SLASHER.DrawHUD(localPly)
+	for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
+		if not survivor:CanBeSeen() then
+			continue
 		end
 
-		for _, survivor in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
-			if not survivor:CanBeSeen() then
-				continue
-			end
+		if survivor:GetMarkedByCloaks() then
+			local pos = survivor:WorldSpaceCenter():ToScreen()
 
-			if survivor:GetNWBool("MarkedByCloaks") then
-				local pos = survivor:WorldSpaceCenter():ToScreen()
-
-				if pos.visible then
-					surface.SetDrawColor(255, 255, 255, 60)
-					surface.SetMaterial(cloakNoticeIcon)
-					surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
-				end
+		if pos.visible then
+				surface.SetDrawColor(255, 255, 255, 60)
+				surface.SetMaterial(cloakNoticeIcon)
+				surface.DrawTexturedRect(pos.x - ScrW() / 32, pos.y - ScrW() / 32, ScrW() / 16, ScrW() / 16)
 			end
 		end
-	end)
+	end
 end
 
 SlashCo.RegisterSlasher(SLASHER, "CovenantRocks")

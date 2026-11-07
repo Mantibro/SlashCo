@@ -22,8 +22,29 @@ function SlashCo.OpenKeyboardUI()
 	KeyBindings:Dock(FILL)
 	KeyBindings:DockMargin(0, 0, 0, 0)
 
+	local keyBinds = {}
+	for bindName, info in pairs(SlashCo.KeyboardBinds) do
+		keyBinds[#keyBinds + 1] = {
+			bindName = bindName,
+			info = info
+		}
+	end
+
+	table.sort(keyBinds, function(a, b)
+		local priorityA = a.info.ui_priority or 0
+		local priorityB = b.info.ui_priority or 0
+
+		if priorityA == priorityB then
+			return a.info.name < b.info.name
+		end
+
+		return priorityA > priorityB
+	end)
+
 	local pressedButton = nil
-	for bindName, info in SortedPairs(SlashCo.KeyboardBinds) do
+	for _, bind in ipairs(keyBinds) do
+		local bindName = bind.bindName
+		local info = bind.info
 		local currentValue = SlashCo.GetKeyButtonName(bindName)
 
 		local KeyPanel = vgui.Create("DPanel", KeyBindings)
@@ -66,7 +87,14 @@ function SlashCo.OpenKeyboardUI()
 
 		ChangeKey.ConfirmKey = function(keyName, keyCode)
 			if ChangeKey.NewKey == keyCode then
-				GameData.KeyboardBinds[bindName] = ChangeKey.NewKey
+				local bindData = GameData.KeyboardBinds[bindName]
+				if istable(bindData) then
+					bindData.button = ChangeKey.NewKey
+				else
+					GameData.KeyboardBinds[bindName] = { button = ChangeKey.NewKey }
+				end
+
+				GameData.KeyboardBinds = SlashCo.ParseKeyboardBinds(SlashCo.KeyboardBindsToString(GameData.KeyboardBinds))
 				CurrentKey:SetText(SlashCo.Language("keyboard_currentkey", string.upper(input.GetKeyName(ChangeKey.NewKey))))
 				ChangeKey:SetText(SlashCo.Language("keyboard_changekey"))
 				pressedButton = nil

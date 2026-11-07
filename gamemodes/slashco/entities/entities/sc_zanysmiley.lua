@@ -7,6 +7,7 @@ ENT.Type = "nextbot"
 ENT.ClassName = "sc_zanysmiley"
 ENT.Spawnable = true
 ENT.PingType = "SLASHER"
+ENT.PingExpiryTime = 5
 ENT.Smiley = true
 
 function ENT:Initialize()
@@ -92,14 +93,14 @@ function ENT:RunBehaviour()
 		self:StartActivity(ACT_IDLE)
 		if self:HaveEnemy() then
 			if not self.Enemy.BeenMarked then
-				self.Enemy:SetNWBool("MarkedBySmiley", true)
+				self.Enemy:SetMarkedBySmiley(true)
 				timer.Create("zanyMark_" .. self.Enemy:UserID(), 5, 1, function()
 					if not IsValid(self.Enemy) then
 						return
 					end
 
 					self.Enemy.BeenMarked = nil
-					self.Enemy:SetNWBool("MarkedBySmiley", false)
+					self.Enemy:SetMarkedBySmiley(false)
 				end)
 			end
 			self.Enemy.BeenMarked = true
@@ -153,7 +154,7 @@ function ENT:RunBehaviour()
 					lookahead = 600
 				}) -- Walk to a random place
 				if result == "failed" then
-					self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+					SlashCo.AudioSystem.EmitSound(self:GetPos(), "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 					self:Remove()
 				elseif result == "timeout" then
 					self.GotStuck = true
@@ -256,7 +257,7 @@ function ENT:HandleStuck()
 		lim = math.Clamp(lim + 0.5, 1, 120)
 	end
 
-	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
+	SlashCo.AudioSystem.EmitSound(self, "physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 0.1)
 	self.loco:ClearStuck()
 end
 
@@ -294,7 +295,7 @@ function ENT:Think()
 		filter = self
 	})
 
-	if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+	if IsValid(tr.Entity) and SlashCo.IsValidDoor(tr.Entity) and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
 			not SlashCo.IsDoorOpen(tr.Entity) and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
 		tr.Entity:Use(self)
@@ -308,7 +309,7 @@ function ENT:Think()
 	for _, v in ipairs(ents.FindInSphere(self:GetPos(), self.SearchRadius)) do
 		if v:IsPlayer() and v:Team() == TEAM_SURVIVOR and v:GetPos():Distance(self:GetPos()) < 50 then
 			v:TakeDamage(50, self, self)
-			v:SetNWBool("MarkedBySmiley", false)
+			v:SetMarkedBySmiley(false)
 			v.BeenMarked = nil
 			timer.Remove("zanyMark_" .. v:UserID())
 			SlashCo.AudioSystem.StopSound("ZanyAttack", 0, self)
@@ -322,11 +323,11 @@ function ENT:Use(activator)
 		return
 	end
 
-	self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+	SlashCo.AudioSystem.EmitSound(self:GetPos(), "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 	self:Remove()
 end
 
 function ENT:OnKilled(dmginfo)
-	self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+	SlashCo.AudioSystem.EmitSound(self:GetPos(), "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 	hook.Run("OnNPCKilled", self, dmginfo:GetAttacker(), dmginfo:GetInflictor())
 end

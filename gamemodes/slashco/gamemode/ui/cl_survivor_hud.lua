@@ -1,6 +1,6 @@
-CreateClientConVar("slashco_cl_show_lowhealth", 1, true, false,
+local showLowHealth = CreateClientConVar("slashco_cl_show_lowhealth", 1, true, false,
 		"Whether to display the survivor's hud as blinking yellow when at low health.", 0, 1)
-CreateClientConVar("slashco_cl_show_healthvalue", 0, true, false,
+local showHealthValue = CreateClientConVar("slashco_cl_show_healthvalue", 0, true, false,
 		"Whether to display the value of the survivor's health on their hud.", 0, 1)
 
 local SlashCoItems = SlashCoItems
@@ -187,11 +187,12 @@ local function selectCrosshair(hitPos)
 				local realDistance = hitPos:Distance(gasPos)
 				gasPos = gasPos:ToScreen()
 				local centerDistance = math.Distance(ScrW() / 2, ScrH() / 2, gasPos.x, gasPos.y)
+				local alpha = math.Clamp((100 - realDistance) * (300 - centerDistance) * 0.02, 0, 255)
 				draw.SimpleText("[", "Indicator", gasPos.x - centerDistance / 2 - 12, gasPos.y,
-						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
+						Color(255, 255, 255, alpha), TEXT_ALIGN_CENTER,
 						TEXT_ALIGN_CENTER)
 				draw.SimpleText("]", "Indicator", gasPos.x + centerDistance / 2 + 12, gasPos.y,
-						Color(255, 255, 255, (100 - realDistance) * (300 - centerDistance) * 0.02), TEXT_ALIGN_CENTER,
+						Color(255, 255, 255, alpha), TEXT_ALIGN_CENTER,
 						TEXT_ALIGN_CENTER)
 
 				if realDistance < 200 and centerDistance < 25 then
@@ -210,13 +211,18 @@ local function slamIndicator()
 	end
 
 	local lookent = GameData.LocalPlayer:GetEyeTrace().Entity
-	if not IsValid(lookent) or lookent:GetClass() ~= "prop_door_rotating" or not SlashCo.CheckDoorWL(lookent) then
+
+	if not IsValid(lookent) then return end
+
+	lookent = SlashCo.GetValidDoor(lookent)
+	if not lookent then return end
+
+	if lookent:WorldSpaceCenter():Distance(GameData.LocalPlayer:GetPos()) >= 150 or SlashCo.IsDoorOpen(lookent) then
 		return
 	end
 
-	if lookent:GetPos():Distance(GameData.LocalPlayer:GetPos()) >= 150 or SlashCo.IsDoorOpen(lookent) then
-		return
-	end
+	-- RaphaelIT7: If we predicted it to slam open we don't render as else we get a funky flickering UI
+	if lookent.PredictedDoorSlam then return end
 
 	draw.SimpleText(SlashCo.Language("door_slam", "LMB"), "TVCD", ScrW() / 2, ScrH() / 2, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
@@ -268,6 +274,14 @@ local function gasFuelMeter(hitPos)
 	end
 end
 
+function SlashCo.StartFuelMeter(can, timeToFuel)
+	FuelingCan = can
+	FuelingCanIndex = can:EntIndex()
+	TimeToFuel = math.floor(timeToFuel)
+	TimeUntilFueled = CurTime() + timeToFuel
+	IsFueling = true
+end
+
 local function hpMeter()
 	local hp = GameData.LocalPlayer:Health()
 
@@ -302,7 +316,7 @@ local function hpMeter()
 	aHp = Lerp(FrameTime() * 3, aHp or 100, hp)
 	local parsed
 
-	if hp >= 25 or not GetConVar("slashco_cl_show_lowhealth"):GetBool() then
+	if hp >= 25 or not showLowHealth:GetBool() then
 		local hpOver = math.Clamp(hp - maxHp, 0, maxHp)
 		local hpAdjust = math.Clamp(hp, 0, maxHp) - hpOver
 		local displayHpBar = math.Round(math.Clamp(hpAdjust / maxHp, 0, 1) * 27)
@@ -328,7 +342,7 @@ local function hpMeter()
 
 	local hpLength = markup.Parse("<font=TVCD>" .. SlashCo.Language("HP") .. "</font>"):GetWidth()
 
-	if not GetConVar("slashco_cl_show_healthvalue"):GetBool() then
+	if not showHealthValue:GetBool() then
 		surface.DrawRect(ScrW() * 0.025, ScrH() * 0.95 - 24, 376 + hpLength, 27)
 	else
 		local displayHp = math.Round(aHp)
@@ -347,9 +361,9 @@ local skullBroken = Material("slashco/ui/slashco_skull_broken", "noclamp")
 local deathward = Material("slashco/ui/deathward", "noclamp")
 local deathwardBroken = Material("slashco/ui/deathward_broken", "noclamp")
 hook.Add("PreRender", "SlashCo:DeathUI", function()
-	if not GameData.LocalPlayer:GetNW2Bool("ShowDeathUI", false) then return end
+	if not GameData.LocalPlayer:GetShowDeathUI() then return end
 
-	local curTime = GameData.LocalPlayer:GetNW2Float("DeathUITime", 0)
+	local curTime = GameData.LocalPlayer:GetDeathUITime()
 	if curTime == 0 then return end
 
 	if lastDeathTime ~= curTime then
@@ -361,8 +375,8 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 	--GameData.LocalPlayer:EmitSound("slashco/survivor/deathward_break" .. math.random(1, 2) .. ".mp3")
 
 	local animTime = (CurTime() - curTime) * 2
-	local isDeathWard = GameData.LocalPlayer:GetNW2Bool("DeathWardUI", false)
-	local isRevive = GameData.LocalPlayer:GetNW2Bool("DeathReviveUI", false)
+	local isDeathWard = GameData.LocalPlayer:GetDeathWardUI()
+	local isRevive = GameData.LocalPlayer:GetDeathReviveUI()
 	if lastDeathSecond ~= math.floor(animTime) then
 		lastDeathSecond = math.floor(animTime)
 
@@ -441,7 +455,7 @@ hook.Add("PreRender", "SlashCo:DeathUI", function()
 					if animTime < 18 then
 						scale = 1 + ((animTime - 12) / 3)
 					else
-						scale = ((24 - animTime) / 4)
+						scale = math.max(0, (24 - animTime) / 4)
 					end
 
 					local strength = scale * shakeStrength
@@ -495,7 +509,7 @@ hook.Add("SlashCo:DrawHUD", "SurvivorStruggle", function()
 	if team == TEAM_SPECTATOR then return end
 	if team ~= TEAM_SURVIVOR then return end
 
-	if (ply:GetNWBool("SurvivorTackled") == true) or (ply:GetNWBool("SurvivorGrabbed") == true) or (ply:GetNWBool("SurvivorDragged") == true) then
+	if ply:GetSurvivorTackled() or ply:GetSurvivorGrabbed() or ply:GetSurvivorDragged() then
 		if GameData.LocalPlayer.struggle_key == nil then
 			GameData.LocalPlayer.struggle_key = 0
 		end
@@ -520,20 +534,31 @@ hook.Add("SlashCo:DrawHUD", "SurvivorStruggle", function()
 end)
 
 hook.Add("PlayerButtonDown", "slashco_open_voice", function(ply, button)
-	if not IsFirstTimePredicted() or ply:Team() ~= TEAM_SURVIVOR then
+	if ply:Team() ~= TEAM_SURVIVOR then
+		return
+	end
+
+	if SlashCo.IsKeyPressed("PING", ply, button) then
+		ply:SurvivorPing()
+		return
+	end
+
+	-- the VOICE_SELECT does not work with prediction, but SurvivorPing() needs to be called in prediction
+	if not IsFirstTimePredicted() then
 		return
 	end
 
 	if SlashCo.IsKeyPressed("VOICE_SELECT", ply, button) then
 		vgui.Create("sc_voiceselect")
+		return
 	end
 end)
 
 local chaseLightOffset = Vector(0, 0, 20)
 hook.Add("Think", "Slasher_Chasing_Light", function()
 	local curTime = CurTime()
-	for _, clone in ipairs(ents.FindByClass("sc_crimclone")) do
-		if clone:GetMainRageClone() then
+	for _, clone in ipairs(SlashCo.FindByClass("sc_crimclone")) do
+		if IsValid(clone) and clone:GetMainRageClone() then
 			local tlight = DynamicLight(clone:EntIndex())
 			if tlight then
 				tlight.pos = clone:LocalToWorld(chaseLightOffset)
@@ -550,56 +575,34 @@ hook.Add("Think", "Slasher_Chasing_Light", function()
 	end
 
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		if slasher:GetNWBool("TrollgeStage2") then
-			local tlight = DynamicLight(slasher:EntIndex())
-			if tlight then
-				tlight.pos = slasher:LocalToWorld(chaseLightOffset)
-				tlight.r = 255
-				tlight.g = 0
-				tlight.b = 0
-				tlight.brightness = 5
-				tlight.Decay = 1000
-				tlight.Size = 2500
-				tlight.DieTime = curTime + 1
-			end
+		if slasher:IsDormant() then
 			continue
 		end
 
-		if slasher:GetNWBool("TylerFlash") then
+		local r, g, b, brightness, size, decay = slasher:SlasherFunction("ChaseLight")
+		if not r and slasher:GetInSlasherChaseMode() then
+			r, g, b, brightness, size, decay = SlashCo.DefaultChaseLight()
+		end
+
+		if r then
 			local dlight = DynamicLight(slasher:EntIndex())
 			if dlight then
 				dlight.pos = slasher:LocalToWorld(chaseLightOffset)
-				dlight.r = 255
-				dlight.g = 0
-				dlight.b = 0
-				dlight.brightness = 10
-				local size = 400
-				dlight.Decay = size * 3
+				dlight.r = r
+				dlight.g = g
+				dlight.b = b
+				dlight.brightness = brightness
+				dlight.Decay = decay
 				dlight.Size = size
 				dlight.DieTime = curTime + 1
 			end
-			continue
-		end
-
-		if not slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("SidGunRage") and not slasher:GetNWBool("WatcherRage")
-				or (slasher:GetNWBool("InSlasherChaseMode") and slasher:GetNWBool("DisableChaseLight")) then
-			continue
-		end
-
-		local dlight = DynamicLight(slasher:EntIndex())
-		if dlight then
-			dlight.pos = slasher:LocalToWorld(chaseLightOffset)
-			dlight.r = 255
-			dlight.g = 0
-			dlight.b = 0
-			dlight.brightness = 6
-			local size = 250
-			dlight.Decay = size * 4
-			dlight.Size = size
-			dlight.DieTime = curTime + 1
 		end
 	end
 end)
+
+function SlashCo.DefaultChaseLight()
+	return 255, 0, 0, 6, 250, 1000
+end
 
 net.Receive("SlashCo:AskToBecomeSlasher", function()
 	system.FlashWindow() -- Flash it to notify them if their tabbed out.
@@ -617,6 +620,10 @@ net.Receive("SlashCo:AskToBecomeSlasher", function()
 		local fadeOut = difference > timeToAsk
 		if fadeOut then
 			difference = difference - timeToAsk
+			if difference > fadeTime then
+				hook.Remove("PostDrawHUD", "SlashCo:AskToBecomeSlasher")
+				return
+			end
 		end
 
 		local alpha = fadeOut and (255 - (math.Clamp(difference / fadeTime, 0, 1) * 255)) or (math.Clamp(difference / fadeTime, 0, 1) * 255)
@@ -676,12 +683,16 @@ net.Receive("SlashCo:Announcement", function()
 	local startTime = CurTime()
 	local fadeTime = 0.5 -- in seconds
 	local textColor = Color(255, 255, 255)
-	hook.Add("PostDrawHUD", "SlashCo:AskToBecomeSlasher", function()
+	hook.Add("PostDrawHUD", "SlashCo:Announcement", function()
 		local curTime = CurTime()
 		local difference = curTime - startTime
 		local fadeOut = difference > timeToDisplay
 		if fadeOut then
 			difference = difference - timeToDisplay
+			if difference > fadeTime then
+				hook.Remove("PostDrawHUD", "SlashCo:Announcement")
+				return
+			end
 		end
 
 		local alpha = fadeOut and (255 - (math.Clamp(difference / fadeTime, 0, 1) * 255)) or (math.Clamp(difference / fadeTime, 0, 1) * 255)

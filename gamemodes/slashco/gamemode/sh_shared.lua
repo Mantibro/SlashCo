@@ -29,6 +29,11 @@ SlashCo.PlayerPingDelay = 30 -- Default time in seconds to wait before a player 
 SlashCo.MapForceCost = 50 -- Default cost to force a map
 SlashCo.MapForceCostIncrease = 50 -- Default amount of points that the cost to force a map is increased by every time someone tires to force it
 
+-- The allowed "slashco/survivor/voice/prompt_" [NAME] [RNG 1-5] ".mp3" files
+-- A client could request to play ANY of them so we define which we allow
+-- (also avoids issues like clients requesting to play ../../someHL2 sounds which was possible before...)
+SlashCo.VoicePrompts = { "no", "follow", "spot", "yes", "run", "help" }
+
 SlashCo.HelicopterVoices = {
 	INTRO = 1,
 	APPROACH = 2,
@@ -116,9 +121,10 @@ function SlashCo.GetGeneratorsToSpawn()
 	return GetGlobal2Int("SlashCo:GeneratorsToSpawn", SlashCo.Generators)
 end
 
-function SlashCo.GasCansPerGenerator(amount)
-	SetGlobal2Int("SlashCo:GasCansToSpawn", amount)
+function SlashCo.SetGasCansPerGenerator(amount)
+	SetGlobal2Int("SlashCo:GasCansPerGenerator", amount)
 end
+SlashCo.GasCansPerGenerator = SlashCo.SetGasCansPerGenerator
 
 function SlashCo.GetGasCansPerGenerator()
 	return GetGlobal2Int("SlashCo:GasCansPerGenerator", SlashCo.GasPerGen)
@@ -142,6 +148,15 @@ function SlashCo.GetMapSize()
 	return SlashCo.MapSize or GetGlobal2Int("SlashCo:MapSize", 1)
 end
 
+-- Round info
+function SlashCo.SetGameProgress(progress)
+	SetGlobal2Int("SlashCo:GameProgress", progress)
+end
+
+function SlashCo.GetGameProgress()
+	return GetGlobal2Int("SlashCo:GameProgress", 0)
+end
+
 -- Lobby info
 -- This var controlls when the spectators camera is bound to the helicopter and suicide will be disallowed.
 function SlashCo.MarkLobbyStarting()
@@ -150,6 +165,23 @@ end
 
 function SlashCo.IsLobbyStarting()
 	return GetGlobal2Bool("SlashCo:IsLobbyStarting", false)
+end
+
+-- The current price to guarantee a map & the map that was guaranteed
+function SlashCo.SetMapForceCost(cost)
+	SetGlobal2Int("SlashCo:MapForceCost", cost)
+end
+
+function SlashCo.GetMapForceCost()
+	return GetGlobal2Int("SlashCo:MapForceCost", SlashCo.MapForceCost)
+end
+
+function SlashCo.SetForcedMap(map)
+	SetGlobal2String("SlashCo:ForcedMap", map)
+end
+
+function SlashCo.GetForcedMap()
+	return GetGlobal2String("SlashCo:ForcedMap", "")
 end
 
 -- Spectator vars
@@ -161,7 +193,7 @@ function SlashCo.CanSpectatorsPing()
 	return GetGlobal2Bool("SlashCo:SpectatorsCanPing", false)
 end
 
--- Serevr settings
+-- Server settings
 function SlashCo.GetPlayerPingDelay()
 	return GetConVarNumber("slashco_playerpingdelay")
 end
@@ -199,7 +231,7 @@ function SlashCo.GetGlobalFogColor(type, object)
 			return r, g, b
 		end
 	else
-		if not asVector then
+		if not isvector(object) then
 			object.r = r
 			object.g = g
 			object.b = b
@@ -214,6 +246,29 @@ SlashCo.MapTools = SlashCo.MapTools or {}
 local slashco_enablemaptools = GetConVar("slashco_enablemaptools")
 function SlashCo.MapTools.IsEnabled()
 	return slashco_enablemaptools and slashco_enablemaptools:GetBool()
+end
+
+--[[
+	If true then we change a lot of behavior as we aren't dealing with a real round
+	While with g_SlashCoDebug we expect the proper Lobby setup and so on
+	With these two, we don't expect anything as the lobby may not even have been loaded at all
+]]
+function SlashCo.IsDebugGame()
+	return GameData.IsSinglePlayer or SlashCo.MapTools.IsEnabled(true)
+end
+
+function SlashCo.SetDebug(enabled)
+	g_SlashCoDebug = enabled
+	SetGlobal2Bool("SlashCo:InDebug", enabled)
+end
+
+function SlashCo.InDebug() -- Networked to avoid issues like prediction issues with noclip
+	return GetGlobal2Bool("SlashCo:InDebug", false)
+end
+
+-- Timestamps that the client has to compare while predicting are stored as ticks, CurTime can't be stored in a float without prediction errors
+function SlashCo.GetTick()
+	return math.floor(CurTime() / engine.TickInterval() + 0.5)
 end
 
 -- Helper networking functions
@@ -449,6 +504,12 @@ if CLIENT then
 		SlashCo.LoadKeyboardBinds()
 
 		RunConsoleCommand("r_flushlod") -- RaphaelIT7: GMod has a lot of those checksum errors in our maps, always breaking something after every map change, so we flush just to avoid issues with models not rendering.
+
+		GameData.Using2DSkyBox = game.Get3DSkyboxInfo() == nil
+
+		GameData.CalledInitPostEntity = true
+
+		hook.Run("SlashCo:InitPostEntity")
 	end
 else
 	local maxplayers = CreateConVar("slashco_maxplayers", tostring(GameData.BaseMaxPlayers), FCVAR_ARCHIVE, "The number of maximum players, by default 7. 6 survivors - 1 slasher", 1, 255)
@@ -493,6 +554,10 @@ else
 		end
 
 		SlashCo.InitMapMesh()
+
+		GameData.CalledInitPostEntity = true
+
+		hook.Run("SlashCo:InitPostEntity")
 	end
 end
 
@@ -528,23 +593,6 @@ function GM:CreateTeams()
 	team.SetUp(TEAM_SLASHER, "Slasher", Color(255, 0, 0), false)
 	team.SetUp(TEAM_LOBBY, "Lobby", Color(230, 255, 230), false)
 	team.SetUp(TEAM_SPECTATOR, "Spectator", Color(135, 206, 235), false)
-end
-
-local DoorSlamWhitelist = {
-	["models/props_c17/door03_left.mdl"] = true,
-	["models/props_doors/doormain_rural01_small.mdl"] = true,
-	["models/props_doors/doormainmetal01.mdl"] = true,
-	["models/props_c17/door01_left.mdl"] = true,
-	["models/props_c17/door_fg.mdl"] = true,
-	["models/props_doors/doormain01.mdl"] = true,
-	["models/props_doors/doorglassmain01.mdl"] = true,
-	["models/props_doors/door_rotate_112.mdl"] = true,
-	["models/props_doors/doormainmetalwindow01.mdl"] = true,
-	["models/props_c17/door01_addg_medium.mdl"] = true
-}
-
-function SlashCo.CheckDoorWL(ent)
-	return DoorSlamWhitelist[ent:GetModel()]
 end
 
 function SlashCo.Dampen(speed, from, to)

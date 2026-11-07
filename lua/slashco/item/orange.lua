@@ -9,9 +9,7 @@ ITEM.Description = "Orange_desc"
 ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse(ply)
-	if GameData.IsLobby then return end
-
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = SlashCo.AudioSystem.GetSoundFileFromSource("Weapon_Crowbar.Single"),
 		identifier = "OrangeThrow",
@@ -20,10 +18,18 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
 
-	ply:SetNWBool("HoldingOrange", false)
-	ply:ViewPunch(Angle(-10, 0, 0))
+	ply:PredictedViewPunch(Angle(-10, 0, 0))
+end
+
+function ITEM.OnUse(ply)
+	if GameData.IsLobby then return end
+
+	ITEM.OnUsePredicted(ply)
+
+	ply.HoldingOrange = false
 	local droppeditem = SlashCo.CreateItem(ITEM.EntClass, ply:EyePos() + ply:GetAimVector(), ply:LocalToWorldAngles(Angle(0, 0, 0)))
 	droppeditem:SetOrangeVelocity(ply:GetAimVector() * 150)
 	SlashCo.CurRound.Items[droppeditem:EntIndex()] = true
@@ -31,16 +37,16 @@ function ITEM.OnUse(ply)
 end
 
 function ITEM.OnDie(ply)
-	ply:SetNWBool("HoldingOrange", false)
+	ply.HoldingOrange = false
 end
 
 function ITEM.OnDrop(ply)
-	ply:SetNWBool("HoldingOrange", false)
+	ply.HoldingOrange = false
 end
 
 function ITEM.OnPickUp(ply)
 	ITEM.Orange(ply)
-	ply:SetNWBool("HoldingOrange", true)
+	ply.HoldingOrange = true
 end
 
 function ITEM.Orange(ply)
@@ -57,7 +63,7 @@ function ITEM.Orange(ply)
 
 	timer.Simple(math.random(7, 15), function()
 		if not IsValid(ply) then return end
-		if not ply:GetNWBool("HoldingOrange") then return end
+		if not ply.HoldingOrange then return end
 
 		ITEM.Orange(ply)
 	end)

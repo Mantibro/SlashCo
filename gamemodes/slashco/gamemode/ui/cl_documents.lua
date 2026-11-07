@@ -416,13 +416,11 @@ end
 local function GenerateDocuments()
 	for _, document in pairs(SlashCoDocumentTypes["Slasher"] or {}) do
 		local slasher = SlashCoSlashers[document.Slasher]
-		local Aliases = document.Aliases or (slasher and slasher.Aliases or {})
-		for idx, name in ipairs(Aliases) do
+		local Aliases = {}
+		for idx, name in ipairs(document.Aliases or (slasher and slasher.Aliases or {})) do
 			local translateKey = "Alias_" .. name
 			local translated = SlashCo.Language(translateKey)
-			if translated ~= translateKey then
-				Aliases[idx] = translated
-			end
+			Aliases[idx] = translated ~= translateKey and translated or name
 		end
 
 		local Class = MakeStringUpperIfPossible(SlashCo.SlasherClass[document.Class or (slasher and slasher.Class or SlashCo.SlasherClass.Unknown)])
@@ -621,7 +619,7 @@ end
 
 GameData.CurrentDocumentScroll = GameData.CurrentDocumentScroll or 0
 hook.Add("PostDrawOpaqueRenderables", "SlashCo:LobbyDocumentScreen", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
-	if not GameData.IsLobby or GameData.LocalPlayer:Team() == TEAM_SPECTATOR or bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then
+	if not GameData.IsLobby or GameData.LocalPlayer:Team() == TEAM_SPECTATOR or bDrawingDepth or (not GameData.Using2DSkyBox and bDrawingSkybox) or isDraw3DSkybox then
 		return
 	end
 

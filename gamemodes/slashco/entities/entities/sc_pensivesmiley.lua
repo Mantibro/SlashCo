@@ -7,6 +7,7 @@ ENT.Type = "nextbot"
 ENT.ClassName = "sc_pensivesmiley"
 ENT.Spawnable = true
 ENT.PingType = "SLASHER"
+ENT.PingExpiryTime = 5
 ENT.Smiley = true
 
 function ENT:Initialize()
@@ -122,7 +123,7 @@ function ENT:RunBehaviour()
 						lookahead = 600
 					}) -- Walk to a random place
 					if result == "failed" then
-						self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+						SlashCo.AudioSystem.EmitSound(self:GetPos(), "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 						self:Remove()
 					elseif result == "timeout" then
 						self.GotStuck = true
@@ -234,7 +235,7 @@ function ENT:HandleStuck()
 		lim = math.Clamp(lim + 0.5, 1, 120)
 	end
 
-	self:EmitSound("physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 90, 0.1)
+	SlashCo.AudioSystem.EmitSound(self, "physics/water/water_impact_hard" .. math.random(2) .. ".wav", 75, 0.1)
 	self.loco:ClearStuck()
 end
 
@@ -272,7 +273,7 @@ function ENT:Think()
 		filter = self
 	})
 
-	if IsValid(tr.Entity) and tr.Entity:GetClass() == "prop_door_rotating" and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
+	if IsValid(tr.Entity) and SlashCo.IsValidDoor(tr.Entity) and self:GetPos():Distance(tr.Entity:GetPos()) < 100 and
 			not SlashCo.IsDoorOpen(tr.Entity) and (not self.UseCooldown or CurTime() - self.UseCooldown > 2) then
 
 		tr.Entity:Use(self)
@@ -293,7 +294,7 @@ function ENT:Think()
 	else
 		local attacked = self.AttackedPlayer
 		attacked:AddSpeedEffect("smiley", 50, 15)
-		attacked:SetNWBool("MarkedBySmiley", true)
+		attacked:SetMarkedBySmiley(true)
 
 		if self.AttackEngage == false then
 			local idx = math.random(1, 2)
@@ -314,7 +315,7 @@ function ENT:Think()
 				end
 
 				attacked:RemoveSpeedEffect("smiley")
-				attacked:SetNWBool("MarkedBySmiley", false)
+				attacked:SetMarkedBySmiley(false)
 
 				self:Remove()
 			end)
@@ -329,11 +330,11 @@ function ENT:Use(activator)
 		return
 	end
 
-	self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+	SlashCo.AudioSystem.EmitSound(self:GetPos(), "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 	self:Remove()
 end
 
 function ENT:OnKilled(dmginfo)
-	self:EmitSound("physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
+	SlashCo.AudioSystem.EmitSound(self:GetPos(), "physics/body/body_medium_break" .. math.random(2, 4) .. ".wav")
 	hook.Run("OnNPCKilled", self, dmginfo:GetAttacker(), dmginfo:GetInflictor())
 end

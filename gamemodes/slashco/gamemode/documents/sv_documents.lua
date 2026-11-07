@@ -98,7 +98,7 @@ function PLAYER:GiveDocument(name, rating)
 		}
 	else
 		if documents[name].rating < rating then -- We only allow a increase in the rating in this function
-			sql.Query("UPDATE slashco_documents SET Rating = " .. rating .. " WHERE PlayerID = " .. sql.SQLStr(self:SteamID64()) .. ";")
+			sql.Query("UPDATE slashco_documents SET Rating = " .. rating .. " WHERE PlayerID = " .. sql.SQLStr(self:SteamID64()) .. " AND Document = " .. sql.SQLStr(name) .. ";")
 			documents[name].rating = rating
 		end
 	end
@@ -132,7 +132,7 @@ SlashCo.CreateDocumentsDB()
 hook.Add("SlashCo:EndRound", "SlashCo:HandoutDocuments", function(winners)
 	local slashers = {}
 	for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-		slashers[ply:GetNWString("Slasher")] = true
+		slashers[ply:GetNW2String("Slasher")] = true
 	end
 
 	for _, ply in player.Iterator() do

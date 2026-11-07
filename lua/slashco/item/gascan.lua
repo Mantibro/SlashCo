@@ -8,7 +8,7 @@ ITEM.Icon = "slashco/ui/icons/items/item_1"
 ITEM.Price = 0
 ITEM.Description = "GasCan_desc"
 ITEM.CamPos = Vector(80, 0, 0)
-ITEM.ChangesSpeed = true
+ITEM.SpeedPriority = 10
 ITEM.IsSpawnable = false
 ITEM.IsFuel = true
 
@@ -20,22 +20,12 @@ function ITEM.OnDrop(ply)
 	return 45
 end
 
-function ITEM.OnSwitchFrom(ply)
-	ply:RemoveSpeedEffect("gas")
+function ITEM.Speed(ply)
+	return SlashCo.IsActivePerk(ply, "extremelybuff") and 200 or 150
 end
 
 function ITEM.OnBuy(_)
 	SlashCo.LobbyData.SurvivorGasMod = SlashCo.LobbyData.SurvivorGasMod + 1
-end
-
-function ITEM.OnPickUp(ply)
-	if not SlashCo.IsActivePerk(ply, "extremelybuff") then
-		ply:AddSpeedEffect("gas", 150, 10)
-		return
-	else
-		ply:AddSpeedEffect("gas", 200, 10)
-		return
-	end
 end
 
 function ITEM.EquipSound()

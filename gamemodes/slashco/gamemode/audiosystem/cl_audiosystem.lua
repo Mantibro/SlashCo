@@ -45,7 +45,9 @@ function SlashCo.AudioSystem.NukeChannels()
 	end
 
 	for _, precacheData in pairs(SlashCo.AudioSystem.PrecacheSounds) do
-		precacheData.channel:__gc()
+		if IsValid(precacheData.channel) then
+			precacheData.channel:__gc()
+		end
 	end
 
 	SlashCo.AudioSystem.CreatingChannels = {}
@@ -522,6 +524,7 @@ local function RemoveModifyChannelGroup(channel, channelData)
 				local otherChannelData = SlashCo.AudioSystem.Channels[otherChannel]
 				if not otherChannelData or not otherChannelData.modifyGroupVolumeMult then continue end
 
+				found = true
 				if groupTbl.modifyGroupVolumeMult > otherChannelData.modifyGroupVolumeMult then
 					groupTbl.modifyGroupVolumeMult = otherChannelData.modifyGroupVolumeMult
 				end
@@ -557,12 +560,14 @@ local function ShouldMuteVolue()
 		return MuteState.MUTED
 	end
 
-	if not mute and GameData.WasAudioSystemMuted and GameData.WasAudioSystemMuted > (CurTime() - 0.5) then
+	if not mute and GameData and GameData.WasAudioSystemMuted and GameData.WasAudioSystemMuted > (CurTime() - 0.5) then
 		return MuteState.WAS_MUTED
 	end
 
 	return MuteState.PLAYING
 end
+
+local snd_musicvolume = GetConVar("snd_musicvolume")
 
 -- Helper function to wrap around CalculateChannelFadeVolume
 local function CalculateChannelVolume(channel, targetVol, ignoreMuted)
@@ -588,7 +593,7 @@ local function CalculateChannelVolume(channel, targetVol, ignoreMuted)
 			volume = CalculateRayTracedVolume(channel, channelData, soundData, channelPos, playerPos, volume)
 
 			if soundData.isMusic then
-				volume = volume * snd_musicvolume:GetInt()
+				volume = volume * snd_musicvolume:GetFloat()
 			end
 
 			if channelData.group then
@@ -666,7 +671,8 @@ function SlashCo.AudioSystem.DestroyChannel(channel, fadeOutTime, callback)
 	end
 
 	if IsValid(channel) then
-		OnDestoryChannel(channel, SlashCo.AudioSystem.Channels[channel])
+		local channelData = SlashCo.AudioSystem.Channels[channel]
+		OnDestoryChannel(channel, channelData)
 
 		channel:__gc()
 
@@ -698,6 +704,10 @@ local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, cha
 			channelData.volume = nil
 		else
 			channelData.playbackRate = nil
+			channelData.baseRate = targetVol
+			if IsValid(channel) then
+				channel:SetPlaybackRate(targetVol * (channelData.dopplerRatio or 1))
+			end
 		end
 		timer.Remove(timerName)
 		if callback then
@@ -720,7 +730,7 @@ local function UpdateFadeToVolume(targetVol, vol, volumeIncrement, lowerVol, cha
 		end
 	else
 		channelData.playbackRate = SlashCo.AudioSystem.EnsureValidVolume(vol)
-		channel:SetPlaybackRate(channelData.playbackRate)
+		channel:SetPlaybackRate(channelData.playbackRate * (channelData.dopplerRatio or 1))
 	end
 
 	return vol
@@ -750,19 +760,27 @@ function SlashCo.AudioSystem.FadeToPlaybackRate(channel, fadeTime, targetPlaybac
 	targetPlaybackRate = targetPlaybackRate or 1
 	fadeTime = fadeTime or 3
 
-	local vol = SlashCo.AudioSystem.EnsureValidVolume(channel:GetPlaybackRate())
+	local channelData = SlashCo.AudioSystem.Channels[channel]
+	local vol = SlashCo.AudioSystem.EnsureValidVolume(channel:GetPlaybackRate() / (channelData.dopplerRatio or 1))
 	local lowerVol = targetPlaybackRate < vol
 	local id = SlashCo.AudioSystem.GetChannelID(channel)
 	local timerName = "SlashCo:FadeToPlaybackRateAudioChannel" .. id
 	local updateFreq = SlashCo.AudioSystem.UpdateFrequency
 	local volumeIncrement = math.abs(targetPlaybackRate - vol) / math.ceil(fadeTime / updateFreq)
-	local channelData = SlashCo.AudioSystem.Channels[channel]
 	timer.Create(timerName, updateFreq, 0, function() -- Let the sound fade away
 		vol = UpdateFadeToVolume(targetPlaybackRate, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, false)
 	end)
 
 	-- Do one update outside the timer, since if you call this function every frame for some reason, the timer may never execute.
 	vol = UpdateFadeToVolume(targetPlaybackRate, vol, volumeIncrement, lowerVol, channelData, callback, timerName, channel, false)
+end
+
+-- Sets the rate instantly, use it when you change it every frame since FadeToPlaybackRate creates a timer
+function SlashCo.AudioSystem.SetPlaybackRate(channel, playbackRate)
+	local channelData = SlashCo.AudioSystem.Channels[channel]
+	channelData.playbackRate = nil
+	channelData.baseRate = playbackRate
+	channel:SetPlaybackRate(playbackRate * (channelData.dopplerRatio or 1))
 end
 
 function SlashCo.AudioSystem.StopBackgroundMusic()
@@ -838,7 +856,7 @@ end
 -- Did you know? This was one too >:3
 local function OnBackgroundMusicVolumeChange(ent, name, old, new)
 	if IsValid(SlashCo.AudioSystem.BackgroundChannel) then
-		SlashCo.AudioSystem.FadeToVolume(SlashCo.AudioSystem.BackgroundChannel, 3, new)
+		SlashCo.AudioSystem.FadeToVolume(SlashCo.AudioSystem.BackgroundChannel, 3, new * snd_musicvolume:GetFloat())
 	end
 end
 
@@ -850,7 +868,6 @@ local function OnBackgroundMusicPlaybackRateChange(ent, name, old, new)
 end
 
 -- Similar to GetBackgroundMusicVolume BUT in the lobby it's bound to snd_musicvolume -> The GMod Settings Music volume slider
-local snd_musicvolume = GetConVar("snd_musicvolume")
 function SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled(fallBack)
 	local volume = SlashCo.AudioSystem.GetBackgroundMusicVolume(fallBack)
 
@@ -880,7 +897,7 @@ function SlashCo.AudioSystem.Init()
 	OnBackgroundMusicStateChange(world, "SlashCo:ShouldPlayBackgroundMusic", nil, SlashCo.AudioSystem.ShouldPlayBackgroundMusic())
 
 	world:SetNW2VarProxy("SlashCo:BackgroundMusicVolume", OnBackgroundMusicVolumeChange)
-	OnBackgroundMusicVolumeChange(world, "SlashCo:BackgroundMusicVolume", nil, SlashCo.AudioSystem.GetBackgroundMusicVolumeControlled())
+	OnBackgroundMusicVolumeChange(world, "SlashCo:BackgroundMusicVolume", nil, SlashCo.AudioSystem.GetBackgroundMusicVolume())
 
 	world:SetNW2VarProxy("SlashCo:BackgroundMusicPlaybackRate", OnBackgroundMusicPlaybackRateChange)
 	OnBackgroundMusicPlaybackRateChange(world, "SlashCo:BackgroundMusicPlaybackRate", nil, SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate())
@@ -916,7 +933,7 @@ local function UpdateBackgroundMusic()
 	end
 end
 
-function CalculatePan(ply, channelPos)
+local function CalculatePan(ply, channelPos)
 	if not SlashCo.AudioSystem.ValidLocalPlayer then
 		return 0
 	end
@@ -927,6 +944,60 @@ function CalculatePan(ply, channelPos)
 
 	local pan = right:Dot(toSound)
 	return math.Clamp(pan, -1, 1)
+end
+
+local function GetBasePlaybackRate(channelData, soundData)
+	local rate = channelData.playbackRate or channelData.baseRate or soundData.playbackRate or 1
+	if rate <= 0 then return 1 end
+
+	return rate
+end
+
+local DOPPLER_SPEED_OF_SOUND = 5000
+local DOPPLER_MIN_RATIO = 0.5
+local DOPPLER_MAX_RATIO = 2
+local DOPPLER_MAX_SPEED = 6000
+local DOPPLER_SMOOTHING = 12
+local DOPPLER_DEADBAND = 0.002
+local function UpdateChannelDoppler(channel, channelData, soundData, channelPos, listenerPos)
+	local strength = soundData.doppler
+	if strength <= 0 or soundData.raytraced then
+		if channelData.dopplerRatio then
+			channelData.dopplerRatio = nil
+			channelData.dopplerSpeed = nil
+			channelData.dopplerLastTime = nil
+			channelData.dopplerLastDistance = nil
+			channel:SetPlaybackRate(GetBasePlaybackRate(channelData, soundData))
+		end
+
+		return
+	end
+
+	local now = RealTime()
+	local distance = channelPos:Distance(listenerPos)
+	local lastTime = channelData.dopplerLastTime
+	local lastDistance = channelData.dopplerLastDistance
+	channelData.dopplerLastTime = now
+	channelData.dopplerLastDistance = distance
+	if not lastTime then return end
+
+	local deltaTime = now - lastTime
+	if deltaTime <= 0 then return end
+
+	local speed = (distance - lastDistance) / deltaTime
+	if math.abs(speed) > DOPPLER_MAX_SPEED then return end
+
+	local smoothedSpeed = Lerp(1 - math.exp(-deltaTime * DOPPLER_SMOOTHING), channelData.dopplerSpeed or 0, speed)
+	channelData.dopplerSpeed = smoothedSpeed
+
+	local ratio = DOPPLER_SPEED_OF_SOUND / math.max(DOPPLER_SPEED_OF_SOUND + smoothedSpeed, DOPPLER_SPEED_OF_SOUND * 0.1)
+	ratio = math.Clamp(1 + (ratio - 1) * strength, DOPPLER_MIN_RATIO, DOPPLER_MAX_RATIO)
+
+	local previousRatio = channelData.dopplerRatio
+	if previousRatio and math.abs(previousRatio - ratio) < DOPPLER_DEADBAND then return end
+
+	channelData.dopplerRatio = ratio
+	channel:SetPlaybackRate(GetBasePlaybackRate(channelData, soundData) * ratio)
 end
 
 local function UpdateChannelPositionAndVolume(channel, channelData, localPlyPos)
@@ -949,6 +1020,10 @@ local function UpdateChannelPositionAndVolume(channel, channelData, localPlyPos)
 			
 			channelData.pos = newPos -- Since non-3d channels :GetPos will always be the world origin, we store our position in here instead.
 		end
+	end
+
+	if soundData.doppler and newPos and localPlyPos then
+		UpdateChannelDoppler(channel, channelData, soundData, newPos, localPlyPos)
 	end
 
 	if newPos and soundData.minDistance and soundData.maxDistance then
@@ -1125,6 +1200,7 @@ end)
 		number modifyGroupVolumeMult - The volume multiplier that should be enforced onto all channels
 		number modifyGroupVolumeFadeTime - (NOT IMPLEMENTED) Time in seconds for the volume to fade to the enforced multiplier. Clamped between a minimum of 0 and maximum of 30
 		boolean isMusic - If set then the volume will also account for snd_musicvolume
+		number doppler - If not 0/nil it enables the doppler effect and controlls it's strength (1 is normal)
 
 		table pulseEffect - A table for the pulse effect. NOTE: This is still WIP and should not be used.
 		-> Entity entity - A entity that should pulse
@@ -1146,20 +1222,29 @@ end)
 		You can combine forceStereo and dynamicPan to give sounds a fake 3D effect while keeping the quality of them being in stereo/using multiple channels instead of the normal 3D that forces them into mono.
 ]]
 function SlashCo.AudioSystem.PlaySound(soundData)
+	-- RaphaelIT7: We check GetPredictionPlayer as else when we call this function from the net.Receive then IsFirstTimePredicted is false...
+	if IsValid(GetPredictionPlayer()) and not IsFirstTimePredicted() then return end
+
 	local soundPath = soundData.soundPath
 	if soundData.boundConVar and soundData.fallbackSoundPath then
 		local convar = GetConVar(soundData.boundConVar)
-		if IsValid(convar) and not convar:GetBool() then
+		if convar and not convar:GetBool() then
 			soundPath = soundData.fallbackSoundPath
 		end
 	end
 
 	soundData.identifier = soundData.identifier or soundPath
+	local baseIdentifier = soundData.identifier
 	soundData.startTick = soundData.startTick or engine.TickCount()
 	--soundData.entity = soundData.entity or game.GetWorld()
 	soundData.volume = soundData.volume or 1
 	soundData.looping = soundData.looping or false
 	soundData.modes = soundData.modes or ""
+
+	-- RaphaelIT7: Let's mimic the server for predicted sounds
+	if soundData.excludeSendTo and not soundData.looping then
+		soundData.deleteWhenDone = true
+	end
 
 	local entIndex = 0
 	if isnumber(soundData.entity) then
@@ -1219,7 +1304,9 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 			channel:SetVolume(0)
 			SlashCo.AudioSystem.DestroyChannel(channel)
 			SlashCo.AudioSystem.CreatingChannels[soundData.identifier] = nil
-			channel:__gc()
+			if IsValid(channel) then
+				channel:__gc()
+			end
 			return
 		end
 
@@ -1306,6 +1393,21 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		if soundData.deleteWhenDone and not soundData.looping then
 			timer.Simple(timeLeft + 0.1, function()
 				if not IsValid(channel) then return end
+
+				if soundData.doppler and channel:GetState() == GMOD_CHANNEL_PLAYING then
+					local timerName = "SlashCo:DeleteAudioChannel" .. channelData.ID
+					timer.Create(timerName, 0.1, 0, function()
+						if IsValid(channel) and channel:GetState() == GMOD_CHANNEL_PLAYING then return end
+
+						timer.Remove(timerName)
+						if IsValid(channel) then
+							SlashCo.AudioSystem.DestroyChannel(channel, 0)
+						end
+					end)
+
+					return
+				end
+
 				SlashCo.AudioSystem.DestroyChannel(channel, 0)
 			end)
 		end
@@ -1333,6 +1435,7 @@ function SlashCo.AudioSystem.PlaySound(soundData)
 		if errStr == "BASS_ERROR_NO3D" and not Fake3DList[soundPath] then
 			print("[SlashCo] Sound \"" .. soundPath .. "\" was attempted to be played as 3D when it's not. Falling back to fake 3D!")
 			Fake3DList[soundPath] = true
+			soundData.identifier = baseIdentifier
 			SlashCo.AudioSystem.PlaySound(soundData)
 
 			return true
@@ -1370,6 +1473,9 @@ end
 	If given no identifier and a entity, it will stop all sounds from the entity.
 ]]
 function SlashCo.AudioSystem.StopSound(identifier, fadeOut, entIndex)
+	-- RaphaelIT7: We check GetPredictionPlayer as else when we call this function from the net.Receive then IsFirstTimePredicted is false...
+	if IsValid(GetPredictionPlayer()) and not IsFirstTimePredicted() then return end
+	
 	fadeOut = fadeOut or 1
 
 	if not isnumber(entIndex) and IsValid(entIndex) then
@@ -1429,7 +1535,7 @@ local deltaMerge
 local function DeltaMerge(deltaTable, baseTable)
 	for key, val in pairs(baseTable) do
 		local deltaTableVal = deltaTable[key]
-		if deltaTableVal then
+		if deltaTableVal ~= nil then
 			if istable(deltaTableVal) then
 				deltaMerge(deltaTableVal, baseTable[key])
 			else
@@ -1477,6 +1583,7 @@ local function ReadSoundData()
 		modifyGroup = ReadSoundField(net.ReadString),
 		modifyGroupVolumeMult = ReadSoundField(net.ReadFloat),
 		modifyGroupVolumeFadeTime = ReadSoundField(net.ReadFloat),
+		doppler = ReadSoundField(net.ReadFloat),
 	}
 end
 
@@ -1606,7 +1713,7 @@ function NetworkSettings.PlaySound.ProcessFunc(data)
 			local missID = nextMissID
 			nextMissID = nextMissID + 1
 
-			deltaMissRecovery[nextMissID] = soundData
+			deltaMissRecovery[missID] = soundData
 
 			net.Start("slashCo_AudioSystem_MissingDelta")
 				net.WriteString(identifier)

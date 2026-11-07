@@ -29,7 +29,7 @@ function ENT:KeyValue(key, value)
 	end
 
 	if key == "gascans_needed" then
-		SlashCo.GasCansPerGenerator(valNum)
+		SlashCo.SetGasCansPerGenerator(valNum)
 		return
 	end
 
@@ -80,7 +80,7 @@ function ENT:AcceptInput(name, activator, _, value)
 	end
 
 	if name == "set_gascans_needed" then
-		SlashCo.GasCansPerGenerator(valNum)
+		SlashCo.SetGasCansPerGenerator(valNum)
 		return true
 	end
 
@@ -89,12 +89,12 @@ function ENT:AcceptInput(name, activator, _, value)
 		return true
 	end
 
-	if name == "EnableAlarmLights" then
+	if name == "enablealarmlights" then
 		SlashCo.EnableAlarmLights()
 		return true
 	end
 
-	if name == "DisableAlarmLights" then
+	if name == "disablealarmlights" then
 		SlashCo.DisableAlarmLights()
 		return true
 	end

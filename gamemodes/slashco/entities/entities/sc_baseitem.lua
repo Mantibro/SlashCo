@@ -13,27 +13,41 @@ ENT.Purpose = "the essential item"
 ENT.Instructions = ""
 ENT.IsSelectable = true
 ENT.PingType = "ITEM"
+ENT.PredictPickUp = true
 
 function ENT:Initialize()
+	self.PredictPickUp = true
 	if SERVER then
-		local item = SlashCoItems[self.OverrideItem or self.PrintName]
-		if not item then
-			ErrorNoHaltWithStack("[SlashCo] Failed to spawn item \"" .. (self.OverrideItem or self.PrintName) .. "\"!")
-		else
-			self:SetModel(item.Model)
-		end
-
-		self:SetSolid(SOLID_VPHYSICS)
-		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)
-		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
-		self:SetMoveType(MOVETYPE_VPHYSICS)
 	end
 
-	local phys = self:GetPhysicsObject()
-	if phys:IsValid() then
-		phys:Wake()
+	local item = SlashCoItems[self.OverrideItem or self.PrintName]
+	if not item then
+		ErrorNoHaltWithStack("[SlashCo] Failed to spawn item \"" .. (self.OverrideItem or self.PrintName) .. "\"!")
+	else
+		self:SetModel(item.Model)
 	end
+
+	self:SetSolid(SOLID_VPHYSICS)
+	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR) --Collide with everything but the player
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
+
+	self:PhysWake()
+	
+	local postInitialize = self.PostInitialize
+	if postInitialize then
+		postInitialize(self)
+	end
+end
+
+-- RaphaelIT7: For all items we use slot 31 for the DontPickup flag
+function ENT:SetDontPickup(state)
+	self:SetDTBool(31, state)
+end
+
+function ENT:GetDontPickup()
+	return self:GetDTBool(31)
 end
 
 if SERVER then

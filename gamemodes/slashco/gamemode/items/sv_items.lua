@@ -74,6 +74,9 @@ function SlashCo.DropItem(ply, dropCallback, ignoreField)
 	end
 
 	if not SlashCoItems[item] then
+		if dropCallback then
+			dropCallback(nil)
+		end
 		return
 	end
 
@@ -176,9 +179,9 @@ function SlashCo.ChangeSurvivorItem(ply, slot, id, noSound)
 		
 		if not noSound then
 			if SlashCoItems[id].EquipSound then
-				ply:EmitSound(SlashCoItems[id].EquipSound())
+				SlashCo.AudioSystem.EmitSound(ply, SlashCoItems[id].EquipSound())
 			else
-				ply:EmitSound("slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
+				SlashCo.AudioSystem.EmitSound(ply, "slashco/survivor/item_equip" .. math.random(1, 2) .. ".mp3")
 			end
 		end
 	elseif id == "none" then
@@ -207,7 +210,7 @@ function SlashCo.ItemPickUp(ply, itemindex, item)
 	end
 	
 	local itemEnt = Entity(itemindex)
-	if itemEnt.DONTPICKUP then
+	if not IsValid(itemEnt) or itemEnt.DONTPICKUP then
 		return
 	end
 

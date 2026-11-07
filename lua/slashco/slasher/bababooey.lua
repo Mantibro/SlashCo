@@ -34,9 +34,7 @@ SLASHER.CooldownReduction = 0 -- Additional number that is added to FrameTime to
 SLASHER.AppearCooldownReduction = 0 -- Appear Cooldown reduction, same as above but used when quitely appearing
 SLASHER.MaxClones = 1 -- How many clones he can have.
 
-function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
-	local SO = SlashCo.CurRound.OfferingData.Singularity
-
+function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors, SO)
 	SLASHER.ChaseDuration = 10.0 + (1 * additionalSurvivors)
 	SLASHER.MaxClones = 1 + SO
 
@@ -51,6 +49,12 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if not slasher:GetVisible() then
+		return 200
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	SLASHER.DoSound(slasher)
 
@@ -60,9 +64,10 @@ function SLASHER.OnSpawn(slasher)
 end
 
 function SLASHER.DoSound(slasher)
-	if not IsValid(slasher) then return end
+	-- RaphaelIT7: When testing a slasher may switch out to another! So lets stop idle sounds if were no longer this slasher!
+	if not IsValid(slasher) or SlashCoSlashers[slasher:GetNW2String("Slasher")] ~= SLASHER then return end
 
-	if slasher:GetNWBool("BababooeyInvisibility") then
+	if slasher:GetNW2Bool("BababooeyInvisibility") then
 		local idx = math.random(2, 4)
 		local idx2 = math.random(0.1, 0.5)
 		SlashCo.AudioSystem.PlaySound({
@@ -91,17 +96,17 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	if KillCD > 0 then
-		slasher:SetNWBool("CanKill", false)
-	elseif not slasher:GetNWBool("BababooeyInvisibility") then
-		slasher:SetNWBool("CanKill", true)
+		slasher:SetCanKill(false)
+	elseif not slasher:GetNW2Bool("BababooeyInvisibility") then
+		slasher:SetCanKill(true)
 	else
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 	end
 
-	slasher:SetNWBool("CanChase", not slasher:GetNWBool("BababooeyInvisibility"))
+	slasher:SetCanChase(not slasher:GetNW2Bool("BababooeyInvisibility"))
 
 	if SpookCD < 0.01 then
-		slasher:SetNWBool("BababooeySpooking", false)
+		slasher:SetNW2Bool("BababooeySpooking", false)
 	end
 
 	if KillCD > 0 then
@@ -126,11 +131,11 @@ end
 
 function SLASHER.OnMainAbilityFire(slasher, target)
 	if slasher.TriggerCooldown > 0 then return end
-	if slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher:GetInSlasherChaseMode() then return end
 
-	slasher:SetNWBool("BababooeyInvisibility", not slasher:GetNWBool("BababooeyInvisibility"))
+	slasher:SetNW2Bool("BababooeyInvisibility", not slasher:GetNW2Bool("BababooeyInvisibility"))
 
-	if slasher:GetNWBool("BababooeyInvisibility") then
+	if slasher:GetNW2Bool("BababooeyInvisibility") then
 		--Turning invisible
 
 		slasher:SlasherHudFunc("SetAvatar", "invisible")
@@ -163,9 +168,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 				volume = 1,
 				fadeIn = 0,
 			})
-
-			slasher:SetRunSpeed(200)
-			slasher:SetWalkSpeed(200)
 		end)
 	else
 		SlashCo.AudioSystem.PlaySound({
@@ -189,7 +191,7 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 			end
 
 			if slasher:GetPos():Distance(target:GetPos()) < 150 then
-				slasher:SetNWBool("BababooeySpooking", true)
+				slasher:SetNW2Bool("BababooeySpooking", true)
 				slasher.KillCooldown = 2
 				slasher.SpookCooldown = 2
 				SlashCo.AudioSystem.PlaySound({
@@ -223,9 +225,6 @@ function SLASHER.OnMainAbilityFire(slasher, target)
 		:: SPOOKAPPEAR ::
 
 		slasher:SetVisible(true)
-
-		slasher:SetRunSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
-		slasher:SetWalkSpeed(SlashCoSlashers[slasher:GetNWString("Slasher")].ProwlSpeed)
 	end
 end
 
@@ -243,8 +242,8 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
-	local spook = ply:GetNWBool("BababooeySpooking")
+	local spook = ply:GetNW2Bool("BababooeySpooking")
+	local chase = ply:GetInSlasherChaseMode()
 
 	if ply:IsOnGround() then
 		if not spook then
@@ -266,7 +265,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER and not ply:GetNWBool("BababooeyInvisibility") then
+	if not ply:GetNW2Bool("BababooeyInvisibility") then
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bababooey/babastep_0" .. idx .. ".mp3",
@@ -277,6 +276,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			excludeSendTo = ply,
 		})
 	end
 
@@ -284,7 +284,7 @@ function SLASHER.Footstep(ply)
 end
 
 hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-	if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Bababooey") == true then
+	if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 		if GameData.LocalPlayer.baba_f == nil then
 			GameData.LocalPlayer.baba_f = 0
 		end

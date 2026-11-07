@@ -8,14 +8,10 @@ ITEM.Description = "CostcoPizza_desc"
 ITEM.CamPos = Vector(150, 0, 0)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	if not SlashCo.IsActivePerk(ply, "Healthy") then
 		return true
 	end
-
-	local maxHealth = ply:GetMaxHealth()
-	local healAmount = maxHealth / 4
-	ply:SetHealth(math.min(ply:Health() + healAmount, maxHealth))
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/eat_cookie.mp3",
@@ -25,7 +21,18 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
+
+function ITEM.OnUse(ply)
+	if ITEM.OnUsePredicted(ply) then
+		return true
+	end
+
+	local maxHealth = ply:GetMaxHealth()
+	local healAmount = maxHealth / 4
+	ply:SetHealth(math.min(ply:Health() + healAmount, maxHealth))
 
 	return false
 end
@@ -37,12 +44,12 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 		identifier = "CostcoPizzaImpact" .. rng,
 		minDistance = 400,
 		maxDistance = 600,
-		entity = self,
+		entity = owner,
 		volume = 0.9,
 		fadeIn = 0,
 	})
 
-	if math.random(1, 3) == 1 or dmg:GetDamage() > 100 then
+	if math.random(1, 3) == 1 or dmg:GetDamage() > 60 then
 		SlashCo.RemoveItem(owner, false)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -50,7 +57,7 @@ function ITEM.OnOwnerTakeDamage(owner, dmg)
 			identifier = "CostcoShatter",
 			minDistance = 700,
 			maxDistance = 1000,
-			entity = self,
+			entity = owner,
 			volume = 0.9,
 			fadeIn = 0,
 		})

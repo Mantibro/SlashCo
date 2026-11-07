@@ -1,5 +1,11 @@
 local PANEL = {}
 
+local function sendPrompt(snd)
+	net.Start("SlashCo:SurvivorVoicePrompt")
+		net.WriteUInt(table.KeyFromValue(SlashCo.VoicePrompts, snd), 8)
+	net.SendToServer()
+end
+
 local voiceText = {
 	{
 		prompt = SlashCo.Language("vocal_no"),
@@ -119,9 +125,7 @@ function PANEL:Think()
 		GameData.VoiceSay:Remove()
 
 		if GameData.VoiceSay.CursorSelect then
-			net.Start("SlashCo:SurvivorVoicePrompt")
-				net.WriteString(GameData.VoiceSay.CursorSelect)
-			net.SendToServer()
+			sendPrompt(GameData.VoiceSay.CursorSelect)
 		end
 		GameData.VoiceSay = nil
 	end
@@ -133,9 +137,7 @@ function PANEL:OnKeyCodeReleased(keyCode)
 		self:Remove()
 
 		if self.CursorSelect then
-			net.Start("SlashCo:SurvivorVoicePrompt")
-				net.WriteString(self.CursorSelect)
-			net.SendToServer()
+			sendPrompt(self.CursorSelect)
 		end
 		GameData.VoiceSay = nil
 	end

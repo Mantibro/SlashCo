@@ -68,7 +68,7 @@ function SlashCo.AudioSystem.SetBackgroundMusicPlaybackRate(playbackrate)
 end
 
 function SlashCo.AudioSystem.GetBackgroundMusicPlaybackRate(fallBack)
-	return GetGlobal2Float("SlashCo:BackgroundMusicPlaybackRate", playbackrate or 1)
+	return GetGlobal2Float("SlashCo:BackgroundMusicPlaybackRate", fallBack or 1)
 end
 
 function SlashCo.AudioSystem.RegisterSound(registerName, soundTable)
@@ -203,6 +203,18 @@ function SlashCo.AudioSystem.ResolveSoundPath(soundPath)
 	end
 
 	return nil, false
+end
+
+function SlashCo.AudioSystem.EmitSound(source, soundPath, soundLevel, volume)
+	local isPosition = isvector(source)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = soundPath,
+		entity = not isPosition and source or nil,
+		position = isPosition and source or nil,
+		soundLevel = soundLevel or 75,
+		volume = volume or 1,
+		fadeIn = 0,
+	})
 end
 
 -- Server & client files are loaded at last

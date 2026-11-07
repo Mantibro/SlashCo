@@ -37,4 +37,11 @@ else
 	function ENT:Draw()
 		self:DrawModel()
 	end
+
+	function ENT:PredictUse(ply)
+		if ply ~= GameData.LocalPlayer then return end
+		if not IsFirstTimePredicted() then return end
+
+		hook.Run("scValue_openItemPicker")
+	end
 end

@@ -47,9 +47,28 @@ function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
 	end
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("BrenSnapState") then
+		return 305
+	end
+
+	if not slasher:GetInSlasherChaseMode() then
+		return SLASHER.ProwlSpeed
+	end
+
+	return slasher:GetNW2Bool("BrenBoost") and SLASHER.ChaseSpeed + 15 or SLASHER.ChaseSpeed
+end
+
+function SLASHER.Move(ply)
+	local moveType = ply:GetNW2Bool("BrenNoclip") and MOVETYPE_NOCLIP or MOVETYPE_WALK
+	if ply:GetMoveType() ~= moveType then
+		ply:SetMoveType(moveType)
+	end
+end
+
 function SLASHER.OnSpawn(slasher)
 	slasher:DrawShadow(false)
-	slasher:SetNWBool("CanChase", true)
+	slasher:SetCanChase(true)
 
 	slasher.MainCooldown = 0
 	slasher.NoclipCooldown = 0
@@ -65,25 +84,22 @@ function SLASHER.OnTickBehaviour(slasher)
 	local final_perception = SLASHER.Perception
 
 	if MainCD > 0 then
-		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
 		slasher.MainCooldown = MainCD - FrameTime()
-	else
-		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
 	end
 
 	if NoclipCD > 0 then
-		slasher:SlasherHudFunc("SetControlEnabled", "R", false)
 		slasher.NoclipCooldown = NoclipCD - FrameTime()
-	else
-		slasher:SlasherHudFunc("SetControlEnabled", "R", true)
 	end
 
 	if SnapCD > 0 then
-		slasher:SlasherHudFunc("SetControlEnabled", "F", false)
 		slasher.SnapCooldown = SnapCD - FrameTime()
-	else
-		slasher:SlasherHudFunc("SetControlEnabled", "F", true)
 	end
+
+	local noclip = slasher:GetNW2Bool("BrenNoclip")
+	slasher:SlasherHudControlEnabled("LMB", MainCD <= 0 and not noclip)
+	slasher:SlasherHudControlEnabled("RMB", not noclip)
+	slasher:SlasherHudControlEnabled("R", NoclipCD <= 0)
+	slasher:SlasherHudControlEnabled("F", SnapCD <= 0)
 
 	if SlashCo.CurRound.GameProgress > 4 then
 		slasher:SetImpervious(true)
@@ -91,7 +107,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		final_perception = 2.0
 	end
 
-	if not slasher:GetNWBool("InSlasherChaseMode") then
+	if not slasher:GetInSlasherChaseMode() then
 		slasher:SetBodygroup(0, 0)
 	else
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AngerChaseGain)
@@ -99,36 +115,16 @@ function SLASHER.OnTickBehaviour(slasher)
 	end
 
 	local anger = SlashCo.GetSlasherAnger(slasher)
-	slasher:SetNWBool("CanNoclip", anger > 50)
+	slasher:SetNW2Bool("CanNoclip", anger > 50)
 
-	if not slasher:GetNWBool("BrenNoclip") then
-		slasher:SetMoveType(MOVETYPE_WALK)
-
+	if not slasher:GetNW2Bool("BrenNoclip") then
 		final_eyesight = SLASHER.Eyesight
 	else
-		slasher:SetMoveType(MOVETYPE_NOCLIP)
-
 		final_eyesight = 1
 	end
 
-	if not slasher:GetNWBool("BrenSnapState") then
-		if not slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-		else
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-		end
-	else
-		slasher:SetRunSpeed(350)
-		slasher:SetWalkSpeed(350)
-		slasher:SetSlowWalkSpeed(350)
-	end
-
-	if slasher:GetNWInt("BrenAnger") ~= math.floor(anger) then
-		slasher:SetNWInt("BrenAnger", math.floor(anger))
+	if slasher:GetNW2Int("BrenAnger") ~= math.floor(anger) then
+		slasher:SetNW2Int("BrenAnger", math.floor(anger))
 	end
 
 	slasher:SetEyeSight(final_eyesight)
@@ -136,15 +132,15 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if slasher:GetNWBool("BrenStunned") then return end
-	if slasher:GetNWBool("BrenNoclip") then return end
+	if slasher:GetNW2Bool("BrenStunned") then return end
+	if slasher:GetNW2Bool("BrenNoclip") then return end
 	if slasher.MainCooldown > 0.01 then return end
 
 	if not IsValid(target) or not target:IsPlayer() then return end
 	if target:Team() ~= TEAM_SURVIVOR then return end
 
 	local dist = SLASHER.KillDistance
-	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetNWBool("SurvivorBeingJumpscared") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
 
 	slasher.MainCooldown = 5
 
@@ -167,22 +163,28 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			fadeIn = 0,
 		})
 
-		slasher:SetNWBool("CanChase", false)
-		slasher:SetNWBool("BrenKill", true)
+		slasher:SetNW2Bool("BrenKill", true)
+		slasher:SetCanChase(false)
 
 		timer.Simple(1.5, function()
-			if not IsValid(slasher) then return end
+			if not IsValid(slasher) then
+				if IsValid(target) then
+					target:Freeze(false)
+				end
+
+				return
+			end
 
 			slasher:Freeze(false)
-			slasher:SetNWBool("BrenKill", false)
-			slasher:SetNWBool("CanChase", true)
+			slasher:SetNW2Bool("BrenKill", false)
+			slasher:SetCanChase(true)
 			SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 
 			if not IsValid(target) then return end
 
 			target:Freeze(false)
 
-			local rand_dmg = math.random(50, 60)
+			local rand_dmg = math.random(50, 65)
 			if target:Health() < 51 then
 				target:TakeDamage(99999, slasher, slasher)
 			else
@@ -233,25 +235,32 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("BrenStunned") then return end
+	if slasher:GetNW2Bool("BrenStunned") then return end
 
-	SlashCo.StartChaseMode(slasher)
+	if SlashCo.StartChaseMode(slasher) then
+		slasher:SetNW2Bool("BrenBoost", true)
+
+		timer.Simple(3.0, function()
+			if not IsValid(slasher) then return end
+			slasher:SetNW2Bool("BrenBoost", false)
+		end)
+	end
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher:GetNWBool("BrenStunned") then return end
-	if slasher:GetNWBool("BrenKill") then return end
-	if not slasher:GetNWBool("CanNoclip") then return end
+	if slasher:GetNW2Bool("BrenStunned") then return end
+	if slasher:GetNW2Bool("BrenKill") then return end
+	if not slasher:GetNW2Bool("CanNoclip") then return end
 
-	if not slasher:GetNWBool("BrenNoclip") then
+	if not slasher:GetNW2Bool("BrenNoclip") then
 		if !slasher:OnGround() and slasher:WaterLevel() == 0 and !slasher:IsStuck() then return end
 		if slasher.NoclipCooldown > 0.01 then return end
 
 		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
 		slasher:SlasherHudFunc("SetControlEnabled", "RMB", false)
 
-		slasher:SetNWBool("BrenNoclip", true)
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetNW2Bool("BrenNoclip", true)
+		slasher:SetCanChase(false)
 
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/bren/bren_noclip_start.mp3",
@@ -300,8 +309,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 		SlashCo.AudioSystem.StopSound("BrenNoclipLoop", 1, slasher)
 		local anger = SlashCo.GetSlasherAnger(slasher) / 8
 
-		slasher:SetNWBool("BrenNoclip", false)
-		slasher:SetNWBool("CanChase", true)
+		slasher:SetNW2Bool("BrenNoclip", false)
+		slasher:SetCanChase(true)
 
 		slasher.NoclipCooldown = math.Round((SLASHER.NoclipCooldownLength - anger), 0)
 		slasher.MainCooldown = 5
@@ -310,28 +319,29 @@ function SLASHER.OnMainAbilityFire(slasher)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
-	if slasher:GetNWBool("BrenStunned") then return end
-	if slasher:GetNWBool("BrenKill") then return end
+	if slasher:GetNW2Bool("BrenStunned") then return end
+	if slasher:GetNW2Bool("BrenKill") then return end
 	if slasher.SnapCooldown > 0.01 then return end
 
 	SlashCo.StopChase(slasher)
 
 	slasher.SnapCooldown = 60
-	slasher:SetNWBool("BrenSnapAnim", true)
-	slasher:SetNWBool("CanChase", false)
+	slasher:SetNW2Bool("BrenSnapAnim", true)
+	slasher:SetCanChase(false)
 	slasher:Freeze(true)
+
+	slasher.MainCooldown = (SLASHER.FogIncreaseLength * 1) + 7
+	slasher.NoclipCooldown = (SLASHER.FogIncreaseLength * 1) + 7
 
 	timer.Simple(1.0, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("BrenSnapAnim", false)
-		slasher:SetNWBool("BrenSnapState", true)
+		slasher:SetNW2Bool("BrenSnapAnim", false)
+		slasher:SetNW2Bool("BrenSnapState", true)
 		slasher:Freeze(false)
 		slasher:DrawShadow(false)
 		slasher:SetVisible(false)
 
-		slasher.MainCooldown = SLASHER.FogIncreaseLength + 7
-		slasher.NoclipCooldown = SLASHER.FogIncreaseLength + 7
 		SlashCo.AddSlasherAnger(slasher, -15)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -367,8 +377,10 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		timer.Simple(SLASHER.FogIncreaseLength, function()
 			SlashCo.RemoveFog("BrenSnap", TEAM_SURVIVOR)
 
-			slasher:SetNWBool("BrenSnapState", false)
-			slasher:SetNWBool("CanChase", true)
+			if not IsValid(slasher) then return end
+
+			slasher:SetNW2Bool("BrenSnapState", false)
+			slasher:SetCanChase(true)
 			slasher:DrawShadow(true)
 			slasher:SetVisible(true)
 		end)
@@ -378,12 +390,12 @@ end
 function SLASHER.OnHitByPocketSand(slasher, ply)
 	SlashCo.StopChase(slasher)
 
-	slasher:SetNWBool("BrenStunned", true)
+	slasher:SetNW2Bool("BrenStunned", true)
 	slasher:Freeze(true)
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("BrenStunned", false)
+		slasher:SetNW2Bool("BrenStunned", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -391,9 +403,9 @@ SLASHER.OnHitByBeerKeg = SLASHER.OnHitByPocketSand
 SLASHER.OnHitByTeslaCoil = SLASHER.OnHitByPocketSand
 
 function SLASHER.Animator(ply)
-	local bren_kill = ply:GetNWBool("BrenKill")
-	local bren_snap = ply:GetNWBool("BrenSnapAnim")
-	local bren_stun = ply:GetNWBool("BrenStunned")
+	local bren_kill = ply:GetNW2Bool("BrenKill")
+	local bren_snap = ply:GetNW2Bool("BrenSnapAnim")
+	local bren_stun = ply:GetNW2Bool("BrenStunned")
 
 	if not bren_kill and not bren_snap and not bren_stun then
 		ply.anim_antispam = false
@@ -435,24 +447,23 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("BrenSnapAnim") or ply:GetNWBool("BrenKill")
+	return ply:GetNW2Bool("BrenSnapAnim") or ply:GetNW2Bool("BrenKill")
 end
 
 function SLASHER.Footstep(ply)
-	if SERVER then
-		if not ply:GetNWBool("BrenNoclip") then
-			local idx = math.random(1, 6)
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
-				identifier = "BrenFootstep" .. idx,
-				group = "SlasherFootstep",
-				minDistance = 200,
-				maxDistance = 400,
-				entity = ply,
-				volume = 1,
-				fadeIn = 0,
-			})
-		end
+	if not ply:GetNW2Bool("BrenNoclip") then
+		local idx = math.random(1, 6)
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/criminal/criminal_step" .. idx .. ".mp3",
+			identifier = "BrenFootstep" .. idx,
+			group = "SlasherFootstep",
+			minDistance = 200,
+			maxDistance = 400,
+			entity = ply,
+			volume = 1,
+			fadeIn = 0,
+			excludeSendTo = ply,
+		})
 	end
 
 	return true

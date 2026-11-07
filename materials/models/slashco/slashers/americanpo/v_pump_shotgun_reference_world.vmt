@@ -1,0 +1,14 @@
+VertexLitGeneric
+{
+$baseTexture "models\slashco\slashers\americanpo\v_pump_shotgun_reference_world"
+$bumpmap "effects/flat_normal"
+
+$halflambert 1
+$phong 1
+$phongboost 1
+$phongexponent 10
+$phongfresnelranges "[5 5 15]"
+$BASEMAPLUMINANCEPHONGMASK 1
+$color2 "[ 3 3 3 ]"
+$ambientocclusion 1
+}

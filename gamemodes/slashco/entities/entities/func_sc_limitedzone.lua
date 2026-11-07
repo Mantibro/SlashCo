@@ -72,7 +72,7 @@ function ENT:Enter(ent)
 		ent:AddSpeedEffect("limitedZone", self.SpeedEffect, priority)
 	end
 
-	SlashCo.SendValue(ent, "limitedZone", self.Effect or 1)
+	ent:SetZoneEffect(self.Effect or 1)
 
 	self:TriggerOutput("OnEnter", ent)
 	if table.IsEmpty(self.PlayersInside) then
@@ -90,7 +90,7 @@ function ENT:Leave(ent)
 		ent:RemoveSpeedEffect("limitedZone")
 	end
 
-	SlashCo.SendValue(ent, "limitedZone", 0)
+	ent:SetZoneEffect(0)
 
 	self:TriggerOutput("OnExit", ent)
 	if table.IsEmpty(self.PlayersInside) then
@@ -140,39 +140,39 @@ local damageSounds = {
 	[1] = function(ent, damage)
 		--default
 		if damage <= 10 then
-			ent:EmitSound("physics/flesh/flesh_impact_bullet" .. math.random(1, 5) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_impact_bullet" .. math.random(1, 5) .. ".wav")
 		elseif damage >= ent:Health() then
-			ent:EmitSound("physics/flesh/flesh_bloody_break.wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_bloody_break.wav")
 		else
-			ent:EmitSound("physics/flesh/flesh_strider_impact_bullet" .. math.random(1, 3) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_strider_impact_bullet" .. math.random(1, 3) .. ".wav")
 		end
 	end,
 	[2] = function(ent, damage)
 		--blizzard
 		if damage >= ent:Health() and damage > 10 then
-			ent:EmitSound("physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
 		else
-			ent:EmitSound("physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
 		end
 	end,
 	[3] = function(ent)
 		--poison
-		ent:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
+		SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
 	end,
 	[4] = function(ent, damage)
 		--blood
 		if damage >= ent:Health() and damage > 10 then
-			ent:EmitSound("physics/flesh/flesh_bloody_break.wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_bloody_break.wav")
 		else
-			ent:EmitSound("physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/flesh/flesh_squishy_impact_hard" .. math.random(1, 4) .. ".wav")
 		end
 	end,
 	[6] = function(ent, damage)
 		--black snow
 		if damage >= ent:Health() and damage > 10 then
-			ent:EmitSound("physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_pottery_break" .. math.random(1, 4) .. ".wav")
 		else
-			ent:EmitSound("physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
+			SlashCo.AudioSystem.EmitSound(ent, "physics/glass/glass_strain" .. math.random(1, 4) .. ".wav")
 		end
 	end
 }
@@ -187,11 +187,12 @@ function ENT:Touch(ent)
 		self:Leave(ent)
 		return
 	end
+	-- TEAM 0 is Joining/Connecting
 	if self.Team == 0 and ent:Team() ~= TEAM_SURVIVOR then
 		self:Leave(ent)
 		return
 	end
-	if self.Team == 1 and ent:Team() ~= TEAM_SLASHER then
+	if self.Team == TEAM_SURVIVOR and ent:Team() ~= TEAM_SLASHER then
 		self:Leave(ent)
 		return
 	end
@@ -223,11 +224,12 @@ function ENT:StartTouch(ent)
 	if self.Disabled or not ent:IsPlayer() or not ent:Alive() or IsValid(ent.LimitBrush) then
 		return
 	end
-	if (self.Team == 2 or self.Team == 0) and ent:Team() == TEAM_SURVIVOR then
+	-- Team 0 is Joining/Connecting
+	if (self.Team == TEAM_SLASHER or self.Team == 0) and ent:Team() == TEAM_SURVIVOR then
 		self:Enter(ent)
 		return
 	end
-	if (self.Team == 2 or self.Team == 1) and ent:Team() == TEAM_SLASHER then
+	if (self.Team == TEAM_SLASHER or self.Team == TEAM_SURVIVOR) and ent:Team() == TEAM_SLASHER then
 		self:Enter(ent)
 		return
 	end

@@ -9,12 +9,12 @@ end
 function EFFECT.CanBeSeen()
 	return false
 end
+EFFECT.Speed = 250
+EFFECT.SpeedPriority = 2
 function EFFECT.OnApplied(ply)
-	ply:AddSpeedEffect("invis", 250, 2)
 	ply:DrawShadow(false)
 end
 function EFFECT.OnExpired(ply)
-	ply:RemoveSpeedEffect("invis")
 	ply:DrawShadow(true)
 end
 

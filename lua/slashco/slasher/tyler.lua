@@ -68,6 +68,18 @@ local TYLER_SPECTER = 0
 local TYLER_CREATOR = 1
 local TYLER_PRE_DESTROYER = 2
 local TYLER_DESTROYER = 3
+
+function SLASHER.GetSpeed(slasher)
+	local state = slasher:GetNW2Int("TylerState")
+	if state == TYLER_SPECTER then
+		return SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher))
+	elseif state == TYLER_DESTROYER then
+		return SLASHER.ChaseSpeed
+	end
+
+	return 1
+end
+
 function TylerSwitchForm(slasher, newForm)
 	local anger = SlashCo.GetSlasherAnger(slasher)
 	if newForm == TYLER_CREATOR and anger > 50 and math.random(1, 200 - anger) == 1 then
@@ -79,7 +91,7 @@ function TylerSwitchForm(slasher, newForm)
 		SlashCo.AudioSystem.StopSound("TylerWhisper", 1, slasher)
 
 		slasher:SetVisible(false)
-		slasher:SetNWBool("TylerFlash", false)
+		slasher:SetNW2Bool("TylerFlash", false)
 		slasher.TimeAsTylerSpecter = 0
 
 		SetGlobal2Bool("DisplayTylerTheDestroyerEffects", false)
@@ -104,24 +116,25 @@ function TylerSwitchForm(slasher, newForm)
 		SLASHER.HideTime(slasher)
 		if not SlashCo.AudioSystem.ShouldPlayBackgroundMusic() and slasher.WasDestroyerOnce then -- If its already playing, we don't need to start it again.
 			SlashCo.AudioSystem.EnableBackgroundMusic()
-			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.max(math.Clamp(100 - anger, 0, 100) / 100), 0.1) -- Make the background music getting more silent the more anger he has.
+			SlashCo.AudioSystem.SetBackgroundMusic("slashco/slasher/tyler/tyler_ambience.ogg", math.max(math.Clamp(100 - anger, 0, 100) / 100, 0.1)) -- Make the background music getting more silent the more anger he has.
 		end
 
-		slasher:SetNW2Bool("Slasher:NoFootsteps", false)
+		slasher:SetNoFootsteps(false)
 	else
 		slasher.WasDestroyerOnce = true
 		SlashCo.AudioSystem.DisableBackgroundMusic()
 		if EndlessChase() then
-			slasher:SetNW2Bool("Slasher:NoFootsteps", true)
+			slasher:SetNoFootsteps(true)
 		end
 	end
 end
 
 function SLASHER.OnSpawn(slasher)
 	slasher:SetVisible(false)
+	slasher:SetNW2Bool("TylerEndlessChase", false)
 
 	slasher.GasCanCreated = 0
-	slasher.TylerState = 0
+	slasher.TylerState = TYLER_SPECTER
 	slasher.TimeAsTylerForm = 0
 	slasher.TimeAsTylerSpecter = 0
 	slasher.TylerBlink = 0
@@ -147,6 +160,7 @@ function SLASHER.OnHelicopterSummon(slasher)
 	SlashCo.AudioSystem.StopSound("TylerTheme", 1, slasher)
 	SlashCo.AudioSystem.StopSound("TylerWhisper", 1, slasher)
 	SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
+	slasher:SetNW2Bool("TylerEndlessChase", true)
 	TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 end
 
@@ -156,11 +170,10 @@ end
 
 if CLIENT then
 	CreateClientConVar("slashco_tyler_endless_chase_music", "1", true, false, "When 0 the endless chase music is changed to be the normal one", 0, 1)
-	CreateClientConVar("slashco_tyler_disable_shake", "0", true, false, "When 1 the screen shake will be disabled", 0, 1)
 end
 
 function SLASHER.OnTickBehaviour(slasher)
-	local TylerState = slasher.TylerState or 0 --State
+	local TylerState = slasher.TylerState or TYLER_SPECTER --State
 	local TimeAsTylerForm = slasher.TimeAsTylerForm or 0 --Time Spent as Creator or destroyer
 	local TylerBlink = slasher.TylerBlink or 0 --Destoyer Blink
 	local TylerHidingTimer = slasher.TylerTimerHUD or 0
@@ -186,20 +199,17 @@ function SLASHER.OnTickBehaviour(slasher)
 		--Specter
 
 		slasher.TylerSongPickedID = nil
-		slasher:SetNWBool("TylerFlash", false)
-		slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
-		slasher:SetRunSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
-		slasher:SetWalkSpeed(SLASHER.ProwlSpeed + (3 * SlashCo.GetSlasherAnger(slasher)))
-		slasher:SetNWBool("TylerTheCreator", false)
+		slasher:SetNW2Bool("TylerFlash", false)
+		slasher:SetNW2Bool("TylerTheCreator", false)
 		slasher:SetCanSeePlayers(false)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = 0
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		slasher:SetImpervious(true)
 		slasher.TimeAsTylerSpecter = (slasher.TimeAsTylerSpecter or 0) + FrameTime()
 		final_perception = 6.0
 
-		if slasher:IsVisible() then
+		if slasher:GetVisible() then
 			slasher:SetVisible(false) -- Just in case he somehow ends up still being visible
 		end
 
@@ -212,24 +222,21 @@ function SLASHER.OnTickBehaviour(slasher)
 	elseif TylerState == TYLER_CREATOR then
 		--Creator
 
-		if not slasher:IsVisible() then
+		if not slasher:GetVisible() then
 			slasher:SetVisible(true) -- Just in case he somehow ends up invisible
 		end
 
 		slasher:SetImpervious(false)
-		slasher:SetNWBool("TylerFlash", false)
-		slasher:SetSlowWalkSpeed(1)
-		slasher:SetRunSpeed(1)
-		slasher:SetWalkSpeed(1)
+		slasher:SetNW2Bool("TylerFlash", false)
 		slasher:Freeze(true)
-		slasher:SetNWBool("TylerTheCreator", true)
+		slasher:SetNW2Bool("TylerTheCreator", true)
 		slasher:SetBodygroup(0, 0)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		slasher:SetCanSeePlayers(false)
 		final_perception = 0.0
 
-		local isCreating = slasher:GetNWBool("TylerCreating")
+		local isCreating = slasher:GetNW2Bool("TylerCreating")
 		if not isCreating and slasher.TylerSongPickedID == nil then
 			local rnd = math.random(1, 9)
 			slasher.TylerSongPickedID = "slashco/slasher/tyler/tyler_song_" .. rnd .. (rnd <= 6 and ".mp3" or ".ogg")
@@ -254,7 +261,7 @@ function SLASHER.OnTickBehaviour(slasher)
 		SlashCo.AudioSystem.SetBackgroundMusicVolume(math.Round(math.max(math.Clamp(100 - anger, 0, 100) / 100, 0.1) * math.Clamp(1 - (TimeAsTylerForm / slasher.TylerTime), 0, 1), 3))
 
 		--Time ran out
-		if not isCreating and (SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime then
+		if not isCreating and ((SLASHER.AllowEndlessChase == false and SlashCo.CurRound.EscapeHelicopterSummoned and TimeAsTylerForm > (slasher.TylerTime / 2.5)) or TimeAsTylerForm > slasher.TylerTime) then
 			slasher.TylerSongPickedID = nil
 			TylerSwitchForm(slasher, TYLER_PRE_DESTROYER)
 			SlashCo.AudioSystem.StopSound("TylerSong", 0, slasher)
@@ -269,7 +276,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			if not isCreating and surv:GetPos():Distance(slasher:GetPos()) < 400 and surv:GetEyeTrace().Entity == slasher then
 				isCreating = true
 				slasher.TimeAsTylerForm = math.max(slasher.TimeAsTylerForm - SLASHER.TimeRemovedWhenFound, 0) -- Can never go below 0
-				slasher:SetNWBool("TylerCreating", true)
+				slasher:SetNW2Bool("TylerCreating", true)
 				slasher.TylerSongPickedID = nil
 				timer.Simple(0.5, function()
 					if not IsValid(slasher) then
@@ -319,7 +326,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			timer.Simple(4, function()
 				if not IsValid(slasher) then return end
 
-				slasher:SetNWBool("TylerCreating", false)
+				slasher:SetNW2Bool("TylerCreating", false)
 				TylerSwitchForm(slasher, TYLER_SPECTER)
 				slasher.GasCanCreated = slasher.GasCanCreated + 1
 				slasher.TylerBlink = 0
@@ -368,6 +375,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					minDistance = 15000,
 					maxDistance = 20000,
 					looping = true,
+					isMusic = true,
 					entity = slasher,
 					volume = 0.6,
 					fadeIn = 1,
@@ -381,6 +389,7 @@ function SLASHER.OnTickBehaviour(slasher)
 					minDistance = 15000,
 					maxDistance = 20000,
 					looping = true,
+					isMusic = true,
 					entity = slasher,
 					volume = 0.9,
 					fadeIn = 1,
@@ -393,6 +402,7 @@ function SLASHER.OnTickBehaviour(slasher)
 						minDistance = 15000,
 						maxDistance = 20000,
 						looping = true,
+						isMusic = true,
 						entity = slasher,
 						volume = 0.8,
 						fadeIn = 1,
@@ -417,24 +427,18 @@ function SLASHER.OnTickBehaviour(slasher)
 			SetGlobal2Bool("DisplayTylerTheDestroyerEffects", true)
 		end
 
-		slasher:SetSlowWalkSpeed(1)
-		slasher:SetRunSpeed(1)
-		slasher:SetWalkSpeed(1)
-		slasher:SetNWBool("TylerTheCreator", false)
+		slasher:SetNW2Bool("TylerTheCreator", false)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = 0
-		slasher:SetNWBool("CanKill", false)
+		slasher:SetCanKill(false)
 		final_perception = 0.0
 	elseif TylerState == TYLER_DESTROYER then
 		--Destroyer
 
-		slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-		slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-		slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-		slasher:SetNWBool("TylerTheCreator", false)
+		slasher:SetNW2Bool("TylerTheCreator", false)
 		slasher:SetBodygroup(0, 1)
 		slasher.TimeAsTylerForm = TimeAsTylerForm + FrameTime()
-		slasher:SetNWBool("CanKill", true)
+		slasher:SetCanKill(true)
 		slasher:SetCanSeePlayers(true)
 		final_perception = 2.0
 
@@ -446,11 +450,15 @@ function SLASHER.OnTickBehaviour(slasher)
 
 				if ent:GetClass() == "func_breakable" or ent:GetClass() == "func_breakable_surf" then
 					ent:TakeDamage(100, slasher, slasher)
-				elseif ent:GetClass() == "prop_door_rotating" or ent:GetClass() == "func_door_rotating" then
+				elseif SlashCo.IsValidDoor(ent) then
 					SlashCo.BustDoor(slasher, ent, 50000)
-				elseif ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer" then
+				elseif (ent:GetClass() == "prop_physics" or ent:GetClass() == "prop_physics_multiplayer") and not ent.TylerPushing then
+					ent.TylerPushing = true
 					timer.Simple(1.0, function()
-						if not IsValid(slasher) or not IsValid(ent) then return end
+						if not IsValid(ent) then return end
+
+						ent.TylerPushing = nil
+						if not IsValid(slasher) then return end
 
 						ent:SetVelocity(slasher:GetForward() * 500)
 					end)
@@ -472,30 +480,28 @@ function SLASHER.OnTickBehaviour(slasher)
 
 		if TylerBlink <= 0.5 then
 			slasher:SetVisible(false)
-			slasher:SetNWBool("TylerFlash", false)
+			slasher:SetNW2Bool("TylerFlash", false)
 		else
 			slasher:SetVisible(true)
-			slasher:SetNWBool("TylerFlash", true)
+			slasher:SetNW2Bool("TylerFlash", true)
 		end
 	end
 
-	if slasher:GetNWInt("TylerState") ~= TylerState then
-		slasher:SetNWInt("TylerState", TylerState)
-	end
+	slasher:SetNW2Int("TylerState", TylerState)
 
-	if slasher:GetNWInt("TylerHideTime") ~= math.floor(TylerHidingTimer) then
-		slasher:SetNWInt("TylerHideTime", math.floor(TylerHidingTimer))
+	if slasher:GetNW2Int("TylerHideTime") ~= math.floor(TylerHidingTimer) then
+		slasher:SetNW2Int("TylerHideTime", math.floor(TylerHidingTimer))
 	end
 
 	-- eno: weird ass fucking math shit, I hate my life. but it should work.
 	local TylerDestroyerDuration = math.max((((2 + SlashCo.MapSize) / 1.5) * anger * (0.5 + (team.NumPlayers(TEAM_SURVIVOR) / 10))), SLASHER.MinChase) -- The current formula used by Tyler to determine how long his Destroyer form lasts.
 	local DestroyerTimeleft = TylerDestroyerDuration - TimeAsTylerForm 	-- We use the duration formula and count down using TimeAsTylerForm.
-	if slasher:GetNWInt("TylerHuntTime") ~= math.floor(DestroyerTimeleft) then
-		slasher:SetNWInt("TylerHuntTime", math.floor(DestroyerTimeleft)) -- End result: DestroyerTimeleft should accurately display how long your Destroyer form lasts.
+	if slasher:GetNW2Int("TylerHuntTime") ~= math.floor(DestroyerTimeleft) then
+		slasher:SetNW2Int("TylerHuntTime", math.floor(DestroyerTimeleft)) -- End result: DestroyerTimeleft should accurately display how long your Destroyer form lasts.
 	end
 
-	if slasher:GetNWInt("TylerAnger") ~= math.floor(anger) then
-		slasher:SetNWInt("TylerAnger", math.floor(anger))
+	if slasher:GetNW2Int("TylerAnger") ~= math.floor(anger) then
+		slasher:SetNW2Int("TylerAnger", math.floor(anger))
 	end
 
 	slasher:SetEyeSight(final_eyesight)
@@ -503,6 +509,8 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 local function DestroyItem(slasher, target)
+	if not IsValid(slasher) then return end
+
 	SlashCo.AddSlasherAnger(slasher, SLASHER.AngerIncrease)
 	if not IsValid(target) then return end
 
@@ -554,13 +562,13 @@ end
 
 function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher.TylerState ~= TYLER_DESTROYER then return end
-	if slasher:GetNWBool("CanKill") == false then return end
+	if slasher:GetCanKill() == false then return end
 	if slasher.KillDelayTick > 0 then return end
 	if not IsValid(target) then return end
 
 	local class = target:GetClass()
 	if (not target:IsPlayer() and target.PingType ~= "ITEM") or class == "sc_beacon" or class == "sc_battery" then return end
-	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance or target:GetNWBool("SurvivorBeingJumpscared") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= SLASHER.KillDistance or slasher:GetNW2Entity("TylerJumpscareTarget") == target then return end
 	if target:IsPlayer() and target:Team() == TEAM_SLASHER then return end
 
 	SlashCo.AudioSystem.PlaySound({
@@ -599,25 +607,31 @@ function SLASHER.OnPrimaryFire(slasher, target)
 		end
 	end
 
-	target:SetNWBool("SurvivorBeingJumpscared", true)
-	target:SetNWBool("SurvivorJumpscare_Tyler", true)
+	slasher:SetNW2Entity("TylerJumpscareTarget", target)
 
 	if target:IsPlayer() then
+		target:SetSurvivorBeingJumpscared(true)
+		target:SetSurvivorJumpscare(SLASHER.ID)
 		target:Freeze(true)
 	end
 
 	timer.Simple(SLASHER.JumpscareDuration, function()
 		StopTylerChase(slasher, IsValid(target) and target:GetClass() == "sc_gascan") -- Only stop instantly, if he destoryed a fuelcan
 
-		if IsValid(target) then
-			target:SetNWBool("SurvivorBeingJumpscared", false)
-			target:SetNWBool("SurvivorJumpscare_Tyler", false)
+		if IsValid(slasher) then
+			slasher:SetNW2Entity("TylerJumpscareTarget", NULL)
+		end
 
+		if IsValid(target) then
 			if target:IsPlayer() then
+				target:SetSurvivorBeingJumpscared(false)
+				target:SetSurvivorJumpscare(0)
 				target:Freeze(false)
 				target:TakeDamage(99999, slasher, slasher)
 
-				slasher.TimeAsTylerForm = slasher.TimeAsTylerForm + SLASHER.TimeAddedForPlayerKill
+				if IsValid(slasher) then
+					slasher.TimeAsTylerForm = slasher.TimeAsTylerForm + SLASHER.TimeAddedForPlayerKill
+				end
 			end
 
 			timer.Simple(FrameTime(), function()
@@ -628,16 +642,23 @@ function SLASHER.OnPrimaryFire(slasher, target)
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.TylerState ~= 0 then return end
+	if slasher.TylerState ~= TYLER_SPECTER then return end
 	if slasher:WaterLevel() > 1 then return end
 
 	TylerSwitchForm(slasher, TYLER_CREATOR)
 	slasher:SetVisible(true)
 end
 
+function SLASHER.ChaseLight(slasher)
+	if slasher:GetNW2Bool("TylerFlash") then
+		return 255, 0, 0, 10, 400, 1200
+	end
+end
+
 function SLASHER.Animator(ply)
-	local tyler_creator = ply:GetNWBool("TylerTheCreator")
-	local tyler_creating = ply:GetNWBool("TylerCreating")
+	local tyler_creator = ply:GetNW2Bool("TylerTheCreator")
+	local tyler_creating = ply:GetNW2Bool("TylerCreating")
+	local tyler_endless = ply:GetNW2Bool("TylerEndlessChase")
 
 	if tyler_creator then
 		if not tyler_creating then
@@ -653,7 +674,11 @@ function SLASHER.Animator(ply)
 		end
 	else
 		if ply:GetVelocity():LengthSqr() > 5 then
-			ply.CalcSeqOverride = ply:LookupSequence("destroyer walk")
+			if tyler_endless then
+				ply.CalcSeqOverride = ply:LookupSequence("whatsgood")
+			else
+				ply.CalcSeqOverride = ply:LookupSequence("destroyer walk")
+			end
 		else
 			ply.CalcSeqOverride = ply:LookupSequence("destroyer activated")
 		end
@@ -663,7 +688,7 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWInt("TylerState") == 1
+	return ply:GetNW2Int("TylerState") == TYLER_CREATOR
 end
 
 function SLASHER.Footstep()
@@ -673,7 +698,7 @@ end
 function SLASHER.CanBeSeen(ply)
 	if SERVER then return end
 
-	if ply:IsVisible() and ply:GetNWInt("TylerState") ~= 1 then
+	if ply:GetVisible() and ply:GetNW2Int("TylerState") ~= TYLER_CREATOR then
 		return true
 	end
 end
@@ -688,6 +713,7 @@ local manifestTable = {
 	["d/"] = Material("slashco/ui/icons/slasher/kill_disabled")
 }
 
+local state = TYLER_SPECTER
 function SLASHER.InitHud(_, hud)
 	hud:SetAvatarTable(avatarTable)
 	hud:SetTitle("Tyler_creator")
@@ -705,7 +731,7 @@ function SLASHER.InitHud(_, hud)
 	hud.prevWater = -1
 	local HuntTimeColor = Color(255, 0, 0, 255)
 	function hud.AlsoThink()
-		local state = GameData.LocalPlayer:GetNWInt("TylerState")
+		state = GameData.LocalPlayer:GetNW2Int("TylerState")
 		if state == TYLER_SPECTER then
 			local isInWater = GameData.LocalPlayer:WaterLevel() > 1
 			if hud.prevWater ~= isInWater then
@@ -751,29 +777,10 @@ function SLASHER.InitHud(_, hud)
 			hud.prevState = state
 		end
 
-		hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-			if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-				hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-				return
-			end
-
-			if state == TYLER_DESTROYER then
-				local HuntTime = GameData.LocalPlayer:GetNWInt("TylerHuntTime")
-				if HuntTime > 0 then -- In Lua "if 0 then" is still true.
-					draw.SimpleText("HUNT TIME: " .. math.Round(HuntTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-				end
-			else
-				local HideTime = GameData.LocalPlayer:GetNWInt("TylerHideTime")
-				if HideTime > 0 then
-					draw.SimpleText("HIDE TIME: " .. math.Round(HideTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-				end
-			end
-		end)
-
 		local target = GameData.LocalPlayer:GetEyeTrace().Entity
 		local class = IsValid(target) and target:GetClass()
-		if IsValid(target) and target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon")
-				and class ~= "sc_battery" and not target:GetNWBool("SurvivorBeingJumpscared") and
+		if IsValid(target) and (target:IsPlayer() or (target.PingType == "ITEM" and class ~= "sc_beacon" and class ~= "sc_battery"))
+				and GameData.LocalPlayer:GetNW2Entity("TylerJumpscareTarget") ~= target and
 				GameData.LocalPlayer:GetPos():Distance(target:GetPos()) < SLASHER.KillDistance then
 
 			if not hud.destroyEnabled then
@@ -799,6 +806,20 @@ function SLASHER.InitHud(_, hud)
 	end
 end
 
+function SLASHER.DrawHUD(localPly)
+	if state == TYLER_DESTROYER then
+		local HuntTime = localPly:GetNW2Int("TylerHuntTime")
+		if HuntTime > 0 then -- In Lua "if 0 then" is still true.
+			draw.SimpleText("HUNT TIME: " .. math.Round(HuntTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		end
+	else
+		local HideTime = localPly:GetNW2Int("TylerHideTime")
+		if HideTime > 0 then
+			draw.SimpleText("HIDE TIME: " .. math.Round(HideTime, 1), "TVCD", ScrW() / 2, 750, HuntTimeColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+		end
+	end
+end
+
 if CLIENT then
 	local eyeball = Material("slashco/ui/particle/eyeball.png")
 	local drawIcon
@@ -806,7 +827,7 @@ if CLIENT then
 	local iconTL = 0
 
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Tyler") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.tyl_f == nil then
 				GameData.LocalPlayer.tyl_f = 0
 			end
@@ -839,7 +860,7 @@ if CLIENT then
 			local effectScale = 0
 			local localPos = GameData.LocalPlayer:GetPos()
 			for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-				if slasher:GetNWString("Slasher") == SLASHER.Name then
+				if slasher:GetNW2String("Slasher") == SLASHER.Name then
 					local pos = slasher:GetPos()
 					local dist = pos:Distance(localPos)
 					if dist > SLASHER.MaxEffectRadius then continue end
@@ -849,7 +870,7 @@ if CLIENT then
 						effectScale = scale
 					end
 
-					if not slasher:IsDormant() and not GetConVar("slashco_tyler_disable_shake"):GetBool() then -- Play the shake every time he's visible.
+					if not slasher:IsDormant() and not GetConVar("slashco_cl_disable_effects"):GetBool() then -- Play the shake every time he's visible.
 						util.ScreenShake(slasher:GetPos(), 10 * scale, 40, 1, SLASHER.MaxEffectRadius, true)
 					end
 				end

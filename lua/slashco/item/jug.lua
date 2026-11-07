@@ -6,7 +6,8 @@ ITEM.EntClass = "sc_jug"
 ITEM.Price = 10
 ITEM.Description = "Jug_desc"
 ITEM.CamPos = Vector(50, 0, 0)
-ITEM.ChangesSpeed = true
+ITEM.Speed = 310
+ITEM.SpeedPriority = 1
 ITEM.IsSpawnable = true
 
 function ITEM.ItemDropped(ply, droppeditem)
@@ -27,18 +28,10 @@ function ITEM.ItemDropped(ply, droppeditem)
 	end
 end
 
-function ITEM.OnSwitchFrom(ply)
-	ply:RemoveSpeedEffect("jug")
-end
-
 function ITEM.PrePickUp(ply)
-	if not ply:GetNWBool("CurseOfTheJug") then
-		return
-	end
+	if not ply:GetCurseOfTheJug() then return end
 
-	if ply.JugDropTimer and CurTime() - ply.JugDropTimer < 1 then
-		return true
-	end
+	if ply.JugDropTimer and CurTime() - ply.JugDropTimer < 1 then return true end
 	ply.JugDropTimer = CurTime()
 
 	SlashCo.AudioSystem.PlaySound({
@@ -55,15 +48,11 @@ function ITEM.PrePickUp(ply)
 end
 
 function ITEM.OnPickUp(ply)
-	if ply:GetNWBool("CurseOfTheJug") then
+	if ply:GetCurseOfTheJug() then
 		timer.Simple(0, function()
 			SlashCo.DropItem(ply)
 		end)
-
-		return
 	end
-
-	ply:AddSpeedEffect("jug", 310, 1)
 end
 
 ITEM.ViewModel = {
@@ -107,9 +96,8 @@ SlashCo.RegisterItem(ITEM, "Jug")
 
 if SERVER then
 	local function tele(ply, force)
-		if ply.JugTele and not force then
-			return
-		end
+		if ply.JugTele and not force then return end
+
 		ply.JugTele = true
 
 		timer.Create("JugTele_" .. ply:UserID(), 1, 1, function()
@@ -119,12 +107,12 @@ if SERVER then
 
 			if ply:GetItem("item") ~= "Jug" then return end
 			if ply:Team() ~= TEAM_SURVIVOR then return end
-			if ply:GetNWBool("SurvivorBeingJumpscared") then return end
+			if ply:GetSurvivorBeingJumpscared() then return end
 
 			SlashCo.RemoveItem(ply)
 			ply:RandomTeleport()
 			ply:AddSpeedEffect("jugCurse", 290, 1)
-			ply:SetNWBool("CurseOfTheJug", true)
+			ply:SetCurseOfTheJug(true)
 
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/jug_curse.mp3",
@@ -160,7 +148,7 @@ if SERVER then
 	hook.Add("Think", "JugFunc", function()
 		for _, surv in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			if surv:GetItem("item") ~= "Jug" then continue end
-			if surv:GetNWBool("CurseOfTheJug") then continue end
+			if surv:GetCurseOfTheJug() then continue end
 
 			for _, ent in ipairs(ents.FindInSphere(surv:GetPos(), 250)) do
 				if ent:IsPlayer() and ent:Team() == TEAM_SLASHER and ent:CanBeSeen() then
@@ -172,25 +160,17 @@ if SERVER then
 	end)
 
 	hook.Add("SlashCoItemPickUp", "JugCurse", function(ply, item, id)
-		if item ~= "GasCan" then
-			return
-		end
-
-		if not ply:GetNWBool("CurseOfTheJug") then
-			return
-		end
-
-		if math.random() < 0.5 then
-			return
-		end
+		if item ~= "GasCan" then return end
+		if not ply:GetCurseOfTheJug() then return end
+		if math.random() < 0.5 then return end
 
 		local ent = Entity(id)
 		ent:RandomTeleport(Vector(0, 0, 50))
-		ply:SetNWBool("JugCurseActivate", true)
+		ply:SetJugCurseActivate(true)
 
 		timer.Create("jugCurse_" .. ply:UserID(), 6, 1, function()
 			if IsValid(ply) then
-				ply:SetNWBool("JugCurseActivate", false)
+				ply:SetJugCurseActivate(false)
 			end
 		end)
 
@@ -201,7 +181,7 @@ if SERVER then
 end
 
 hook.Add("SlashCo:DrawHUD", "JugVisions", function()
-	if GameData.LocalPlayer:GetNWBool("JugCurseActivate") then
+	if GameData.LocalPlayer:GetJugCurseActivate() then
 		local Overlay = Material("slashco/ui/overlays/jug_freeze")
 
 		if GameData.LocalPlayer.JugFrame < 61 then

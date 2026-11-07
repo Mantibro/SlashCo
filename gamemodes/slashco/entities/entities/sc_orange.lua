@@ -5,12 +5,6 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "Orange"
 ENT.ClassName = "sc_orange"
 
-function ENT:Initialize()
-	self:SetModel("models/slashco/items/annoyingorange.mdl")
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-end
-
 function ENT:SetOrangeVelocity(velocity)
 	local phys = self:GetPhysicsObject()
 	if IsValid(phys) then
@@ -29,7 +23,7 @@ function ENT:SetOrangeVelocity(velocity)
 	self:SetSkin(1)
 
 	self.EnableExposion = true
-	self.DONTPICKUP = true -- Block being picked up again
+	self:SetDontPickup(true) -- Block being picked up again
 end
 
 function ENT:Explode()
@@ -63,14 +57,16 @@ function ENT:Explode()
 		if team == TEAM_SURVIVOR then
 			ply:TakeDamage(90, self, self)
 		elseif team == TEAM_SLASHER then
-			ply:SlasherStunDeafen(5)
-			ply:SetNWBool("OrangeBlur", true)
+			if not ply.StunImmunity then
+				ply:SlasherStunDeafen(5)
+				ply:SetOrangeBlur(true)
+			end
 		end
 
 		timer.Simple(5, function()
 			if not IsValid(ply) then return end
 
-			ply:SetNWBool("OrangeBlur", false)
+			ply:SetOrangeBlur(false)
 		end)
 
 		ply:SetVelocity((self:GetForward() * 600) + Vector(0, 0, 400))
@@ -109,7 +105,7 @@ end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", "Orange", function()
-		if GameData.LocalPlayer:GetNWBool("OrangeBlur") then
+		if GameData.LocalPlayer:GetOrangeBlur() and not GetConVar("slashco_cl_disable_effects"):GetBool() then
 			DrawSobel(0.3)
 			DrawToyTown(4, ScrH() / 2)
 		end

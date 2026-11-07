@@ -5,6 +5,8 @@ local SlashCo = SlashCo
 ENT.Base 			= "base_nextbot"
 ENT.Type			= "nextbot"
 ENT.ClassName 		= "sc_crimclone"
+ENT.PingType 		= "SLASHER"
+ENT.PingExpiryTime 	= 5
 ENT.Spawnable		= true
 
 hook.Add("SlashCo:Precache", "SlashCo:PrecacheClone", function()
@@ -32,7 +34,7 @@ function ENT:RunBehaviour()
 		local owner = self:GetOwner()
 		if not IsValid(owner) then return end
 
-		local rage_switch = owner:GetNWBool("CriminalRage")
+		local rage_switch = owner:GetNW2Bool("CriminalRage")
 		self:StartActivity(ACT_IDLE)
 		if self.IsMain ~= true then
 			if rage_switch then
@@ -79,7 +81,7 @@ if SERVER then
 			return
 		end
 
-		local rage_switch = owner:GetNWBool("CriminalRage")
+		local rage_switch = owner:GetNW2Bool("CriminalRage")
 
 		if not self.IsMain then
 			if rage_switch then

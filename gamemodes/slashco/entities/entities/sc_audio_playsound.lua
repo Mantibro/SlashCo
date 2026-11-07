@@ -1,5 +1,25 @@
 ENT.Type = "point"
 
+local numberKeys = {
+	volume = true,
+	minDistance = true,
+	maxDistance = true,
+	startDistance = true,
+	startEndDistance = true,
+	pan = true,
+	playbackRate = true,
+	fadeIn = true,
+	fadeOut = true,
+	fadeOutStart = true,
+	doppler = true,
+}
+
+local boolKeys = {
+	looping = true,
+	forceStereo = true,
+	dynamicPan = true,
+}
+
 function ENT:KeyValue(key, value)
 	-- Ensure soundData table exists
 	local entTbl = self:GetTable()
@@ -11,8 +31,10 @@ function ENT:KeyValue(key, value)
 		entTbl.soundData = soundData
 	end
 
-	if key == "looping" then
+	if boolKeys[key] then
 		value = tobool(value)
+	elseif numberKeys[key] then
+		value = tonumber(value) or 0
 	end
 
 	if key == "soundPath" then
@@ -24,7 +46,7 @@ function ENT:KeyValue(key, value)
 	end
 
 	-- It's a default! Away you go
-	if isnumber(value) and value == 0 then return end
+	if isnumber(value) and value == 0 and key ~= "volume" then return end
 
 	soundData[key] = value
 end

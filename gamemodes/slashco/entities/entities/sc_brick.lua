@@ -5,12 +5,7 @@ ENT.Base = "sc_baseitem"
 ENT.PrintName = "Brick"
 ENT.ClassName = "sc_brick"
 
-function ENT:Initialize()
-	self:SetModel("models/props_junk/cinderblock01a.mdl")
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-
+function ENT:PostInitialize()
 	self.HitObjects = {}
 end
 
@@ -58,18 +53,20 @@ function ENT:PhysicsCollide(data)
 	local velocity = self.InitialVelocity or self:GetPhysicsObject():GetVelocity()
 	if IsValid(data.HitEntity) then
 		if data.HitEntity:IsPlayer() and data.HitEntity:Team() == TEAM_SLASHER then
-			data.HitEntity.SlashCoBrickFriction = data.HitEntity.SlashCoBrickFriction or data.HitEntity:GetFriction()
-			data.HitEntity:SetFriction(0)
-			data.HitEntity:SetVelocity(velocity * 4)
-			timer.Create("BrickHit" .. data.HitEntity:EntIndex(), 0.4, 1, function()
-				if not IsValid(data.HitEntity) then return end
+			if not data.HitEntity.StunImmunity then
+				data.HitEntity.SlashCoBrickFriction = data.HitEntity.SlashCoBrickFriction or data.HitEntity:GetFriction()
+				data.HitEntity:SetFriction(0)
+				data.HitEntity:SetVelocity(velocity * 4)
+				timer.Create("BrickHit" .. data.HitEntity:EntIndex(), 0.4, 1, function()
+					if not IsValid(data.HitEntity) then return end
 
-				data.HitEntity:SetFriction(data.HitEntity.SlashCoBrickFriction)
-				data.HitEntity.SlashCoBrickFriction = nil
-			end)
+					data.HitEntity:SetFriction(data.HitEntity.SlashCoBrickFriction)
+					data.HitEntity.SlashCoBrickFriction = nil
+				end)
+			end
 
 			self:Break()
-		elseif data.HitEntity:GetClass() == "prop_door_rotating" then
+		elseif SlashCo.IsValidDoor(data.HitEntity) then
 			SlashCo.BustDoor(self, data.HitEntity, velocity * 50, function(_, doorProps)
 				if IsValid(owner) then -- Inherit Physics Attacker!
 					for _, prop in ipairs(doorProps) do

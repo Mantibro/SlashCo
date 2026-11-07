@@ -28,6 +28,10 @@ SLASHER.SpeedRating = "★★★★★"
 SLASHER.EyeRating = "★★★☆☆"
 SLASHER.DiffRating = "★★★★★"
 
+function SLASHER.GetSpeed(slasher)
+	return slasher:GetNW2Int("SpeedrunnerSpeed")
+end
+
 function SLASHER.OnSpawn(slasher)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/speedrunner/speedrunner_1.ogg",
@@ -39,7 +43,7 @@ function SLASHER.OnSpawn(slasher)
 		volume = 1,
 		fadeIn = 0,
 	})
-	slasher:SetNWBool("CanKill", true)
+	slasher:SetCanKill(true)
 
 	timer.Simple(1, function()
 		if not IsValid(slasher) then return end
@@ -47,6 +51,7 @@ function SLASHER.OnSpawn(slasher)
 	end)
 
 	slasher.Speedrun = 100
+	slasher:SetNW2Int("SpeedrunnerSpeed", slasher.Speedrun)
 	slasher.Speedrunning = 1
 	slasher.Speedrunned = 285
 end
@@ -64,20 +69,14 @@ function SLASHER.OnTickBehaviour(slasher)
 		slasher.Speedrun = Speed + engine.TickInterval() * mapSizeMod * SpeedGain * (1 + SO) * 0.66 * gasMod
 	end
 
-	slasher:SetRunSpeed(math.floor(slasher.Speedrun))
-	slasher:SetWalkSpeed(math.floor(slasher.Speedrun))
-	slasher:SetSlowWalkSpeed(math.floor(slasher.Speedrun))
-
-	if slasher:GetNWInt("SpeedrunnerSpeed") ~= math.floor(Speed) then
-		slasher:SetNWInt("SpeedrunnerSpeed", math.floor(Speed))
-	end
+	slasher:SetNW2Int("SpeedrunnerSpeed", math.floor(slasher.Speedrun))
 
 	slasher:SetEyeSight(SLASHER.Eyesight)
 	slasher:SetPerception(SLASHER.Perception)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-	if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") and target:GetClass() == "sc_gascan" and (slasher:GetPos():Distance(target:GetPos()) <= SLASHER.KillDistance) then
+	if not slasher:GetNW2Bool("SpeedrunnerSacrificeTwo") and IsValid(target) and target:GetClass() == "sc_gascan" and (slasher:GetPos():Distance(target:GetPos()) <= SLASHER.KillDistance) then
 		target:RandomTeleport(Vector(0, 0, 50))
 		return
 	end
@@ -91,13 +90,17 @@ end
 function SLASHER.RandomTPCans()
 	for _, ent in ipairs(ents.FindByClass("sc_gascan")) do
 		ent:RandomTeleport(Vector(0, 0, 50))
-		ent:GetPhysicsObject():ApplyForceCenter(Vector((math.random() - 0.5) * 100,
+
+		local phys = ent:GetPhysicsObject()
+		if not IsValid(phys) then continue end
+
+		phys:ApplyForceCenter(Vector((math.random() - 0.5) * 100,
 				(math.random() - 0.5) * 100, (math.random() - 0.5) * 100))
 	end
 end
 
 function SLASHER.OnMainAbilityFire(slasher)
-	if slasher.Speedrun < slasher.Speedrunned or slasher:GetNWBool("SpeedrunnerSacrificeTwo") then return end
+	if slasher.Speedrun < slasher.Speedrunned or slasher:GetNW2Bool("SpeedrunnerSacrificeTwo") then return end
 	if slasher.SpeedRunnering then return end
 
 	slasher.SpeedRunnering = true
@@ -111,7 +114,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 
 	slasher:Freeze(true)
 
-	if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
+	if not slasher:GetNW2Bool("SpeedrunnerSacrificeOne") then
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/speedrunner/speedrunner_rng1.mp3",
 			identifier = "SpeedrunRNG1",
@@ -140,8 +143,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 		slasher.SpeedRunnering = nil
 		slasher:Freeze(false)
 
-		if not slasher:GetNWBool("SpeedrunnerSacrificeOne") then
-			slasher:SetNWBool("SpeedrunnerSacrificeOne", true)
+		if not slasher:GetNW2Bool("SpeedrunnerSacrificeOne") then
+			slasher:SetNW2Bool("SpeedrunnerSacrificeOne", true)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/speedrunner/speedrunner_2.ogg",
 				identifier = "Speedrun2",
@@ -159,8 +162,8 @@ function SLASHER.OnMainAbilityFire(slasher)
 			return
 		end
 
-		if not slasher:GetNWBool("SpeedrunnerSacrificeTwo") then
-			slasher:SetNWBool("SpeedrunnerSacrificeTwo", true)
+		if not slasher:GetNW2Bool("SpeedrunnerSacrificeTwo") then
+			slasher:SetNW2Bool("SpeedrunnerSacrificeTwo", true)
 			SlashCo.AudioSystem.PlaySound({
 				soundPath = "slashco/slasher/speedrunner/speedrunner_3.ogg",
 				identifier = "Speedrun3",
@@ -183,11 +186,11 @@ end
 
 function SLASHER.OnSpecialAbilityFire(slasher, target)
 	if not IsValid(target) or target:GetClass() ~= "sc_ore" then return end
-	if slasher:GetPos():Distance(target:GetPos()) >= 200 or slasher:GetNWBool("SpeedrunnerMining") then return end
-	if slasher:GetNWBool("SpeedrunnerSacrificeTwo") then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= 200 or slasher:GetNW2Bool("SpeedrunnerMining") then return end
+	if slasher:GetNW2Bool("SpeedrunnerSacrificeTwo") then return end
 
 	slasher:Freeze(true)
-	slasher:SetNWBool("SpeedrunnerMining", true)
+	slasher:SetNW2Bool("SpeedrunnerMining", true)
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/slasher/speedrunner/speedrunner_mining.mp3",
@@ -216,7 +219,7 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 		if not IsValid(slasher) then return end
 
 		slasher:Freeze(false)
-		slasher:SetNWBool("SpeedrunnerMining", false)
+		slasher:SetNW2Bool("SpeedrunnerMining", false)
 		SlashCo.AudioSystem.StopSound("SpeedrunMining", 0.1, slasher)
 
 		SlashCo.AudioSystem.PlaySound({
@@ -245,12 +248,12 @@ function SLASHER.OnSpecialAbilityFire(slasher, target)
 end
 
 function SLASHER.OnHitByPocketSand(slasher, ply)
-	slasher:SetNWBool("SpeedrunnerStun", true)
+	slasher:SetNW2Bool("SpeedrunnerStun", true)
 	slasher:Freeze(true)
 	timer.Simple(9, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("SpeedrunnerStun", false)
+		slasher:SetNW2Bool("SpeedrunnerStun", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -261,9 +264,9 @@ function SLASHER.Animator(ply, veloc)
 	local move_vel = ply:WorldToLocal(veloc + ply:GetPos())
 	local anim_vel = veloc:Length()
 
-	local mining = ply:GetNWBool("SpeedrunnerMining")
-	local stun = ply:GetNWBool("SpeedrunnerStun")
-	local ascended = ply:GetNWBool("SpeedrunnerSacrificeTwo")
+	local mining = ply:GetNW2Bool("SpeedrunnerMining")
+	local stun = ply:GetNW2Bool("SpeedrunnerStun")
+	local ascended = ply:GetNW2Bool("SpeedrunnerSacrificeTwo")
 
 	if not mining and not stun then
 		ply.anim_antispam = false
@@ -317,7 +320,7 @@ function SLASHER.Animator(ply, veloc)
 end
 
 function SLASHER.Footstep(ply)
-	return ply:GetNWBool("SpeedrunnerSacrificeTwo")
+	return ply:GetNW2Bool("SpeedrunnerSacrificeTwo")
 end
 
 function SLASHER.InitHud(_, hud)
@@ -330,26 +333,13 @@ function SLASHER.InitHud(_, hud)
 
 	hud:AddMeter("speed", 235, "", nil, true)
 	hud:TieMeterInt("speed", "SpeedrunnerSpeed")
-	
-	hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
-		if GameData.LocalPlayer:Team() ~= TEAM_SLASHER then
-			hook.Remove("SlashCo:DrawHUD", "SlashCo:SlasherHUD")
-			return
-		end
-		
-		if GameData.LocalPlayer:GetNWBool("SpeedrunnerMining") then
-			draw.SimpleText("MINING ORE . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
-					Color(255, 0, 0, 255),
-					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-		end
-	end)
 
-	hud.prevSac1 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeOne")
-	hud.prevSac2 = not GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeTwo")
+	hud.prevSac1 = not GameData.LocalPlayer:GetNW2Bool("SpeedrunnerSacrificeOne")
+	hud.prevSac2 = not GameData.LocalPlayer:GetNW2Bool("SpeedrunnerSacrificeTwo")
 	hud.SpeedGo = true
 	function hud.AlsoThink()
-		local sac1 = GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeOne")
-		local sac2 = GameData.LocalPlayer:GetNWBool("SpeedrunnerSacrificeTwo")
+		local sac1 = GameData.LocalPlayer:GetNW2Bool("SpeedrunnerSacrificeOne")
+		local sac2 = GameData.LocalPlayer:GetNW2Bool("SpeedrunnerSacrificeTwo")
 		if sac2 ~= hud.prevSac2 or sac1 ~= hud.prevSac1 then
 			if sac2 then
 				hud:SetMeterMax("speed", 500)
@@ -380,14 +370,22 @@ function SLASHER.InitHud(_, hud)
 	end
 end
 
+function SLASHER.DrawHUD(localPly)
+	if localPly:GetNW2Bool("SpeedrunnerMining") then
+		draw.SimpleText("MINING ORE . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
+				Color(255, 0, 0, 255),
+				TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	end
+end
+
 function SLASHER.PreDrawHalos()
-	SlashCo.DrawHalo(ents.FindByClass("sc_ore"), "green")
-	SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "red")
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_ore"), "green")
+	SlashCo.DrawHalo(SlashCo.FindByClass("sc_gascan"), "red", 2, false)
 end
 
 if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_Speedrunner") == true then
+		if GameData.LocalPlayer:GetSurvivorJumpscare() == SLASHER.ID then
 			if GameData.LocalPlayer.spd_f == nil then
 				GameData.LocalPlayer.spd_f = 0
 			end
@@ -406,7 +404,7 @@ if CLIENT then
 			GameData.LocalPlayer.spd_f = nil
 		end
 
-		if GameData.LocalPlayer:GetNWBool("SurvivorMining") then
+		if GameData.LocalPlayer:GetSurvivorMining() then
 			draw.SimpleText("MINING . . .", "ItemFontTip", ScrW() / 2, ScrH() / 4,
 					Color(255, 0, 0, 255),
 					TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
@@ -415,7 +413,7 @@ if CLIENT then
 
 	hook.Add("Tick", "SpeedrunnerBones", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if v:GetNWString("Slasher") == "Speedrunner" then
+			if v:GetNW2String("Slasher") == "Speedrunner" then
 				if v.AllBones == nil then
 					v.AllBones = {}
 
@@ -423,7 +421,7 @@ if CLIENT then
 						table.insert(v.AllBones, { Bone = v:GetBoneName(b), Offset = Vector(0, 0, 0) })
 					end
 
-					return
+					continue
 				end
 
 				local r_bone = math.random(1, v:GetBoneCount() - 1)
@@ -438,10 +436,10 @@ if CLIENT then
 
 				local intensity = 0
 
-				if v:GetNWBool("SpeedrunnerSacrificeOne") then
+				if v:GetNW2Bool("SpeedrunnerSacrificeOne") then
 					intensity = 0.5
 				end
-				if v:GetNWBool("SpeedrunnerSacrificeTwo") then
+				if v:GetNW2Bool("SpeedrunnerSacrificeTwo") then
 					intensity = 1.5
 				end
 
@@ -483,7 +481,7 @@ if CLIENT then
 				end
 			end
 
-			if v:GetNWBool("SpeedrunnerSacrificeTwo") then
+			if v:GetNW2Bool("SpeedrunnerSacrificeTwo") then
 				local tlight = DynamicLight(MAX_EDICT + v:EntIndex())
 				if tlight then
 					tlight.pos = v:LocalToWorld(Vector(0, 0, 20))

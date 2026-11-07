@@ -9,7 +9,7 @@ ITEM.Description = "Mayo_desc"
 ITEM.CamPos = Vector(50,0,20)
 ITEM.IsSpawnable = true
 
-function ITEM.OnUse(ply)
+function ITEM.OnUsePredicted(ply)
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/eat_mayo.mp3",
 		identifier = "MayoUse",
@@ -18,7 +18,12 @@ function ITEM.OnUse(ply)
 		entity = ply,
 		volume = 1,
 		fadeIn = 0,
+		excludeSendTo = ply,
 	})
+end
+
+function ITEM.OnUse(ply)
+	ITEM.OnUsePredicted(ply)
 
 	--While the item is stored, a survivor can press R to consume it. It will set their health to 200, regardless of current health.
 	local maxHealth = ply:GetMaxHealth()

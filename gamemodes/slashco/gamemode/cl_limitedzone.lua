@@ -7,54 +7,34 @@ local ambiences = {
 	[6] = "ambient/windwinter.wav",
 }
 
-local zoneAmbience, snd
-hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
-	local ply = GameData.LocalPlayer
-
-	-- [[ soundpatch method
+local function switchZoneEffect(ply, effect)
 	if ambiences[effect] then
-		timer.Remove("SCFadeOut")
-		if snd ~= ambiences[effect] then
-			if zoneAmbience then
-				zoneAmbience:FadeOut(1)
+		if GameData.LimitedZoneSound ~= ambiences[effect] then
+			if GameData.LimitedZoneAmbience then
+				SlashCo.AudioSystem.DestroyChannel(GameData.LimitedZoneAmbience, 1)
 			end
 
-			zoneAmbience = SlashCo.ReadSound(ambiences[effect])
-			zoneAmbience:ChangeVolume(0)
-			zoneAmbience:ChangeVolume(1, 1)
-			snd = ambiences[effect]
-		end
-	elseif zoneAmbience then
-		timer.Create("SCFadeOut", 0.1, 1, function()
-			zoneAmbience:FadeOut(1)
-			snd = nil
-			zoneAmbience = nil
-		end)
-	end
-	--]]
+			SlashCo.AudioSystem.PlaySound({
+				soundPath = ambiences[effect],
+				identifier = "LimitedZone",
+				fadeIn = 1,
+				callback = function(channel)
+					GameData.LimitedZoneAmbience = channel
+				end,
+				-- RaphaelIT7: The sounds don't even exist? So we allow silent failure
+				errorCallback = function()
+					return true
+				end
+			})
 
-	--[[ playfile method
-	if ambiences[effect] and snd ~= ambiences[effect] then
-		if IsValid(zoneAmbience) then
-			zoneAmbience:Stop()
+			GameData.LimitedZoneSound = ambiences[effect]
 		end
-		snd = ambiences[effect]
-		sound.PlayFile("sound/" .. ambiences[effect], "noplay", function(music, errCode, errStr)
-			if IsValid(music) then
-				zoneAmbience = music
-				zoneAmbience:EnableLooping(true)
-				zoneAmbience:Play()
-			else
-				print("[SlashCo] Error playing zone ambience!", errCode, errStr)
-			end
-		end)
-	elseif IsValid(zoneAmbience) then
-		zoneAmbience:Stop()
-		snd = nil
+	elseif IsValid(GameData.LimitedZoneAmbience) then
+		SlashCo.AudioSystem.DestroyChannel(GameData.LimitedZoneAmbience, 1)
+		GameData.LimitedZoneSound = nil
+		GameData.LimitedZoneAmbience = nil
 	end
-	--]]
 
-	ply.ZoneEffect = effect
 	if not ply.FogColor then
 		ply.ColorTable = {
 			["$pp_colour_addr"] = 0,
@@ -83,7 +63,7 @@ hook.Add("scValue_limitedZone", "SlashCo:LimitedZone", function(effect)
 		ply.FogStart, ply.FogEnd = render.GetFogDistances()
 		ply.DefaultFogStart, ply.DefaultFogEnd = render.GetFogDistances()
 	end
-end)
+end
 
 local particleSettings = {
 	[1] = {
@@ -153,15 +133,22 @@ local particleSettings = {
 }
 
 local delta = 0
+local lastEffect = 0
 hook.Add("Think", "SlashCoZoneParticles", function()
 	local ply = GameData.LocalPlayer
-	if not ply.ZoneEffect or not particleSettings[ply.ZoneEffect] then
+	local effect = ply:GetZoneEffect()
+	if effect ~= lastEffect then
+		lastEffect = effect
+		switchZoneEffect(ply, effect)
+	end
+
+	local settings = particleSettings[effect]
+	if not settings then
 		delta = 0
 		return
 	end
 
 	delta = math.Clamp(Lerp(0.005, delta, 1), 0, 1)
-	local settings = particleSettings[ply.ZoneEffect]
 	local pos = ply:WorldSpaceCenter()
 	local emitter = ParticleEmitter(pos)
 	local part = emitter:Add(settings.texture, pos + VectorRand(-settings.distance, settings.distance))
@@ -209,10 +196,11 @@ local function renderFog(scale)
 	local ply = GameData.LocalPlayer
 
 	local targetColor, targetStart, targetEnd = ply.DefaultFogColor, ply.DefaultFogStart, ply.DefaultFogEnd
-	if fogSettings[ply.ZoneEffect] then
-		targetColor = fogSettings[ply.ZoneEffect].color
-		targetStart = fogSettings[ply.ZoneEffect]._start
-		targetEnd = fogSettings[ply.ZoneEffect]._end
+	local settings = fogSettings[ply:GetZoneEffect()]
+	if settings then
+		targetColor = settings.color
+		targetStart = settings._start
+		targetEnd = settings._end
 	end
 
 	ply.FogColor[1] = math.Clamp(Lerp(0.02, ply.FogColor[1], targetColor[1]), 0, 255)
@@ -237,7 +225,7 @@ local function renderFog(scale)
 end
 
 hook.Add("SetupWorldFog", "SlashCo:ZoneFog", function()
-	if not GameData.LocalPlayer.ZoneEffect then
+	if not GameData.LocalPlayer.FogColor then
 		return
 	end
 
@@ -245,7 +233,7 @@ hook.Add("SetupWorldFog", "SlashCo:ZoneFog", function()
 end)
 
 hook.Add("SetupSkyboxFog", "SlashCo:ZoneFog", function(scale)
-	if not GameData.LocalPlayer.ZoneEffect then
+	if not GameData.LocalPlayer.FogColor then
 		return
 	end
 
@@ -334,12 +322,17 @@ local colorSettings = {
 
 hook.Add("RenderScreenspaceEffects", "SlashCo:ZoneScreenSpace", function()
 	local ply = GameData.LocalPlayer
-	if not ply.ZoneEffect then
+	if not ply.ColorTable then
+		return
+	end
+
+	local settings = colorSettings[ply:GetZoneEffect()]
+	if not settings then
 		return
 	end
 
 	for k, v in pairs(ply.ColorTable) do
-		ply.ColorTable[k] = math.Clamp(Lerp(0.01, v, colorSettings[ply.ZoneEffect][k]), -10, 10)
+		ply.ColorTable[k] = math.Clamp(Lerp(0.01, v, settings[k]), -10, 10)
 	end
 
 	DrawColorModify(ply.ColorTable)

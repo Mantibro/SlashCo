@@ -58,7 +58,8 @@ function SlashCo.Language(key, ...)
 	elseif SlashCo.LangTableFallback[key] then
 		return #vars > 0 and string.format(SlashCo.LangTableFallback[key], unpack(vars)) or SlashCo.LangTableFallback[key]
 	else
-		return string.format(Localize("slashco." .. string.gsub(key, " ", "_"), key), unpack(vars))
+		local localized = Localize("slashco." .. string.gsub(key, " ", "_"), key)
+		return #vars > 0 and string.format(localized, unpack(vars)) or localized
 	end
 end
 
@@ -66,6 +67,7 @@ include("ui/cl_scoreboard.lua")
 include("cl_headbob.lua")
 include("ui/cl_fonts.lua")
 
+include("sh_player.lua") -- Must be loaded before the slashers due to the datatable setup
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
 include("documents/cl_documents.lua")
@@ -92,7 +94,6 @@ include("sh_experience.lua")
 include("sh_perks.lua")
 include("ui/cl_documents.lua") -- Depends on sh_perks.lua
 include("sh_canbeseen.lua")
-include("sh_player.lua")
 include("sh_fog.lua")
 include("sh_keyboard.lua")
 
@@ -106,6 +107,7 @@ include("cl_limitedzone.lua")
 
 CreateClientConVar("slashco_cl_disable_pp", 0, true, false, "Disable post processing effects for survivors.", 0, 1)
 CreateClientConVar("slashco_cl_playermodel", "models/slashco/survivor/male_01.mdl", true, true, "SlashCo Survivor Playermodel")
+CreateClientConVar("slashco_cl_disable_effects", 0, true, false, "Disable some effects for sensitive eyes", 0, 1)
 
 --[[
 cvars.AddChangeCallback("slashco_cl_playermodel", function(_, _, newVal)
@@ -199,6 +201,27 @@ local colors = {
 	gray = Color(200, 200, 200)
 }
 
+-- RaphaelIT7: use this to avoid spam calling ents.FindByClass in paint code... (ToDo: Actually profile this)
+local classCache = {}
+function SlashCo.FindByClass(class)
+	local realTime = RealTime()
+	local entry = classCache[class]
+	if not entry or (entry.time + 0.2) < realTime then
+		entry = {
+			list = ents.FindByClass(class),
+			time = realTime,
+		}
+
+		classCache[class] = entry
+	end
+
+	return entry.list
+end
+
+local function IsHaloHidden(ent)
+	return not IsValid(ent) or (ent:IsPlayer() and not ent:CanBeSeen()) or ent:IsDormant()
+end
+
 ---draw halos; can only be used in the below function
 function SlashCo.DrawHalo(_ents, color, passes, noZ)
 	if not g_SlashCoDrawingHalos then
@@ -217,9 +240,17 @@ function SlashCo.DrawHalo(_ents, color, passes, noZ)
 		noZ = true
 	end
 
-	for k, v in pairs(_ents) do
-		if IsValid(v) and (v:IsPlayer() and not v:CanBeSeen() or v:IsDormant()) then
-			table.remove(_ents, k)
+	for i = 1, #_ents do
+		if IsHaloHidden(_ents[i]) then
+			local visible = {}
+			for j = 1, #_ents do
+				if not IsHaloHidden(_ents[j]) then
+					visible[#visible + 1] = _ents[j]
+				end
+			end
+
+			_ents = visible
+			break
 		end
 	end
 
@@ -232,9 +263,9 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 	local ply = GameData.LocalPlayer
 	local _team = ply:Team()
 	if _team == TEAM_SLASHER then
-		SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
-		SlashCo.DrawHalo(ents.FindByClass("sc_babaclone"))
-		SlashCo.DrawHalo(ents.FindByClass("sc_maleclone"))
+		SlashCo.DrawHalo(SlashCo.FindByClass("sc_generator"), "yellow")
+		SlashCo.DrawHalo(SlashCo.FindByClass("sc_babaclone"))
+		SlashCo.DrawHalo(SlashCo.FindByClass("sc_maleclone"))
 		ply:SlasherFunction("PreDrawHalos")
 
 		if SlashCo.IsSlowEscape() then
@@ -246,13 +277,13 @@ hook.Add("PreDrawHalos", "SlashCo:ClientPreDrawHalos", function()
 	end
 
 	if _team == TEAM_SPECTATOR then
-		if GameData.showHalos then
-			SlashCo.DrawHalo(ents.FindByClass("sc_generator"), "yellow")
+		if GameData.showHalos and not GameData.IsLobby then
+			SlashCo.DrawHalo(SlashCo.FindByClass("sc_generator"), "yellow")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SURVIVOR), "blue")
 			SlashCo.DrawHalo(team.GetPlayers(TEAM_SLASHER), "red")
 			if GameData.showGasCanHalos then
-				SlashCo.DrawHalo(ents.FindByClass("sc_gascan"), "gray")
-				SlashCo.DrawHalo(ents.FindByClass("sc_battery"), "green")
+				SlashCo.DrawHalo(SlashCo.FindByClass("sc_gascan"), "gray")
+				SlashCo.DrawHalo(SlashCo.FindByClass("sc_battery"), "green")
 			end
 		end
 
@@ -279,9 +310,16 @@ local function UpdateCache(entity, state)
 	end
 
 	if state then
-		table.insert(cache, entity)
+		if not table.HasValue(cache, entity) then
+			table.insert(cache, entity)
+		end
 	else
-		for i = 1, #cache do
+		if entity.DynamicFlashlight then
+			entity.DynamicFlashlight:Remove()
+			entity.DynamicFlashlight = nil
+		end
+
+		for i = #cache, 1, -1 do
 			if cache[i] == entity then
 				table.remove(cache, i)
 			end
@@ -295,6 +333,19 @@ end)
 
 hook.Add("EntityRemoved", "DynamicFlashlight.PVS_Cache", function(entity)
 	UpdateCache(entity, false)
+end)
+
+local FLASHLIGHT_SOUNDS = {
+	["slashco/survivor/flashlight-switchoff.mp3"] = true,
+	["slashco/survivor/flashlight-switchon.mp3"] = true,
+}
+
+hook.Add("PlayerButtonDown", "DynamicFlashlight.Predict", function(ply, button)
+	if input.LookupKeyBinding(button) ~= "impulse 100" or not ply:Alive() then
+		return
+	end
+
+	hook.Run("SlashCo:PlayerSwitchFlashlight", ply, not ply:GetDynamicFlashlight())
 end)
 
 hook.Add("Think", "DynamicFlashlight.Rendering", function()
@@ -311,7 +362,7 @@ hook.Add("Think", "DynamicFlashlight.Rendering", function()
 	end
 
 	for _, target in ipairs(cache) do
-		if target:GetNW2Bool("DynamicFlashlight") and (target:CanBeSeen() or target == ply) then
+		if target:GetDynamicFlashlight() and (target:CanBeSeen() or target == ply) then
 			if target.DynamicFlashlight then
 				local position = target:GetPos()
 				local newposition = Vector(position[1], position[2], position[3] + 40) + target:GetForward() * 20
@@ -527,14 +578,14 @@ local function GetBriefingScreenPos()
 end
 
 local b_tick = -500
-hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
+hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function(bDrawingDepth, bDrawingSkybox, isDraw3DSkybox)
 	if not GameData.IsLobby then
 		return
 	end
 
 	if bDrawingDepth or bDrawingSkybox or isDraw3DSkybox then return end
 
-	local offerTable = table.Random(ents.FindByClass("sc_offertable"))
+	local offerTable = SlashCo.FindByClass("sc_offertable")[1]
 	if IsValid(offerTable) then
 		local angle = offerTable:LocalToWorldAngles(Angle(0, 90, 90))
 		local pos = offerTable:LocalToWorld(Vector(5, 0, 110))
@@ -630,29 +681,6 @@ hook.Add("PostDrawOpaqueRenderables", "LobbyScreens", function()
 		cam.End3D2D()
 	end
 end)
-
-g_SCLoadedSounds = g_SCLoadedSounds or {} --set as global to protect against lua restarts
-function SlashCo.ReadSound(fileName)
-	local _sound
-	local filter
-	if not g_SCLoadedSounds[fileName] then
-		_sound = CreateSound(game.GetWorld(), fileName, filter)
-		if _sound then
-			_sound:SetSoundLevel(0)
-			g_SCLoadedSounds[fileName] = { _sound, filter }
-		end
-	else
-		_sound = g_SCLoadedSounds[fileName][1]
-		filter = g_SCLoadedSounds[fileName][2]
-	end
-
-	if _sound then
-		_sound:Stop()
-		_sound:Play()
-	end
-
-	return _sound
-end
 
 -- RaphaelIT7: We use PostDrawHUD instead of DrawOverlay to avoid rendering OVER the main menu.
 hook.Add("PostDrawHUD", "SlashCo:DrawHUD", function()

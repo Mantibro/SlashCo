@@ -72,7 +72,32 @@ SlashCo.KeyboardBinds = {
 	OPEN_KEYBINDS = {
 		name = "keyboard_bind_keybinds",
 		button = KEY_F8,
-	}
+	},
+	-- Keys for the Map tools (WIP)
+	MAPTOOL_SWITCH_SURVIVOR = {
+		ui_priority = -999,
+		name = "maptools_become_survivor",
+		button = KEY_F1, -- BUG: GMod has it's debug menu bound to SHIFT + F1, no idea how we could supress that yet
+		--button2 = KEY_LSHIFT,
+	},
+	MAPTOOL_SWITCH_SLASHER = {
+		ui_priority = -999,
+		name = "maptools_become_slasher",
+		button = KEY_F2,
+		--button2 = KEY_LSHIFT,
+	},
+	MAPTOOL_UNDO = {
+		ui_priority = -999,
+		name = "maptools_undo",
+		button = KEY_Z,
+		button2 = KEY_LCONTROL,
+	},
+	MAPTOOL_REDO = {
+		ui_priority = -999,
+		name = "maptools_redo",
+		button = KEY_Y,
+		button2 = KEY_LCONTROL,
+	},
 }
 
 function SlashCo.GetDefaultKey(name)
@@ -92,15 +117,40 @@ function SlashCo.ParseKeyboardBinds(stringData)
 		local info = string.Split(keyData, "|")
 		if #info ~= 2 then continue end
 
-		binds[info[1]] = tonumber(info[2]) -- 1 = Name, 2 = Button Number
-		binds[tonumber(info[2])] = true
+		local buttonData = info[2]
+		if buttonData:StartsWith("#") then
+			-- sub so that we skip the #
+			local buttons = string.Split(buttonData:sub(2), ".")
+			buttonData = {
+				button = tonumber(buttons[1]),
+				button2 = tonumber(buttons[2])
+			}
+		else
+			buttonData = {
+				button = tonumber(info[2])
+			}
+		end
+
+		-- 1 = Name
+		binds[info[1]] = buttonData
+		binds[buttonData.button] = true
+		if buttonData.button2 then
+			binds[buttonData.button2] = true
+		end
 	end
 
 	for name, info in pairs(SlashCo.KeyboardBinds) do
 		if binds[name] then continue end
 
-		binds[name] = tonumber(info.button) -- Add any missing buttons
+		binds[name] = {
+			button = tonumber(info.button), -- Add any missing buttons
+		}
 		binds[tonumber(info.button)] = true
+
+		if info.button2 then
+			binds[name].button2 = tonumber(info.button2)
+			binds[tonumber(info.button2)] = true
+		end
 	end
 
 	return binds
@@ -112,7 +162,10 @@ function SlashCo.KeyboardBindsToString(binds)
 	for name, info in pairs(SlashCo.KeyboardBinds) do
 		if isbool(info) then continue end
 
-		local keyData = name .. "|" .. tostring(binds[name] or info.button)
+		local button = binds[name] and binds[name].button or info.button
+		local button2 = binds[name] and binds[name].button2 or info.button2
+		local buttonData = isnumber(info.button2) and ("#" .. tostring(button) .. "." .. tostring(button2)) or tostring(button)
+		local keyData = name .. "|" .. buttonData
 		if data == "" then
 			data = keyData
 		else
@@ -136,6 +189,11 @@ if CLIENT then
 	end
 
 	function SlashCo.SaveKeyboardBinds()
+		if cookie.GetString("SlashCo:KeyboardBinds_BACKUP_05_10_2026", nil) == nil then
+			-- RaphaelIT7: Just to be sure so we can recover in the case I fked up as I really don't want people to lose their bindings
+			cookie.Set("SlashCo:KeyboardBinds_BACKUP_05_10_2026", cookie.GetString("SlashCo:KeyboardBinds", ""))
+		end
+
 		cookie.Set("SlashCo:KeyboardBinds", SlashCo.KeyboardBindsToString(GameData.KeyboardBinds))
 		SlashCo.LoadKeyboardBinds() -- Acts as verification too
 	end
@@ -148,18 +206,41 @@ if CLIENT then
 
 	function SlashCo.GetKeyButton(name)
 		if not GameData.KeyboardBinds or not GameData.KeyboardBinds[name] then
-			return SlashCo.KeyboardBinds[name] and SlashCo.KeyboardBinds[name].button or -1
+			if not SlashCo.KeyboardBinds[name] then
+				return -1
+			end
+
+			return SlashCo.KeyboardBinds[name].button or -1, SlashCo.KeyboardBinds[name].button2
 		end
 
-		return GameData.KeyboardBinds[name]
+		return GameData.KeyboardBinds[name].button, GameData.KeyboardBinds[name].button2
 	end
 
 	function SlashCo.GetKeyButtonName(name)
-		return string.upper(input.GetKeyName(SlashCo.GetKeyButton(name, ply)) or "UNKNOWN")
+		local button1, button2 = SlashCo.GetKeyButton(name, ply)
+		local buttonName = string.upper(input.GetKeyName(button1) or "UNKNOWN")
+		if button2 then
+			buttonName = buttonName .. " + " .. string.upper(input.GetKeyName(button2) or "UNKNOWN")
+		end
+
+		return buttonName
 	end
 
 	function SlashCo.IsKeyPressed(name, ply, button)
-		return button == SlashCo.GetKeyButton(name, ply)
+		local button1, button2 = SlashCo.GetKeyButton(name, ply)
+		if button1 == button then
+			if not button2 then
+				return true
+			else
+				return input.IsButtonDown(button2)
+			end
+		end
+
+		if button2 == button then
+			return input.IsButtonDown(button1)
+		end
+
+		return false
 	end
 
 	local blockBinds = CreateClientConVar("slashco_blockbinds", "1", true, false, "If enabled, GMod key binds that overlap with SlashCo's binds will be blocked from executing")
@@ -192,5 +273,47 @@ function SlashCo.IsKeyPressed(name, ply, button)
 		return button == defaultBind.button
 	end
 
-	return button == binds[name]
+	local bind = binds[name]
+	if not bind.button2 then
+		return button == bind.button
+	else
+		local buttons = ply.KEYBOARD_BUTTONS
+		if button == bind.button then
+			-- We check if the second button is pressed too
+			return buttons[bind.button2] or false
+		end
+
+		if button == bind.button2 then
+			return buttons[bind.button] or false
+		end
+
+		return false
+	end
 end
+
+-- We must keep track of this ourselves... ugly
+function SlashCo.OnPlayerButtonDown(ply, button)
+	local buttons = ply.KEYBOARD_BUTTONS
+	if not buttons then
+		buttons = {}
+		ply.KEYBOARD_BUTTONS = buttons
+	end
+
+	buttons[button] = true
+
+	-- This one is needed as hook order is funky
+	hook.Run("SlashCo:PlayerButtonDown", ply, button)
+end
+
+function SlashCo.OnPlayerButtonUp(ply, button)
+	local buttons = ply.KEYBOARD_BUTTONS
+	if not buttons then
+		buttons = {}
+		ply.KEYBOARD_BUTTONS = buttons
+	end
+
+	buttons[button] = nil
+end
+
+hook.Add("PlayerButtonDown", "SlashCo:Keyboard", SlashCo.OnPlayerButtonDown)
+hook.Add("PlayerButtonUp", "SlashCo:Keyboard", SlashCo.OnPlayerButtonUp)

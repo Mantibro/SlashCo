@@ -13,8 +13,8 @@ ITEM.IsSpawnable = true
 function ITEM.OnUse(ply)
 	local flare = SlashCo.CreateItem("sc_flare", ply:LocalToWorld( Vector(0, 0, 30) ) , ply:LocalToWorldAngles( Angle(0,0,0) ))
 	flare:GetPhysicsObject():SetVelocity(ply:GetAimVector() * 400)
-	flare:SetNWBool("FlareActive", true)
-	flare:SetNWString("FlareDropperName", ply:Nick())
+	flare:SetFlareActive(true)
+	flare:SetFlareDropperName(ply:Nick())
 
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "weapons/flaregun/burn.wav",

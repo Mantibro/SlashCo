@@ -40,6 +40,7 @@ include("sh_shared.lua")
 include("sv_globals.lua")
 include("sv_spawning.lua")
 include("sv_teleporting.lua")
+include("sh_player.lua") -- Must be loaded before the slashers because of the datatable stuff
 include("items/items_init.lua")
 include("slasher/slasher_init.lua")
 include("documents/sv_documents.lua")
@@ -53,7 +54,6 @@ include("slasher/sv_slasher_func.lua")
 include("sv_concommands.lua")
 include("sv_ply_voicelines.lua")
 include("sv_survivor_func.lua")
-include("items/sv_playerspeed.lua")
 include("ui/slasher_stock/sh_slasher_hudfunctions.lua")
 include("sh_values.lua")
 include("sh_doors.lua")
@@ -64,7 +64,6 @@ include("sh_roundpoints.lua")
 include("sh_experience.lua")
 include("sh_perks.lua")
 include("sh_canbeseen.lua")
-include("sh_player.lua")
 include("sh_fog.lua")
 include("sv_holylib.lua")
 include("sv_maptools.lua")
@@ -88,7 +87,8 @@ Extra credits: undo, Jim, DarkGrey
 --local roundOverToggle = SlashCo.CurRound.roundOverToggle
 
 -- RaphaelIT7: Restore g_SlashCoDebug when transitioning from slashco_debug_changemap
-if SysTime() > cookie.GetNumber("slashco_debug", 0) then
+local debugTime = cookie.GetNumber("slashco_debug", 0)
+if debugTime ~= 0 and SysTime() > debugTime then
 	g_SlashCoDebug = true
 	cookie.Delete("slashco_debug")
 end
@@ -98,7 +98,7 @@ CreateConVar("slashco_force_difficulty", -1, FCVAR_NONE,
 
 hook.Add("CanExitVehicle", "PlayerMotion", function(veh, ply)
 	if ply:Team() == TEAM_SURVIVOR then
-		return veh.VehicleName ~= "Airboat Seat"
+		return veh.VehicleName ~= "Airboat Seat" or veh.AllowExit == true
 	end
 end)
 
@@ -134,6 +134,17 @@ local function lagTrace(ply)
 	return tr.Entity, tr
 end
 
+local function playBlip(ply, pitch)
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/blip.mp3",
+		entity = ply,
+		soundLevel = 75,
+		volume = 0.5,
+		playbackRate = pitch / 100,
+		fadeIn = 0,
+	})
+end
+
 local function lobbyButtons(ply, button)
 	local plyTeam = ply:Team()
 	if SlashCo.LobbyData.LOBBYSTATE == 0 and plyTeam == TEAM_LOBBY then
@@ -145,10 +156,7 @@ local function lobbyButtons(ply, button)
 				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.NotReady)
 				SlashCo.LobbyBroadcastInfo()
 			end
-			local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-			Sndd:Play()
-			Sndd:ChangeVolume(0.5, 0)
-			Sndd:ChangePitch(100, 0)
+			playBlip(ply, 100)
 		end
 
 		if SlashCo.IsKeyPressed("READY_SLASHER", ply, button) then
@@ -165,17 +173,11 @@ local function lobbyButtons(ply, button)
 
 				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.Slasher)
 				SlashCo.LobbyBroadcastInfo()
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(100, 0)
+				playBlip(ply, 100)
 			else
 				SlashCo.SetLobbyPlayerReadyState(ply, SlashCo.ReadyState.NotReady)
 				SlashCo.LobbyBroadcastInfo()
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(100, 0)
+				playBlip(ply, 100)
 			end
 		end
 
@@ -192,24 +194,15 @@ local function lobbyButtons(ply, button)
 			if (#team.GetPlayers(TEAM_LOBBY) < GameData.MaxPlayers) then
 				ply:SetTeam(TEAM_LOBBY)
 				ply:Spawn()
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(80, 0)
+				playBlip(ply, 80)
 			else
 				ply:ChatPrint("The Lobby is currently full.")
-				local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-				Sndd:Play()
-				Sndd:ChangeVolume(0.5, 0)
-				Sndd:ChangePitch(65, 0)
+				playBlip(ply, 65)
 			end
 		elseif plyTeam == TEAM_LOBBY then
 			ply:SetTeam(TEAM_SPECTATOR)
 			ply:Spawn()
-			local Sndd = CreateSound(ply, Sound("slashco/blip.mp3"))
-			Sndd:Play()
-			Sndd:ChangeVolume(0.5, 0)
-			Sndd:ChangePitch(80, 0)
+			playBlip(ply, 80)
 		end
 	end
 end
@@ -288,6 +281,11 @@ local function spectatorButtons(ply, button)
 			ply:SetObserverMode(OBS_MODE_CHASE)
 		end
 
+		return
+	end
+
+	if SlashCo.IsKeyPressed("PING", ply, button) then
+		ply:SurvivorPing()
 		return
 	end
 end
@@ -408,7 +406,9 @@ hook.Add("InitPostEntity", "SlashCo:InitPostEntity", function()
 	end
 end)
 
-local function Think()
+hook.Add("Think", "SlashCo:CoreThink", function()
+	if GameData.IsLobby then return end
+
 	if engine.TickCount() % math.floor(5 / engine.TickInterval()) == 0 then
 		for _, p in ipairs(team.GetPlayers(TEAM_SURVIVOR)) do
 			local health = p:Health()
@@ -420,25 +420,21 @@ local function Think()
 
 	if SlashCo.CurRound.GameProgress == -1 then
 		for _, v in ipairs(team.GetPlayers(TEAM_SPECTATOR)) do
-			if SlashCo.CurRound.Slashers[v:SteamID64()] and v:GetNWString("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
+			if SlashCo.CurRound.Slashers[v:SteamID64()] and v:GetNW2String("Slasher") ~= SlashCo.CurRound.Slashers[v:SteamID64()].SlasherID then
 				SlashCo.ApplySlasherToPlayer(v)
 			end
 		end
 	end
 
 	if SlashCo.CurRound.GameProgress >= 0 then
-		for _, ply in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			if ply:GetNWInt("GameProgressDisplay") ~= SlashCo.CurRound.GameProgress then
-				ply:SetNWInt("GameProgressDisplay", SlashCo.CurRound.GameProgress)
-			end
-		end
+		SlashCo.SetGameProgress(SlashCo.CurRound.GameProgress)
 	end
 
 	local gens = ents.FindByClass("sc_generator")
 	if SlashCo.CurRound and SlashCo.State == SlashCo.States.IN_GAME and #gens > 0 then
 		local runningCount = 0
 		for _, v in ipairs(gens) do
-			if v.IsRunning then
+			if v:GetRunning() then
 				runningCount = runningCount + 1
 			end
 		end
@@ -451,11 +447,8 @@ local function Think()
 				totalCansRemaining = totalCansRemaining + (v.CansRemaining or gasPerGen)
 			end
 
-			if #gens <= totalCansRemaining then
-				return
-			end --Prevent draining if there is too few gas cans
-
-			if engine.TickCount() % math.floor(240 / engine.TickInterval()) == 0 then
+			--Prevent draining if there is too few gas cans
+			if #gens > totalCansRemaining and engine.TickCount() % math.floor(240 / engine.TickInterval()) == 0 then
 				local random = math.random(#gens)
 				gens[random]:ChangeCanProgress(-1)
 				--gens[random].CansRemaining = math.Clamp((gens[random].CansRemaining or gasPerGen) + 1, 0, gasPerGen)
@@ -504,12 +497,6 @@ local function Think()
 			SlashCo.CurRound.roundOverToggle = false
 		end
 	end
-end
-
-hook.Add("PostGamemodeLoaded", "SlashCo:PostGamemodeLoaded", function()
-	timer.Simple(1, function()
-		hook.Add("Think", "SlashCo:CoreThink", Think)
-	end)
 end)
 
 function SlashCo.AddLateSurvivor(ply)
@@ -594,7 +581,13 @@ hook.Add("PlayerChangedTeam", "SlashCo:PlayerChangedTeam", function(ply, oldTeam
 	end
 
 	if oldTeam == TEAM_SURVIVOR then
-		ply:SetNW2Bool("DynamicFlashlight", false)
+		ply:SetDynamicFlashlight(false)
+	end
+
+	-- "Outfitter" addon can add/modify slashers which we preferably do not want
+	-- See https://github.com/Mantibro/SlashCo/pull/81
+	if ply.OutfitSuppress and (newTeam == TEAM_SLASHER) ~= (oldTeam == TEAM_SLASHER) then
+		ply:OutfitSuppress(newTeam == TEAM_SLASHER, "SlashCo")
 	end
 
 	if GameData.IsLobby then
@@ -615,7 +608,7 @@ function GM:PlayerDeath(victim)
 		return
 	end
 
-	victim:SetNW2Bool("DynamicFlashlight", false)
+	victim:SetDynamicFlashlight(false)
 
 	local dontTickLife = victim:ItemFunction("OnDie")
 	if dontTickLife then
@@ -680,7 +673,7 @@ function GM:PlayerDeath(victim)
 
 	table.insert(SlashCo.DeadBodies, ragdoll)
 
-	if victim:GetNWBool("SurvivorDecapitate") then
+	if victim.SurvivorDecapitate then
 		ragdoll:ManipulateBoneScale(ragdoll:LookupBone("ValveBiped.Bip01_Head1"), Vector(0, 0, 0))
 
 		local vPoint = ragdoll:GetBonePosition(ragdoll:LookupBone("ValveBiped.Bip01_Head1"))
@@ -695,8 +688,6 @@ function GM:PlayerDeath(victim)
 		dripfx:SetColor(0)
 		dripfx:SetScale(6)
 		util.Effect("bloodspray", dripfx)
-
-		ang_offset = 180
 	end
 
 	if team.NumPlayers(TEAM_SURVIVOR) == 1 and #SlashCo.CurRound.SlasherData.AllSurvivors > 1 then
@@ -741,26 +732,7 @@ end
 --https://github.com/RiggsMackay/Dynamic-Flashlight
 
 hook.Add("PlayerSwitchFlashlight", "DynamicFlashlight.Switch", function(ply, state)
-	if ply:Team() ~= TEAM_SURVIVOR and not ply:GetNWBool("AmogusSurvivorDisguise") then
-		if not (GameData.IsLobby and GameData.IsBlackout) then
-			return false
-		end
-	end
-
-	if state == false then
-		return false
-	end
-
-	ply:SetNW2Bool("DynamicFlashlight", not ply:GetNW2Bool("DynamicFlashlight"))
-	if ply:GetNW2Bool("DynamicFlashlight") then
-		ply:EmitSound("slashco/survivor/flashlight-switchoff.mp3", 60, 100)
-	end
-
-	if not ply:GetNW2Bool("DynamicFlashlight") then
-		ply:EmitSound("slashco/survivor/flashlight-switchon.mp3", 60, 100)
-	end
-
-	return false
+	return hook.Run("SlashCo:PlayerSwitchFlashlight", ply, state)
 end)
 
 util.AddNetworkString("SlashCo:FlashWindows")
@@ -773,15 +745,6 @@ function SlashCo.FlashWindows(players)
 		net.Broadcast()
 	end
 end
-
-hook.Add("PlayerButtonDown", "SlashCo:SpectatorFunctions", function(ply, button)
-	if ply:Team() ~= TEAM_SPECTATOR then return end
-	if not SlashCo.CanSpectatorsPing() then return end
-	if button ~= MOUSE_MIDDLE then return end
-	if ply.LastPinged and (CurTime() - ply.LastPinged) < SlashCo.GetPlayerPingDelay() then return end
-
-	ply:SurvivorPing()
-end)
 
 util.AddNetworkString("SlashCo:UpdateLightMap")
 function SlashCo.SetLightStyle(lightStyle, lightPattern)

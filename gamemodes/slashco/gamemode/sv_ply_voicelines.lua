@@ -119,7 +119,9 @@ net.Receive("SlashCo:SurvivorVoicePrompt", function(_, ply)
 	end
 	ply.VoicePromptCooldown = CurTime()
 
-	local prompt = net.ReadString()
+	local prompt = SlashCo.VoicePrompts[net.ReadUInt(8)]
+	if not prompt then return end
+
 	SlashCo.AudioSystem.PlaySound({
 		soundPath = "slashco/survivor/voice/prompt_" .. prompt .. math.random(1, 5) .. ".mp3",
 		identifier = "SurvivorVoicePrompt",

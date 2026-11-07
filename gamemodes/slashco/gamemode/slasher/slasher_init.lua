@@ -47,17 +47,8 @@ function SlashCo.RegisterSlasher(table, name)
 	SlashCoSlashers[name] = table
 	SlashCoSlashersByID[ID] = table
 
-	if SERVER then
-		for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
-			local slasherTbl = SlashCoSlashers[slasher:GetNWString("Slasher")]
-			if slasherTbl.OnBalanceForPlayers then
-				slasherTbl.OnBalanceForPlayers(GameData.RoundStartSurvivorCount, GameData.RoundStartSurvivorCount - GameData.BaseMaxSurvivors)
-			end
-		end
-
-		if SC_CURRENT_SLASHER_FILE then
-			SlashCo.PrecacheSlasherAddon(SC_CURRENT_SLASHER_FILE)
-		end
+	if SERVER and SC_CURRENT_SLASHER_FILE then
+		SlashCo.PrecacheSlasherAddon(SC_CURRENT_SLASHER_FILE)
 	end
 end
 
@@ -88,7 +79,7 @@ local PLAYER = FindMetaTable("Player")
 
 --this doesn't include a team check because we assume that it's in a slasher-only context
 function PLAYER:SlasherValue(value, fallback)
-	local slasher = self:GetNWString("Slasher", "none")
+	local slasher = self:GetNW2String("Slasher", "none")
 
 	if SlashCoSlashers[slasher] and SlashCoSlashers[slasher][value] then
 		return SlashCoSlashers[slasher][value]
@@ -98,11 +89,70 @@ function PLAYER:SlasherValue(value, fallback)
 end
 
 function PLAYER:SlasherFunction(value, ...)
-	local slasher = self:GetNWString("Slasher", "none")
+	local slasher = self:GetNW2String("Slasher", "none")
 
 	if SlashCoSlashers[slasher] and SlashCoSlashers[slasher][value] then
 		return SlashCoSlashers[slasher][value](self, ...)
 	end
+end
+
+local function GetBaseValues(slasherTbl)
+	if not slasherTbl.BaseValues then
+		local base = {}
+		for key, value in pairs(slasherTbl) do
+			if isnumber(value) then
+				base[key] = value
+			end
+		end
+
+		slasherTbl.BaseValues = base
+	end
+
+	return slasherTbl.BaseValues
+end
+
+--[[
+	Example:
+
+	totalSurvivors = How many survivors existed when they got spawned in using the helicopter
+	additionalSurvivors = How many survivors above or below the base max survivor count exist. If 2 total survivors exist them this would be -4 since 2 - 6(the base max survivors) = -4
+
+	function SLASHER.OnBalanceForPlayers(totalSurvivors, additionalSurvivors)
+		SLASHER.ProwlSpeed = 140 + (5 * totalSurvivors)
+	end
+]]
+function SlashCo.BalanceSlasher(slasherTbl)
+	if not slasherTbl or not slasherTbl.OnBalanceForPlayers then return end
+
+	local survivors = GetGlobal2Int("SlashCo:BalanceSurvivors")
+	local singularity = GetGlobal2Int("SlashCo:BalanceSingularity")
+	if slasherTbl.BalancedSurvivors == survivors and slasherTbl.BalancedSingularity == singularity then return end
+
+	for key, value in pairs(GetBaseValues(slasherTbl)) do
+		slasherTbl[key] = value
+	end
+
+	slasherTbl.BalancedSurvivors = survivors
+	slasherTbl.BalancedSingularity = singularity
+	slasherTbl.OnBalanceForPlayers(survivors, survivors - GameData.BaseMaxSurvivors, singularity)
+end
+
+function PLAYER:SetSlasherSpeed(run, walk)
+	walk = walk or run
+	if self:GetRunSpeed() == run and self:GetWalkSpeed() == walk then return end
+
+	self:SetRunSpeed(run)
+	self:SetWalkSpeed(walk)
+	self:SetSlowWalkSpeed(walk)
+end
+
+function PLAYER:UpdateSlasherSpeed()
+	local run, walk = self:SlasherFunction("GetSpeed")
+	if not run then
+		run = self:SlasherValue(self:GetInSlasherChaseMode() and "ChaseSpeed" or "ProwlSpeed", 150)
+	end
+
+	self:SetSlasherSpeed(run, walk)
 end
 
 function PLAYER:SlasherStunDeafen(duration)
@@ -148,7 +198,7 @@ end
 -- RaphaelIT7: No AddSlasherAnger for client!
 
 function SlashCo.GetSlasherAnger(slasher)
-	return slasher:GetNW2Float("SlasherAnger", 0)
+	return slasher:GetSlasherAnger()
 end
 
 function SlashCo.GetGlobalSlasherAnger()
@@ -159,6 +209,8 @@ function SlashCo.GetGlobalSlasherAnger()
 	for _, slasher in ipairs(slashers) do
 		totalAnger = totalAnger + SlashCo.GetSlasherAnger(slasher)
 	end
+
+	if count == 0 then return 0 end
 
 	return totalAnger / count
 end
@@ -183,17 +235,47 @@ end)
 
 hook.Add("PlayerFootstep", "SlashCo:SlasherFootstep", function(ply)
 	if ply:Team() ~= TEAM_SLASHER then return end
+
+	-- RaphaelIT7: Can ply even not be the GameData.LocalPlayer?
+	if CLIENT and (ply ~= GameData.LocalPlayer or not IsFirstTimePredicted()) then
+		return true
+	end
+
 	return ply:SlasherFunction("Footstep")
 end)
 
+local function GainPassiveAnger(slasher)
+	local gain = slasher:SlasherValue("AngerPassiveGain", 0)
+	if gain == 0 or GameData.IsLobby then return end
+
+	slasher:SetSlasherAnger(math.Clamp(slasher:GetSlasherAnger() + gain * engine.TickInterval(), 0, 100))
+end
+
 hook.Add("Move", "SlashCo:SlasherMove", function(ply, mv)
 	if ply:Team() ~= TEAM_SLASHER then return end
+
+	SlashCo.BalanceSlasher(SlashCoSlashers[ply:GetNW2String("Slasher")])
+	ply:UpdateSlasherSpeed()
+	GainPassiveAnger(ply)
+
 	return ply:SlasherFunction("Move", mv)
 end)
 
 hook.Add("FinishMove", "SlashCo:SlasherFinishMove", function(ply, mv)
 	if ply:Team() ~= TEAM_SLASHER then return end
 	return ply:SlasherFunction("FinishMove", mv)
+end)
+
+hook.Add("SlashCo:DrawHUD", "SlashCo:SlasherHUD", function()
+	local localPly = GameData.LocalPlayer
+	if localPly:Team() ~= TEAM_SLASHER then return end
+	return localPly:SlasherFunction("DrawHUD", localPly.SlasherHud)
+end)
+
+hook.Add("PlayerTick", "SlashCo:PredictedSlasherTick", function(ply)
+	if ply:Team() ~= TEAM_SLASHER then return end
+
+	ply:SlasherFunction("OnPredictedTick")
 end)
 
 if CLIENT then
@@ -223,7 +305,7 @@ if CLIENT then
 
 		local slasherpos = GameData.LocalPlayer:GetPos()
 		local PerceptionReal = 0
-		if not GameData.LocalPlayer:GetNWBool("InSlasherChaseMode") then
+		if not GameData.LocalPlayer:GetInSlasherChaseMode() then
 			PerceptionReal = GameData.LocalPlayer:GetPerception()
 		end
 
@@ -238,7 +320,7 @@ if CLIENT then
 
 		GameData.LocalPlayer:SlasherFunction("ClientSideEffect")
 
-		if GameData.LocalPlayer:GetNW2Bool("Slasher:NoFootsteps") or GameData.LocalPlayer:SlasherIsStunDeaf() then
+		if GameData.LocalPlayer:GetNoFootsteps() or GameData.LocalPlayer:SlasherIsStunDeaf() then
 			return
 		end
 

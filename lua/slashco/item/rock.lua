@@ -7,25 +7,15 @@ ITEM.Icon = "slashco/ui/icons/items/item_7"
 ITEM.Price = 30
 ITEM.Description = "Rock_desc"
 ITEM.CamPos = Vector(50,0,0)
-ITEM.ChangesSpeed = true
+ITEM.SpeedPriority = 10
 ITEM.IsSpawnable = true
 
 function ITEM.OnFootstep()
 	return true
 end
 
-function ITEM.OnSwitchFrom(ply)
-	ply:RemoveSpeedEffect("rock")
-end
-
-function ITEM.OnPickUp(ply)
-	if not SlashCo.IsActivePerk(ply, "extremelybuff") then
-		ply:AddSpeedEffect("rock", 250, 10)
-		return
-	else
-		ply:AddSpeedEffect("rock", 270, 10)
-		return
-	end
+function ITEM.Speed(ply)
+	return SlashCo.IsActivePerk(ply, "extremelybuff") and 270 or 250
 end
 
 ITEM.ViewModel = {
