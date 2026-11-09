@@ -251,8 +251,8 @@ function SLASHER.OnTickBehaviour(slasher)
 	slasher:SetNW2Int("SpeedrunnerCardChaseSpeed", math.floor(SpeedChase))
 	slasher:SetNW2Int("CardCooldown", math.floor(SwitchCardCD))
 
-	slasher:SetEyeSight(SLASHER.Eyesight)
-	slasher:SetPerception(SLASHER.Perception)
+	slasher:SetEyeSight(slasher.EyesightOverride or SLASHER.Eyesight)
+	slasher:SetPerception(slasher.PerceptionOverride or SLASHER.Perception)
 end
 
 hook.Add("PlayerUse", "CardguyItemInteraction", function(ply, ent)
@@ -266,12 +266,12 @@ hook.Add("PlayerUse", "CardguyItemInteraction", function(ply, ent)
 	if ent:GetClass() == "sc_alcohol" then
 		SlashCo.AudioSystem.EmitSound(ply, "slashco/survivor/soda_drink1.mp3")
 
-		SLASHER.Perception = 2.0
+		ply.PerceptionOverride = 2.0
 		ply:SetNW2Int("CardguyEffect1", 1)
 
 		timer.Simple(20, function()
 			if not IsValid(ply) then return end
-			SLASHER.Perception = 0.8
+			ply.PerceptionOverride = nil
 			ply:SetNW2Int("CardguyEffect1", 0)
 		end)
 	elseif ent:GetClass() == "sc_brick" then
@@ -285,12 +285,12 @@ hook.Add("PlayerUse", "CardguyItemInteraction", function(ply, ent)
 	elseif ent:GetClass() == "sc_newports" then
 		SlashCo.AudioSystem.EmitSound(ply, "slashco/newports_eat.ogg")
 
-		SLASHER.Eyesight = 6
+		ply.EyesightOverride = 6
 		ply:SetNW2Int("CardguyEffect2", 1)
 
 		timer.Simple(20, function()
 			if not IsValid(ply) then return end
-			SLASHER.Eyesight = 4
+			ply.EyesightOverride = nil
 			ply:SetNW2Int("CardguyEffect2", 0)
 		end)
     elseif ent:GetClass() == "sc_porchlight" then
@@ -316,89 +316,91 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetNW2Bool("CardguyTeleporting") then return end
 	if slasher:GetNW2Bool("CardguyThrowing") then return end
 	if slasher:GetNW2Bool("CardguyExecuting") then return end
+	if not IsValid(target) then return end
 
 	local dist = SLASHER.KillDistance
-	if IsValid(target) then
-		if not target:IsPlayer() then
-			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
-				Vector(-30, -30, -60), Vector(30, 30, 60), 50, DMG_SLASH, 5, false)
-			return
-		end
+	if not target:IsPlayer() then
+		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
+			Vector(-30, -30, -60), Vector(30, 30, 60), 50, DMG_SLASH, 5, false)
+		return
+	end
 
-		if target:IsPlayer() and slasher:GetNW2Float("CardSelection") == CARD_JONKLER then
-			local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
-				Vector(-30, -30, -60), Vector(30, 30, 60), 5, DMG_SLASH, 5, false)
+	if target:IsPlayer() and slasher:GetNW2Float("CardSelection") == CARD_JONKLER then
+		local target = slasher:TraceHullAttack(slasher:EyePos(), slasher:LocalToWorld(Vector(45, 0, 0)),
+			Vector(-30, -30, -60), Vector(30, 30, 60), 5, DMG_SLASH, 5, false)
 
-			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/cardguy/cardguy_slap.mp3")
-			return
-		end
+		SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/cardguy/cardguy_slap.mp3")
+		return
+	end
 
-		if target:Team() ~= TEAM_SURVIVOR then return end
-		if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
+	if target:Team() ~= TEAM_SURVIVOR then return end
+	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
 
-		local pick_ang = SlashCo.RadialTester(slasher, 600, target)
+	local pick_ang = SlashCo.RadialTester(slasher, 600, target)
 
-		slasher:SetEyeAngles(Angle(0, pick_ang, 0))
+	slasher:SetEyeAngles(Angle(0, pick_ang, 0))
+	target:SetEyeAngles(Angle(0, pick_ang, 0))
+	slasher:Freeze(true)
+
+	slasher.KillDelayTick = SLASHER.KillDelay
+
+	timer.Simple(0.1, function()
+		if not IsValid(slasher) or not IsValid(target) then return end
+
+		target:SetPos(slasher:GetPos())
+		target:Freeze(true)
+		target:SetSurvivorBeingJumpscared(true)
+
+		slasher:SetCanKill(false)
+		slasher:SetCanChase(false)
+		slasher:SetNW2Bool("CardguyExecuting", true)
+
+		target:SetSurvivorSidExecution(true)
+
+		target:SetPos(slasher:GetPos())
 		target:SetEyeAngles(Angle(0, pick_ang, 0))
-		slasher:Freeze(true)
 
-		slasher.KillDelayTick = SLASHER.KillDelay
+		timer.Simple(1.35, function()
+			if not IsValid(target) then return end
 
-		timer.Simple(0.1, function()
-			if not IsValid(slasher) or not IsValid(target) then return end
+			target:SetEyeAngles(Angle(0, 180 + pick_ang, 0))
+		end)
 
-			target:SetPos(slasher:GetPos())
-			target:Freeze(true)
-			target:SetSurvivorBeingJumpscared(true)
+		timer.Simple(1.75, function()
+			if not IsValid(target) then return end
 
-			slasher:SetCanKill(false)
-			slasher:SetCanChase(false)
-			slasher:SetNW2Bool("CardguyExecuting", true)
+			target:SetSurvivorBeingJumpscared(false)
+			target:SetSurvivorSidExecution(false)
+		
+			target:Freeze(false)
+			target:SetNotSolid(false)
 
-			target:SetSurvivorSidExecution(true)
+			if IsValid(slasher) then -- RaphaelIT7: We check it down here to avoid leaving the player wrongly frozen
+				SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/cardguy/cardguy_slap.mp3")
+				target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
+				target:SetVelocity(slasher:GetForward() * 300)
+			end
 
-			target:SetPos(slasher:GetPos())
-			target:SetEyeAngles(Angle(0, pick_ang, 0))
-
-			timer.Simple(1.35, function()
+			timer.Simple(0.05, function()
 				if not IsValid(target) then return end
 
-				target:SetEyeAngles(Angle(0, 180 + pick_ang, 0))
-			end)
-
-			timer.Simple(1.75, function()
-				if not IsValid(slasher) or not IsValid(target) then return end
-
-				SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/cardguy/cardguy_slap.mp3")
-
-				target:SetSurvivorBeingJumpscared(false)
-				target:SetSurvivorSidExecution(false)
-				target:SetPos(slasher:GetPos() + (slasher:GetForward() * 40))
-
-				target:Freeze(false)
-				target:SetVelocity(slasher:GetForward() * 300)
-				target:SetNotSolid(false)
-				timer.Simple(0.05, function()
-					if not IsValid(target) then return end
-
-					if IsValid(slasher) then
-						target:TakeDamage(99999, slasher, slasher)
-					else
-						target:Kill()
-					end
-				end)
-			end)
-
-			timer.Simple(2.3, function()
-				if not IsValid(slasher) or not IsValid(target) then return end
-
-				slasher:Freeze(false)
-				slasher:SetCanKill(true)
-				slasher:SetCanChase(true)
-				slasher:SetNW2Bool("CardguyExecuting", false)
+				if IsValid(slasher) then
+					target:TakeDamage(99999, slasher, slasher)
+				else
+					target:Kill()
+				end
 			end)
 		end)
-	end
+
+		timer.Simple(2.3, function()
+			if not IsValid(slasher) then return end
+
+			slasher:Freeze(false)
+			slasher:SetCanKill(true)
+			slasher:SetCanChase(true)
+			slasher:SetNW2Bool("CardguyExecuting", false)
+		end)
+	end)
 end
 
 function SLASHER.OnSecondaryFire(slasher)
@@ -435,6 +437,7 @@ function SLASHER.OnMainAbilityFire(slasher)
 		local ang = slasher:LocalToWorldAngles(Angle(0, 0, 0))
 		local pos = vec
 		local matcha = ents.Create("sc_matchacoffee")
+		if not IsValid(matcha) then return end
 
 		matcha:SetPos(pos + slasher:GetForward() * 7 + Vector(0, 0, 60))
 		matcha:SetAngles(ang)
@@ -520,12 +523,14 @@ function SLASHER.OnSpecialAbilityFire(slasher)
 			end
 			return
 		end
+
 		if not slasher:Alive() or not targetRef:Alive() then
 			slasher:ChatPrint("Survivor is dead.")
 			slasher:SetNW2Bool("CardguyTeleporting", false)
 			slasher.TeleportCooldown = 5
 			return
 		end
+
 		if targetRef:Team() == TEAM_SPECTATOR then
 			slasher:ChatPrint("Survivor is dead.")
 			slasher:SetNW2Bool("CardguyTeleporting", false)
@@ -740,6 +745,7 @@ if CLIENT then
 		end
 	end)
 
+	-- RaphaelIT7 (ToDo): Once we have a clientside slasher tick hook this should be moved there :)
 	hook.Add("Tick", "CardguyJonkler", function()
 		for _, v in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 			if SlashCoSlashers[v:GetNW2String("Slasher")] == SLASHER then
