@@ -1,0 +1,31 @@
+"VertexlitGeneric"
+{
+	"$basetexture"		"models\slashco\slashers\cardguy\shoes"
+	"$bumpmap"		"models\slashco\slashers\cardguy\shoes_normal"
+
+        "$normalmapalphaenvmapmask"	"1"
+
+	"$ambientocclusion" 	   "1"
+	"$ambientocclTexture" 	   "models\slashco\slashers\cardguy\shoes_roughness"
+	"$ambientocclusiontexture" "models\slashco\slashers\cardguy\shoes_roughness"
+
+	"$phong"		   "1"
+	"$phongexponent"	   "5"
+	"$phongboost"		   "2"
+	"$phongalbedotint"	   "1"
+	"$nocull"		   "1"
+
+	"$phongfresnelranges"	"[0.15 0.1 0.5]"
+	"$rimlight"		"1"	// To enable rim lighting (requires phong)
+	"$rimlightexponent"	"90"	// Exponent for phong component of rim lighting	
+	"$rimlightboost"	".05"		
+
+	"$halflambert" 		"0"
+	"$diffuseexp" 		"1"
+
+//	$phongexponenttexture	"models\"
+//	$detail			"models\"
+//	$detailscale		"1"
+//	$detailblendfactor	"1"
+//	$detailblendmode	"1"
+}

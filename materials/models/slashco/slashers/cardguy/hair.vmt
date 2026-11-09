@@ -1,0 +1,28 @@
+"VertexlitGeneric"
+{
+	"$basetexture"		"models\slashco\slashers\cardguy\hair"
+	"$bumpmap"		"models\slashco\slashers\cardguy\hair_normal"
+
+        "$normalmapalphaenvmapmask"	"1"
+
+	"$ambientocclusion" 	   "1"
+	"$ambientocclTexture" 	   "models\slashco\slashers\cardguy\hair_roughness"
+	"$ambientocclusiontexture" "models\slashco\slashers\cardguy\hair_roughness"
+
+	"$phong"		   "1"
+	"$phongexponent"	   "10"
+	"$phongboost"		   "0.05"
+	"$phongalbedotint"	   "1"
+	"$nocull"		   "1"
+
+	"$phongfresnelranges"	"[0.15 0.1 0.5]"
+
+	"$halflambert" 		"0"
+	"$diffuseexp" 		"1"
+
+//	$phongexponenttexture	"models\"
+//	$detail			"models\"
+//	$detailscale		"1"
+//	$detailblendfactor	"1"
+//	$detailblendmode	"1"
+}
