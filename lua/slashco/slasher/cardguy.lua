@@ -14,7 +14,7 @@ SLASHER.ProwlSpeed = 180
 SLASHER.ChaseSpeed = 295
 SLASHER.Perception = 0.8
 SLASHER.Eyesight = 4
-SLASHER.KillDistance = 150
+SLASHER.KillDistance = 137
 SLASHER.ChaseRange = 1800
 SLASHER.ChaseRadius = 0.91
 SLASHER.ChaseDuration = 9.0
@@ -57,6 +57,8 @@ local function CardSwitch(slasher)
 		CardChances(slasher)
 	end
 
+	slasher.KillCooldown = 2
+
 	slasher:SetNW2Bool("CardguySwitching", true)
 	slasher:SetNW2Float("CardSelection", card)
 	slasher.CardCooldown = math.random(60, 75)
@@ -81,26 +83,26 @@ local function BababooeyCard(slasher)
 
 	local interval = math.random(10, 15)
 	local reset = interval / 2
-
-	timer.Simple(reset, function()
-		if not IsValid(slasher) then return end
-
-		slasher:SetVisible(true)
-		slasher:DrawShadow(true)
-		slasher:SetCanKill(true)
-	end)
-
 	timer.Simple(slasher.BababooeyCooldown, function()
 		if not IsValid(slasher) then return end
 		if slasher:GetNW2Float("CardSelection") ~= CARD_BABA then return end
 
 		slasher:SetVisible(false)
 		slasher:DrawShadow(false)
-		slasher:SetCanKill(false)
+		slasher.KillCooldown = reset
 
 		slasher.BababooeyCooldown = interval
 
-		SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/bababooey/baba_reveal.mp3")
+		SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/bababooey/baba_hide.mp3")
+
+		timer.Simple(reset, function()
+			if not IsValid(slasher) then return end
+
+			slasher:SetVisible(true)
+			slasher:DrawShadow(true)
+
+			SlashCo.AudioSystem.EmitSound(slasher, "slashco/slasher/bababooey/baba_reveal.mp3")
+		end)
 	end)
 end
 
@@ -156,6 +158,7 @@ function SLASHER.OnSpawn(slasher)
 	slasher:SetCanChase(true)
 
 	slasher.JonklerSound = nil
+	slasher.KillCooldown = 0
 	slasher.CardCooldown = 60
 	slasher.BababooeyCooldown = 0
 	slasher.TeleportCooldown = 60
@@ -172,6 +175,7 @@ end
 function SLASHER.OnTickBehaviour(slasher)
 	local SwitchCardCD = slasher.CardCooldown or 0 --Cooldown
 	local BabaCardCD = slasher.BababooeyCooldown or 0 --Cooldown
+	local KillCD = slasher.KillCooldown or 0 --Cooldown
 	local TeleportCD = slasher.TeleportCooldown or 0 --Cooldown
 	local MatchaCD = slasher.MatchaCooldown or 0 --Cooldown
 	local SpeedProwl = slasher.SpeedProwlCard or 0 -- Speedcard
@@ -183,6 +187,13 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if BabaCardCD > 0 then
 		slasher.BababooeyCooldown = BabaCardCD - FrameTime()
+	end
+
+	if KillCD > 0 then
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", false)
+		slasher.KillCooldown = KillCD - FrameTime()
+	else
+		slasher:SlasherHudFunc("SetControlEnabled", "LMB", true)
 	end
 
 	if TeleportCD > 0 then
@@ -335,6 +346,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 	if target:Team() ~= TEAM_SURVIVOR then return end
 	if slasher:GetPos():Distance(target:GetPos()) >= dist * 1.4 or target:GetSurvivorBeingJumpscared() then return end
+	if slasher.KillCooldown > 0.01 then return end
 
 	local pick_ang = SlashCo.RadialTester(slasher, 600, target)
 
