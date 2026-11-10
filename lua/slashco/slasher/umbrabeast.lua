@@ -69,7 +69,7 @@ local function StopUmbraBeastMauling(slasher)
 	slasher.LeapHit = false
 
 	-- Stop animating the mauling.
-	slasher:SetNWBool("UmbraBeastAnimateMauling", false)
+	slasher:SetNW2Bool("UmbraBeastAnimateMauling", false)
 
 	-- Play a shove sound as extra feedback for the survivor(s).
 	SlashCo.AudioSystem.PlaySound({
@@ -90,9 +90,9 @@ local function StopUmbraBeastMauling(slasher)
     SlashCo.AudioSystem.StopSound("StanMauling", 0.1, slasher)	-- Stops the looping sound.
 
 	for _, survivor in ipairs(player.GetAll()) do -- Self Explanatory I think...
-    	if not survivor:GetNWBool("SurvivorPounced") then return end
+    	if not survivor:GetNW2Bool("SurvivorPounced") then return end
 
-		survivor:SetNWBool("SurvivorPounced", false) -- Clear the pounced state off of the survivor.
+		survivor:SetNW2Bool("SurvivorPounced", false) -- Clear the pounced state off of the survivor.
 		survivor:Freeze(false)	-- Unfreeze the survivor who was pounced.
 
 		slasher:SetImpervious(true) -- We need to remove the collisions for a second.
@@ -122,14 +122,14 @@ if SERVER then
 		TerritoryCheckDelay = gametime + 0.5
 
 		for _, slasher in ipairs(player.GetAll()) do
-			if slasher:GetNWString("Slasher") ~= "UmbraBeast" then continue end
-			if not slasher:GetNWBool("UmbraBeastMarkTerritory") then
+			if slasher:GetNW2String("Slasher") ~= "UmbraBeast" then continue end
+			if not slasher:GetNW2Bool("UmbraBeastMarkTerritory") then
 				PaintedItems[slasher] = nil
 				continue
 			end
 
 			local territoryPos = slasher:GetNWVector("UmbraBeastTerritoryPos") -- Position of the Territory
-			local radius = slasher:GetNWInt("UmbraBeastTerritoryRadius", UMBRA_TERRITORY_RADIUS) -- Radius of the Territory
+			local radius = slasher:GetNW2Int("UmbraBeastTerritoryRadius", UMBRA_TERRITORY_RADIUS) -- Radius of the Territory
 
 			local radiusSqr = radius * radius
 
@@ -231,7 +231,7 @@ if SERVER then
 	
 		-- Freeze the slasher for a bit.
 		slasher:Freeze(true)
-		slasher:SetNWBool("UmbraBeastShoved", true)
+		slasher:SetNW2Bool("UmbraBeastShoved", true)
 	
 		-- Push the slasher away.
 		local pushDir = (slasher:GetPos() - ply:GetPos()):GetNormalized()
@@ -243,7 +243,7 @@ if SERVER then
 			if not IsValid(slasher) then return end
 		
 			slasher:Freeze(false)
-			slasher:SetNWBool("UmbraBeastShoved", false)
+			slasher:SetNW2Bool("UmbraBeastShoved", false)
 		end)
 	end)
 end
@@ -370,7 +370,7 @@ local function StartFlashlightDetection(slasher)
 
 		local beingFlashed, flasher = IsFlashlightOnSlasher(slasher)
 
-		slasher:SetNWBool("BeingFlashed", beingFlashed)
+		slasher:SetNW2Bool("BeingFlashed", beingFlashed)
 	end)
 end
 
@@ -391,6 +391,26 @@ local function StopBreathing(slasher)
 	SlashCo.AudioSystem.StopSound("StanBreath", 0.1, slasher)
 end
 
+function SLASHER.GetSpeed(slasher)
+	if slasher:GetNW2Bool("UmbraBeastStalk") then
+		if slasher:GetInSlasherChaseMode() then
+			if slasher:GetNW2Bool("BeingFlashed") then
+				return SLASHER.ChaseSpeedFlashed
+			else
+				return SLASHER.ChaseSpeed
+			end
+		else
+			return SLASHER.StalkSpeed
+		end
+	end
+
+	if slasher:GetInSlasherChaseMode() then
+		return SLASHER.StalkSpeed
+	end
+
+	return SLASHER.ProwlSpeed
+end
+
 function SLASHER.OnSpawn(slasher)
 	StanBreathing(slasher)
 
@@ -405,11 +425,12 @@ function SLASHER.OnSpawn(slasher)
 	slasher.ForwardCharge = 0
 	slasher.LungeDuration = 0
 	slasher.TimeCrouching = 0
+	slasher.LeapAirTime = 0
 	StartFlashlightDetection(slasher)
-	slasher:SetNWBool("UmbraBeastEnrage", false)
-	slasher:SetNWBool("CanKill", false)
-	slasher:SetNWBool("CanChase", false)
-	slasher:SetNWBool("DisableChaseLight", true)
+	slasher:SetNW2Bool("UmbraBeastEnrage", false)
+	slasher:SetCanKill(false)
+	slasher:SetCanChase(false)
+	slasher:SetNW2Bool("DisableChaseLight", true)
 end
 
 -- We create these only once since we use them every tick.
@@ -439,7 +460,7 @@ function SLASHER.OnTickBehaviour(slasher)
 
 	if not SlashCo.CurRound.EscapeHelicopterSummoned then
 		-- Check for game progress for Stage 1
-		if SlashCo.CurRound.GameProgress < 3 and slasher:GetNWInt("UmbraStage") ~= UMBRA_FIRST_STAGE then
+		if SlashCo.CurRound.GameProgress < 3 and slasher:GetNW2Int("UmbraStage") ~= UMBRA_FIRST_STAGE then
 			stage = UMBRA_FIRST_STAGE
 			SlashCo.AddFog({
 				name = "UmbraStageOne",
@@ -450,7 +471,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			})
 		end
 		-- Check for game progress for Stage 2
-		if SlashCo.CurRound.GameProgress >= 3 and SlashCo.CurRound.GameProgress < 6 and slasher:GetNWInt("UmbraStage") ~= UMBRA_SECOND_STAGE then
+		if SlashCo.CurRound.GameProgress >= 3 and SlashCo.CurRound.GameProgress < 6 and slasher:GetNW2Int("UmbraStage") ~= UMBRA_SECOND_STAGE then
 			stage = UMBRA_SECOND_STAGE
 			SlashCo.AddFog({
 				name = "UmbraStageTwo",
@@ -461,7 +482,7 @@ function SLASHER.OnTickBehaviour(slasher)
 			})
 		end
 		-- Check for game progress for Stage 3
-		if SlashCo.CurRound.GameProgress >= 6 and SlashCo.CurRound.GameProgress < 10 and slasher:GetNWInt("UmbraStage") ~= UMBRA_THIRD_STAGE then
+		if SlashCo.CurRound.GameProgress >= 6 and SlashCo.CurRound.GameProgress < 10 and slasher:GetNW2Int("UmbraStage") ~= UMBRA_THIRD_STAGE then
 			stage = UMBRA_THIRD_STAGE
 			SlashCo.AddFog({
 				name = "UmbraStageThree",
@@ -473,43 +494,25 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if slasher:GetNWBool("UmbraBeastStalk") then
+	if slasher:GetNW2Bool("UmbraBeastStalk") then
 		StopBreathing(slasher)
 		if SlashCo.GetSlasherAnger(slasher) >= 100 then
-			slasher:SetNWBool("CanChase", true)
+			slasher:SetCanChase(true)
 		else
-			slasher:SetNWBool("CanChase", false)
+			slasher:SetCanChase(false)
 		end
 
 		if SlashCo.GetSlasherAnger(slasher) == 0 then
 			SlashCo.StopChase(slasher)
 		end
 
-		slasher:SetSlowWalkSpeed(SLASHER.StalkSpeed)
-		slasher:SetWalkSpeed(SLASHER.StalkSpeed)
-		slasher:SetRunSpeed(SLASHER.StalkSpeed)
-
-		if slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("BeingFlashed") then
-			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeed)
-			slasher:SetRunSpeed(SLASHER.ChaseSpeed)
-		elseif slasher:GetNWBool("InSlasherChaseMode") and slasher:GetNWBool("BeingFlashed") then
-			slasher:SetSlowWalkSpeed(SLASHER.ChaseSpeedFlashed)
-			slasher:SetWalkSpeed(SLASHER.ChaseSpeedFlashed)
-			slasher:SetRunSpeed(SLASHER.ChaseSpeedFlashed)
-		else
-			slasher:SetSlowWalkSpeed(SLASHER.StalkSpeed)
-			slasher:SetWalkSpeed(SLASHER.StalkSpeed)
-			slasher:SetRunSpeed(SLASHER.StalkSpeed)
-		end
-
-		if slasher:GetNWBool("InSlasherChaseMode") and not slasher:GetNWBool("UmbraBeastAlreadyEnraged") then
+		if slasher:GetInSlasherChaseMode() and not slasher:GetNW2Bool("UmbraBeastAlreadyEnraged") then
 			slasher:Freeze(true)
-			slasher:SetNWBool("UmbraBeastEnrage", true)
-			slasher:SetNWBool("UmbraBeastAlreadyEnraged", true)
+			slasher:SetNW2Bool("UmbraBeastEnrage", true)
+			slasher:SetNW2Bool("UmbraBeastAlreadyEnraged", true)
 
 			timer.Simple(1.0, function()
-				slasher:SetNWBool("UmbraBeastEnrage", false)
+				slasher:SetNW2Bool("UmbraBeastEnrage", false)
 			end)
 
 			timer.Simple(1.5, function()
@@ -517,55 +520,42 @@ function SLASHER.OnTickBehaviour(slasher)
 			end)
 		end
 
-		if not slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:SetNWBool("UmbraBeastAlreadyEnraged", false)
+		if not slasher:GetInSlasherChaseMode() then
+			slasher:SetNW2Bool("UmbraBeastAlreadyEnraged", false)
 		end
 
 		slasher:SetViewOffset(stalking_viewoffset)
 		slasher:SetCurrentViewOffset(stalking_viewoffset)
 	else
-		slasher:SetNWBool("CanChase", false)
+		slasher:SetCanChase(false)
 		slasher:SetViewOffset(standing_viewoffset)
 		slasher:SetCurrentViewOffset(standing_viewoffset)
-		if not slasher:GetNWBool("InSlasherChaseMode") then
-			slasher:SetNWBool("UmbraBeastAlreadyEnraged", false)
-			slasher:SetSlowWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetWalkSpeed(SLASHER.ProwlSpeed)
-			slasher:SetRunSpeed(SLASHER.ProwlSpeed)
-		else
-			slasher:SetNWBool("UmbraBeastAlreadyEnraged", false)
-			slasher:SetSlowWalkSpeed(SLASHER.StalkSpeed)
-			slasher:SetWalkSpeed(SLASHER.StalkSpeed)
-			slasher:SetRunSpeed(SLASHER.StalkSpeed)
-		end
+		slasher:SetNW2Bool("UmbraBeastAlreadyEnraged", false)
 	end
 
-	if SlashCooldown > 0 and slasher:GetNWBool("UmbraBeastCanSlash") then
-		slasher:SetNWBool("UmbraBeastCanSlash", false)
+	if SlashCooldown > 0 and slasher:GetNW2Bool("UmbraBeastCanSlash") then
+		slasher:SetNW2Bool("UmbraBeastCanSlash", false)
 	end
 
-	if SlashCooldown <= 0 and not slasher:GetNWBool("UmbraBeastCanSlash") then
-		slasher:SetNWBool("UmbraBeastCanSlash", true)
+	if SlashCooldown <= 0 and not slasher:GetNW2Bool("UmbraBeastCanSlash") then
+		slasher:SetNW2Bool("UmbraBeastCanSlash", true)
 	end
 
-	if ChargeLeapCooldown > 0 and slasher:GetNWBool("UmbraBeastCanChargeLeap") then
-		slasher:SetNWBool("UmbraBeastCanChargeLeap", false)
+	if ChargeLeapCooldown > 0 and slasher:GetNW2Bool("UmbraBeastCanChargeLeap") then
+		slasher:SetNW2Bool("UmbraBeastCanChargeLeap", false)
 	end
 
-	if ChargeLeapCooldown <= 0 and not slasher:GetNWBool("UmbraBeastCanChargeLeap") then
-		slasher:SetNWBool("UmbraBeastCanChargeLeap", true)
+	if ChargeLeapCooldown <= 0 and not slasher:GetNW2Bool("UmbraBeastCanChargeLeap") then
+		slasher:SetNW2Bool("UmbraBeastCanChargeLeap", true)
 	end
 
 	local radius = 500
 	local radiusSqr = radius * radius
-
-	if not slasher:GetNWBool("UmbraBeastStalk") or slasher:GetNWBool("InSlasherChaseMode") then
-
+	if not slasher:GetNW2Bool("UmbraBeastStalk") or slasher:GetInSlasherChaseMode() then
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationDecrease)
 	end
 
 	local SurvivorNear = false
-
 	for _, ply in ipairs(player.GetAll()) do
 		if IsValid(ply)
 			and ply:IsPlayer()
@@ -578,32 +568,32 @@ function SLASHER.OnTickBehaviour(slasher)
 		end
 	end
 
-	if SurvivorNear and not slasher:GetNWBool("InSlasherChaseMode") and slasher:GetNWBool("UmbraBeastStalk") then
+	if SurvivorNear and not slasher:GetInSlasherChaseMode() and slasher:GetNW2Bool("UmbraBeastStalk") then
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationIncrease)
 	else
 		SlashCo.AddSlasherAnger(slasher, SLASHER.AgitationDecrease)
 	end
 
 	local agitation = SlashCo.GetSlasherAnger(slasher)
-	if slasher:GetNWInt("UmbraBeastAgitation") ~= math.floor(agitation) then
-		slasher:SetNWInt("UmbraBeastAgitation", math.floor(agitation))
+	if slasher:GetNW2Int("UmbraBeastAgitation") ~= math.floor(agitation) then
+		slasher:SetNW2Int("UmbraBeastAgitation", math.floor(agitation))
 	end
 
 	if stage == UMBRA_FIRST_STAGE then
-		slasher:SetNWInt("UmbraStage", UMBRA_FIRST_STAGE)
+		slasher:SetNW2Int("UmbraStage", UMBRA_FIRST_STAGE)
 	elseif stage == UMBRA_SECOND_STAGE then
-		slasher:SetNWInt("UmbraStage", UMBRA_SECOND_STAGE)
+		slasher:SetNW2Int("UmbraStage", UMBRA_SECOND_STAGE)
 	elseif stage == UMBRA_THIRD_STAGE then
-		slasher:SetNWInt("UmbraStage", UMBRA_THIRD_STAGE)
+		slasher:SetNW2Int("UmbraStage", UMBRA_THIRD_STAGE)
 	elseif stage == UMBRA_FINAL_STAGE then
-		slasher:SetNWInt("UmbraStage", UMBRA_FINAL_STAGE)
+		slasher:SetNW2Int("UmbraStage", UMBRA_FINAL_STAGE)
 
 	end
 
 	if slasher:Crouching() then
-		slasher:SetNWBool("UmbraBeastCrouching", true)
+		slasher:SetNW2Bool("UmbraBeastCrouching", true)
 	else
-		slasher:SetNWBool("UmbraBeastCrouching", false)
+		slasher:SetNW2Bool("UmbraBeastCrouching", false)
 	end
 
 	slasher:SetEyeSight(eyesight_final)
@@ -616,14 +606,13 @@ function SLASHER.OnTickBehaviour(slasher)
 end
 
 function SLASHER.OnPrimaryFire(slasher, target)
-
-	if slasher:GetNWBool("UmbraBeastSlashing") then return end
-	if slasher:GetNWBool("UmbraBeastStunned") then return end
+	if slasher:GetNW2Bool("UmbraBeastSlashing") then return end
+	if slasher:GetNW2Bool("UmbraBeastStunned") then return end
 	if slasher.Leaping then return end
 	if slasher.LeapHit then return end
 	if slasher.SlashCooldown > 0 then return end
 
-	slasher:SetNWBool("UmbraBeastSlashing", true)
+	slasher:SetNW2Bool("UmbraBeastSlashing", true)
 	slasher.SlashCooldown = 3
 
 	slasher:SlasherHudFunc("ShakeControl", "LMB")
@@ -666,7 +655,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 		SlashCo.BustDoor(slasher, target, 20000)
 
-		slasher:SetNWBool("UmbraBeastSlashing", false)
+		slasher:SetNW2Bool("UmbraBeastSlashing", false)
 
 		if target:IsPlayer() then
 			if target:Team() ~= TEAM_SURVIVOR then return end
@@ -704,7 +693,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 				end
 			end
 			:: FOUND ::
-		if slasher:GetNWBool("UmbraBeastStalk") then
+		if slasher:GetNW2Bool("UmbraBeastStalk") then
 			if IsValid(slashertarget) and slashertarget == slasher then
 				--print("SEEN")
 				isSeen = true
@@ -714,11 +703,11 @@ function SLASHER.OnPrimaryFire(slasher, target)
 			end
 		end
 			if SlashCo.GetSlasherAnger(slasher) >= 70 then
-				slasher:SetNWBool("CanKill", true)
+				slasher:SetCanKill(true)
 				SlashCo.Jumpscare(slasher, target)
-				target:SetNWBool("SurvivorBeingJumpscared", true)
+				target:SetNW2Bool("SurvivorBeingJumpscared", true)
 			else
-				slasher:SetNWBool("CanKill", false)
+				slasher:SetCanKill(false)
 			end
 
 			local vPoint = target:GetPos() + Vector(0, 0, 50)
@@ -745,13 +734,13 @@ hook.Add("Think", "StanLeapCharge", function()
 	for _, slasher in ipairs(team.GetPlayers(TEAM_SLASHER)) do
 		if not IsValid(slasher) then continue end
 		if slasher:GetVelocity():Length() > 100 then continue end
-		if slasher:GetNWBool("UmbraBeastStalk") then continue end
-		if slasher:GetNWString("Slasher") ~= "UmbraBeast" then continue end
+		if slasher:GetNW2Bool("UmbraBeastStalk") then continue end
+		if slasher:GetNW2String("Slasher") ~= "UmbraBeast" then continue end
 
 		if slasher:Crouching() and (slasher.LeapCooldown or 10) <= 0 then
 			if not slasher.LeapChargeStart then
 				slasher.LeapChargeStart = CurTime()
-				slasher:SetNWBool("UmbraBeastCanLeap", false)
+				slasher:SetNW2Bool("UmbraBeastCanLeap", false)
 
 				SlashCo.AudioSystem.PlaySound({
 					soundPath = "slashco/slasher/umbrabeast/stan_leap_charge.ogg",
@@ -764,7 +753,7 @@ hook.Add("Think", "StanLeapCharge", function()
 				})
 			elseif CurTime() - slasher.LeapChargeStart >= 2 then
 				-- 2 seconds passed? You can leap!
-				slasher:SetNWBool("UmbraBeastCanLeap", true)
+				slasher:SetNW2Bool("UmbraBeastCanLeap", true)
 			end
 		else
 			-- The slasher isn't crouching or the leap is on cooldown.
@@ -777,15 +766,45 @@ hook.Add("Think", "UmbraBeastPounce", function()
 	for _, slasher in ipairs(player.GetAll()) do
 		if not slasher.Leaping then continue end
 		if not IsValid(slasher) then continue end
-		if slasher:GetNWString("Slasher") ~= "UmbraBeast" then continue end
+		if slasher:GetNW2String("Slasher") ~= "UmbraBeast" then continue end
 
-		slasher:SetNWBool("UmbraBeastAnimateLeap", true)
+		slasher:SetNW2Bool("UmbraBeastAnimateLeap", true)
+
+		if not slasher:IsOnGround() and slasher.Leaping then
+			slasher.LeapAirTime = slasher.LeapAirTime or CurTime()
+		elseif slasher.LeapAirTime then
+			slasher.LeapAirTime = nil
+			slasher.LeapEndTime = 0
+		end
+
+		if slasher.LeapAirTime == nil then
+			return
+		end
+
+		local AirTime = CurTime() - slasher.LeapAirTime
+
+		if AirTime < 1 then
+			AirTime = 3
+		elseif AirTime < 2 then
+			AirTime = 4
+		elseif AirTime < 3 then
+			AirTime = 5
+		elseif AirTime < 4 then
+			AirTime = 6
+		elseif AirTime < 5 then
+			AirTime = 7
+		elseif AirTime < 6 then
+			AirTime = 9
+		elseif AirTime >= 7 then
+			AirTime = 10
+		end
 
 		-- Pounce timed out OR you touched the ground, no valid pounce for you.
 		if CurTime() >= slasher.LeapEndTime or slasher:IsOnGround() then
+			slasher.LeapAirTime = 0
 			slasher.Leaping = false
 			slasher.LeapHit = false
-			slasher:SetNWBool("UmbraBeastAnimateLeap", false)
+			slasher:SetNW2Bool("UmbraBeastAnimateLeap", false)
 			continue
 		end
 
@@ -793,12 +812,10 @@ hook.Add("Think", "UmbraBeastPounce", function()
 			if not IsValid(survivor) then continue end
 			if not survivor:IsPlayer() then continue end
 			if survivor:Team() ~= TEAM_SURVIVOR then continue end
-			if survivor:GetNWBool("SurvivorPounced") then continue end
-			local vehicle = survivor:GetVehicle()
-			if IsValid(vehicle) and vehicle.IsHelicopterSeat then continue end
+			if survivor:GetNW2Bool("SurvivorPounced") then continue end
 
 			-- Pounced a guy.
-			slasher:SetNWBool("UmbraBeastAnimateLeap", false)
+			slasher:SetNW2Bool("UmbraBeastAnimateLeap", false)
 			slasher.LeapHit = true
 			slasher.Leaping = false
 
@@ -813,7 +830,7 @@ hook.Add("Think", "UmbraBeastPounce", function()
 			-- Stop the slasher from moving once again.
 			slasher:SetVelocity(-slasher:GetVelocity())
 
-			survivor:SetNWBool("SurvivorPounced", true)
+			survivor:SetNW2Bool("SurvivorPounced", true)
 			survivor:Freeze(true)
 			slasher:Freeze(true)
 			slasher.SlashCooldown = 8
@@ -829,8 +846,8 @@ hook.Add("Think", "UmbraBeastPounce", function()
 				fadeIn = 0,
 			})
 
-			if survivor:GetNWBool("SurvivorPounced") then
-				slasher:SetNWBool("UmbraBeastAnimateMauling", true)
+			if survivor:GetNW2Bool("SurvivorPounced") then
+				slasher:SetNW2Bool("UmbraBeastAnimateMauling", true)
 				timer.Create("UmbraBeastPounceDamage", 1, 0, function()
 					survivor:TakeDamage(10, slasher, slasher)
 					survivor:SetVelocity(Vector(0, 0, 0))
@@ -853,31 +870,28 @@ hook.Add("Think", "UmbraBeastPounce", function()
 				end)
 			end
 
-			timer.Simple(6, function()
-				if not IsValid(survivor) then return end
-
-				slasher:SetNWBool("UmbraBeastAnimateMauling", false)
-				survivor:SetNWBool("SurvivorPounced", false)
-				survivor:Freeze(false)
-				slasher:Freeze(false)
-				survivor:SetImpervious(true)
-				slasher:SetImpervious(true)
-				timer.Remove("UmbraBeastPounceDamage")
-				SlashCo.AudioSystem.StopSound("StanMauling", 0.1, slasher)
-
-				if IsValid(slasher) then
-					survivor:SetVelocity(
-						slasher:GetForward() * 500 +
-						Vector(0, 0, 150)
-					)
-
-					slasher.LeapHit = false
-				end
-				timer.Simple(3, function()
-					survivor:SetImpervious(false)
-					slasher:SetImpervious(false)
+				timer.Simple(AirTime, function()
+					if not IsValid(survivor) then return end
+				
+					slasher:SetNW2Bool("UmbraBeastAnimateMauling", false)
+					survivor:SetNW2Bool("SurvivorPounced", false)
+					survivor:Freeze(false)
+					slasher:Freeze(false)
+					survivor:SetImpervious(true)
+					slasher:SetImpervious(true)
+					timer.Remove("UmbraBeastPounceDamage")
+					SlashCo.AudioSystem.StopSound("StanMauling", 0.1, slasher)
+				
+						if IsValid(slasher) then
+							survivor:SetVelocity(slasher:GetForward() * 500 + Vector(0, 0, 150))
+						
+							slasher.LeapHit = false
+						end
+							timer.Simple(3, function()
+								survivor:SetImpervious(false)
+								slasher:SetImpervious(false)
+							end)
 				end)
-			end)
 			break
 		end
 	end
@@ -893,10 +907,10 @@ local function StanLeap(slasher)
 	if CurTime() - slasher.LeapChargeStart < 2 then return end
 
 	slasher.ChargeLeapCooldown = 10
-	slasher:SetNWBool("UmbraBeastAnimateLeapStart", true)
+	slasher:SetNW2Bool("UmbraBeastAnimateLeapStart", true)
 
-	if slasher:GetNWBool("UmbraBeastAnimateLeapStart") then
-		slasher:SetNWBool("UmbraBeastAnimateLeapStart", false)
+	if slasher:GetNW2Bool("UmbraBeastAnimateLeapStart") then
+		slasher:SetNW2Bool("UmbraBeastAnimateLeapStart", false)
 	end
 
 	SlashCo.AudioSystem.PlaySound({
@@ -911,18 +925,19 @@ local function StanLeap(slasher)
 
 	slasher.LeapCooldown = 10
 	slasher.LeapChargeStart = nil
-	slasher:SetNWBool("UmbraBeastCanLeap", false)
+	slasher:SetNW2Bool("UmbraBeastCanLeap", false)
 
 	slasher.Leaping = true
 	slasher.LeapHit = false
-	slasher.LeapEndTime = CurTime() + 5
+	slasher.LeapEndTime = CurTime() + 10
+	slasher.LeapAirTime = CurTime()
 
 	local direction = slasher:GetAimVector()
 	slasher:SetVelocity(direction * 1000 + Vector(0, 0, 150))
 end
 
 function SLASHER.OnSecondaryFire(slasher)
-	if slasher:GetNWBool("UmbraBeastStalk") then
+	if slasher:GetNW2Bool("UmbraBeastStalk") then
 		SlashCo.StartChaseMode(slasher)
 	else
 		StanLeap(slasher)
@@ -931,35 +946,35 @@ end
 
 function SLASHER.OnMainAbilityFire(slasher)
 	-- We need a lot of precautions so we don't break the swapping.
-	if slasher:GetNWBool("UmbraBeastStunned") then return end
-	if slasher:GetNWBool("InSlasherChaseMode") then return end
+	if slasher:GetNW2Bool("UmbraBeastStunned") then return end
+	if slasher:GetInSlasherChaseMode() then return end
 	if slasher.Leaping then return end
 
-	if slasher:GetNWBool("UmbraBeastStalk") then
+	if slasher:GetNW2Bool("UmbraBeastStalk") then
 		StanBreathing(slasher)
-		slasher:SetNWBool("UmbraBeastStalk", false)
+		slasher:SetNW2Bool("UmbraBeastStalk", false)
 		slasher.ChaseActivationCooldown = SLASHER.ChaseCooldown
 		return
 	end
 
-	if slasher:GetNWBool("InSlasherChaseMode") then return end
-	if slasher:GetNWBool("UmbraBeastSlashing") then return end
+	if slasher:GetInSlasherChaseMode() then return end
+	if slasher:GetNW2Bool("UmbraBeastSlashing") then return end
 	if slasher.ChaseActivationCooldown > 0 then return end
 
-	if not slasher:GetNWBool("UmbraBeastStalk") then
-		slasher:SetNWBool("UmbraBeastStalk", true)
+	if not slasher:GetNW2Bool("UmbraBeastStalk") then
+		slasher:SetNW2Bool("UmbraBeastStalk", true)
 	end
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
 	if not IsValid(slasher) then return end
-	if slasher:GetNWBool("UmbraBeastMarkTerritory") then return end
+	if slasher:GetNW2Bool("UmbraBeastMarkTerritory") then return end
 
 	local territoryPos = slasher:GetPos()
 
-	slasher:SetNWBool("UmbraBeastMarkTerritory", true)
+	slasher:SetNW2Bool("UmbraBeastMarkTerritory", true)
 	slasher:SetNWVector("UmbraBeastTerritoryPos", territoryPos)
-	slasher:SetNWInt("UmbraBeastTerritoryRadius", slasher.UmbraBeastTerritoryRadius)
+	slasher:SetNW2Int("UmbraBeastTerritoryRadius", slasher.UmbraBeastTerritoryRadius)
 end
 
 -- This is where we spawn our "territory"
@@ -970,10 +985,10 @@ if CLIENT then
 
 		if not IsValid(slasher) then return end
 		if slasher:Team() ~= TEAM_SLASHER then return end
-		if not slasher:GetNWBool("UmbraBeastMarkTerritory") then return end
+		if not slasher:GetNW2Bool("UmbraBeastMarkTerritory") then return end
 
 		local territoryPos = slasher:GetNWVector("UmbraBeastTerritoryPos")
-		local territoryRadius = slasher:GetNWInt("UmbraBeastTerritoryRadius", slasher.UmbraBeastTerritoryRadius)
+		local territoryRadius = slasher:GetNW2Int("UmbraBeastTerritoryRadius", slasher.UmbraBeastTerritoryRadius)
 
 		render.SetColorMaterial()
 		render.SetBlend(1)
@@ -989,21 +1004,20 @@ if CLIENT then
 end
 
 function SLASHER.Thirdperson(ply)
-	return ply:GetNWBool("UmbraBeastStunned") or ply:GetNWBool("UmbraBeastEnrage")
+	return ply:GetNW2Bool("UmbraBeastStunned") or ply:GetNW2Bool("UmbraBeastEnrage")
 end
 
 function SLASHER.Animator(ply)
-	local chase = ply:GetNWBool("InSlasherChaseMode")
+	local chase = ply:GetInSlasherChaseMode()
 
-	local stan_mainslash = ply:GetNWBool("UmbraBeastSlashing")
-	local stan_stalk = ply:GetNWBool("UmbraBeastStalk")
-	local stan_stun = ply:GetNWBool("UmbraBeastStunned")
-	local stan_leap_start = ply:GetNWBool("UmbraBeastAnimateLeapStart")
-	local stan_leap_loop = ply:GetNWBool("UmbraBeastAnimateLeap")
-	local stan_maul_loop = ply:GetNWBool("UmbraBeastAnimateMauling")
-	local stan_flashed = ply:GetNWBool("BeingFlashed", false)
-	local stan_enrage = ply:GetNWBool("UmbraBeastEnrage")
-	
+	local stan_mainslash = ply:GetNW2Bool("UmbraBeastSlashing")
+	local stan_stalk = ply:GetNW2Bool("UmbraBeastStalk")
+	local stan_stun = ply:GetNW2Bool("UmbraBeastStunned")
+	local stan_leap_start = ply:GetNW2Bool("UmbraBeastAnimateLeapStart")
+	local stan_leap_loop = ply:GetNW2Bool("UmbraBeastAnimateLeap")
+	local stan_maul_loop = ply:GetNW2Bool("UmbraBeastAnimateMauling")
+	local stan_flashed = ply:GetNW2Bool("BeingFlashed", false)
+	local stan_enrage = ply:GetNW2Bool("UmbraBeastEnrage")
 
 	if not stan_stun then
 		ply.anim_antispam = false
@@ -1133,10 +1147,8 @@ function SLASHER.Animator(ply)
 end
 
 function SLASHER.Footstep(ply)
-	if ply:GetNWBool("UmbraBeastStalk") then return true end
+	if ply:GetNW2Bool("UmbraBeastStalk") then return true end
 	if SERVER then
-		local chase = ply:GetNWBool("InSlasherChaseMode")
-
 		local idx = math.random(1, 3)
 		SlashCo.AudioSystem.PlaySound({
 			soundPath = "slashco/slasher/umbrabeast/stan_step" .. idx .. ".ogg",
@@ -1147,6 +1159,7 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
+			excludeSendTo = ply,
 		})
 	end
 
@@ -1166,15 +1179,15 @@ function SLASHER.OnHitByPocketSand(slasher, ply, additionalRage)
 		fadeIn = 0,
 	})
 
-	slasher:SetNWBool("UmbraBeastStunned", true)
+	slasher:SetNW2Bool("UmbraBeastStunned", true)
 	slasher:Freeze(true)
 
-	slasher:SetNWBool("UmbraBeastStalk", false)
+	slasher:SetNW2Bool("UmbraBeastStalk", false)
 
 	timer.Simple(8, function()
 		if not IsValid(slasher) then return end
 
-		slasher:SetNWBool("UmbraBeastStunned", false)
+		slasher:SetNW2Bool("UmbraBeastStunned", false)
 		slasher:Freeze(false)
 	end)
 end
@@ -1202,7 +1215,7 @@ function SLASHER.InitHud(_, hud)
 	hud:TieMeterInt("agitation", "UmbraBeastAgitation")
 
 	hud:AddControl("CTRL", "charge leap", Material("slashco/ui/icons/slasher/umbrabeast_leap"))
-	hud:AddControl("R", "stalk")
+	hud:AddControl("R", "stalk", Material("slashco/ui/icons/slasher/umbrabeast_stalk"))
 	hud:AddControl("F", "mark territory", Material("slashco/ui/icons/slasher/umbrabeast_territory"))
 	hud:TieControlText("R", "UmbraBeastStalk", "prowl", "stalk", true)
 	hud:AddControl("LMB", "slash", controlTable)
@@ -1213,11 +1226,11 @@ function SLASHER.InitHud(_, hud)
 	hud:TieControl("LMB", "UmbraBeastCanSlash")
 
 	function hud.AlsoThink()
-		local stalking = GameData.LocalPlayer:GetNWBool("UmbraBeastStalk")
-		local crouching = GameData.LocalPlayer:GetNWBool("UmbraBeastCrouching")
-		local chasing = GameData.LocalPlayer:GetNWBool("InSlasherChaseMode")
-		local agitation = GameData.LocalPlayer:GetNWInt("UmbraBeastAgitation")
-		local territory = GameData.LocalPlayer:GetNWBool("UmbraBeastMarkTerritory")
+		local stalking = GameData.LocalPlayer:GetNW2Bool("UmbraBeastStalk")
+		local crouching = GameData.LocalPlayer:GetNW2Bool("UmbraBeastCrouching")
+		local chasing = GameData.LocalPlayer:GetInSlasherChaseMode()
+		local agitation = GameData.LocalPlayer:GetNW2Int("UmbraBeastAgitation")
+		local territory = GameData.LocalPlayer:GetNW2Bool("UmbraBeastMarkTerritory")
 
 		if territory then
 			hud:RemoveControl("F")
@@ -1264,9 +1277,9 @@ function SLASHER.InitHud(_, hud)
 	end
 end
 
-
+if CLIENT then
 	hook.Add("SlashCo:DrawHUD", SLASHER.Name .. "_Jumpscare", function()
-		if GameData.LocalPlayer:GetNWBool("SurvivorJumpscare_UmbraBeast") == true then
+		if GameData.LocalPlayer:GetNW2Bool("SurvivorJumpscare_UmbraBeast") == true then
 			if GameData.LocalPlayer.umbra_f == nil then
 				GameData.LocalPlayer.umbra_f = 0
 			end
@@ -1285,5 +1298,6 @@ end
 			GameData.LocalPlayer.umbra_f = nil
 		end
 	end)
+end
 
 SlashCo.RegisterSlasher(SLASHER, "UmbraBeast")
