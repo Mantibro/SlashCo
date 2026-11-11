@@ -15,90 +15,13 @@ ENT.IsSelectable = true
 ENT.PingType = "ORE"
 ENT.PingExpiryTime = 10
 
-function ENT:Initialize()
-	if SERVER then
-		self:SetDontPickup(true)
-		self:SetModel("models/slashco/slashers/dream/ore.mdl")
-		self:SetSkin(1)
-		self:SetSolid(SOLID_VPHYSICS)
-		self:PhysicsInit(SOLID_VPHYSICS)
-		self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-		self:SetMoveType(MOVETYPE_VPHYSICS)
-	end
-
-	local phys = self:GetPhysicsObject()
-
-	if phys:IsValid() then
-		phys:Wake()
-	end
-end
-
-if SERVER then
-	function ENT:Use(activator)
-		if activator:Team() ~= TEAM_SURVIVOR then return end
-		if activator:GetSurvivorMining() then return end
-		if IsValid(self.MiningPlayer) and self.MiningPlayer == TEAM_SURVIVOR then return end
-
-		activator:SetSurvivorMining(true)
-	    activator:Freeze(true)
-	    activator.MiningOre = self
-	    self.MiningPlayer = activator
-
-		SlashCo.AudioSystem.PlaySound({
-			soundPath = "slashco/slasher/speedrunner/speedrunner_mining.mp3",
-			identifier = "SurvivorMining",
-			minDistance = 400,
-			maxDistance = 800,
-			entity = activator,
-			volume = 2,
-			fadeIn = 0,
-		})
-
-		timer.Create("Mining-" .. activator:UserID(), 10, 1, function()
-			if not IsValid(activator) then return end
-
-			activator:SetSurvivorMining(false)
-			activator:Freeze(false)
-			activator:AddEffect("Speed", 10)
-
-			SlashCo.AudioSystem.PlaySound({
-				soundPath = "slashco/slasher/speedrunner/speedrunner_mined.mp3",
-				identifier = "SurvivorMined",
-				minDistance = 400,
-				maxDistance = 800,
-				entity = activator,
-				volume = 2,
-				fadeIn = 0,
-			})
-
-			if not IsValid(self) then return end
-
-			SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
-			self:Remove()
-		end)
-	end
-
-	local function CancelMining(activator)
-		if not activator:GetSurvivorMining() then return end
-
-		timer.Remove("Mining-" .. activator:UserID())
-		activator:Freeze(false)
-		activator:SetSurvivorMining(false)
-
-		if IsValid(activator.MiningOre) then
-			activator.MiningOre.MiningPlayer = nil
-			activator.MiningOre = nil
-		end
-	end
-
-	hook.Add("SlashCo:PlayerDeath", "SlashCo:CancelMining", CancelMining)
-else
+if CLIENT then
 	function ENT:Draw()
-	    local curTime = CurTime()
-	    local tr = self:GetPos()
+		local curTime = CurTime()
+		local tr = self:GetPos()
 		local dlight = DynamicLight(self:EntIndex())
 		if dlight then
-		    dlight.pos = tr
+			dlight.pos = tr
 			dlight.r = 0
 			dlight.g = 255
 			dlight.b = 0
@@ -110,4 +33,79 @@ else
 
 		self:DrawModel()
 	end
+
+	return
 end
+
+function ENT:Initialize()
+	self:SetModel("models/slashco/slashers/dream/ore.mdl")
+	self:SetSkin(1)
+	self:SetSolid(SOLID_VPHYSICS)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
+
+	local phys = self:GetPhysicsObject()
+	if phys:IsValid() then
+		phys:Wake()
+	end
+end
+
+function ENT:Use(activator)
+	if activator:Team() ~= TEAM_SURVIVOR then return end
+	if activator:GetSurvivorMining() then return end
+	if IsValid(self.MiningPlayer) and self.MiningPlayer == TEAM_SURVIVOR then return end
+
+	activator:SetSurvivorMining(true)
+	activator:Freeze(true)
+	activator.MiningOre = self
+	self.MiningPlayer = activator
+
+	SlashCo.AudioSystem.PlaySound({
+		soundPath = "slashco/slasher/speedrunner/speedrunner_mining.mp3",
+		identifier = "SurvivorMining",
+		minDistance = 400,
+		maxDistance = 800,
+		entity = activator,
+		volume = 2,
+		fadeIn = 0,
+	})
+
+	timer.Create("Mining-" .. activator:UserID(), 10, 1, function()
+		if not IsValid(activator) then return end
+
+		activator:SetSurvivorMining(false)
+		activator:Freeze(false)
+		activator:AddEffect("Speed", 10)
+
+		SlashCo.AudioSystem.PlaySound({
+			soundPath = "slashco/slasher/speedrunner/speedrunner_mined.mp3",
+			identifier = "SurvivorMined",
+			minDistance = 400,
+			maxDistance = 800,
+			entity = activator,
+			volume = 2,
+			fadeIn = 0,
+		})
+
+		if not IsValid(self) then return end
+
+		SlashCo.CreateItem("sc_ore", SlashCo.RandomPosLocator(), Angle(0, 0, 0))
+		self:Remove()
+	end)
+end
+
+local function CancelMining(activator)
+	if not activator:GetSurvivorMining() then return end
+
+	timer.Remove("Mining-" .. activator:UserID())
+	activator:Freeze(false)
+	activator:SetSurvivorMining(false)
+
+	if IsValid(activator.MiningOre) then
+		activator.MiningOre.MiningPlayer = nil
+		activator.MiningOre = nil
+	end
+end
+
+hook.Add("SlashCo:PlayerDeath", "SlashCo:CancelMining", CancelMining)

@@ -1,0 +1,6 @@
+"VertexlitGeneric"
+{
+	"$basetexture"		"models\slashco\slashers\cardguy\face"
+	"$nocull"		"1"
+	"$diffuseexp" 		"1"
+}

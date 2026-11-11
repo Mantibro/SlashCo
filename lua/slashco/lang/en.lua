@@ -663,6 +663,15 @@ SlashCo.LangTable["eat hotdog"] = "eat hotdog"
 SlashCo.LangTable["vomit"] = "vomit"
 SlashCo.LangTable["nausea"] = "nausea"
 
+-- CARDGUY
+SlashCo.LangTable["Cardguy"] = "Card Guy"
+SlashCo.LangTable["Cardguy_desc"] = [[A highly unpredictable cryptid whos obsessed with cards.
+
+-Card Guy can swap cards and gain different effects.
+-This slasher its not really fast.
+-Can interact with some items.]]
+SlashCo.LangTable["Cardguy_tip"] = "-Don't keep your guard down."
+
 --misc from maptools
 SlashCo.LangTable["spectators_can_ping"] = "Spectators can now ping for survivors."
 SlashCo.LangTable["unhide"] = "unhide" -- for dolphinman to unhide

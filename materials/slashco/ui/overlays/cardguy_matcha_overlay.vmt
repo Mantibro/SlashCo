@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "slashco/ui/overlays/cardguy_matcha_overlay"
+	"$translucent" 1
+}
+

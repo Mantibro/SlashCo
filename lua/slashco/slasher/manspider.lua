@@ -624,7 +624,6 @@ local vectorAddHigh = Vector(0, 0, 64)
 function SLASHER.Move(ply, mv)
 	if ply:GetNW2Bool("ManspiderClimbing") or ply:GetNW2Bool("ManspiderNested") then
 		ply:SetVelocity(-ply:GetVelocity())
-
 		return true
 	end
 
@@ -702,14 +701,21 @@ function SLASHER.Move(ply, mv)
 	if CLIENT then return end
 
 	-- RaphaelIT7 (ToDo): Go back here later and see if we can get rid of it completely, doesn't seem to be used by anything other? Could be just a bool if needed?
-	local climbEntity = ply:GetNW2Int("ManspiderClimbType")
-	if climbEntity ~= "" then return end
-	
+	--if ply:GetNW2Int("ManspiderClimbType") == CLIMB_TYPE_NONE then return end
+
+	ply:LagCompensation(true)
 	local tr = ManspiderKillCheck(ply, mv)
-	if !tr then return end
+
+	if !tr then
+		ply:LagCompensation(false)
+		return
+	end
 
 	-- RaphaelIT7: tr.Entity will never be nil - it'll be NULL, and we can use IsPlayer on NULL and if it returns true we can also be sure that it's valid-
-	if not tr.Entity:IsPlayer() then return end
+	if not tr.Entity:IsPlayer() then
+		ply:LagCompensation(false)
+		return
+	end
 
 	ply.leap_damage_anti_spam = ply.leap_damage_anti_spam or false
 	if ply.leap_damage_anti_spam then return end
@@ -732,9 +738,10 @@ function SLASHER.Move(ply, mv)
 		maxDistance = 800,
 		entity = victim,
 		volume = 1,
-		fadeIn = 0,
 	})
+
 	ply:SetNW2Int("ManspiderClimbType", CLIMB_TYPE_NONE)
+	ply:LagCompensation(false)
 end
 
 function SLASHER.OnSpecialAbilityFire(slasher)
