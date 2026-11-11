@@ -1,0 +1,47 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/slashco/slashers/stan/mike_facemap"
+	"$bumpmap" "null-bumpmap"
+	
+	"$phong" "1"
+	"$phongexponent" "12.0"
+	"$phongboost" "0.8"
+	"$phongfresnelranges"	"[0.1 0.5 1]"
+	"$basemapalphaphongmask" "1"
+	
+
+"$cloakpassenabled" "1"
+"$cloakfactor" "0.85"
+"$cloakcolortint" "[0 0 0]"
+"$refractamount" "0"
+
+"$nodecal" "1"
+
+Proxies
+{
+"Sine"
+{
+"sineperiod" 2
+"sinemin" "0"
+"sinemax" "0.4"
+"timeoffset" "0"
+"resultVar" "$cloakcolortint[0]"
+}
+"Sine"
+{
+"sineperiod" 2
+"sinemin" "0"
+"sinemax" "0.4"
+"timeoffset" "0"
+"resultVar" "$cloakcolortint[1]"
+}
+"Sine"
+{
+"sineperiod" 2
+"sinemin" "0"
+"sinemax" "0.4"
+"timeoffset" "0"
+"resultVar" "$cloakcolortint[2]"
+}
+}
+}
