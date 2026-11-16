@@ -48,6 +48,7 @@ local UMBRA_STATE_PROWL = 0
 local UMBRA_STATE_STALK = 1
 local UMBRA_STATE_CHASE = 2
 local NextTerritorySound = {}
+local NextFlashedSound = {}
 local TerritoryCheckDelay = 0.5
 local PaintedTargets = {}
 local PaintedItems = {}
@@ -317,8 +318,8 @@ end
 
 local function IsFlashlightOnSlasher(slasher)
 	for _, ply in ipairs(player.GetAll()) do
-		if not IsValid(ply) or not ply:Alive() then return end
-		if not ply:GetNW2Bool("DynamicFlashlight", false) then continue end
+		if not IsValid(ply) or not ply:Alive() then continue end
+		if not ply:GetDynamicFlashlight() then continue end
 
 		local startPos = ply:EyePos()
 		local targetPos = slasher:WorldSpaceCenter()
@@ -368,9 +369,30 @@ local function StartFlashlightDetection(slasher)
 			return
 		end
 
+		local idx = math.random(1, 5)
+
 		local beingFlashed, flasher = IsFlashlightOnSlasher(slasher)
 
 		slasher:SetNW2Bool("BeingFlashed", beingFlashed)
+
+		if slasher:GetNW2Bool("BeingFlashed") then
+			if not NextFlashedSound[slasher] then
+				NextFlashedSound[slasher] = CurTime() + math.Rand(5, 10)
+			end
+
+			if CurTime() >= NextFlashedSound[slasher] then
+				SlashCo.AudioSystem.PlaySound({
+					soundPath = "slashco/slasher/umbrabeast/stan_flashed" .. idx .. ".ogg",
+					identifier = "StanFlashed" .. idx,
+					minDistance = 200,
+					maxDistance = 400,
+					entity = slasher,
+					volume = 1,
+					fadeIn = 0,
+				})
+				NextFlashedSound[slasher] = CurTime() + math.Rand(5, 10)
+			end
+		end
 	end)
 end
 
@@ -778,6 +800,7 @@ hook.Add("Think", "UmbraBeastPounce", function()
 		end
 
 		if slasher.LeapAirTime == nil then
+			slasher:SetNW2Bool("UmbraBeastAnimateLeap", false)
 			return
 		end
 
@@ -1016,7 +1039,7 @@ function SLASHER.Animator(ply)
 	local stan_leap_start = ply:GetNW2Bool("UmbraBeastAnimateLeapStart")
 	local stan_leap_loop = ply:GetNW2Bool("UmbraBeastAnimateLeap")
 	local stan_maul_loop = ply:GetNW2Bool("UmbraBeastAnimateMauling")
-	local stan_flashed = ply:GetNW2Bool("BeingFlashed", false)
+	local stan_flashed = ply:GetNW2Bool("BeingFlashed")
 	local stan_enrage = ply:GetNW2Bool("UmbraBeastEnrage")
 
 	if not stan_stun then
@@ -1159,7 +1182,6 @@ function SLASHER.Footstep(ply)
 			entity = ply,
 			volume = 1,
 			fadeIn = 0,
-			excludeSendTo = ply,
 		})
 	end
 
