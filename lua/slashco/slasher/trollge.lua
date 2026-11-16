@@ -521,6 +521,7 @@ function SLASHER.OnPrimaryFire(slasher, target)
 	if slasher:GetNW2Bool("TrollgeDashing") then return end
 	if slasher:GetNW2Bool("TrollgeDashFinish") then return end
 
+	slasher.ClawCooldown = slasher.ClawCooldown + 0.5
 	slasher:SetNW2Bool("TrollgeSlashing", false)
 	timer.Remove("TrollgeSlashDecay")
 
@@ -600,8 +601,6 @@ function SLASHER.OnPrimaryFire(slasher, target)
 
 			slasher:SetNW2Bool("TrollgeSlashing", false)
 		end)
-
-		slasher.ClawCooldown = slasher.ClawCooldown + 0.5
 	end)
 end
 
